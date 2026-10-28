@@ -1,0 +1,109 @@
+---
+title: Motion
+description: The tokens, recipes, and reduced-motion rules every Cadence component follows.
+---
+
+## Principles
+
+1. **Motion explains cause and effect.** If you cannot say what changed and why, remove it.
+2. **One protagonist at a time.** Do not move, scale, rotate, and recolor the same element at once.
+3. **Duration follows hierarchy.** Small controls are fast, panels are medium, whole sections are slow.
+4. **Interruptible by default.** Closing animations can be reversed by reopening.
+5. **Reduced motion is equivalent.** Drop travel and scale, keep the state change readable.
+
+## Tokens
+
+Durations are seconds, easings are cubic-bezier tuples, springs use Motion's spring options.
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| `duration.instant` | 0.1 | Press, toggle |
+| `duration.fast` | 0.16 | Small exits |
+| `duration.base` | 0.22 | Default |
+| `duration.slow` | 0.32 | Panels, drawers, text |
+| `duration.page` | 0.45 | Full-page reveals |
+| `ease.out` | `[0.22, 1, 0.36, 1]` | Entrances |
+| `ease.inOut` | `[0.65, 0, 0.35, 1]` | Movement on screen |
+| `ease.in` | `[0.7, 0, 0.84, 0]` | Exits |
+| `spring.press` | visualDuration 0.24, bounce 0.12 | Press feedback |
+| `spring.snappy` | visualDuration 0.26, bounce 0 | Popovers, small panels |
+| `spring.smooth` | visualDuration 0.4, bounce 0 | Dialogs, layout |
+| `spring.morph` | visualDuration 0.42, bounce 0 | Shared elements, width changes |
+
+Do not invent new values. If a component needs a different feel, add a recipe to `lib/motion.ts`
+and document it.
+
+## Recipes
+
+A recipe is a named transition. Components call `useCadenceMotion().transition("reveal")` instead of
+writing durations inline.
+
+| Recipe | Used by | Character |
+| --- | --- | --- |
+| `reveal` | fade-in, text-reveal, tabs panel | 0.22s ease-out |
+| `enter.pop` | popovers | snappy spring |
+| `exit.fade` | backdrops, dismissed layers | 0.16s ease-in |
+| `exit.shrink` | closing panels | 0.16s ease-in |
+| `popup.anchored` | dialog panel | smooth spring |
+| `layout.move` | reorder, list shifts | smooth spring |
+| `layout.shared` | tab indicator | morph spring |
+| `list.stagger` | staggered lists | 0.22s + stagger |
+| `gesture.drag` | carousel, sheet | snappy spring |
+| `scroll.progress` | scroll bar | smooth spring |
+| `scroll.story` | scroll narratives (optional GSAP) | 0.32s |
+| `text.reveal` | per-word reveals | 0.32s |
+| `text.split` | per-character reveals (optional GSAP) | 0.32s |
+| `number.roll` | number-flow | snappy spring |
+| `state.morph` | accordion, button width | morph spring |
+| `feedback.press` | buttons | press spring |
+
+## Reduced motion
+
+Three layers, in order of precedence:
+
+1. **System** — `prefers-reduced-motion: reduce` disables transform and layout animations, keeps opacity.
+2. **Provider** — `mode="reduced"` halves travel and shortens timing; `mode="none"` disables animation.
+3. **Subtree** — `data-motion="none"` on any element turns animation off inside it.
+
+Components branch on `useCadenceMotion().reduced`, so a reduced render never depends on CSS alone.
+
+## Writing a component
+
+```tsx
+"use client";
+import { motion } from "motion/react";
+import { useCadenceMotion } from "../lib/provider";
+
+export function Example() {
+  const cm = useCadenceMotion();
+  return (
+    <motion.div
+      initial={cm.reduced ? { opacity: 0 } : { opacity: 0, y: cm.distance.md }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={cm.transition("reveal")}
+      data-motion={cm.mode}
+    />
+  );
+}
+```
+
+Five rules for new components:
+
+1. Import presets from `../lib/motion`; never hard-code a duration.
+2. Animate transform, opacity, or filter only. Height is allowed for disclosures.
+3. Give every animation a reduced branch (opacity only, or none).
+4. Use `data-slot` on each part so consumers can target it with CSS.
+5. Add a Motion contract table to the component's docs.
+
+## Performance budget
+
+| Metric | Budget |
+| --- | --- |
+| Motion runtime | ≈ 43 KB gzip (Motion full); optional LazyMotion path ~30 KB |
+| Per-component JS | ≤ 8 KB gzip |
+| Concurrent animated elements | ≤ 20 |
+| Total stagger | ≤ 400 ms |
+| Animated properties | transform, opacity, filter |
+
+Run `pnpm registry:check` before opening a pull request; it enforces the per-item size budget
+and the reduced-motion branch.

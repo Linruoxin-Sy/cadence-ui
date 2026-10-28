@@ -1,0 +1,74 @@
+---
+title: Theming
+description: Cadence layers motion tokens and an intensity switch on top of the shadcn theme.
+---
+
+## Tokens
+
+Cadence does not ship its own color system. It reads the shadcn semantic tokens:
+
+| Token | Used for |
+| --- | --- |
+| `--background`, `--foreground` | Page and default text |
+| `--muted`, `--muted-foreground` | Quiet surfaces and secondary text |
+| `--border` | Edges and dividers |
+| `--primary`, `--primary-foreground` | Primary actions |
+| `--destructive` | Destructive actions |
+| `--ring` | Focus rings |
+
+Override those variables the same way you would for any shadcn component. Everything in Cadence
+follows, in both themes.
+
+## Motion variables
+
+`cadence-theme` adds a small set of motion variables:
+
+```css
+:root {
+  --motion-distance-sm: 8px;
+  --motion-distance-md: 12px;
+  --motion-intensity: 1;
+}
+```
+
+They exist so plain CSS transitions can follow the same distances as the JS components. The JS
+presets live in `components/cadence/lib/motion.ts` and are the source of truth for durations and
+springs.
+
+## Dark mode
+
+Cadence follows the shadcn convention: a `dark` class on `<html>`. Set it before the page paints:
+
+```html
+<script>
+  const stored = localStorage.getItem("theme");
+  const dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.classList.toggle("dark", dark);
+</script>
+```
+
+## Motion intensity
+
+`CadenceProvider` accepts `mode`:
+
+```tsx
+<CadenceProvider mode="full">…</CadenceProvider>   // default
+<CadenceProvider mode="reduced">…</CadenceProvider> // halved travel, shorter timing
+<CadenceProvider mode="none">…</CadenceProvider>    // no animation
+```
+
+Use `reduced` for dense product surfaces, `none` for screenshots, tests, or users who ask for it.
+The OS setting `prefers-reduced-motion: reduce` always wins over `full`.
+
+## Per-subtree override
+
+The provider renders `data-motion` on a wrapper, and the CSS rules apply to any element with the
+attribute:
+
+```tsx
+<div data-motion="none">
+  <ChartCard />
+</div>
+```
+
+Use this to calm a single dense region without changing the whole app.

@@ -1,0 +1,102 @@
+---
+title: Installation
+description: Add Cadence to a Next.js or Vite project with the shadcn CLI, or copy the source by hand.
+---
+
+## Requirements
+
+- React 19 and TypeScript
+- Tailwind CSS v4 (shadcn's current default)
+- A project initialized with `npx shadcn@latest init` and Base UI as the component library
+- `motion` is installed automatically by the CLI; no other runtime is required
+
+## Next.js
+
+```bash
+npx create-next-app@latest my-app --ts --tailwind --app
+cd my-app
+npx shadcn@latest init -b base-ui
+```
+
+Then register the Cadence registry once in `components.json`:
+
+```json
+{
+  "registries": {
+    "@cadence": "https://cadence.dev/r/{name}.json"
+  }
+}
+```
+
+Install the theme once, then any component:
+
+```bash
+npx shadcn@latest add @cadence/cadence-theme
+npx shadcn@latest add @cadence/morph-button
+```
+
+The CLI writes files into the `cadence/` folder under your components alias
+(`components/cadence/...`, or `src/components/cadence/...` in a `src/` project) and installs
+`motion`, `lucide-react`, or `@base-ui/react` when an item needs them.
+
+## Vite
+
+```bash
+npm create vite@latest my-app -- --template react-ts
+cd my-app
+npx shadcn@latest init -b base-ui
+```
+
+Map the `@/*` alias in both `tsconfig.json` and `vite.config.ts` as shadcn expects, then install
+items the same way. Cadence components do not import `next/*`, so they run unchanged in Vite.
+
+## Wrap the app (recommended)
+
+`CadenceProvider` is optional, but it gives you one place to control motion intensity and to make
+sure `prefers-reduced-motion` is honored everywhere:
+
+```tsx
+// app/layout.tsx or src/main.tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <CadenceProvider mode="full">{children}</CadenceProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+## Manual installation
+
+1. Install the packages: `pnpm add motion lucide-react @base-ui/react clsx tailwind-merge` (or the npm/yarn equivalent).
+2. Copy `lib/motion.ts`, `lib/cn.ts`, and `lib/provider.tsx` from the registry item into
+   `components/cadence/lib/`.
+3. Copy the component folder into `components/cadence/<id>/`.
+4. Copy the `docs` body from `/r/<id>.json` if you want the documentation next to the code.
+
+Every item keeps relative imports (`../lib/motion`), so the folder can be moved as a whole.
+
+## Troubleshooting
+
+### The CLI cannot find `@cadence`
+
+Add the `registries` entry to `components.json`, or install from the full URL:
+`npx shadcn@latest add https://cadence.dev/r/fade-in.json`.
+
+### Styles are missing
+
+Cadence uses the shadcn semantic tokens (`bg-background`, `text-muted-foreground`, `border-border`).
+If you did not initialize shadcn, add those tokens to your CSS first.
+
+### Animations do not play
+
+Check that `motion` is installed and that `prefers-reduced-motion` is not enabled at the OS level.
+Cadence intentionally reduces or disables motion in that case.
+
+### TypeScript cannot resolve `../lib/motion`
+
+You copied a component without its dependencies. Re-run the CLI, or copy the `lib/` folder as well.
