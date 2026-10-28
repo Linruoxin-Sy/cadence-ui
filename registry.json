@@ -1,0 +1,103 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "cadence",
+  "homepage": "https://cadence.dev",
+  "items": [
+    {
+      "name": "cadence-base",
+      "type": "registry:base",
+      "title": "Cadence base",
+      "description": "Pins a Cadence project to Base UI, lucide icons, and the neutral shadcn theme.",
+      "style": "base-ui",
+      "iconLibrary": "lucide",
+      "baseColor": "neutral",
+      "theme": "neutral"
+    },
+    {
+      "name": "cadence-motion",
+      "type": "registry:lib",
+      "title": "Motion presets",
+      "description": "Durations, easings, springs, and recipe resolution shared by every Cadence component.",
+      "categories": ["foundation"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/motion.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/motion.ts"
+        }
+      ]
+    },
+    {
+      "name": "cadence-utils",
+      "type": "registry:lib",
+      "title": "Utilities",
+      "description": "The cn() helper every Cadence component uses to merge Tailwind classes.",
+      "categories": ["foundation"],
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/cn.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/cn.ts"
+        }
+      ]
+    },
+    {
+      "name": "cadence-provider",
+      "type": "registry:lib",
+      "title": "Provider",
+      "description": "Optional provider that wires prefers-reduced-motion, motion intensity, and shared defaults into one MotionConfig.",
+      "categories": ["foundation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["cadence-motion", "cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/provider.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/provider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "cadence-theme",
+      "type": "registry:theme",
+      "title": "Cadence theme",
+      "description": "Motion CSS variables and intensity rules layered on top of the shadcn theme.",
+      "categories": ["foundation"],
+      "cssVars": {
+        "theme": {
+          "--ease-cadence-out": "cubic-bezier(0.22, 1, 0.36, 1)",
+          "--ease-cadence-in-out": "cubic-bezier(0.65, 0, 0.35, 1)"
+        },
+        "light": {
+          "--motion-distance-sm": "8px",
+          "--motion-distance-md": "12px",
+          "--motion-intensity": "1"
+        },
+        "dark": {
+          "--motion-distance-sm": "8px",
+          "--motion-distance-md": "12px",
+          "--motion-intensity": "1"
+        }
+      },
+      "css": {
+        "@layer base": {
+          "[data-motion='reduced']": {
+            "--motion-distance-sm": "4px",
+            "--motion-distance-md": "6px"
+          },
+          "[data-motion='none']": {
+            "--motion-distance-sm": "0px",
+            "--motion-distance-md": "0px"
+          },
+          "@media (prefers-reduced-motion: reduce)": {
+            ":root": {
+              "--motion-distance-sm": "0px",
+              "--motion-distance-md": "0px"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
