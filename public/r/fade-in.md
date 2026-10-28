@@ -1,0 +1,114 @@
+# Fade in
+
+> Reveal content on scroll with a short rise and a reduced-motion fallback.
+
+- Registry item: /r/fade-in.json
+- Install: `npx shadcn@latest add @cadence/fade-in`
+- Type: registry:ui
+- Since: 0.1.0
+- Motion recipes: reveal
+
+## When to use
+
+- Section intros, cards, and empty states that should arrive when they enter the viewport.
+- Anywhere you want one consistent entrance instead of hand-writing `whileInView` per element.
+- Marketing pages where a short rise adds reading rhythm without delaying content.
+
+## When not to use
+
+- Content that is already visible on first paint and must not move (use no animation).
+- Long lists where every row would animate at once; use a stagger container instead.
+- Replacing layout or routing transitions; this only animates its own children.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/fade-in
+```
+
+This pulls in `cadence-motion`, `cadence-utils`, and `cadence-provider` automatically.
+
+## Usage
+
+```tsx
+import { FadeIn } from "@/components/cadence/fade-in/fade-in";
+
+export function Feature() {
+  return (
+    <FadeIn distance={16} delay={0.05}>
+      <h2>Everything you need to ship</h2>
+    </FadeIn>
+  );
+}
+```
+
+## Examples
+
+### Stagger a row of cards
+
+```tsx
+<div className="grid gap-4 md:grid-cols-3">
+  {features.map((feature, index) => (
+    <FadeIn key={feature.title} delay={index * 0.06}>
+      <Card {...feature} />
+    </FadeIn>
+  ))}
+</div>
+```
+
+### Replay on every entry
+
+```tsx
+<FadeIn once={false} distance={24}>
+  <Quote />
+</FadeIn>
+```
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `delay` | `number` | `0` | Stagger offset in seconds. Ignored when motion is reduced. |
+| `distance` | `number` | `12` | Pixels travelled while fading in. |
+| `once` | `boolean` | `true` | Reveal once, or replay on every viewport entry. |
+| `className` | `string` | – | Merged with the wrapper classes. |
+| `children` | `ReactNode` | – | Content to reveal. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | `opacity 0 → 1`, `translateY distance → 0` | `reveal` (0.22s, ease-out) | n/a (one-shot) |
+| reduced | `opacity` only, 0.16s | `reveal` short | n/a |
+| none | end state immediately | – | n/a |
+
+## Keyboard interactions
+
+No keyboard behaviour of its own. Focus order and semantics are unchanged.
+
+## Accessibility
+
+- Never hides content permanently: opacity reaches `1` and the element stays in the DOM.
+- The wrapper is a `div`; pass `as`-style semantics by nesting the correct element, or use your own wrapper.
+- Respects `prefers-reduced-motion`; with reduce enabled only opacity animates.
+
+## Responsive behavior
+
+Distance is in pixels, not viewport units, so the motion stays subtle on mobile. Use a larger
+`distance` only for full-width hero blocks.
+
+## Performance
+
+- Animates `opacity` and `transform` only, on the compositor.
+- One `IntersectionObserver` per instance, no scroll listeners.
+- Prefer `once` for long pages so observers disconnect after the first reveal.
+
+## Notes for AI
+
+- Default entrance for a single block. For lists, keep the stagger on the parent and use small values (≤ 0.06s per item).
+- Do not wrap above-the-fold hero text that must be readable before hydration.
+- If the design already animates the parent, nest `FadeIn` only for the child that needs its own timing.
+
+---
+
+Full index: /llms.txt

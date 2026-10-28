@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fade-in",
+  "title": "Fade in",
+  "description": "Reveal content on scroll with a short rise and a reduced-motion fallback.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "cadence-motion",
+    "cadence-utils",
+    "cadence-provider"
+  ],
+  "files": [
+    {
+      "path": "registry/cadence/fade-in/fade-in.tsx",
+      "content": "\"use client\";\n\nimport { motion } from \"motion/react\";\nimport type { ReactNode } from \"react\";\nimport { cn } from \"../lib/cn\";\nimport { distance as scaleDistance } from \"../lib/motion\";\nimport { useCadenceMotion } from \"../lib/provider\";\n\nexport interface FadeInProps\n  extends Omit<\n    React.ComponentPropsWithoutRef<\"div\">,\n    \"children\" | \"onAnimationStart\" | \"onDrag\" | \"onDragEnd\" | \"onDragStart\"\n  > {\n  /** Stagger offset in seconds. Ignored when motion is reduced or off. */\n  delay?: number;\n  /** Distance in px the content travels while fading in. */\n  distance?: number;\n  /** Replay the reveal every time the element re-enters the viewport. */\n  once?: boolean;\n  children: ReactNode;\n}\n\n/**\n * Reveals its children once, when they scroll into view.\n *\n * Motion contract:\n * - enter: opacity 0 → 1, y `distance` → 0, `reveal` token (0.22s, ease.out)\n * - reduced: opacity only, `fast` duration, no offset\n * - none: end state immediately\n *\n * a11y: purely visual; it never changes the semantic element or hides content\n * from assistive technology.\n */\nexport function FadeIn({\n  delay = 0,\n  distance = scaleDistance.md,\n  once = true,\n  className,\n  children,\n  ...props\n}: FadeInProps) {\n  const cm = useCadenceMotion();\n  const hidden = cm.reduced ? { opacity: 0 } : { opacity: 0, y: distance };\n\n  return (\n    <motion.div\n      data-slot=\"fade-in\"\n      data-motion={cm.mode}\n      className={cn(\"will-change-[opacity,transform]\", className)}\n      initial={hidden}\n      whileInView={{ opacity: 1, y: 0 }}\n      viewport={{ once, margin: \"-10% 0px\" }}\n      transition={cm.transition(\"reveal\", { delay })}\n      {...props}\n    >\n      {children}\n    </motion.div>\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "@components/cadence/fade-in/fade-in.tsx"
+    }
+  ],
+  "meta": {
+    "since": "0.1.0",
+    "motion": [
+      "reveal"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "sourceSha": "dev"
+  },
+  "docs": "## When to use\n\n- Section intros, cards, and empty states that should arrive when they enter the viewport.\n- Anywhere you want one consistent entrance instead of hand-writing `whileInView` per element.\n- Marketing pages where a short rise adds reading rhythm without delaying content.\n\n## When not to use\n\n- Content that is already visible on first paint and must not move (use no animation).\n- Long lists where every row would animate at once; use a stagger container instead.\n- Replacing layout or routing transitions; this only animates its own children.\n\n## Installation\n\n```bash\nnpx shadcn@latest add @cadence/fade-in\n```\n\nThis pulls in `cadence-motion`, `cadence-utils`, and `cadence-provider` automatically.\n\n## Usage\n\n```tsx\nimport { FadeIn } from \"@/components/cadence/fade-in/fade-in\";\n\nexport function Feature() {\n  return (\n    <FadeIn distance={16} delay={0.05}>\n      <h2>Everything you need to ship</h2>\n    </FadeIn>\n  );\n}\n```\n\n## Examples\n\n### Stagger a row of cards\n\n```tsx\n<div className=\"grid gap-4 md:grid-cols-3\">\n  {features.map((feature, index) => (\n    <FadeIn key={feature.title} delay={index * 0.06}>\n      <Card {...feature} />\n    </FadeIn>\n  ))}\n</div>\n```\n\n### Replay on every entry\n\n```tsx\n<FadeIn once={false} distance={24}>\n  <Quote />\n</FadeIn>\n```\n\n## API\n\n| Prop | Type | Default | Description |\n| --- | --- | --- | --- |\n| `delay` | `number` | `0` | Stagger offset in seconds. Ignored when motion is reduced. |\n| `distance` | `number` | `12` | Pixels travelled while fading in. |\n| `once` | `boolean` | `true` | Reveal once, or replay on every viewport entry. |\n| `className` | `string` | – | Merged with the wrapper classes. |\n| `children` | `ReactNode` | – | Content to reveal. |\n\n## Motion contract\n\n| Phase | Properties | Token | Interruptible |\n| --- | --- | --- | --- |\n| enter | `opacity 0 → 1`, `translateY distance → 0` | `reveal` (0.22s, ease-out) | n/a (one-shot) |\n| reduced | `opacity` only, 0.16s | `reveal` short | n/a |\n| none | end state immediately | – | n/a |\n\n## Keyboard interactions\n\nNo keyboard behaviour of its own. Focus order and semantics are unchanged.\n\n## Accessibility\n\n- Never hides content permanently: opacity reaches `1` and the element stays in the DOM.\n- The wrapper is a `div`; pass `as`-style semantics by nesting the correct element, or use your own wrapper.\n- Respects `prefers-reduced-motion`; with reduce enabled only opacity animates.\n\n## Responsive behavior\n\nDistance is in pixels, not viewport units, so the motion stays subtle on mobile. Use a larger\n`distance` only for full-width hero blocks.\n\n## Performance\n\n- Animates `opacity` and `transform` only, on the compositor.\n- One `IntersectionObserver` per instance, no scroll listeners.\n- Prefer `once` for long pages so observers disconnect after the first reveal.\n\n## Notes for AI\n\n- Default entrance for a single block. For lists, keep the stagger on the parent and use small values (≤ 0.06s per item).\n- Do not wrap above-the-fold hero text that must be readable before hydration.\n- If the design already animates the parent, nest `FadeIn` only for the child that needs its own timing.",
+  "categories": [
+    "text",
+    "motion"
+  ],
+  "type": "registry:ui"
+}

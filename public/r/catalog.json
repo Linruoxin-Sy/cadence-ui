@@ -1,0 +1,297 @@
+[
+  {
+    "name": "cadence-base",
+    "type": "registry:base",
+    "title": "Cadence base",
+    "description": "Pins a Cadence project to Base UI, lucide icons, and the neutral shadcn theme.",
+    "categories": [],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/cadence-base.md",
+    "item": "/r/cadence-base.json"
+  },
+  {
+    "name": "cadence-motion",
+    "type": "registry:lib",
+    "title": "Motion presets",
+    "description": "Durations, easings, springs, and recipe resolution shared by every Cadence component.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/cadence-motion.md",
+    "item": "/r/cadence-motion.json"
+  },
+  {
+    "name": "cadence-utils",
+    "type": "registry:lib",
+    "title": "Utilities",
+    "description": "The cn() helper every Cadence component uses to merge Tailwind classes.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [],
+    "docs": "/r/cadence-utils.md",
+    "item": "/r/cadence-utils.json"
+  },
+  {
+    "name": "cadence-provider",
+    "type": "registry:lib",
+    "title": "Provider",
+    "description": "Optional provider that wires prefers-reduced-motion, motion intensity, and shared defaults into one MotionConfig.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils"
+    ],
+    "docs": "/r/cadence-provider.md",
+    "item": "/r/cadence-provider.json"
+  },
+  {
+    "name": "cadence-theme",
+    "type": "registry:theme",
+    "title": "Cadence theme",
+    "description": "Motion CSS variables and intensity rules layered on top of the shadcn theme.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/cadence-theme.md",
+    "item": "/r/cadence-theme.json"
+  },
+  {
+    "name": "fade-in",
+    "type": "registry:ui",
+    "title": "Fade in",
+    "description": "Reveal content on scroll with a short rise and a reduced-motion fallback.",
+    "categories": [
+      "text",
+      "motion"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "reveal"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "sourceSha": "dev",
+    "docs": "/r/fade-in.md",
+    "item": "/r/fade-in.json"
+  },
+  {
+    "name": "text-reveal",
+    "type": "registry:ui",
+    "title": "Text reveal",
+    "description": "Reveal a heading or paragraph word by word, with a single accessible sentence.",
+    "categories": [
+      "text",
+      "motion"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "text.reveal",
+      "reveal"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "sourceSha": "dev",
+    "docs": "/r/text-reveal.md",
+    "item": "/r/text-reveal.json"
+  },
+  {
+    "name": "number-flow",
+    "type": "registry:ui",
+    "title": "Number flow",
+    "description": "A number that rolls from its previous value to the next, with a static accessible value.",
+    "categories": [
+      "feedback",
+      "motion"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "number.roll"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "sourceSha": "dev",
+    "docs": "/r/number-flow.md",
+    "item": "/r/number-flow.json"
+  },
+  {
+    "name": "morph-button",
+    "type": "registry:ui",
+    "title": "Morph button",
+    "description": "A button whose label and width morph between idle, loading, success, and error.",
+    "categories": [
+      "feedback",
+      "motion"
+    ],
+    "dependencies": [
+      "motion",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "state.morph",
+      "feedback.press"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "sourceSha": "dev",
+    "docs": "/r/morph-button.md",
+    "item": "/r/morph-button.json"
+  },
+  {
+    "name": "animated-tabs",
+    "type": "registry:ui",
+    "title": "Animated tabs",
+    "description": "Tabs with a shared-element indicator and an animated panel swap.",
+    "categories": [
+      "navigation",
+      "motion"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "layout.shared",
+      "reveal"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "sourceSha": "dev",
+    "docs": "/r/animated-tabs.md",
+    "item": "/r/animated-tabs.json"
+  },
+  {
+    "name": "motion-accordion",
+    "type": "registry:ui",
+    "title": "Motion accordion",
+    "description": "An accordion whose panels spring open and closed, with a rotating chevron.",
+    "categories": [
+      "navigation",
+      "motion"
+    ],
+    "dependencies": [
+      "motion",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "state.morph"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "sourceSha": "dev",
+    "docs": "/r/motion-accordion.md",
+    "item": "/r/motion-accordion.json"
+  },
+  {
+    "name": "scroll-progress",
+    "type": "registry:ui",
+    "title": "Scroll progress",
+    "description": "A reading-progress bar that follows the page scroll on a spring.",
+    "categories": [
+      "scroll",
+      "motion"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "scroll.progress"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "sourceSha": "dev",
+    "docs": "/r/scroll-progress.md",
+    "item": "/r/scroll-progress.json"
+  },
+  {
+    "name": "motion-dialog",
+    "type": "registry:ui",
+    "title": "Motion dialog",
+    "description": "A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit.",
+    "categories": [
+      "overlay",
+      "motion"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "cadence-motion",
+      "cadence-utils",
+      "cadence-provider"
+    ],
+    "since": "0.1.0",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "sourceSha": "dev",
+    "docs": "/r/motion-dialog.md",
+    "item": "/r/motion-dialog.json"
+  }
+]

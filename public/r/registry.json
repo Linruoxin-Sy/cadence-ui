@@ -1,0 +1,211 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "cadence",
+  "homepage": "https://cadence.dev",
+  "items": [
+    {
+      "name": "cadence-base",
+      "type": "registry:base",
+      "title": "Cadence base",
+      "description": "Pins a Cadence project to Base UI, lucide icons, and the neutral shadcn theme.",
+      "categories": [],
+      "meta": {}
+    },
+    {
+      "name": "cadence-motion",
+      "type": "registry:lib",
+      "title": "Motion presets",
+      "description": "Durations, easings, springs, and recipe resolution shared by every Cadence component.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
+      "name": "cadence-utils",
+      "type": "registry:lib",
+      "title": "Utilities",
+      "description": "The cn() helper every Cadence component uses to merge Tailwind classes.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
+      "name": "cadence-provider",
+      "type": "registry:lib",
+      "title": "Provider",
+      "description": "Optional provider that wires prefers-reduced-motion, motion intensity, and shared defaults into one MotionConfig.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
+      "name": "cadence-theme",
+      "type": "registry:theme",
+      "title": "Cadence theme",
+      "description": "Motion CSS variables and intensity rules layered on top of the shadcn theme.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
+      "name": "fade-in",
+      "type": "registry:ui",
+      "title": "Fade in",
+      "description": "Reveal content on scroll with a short rise and a reduced-motion fallback.",
+      "categories": [
+        "text",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "reveal"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "text-reveal",
+      "type": "registry:ui",
+      "title": "Text reveal",
+      "description": "Reveal a heading or paragraph word by word, with a single accessible sentence.",
+      "categories": [
+        "text",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "text.reveal",
+          "reveal"
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "number-flow",
+      "type": "registry:ui",
+      "title": "Number flow",
+      "description": "A number that rolls from its previous value to the next, with a static accessible value.",
+      "categories": [
+        "feedback",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "number.roll"
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "morph-button",
+      "type": "registry:ui",
+      "title": "Morph button",
+      "description": "A button whose label and width morph between idle, loading, success, and error.",
+      "categories": [
+        "feedback",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "state.morph",
+          "feedback.press"
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "animated-tabs",
+      "type": "registry:ui",
+      "title": "Animated tabs",
+      "description": "Tabs with a shared-element indicator and an animated panel swap.",
+      "categories": [
+        "navigation",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "layout.shared",
+          "reveal"
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "motion-accordion",
+      "type": "registry:ui",
+      "title": "Motion accordion",
+      "description": "An accordion whose panels spring open and closed, with a rotating chevron.",
+      "categories": [
+        "navigation",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "state.morph"
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "scroll-progress",
+      "type": "registry:ui",
+      "title": "Scroll progress",
+      "description": "A reading-progress bar that follows the page scroll on a spring.",
+      "categories": [
+        "scroll",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "scroll.progress"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "sourceSha": "dev"
+      }
+    },
+    {
+      "name": "motion-dialog",
+      "type": "registry:ui",
+      "title": "Motion dialog",
+      "description": "A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit.",
+      "categories": [
+        "overlay",
+        "motion"
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": [
+          "popup.anchored",
+          "exit.fade"
+        ],
+        "intensity": "medium",
+        "complexity": "L",
+        "sourceSha": "dev"
+      }
+    }
+  ]
+}

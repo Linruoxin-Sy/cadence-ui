@@ -1,0 +1,38 @@
+# Cadence UI
+
+> Animation-first React components for shadcn. Base UI + Tailwind CSS v4 + Motion.
+> Install with `npx shadcn@latest add @cadence/<id>`. Every component ships its motion contract and a reduced-motion branch.
+
+## Install
+
+```json
+{ "registries": { "@cadence": "https://cadence.dev/r/{name}.json" } }
+```
+
+```bash
+npx shadcn@latest add @cadence/fade-in
+```
+
+## Rules for agents
+
+- Prefer an existing Cadence component over writing new animation code.
+- Read the item's `docs` and `meta.motion` before changing motion.
+- Keep the reduced-motion branch; never remove `data-motion`.
+- Use presets from `components/cadence/lib/motion.ts`; do not invent durations.
+
+## Components
+
+- [Fade in](/r/fade-in.md): Reveal content on scroll with a short rise and a reduced-motion fallback. (text, motion)
+- [Text reveal](/r/text-reveal.md): Reveal a heading or paragraph word by word, with a single accessible sentence. (text, motion)
+- [Number flow](/r/number-flow.md): A number that rolls from its previous value to the next, with a static accessible value. (feedback, motion)
+- [Morph button](/r/morph-button.md): A button whose label and width morph between idle, loading, success, and error. (feedback, motion)
+- [Animated tabs](/r/animated-tabs.md): Tabs with a shared-element indicator and an animated panel swap. (navigation, motion)
+- [Motion accordion](/r/motion-accordion.md): An accordion whose panels spring open and closed, with a rotating chevron. (navigation, motion)
+- [Scroll progress](/r/scroll-progress.md): A reading-progress bar that follows the page scroll on a spring. (scroll, motion)
+- [Motion dialog](/r/motion-dialog.md): A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit. (overlay, motion)
+
+## Docs
+
+- [/r/registry.json](/r/registry.json): install index
+- [/r/catalog.json](/r/catalog.json): machine-readable catalog
+- [/llms-full.txt](/llms-full.txt): every component doc inline

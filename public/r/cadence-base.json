@@ -1,0 +1,7 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cadence-base",
+  "title": "Cadence base",
+  "description": "Pins a Cadence project to Base UI, lucide icons, and the neutral shadcn theme.",
+  "type": "registry:base"
+}

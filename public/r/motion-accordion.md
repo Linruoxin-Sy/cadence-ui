@@ -1,0 +1,100 @@
+# Motion accordion
+
+> An accordion whose panels spring open and closed, with a rotating chevron.
+
+- Registry item: /r/motion-accordion.json
+- Install: `npx shadcn@latest add @cadence/motion-accordion`
+- Type: registry:ui
+- Since: 0.1.0
+- Motion recipes: state.morph
+
+## When to use
+
+- FAQ sections and settings groups where one answer is open at a time.
+- Long forms split into optional sections.
+- Any disclosure where the height change should feel physical rather than instant.
+
+## When not to use
+
+- Primary navigation (use a menu).
+- Content that must always be visible for SEO-critical copy; render it open by default.
+- Nested accordions more than two levels deep; the height animation compounds.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/motion-accordion
+```
+
+## Usage
+
+```tsx
+import { MotionAccordion } from "@/components/cadence/motion-accordion/motion-accordion";
+
+export function Faq() {
+  return (
+    <MotionAccordion
+      defaultValue="billing"
+      items={[
+        { value: "billing", trigger: "How does billing work?", content: "We bill monthly." },
+        { value: "cancel", trigger: "Can I cancel?", content: "Any time, from settings." },
+      ]}
+    />
+  );
+}
+```
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `AccordionItem[]` | – | `value`, `trigger`, `content`. |
+| `type` | `"single" \| "multiple"` | `"single"` | One open panel, or any number. |
+| `value` / `defaultValue` | `string \| string[]` | – | Controlled / initial open values. |
+| `onValueChange` | `(value: string \| string[]) => void` | – | Called with a string in single mode. |
+| `collapsible` | `boolean` | `true` | Allow closing the open panel in single mode. |
+| `className` | `string` | – | Merged onto the root. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| open | `height 0 → auto`, content `opacity`/`translateY 4px` | `state.morph` (0.42s spring) | yes |
+| close | reverse of open | `state.morph` | yes |
+| chevron | `rotate 0 → 180°` | `state.morph` on open, `exit.fade` on close | yes |
+| reduced | height snaps, content fades | `state.morph` short | yes |
+| none | instant | – | – |
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Enter / Space | Toggles the focused trigger. |
+| Tab | Moves through triggers and open panel content. |
+
+## Accessibility
+
+- Triggers are native buttons with `aria-expanded` and `aria-controls`.
+- Open panels are `role="region"` labelled by their trigger, and are removed from the DOM when closed.
+- Chevron is decorative (`aria-hidden`); the expanded state is conveyed by `aria-expanded`.
+
+## Responsive behavior
+
+Height animates to `auto`, so content of any length works. On very long panels the spring can feel
+slow; reduce content or switch `type="multiple"` and keep one open.
+
+## Performance
+
+- Animating `height` triggers layout on each frame. Keep panels under ~600px tall.
+- Content is mounted only while open, so collapsed sections cost nothing.
+
+## Notes for AI
+
+- Use `type="multiple"` only when sections are independent.
+- Do not put another accordion inside a panel unless you disable height animation; nested height
+  springs beat against each other.
+- Keep trigger labels as plain text; the whole button is the hit target.
+
+---
+
+Full index: /llms.txt

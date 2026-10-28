@@ -1,0 +1,44 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cadence-theme",
+  "title": "Cadence theme",
+  "description": "Motion CSS variables and intensity rules layered on top of the shadcn theme.",
+  "cssVars": {
+    "theme": {
+      "--ease-cadence-out": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "--ease-cadence-in-out": "cubic-bezier(0.65, 0, 0.35, 1)"
+    },
+    "light": {
+      "--motion-distance-sm": "8px",
+      "--motion-distance-md": "12px",
+      "--motion-intensity": "1"
+    },
+    "dark": {
+      "--motion-distance-sm": "8px",
+      "--motion-distance-md": "12px",
+      "--motion-intensity": "1"
+    }
+  },
+  "css": {
+    "@layer base": {
+      "[data-motion='reduced']": {
+        "--motion-distance-sm": "4px",
+        "--motion-distance-md": "6px"
+      },
+      "[data-motion='none']": {
+        "--motion-distance-sm": "0px",
+        "--motion-distance-md": "0px"
+      },
+      "@media (prefers-reduced-motion: reduce)": {
+        ":root": {
+          "--motion-distance-sm": "0px",
+          "--motion-distance-md": "0px"
+        }
+      }
+    }
+  },
+  "categories": [
+    "foundation"
+  ],
+  "type": "registry:theme"
+}
