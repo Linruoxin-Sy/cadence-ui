@@ -142,6 +142,28 @@
         "intensity": "medium",
         "complexity": "M"
       }
+    },
+    {
+      "name": "number-flow",
+      "type": "registry:ui",
+      "title": "Number flow",
+      "description": "A number that rolls from its previous value to the next, with a static accessible value.",
+      "categories": ["feedback", "motion"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/number-flow/number-flow.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/number-flow/number-flow.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["number.roll"],
+        "intensity": "medium",
+        "complexity": "M"
+      }
     }
   ]
 }
