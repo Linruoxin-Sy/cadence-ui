@@ -186,6 +186,28 @@
         "intensity": "medium",
         "complexity": "M"
       }
+    },
+    {
+      "name": "animated-tabs",
+      "type": "registry:ui",
+      "title": "Animated tabs",
+      "description": "Tabs with a shared-element indicator and an animated panel swap.",
+      "categories": ["navigation", "motion"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/animated-tabs/animated-tabs.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/animated-tabs/animated-tabs.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["layout.shared", "reveal"],
+        "intensity": "medium",
+        "complexity": "M"
+      }
     }
   ]
 }
