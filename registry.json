@@ -252,6 +252,28 @@
         "intensity": "subtle",
         "complexity": "S"
       }
+    },
+    {
+      "name": "motion-dialog",
+      "type": "registry:ui",
+      "title": "Motion dialog",
+      "description": "A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit.",
+      "categories": ["overlay", "motion"],
+      "dependencies": ["@base-ui/react", "motion", "lucide-react"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/motion-dialog/motion-dialog.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/motion-dialog/motion-dialog.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "L"
+      }
     }
   ]
 }
