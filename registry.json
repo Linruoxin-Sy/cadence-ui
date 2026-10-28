@@ -98,6 +98,28 @@
           }
         }
       }
+    },
+    {
+      "name": "fade-in",
+      "type": "registry:ui",
+      "title": "Fade in",
+      "description": "Reveal content on scroll with a short rise and a reduced-motion fallback.",
+      "categories": ["text", "motion"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/fade-in/fade-in.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/fade-in/fade-in.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["reveal"],
+        "intensity": "subtle",
+        "complexity": "S"
+      }
     }
   ]
 }
