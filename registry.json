@@ -208,6 +208,28 @@
         "intensity": "medium",
         "complexity": "M"
       }
+    },
+    {
+      "name": "motion-accordion",
+      "type": "registry:ui",
+      "title": "Motion accordion",
+      "description": "An accordion whose panels spring open and closed, with a rotating chevron.",
+      "categories": ["navigation", "motion"],
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/motion-accordion/motion-accordion.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/motion-accordion/motion-accordion.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["state.morph"],
+        "intensity": "medium",
+        "complexity": "M"
+      }
     }
   ]
 }
