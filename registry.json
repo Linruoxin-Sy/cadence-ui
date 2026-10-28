@@ -230,6 +230,28 @@
         "intensity": "medium",
         "complexity": "M"
       }
+    },
+    {
+      "name": "scroll-progress",
+      "type": "registry:ui",
+      "title": "Scroll progress",
+      "description": "A reading-progress bar that follows the page scroll on a spring.",
+      "categories": ["scroll", "motion"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/scroll-progress/scroll-progress.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/scroll-progress/scroll-progress.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["scroll.progress"],
+        "intensity": "subtle",
+        "complexity": "S"
+      }
     }
   ]
 }

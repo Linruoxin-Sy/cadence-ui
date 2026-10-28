@@ -1,0 +1,95 @@
+---
+title: Scroll progress
+description: A reading-progress bar that follows the page scroll on a spring.
+category: scroll
+motion: [scroll.progress]
+intensity: subtle
+complexity: S
+since: 0.1.0
+deps: [motion]
+registryDeps: [cadence-motion, cadence-utils, cadence-provider]
+---
+
+## When to use
+
+- Long-form articles, documentation pages, and changelogs.
+- Any page where "how much is left" helps orientation.
+- As a global indicator mounted once in the root layout.
+
+## When not to use
+
+- Short pages that fit in one viewport; the bar never moves.
+- App shells with their own scroll containers (the hook tracks the window by default).
+- As a substitute for a table of contents or section navigation.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/scroll-progress
+```
+
+## Usage
+
+```tsx
+import { ScrollProgress } from "@/components/cadence/scroll-progress/scroll-progress";
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <ScrollProgress />
+      {children}
+    </>
+  );
+}
+```
+
+## Examples
+
+### Bottom-aligned, thicker bar
+
+```tsx
+<ScrollProgress position="bottom" height={3} className="bg-primary" />
+```
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `height` | `number` | `2` | Bar thickness in px. |
+| `position` | `"top" \| "bottom"` | `"top"` | Viewport edge to pin to. |
+| `className` | `string` | – | Merged onto the bar; use it to change the color. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| scroll | `scaleX` follows `scrollYProgress` with a spring | `scroll.progress` (0.4s spring) | yes (continuous) |
+| reduced | raw progress, no spring | – | – |
+| none | raw progress | – | – |
+
+## Keyboard interactions
+
+None. The bar is decorative and not focusable.
+
+## Accessibility
+
+- `aria-hidden="true"`: the progress is visual only and adds no noise for screen readers.
+- Hidden in print styles.
+- `pointer-events-none`: it never blocks clicks near the viewport edge.
+
+## Responsive behavior
+
+Full viewport width, fixed position. On mobile browsers with a dynamic toolbar the bar stays pinned
+because it uses `fixed` rather than absolute positioning.
+
+## Performance
+
+- One `scrollYProgress` listener; the transform is compositor-only.
+- The spring adds a frame loop only while scrolling.
+
+## Notes for AI
+
+- Mount once, at the layout level, not per page.
+- For a scroll container other than the window, pass a custom `useScroll` target in your own wrapper;
+  this component intentionally stays window-scoped and dependency-free.
+- Do not use it as a loading indicator.
