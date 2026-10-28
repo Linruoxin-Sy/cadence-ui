@@ -164,6 +164,28 @@
         "intensity": "medium",
         "complexity": "M"
       }
+    },
+    {
+      "name": "morph-button",
+      "type": "registry:ui",
+      "title": "Morph button",
+      "description": "A button whose label and width morph between idle, loading, success, and error.",
+      "categories": ["feedback", "motion"],
+      "dependencies": ["motion", "lucide-react"],
+      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/morph-button/morph-button.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/morph-button/morph-button.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.1.0",
+        "motion": ["state.morph", "feedback.press"],
+        "intensity": "medium",
+        "complexity": "M"
+      }
     }
   ]
 }
