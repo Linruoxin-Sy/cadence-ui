@@ -266,6 +266,11 @@ Motion tokens (--motion-duration-* / --motion-ease-* / --motion-distance-*)
 Exposed through Tailwind @theme (--ease-cadence-*, --animate-*)
 ```
 
+The site's brand gradient (`--brand-from` → `--brand-to`, the pastel pair hard-coded in `app/globals.css`)
+is not part of this stack. It is site chrome, used only for the wordmark in the header: it ships in no
+registry item, the semantic tokens stay neutral, and component previews never pick it up — an installed
+component has to look like the shadcn project it landed in, not like Cadence.
+
 ### 7.2 Installing the theme
 
 `cadence-theme` injects via the registry's `cssVars` (theme/light/dark), so users never hand-edit CSS:
