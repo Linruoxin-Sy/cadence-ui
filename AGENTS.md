@@ -37,11 +37,45 @@ These follow from the documents above; the documents are authoritative if they d
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
 - **Keep the reduced branch.** Every animated component must keep `useCadenceMotion().reduced` and `data-motion`; `data-motion="none"` must fully disable motion.
 - **Animate `transform`, `opacity`, or `filter` only.** No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
+- **Audit the animation before calling a component done.** After writing or editing a component, run the [motion conformance check](#motion-conformance-check): the declared recipes, the implementation, and the docs must agree, and all three modes must be proven. `registry:check` only proves that a reduced branch exists, not that it conforms.
 - **Base UI `render`, not `asChild`.** Use `data-slot` on every part and merge classes with `cn()` (user classes last).
 - **UI only, no validation (P11).** Never import `zod`, `react-hook-form`, `@hookform/resolvers`, `yup`, `valibot`, `joi`, or `superstruct`; never add `schema` / `resolver` / `validate` props. Render invalid state from `aria-invalid` / `data-invalid` only. `registry:check` enforces this.
 - **Match upstream.** Exports and `data-slot` values are copied from shadcn; additions are allowed, renames and removals are not (`meta.upstream` records the pinned style).
 - **Intra-registry dependencies are namespaced.** Use `@cadence/<id>` in `registryDependencies`; a bare name resolves against the default shadcn registry and installs the wrong file.
 - **Docs are data.** `content/components/<id>.mdx` frontmatter must match `registry.json` (title, description, deps, registryDeps, motion, intensity, complexity, since, tier); the build fails when docs or metadata are missing.
+
+## Motion conformance check
+
+Rendering is not the finish line. After writing or editing a component, audit the animation against
+[docs/animation-system.md](docs/animation-system.md) (§3 recipes, §6 modes, §7 budgets, §11 review) before
+`pnpm check`, and fix the source — or the scheme — before opening the PR.
+
+1. **Declared = implemented = documented.** The recipe names in `registry.json` (`meta.motion`), in the
+   `motion:` frontmatter of `content/components/<id>.mdx`, in that file's Motion contract table, and in the
+   source (`cm.transition("<recipe>")`, or the CSS `data-starting-style` / `data-ending-style` transitions of a
+   CSS-only popup) must be the same set. A declared-but-unused recipe, or an animated transition with no
+   recipe behind it, is a defect.
+2. **Tokens only.** No literal duration, easing tuple, distance, scale, or spring values under
+   `registry/cadence/**` outside `lib/motion.ts` itself. Motion-driven parts use `cm.transition()`,
+   `cm.distance`, `cm.spring`; CSS-only popups use token-backed `duration-*` and `ease-cadence-out` /
+   `ease-cadence-in-out`.
+3. **Three modes, three behaviours.** `full` plays the recipe; `reduced` keeps opacity and drops
+   transform/scale/layout; `none` resolves to zero duration (`duration-0`, `{ duration: 0 }`, or no transition
+   at all). Mapping `none` onto the `reduced` branch is a failure, not a shortcut.
+4. **The branch is in the tree.** Every animated part has `data-motion={cm.mode}` and reads
+   `useCadenceMotion().reduced`; the reduced path is a JSX/class branch, not a media query alone. Under `none`
+   no motion property (transform/opacity/filter) keeps a non-zero transition.
+5. **Properties stay in budget.** Motion touches only `transform`, `opacity`, `filter`. Colour, border, and
+   shadow transitions are allowed as state feedback, never as motion, and never through `transition: all` or a
+   `setTimeout`.
+6. **Tests prove the modes.** `tests/components/<id>.test.tsx` asserts the `data-motion` value for each mode and
+   that the reduced (and `none`) render drops the transform. `registry:check` only proves a reduced branch
+   exists; it does not prove any of the above.
+
+This applies to a new component and to any component you touch — do not copy an existing component's
+deviation. If a check fails, fix the component. If the scheme itself is wrong, edit
+[docs/animation-system.md](docs/animation-system.md) first and call the deviation out in the PR. Source and
+scheme must never disagree silently.
 
 ## Commands
 
@@ -70,5 +104,6 @@ the check compares payloads against source and fails on stale artifacts.
 4. Write `content/components/<id>.mdx` with matching frontmatter: compact (9 sections) for T0–T1,
    standard (12 sections) for T2+; input components also get a "Validation and data ownership" section.
 5. Add `components/site/previews/<id>.tsx` and register it in `components/site/previews/index.tsx`.
-6. Add `tests/components/<id>.test.tsx`: render, `data-slot`, keyboard path, reduced branch.
-7. Rebuild payloads, run `pnpm check`, and paste dual-theme screenshots in the PR.
+6. Add `tests/components/<id>.test.tsx`: render, `data-slot`, keyboard path, `reduced` and `none` modes.
+7. Run the [motion conformance check](#motion-conformance-check) above and fix every failed item.
+8. Rebuild payloads, run `pnpm check`, and paste dual-theme screenshots in the PR.

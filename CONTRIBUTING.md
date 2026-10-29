@@ -46,10 +46,13 @@ A pull request is ready when the component has:
    (9 sections) for T0–T1, standard (12) for T2+, plus a motion contract table.
 4. **UI only**: no validation imports and no `schema` / `resolver` / `validate` props. Invalid state
    comes from `aria-invalid` / `data-invalid`. See [validation](content/docs/validation.mdx).
-5. **A reduced branch** driven by `useCadenceMotion().reduced` and `data-motion`.
+5. **Motion conformance**: the recipes declared in `meta.motion`, the MDX frontmatter, and the Motion contract
+   table match what the source actually runs. `full` plays the recipe, `reduced` keeps opacity and drops
+   transform/scale/layout, `none` is instant, and the branch is driven by `useCadenceMotion().reduced` plus
+   `data-motion`. Run the [motion conformance check](AGENTS.md#motion-conformance-check) before the PR.
 6. **Accessibility**: roles, keyboard, focus, and a screen-reader story.
-7. **Tests** in `tests/components/<id>.test.tsx` covering the API, the slot, the keyboard path, and
-   the reduced branch.
+7. **Tests** in `tests/components/<id>.test.tsx` covering the API, the slot, the keyboard path, the `reduced`
+   branch, and the `none` mode.
 8. **A preview** in `components/site/previews/<id>.tsx`, registered in `previews/index.tsx`.
 
 Then run:
@@ -59,7 +62,8 @@ pnpm registry:build && pnpm check
 ```
 
 which runs typecheck, Biome (lint, formatting, and import order), the registry checks (targets, payload
-freshness, docs, export names, tier budgets, P11), and the unit tests.
+freshness, docs, export names, tier budgets, P11), and the unit tests. `registry:check` does not verify the
+motion contract, so the conformance check above is a review step, not an optional one.
 
 ## Style
 
