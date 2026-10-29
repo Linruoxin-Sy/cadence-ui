@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -388,7 +388,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -425,7 +425,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "09ca2ff",
+    "sourceSha": "022eb56",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   }

@@ -8,19 +8,6 @@
 - Since: 0.2.0
 - Motion recipes: feedback.press
 
-## When to use
-
-- The primary action of a form, dialog, or toolbar.
-- A single, clearly labelled command: save, delete, invite.
-- Anywhere the user expects a physical press response.
-
-## When not to use
-
-- Navigation between routes; use a link styled with `buttonVariants`.
-- Toggling a persistent state; use `toggle` or `switch`.
-- Submitting a long-running job that needs its own progress surface; pair the button with a
-  spinner and a `disabled` state, or use `toast` for the result.
-
 ## Installation
 
 ```bash
@@ -37,19 +24,81 @@ export function Save() {
 }
 ```
 
-## Examples
+## Variants
 
-### Variants
+`variant` sets the visual weight. There are six, and the default one is the primary action of
+the surface it sits on; reach for a different weight only when the hierarchy asks for it.
+
+| Variant | Use it for |
+| --- | --- |
+| `default` | The one primary action on the surface. |
+| `secondary` | A supporting action next to the primary one. |
+| `outline` | A neutral action that should not compete for attention. |
+| `ghost` | Toolbar and icon-row actions, where the surface carries the shape. |
+| `destructive` | An action that removes or overwrites data. |
+| `link` | An in-flow action that reads as text. |
 
 ```tsx
+<Button>Save changes</Button>
+<Button variant="secondary">Preview</Button>
 <Button variant="outline">Cancel</Button>
+<Button variant="ghost">Skip</Button>
 <Button variant="destructive">Delete project</Button>
-<Button variant="ghost" size="icon-sm" aria-label="Open settings">
+<Button variant="link">Read the changelog</Button>
+```
+
+## Sizes
+
+`size` sets the height and padding. Four text sizes cover dense toolbars through page-level
+calls to action; four square sizes cover icon-only buttons.
+
+| Size | Height | Use it for |
+| --- | --- | --- |
+| `xs` | 24px | Dense toolbars and table rows. |
+| `sm` | 32px | Secondary actions in compact layouts. |
+| `default` | 36px | Most buttons. |
+| `lg` | 40px | Page-level calls to action. |
+| `icon-xs` | 24px | Icon only, dense. |
+| `icon-sm` | 32px | Icon only, compact. |
+| `icon` | 36px | Icon only, default. |
+| `icon-lg` | 40px | Icon only, prominent. |
+
+```tsx
+<Button size="xs">Extra small</Button>
+<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+
+<Button size="icon-xs" variant="ghost" aria-label="More">
+  <MoreHorizontal />
+</Button>
+<Button size="icon-sm" variant="outline" aria-label="Search">
+  <Search />
+</Button>
+<Button size="icon" variant="outline" aria-label="Add item">
+  <Plus />
+</Button>
+<Button size="icon-lg" aria-label="Open settings">
   <Settings />
 </Button>
 ```
 
-### Links
+Icon-only buttons always need an `aria-label`: the glyph is not a name.
+
+## When to use
+
+- The primary action of a form, dialog, or toolbar.
+- A single, clearly labelled command: save, delete, invite.
+- Anywhere the user expects a physical press response.
+
+## When not to use
+
+- Navigation between routes; use a link styled with `buttonVariants`.
+- Toggling a persistent state; use `toggle` or `switch`.
+- Submitting a long-running job that needs its own progress surface; pair the button with a
+  spinner and a `disabled` state, or use `toast` for the result.
+
+## Links
 
 For navigation, keep the link and take the styles: this preserves link semantics and
 middle-click.
@@ -63,7 +112,7 @@ import { buttonVariants } from "@/components/cadence/button/button";
 </Link>;
 ```
 
-### Composition
+## Composition
 
 `render` replaces the underlying element; use it for custom button components, not for links.
 
