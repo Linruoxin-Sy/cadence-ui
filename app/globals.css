@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./typeset.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -119,6 +120,33 @@
     --motion-distance-sm: 0px;
     --motion-distance-md: 0px;
   }
+}
+
+/* Documentation typeset.
+   shadcn/typeset (app/typeset.css, a verbatim copy) styles every element inside a
+   `.typeset` container. This repo does not own a second set of element rules: the
+   preset below only sets the documented controls, and everything else (heading
+   sizes, list indents, the gap under a heading, the space around a rule) derives
+   from them. */
+.typeset-docs {
+  /* Colors and radius come from the app theme. `@theme inline` does not emit
+     `--color-*` custom properties, so the aliases typeset reads are wired here. */
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-ring: var(--ring);
+
+  /* Fonts: the site has no `--font-heading` / `--font-mono` theme tokens. */
+  --typeset-font-heading: inherit;
+  --typeset-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Rhythm: three controls. */
+  --typeset-size: 15px;
+  --typeset-leading: 1.7;
+  --typeset-flow: 1.5em;
 }
 
 /* Documentation prose. Kept intentionally small: components are the product. */

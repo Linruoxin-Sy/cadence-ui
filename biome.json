@@ -10,6 +10,7 @@
       "!**/public/r",
       "!**/public/llms.txt",
       "!**/public/llms-full.txt",
+      "!app/typeset.css",
       "!**/upstream/manifest.json",
       "!**/*.mdx",
       "!next-env.d.ts",
