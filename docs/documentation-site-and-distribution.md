@@ -75,6 +75,25 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 
+### 2.3 Body typography
+
+The MDX body is styled by [shadcn/typeset](https://ui.shadcn.com/docs/typeset), not by a typography layer of
+ours. `app/typeset.css` is a verbatim copy of the upstream file (imported right after Tailwind in
+`app/globals.css` and excluded from Biome so it stays diffable against upstream); `Mdx` wraps the rendered
+markdown in `typeset typeset-docs`, and `.typeset-docs` in `app/globals.css` only sets the documented
+controls — three rhythm values, the font families, and the `--color-*` aliases, because `@theme inline` does
+not emit those custom properties.
+
+| Rule                                                                          | Why                                                                       |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Style a markdown element in `app/typeset.css`, never in a preset or a page.   | The element rules come from upstream; a local rule forks the system.      |
+| A preset sets `--typeset-size` / `--typeset-leading` / `--typeset-flow` only. | Everything else (heading scale, list indents, margins) derives from them. |
+| Re-vendor the file wholesale when upstream changes; do not patch it.          | A patched copy means the next update is a merge, not a copy.              |
+
+Tables keep typeset's "wrap to fit" behaviour and get a plain `overflow-x-auto` wrapper from the renderer;
+`typeset-scroll` is not used because it sets `width: max-content`, which would stop the props table from
+wrapping on desktop.
+
 ---
 
 ## 3. Data flow: one MDX drives every output
