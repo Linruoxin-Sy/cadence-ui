@@ -43,6 +43,7 @@ function NavLink({ href, title, active }: { href: string; title: string; active:
 
 function Groups({ groups, guides, pathname }: SidebarProps & { pathname: string }) {
   const total = groups.reduce((count, group) => count + group.components.length, 0);
+  const onIndex = pathname === "/components";
 
   return (
     <div className="space-y-7">
@@ -63,9 +64,22 @@ function Groups({ groups, guides, pathname }: SidebarProps & { pathname: string 
       </div>
 
       <div>
+        {/*
+         * The label is the link to the index, so the index has one place to be "current"
+         * instead of a trailing link that duplicates the heading above it.
+         */}
         <div className="flex items-baseline justify-between px-2">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Components</p>
-          <span className="text-[11px] text-muted-foreground">{total}</span>
+          <Link
+            href="/components"
+            aria-current={onIndex ? "page" : undefined}
+            className={cn(
+              "text-[11px] font-medium uppercase tracking-[0.14em] transition-colors",
+              onIndex ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Components
+          </Link>
+          <span className={cn("text-[11px]", onIndex ? "text-foreground" : "text-muted-foreground")}>{total}</span>
         </div>
         {/*
          * Second level: one block per parity batch (docs/parity-plan.md §7). The batch is
@@ -92,16 +106,6 @@ function Groups({ groups, guides, pathname }: SidebarProps & { pathname: string 
             </nav>
           ))}
         </div>
-        <Link
-          href="/components"
-          aria-current={pathname === "/components" ? "page" : undefined}
-          className={cn(
-            "mt-3 block px-2 text-[12px] underline underline-offset-4",
-            pathname === "/components" ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          All components
-        </Link>
       </div>
     </div>
   );
