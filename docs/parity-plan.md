@@ -145,6 +145,7 @@ upstream/manifest.json        # pinned upstream API surface
 "meta": {
   "since": "0.2.0",
   "tier": "T2",
+  "batch": "B4",
   "motion": ["popup.anchored", "exit.fade"],
   "intensity": "medium",
   "complexity": "L",
@@ -185,7 +186,7 @@ and `data.transition`. Both must land in [animation-system.md](animation-system.
 
 1. Source at `registry/cadence/<id>/<id>.tsx`, relative imports only, `data-slot` on every part.
 2. Exports and props match upstream (parity check), additive props documented.
-3. Registry item with `meta.tier`, `motion`, `intensity`, `complexity`, `upstream`.
+3. Registry item with `meta.tier`, `meta.batch`, `motion`, `intensity`, `complexity`, `upstream`.
 4. MDX: compact (9 sections) for T0–T1, standard (12) for T2+, including the motion contract and,
    for input components, the "Validation and data ownership" section.
 5. Preview module at `components/site/previews/<id>.tsx`.
@@ -196,6 +197,12 @@ and `data.transition`. Both must land in [animation-system.md](animation-system.
 
 Ordering is by dependency: atoms → structure → form controls → overlays → menus → disclosure →
 heavy data → compositions → AI.
+
+Each item records its batch in `meta.batch` (`B1`–`B9`), so the batch table below is the single
+source for both the build order and the documentation sidebar: the site groups components one level
+deep by batch and drops batches that have not shipped yet, which means a new component appears under
+the right heading as soon as its registry item declares one. `registry:check` requires the field, and
+`scripts/new-item.mjs --batch` writes it.
 
 | Batch | Theme                      | Items  | Depends on | Person-days | Version | Status  |
 | ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |

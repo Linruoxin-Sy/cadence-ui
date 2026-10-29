@@ -98,10 +98,10 @@ the check compares payloads against source and fails on stale artifacts.
 
 ## Adding a component
 
-1. Scaffold it: `node scripts/new-item.mjs --name tooltip --tier T2 --title "Tooltip" --description "…"`.
+1. Scaffold it: `node scripts/new-item.mjs --name tooltip --tier T2 --batch B4 --title "Tooltip" --description "…"`.
 2. Put the source in `registry/cadence/<id>/<id>.tsx` (relative imports only, `data-slot` on every part).
 3. Keep the item in `registry.json` with `files[].target` of `@components/cadence/<id>/<id>.tsx`, plus
-   `meta.tier`, `meta.motion`, `meta.intensity`, `meta.complexity`, and `meta.upstream`.
+   `meta.tier`, `meta.batch`, `meta.motion`, `meta.intensity`, `meta.complexity`, and `meta.upstream`.
 4. Write `content/components/<id>.mdx` with matching frontmatter: compact (9 sections) for T0–T1,
    standard (12 sections) for T2+; input components also get a "Validation and data ownership" section.
 5. Add `components/site/previews/<id>.tsx` and register it in `components/site/previews/index.tsx`.

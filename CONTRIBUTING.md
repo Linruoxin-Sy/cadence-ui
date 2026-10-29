@@ -39,7 +39,8 @@ A pull request is ready when the component has:
 
 1. **Source** in `registry/cadence/<id>/<id>.tsx`, relative imports only (`../lib/motion`), `data-slot`
    on every part, and the same exports and props as shadcn.
-2. **Registry metadata**: `meta.tier`, `meta.motion`, `meta.intensity`, `meta.complexity`, and
+2. **Registry metadata**: `meta.tier`, `meta.batch` (the parity batch from
+   [the plan](docs/parity-plan.md#7-batches)), `meta.motion`, `meta.intensity`, `meta.complexity`, and
    `meta.upstream`. Intra-registry dependencies are namespaced (`@cadence/button`).
 3. **Docs** in `content/components/<id>.mdx` with frontmatter that matches `registry.json`
    (title, description, deps, registryDeps, motion, intensity, complexity, since, tier). Compact

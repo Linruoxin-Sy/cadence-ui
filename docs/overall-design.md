@@ -239,6 +239,7 @@ We ship a `cadence-base` (`registry:base`) item that pins the consumer's shadcn 
 | `type`            | components `registry:ui`; pure utilities `registry:lib`; composed blocks `registry:block`; theme `registry:theme`; base `registry:base` |
 | `categories`      | fixed enum: `text`, `feedback`, `navigation`, `overlay`, `gesture`, `collection`, `scroll`, `theme`                                     |
 | `meta.motion`     | array of recipe names (see the Animation system doc), used for docs filtering and "motion search"                                       |
+| `meta.batch`      | `B1`–`B9`, the parity batch that shipped the component; the docs sidebar nests items by it                                              |
 | `meta.intensity`  | `subtle` / `medium` / `expressive`, used for the intensity filter                                                                       |
 | `meta.complexity` | `S` / `M` / `L`, used for contributor estimates                                                                                         |
 | `meta.since`      | first released version, injected automatically                                                                                          |
