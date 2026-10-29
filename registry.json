@@ -120,7 +120,11 @@
         "motion": ["feedback.press"],
         "intensity": "subtle",
         "complexity": "S",
-        "upstream": { "registry": "shadcn", "style": "base-ui", "version": "2026-10" }
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
       }
     },
     {
@@ -149,7 +153,11 @@
         "motion": ["popup.anchored", "exit.fade"],
         "intensity": "medium",
         "complexity": "L",
-        "upstream": { "registry": "shadcn", "style": "base-ui", "version": "2026-10" }
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
       }
     }
   ]
