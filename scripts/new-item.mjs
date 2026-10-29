@@ -8,7 +8,7 @@
  *   a matching item in registry.json
  *
  * Usage:
- *   node scripts/new-item.mjs --name tooltip --tier T2 --title "Tooltip" \
+ *   node scripts/new-item.mjs --name tooltip --tier T2 --batch B4 --title "Tooltip" \
  *     --description "A short label shown on hover or focus." [--category overlay] \
  *     [--motion popup.anchored] [--intensity subtle] [--complexity M] [--since 0.3.0]
  */
@@ -30,6 +30,7 @@ const title = flag(
   id ? id.replace(/(^|-)([a-z])/g, (_, dash, letter) => `${dash ? " " : ""}${letter.toUpperCase()}`) : undefined,
 );
 const description = flag("description");
+const batch = flag("batch");
 const category = flag("category", "layout");
 const motion = (flag("motion", "") || "")
   .split(",")
@@ -50,6 +51,7 @@ if (!id || !/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(id)) fail("--name must be kebab
 if (!title) fail("--title is required");
 if (!description) fail("--description is required (it must match registry.json exactly)");
 if (!TIERS.has(tier)) fail(`--tier must be one of ${[...TIERS].join(", ")}`);
+if (!/^B[1-9]$/.test(batch ?? "")) fail("--batch is required (B1–B9, see docs/parity-plan.md §7)");
 if (motion.length === 0 && tier !== "T0") fail("non-T0 components need --motion <recipe>[,<recipe>]");
 
 const pascal = id
@@ -234,6 +236,7 @@ registry.items.push({
   meta: {
     since,
     tier,
+    batch,
     motion,
     intensity,
     complexity,

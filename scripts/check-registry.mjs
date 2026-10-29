@@ -3,7 +3,7 @@
  *
  *   - every file listed in registry.json exists and has the canonical target
  *   - every item has a fresh payload with embedded content and docs
- *   - UI and block items declare `meta.tier`, `meta.upstream`, `meta.motion`, `meta.intensity`
+ *   - UI and block items declare `meta.tier`, `meta.batch`, `meta.upstream`, `meta.motion`, `meta.intensity`
  *   - the tier decides the gzip budget (T0 4 KB … T4 14 KB), unless `meta.budget` overrides it
  *   - no component imports a validation library or an alias, and every animated file has a reduced branch
  *   - intra-registry dependencies are namespaced (`@cadence/<id>`) and exist
@@ -68,6 +68,10 @@ for (const item of registry.items) {
         problems.push(`${item.name}: non-T0 components need at least one recipe in meta.motion`);
       }
       if (!item.meta?.intensity) problems.push(`${item.name}: missing meta.intensity`);
+    }
+    // The sidebar groups components by batch, so a missing batch hides it from navigation.
+    if (!/^B[1-9]$/.test(item.meta?.batch ?? "")) {
+      problems.push(`${item.name}: meta.batch must be a batch id (B1–B9) from docs/parity-plan.md §7`);
     }
     if (item.meta?.upstream?.registry !== "shadcn") {
       problems.push(`${item.name}: meta.upstream.registry must be "shadcn"`);
