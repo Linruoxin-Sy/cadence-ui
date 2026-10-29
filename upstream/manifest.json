@@ -107,6 +107,25 @@
         "aspect-ratio"
       ]
     },
+    "avatar": {
+      "path": "apps/v4/registry/bases/base/ui/avatar.tsx",
+      "exports": [
+        "Avatar",
+        "AvatarBadge",
+        "AvatarFallback",
+        "AvatarGroup",
+        "AvatarGroupCount",
+        "AvatarImage"
+      ],
+      "slots": [
+        "avatar",
+        "avatar-badge",
+        "avatar-fallback",
+        "avatar-group",
+        "avatar-group-count",
+        "avatar-image"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [
