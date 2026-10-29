@@ -1,6 +1,6 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0 complete (2026-10-29); B1 next.** This document is the build record for the "parity"
+> Status: **B0 and B1 complete (2026-10-29); B2 next.** This document is the build record for the "parity"
 > effort: replace the eight original motion components with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
 > every new component must satisfy. Architecture details remain in [overall-design.md](overall-design.md);
@@ -200,8 +200,8 @@ heavy data → compositions → AI.
 | Batch | Theme                      | Items  | Depends on | Person-days | Version | Status  |
 | ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |
 | B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | next    |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | planned |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | next    |
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | planned |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | planned |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
@@ -258,6 +258,38 @@ green, and a real `shadcn add` install was verified (see §5.1).
 Every batch must pass: `pnpm check`, `parity:check`, manual `data-motion` full/reduced/none,
 axe with zero violations, size budget, and dual-theme screenshots.
 
+### 7.1 B1 verification (2026-10-29)
+
+- **Scope shipped:** `badge`, `kbd`, `separator`, `label`, `input`, `textarea`, `card`, `aspect-ratio`,
+  `avatar`, `skeleton`, joining the `button` pilot. 12 components, 17 registry items, 12 docs, 12 previews.
+- **Tooling:** `scripts/sync-upstream.mjs` pins shadcn's `base` (Base UI) source at a commit —
+  `96da9cc` for this batch, `2026-10` — and `scripts/parity.mjs` compares exports and `data-slot`
+  values against the committed `upstream/manifest.json`, so `parity:check` runs offline and is part of
+  `pnpm check`. Additive exports and slots are reported, never failed (P8).
+- **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, tier
+  budgets, P11), `parity:check`, 41 tests across 12 files. Every component page renders 200 from the dev
+  server; `--card-spacing`, `aspect-ratio: var(--ratio)`, `animate-pulse` and `animate-none` are present
+  in the compiled CSS, and the skeleton page serves `data-motion="full"` and `"none"` branches.
+- **Deviations recorded, not silent:**
+  - **T0 atoms carry no motion runtime.** Nine of the eleven have no animation, so they do not import
+    `useCadenceMotion`, do not set `data-motion`, and depend only on `@cadence/cadence-utils`. The
+    `data-motion` rule in overall-design §8.3 applies to _animated_ components; adding a provider
+    dependency to a `separator` would be a runtime cost with nothing to switch off.
+  - **`skeleton` is the one T4 atom** and uses the new `data.transition` recipe in its **continuous**
+    form: CSS `animate-pulse`, gated to `animate-none` under `data-motion="none"`, kept under `reduced`
+    because it is opacity-only. Recipe added to [animation-system.md](animation-system.md) §3 + §3.2 and
+    to `lib/motion.ts` before use, as §6.3 requires.
+  - **`separator` gains an additive `decorative` prop** (Base UI has no equivalent). It sets
+    `role="none"` and `aria-hidden` for markup migrated from the Radix style.
+  - **`card` gains upstream's `size` prop** and a single `--card-spacing` custom property, so `sm` tightens
+    every part without a `group` variant per child.
+  - **Visual classes follow `new-york-v4`, API follows `base`.** shadcn's Base UI sources use `cn-*` theme
+    classes that only exist in its own style sheets; shipping them would make a Cadence component depend on
+    a theme file the consumer does not have. Exports, props, and `data-slot` values come from `base`; the
+    Tailwind utilities come from `new-york-v4`.
+- **Not yet done:** dual-theme screenshots. The headless browser in this environment could not write
+  screenshots, so the visual half of the batch gate is still open; everything else is verified.
+
 ## 8. Backlog
 
 ### AI components (26, unscheduled)
@@ -284,12 +316,13 @@ Prerequisites before any AI batch is scheduled:
 
 ## 9. Tooling
 
-| Script                           | Change                                                                                         |
-| -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `scripts/new-item.mjs`           | New. Scaffolds source, docs, preview, test, registry item from a tier-specific template        |
-| `scripts/check-registry.mjs`     | Tier budgets, banned validation deps, required `meta.tier`/`meta.upstream`, block type support |
-| `scripts/parity.mjs` (B1)        | Generates `upstream/manifest.json` and compares exports + `data-slot` values                   |
-| `scripts/sync-upstream.mjs` (B1) | Fetches upstream source into `.cache/shadcn` for diffing                                       |
+| Script                         | Change                                                                                              |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- |
+| `scripts/new-item.mjs`         | New. Scaffolds source, docs, preview, test, registry item from a tier-specific template             |
+| `scripts/check-registry.mjs`   | Tier budgets, banned validation deps, required `meta.tier`/`meta.upstream`, block type support      |
+| `scripts/parity.mjs`           | ✅ Compares exports + `data-slot` values against `upstream/manifest.json`; `--write` regenerates it |
+| `scripts/sync-upstream.mjs`    | ✅ Fetches upstream `base` source into `.cache/shadcn` at a pinned commit, writes the manifest      |
+| `scripts/upstream-surface.mjs` | ✅ Shared export/`data-slot` extraction, so both sides of the comparison use one parser             |
 
 ## 10. Schedule
 

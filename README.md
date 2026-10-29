@@ -6,7 +6,10 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B0 complete.** The eight original motion components were removed and archived; the parity foundation (motion tiers, P11 checks, the `new-item` scaffold, and the `button`/`dialog` pilots) is in place. B1 (11 atoms) is next — see [the parity plan](docs/parity-plan.md).
+> Status: **B1 complete.** B0 removed the eight original motion components and shipped the parity foundation;
+> B1 adds the eleven atoms (button, badge, kbd, separator, label, input, textarea, card, aspect-ratio, avatar,
+> skeleton) plus the upstream parity check. B2 (structure and feedback) is next — see
+> [the parity plan](docs/parity-plan.md).
 
 ## Install
 
@@ -37,12 +40,23 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 
 ## Components
 
-| Component                 | Tier | Motion                        |
-| ------------------------- | ---- | ----------------------------- |
-| `button` — action trigger | T1   | `feedback.press`              |
-| `dialog` — modal window   | T2   | `popup.anchored`, `exit.fade` |
+| Component                           | Tier | Motion                        |
+| ----------------------------------- | ---- | ----------------------------- |
+| `button` — action trigger           | T1   | `feedback.press`              |
+| `badge` — status label              | T0   | none                          |
+| `kbd` — key or shortcut hint        | T0   | none                          |
+| `separator` — group boundary        | T0   | none                          |
+| `label` — control name              | T0   | none                          |
+| `input` — single-line field         | T0   | none                          |
+| `textarea` — multi-line field       | T0   | none                          |
+| `card` — grouped surface            | T0   | none                          |
+| `aspect-ratio` — reserved media box | T0   | none                          |
+| `avatar` — image with fallback      | T0   | none                          |
+| `skeleton` — loading placeholder    | T4   | `data.transition`             |
+| `dialog` — modal window             | T2   | `popup.anchored`, `exit.fade` |
 
-The remaining 55 components, their batches, and the motion tier for each are listed in [docs/parity-plan.md](docs/parity-plan.md).
+The remaining 45 components, their batches, and the motion tier for each are listed in
+[docs/parity-plan.md](docs/parity-plan.md).
 
 ## Rules
 
@@ -59,11 +73,15 @@ pnpm dev              # docs site at http://localhost:3000
 pnpm lint             # Biome: lint + formatting + import order
 pnpm format           # rewrite files with Biome
 pnpm registry:build   # rebuild public/r from registry.json + content
-pnpm check            # typecheck + lint + registry checks + tests
+pnpm upstream:sync    # re-pin shadcn's source and refresh upstream/manifest.json
+pnpm parity:check     # compare exports and data-slot values with that pin
+pnpm check            # typecheck + lint + registry check + parity + tests
 node scripts/new-item.mjs --name tooltip --tier T2   # scaffold a component
 ```
 
 Run `pnpm registry:build` before `pnpm check` after touching `registry.json`, `content/`, or shipped source. Requires Node 20+ and pnpm 10 (a standalone pnpm binary, no corepack; `packageManager` pins 10.34.5).
+
+Upstream source is fetched into `.cache/shadcn/` (gitignored) and summarised in the committed `upstream/manifest.json`, so `parity:check` runs offline. Re-pin deliberately with `pnpm upstream:sync --latest`, then bump every `meta.upstream.version` and rebuild.
 
 ## Documentation
 
