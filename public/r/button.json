@@ -24,6 +24,7 @@
   "meta": {
     "since": "0.2.0",
     "tier": "T1",
+    "batch": "B1",
     "motion": [
       "feedback.press"
     ],
@@ -34,7 +35,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "4ca3b90"
+    "sourceSha": "09ca2ff"
   },
   "docs": "## When to use\n\n- The primary action of a form, dialog, or toolbar.\n- A single, clearly labelled command: save, delete, invite.\n- Anywhere the user expects a physical press response.\n\n## When not to use\n\n- Navigation between routes; use a link styled with `buttonVariants`.\n- Toggling a persistent state; use `toggle` or `switch`.\n- Submitting a long-running job that needs its own progress surface; pair the button with a\n  spinner and a `disabled` state, or use `toast` for the result.\n\n## Installation\n\n```bash\nnpx shadcn@latest add @cadence/button\n```\n\n## Usage\n\n```tsx\nimport { Button } from \"@/components/cadence/button/button\";\n\nexport function Save() {\n  return <Button onClick={save}>Save changes</Button>;\n}\n```\n\n## Examples\n\n### Variants\n\n```tsx\n<Button variant=\"outline\">Cancel</Button>\n<Button variant=\"destructive\">Delete project</Button>\n<Button variant=\"ghost\" size=\"icon-sm\" aria-label=\"Open settings\">\n  <Settings />\n</Button>\n```\n\n### Links\n\nFor navigation, keep the link and take the styles: this preserves link semantics and\nmiddle-click.\n\n```tsx\nimport Link from \"next/link\";\nimport { buttonVariants } from \"@/components/cadence/button/button\";\n\n<Link href=\"/pricing\" className={buttonVariants({ variant: \"outline\" })}>\n  Pricing\n</Link>;\n```\n\n### Composition\n\n`render` replaces the underlying element; use it for custom button components, not for links.\n\n```tsx\n<Button render={<CopyButton />}>Copy</Button>\n```\n\n## API\n\n| Prop | Type | Default | Description |\n| --- | --- | --- | --- |\n| `variant` | `\"default\" \\| \"destructive\" \\| \"outline\" \\| \"secondary\" \\| \"ghost\" \\| \"link\"` | `\"default\"` | Visual weight. |\n| `size` | `\"default\" \\| \"xs\" \\| \"sm\" \\| \"lg\" \\| \"icon\" \\| \"icon-xs\" \\| \"icon-sm\" \\| \"icon-lg\"` | `\"default\"` | Height and padding. |\n| `render` | `ReactElement \\| (props, state) => ReactElement` | – | Base UI composition; replaces `asChild`. |\n| `className` | `string` | – | Merged last. |\n\nAll native button props are forwarded.\n\n## Motion contract\n\n| Phase | Properties | Token | Interruptible |\n| --- | --- | --- | --- |\n| press | `scale 1 → 0.98` while active | `spring.press` | yes (pointer up) |\n| release | `scale 0.98 → 1` | `spring.press` | yes |\n| reduced | no scale; colour and shadow only | – | – |\n| none | no scale; colour and shadow only | – | – |\n\n## Accessibility\n\n- Renders a real `<button>` through Base UI, so Enter and Space activate it natively.\n- Focus is visible through the ring tokens; disabled buttons are not focusable and keep\n  `aria-disabled` semantics from Base UI.\n- `aria-invalid` drives the destructive border and ring. The component does not validate\n  anything: see [validation](/docs/validation).\n\n## Notes for AI\n\n- Keep the label specific (\"Delete project\", not \"OK\").\n- Do not add a `loading` boolean that hides the label; pass `disabled` and render a spinner\n  next to the text so the action stays readable.",
   "categories": [
