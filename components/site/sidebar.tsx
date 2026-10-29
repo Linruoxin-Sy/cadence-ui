@@ -9,8 +9,14 @@ export interface SidebarItem {
   title: string;
 }
 
-export interface SidebarProps {
+export interface SidebarGroup {
+  id: string;
+  title: string;
   components: SidebarItem[];
+}
+
+export interface SidebarProps {
+  groups: SidebarGroup[];
   guides: SidebarItem[];
 }
 
@@ -35,7 +41,9 @@ function NavLink({ href, title, active }: { href: string; title: string; active:
   );
 }
 
-function Groups({ components, guides, pathname }: SidebarProps & { pathname: string }) {
+function Groups({ groups, guides, pathname }: SidebarProps & { pathname: string }) {
+  const total = groups.reduce((count, group) => count + group.components.length, 0);
+
   return (
     <div className="space-y-7">
       <div>
@@ -57,23 +65,38 @@ function Groups({ components, guides, pathname }: SidebarProps & { pathname: str
       <div>
         <div className="flex items-baseline justify-between px-2">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Components</p>
-          <span className="text-[11px] text-muted-foreground">{components.length}</span>
+          <span className="text-[11px] text-muted-foreground">{total}</span>
         </div>
-        <nav className="mt-2 space-y-0.5" aria-label="Components">
-          {components.map((component) => (
-            <NavLink
-              key={component.slug}
-              href={`/components/${component.slug}`}
-              title={component.title}
-              active={isActive(pathname, `/components/${component.slug}`)}
-            />
+        {/*
+         * Second level: one block per parity batch (docs/parity-plan.md §7). The batch is
+         * structure, not a heading the reader should scan for, so it is a quiet label over
+         * an indented list rather than a third weight of link.
+         */}
+        <div className="mt-3 space-y-4">
+          {groups.map((group) => (
+            <nav key={group.id} aria-label={group.title}>
+              <div className="flex items-baseline justify-between px-2">
+                <p className="text-[11px] leading-5 font-medium text-muted-foreground/80">{group.title}</p>
+                <span className="text-[10px] tabular-nums text-muted-foreground/60">{group.components.length}</span>
+              </div>
+              <div className="mt-1 ml-3 space-y-0.5 border-l border-border pl-1">
+                {group.components.map((component) => (
+                  <NavLink
+                    key={component.slug}
+                    href={`/components/${component.slug}`}
+                    title={component.title}
+                    active={isActive(pathname, `/components/${component.slug}`)}
+                  />
+                ))}
+              </div>
+            </nav>
           ))}
-        </nav>
+        </div>
         <Link
           href="/components"
           aria-current={pathname === "/components" ? "page" : undefined}
           className={cn(
-            "mt-2 block px-2 text-[12px] underline underline-offset-4",
+            "mt-3 block px-2 text-[12px] underline underline-offset-4",
             pathname === "/components" ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -85,12 +108,12 @@ function Groups({ components, guides, pathname }: SidebarProps & { pathname: str
 }
 
 /**
- * Documentation sidebar: guides first, then every component.
+ * Documentation sidebar: guides first, then every component nested under its parity batch.
  *
  * Desktop: sticky column on the left. Mobile: a collapsed disclosure above the
  * content, so the page still starts with the article.
  */
-export function Sidebar({ components, guides }: SidebarProps) {
+export function Sidebar({ groups, guides }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -103,13 +126,13 @@ export function Sidebar({ components, guides }: SidebarProps) {
           </span>
         </summary>
         <div className="border-t border-border pt-4 pb-2">
-          <Groups components={components} guides={guides} pathname={pathname} />
+          <Groups groups={groups} guides={guides} pathname={pathname} />
         </div>
       </details>
 
       <aside className="hidden w-56 shrink-0 md:block">
         <div className="sticky top-14 max-h-[calc(100dvh-3.5rem)] overflow-y-auto py-10 pr-2">
-          <Groups components={components} guides={guides} pathname={pathname} />
+          <Groups groups={groups} guides={guides} pathname={pathname} />
         </div>
       </aside>
     </>

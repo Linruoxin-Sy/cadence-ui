@@ -1,12 +1,12 @@
 import { Sidebar } from "@/components/site/sidebar";
-import { listComponents, listGuides } from "@/lib/content";
+import { listComponentGroups, listGuides } from "@/lib/content";
 
 export default async function ComponentsLayout({ children }: { children: React.ReactNode }) {
-  const [components, guides] = await Promise.all([listComponents(), listGuides()]);
+  const [groups, guides] = await Promise.all([listComponentGroups(), listGuides()]);
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 md:flex-row">
-      <Sidebar components={components} guides={guides} />
+      <Sidebar groups={groups} guides={guides} />
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
