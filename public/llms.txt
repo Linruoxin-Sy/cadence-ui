@@ -24,6 +24,16 @@ npx shadcn@latest add @cadence/button
 ## Components
 
 - [Button](/r/button.md): Triggers an action, with press feedback that collapses under reduced motion. (form, feedback)
+- [Badge](/r/badge.md): A compact status label that stays still while the content around it animates. (feedback)
+- [Kbd](/r/kbd.md): A keyboard key or shortcut hint, styled from the semantic tokens. (utility)
+- [Separator](/r/separator.md): A one-pixel rule that divides groups of content. (layout)
+- [Label](/r/label.md): An accessible name for a form control, with no state of its own. (form)
+- [Input](/r/input.md): A single-line text field whose invalid state is driven by aria-invalid. (form)
+- [Textarea](/r/textarea.md): A multi-line text field that grows with its content instead of a script. (form)
+- [Card](/r/card.md): A bounded surface for grouped content, with parts you can restyle. (layout)
+- [Aspect Ratio](/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
+- [Avatar](/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
+- [Skeleton](/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs

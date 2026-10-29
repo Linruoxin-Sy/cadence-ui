@@ -26,6 +26,16 @@ npx shadcn@latest add @cadence/button
 ## Components
 
 - [Button](/r/button.md): Triggers an action, with press feedback that collapses under reduced motion. (form, feedback)
+- [Badge](/r/badge.md): A compact status label that stays still while the content around it animates. (feedback)
+- [Kbd](/r/kbd.md): A keyboard key or shortcut hint, styled from the semantic tokens. (utility)
+- [Separator](/r/separator.md): A one-pixel rule that divides groups of content. (layout)
+- [Label](/r/label.md): An accessible name for a form control, with no state of its own. (form)
+- [Input](/r/input.md): A single-line text field whose invalid state is driven by aria-invalid. (form)
+- [Textarea](/r/textarea.md): A multi-line text field that grows with its content instead of a script. (form)
+- [Card](/r/card.md): A bounded surface for grouped content, with parts you can restyle. (layout)
+- [Aspect Ratio](/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
+- [Avatar](/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
+- [Skeleton](/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs
@@ -137,6 +147,1177 @@ All native button props are forwarded.
 - Keep the label specific ("Delete project", not "OK").
 - Do not add a `loading` boolean that hides the label; pass `disabled` and render a spinner
   next to the text so the action stays readable.
+
+# Badge
+
+A compact status label that stays still while the content around it animates.
+
+## When to use
+
+- A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
+- A category or tag next to a title, where the colour carries the grouping.
+- A count attached to a navigation item or a filter chip.
+
+## When not to use
+
+- Anything the user must click to act; use `button` (a badge has no focus, no
+  press feedback, and no keyboard path).
+- More than about three words. A long label belongs in running text or in a `card`
+  header, not in a pill.
+- A status that changes while the user watches; use `toast` or an inline message,
+  because a badge swap is easy to miss.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/badge
+```
+
+## Usage
+
+```tsx
+import { Badge } from "@/components/cadence/badge/badge";
+
+export function Release() {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="font-medium">Parity plan</span>
+      <Badge variant="secondary">0.2.0</Badge>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Variants
+
+```tsx
+<Badge>Default</Badge>
+<Badge variant="secondary">Secondary</Badge>
+<Badge variant="outline">Outline</Badge>
+<Badge variant="ghost">Ghost</Badge>
+<Badge variant="destructive">Failed</Badge>
+<Badge variant="link">Changelog</Badge>
+```
+
+### With an icon
+
+```tsx
+import { Check } from "lucide-react";
+
+<Badge variant="outline">
+  <Check />
+  Verified
+</Badge>;
+```
+
+### As a link
+
+`render` replaces the element, so a badge stays a `span` unless you ask for
+something else. The `[a&]` selectors only switch on hover when it really is a link.
+
+```tsx
+<Badge variant="outline" render={<a href="/releases" />}>
+  3 releases
+</Badge>
+```
+
+## API
+
+| Prop        | Type                                                                                             | Default     | Description                                      |
+| ----------- | ------------------------------------------------------------------------------------------------ | ----------- | ------------------------------------------------ |
+| `variant`   | `"default" \| "secondary" \| "outline" \| "ghost" \| "destructive" \| "link"`                     | `"default"` | Visual weight.                                   |
+| `render`    | `ReactElement \| (props, state) => ReactElement`                                                  | –           | Base UI composition; replaces `asChild`.         |
+| `className` | `string`                                                                                          | –           | Merged last.                                     |
+
+`data-slot="badge"` and `data-variant` are rendered from the component's state, so
+you can restyle per variant from CSS without touching this file. All native span
+props are forwarded.
+
+## Motion contract
+
+No motion (T0). A badge labels content; it does not enter, leave, or move.
+
+| Phase   | Properties                          | Token | Interruptible |
+| ------- | ----------------------------------- | ----- | ------------- |
+| –       | none                                | –     | –             |
+| reduced | none                                | –     | –             |
+| none    | none                                | –     | –             |
+
+`transition-[color,box-shadow]` is state feedback on the design tokens (hover on a
+linked badge, the focus ring), not motion: it never moves the box and never runs
+on mount.
+
+## Accessibility
+
+- The badge is a `span`, so it is not in the tab order and has no role — the text
+  itself is the message.
+- Colour is never the only signal: every variant still carries readable text.
+- When rendered as a link it inherits the anchor's semantics, focus ring, and
+  keyboard behaviour, and gains `[a&]:hover` styles automatically.
+
+## Notes for AI
+
+- Never attach `onClick` to a badge; switch to `button` with `size="sm"`.
+- Do not animate a badge in or out. If the status changes, swap the text and let
+  `aria-live` on the surrounding region announce it.
+
+# Kbd
+
+A keyboard key or shortcut hint, styled from the semantic tokens.
+
+## When to use
+
+- A shortcut hinted next to a command: search, save, new item.
+- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.
+- Inside a `tooltip` or a `dropdown-menu` item, where space is short.
+
+## When not to use
+
+- A key that is part of running text. Write it in prose; a pill interrupts the
+  sentence.
+- A button that runs a command. A `kbd` is a label, not a control — it has no
+  keyboard path and no press state.
+- Long sequences of more than three keys. Put the shortcut in a table instead.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/kbd
+```
+
+## Usage
+
+```tsx
+import { Kbd, KbdGroup } from "@/components/cadence/kbd/kbd";
+
+export function ShortcutHint() {
+  return (
+    <span className="text-sm text-muted-foreground">
+      Search <KbdGroup><Kbd>⌘</Kbd><Kbd>K</Kbd></KbdGroup>
+    </span>
+  );
+}
+```
+
+## Examples
+
+### Single key
+
+```tsx
+<Kbd>Esc</Kbd>
+```
+
+### A combination
+
+`KbdGroup` renders the keys with one gap between them and keeps the sequence
+together for screen readers.
+
+```tsx
+<KbdGroup>
+  <Kbd>Ctrl</Kbd>
+  <Kbd>Shift</Kbd>
+  <Kbd>P</Kbd>
+</KbdGroup>
+```
+
+### Inside a tooltip
+
+A `Kbd` inside `data-slot="tooltip-content"` inverts its colours automatically, so
+the hint stays legible on the tooltip surface.
+
+```tsx
+<TooltipContent>
+  Save <Kbd>⌘S</Kbd>
+</TooltipContent>
+```
+
+## API
+
+| Part       | Props                        | Notes                                            |
+| ---------- | ---------------------------- | ------------------------------------------------ |
+| `Kbd`      | native `kbd` props           | One key. `data-slot="kbd"`.                      |
+| `KbdGroup` | native `kbd` props           | Wraps several keys with `data-slot="kbd-group"`. |
+
+## Motion contract
+
+No motion (T0). A key hint is a label; it must not pulse or slide while the user
+is reading it.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- Renders a real `<kbd>` element, which assistive technology reports as keyboard
+  input — the same information a sighted user reads from the key shape.
+- The shortcut is text, so it survives every reduced-motion mode and every colour
+  theme.
+- If a hint is icon-only, put the key name in `aria-label` on the `Kbd`.
+- Do not attach `tabIndex`; a shortcut hint is not focusable.
+
+## Notes for AI
+
+- Use the platform's own glyphs (`⌘`, `⇧`, `↵`) rather than words, and keep one
+  `Kbd` per physical key.
+- If the shortcut is a live command, render a `button` and put the `Kbd` inside it.
+
+# Separator
+
+A one-pixel rule that divides groups of content.
+
+## When to use
+
+- Between groups inside a menu, a card footer, or a settings list.
+- Between a toolbar and its content, horizontally or vertically.
+- Inside a stack of sections that would otherwise merge visually.
+
+## When not to use
+
+- To create space. Use padding or `gap`; a rule is a boundary, not a spacer.
+- Between every list item. Repetition turns a boundary into noise — grouped
+  spacing does the same job with less ink.
+- As a decorative flourish in a hero. That is a background, not a separator.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/separator
+```
+
+## Usage
+
+```tsx
+import { Separator } from "@/components/cadence/separator/separator";
+
+export function Account() {
+  return (
+    <div className="space-y-4">
+      <p className="text-sm">Signed in as ada@example.com</p>
+      <Separator />
+      <p className="text-sm text-muted-foreground">Billing is handled by finance.</p>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Vertical
+
+A vertical rule needs a height from its container. `self-stretch` in a flex row
+gives it one for free.
+
+```tsx
+<div className="flex h-6 items-center gap-3">
+  <span className="text-sm">Draft</span>
+  <Separator orientation="vertical" />
+  <span className="text-sm text-muted-foreground">Edited 2 minutes ago</span>
+</div>
+```
+
+### Decorative
+
+Upstream's Base UI separator is always announced. Mark a purely visual rule as
+decorative so screen readers skip it:
+
+```tsx
+<Separator decorative />
+```
+
+## API
+
+| Prop          | Type                         | Default          | Description                                                   |
+| ------------- | ---------------------------- | ---------------- | ------------------------------------------------------------- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"`   | Direction of the rule.                                        |
+| `decorative`  | `boolean`                    | `false`          | Renders `role="none"` and `aria-hidden`; additive to upstream. |
+| `render`      | Base UI render prop          | –                | Composition, as on every Base UI primitive.                   |
+| `className`   | `string`                     | –                | Merged last.                                                  |
+
+`data-slot="separator"` and `data-orientation` are always set, so a consumer can
+size the rule from CSS: `data-[orientation=vertical]:h-8`.
+
+## Motion contract
+
+No motion (T0). A boundary that animates draws the eye to the wrong thing; if the
+layout changes, the surrounding `accordion` or `collapsible` owns that animation.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- Base UI renders `role="separator"` with `aria-orientation`, which is the
+  correct semantic for a group boundary.
+- `decorative` removes it from the accessibility tree for rules that carry no
+  meaning (a divider inside a visual layout).
+- Focusable separators are not supported on purpose: a rule is not a control.
+
+## Notes for AI
+
+- Prefer `gap` and `space-y` first; add a separator only when two groups need a
+  visible boundary.
+- Never place a separator between two items of the same list. Group the list
+  instead.
+
+# Label
+
+An accessible name for a form control, with no state of its own.
+
+## When to use
+
+- Every input, textarea, select, checkbox, radio, switch, and slider that needs a
+  visible name.
+- A group of controls that share one caption.
+- A field whose purpose is not obvious from the placeholder alone (which is
+  almost every field).
+
+## When not to use
+
+- As a placeholder. A placeholder disappears on the first keystroke and is not a
+  name; use a real `Label`.
+- As a heading. If the text introduces a section, use a heading so it appears in
+  the document outline.
+- For helper text or error text; those belong in the description/error slot so
+  they can be wired through `aria-describedby`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/label
+```
+
+## Usage
+
+```tsx
+import { Input } from "@/components/cadence/input/input";
+import { Label } from "@/components/cadence/label/label";
+
+export function EmailField() {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="email">Email</Label>
+      <Input id="email" type="email" autoComplete="email" />
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Wrapping instead of `htmlFor`
+
+Either association works: `htmlFor` + `id`, or wrapping the control. Pick one per
+field and keep it consistent.
+
+```tsx
+<Label>
+  <input type="checkbox" />
+  Email me about releases
+</Label>
+```
+
+### Disabled
+
+The label follows the control without any prop: `peer-disabled:` handles a sibling
+control, `group-data-[disabled=true]:` handles a disabled `Field`.
+
+```tsx
+<Label htmlFor="slug" className="peer-disabled:opacity-50">
+  Slug
+</Label>
+<Input id="slug" className="peer" disabled defaultValue="cadence" />
+```
+
+## API
+
+| Prop        | Type              | Default | Description                          |
+| ----------- | ----------------- | ------- | ------------------------------------ |
+| `htmlFor`   | `string`          | –       | Id of the control this label names.  |
+| `className` | `string`          | –       | Merged last.                         |
+
+All native `label` props are forwarded.
+
+## Motion contract
+
+No motion (T0). A label is text; the only thing it reacts to is the disabled state,
+which is an opacity change on a token, not an animation.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- Renders a native `<label>`; clicking it focuses the control with no JavaScript.
+- The accessible name comes from the label's text, so never hide it with
+  `display: none`. If the design needs a hidden label, use `sr-only`, not removal.
+- `htmlFor` must point at an `id` that exists in the same document. Duplicate ids
+  break the association silently.
+
+## Notes for AI
+
+- One label per control. Do not add `aria-label` on the control as well; two names
+  fight, and the visible one wins in some browsers and loses in others.
+- Keep the label short and noun-shaped ("Email", "Workspace name"), and put the
+  explanation in the description slot.
+
+# Input
+
+A single-line text field whose invalid state is driven by aria-invalid.
+
+## When to use
+
+- A single line of text the user types: email, name, slug, search, URL.
+- A field that needs a native input type (`email`, `password`, `tel`, `number`,
+  `file`) and therefore native mobile keyboards.
+- Anywhere the browser's autofill, password manager, or form submission should
+  work without a wrapper.
+
+## When not to use
+
+- Multi-line text; use `textarea`.
+- A choice from a fixed list; use `select` (or `combobox` when the list is long).
+- A value the app controls entirely, like a generated id. Render text, not a
+  disabled input.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/input
+```
+
+## Usage
+
+```tsx
+import { Input } from "@/components/cadence/input/input";
+import { Label } from "@/components/cadence/label/label";
+
+export function WorkspaceName() {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="workspace">Workspace name</Label>
+      <Input id="workspace" placeholder="Acme" autoComplete="organization" />
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Invalid
+
+`aria-invalid` is the only switch. The component renders the destructive border and
+ring; it never decides that the value is wrong.
+
+```tsx
+<Input aria-invalid="true" aria-describedby="email-error" defaultValue="ada@" />
+<p id="email-error" className="text-sm text-destructive">
+  Enter a complete email address.
+</p>
+```
+
+### File input
+
+`file:` variants are already wired, so the native picker button picks up the
+tokens:
+
+```tsx
+<Input type="file" accept="image/png" />
+```
+
+### Controlled, Base UI style
+
+```tsx
+const [value, setValue] = useState("");
+
+<Input value={value} onValueChange={setValue} />;
+```
+
+## API
+
+| Prop            | Type                                | Default | Description                                        |
+| --------------- | ----------------------------------- | ------- | -------------------------------------------------- |
+| `type`          | `string`                            | –       | Native input type.                                 |
+| `value`         | `string \| number \| readonly string[]` | –   | Controlled value.                                  |
+| `defaultValue`  | same as `value`                     | –       | Uncontrolled initial value.                        |
+| `onValueChange` | `(value: string, details) => void`  | –       | Base UI change callback, in addition to `onChange`. |
+| `className`     | `string`                            | –       | Merged last.                                       |
+
+All native input props are forwarded, including `disabled`, `readOnly`, `required`,
+and `aria-*`.
+
+## Motion contract
+
+No motion (T0). An input that grows, slides, or fades while the user types is a
+bug: it moves the caret under the user's eyes.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+`transition-[color,box-shadow]` exists for the focus ring and the invalid border.
+Both are colour/shadow state feedback on the design tokens, take no space, and do
+not run on mount.
+
+## Validation and data ownership
+
+P11 draws the line: the component renders state, the user decides state.
+
+| The component does                                    | You do                                                    |
+| ----------------------------------------------------- | --------------------------------------------------------- |
+| Styles `aria-invalid="true"` and `data-invalid`        | Deciding what "valid" means (required, format, length)    |
+| Renders whatever `aria-describedby` points at          | Writing the error text and the ids it lives on            |
+| Forwards `required`, `readOnly`, `disabled`, `name`    | Form state (react-hook-form, TanStack Form, server state)  |
+| Keeps focus visible and keyboard-reachable             | Submit, retry, error mapping, focus management             |
+
+There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
+library is imported. See [validation](/docs/validation).
+
+## Accessibility
+
+- Base UI's input is field-aware: inside a `field`, it receives the label id and
+  the description ids without extra wiring.
+- Always give it a name from a `label`; a placeholder is not a name.
+- `aria-invalid` plus a described error is the accessible failure state. Colour
+  alone is never the signal.
+- Never set `outline: none` in `className`; the focus ring is the only affordance
+  for keyboard users.
+
+## Notes for AI
+
+- Use `aria-invalid` and `aria-describedby` — never an `error` prop or internal
+  state.
+- Do not wrap the input in a div just to add a border; the component already owns
+  the border, radius, and focus ring.
+
+# Textarea
+
+A multi-line text field that grows with its content instead of a script.
+
+## When to use
+
+- A sentence or a paragraph: a comment, a description, a commit message, a note.
+- A field where the user's text is longer than the visible box should be.
+- Anywhere the browser's native resize handle is useful.
+
+## When not to use
+
+- A single line (email, name, slug); use `input`.
+- Rich text. A `textarea` holds plain text; formatting needs an editor, which is
+  out of scope for this library.
+- A value that must stay fixed in height; a `textarea` grows, and a fixed box hides
+  the overflow from the user.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/textarea
+```
+
+## Usage
+
+```tsx
+import { Label } from "@/components/cadence/label/label";
+import { Textarea } from "@/components/cadence/textarea/textarea";
+
+export function Comment() {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="comment">Comment</Label>
+      <Textarea id="comment" rows={4} placeholder="Leave a note for the reviewer" />
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Auto-growing
+
+`field-sizing-content` lets the browser grow the box as the text gets longer. No
+JavaScript, no `ResizeObserver`, no layout read during render.
+
+```tsx
+<Textarea className="min-h-16 max-h-48" placeholder="Type and watch the box grow" />
+```
+
+### Resizable by the user
+
+```tsx
+<Textarea className="resize-y" rows={3} />
+```
+
+### Invalid
+
+```tsx
+<Textarea aria-invalid="true" aria-describedby="bio-error" />
+<p id="bio-error" className="text-sm text-destructive">
+  Keep it under 280 characters.
+</p>
+```
+
+## API
+
+| Prop        | Type     | Default | Description               |
+| ----------- | -------- | ------- | ------------------------- |
+| `className` | `string` | –       | Merged last.              |
+
+All native `textarea` props are forwarded, including `rows`, `maxLength`,
+`required`, `readOnly`, `disabled`, and `aria-*`.
+
+## Motion contract
+
+No motion (T0). Growth is the browser sizing the box, not an animation: on a
+`field-sizing-content` textarea the height changes with the text as you type, and
+a transition on it would lag behind the caret.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Validation and data ownership
+
+Same contract as `input`: the field renders state, you own the state.
+
+| The component does                                 | You do                                                   |
+| -------------------------------------------------- | -------------------------------------------------------- |
+| Styles `aria-invalid="true"`                       | Deciding validity (length, format, required)             |
+| Renders what `aria-describedby` points at           | Writing the error text and the counter ("12 / 280")      |
+| Forwards `required`, `readOnly`, `disabled`, `name` | Form state and submission                                |
+
+Character counters are yours to render: the component does not count. Keep the
+count in the description slot and point `aria-describedby` at it, so a screen
+reader hears it before the limit is hit.
+
+## Accessibility
+
+- Renders a native `<textarea>`, so Enter inserts a newline and Escape does not
+  close anything — expected behaviour in a form.
+- Give it a `label`, and never rely on the placeholder as a name.
+- If you cap the length with `maxLength`, say so in the description; a silent stop
+  in typing reads as a broken field.
+- `resize-y` keeps the horizontal layout stable; full `resize` lets a long word
+  break the page.
+
+## Notes for AI
+
+- Do not implement auto-resize with a `scrollHeight` loop; `field-sizing-content`
+  is the CSS-only answer and it matches upstream.
+- Never own the character count in component state. Render it next to the field and
+  wire it through `aria-describedby`.
+
+# Card
+
+A bounded surface for grouped content, with parts you can restyle.
+
+## When to use
+
+- A unit of content that belongs together: a summary, a plan, an account, a
+  record in a grid.
+- A surface that needs a header, an optional action, body content, and a footer.
+- A list of comparable items where the boundary itself carries meaning.
+
+## When not to use
+
+- To fake spacing. A card is a boundary; use padding if you only need breathing
+  room.
+- As a page layout. Nesting cards inside cards flattens the hierarchy.
+- For a modal or a popover; those are overlays with their own focus rules.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/card
+```
+
+## Usage
+
+```tsx
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/cadence/card/card";
+import { Button } from "@/components/cadence/button/button";
+
+export function Plan() {
+  return (
+    <Card className="max-w-sm">
+      <CardHeader>
+        <CardTitle>Parity plan</CardTitle>
+        <CardDescription>57 components, nine batches, one release train.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">Batch B1 ships the eleven atoms.</p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline">Open plan</Button>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+## Examples
+
+### Action in the header
+
+`CardHeader` switches to two columns when a `CardAction` is present — no extra
+prop, no manual grid.
+
+```tsx
+<CardHeader>
+  <CardTitle>Members</CardTitle>
+  <CardDescription>12 people have access.</CardDescription>
+  <CardAction>
+    <Button size="sm" variant="outline">Invite</Button>
+  </CardAction>
+</CardHeader>
+```
+
+### Compact
+
+`size="sm"` tightens every part at once, because the spacing lives in one custom
+property on the root:
+
+```tsx
+<Card size="sm">…</Card>
+```
+
+### Section boundaries
+
+Add a rule with utilities rather than a new part; the `[.border-b]` selectors are
+already wired:
+
+```tsx
+<CardHeader className="border-b">…</CardHeader>
+<CardFooter className="border-t">…</CardFooter>
+```
+
+## API
+
+| Part              | Props                     | Notes                                                    |
+| ----------------- | ------------------------- | -------------------------------------------------------- |
+| `Card`            | `size`, native div props  | `size`: `"default" \| "sm"`. Sets `--card-spacing` and `data-size`. |
+| `CardHeader`      | native div props          | Grid header; reacts to `CardAction` and a bottom border.  |
+| `CardTitle`       | native div props          | Bold, leading-none. Does not create a heading.            |
+| `CardDescription` | native div props          | Muted supporting text.                                    |
+| `CardAction`      | native div props          | Top-right slot inside the header.                         |
+| `CardContent`     | native div props          | Body; carries the horizontal padding.                     |
+| `CardFooter`      | native div props          | Bottom row; reacts to a top border.                       |
+
+Every part sets `data-slot`, so CSS can reach it:
+`[&>[data-slot=card-header]]:gap-4`.
+
+## Motion contract
+
+No motion (T0). A card does not fade, lift, or scale in. If a group of cards should
+appear in sequence, that is a page-level `list.stagger` decision made by the parent,
+not a property of the card.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- `Card` is a plain `div`: no role, no landmark. That is correct for a visual
+  grouping — but it means the card is not a navigable region. If a set of cards is
+  the main content, wrap it in a `<section>` or a list (`<ul>/<li>`).
+- `CardTitle` renders a `div`. When the title belongs in the document outline, put
+  a heading inside it: `<CardTitle><h3 …>Parity plan</h3></CardTitle>`, or render
+  the card with `aria-labelledby` pointing at the title's id.
+- A card that is clickable must contain a real link or button; do not put
+  `onClick` on the card and call it done — it is invisible to keyboard users.
+
+## Notes for AI
+
+- Use `CardFooter` for actions, not a bare `div` — it keeps spacing consistent when
+  `size` changes.
+- Do not add hover lift to a card that is not interactive. Motion on a static card
+  is decoration (P9).
+
+# Aspect Ratio
+
+Reserves a box at a fixed ratio so media cannot shift the layout.
+
+## When to use
+
+- An image, video, or embed whose intrinsic size is unknown until it loads.
+- A thumbnail grid that must not reflow as the images arrive.
+- A placeholder that will be replaced by media of a known shape.
+
+## When not to use
+
+- Fixed-size icons or avatars; give them a size and be done.
+- Text blocks. A ratio box around text clips exactly the content that needs to grow.
+- A container whose height should follow its content — that is a normal block.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/aspect-ratio
+```
+
+## Usage
+
+```tsx
+import { AspectRatio } from "@/components/cadence/aspect-ratio/aspect-ratio";
+
+export function Cover() {
+  return (
+    <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg">
+      <img src="/cover.jpg" alt="Dashboard preview" className="size-full object-cover" />
+    </AspectRatio>
+  );
+}
+```
+
+## Examples
+
+### Square
+
+```tsx
+<AspectRatio ratio={1} className="overflow-hidden rounded-full">
+  <img src="/avatar.jpg" alt="" className="size-full object-cover" />
+</AspectRatio>
+```
+
+### Video
+
+```tsx
+<AspectRatio ratio={16 / 9}>
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/…"
+    title="Walkthrough"
+    className="size-full"
+    allowFullScreen
+  />
+</AspectRatio>
+```
+
+### Multiple ratios in one grid
+
+Each box keeps its own ratio, so the grid stays stable while media loads:
+
+```tsx
+<div className="grid grid-cols-3 gap-4">
+  <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
+  <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
+  <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
+</div>
+```
+
+## API
+
+| Prop        | Type     | Default | Description                                            |
+| ----------- | -------- | ------- | ------------------------------------------------------ |
+| `ratio`     | `number` | –       | Width ÷ height. Required — there is no sensible default. |
+| `className` | `string` | –       | Merged last; `overflow-hidden` and the radius go here.  |
+
+The ratio is written as `--ratio`, and the box uses `aspect-(--ratio)`. Your own
+`style` is preserved: the custom property is merged after it.
+
+## Motion contract
+
+No motion (T0). The whole point of the box is that it does not change size; a
+transition here would reintroduce the layout shift it exists to prevent.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- The box is a layout element with no role. Put the meaning on the media: a real
+  `alt` on images, a `title` on iframes.
+- A background-only ratio box (no media yet) is decorative — keep it empty, or give
+  it `aria-hidden` if it would otherwise be an empty accessible node.
+- Media that animates (autoplay video, GIF) counts against both the CLS budget and
+  the reduced-motion contract; pause or replace it under
+  `prefers-reduced-motion`.
+
+## Notes for AI
+
+- Always pass a `ratio`; `16 / 9` for video, `1` for avatars, `4 / 3` for photos.
+- Put `object-cover` on the child, not on the ratio box. The box only reserves
+  space; the child fills it.
+
+# Avatar
+
+A profile image with a text fallback, a presence dot, and a stack of peers.
+
+## When to use
+
+- A person or an entity next to content they own: a comment, an assignee, a commit.
+- A stack of participants, with a `+3` tile for the rest.
+- A presence indicator on a collaborator, via `AvatarBadge`.
+
+## When not to use
+
+- A logo that must stay legible at small sizes; use the image with a fixed box.
+- A decorative illustration; avatars imply a person or an account.
+- More than about five faces. Past that the stack stops being readable — use
+  `AvatarGroupCount` with a name list in the tooltip.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/avatar
+```
+
+## Usage
+
+```tsx
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/cadence/avatar/avatar";
+
+export function Author() {
+  return (
+    <Avatar>
+      <AvatarImage src="/ada.png" alt="Ada Lovelace" />
+      <AvatarFallback>AL</AvatarFallback>
+    </Avatar>
+  );
+}
+```
+
+## Examples
+
+### Sizes
+
+`size` sets `data-size` on the root; every child reads it through `group/avatar`.
+
+```tsx
+<Avatar size="sm">…</Avatar>
+<Avatar>…</Avatar>
+<Avatar size="lg">…</Avatar>
+```
+
+### Presence
+
+```tsx
+<Avatar>
+  <AvatarImage src="/ada.png" alt="Ada Lovelace" />
+  <AvatarFallback>AL</AvatarFallback>
+  <AvatarBadge className="bg-emerald-600" />
+</Avatar>
+```
+
+### Group
+
+```tsx
+<AvatarGroup>
+  <Avatar><AvatarImage src="/ada.png" alt="Ada Lovelace" /><AvatarFallback>AL</AvatarFallback></Avatar>
+  <Avatar><AvatarFallback>GH</AvatarFallback></Avatar>
+  <AvatarGroupCount>+3</AvatarGroupCount>
+</AvatarGroup>
+```
+
+## API
+
+| Part               | Props                        | Notes                                                        |
+| ------------------ | ---------------------------- | ------------------------------------------------------------ |
+| `Avatar`           | `size`, Base UI root props   | `size`: `"default" \| "sm" \| "lg"`. Sets `data-size`.        |
+| `AvatarImage`      | Base UI image props          | `src`, `alt`. Hidden automatically when the image fails.      |
+| `AvatarFallback`   | Base UI fallback props       | Rendered while loading and after an error.                    |
+| `AvatarBadge`      | native span props            | Corner dot; sized from the root's `data-size`.                |
+| `AvatarGroup`      | native div props             | Overlapping stack with a ring in the page colour.             |
+| `AvatarGroupCount` | native div props             | The `+3` tile that closes a stack.                            |
+
+All parts carry `data-slot`, so `[&>[data-slot=avatar]]:size-6` style overrides are
+possible without a prop.
+
+## Motion contract
+
+No motion (T0). The image-to-fallback swap is instant by design: Base UI knows when
+the image errored, and a cross-fade would show a half-drawn face in the meantime.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- `AvatarImage` is an `<img>`: always pass a real `alt`. With a name beside the
+  avatar, use `alt=""` so it is not announced twice.
+- `AvatarFallback` prints initials. Those initials are the accessible name when the
+  image is missing, so derive them from the person's actual name.
+- `AvatarBadge` is a visual dot. Give it a text alternative when the presence state
+  matters — e.g. `<span className="sr-only">Online</span>` inside it, or an
+  `aria-label` on the badge.
+- An avatar that links to a profile must be wrapped in an `<a>` with an accessible
+  name; the image `alt` alone is not a link name.
+
+## Notes for AI
+
+- Always render an `AvatarFallback`; without it a failed image leaves an empty hole.
+- Do not animate the presence dot. State lives in the DOM (`aria-label`, text), not
+  in a pulse.
+
+# Skeleton
+
+A placeholder pulse that marks where content will land.
+
+## When to use
+
+- A first load longer than about 300 ms, where the shape of the incoming content is
+  known: a card, a table row, a list item, a comment.
+- A region that swaps content in place, so the layout does not jump when the real
+  content arrives.
+- A page that renders several independent regions which resolve at different times.
+
+## When not to use
+
+- A wait under 300 ms. The placeholder appears and disappears before it can be
+  read, which reads as a flicker.
+- An action the user just triggered (a save, a submit); use the button's own busy
+  state or a `spinner`, so the feedback lands where the user is looking.
+- Content whose shape you do not know. A placeholder that is the wrong shape is
+  worse than a spinner: it promises a layout that never arrives.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/skeleton
+```
+
+## Usage
+
+```tsx
+import { Skeleton } from "@/components/cadence/skeleton/skeleton";
+
+export function CardPlaceholder() {
+  return (
+    <div className="w-full max-w-sm space-y-3" aria-busy="true" aria-live="polite">
+      <Skeleton className="h-40 w-full rounded-xl" />
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Text lines
+
+```tsx
+<div className="space-y-2">
+  <Skeleton className="h-4 w-full" />
+  <Skeleton className="h-4 w-11/12" />
+  <Skeleton className="h-4 w-3/5" />
+</div>
+```
+
+### Avatar and name
+
+```tsx
+<div className="flex items-center gap-3">
+  <Skeleton className="size-10 rounded-full" />
+  <div className="space-y-2">
+    <Skeleton className="h-3 w-32" />
+    <Skeleton className="h-3 w-20" />
+  </div>
+</div>
+```
+
+### Swapping in the real content
+
+Keep the container mounted so the height is continuous; only the children change.
+
+```tsx
+<section aria-busy={loading}>
+  {loading ? <CardPlaceholder /> : <Card>…</Card>}
+</section>
+```
+
+## API
+
+| Prop        | Type     | Default | Description                                        |
+| ----------- | -------- | ------- | -------------------------------------------------- |
+| `className` | `string` | –       | Merged last — the shape (`h-4 w-2/3`) lives here.   |
+
+All native `div` props are forwarded. `data-slot="skeleton"` and `data-motion` are
+always set.
+
+## Motion contract
+
+Recipe: `data.transition`, a continuous opacity loop. It is implemented in CSS
+(`animate-pulse`) rather than in Motion, because a page can render dozens of
+placeholders and each Motion loop costs a frame callback; the pulse only touches
+`opacity`, so it can never trigger layout.
+
+| Phase   | Properties                | Token                          | Interruptible |
+| ------- | ------------------------- | ------------------------------ | ------------- |
+| pulse   | `opacity 1 → 0.5 → 1`     | `animate-pulse` (theme timing) | yes (CSS)     |
+| reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
+| none    | no animation; full opacity | `animate-none`                 | –             |
+
+Reduced keeps the pulse on purpose: M5 removes travel and scale, not opacity, and a
+static grey block is easier to mistake for content that already loaded. `none`
+stops it completely, which is what a screenshot test or a print stylesheet needs.
+
+## Keyboard interactions
+
+None. A skeleton is not focusable and never receives input; focus stays on whatever
+the user was doing when the region started loading.
+
+## Accessibility
+
+- The skeleton itself is decorative: its text is nothing, so it is not announced.
+- The **region** owns the state: `aria-busy="true"` while loading, removed when done.
+  Add `aria-live="polite"` there only if the region resolves without any other
+  change the user would notice.
+- Shape is a promise. Keep the placeholder's height close to the real content, or
+  the swap reintroduces exactly the layout shift the skeleton was meant to avoid.
+- Under `data-motion="none"` the block stays visible at full opacity: the loading
+  state is still communicated by shape and by `aria-busy`, never by motion alone.
+
+## Responsive behavior
+
+A skeleton takes its size from utilities, so it follows whatever grid it is dropped
+into. Avoid a hard-coded pixel height on a full-width block; use a ratio
+(`aspect-video`) or a relative height so the placeholder matches the real card at
+every breakpoint.
+
+## Performance
+
+- One CSS animation per element, on `opacity` only; no JS loop, no layout read.
+- The pulse is compositor-friendly, but the animation-system budget still applies:
+  fewer than twenty simultaneously animating elements. For a long list, render one
+  placeholder row per screen rather than one per future row.
+- No `will-change`: the browser promotes an opacity animation on its own.
+
+## Notes for AI
+
+- Never animate a skeleton into the real content with a custom cross-fade; swap the
+  children and let the container's height stay put.
+- Put the loading state on the region (`aria-busy`), not on each block.
+- Do not use a skeleton as a generic "loading…" indicator for an action; a `spinner`
+  next to the control is clearer.
 
 # Dialog
 

@@ -101,9 +101,285 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "848d950",
+    "sourceSha": "4ca3b90",
     "docs": "/r/button.md",
     "item": "/r/button.json"
+  },
+  {
+    "name": "badge",
+    "type": "registry:ui",
+    "title": "Badge",
+    "description": "A compact status label that stays still while the content around it animates.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/badge.md",
+    "item": "/r/badge.json"
+  },
+  {
+    "name": "kbd",
+    "type": "registry:ui",
+    "title": "Kbd",
+    "description": "A keyboard key or shortcut hint, styled from the semantic tokens.",
+    "categories": [
+      "utility"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/kbd.md",
+    "item": "/r/kbd.json"
+  },
+  {
+    "name": "separator",
+    "type": "registry:ui",
+    "title": "Separator",
+    "description": "A one-pixel rule that divides groups of content.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/separator.md",
+    "item": "/r/separator.json"
+  },
+  {
+    "name": "label",
+    "type": "registry:ui",
+    "title": "Label",
+    "description": "An accessible name for a form control, with no state of its own.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/label.md",
+    "item": "/r/label.json"
+  },
+  {
+    "name": "input",
+    "type": "registry:ui",
+    "title": "Input",
+    "description": "A single-line text field whose invalid state is driven by aria-invalid.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/input.md",
+    "item": "/r/input.json"
+  },
+  {
+    "name": "textarea",
+    "type": "registry:ui",
+    "title": "Textarea",
+    "description": "A multi-line text field that grows with its content instead of a script.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/textarea.md",
+    "item": "/r/textarea.json"
+  },
+  {
+    "name": "card",
+    "type": "registry:ui",
+    "title": "Card",
+    "description": "A bounded surface for grouped content, with parts you can restyle.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/card.md",
+    "item": "/r/card.json"
+  },
+  {
+    "name": "aspect-ratio",
+    "type": "registry:ui",
+    "title": "Aspect Ratio",
+    "description": "Reserves a box at a fixed ratio so media cannot shift the layout.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/aspect-ratio.md",
+    "item": "/r/aspect-ratio.json"
+  },
+  {
+    "name": "avatar",
+    "type": "registry:ui",
+    "title": "Avatar",
+    "description": "A profile image with a text fallback, a presence dot, and a stack of peers.",
+    "categories": [
+      "data"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/avatar.md",
+    "item": "/r/avatar.json"
+  },
+  {
+    "name": "skeleton",
+    "type": "registry:ui",
+    "title": "Skeleton",
+    "description": "A placeholder pulse that marks where content will land.",
+    "categories": [
+      "feedback",
+      "data"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.2.0",
+    "tier": "T4",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90",
+    "docs": "/r/skeleton.md",
+    "item": "/r/skeleton.json"
   },
   {
     "name": "dialog",
@@ -137,7 +413,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "848d950",
+    "sourceSha": "4ca3b90",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   }

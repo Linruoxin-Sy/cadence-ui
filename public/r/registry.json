@@ -73,7 +73,230 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "848d950"
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "A compact status label that stays still while the content around it animates.",
+      "categories": [
+        "feedback"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "A keyboard key or shortcut hint, styled from the semantic tokens.",
+      "categories": [
+        "utility"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A one-pixel rule that divides groups of content.",
+      "categories": [
+        "layout"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "An accessible name for a form control, with no state of its own.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A single-line text field whose invalid state is driven by aria-invalid.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "A multi-line text field that grows with its content instead of a script.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "A bounded surface for grouped content, with parts you can restyle.",
+      "categories": [
+        "layout"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "aspect-ratio",
+      "type": "registry:ui",
+      "title": "Aspect Ratio",
+      "description": "Reserves a box at a fixed ratio so media cannot shift the layout.",
+      "categories": [
+        "layout"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "A profile image with a text fallback, a presence dot, and a stack of peers.",
+      "categories": [
+        "data"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
+      }
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "A placeholder pulse that marks where content will land.",
+      "categories": [
+        "feedback",
+        "data"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T4",
+        "motion": [
+          "data.transition"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "4ca3b90"
       }
     },
     {
@@ -98,7 +321,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "848d950"
+        "sourceSha": "4ca3b90"
       }
     }
   ]
