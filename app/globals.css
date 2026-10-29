@@ -27,6 +27,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
+  --color-brand-from: var(--brand-from);
+  --color-brand-to: var(--brand-to);
   --ease-cadence-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-cadence-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
@@ -51,6 +53,13 @@
   --accent-foreground: oklch(0.2 0 0);
   --destructive: oklch(0.58 0.21 25);
   --ring: oklch(0.3 0 0);
+  /* Brand gradient. Site identity only: it is not a design-system token, nothing under
+     registry/cadence/** reads it, and the semantic tokens above stay neutral, so a
+     copied component never drags the brand along. The given pastels (#fbc2eb, #a6c1ee)
+     live in `.dark`; light mode keeps their hues at a weight that survives a white
+     background (#d22da3 ≈ 4.5:1, #396dc6 ≈ 5:1). */
+  --brand-from: #d22da3;
+  --brand-to: #396dc6;
   --motion-distance-sm: 8px;
   --motion-distance-md: 12px;
   --motion-intensity: 1;
@@ -75,6 +84,8 @@
   --accent-foreground: oklch(0.97 0 0);
   --destructive: oklch(0.65 0.2 25);
   --ring: oklch(0.8 0 0);
+  --brand-from: #fbc2eb;
+  --brand-to: #a6c1ee;
 }
 
 @layer base {
