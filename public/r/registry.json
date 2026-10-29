@@ -63,6 +63,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T1",
+        "batch": "B1",
         "motion": [
           "feedback.press"
         ],
@@ -73,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -87,6 +88,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -95,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -109,6 +111,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -117,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -131,6 +134,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -139,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -153,6 +157,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -161,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -175,6 +180,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -183,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -197,6 +203,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -205,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -219,6 +226,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -227,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -241,6 +249,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -249,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -263,6 +272,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
+        "batch": "B1",
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
@@ -271,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -286,6 +296,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T4",
+        "batch": "B1",
         "motion": [
           "data.transition"
         ],
@@ -296,7 +307,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     },
     {
@@ -310,6 +321,7 @@
       "meta": {
         "since": "0.2.0",
         "tier": "T2",
+        "batch": "B4",
         "motion": [
           "popup.anchored",
           "exit.fade"
@@ -321,7 +333,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "4ca3b90"
+        "sourceSha": "09ca2ff"
       }
     }
   ]
