@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
+import { CardPreview } from "./card";
 import { DialogPreview } from "./dialog";
 import { InputPreview } from "./input";
 import { KbdPreview } from "./kbd";
@@ -20,5 +21,6 @@ export const previews: Record<string, ComponentType> = {
   label: LabelPreview,
   input: InputPreview,
   textarea: TextareaPreview,
+  card: CardPreview,
   dialog: DialogPreview,
 };

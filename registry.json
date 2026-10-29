@@ -296,6 +296,34 @@
       }
     },
     {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "A bounded surface for grouped content, with parts you can restyle.",
+      "categories": ["layout"],
+      "dependencies": [],
+      "registryDependencies": ["@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/card/card.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/card/card.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

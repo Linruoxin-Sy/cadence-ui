@@ -77,6 +77,27 @@
         "textarea"
       ]
     },
+    "card": {
+      "path": "apps/v4/registry/bases/base/ui/card.tsx",
+      "exports": [
+        "Card",
+        "CardAction",
+        "CardContent",
+        "CardDescription",
+        "CardFooter",
+        "CardHeader",
+        "CardTitle"
+      ],
+      "slots": [
+        "card",
+        "card-action",
+        "card-content",
+        "card-description",
+        "card-footer",
+        "card-header",
+        "card-title"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [
