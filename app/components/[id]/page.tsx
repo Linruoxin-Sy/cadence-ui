@@ -23,13 +23,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
   const doc = await getComponent(id);
   if (!doc) notFound();
 
-  const badges = [
-    doc.category,
-    doc.intensity,
-    doc.complexity ? `complexity ${doc.complexity}` : null,
-    doc.since ? `since ${doc.since}` : null,
-  ].filter(Boolean);
-
   return (
     <article className="max-w-3xl py-12">
       <nav className="text-xs text-muted-foreground">
@@ -43,16 +36,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
       <header className="mt-4">
         <h1 className="text-3xl font-semibold tracking-tight">{doc.title}</h1>
         <p className="mt-2 text-base text-muted-foreground">{doc.description}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {badges.map((badge) => (
-            <span
-              key={badge}
-              className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground"
-            >
-              {badge}
-            </span>
-          ))}
-        </div>
       </header>
 
       <section className="mt-8" aria-label="Live preview">
