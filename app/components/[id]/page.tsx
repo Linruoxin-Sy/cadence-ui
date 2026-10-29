@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CopyCommand } from "@/components/site/copy-command";
 import { Mdx } from "@/components/site/mdx";
 import { PreviewFrame } from "@/components/site/preview";
 import { getComponent, listComponents } from "@/lib/content";
@@ -43,10 +42,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
       </section>
 
       <section className="mt-4">
-        <CopyCommand command={`npx shadcn@latest add @cadence/${doc.slug}`} />
-      </section>
-
-      <section className="mt-10">
         <Mdx source={doc.body} />
       </section>
     </article>
