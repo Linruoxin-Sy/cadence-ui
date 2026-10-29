@@ -40,7 +40,7 @@ writing durations inline.
 
 | Recipe | Used by | Character |
 | --- | --- | --- |
-| `reveal` | fade-in, text-reveal, tabs panel | 0.22s ease-out |
+| `reveal` | sections, tab panels | 0.22s ease-out |
 | `enter.pop` | popovers | snappy spring |
 | `exit.fade` | backdrops, dismissed layers | 0.16s ease-in |
 | `exit.shrink` | closing panels | 0.16s ease-in |
@@ -53,7 +53,7 @@ writing durations inline.
 | `scroll.story` | scroll narratives (optional GSAP) | 0.32s |
 | `text.reveal` | per-word reveals | 0.32s |
 | `text.split` | per-character reveals (optional GSAP) | 0.32s |
-| `number.roll` | number-flow | snappy spring |
+| `number.roll` | numeric values | snappy spring |
 | `state.morph` | accordion, button width | morph spring |
 | `feedback.press` | buttons | press spring |
 
@@ -100,7 +100,7 @@ Five rules for new components:
 | Metric | Budget |
 | --- | --- |
 | Motion runtime | ≈ 43 KB gzip (Motion full); optional LazyMotion path ~30 KB |
-| Per-component JS | ≤ 8 KB gzip |
+| Per-component JS | by tier: T0 4 KB, T1 6 KB, T2 10 KB, T3 12 KB, T4 14 KB gzip (`meta.tier`) |
 | Concurrent animated elements | ≤ 20 |
 | Total stagger | ≤ 400 ms |
 | Animated properties | transform, opacity, filter |

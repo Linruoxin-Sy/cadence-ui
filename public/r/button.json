@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button",
+  "title": "Button",
+  "description": "Triggers an action, with press feedback that collapses under reduced motion.",
+  "dependencies": [
+    "@base-ui/react",
+    "class-variance-authority",
+    "motion"
+  ],
+  "registryDependencies": [
+    "@cadence/cadence-motion",
+    "@cadence/cadence-utils",
+    "@cadence/cadence-provider"
+  ],
+  "files": [
+    {
+      "path": "registry/cadence/button/button.tsx",
+      "content": "\"use client\";\n\nimport { Button as ButtonPrimitive } from \"@base-ui/react/button\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\nimport { cn } from \"../lib/cn\";\nimport { useCadenceMotion } from \"../lib/provider\";\n\n/**\n * Press feedback is the only motion here: the control compresses to 0.98 while\n * active, then springs back on release. Under reduced motion the scale is\n * dropped and only the colour transition remains.\n */\nconst buttonVariants = cva(\n  \"inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium outline-none transition-[color,background-color,border-color,box-shadow,scale,transform,opacity] duration-150 ease-out focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4\",\n  {\n    variants: {\n      variant: {\n        default: \"bg-primary text-primary-foreground hover:bg-primary/90\",\n        destructive:\n          \"bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40\",\n        outline:\n          \"border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50\",\n        secondary: \"bg-secondary text-secondary-foreground hover:bg-secondary/80\",\n        ghost: \"hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50\",\n        link: \"text-primary underline-offset-4 hover:underline\",\n      },\n      size: {\n        default: \"h-9 px-4 py-2 has-[>svg]:px-3\",\n        xs: \"h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3\",\n        sm: \"h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5\",\n        lg: \"h-10 rounded-md px-6 has-[>svg]:px-4\",\n        icon: \"size-9\",\n        \"icon-xs\": \"size-6 rounded-md [&_svg:not([class*='size-'])]:size-3\",\n        \"icon-sm\": \"size-8\",\n        \"icon-lg\": \"size-10\",\n      },\n    },\n    defaultVariants: {\n      variant: \"default\",\n      size: \"default\",\n    },\n  },\n);\n\nexport interface ButtonProps extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {}\n\n/**\n * Button with the shadcn API: six variants, eight sizes, and Base UI's `render`\n * for composition.\n *\n * Motion contract:\n * - press: scale 1 → 0.98 on `spring.press`, released on pointer up\n * - reduced / none: no scale, colour transition only\n *\n * a11y: Base UI owns the disabled/focusable semantics; `aria-invalid` drives the\n * destructive ring. The component never validates anything itself.\n */\nexport function Button({ className, variant = \"default\", size = \"default\", ...props }: ButtonProps) {\n  const cm = useCadenceMotion();\n\n  return (\n    <ButtonPrimitive\n      data-slot=\"button\"\n      data-variant={variant}\n      data-size={size}\n      data-motion={cm.mode}\n      className={cn(\n        buttonVariants({ variant, size }),\n        cm.reduced ? \"active:scale-100\" : \"active:scale-[0.98]\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport { buttonVariants };\n",
+      "type": "registry:ui",
+      "target": "@components/cadence/button/button.tsx"
+    }
+  ],
+  "meta": {
+    "since": "0.2.0",
+    "tier": "T1",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "848d950"
+  },
+  "docs": "## When to use\n\n- The primary action of a form, dialog, or toolbar.\n- A single, clearly labelled command: save, delete, invite.\n- Anywhere the user expects a physical press response.\n\n## When not to use\n\n- Navigation between routes; use a link styled with `buttonVariants`.\n- Toggling a persistent state; use `toggle` or `switch`.\n- Submitting a long-running job that needs its own progress surface; pair the button with a\n  spinner and a `disabled` state, or use `toast` for the result.\n\n## Installation\n\n```bash\nnpx shadcn@latest add @cadence/button\n```\n\n## Usage\n\n```tsx\nimport { Button } from \"@/components/cadence/button/button\";\n\nexport function Save() {\n  return <Button onClick={save}>Save changes</Button>;\n}\n```\n\n## Examples\n\n### Variants\n\n```tsx\n<Button variant=\"outline\">Cancel</Button>\n<Button variant=\"destructive\">Delete project</Button>\n<Button variant=\"ghost\" size=\"icon-sm\" aria-label=\"Open settings\">\n  <Settings />\n</Button>\n```\n\n### Links\n\nFor navigation, keep the link and take the styles: this preserves link semantics and\nmiddle-click.\n\n```tsx\nimport Link from \"next/link\";\nimport { buttonVariants } from \"@/components/cadence/button/button\";\n\n<Link href=\"/pricing\" className={buttonVariants({ variant: \"outline\" })}>\n  Pricing\n</Link>;\n```\n\n### Composition\n\n`render` replaces the underlying element; use it for custom button components, not for links.\n\n```tsx\n<Button render={<CopyButton />}>Copy</Button>\n```\n\n## API\n\n| Prop | Type | Default | Description |\n| --- | --- | --- | --- |\n| `variant` | `\"default\" \\| \"destructive\" \\| \"outline\" \\| \"secondary\" \\| \"ghost\" \\| \"link\"` | `\"default\"` | Visual weight. |\n| `size` | `\"default\" \\| \"xs\" \\| \"sm\" \\| \"lg\" \\| \"icon\" \\| \"icon-xs\" \\| \"icon-sm\" \\| \"icon-lg\"` | `\"default\"` | Height and padding. |\n| `render` | `ReactElement \\| (props, state) => ReactElement` | – | Base UI composition; replaces `asChild`. |\n| `className` | `string` | – | Merged last. |\n\nAll native button props are forwarded.\n\n## Motion contract\n\n| Phase | Properties | Token | Interruptible |\n| --- | --- | --- | --- |\n| press | `scale 1 → 0.98` while active | `spring.press` | yes (pointer up) |\n| release | `scale 0.98 → 1` | `spring.press` | yes |\n| reduced | no scale; colour and shadow only | – | – |\n| none | no scale; colour and shadow only | – | – |\n\n## Accessibility\n\n- Renders a real `<button>` through Base UI, so Enter and Space activate it natively.\n- Focus is visible through the ring tokens; disabled buttons are not focusable and keep\n  `aria-disabled` semantics from Base UI.\n- `aria-invalid` drives the destructive border and ring. The component does not validate\n  anything: see [validation](/docs/validation).\n\n## Notes for AI\n\n- Keep the label specific (\"Delete project\", not \"OK\").\n- Do not add a `loading` boolean that hides the label; pass `disabled` and render a spinner\n  next to the text so the action stays readable.",
+  "categories": [
+    "form",
+    "feedback"
+  ],
+  "type": "registry:ui"
+}

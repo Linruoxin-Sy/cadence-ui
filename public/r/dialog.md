@@ -1,0 +1,150 @@
+# Dialog
+
+> A modal window that fades and settles in, with the open and close sequence interruptible.
+
+- Registry item: /r/dialog.json
+- Install: `npx shadcn@latest add @cadence/dialog`
+- Type: registry:ui
+- Since: 0.2.0
+- Motion recipes: popup.anchored, exit.fade
+
+## When to use
+
+- A focused task that must interrupt the page: rename, invite, confirm.
+- Content that needs a modal, a focus trap, and an obvious escape route.
+- A short form whose result matters more than the page behind it.
+
+## When not to use
+
+- Non-blocking hints and menus; use `popover` or `tooltip`.
+- Long multi-step flows; use a page or a wizard.
+- Mobile sheets with drag gestures; use `drawer`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/dialog
+```
+
+This also installs `button`, which the dialog uses for its close control.
+
+## Usage
+
+```tsx
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog/dialog";
+import { Button } from "@/components/cadence/button/button";
+
+export function DeleteProject() {
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="outline" />}>Delete project</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete this project?</DialogTitle>
+          <DialogDescription>This removes every deployment and cannot be undone.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+          <Button variant="destructive">Delete project</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Examples
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent>…</DialogContent>
+</Dialog>;
+```
+
+### Without the built-in close button
+
+```tsx
+<DialogContent showCloseButton={false}>…</DialogContent>
+```
+
+### Footer with a close action
+
+```tsx
+<DialogFooter showCloseButton>
+  <Button>Save</Button>
+</DialogFooter>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Dialog` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root. |
+| `DialogTrigger` | native button props, `render` | Opens the dialog. |
+| `DialogContent` | `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
+| `DialogOverlay` | `className` | Only needed when replacing `DialogContent`. |
+| `DialogClose` | native button props, `render` | Closes the dialog. |
+| `DialogHeader` / `DialogFooter` | `className` | Layout only. |
+| `DialogTitle` | `className` | Required accessible name. |
+| `DialogDescription` | `className` | Optional supporting text. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` | yes (reopen mid-exit) |
+| reduced | opacity only, 100ms | `exit.fade` | yes |
+| none | instant | – | – |
+
+The panel stays mounted while its exit transition runs; Base UI delays unmount until the
+transition ends, so reopening mid-exit reverses cleanly.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Cycles focus inside the dialog. |
+| Escape | Closes the dialog and returns focus to the trigger. |
+| Enter / Space | Activates the focused control. |
+
+## Accessibility
+
+- Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`,
+  focus trapping, focus return, scroll lock, and Escape handling.
+- The close button is a real button with a screen-reader-only label.
+- `DialogTitle` is required; a dialog without an accessible name is invalid.
+- Content is unmounted after the exit transition, so focus is never lost mid-flight.
+
+## Responsive behavior
+
+The panel is centred and capped at `max-w-lg`; on narrow viewports it keeps a 1rem gutter.
+Long content scrolls inside the popup rather than the page.
+
+## Performance
+
+- One popup tree is mounted only while open.
+- Animates opacity and scale only; no layout reads and no JavaScript animation loop.
+
+## Notes for AI
+
+- Always render a `DialogTitle`; it is the accessible name.
+- Keep the confirming action specific ("Delete project", not "OK").
+- Do not animate height inside the dialog; mount content instead.
+
+---
+
+Full index: /llms.txt

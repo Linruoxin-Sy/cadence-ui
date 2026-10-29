@@ -12,7 +12,7 @@
 ```
 
 ```bash
-npx shadcn@latest add @cadence/fade-in
+npx shadcn@latest add @cadence/button
 ```
 
 ## Rules for agents
@@ -21,17 +21,12 @@ npx shadcn@latest add @cadence/fade-in
 - Read the item's `docs` and `meta.motion` before changing motion.
 - Keep the reduced-motion branch; never remove `data-motion`.
 - Use presets from `components/cadence/lib/motion.ts`; do not invent durations.
+- Cadence is UI only: never pass a schema, resolver, or validation rule to a component (P11).
 
 ## Components
 
-- [Fade in](/r/fade-in.md): Reveal content on scroll with a short rise and a reduced-motion fallback. (text, motion)
-- [Text reveal](/r/text-reveal.md): Reveal a heading or paragraph word by word, with a single accessible sentence. (text, motion)
-- [Number flow](/r/number-flow.md): A number that rolls from its previous value to the next, with a static accessible value. (feedback, motion)
-- [Morph button](/r/morph-button.md): A button whose label and width morph between idle, loading, success, and error. (feedback, motion)
-- [Animated tabs](/r/animated-tabs.md): Tabs with a shared-element indicator and an animated panel swap. (navigation, motion)
-- [Motion accordion](/r/motion-accordion.md): An accordion whose panels spring open and closed, with a rotating chevron. (navigation, motion)
-- [Scroll progress](/r/scroll-progress.md): A reading-progress bar that follows the page scroll on a spring. (scroll, motion)
-- [Motion dialog](/r/motion-dialog.md): A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit. (overlay, motion)
+- [Button](/r/button.md): Triggers an action, with press feedback that collapses under reduced motion. (form, feedback)
+- [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs
 
@@ -42,748 +37,215 @@ npx shadcn@latest add @cadence/fade-in
 
 ---
 
-# Fade in
+# Button
 
-Reveal content on scroll with a short rise and a reduced-motion fallback.
+Triggers an action, with press feedback that collapses under reduced motion.
 
 ## When to use
 
-- Section intros, cards, and empty states that should arrive when they enter the viewport.
-- Anywhere you want one consistent entrance instead of hand-writing `whileInView` per element.
-- Marketing pages where a short rise adds reading rhythm without delaying content.
+- The primary action of a form, dialog, or toolbar.
+- A single, clearly labelled command: save, delete, invite.
+- Anywhere the user expects a physical press response.
 
 ## When not to use
 
-- Content that is already visible on first paint and must not move (use no animation).
-- Long lists where every row would animate at once; use a stagger container instead.
-- Replacing layout or routing transitions; this only animates its own children.
+- Navigation between routes; use a link styled with `buttonVariants`.
+- Toggling a persistent state; use `toggle` or `switch`.
+- Submitting a long-running job that needs its own progress surface; pair the button with a
+  spinner and a `disabled` state, or use `toast` for the result.
 
 ## Installation
 
 ```bash
-npx shadcn@latest add @cadence/fade-in
+npx shadcn@latest add @cadence/button
 ```
-
-This pulls in `cadence-motion`, `cadence-utils`, and `cadence-provider` automatically.
 
 ## Usage
 
 ```tsx
-import { FadeIn } from "@/components/cadence/fade-in/fade-in";
+import { Button } from "@/components/cadence/button/button";
 
-export function Feature() {
-  return (
-    <FadeIn distance={16} delay={0.05}>
-      <h2>Everything you need to ship</h2>
-    </FadeIn>
-  );
+export function Save() {
+  return <Button onClick={save}>Save changes</Button>;
 }
 ```
 
 ## Examples
 
-### Stagger a row of cards
+### Variants
 
 ```tsx
-<div className="grid gap-4 md:grid-cols-3">
-  {features.map((feature, index) => (
-    <FadeIn key={feature.title} delay={index * 0.06}>
-      <Card {...feature} />
-    </FadeIn>
-  ))}
-</div>
+<Button variant="outline">Cancel</Button>
+<Button variant="destructive">Delete project</Button>
+<Button variant="ghost" size="icon-sm" aria-label="Open settings">
+  <Settings />
+</Button>
 ```
 
-### Replay on every entry
+### Links
+
+For navigation, keep the link and take the styles: this preserves link semantics and
+middle-click.
 
 ```tsx
-<FadeIn once={false} distance={24}>
-  <Quote />
-</FadeIn>
+import Link from "next/link";
+import { buttonVariants } from "@/components/cadence/button/button";
+
+<Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
+  Pricing
+</Link>;
+```
+
+### Composition
+
+`render` replaces the underlying element; use it for custom button components, not for links.
+
+```tsx
+<Button render={<CopyButton />}>Copy</Button>
 ```
 
 ## API
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `delay` | `number` | `0` | Stagger offset in seconds. Ignored when motion is reduced. |
-| `distance` | `number` | `12` | Pixels travelled while fading in. |
-| `once` | `boolean` | `true` | Reveal once, or replay on every viewport entry. |
-| `className` | `string` | – | Merged with the wrapper classes. |
-| `children` | `ReactNode` | – | Content to reveal. |
+| `variant` | `"default" \| "destructive" \| "outline" \| "secondary" \| "ghost" \| "link"` | `"default"` | Visual weight. |
+| `size` | `"default" \| "xs" \| "sm" \| "lg" \| "icon" \| "icon-xs" \| "icon-sm" \| "icon-lg"` | `"default"` | Height and padding. |
+| `render` | `ReactElement \| (props, state) => ReactElement` | – | Base UI composition; replaces `asChild`. |
+| `className` | `string` | – | Merged last. |
+
+All native button props are forwarded.
 
 ## Motion contract
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | `opacity 0 → 1`, `translateY distance → 0` | `reveal` (0.22s, ease-out) | n/a (one-shot) |
-| reduced | `opacity` only, 0.16s | `reveal` short | n/a |
-| none | end state immediately | – | n/a |
-
-## Keyboard interactions
-
-No keyboard behaviour of its own. Focus order and semantics are unchanged.
+| press | `scale 1 → 0.98` while active | `spring.press` | yes (pointer up) |
+| release | `scale 0.98 → 1` | `spring.press` | yes |
+| reduced | no scale; colour and shadow only | – | – |
+| none | no scale; colour and shadow only | – | – |
 
 ## Accessibility
 
-- Never hides content permanently: opacity reaches `1` and the element stays in the DOM.
-- The wrapper is a `div`; pass `as`-style semantics by nesting the correct element, or use your own wrapper.
-- Respects `prefers-reduced-motion`; with reduce enabled only opacity animates.
-
-## Responsive behavior
-
-Distance is in pixels, not viewport units, so the motion stays subtle on mobile. Use a larger
-`distance` only for full-width hero blocks.
-
-## Performance
-
-- Animates `opacity` and `transform` only, on the compositor.
-- One `IntersectionObserver` per instance, no scroll listeners.
-- Prefer `once` for long pages so observers disconnect after the first reveal.
+- Renders a real `<button>` through Base UI, so Enter and Space activate it natively.
+- Focus is visible through the ring tokens; disabled buttons are not focusable and keep
+  `aria-disabled` semantics from Base UI.
+- `aria-invalid` drives the destructive border and ring. The component does not validate
+  anything: see [validation](/docs/validation).
 
 ## Notes for AI
 
-- Default entrance for a single block. For lists, keep the stagger on the parent and use small values (≤ 0.06s per item).
-- Do not wrap above-the-fold hero text that must be readable before hydration.
-- If the design already animates the parent, nest `FadeIn` only for the child that needs its own timing.
+- Keep the label specific ("Delete project", not "OK").
+- Do not add a `loading` boolean that hides the label; pass `disabled` and render a spinner
+  next to the text so the action stays readable.
 
-# Text reveal
+# Dialog
 
-Reveal a heading or paragraph word by word, with a single accessible sentence.
-
-## When to use
-
-- Page titles and section headings that deserve a moment of arrival.
-- Short paragraphs (under ~40 words) where per-word rhythm reads as intentional.
-- Landing pages where the copy is the main visual.
-
-## When not to use
-
-- Body copy people scan or re-read; per-word motion slows reading.
-- Text that changes often (live data, counters); use a number component instead.
-- Content with inline links, emphasis, or icons: this component takes a plain string only.
-
-## Installation
-
-```bash
-npx shadcn@latest add @cadence/text-reveal
-```
-
-## Usage
-
-```tsx
-import { TextReveal } from "@/components/cadence/text-reveal/text-reveal";
-
-export function Hero() {
-  return (
-    <TextReveal as="h1" stagger={0.04}>
-      Motion that explains what just happened
-    </TextReveal>
-  );
-}
-```
-
-## Examples
-
-### Slower, heavier entrance
-
-```tsx
-<TextReveal as="h2" stagger={0.08} delay={0.1}>
-  Built for products, not demos
-</TextReveal>
-```
-
-### Reduce to a single fade
-
-Set `data-motion="reduced"` on an ancestor (or enable the OS setting) and the whole string
-fades once instead of word by word.
-
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `string` | – | Plain text. Inline markup is not supported. |
-| `as` | `"h1" \| "h2" \| "h3" \| "p" \| "span"` | `"p"` | Semantic element. |
-| `stagger` | `number` | `0.035` | Seconds between words. |
-| `delay` | `number` | `0` | Seconds before the first word. |
-| `once` | `boolean` | `true` | Reveal once or replay on entry. |
-| `className` | `string` | – | Merged onto the semantic element. |
-
-## Motion contract
-
-| Phase | Properties | Token | Interruptible |
-| --- | --- | --- | --- |
-| enter | per word `opacity 0 → 1`, `translateY 0.35em → 0` | `text.reveal` (0.32s, stagger 0.035s) | n/a |
-| reduced | whole string fades once | `reveal` | n/a |
-| none | end state immediately | – | n/a |
-
-## Keyboard interactions
-
-None. Text is not interactive and does not enter the tab order.
-
-## Accessibility
-
-- The visible words are `aria-hidden`; the element itself carries `aria-label` with the full string,
-  so screen readers announce the sentence once.
-- The rendered element keeps its heading/paragraph role, so document structure is preserved.
-- Reduced motion swaps the stagger for one fade; no content is delayed or hidden.
-
-## Responsive behavior
-
-Works at any width. Very narrow columns can produce many short lines; lower `stagger` to keep the
-total under ~0.4s.
-
-## Performance
-
-- One span per word. Keep strings short; a 200-word paragraph creates 200 elements.
-- Animates opacity and transform only.
-- Splitting happens during render, so the DOM is stable after hydration.
-
-## Notes for AI
-
-- Only pass plain strings. If the copy needs a link or `<strong>`, split the sentence and wrap parts
-  in separate `TextReveal` instances instead of injecting markup.
-- Keep total stagger (`stagger × words`) under 0.4s.
-- Do not use for navigation labels or buttons.
-
-# Number flow
-
-A number that rolls from its previous value to the next, with a static accessible value.
+A modal window that fades and settles in, with the open and close sequence interruptible.
 
 ## When to use
 
-- Metrics, KPIs, and totals that update while the user watches.
-- Prices and counters where a jump would hide the direction of the change.
-- Dashboard cards that refresh on an interval or a filter change.
+- A focused task that must interrupt the page: rename, invite, confirm.
+- Content that needs a modal, a focus trap, and an obvious escape route.
+- A short form whose result matters more than the page behind it.
 
 ## When not to use
 
-- Currency inputs the user types into; use a controlled input.
-- Values that change several times per second (streams, live tickers); the spring never settles.
-- Numbers that must be copyable as text; the rendered frames are not stable text.
-
-## Installation
-
-```bash
-npx shadcn@latest add @cadence/number-flow
-```
-
-## Usage
-
-```tsx
-import { NumberFlow } from "@/components/cadence/number-flow/number-flow";
-
-export function Revenue({ value }: { value: number }) {
-  return <NumberFlow value={value} prefix="$" precision={0} announce />;
-}
-```
-
-## Examples
-
-### Percentage with one decimal
-
-```tsx
-<NumberFlow value={0.873} precision={1} suffix="%" />
-```
-
-### Localized grouping
-
-```tsx
-<NumberFlow value={1234567} locale="de-DE" />
-```
-
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` | `number` | – | The value to display. Changes animate. |
-| `precision` | `number` | `0` | Fraction digits. |
-| `locale` | `string` | runtime | Locale passed to `Intl.NumberFormat`. |
-| `prefix` / `suffix` | `string` | – | Rendered beside the number, outside the animated value. |
-| `announce` | `boolean` | `false` | Adds `aria-live="polite"` for result-style values. |
-| `className` | `string` | – | Merged onto the wrapper. |
-
-## Motion contract
-
-| Phase | Properties | Token | Interruptible |
-| --- | --- | --- | --- |
-| change | spring from old to new value, formatted per frame | `number.roll` (0.26s spring) | yes |
-| reduced | new value shown directly | – | – |
-| none | new value shown directly | – | – |
-
-## Keyboard interactions
-
-None. Not focusable.
-
-## Accessibility
-
-- The element exposes the final formatted value through `aria-label`; intermediate frames stay out of
-  the accessibility tree.
-- `announce` adds a polite live region for results such as a checkout total. Leave it off for counters
-  that change often, or screen readers will chatter.
-- Tabular numbers keep the width stable as digits change.
-
-## Responsive behavior
-
-Uses `tabular-nums` and inline flow, so it inherits font size from the container. For very large
-numbers, reduce `precision` rather than shrinking the font.
-
-## Performance
-
-- One spring per instance; updates are cheap and do not re-render React.
-- Avoid dozens of these on one screen; each runs a frame loop while settling.
-
-## Notes for AI
-
-- Use for numbers that change in place. For editable numbers use an input, for static values use text.
-- Keep `announce` off unless the number is a result the user is waiting for.
-- Never format inside the parent and pass a string; pass the raw number so the spring can interpolate.
-
-# Morph button
-
-A button whose label and width morph between idle, loading, success, and error.
-
-## When to use
-
-- Forms where a submit button changes to loading, then success, then back.
-- Toolbars where the label changes in place ("Save" → "Saved") and the button should keep its width.
-- Any action where the button itself can carry the result without a toast.
-
-## When not to use
-
-- Navigation links; use a link component.
-- Destructive actions that need a confirmation step; use a dialog or a hold-to-confirm pattern.
-- Buttons whose label does not change; a plain button is lighter.
-
-## Installation
-
-```bash
-npx shadcn@latest add @cadence/morph-button
-```
-
-## Usage
-
-```tsx
-import { MorphButton } from "@/components/cadence/morph-button/morph-button";
-
-export function SaveBar({ save }: { save: () => Promise<void> }) {
-  const [state, setState] = React.useState<"idle" | "loading" | "success">("idle");
-  return (
-    <MorphButton
-      state={state}
-      labels={{ idle: "Save changes", loading: "Saving", success: "Saved" }}
-      onClick={async () => {
-        setState("loading");
-        await save();
-        setState("success");
-      }}
-    >
-      Save changes
-    </MorphButton>
-  );
-}
-```
-
-## Examples
-
-### Error recovery
-
-```tsx
-<MorphButton
-  state={status}
-  labels={{ loading: "Sending", error: "Try again", success: "Sent" }}
-  variant={status === "error" ? "danger" : "primary"}
->
-  Send invite
-</MorphButton>
-```
-
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `state` | `"idle" \| "loading" \| "success" \| "error"` | `"idle"` | Visible state; drives icon and label. |
-| `labels` | `Partial<Record<State, ReactNode>>` | – | Label per state. Falls back to `children`. |
-| `variant` | `"primary" \| "secondary" \| "ghost" \| "danger"` | `"primary"` | Visual weight. |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Height and padding. |
-| `className` | `string` | – | Merged onto the button. |
-| `...props` | `ButtonHTMLAttributes` | – | Forwarded to the underlying button. |
-
-## Motion contract
-
-| Phase | Properties | Token | Interruptible |
-| --- | --- | --- | --- |
-| state change | label `opacity`/`translateY 4px`, slot `width → auto` | `state.morph` (0.42s spring, no overshoot) | yes |
-| press | `scale 0.97` (icon sizes slightly less) | `feedback.press` (0.24s spring) | yes |
-| reduced | label crossfade only; width jumps; no press scale | `state.morph` short | yes |
-| none | instant label swap | – | – |
-
-## Keyboard interactions
-
-| Keys | Action |
-| --- | --- |
-| Enter / Space | Activates the button. |
-| Tab | Focuses the button; loading keeps it focusable. |
-
-## Accessibility
-
-- Loading uses `aria-busy` and `aria-disabled` instead of `disabled`, so keyboard focus is not lost mid-action.
-- Clicks are swallowed while loading, but the button stays focusable.
-- Success and error are announced through a visually hidden `role="status"` live region.
-- Icon-only usage needs an `aria-label`; the icon is `aria-hidden`.
-
-## Responsive behavior
-
-Width springs to the measured label width, so the button never clips on narrow screens. If the label
-wraps, the measurement follows the new height without animating it.
-
-## Performance
-
-- One `ResizeObserver` per button, disconnected on unmount.
-- Animates opacity, transform, and the slot width (layout) only on state changes, not continuously.
-- The spinner is a CSS rotation; reduced motion renders it static.
-
-## Notes for AI
-
-- Drive `state` from your request state; do not fake success before the promise resolves.
-- Keep labels short; the width animation is meant for a few words, not a sentence.
-- Use `variant="danger"` for error only if the action itself is destructive; otherwise keep the variant stable.
-
-# Animated tabs
-
-Tabs with a shared-element indicator and an animated panel swap.
-
-## When to use
-
-- Two to six peer views in the same context (overview, activity, settings).
-- Panels whose content is lightweight enough to mount on selection.
-- Anywhere the active indicator is part of the design language.
-
-## When not to use
-
-- More than ~7 sections; use a sidebar or select.
-- Content that must keep its state while hidden (a form being edited in another tab); keep the
-  panels mounted yourself or use a router.
-- Navigation between routes; use links with `aria-current`.
-
-## Installation
-
-```bash
-npx shadcn@latest add @cadence/animated-tabs
-```
-
-## Usage
-
-```tsx
-import { AnimatedTabs } from "@/components/cadence/animated-tabs/animated-tabs";
-
-export function Settings() {
-  return (
-    <AnimatedTabs
-      defaultValue="profile"
-      items={[
-        { value: "profile", label: "Profile", content: <ProfileForm /> },
-        { value: "billing", label: "Billing", content: <Billing /> },
-      ]}
-    />
-  );
-}
-```
-
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `AnimatedTabItem[]` | – | `value`, `label`, `content`, optional `disabled`. |
-| `value` | `string` | – | Controlled active value. |
-| `defaultValue` | `string` | first enabled | Initial value when uncontrolled. |
-| `onValueChange` | `(value: string) => void` | – | Called on click and keyboard selection. |
-| `className` | `string` | – | Merged onto the root. |
-
-## Motion contract
-
-| Phase | Properties | Token | Interruptible |
-| --- | --- | --- | --- |
-| indicator | shared-element FLIP between tabs | `layout.shared` (0.42s spring) | yes |
-| panel in | `opacity`, `translateY 8px to 0` | `reveal` | n/a (mount only) |
-| reduced | indicator jumps, panel fades only | `reveal` short | yes |
-| none | instant swap | – | – |
-
-## Keyboard interactions
-
-| Keys | Action |
-| --- | --- |
-| Tab | Moves focus into the tab list (roving tabindex). |
-| Arrow Right / Left | Moves to the next/previous enabled tab and activates it. |
-| Home / End | First/last enabled tab. |
-| Enter / Space | Activates the focused tab (already activated on focus). |
-
-## Accessibility
-
-- Implements the WAI-ARIA tabs pattern: `role="tablist"`, `role="tab"`, `role="tabpanel"`,
-  `aria-selected`, `aria-controls`, `aria-labelledby`, roving `tabIndex`.
-- The panel is focusable (`tabIndex={0}`) so keyboard users can scroll long content.
-- Disabled tabs are skipped by arrow navigation.
-
-## Responsive behavior
-
-The list scrolls horizontally only if you add `overflow-x-auto`; by default it wraps. For narrow
-screens keep labels short or switch to a select.
-
-## Performance
-
-- Only the active panel is mounted; switching unmounts the previous one (state resets).
-- The indicator uses Motion's layout projection, which measures once per switch.
-
-## Notes for AI
-
-- Keep panel content cheap; it mounts on every switch.
-- If a panel holds form state, lift it up or use a router instead of tabs.
-- Do not add `layout` animations inside the panel; they will fight the shared indicator.
-
-# Motion accordion
-
-An accordion whose panels spring open and closed, with a rotating chevron.
-
-## When to use
-
-- FAQ sections and settings groups where one answer is open at a time.
-- Long forms split into optional sections.
-- Any disclosure where the height change should feel physical rather than instant.
-
-## When not to use
-
-- Primary navigation (use a menu).
-- Content that must always be visible for SEO-critical copy; render it open by default.
-- Nested accordions more than two levels deep; the height animation compounds.
-
-## Installation
-
-```bash
-npx shadcn@latest add @cadence/motion-accordion
-```
-
-## Usage
-
-```tsx
-import { MotionAccordion } from "@/components/cadence/motion-accordion/motion-accordion";
-
-export function Faq() {
-  return (
-    <MotionAccordion
-      defaultValue="billing"
-      items={[
-        { value: "billing", trigger: "How does billing work?", content: "We bill monthly." },
-        { value: "cancel", trigger: "Can I cancel?", content: "Any time, from settings." },
-      ]}
-    />
-  );
-}
-```
-
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `AccordionItem[]` | – | `value`, `trigger`, `content`. |
-| `type` | `"single" \| "multiple"` | `"single"` | One open panel, or any number. |
-| `value` / `defaultValue` | `string \| string[]` | – | Controlled / initial open values. |
-| `onValueChange` | `(value: string \| string[]) => void` | – | Called with a string in single mode. |
-| `collapsible` | `boolean` | `true` | Allow closing the open panel in single mode. |
-| `className` | `string` | – | Merged onto the root. |
-
-## Motion contract
-
-| Phase | Properties | Token | Interruptible |
-| --- | --- | --- | --- |
-| open | `height 0 → auto`, content `opacity`/`translateY 4px` | `state.morph` (0.42s spring) | yes |
-| close | reverse of open | `state.morph` | yes |
-| chevron | `rotate 0 → 180°` | `state.morph` on open, `exit.fade` on close | yes |
-| reduced | height snaps, content fades | `state.morph` short | yes |
-| none | instant | – | – |
-
-## Keyboard interactions
-
-| Keys | Action |
-| --- | --- |
-| Enter / Space | Toggles the focused trigger. |
-| Tab | Moves through triggers and open panel content. |
-
-## Accessibility
-
-- Triggers are native buttons with `aria-expanded` and `aria-controls`.
-- Open panels are `role="region"` labelled by their trigger, and are removed from the DOM when closed.
-- Chevron is decorative (`aria-hidden`); the expanded state is conveyed by `aria-expanded`.
-
-## Responsive behavior
-
-Height animates to `auto`, so content of any length works. On very long panels the spring can feel
-slow; reduce content or switch `type="multiple"` and keep one open.
-
-## Performance
-
-- Animating `height` triggers layout on each frame. Keep panels under ~600px tall.
-- Content is mounted only while open, so collapsed sections cost nothing.
-
-## Notes for AI
-
-- Use `type="multiple"` only when sections are independent.
-- Do not put another accordion inside a panel unless you disable height animation; nested height
-  springs beat against each other.
-- Keep trigger labels as plain text; the whole button is the hit target.
-
-# Scroll progress
-
-A reading-progress bar that follows the page scroll on a spring.
-
-## When to use
-
-- Long-form articles, documentation pages, and changelogs.
-- Any page where "how much is left" helps orientation.
-- As a global indicator mounted once in the root layout.
-
-## When not to use
-
-- Short pages that fit in one viewport; the bar never moves.
-- App shells with their own scroll containers (the hook tracks the window by default).
-- As a substitute for a table of contents or section navigation.
-
-## Installation
-
-```bash
-npx shadcn@latest add @cadence/scroll-progress
-```
-
-## Usage
-
-```tsx
-import { ScrollProgress } from "@/components/cadence/scroll-progress/scroll-progress";
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <ScrollProgress />
-      {children}
-    </>
-  );
-}
-```
-
-## Examples
-
-### Bottom-aligned, thicker bar
-
-```tsx
-<ScrollProgress position="bottom" height={3} className="bg-primary" />
-```
-
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `height` | `number` | `2` | Bar thickness in px. |
-| `position` | `"top" \| "bottom"` | `"top"` | Viewport edge to pin to. |
-| `className` | `string` | – | Merged onto the bar; use it to change the color. |
-
-## Motion contract
-
-| Phase | Properties | Token | Interruptible |
-| --- | --- | --- | --- |
-| scroll | `scaleX` follows `scrollYProgress` with a spring | `scroll.progress` (0.4s spring) | yes (continuous) |
-| reduced | raw progress, no spring | – | – |
-| none | raw progress | – | – |
-
-## Keyboard interactions
-
-None. The bar is decorative and not focusable.
-
-## Accessibility
-
-- `aria-hidden="true"`: the progress is visual only and adds no noise for screen readers.
-- Hidden in print styles.
-- `pointer-events-none`: it never blocks clicks near the viewport edge.
-
-## Responsive behavior
-
-Full viewport width, fixed position. On mobile browsers with a dynamic toolbar the bar stays pinned
-because it uses `fixed` rather than absolute positioning.
-
-## Performance
-
-- One `scrollYProgress` listener; the transform is compositor-only.
-- The spring adds a frame loop only while scrolling.
-
-## Notes for AI
-
-- Mount once, at the layout level, not per page.
-- For a scroll container other than the window, pass a custom `useScroll` target in your own wrapper;
-  this component intentionally stays window-scoped and dependency-free.
-- Do not use it as a loading indicator.
-
-# Motion dialog
-
-A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit.
-
-## When to use
-
-- A focused task that must interrupt: confirmations, short forms, destructive actions.
-- Content that needs a modal, focus trapping, and a clear escape route.
-- Any overlay where closing should feel like the panel "settles back" rather than vanishing.
-
-## When not to use
-
-- Non-blocking hints and menus; use a popover or tooltip.
+- Non-blocking hints and menus; use `popover` or `tooltip`.
 - Long multi-step flows; use a page or a wizard.
-- Mobile sheets with drag gestures; use a drawer component.
+- Mobile sheets with drag gestures; use `drawer`.
 
 ## Installation
 
 ```bash
-npx shadcn@latest add @cadence/motion-dialog
+npx shadcn@latest add @cadence/dialog
 ```
+
+This also installs `button`, which the dialog uses for its close control.
 
 ## Usage
 
 ```tsx
-import { MotionDialog } from "@/components/cadence/motion-dialog/motion-dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog/dialog";
+import { Button } from "@/components/cadence/button/button";
 
 export function DeleteProject() {
   return (
-    <MotionDialog
-      trigger="Delete project"
-      title="Delete this project?"
-      description="This removes every deployment and cannot be undone."
-    >
-      <div className="flex justify-end gap-2">
-        <button className="rounded-md border border-border px-3 py-2 text-sm">Cancel</button>
-        <button className="rounded-md bg-destructive px-3 py-2 text-sm text-white">Delete</button>
-      </div>
-    </MotionDialog>
+    <Dialog>
+      <DialogTrigger render={<Button variant="outline" />}>Delete project</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete this project?</DialogTitle>
+          <DialogDescription>This removes every deployment and cannot be undone.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+          <Button variant="destructive">Delete project</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 ```
 
+## Examples
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent>…</DialogContent>
+</Dialog>;
+```
+
+### Without the built-in close button
+
+```tsx
+<DialogContent showCloseButton={false}>…</DialogContent>
+```
+
+### Footer with a close action
+
+```tsx
+<DialogFooter showCloseButton>
+  <Button>Save</Button>
+</DialogFooter>
+```
+
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `trigger` | `ReactNode` | – | Content of the trigger button. |
-| `title` | `string` | – | Dialog title; required for accessibility. |
-| `description` | `string` | – | Optional supporting text. |
-| `children` | `ReactNode` | – | Dialog body. |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Max width. |
-| `open` | `boolean` | – | Controlled open state. |
-| `onOpenChange` | `(open: boolean) => void` | – | Called on open and close. |
-| `className` | `string` | – | Merged onto the panel. |
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Dialog` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root. |
+| `DialogTrigger` | native button props, `render` | Opens the dialog. |
+| `DialogContent` | `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
+| `DialogOverlay` | `className` | Only needed when replacing `DialogContent`. |
+| `DialogClose` | native button props, `render` | Closes the dialog. |
+| `DialogHeader` / `DialogFooter` | `className` | Layout only. |
+| `DialogTitle` | `className` | Required accessible name. |
+| `DialogDescription` | `className` | Optional supporting text. |
 
 ## Motion contract
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | backdrop `opacity 0 → 1`; panel `opacity`, `translateY 8px → 0`, `scale 0.96 → 1` | `popup.anchored` (0.4s spring) | yes |
-| exit | panel `opacity → 0`, `scale → 0.98`, `translateY 4px` | `popup.anchored` | yes |
-| reduced | opacity only | `exit.fade` / `popup.anchored` short | yes |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` | yes (reopen mid-exit) |
+| reduced | opacity only, 100ms | `exit.fade` | yes |
 | none | instant | – | – |
+
+The panel stays mounted while its exit transition runs; Base UI delays unmount until the
+transition ends, so reopening mid-exit reverses cleanly.
 
 ## Keyboard interactions
 
@@ -795,25 +257,24 @@ export function DeleteProject() {
 
 ## Accessibility
 
-- Base UI provides the modal semantics: `role="dialog"`, `aria-modal`, `aria-labelledby` /
-  `aria-describedby`, focus trap, focus return, scroll lock, and Escape handling.
-- The close button has an explicit `aria-label`.
-- The title is required; a dialog without an accessible name is invalid.
-- The panel is removed only after its exit animation finishes, so focus is never lost mid-flight.
+- Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`,
+  focus trapping, focus return, scroll lock, and Escape handling.
+- The close button is a real button with a screen-reader-only label.
+- `DialogTitle` is required; a dialog without an accessible name is invalid.
+- Content is unmounted after the exit transition, so focus is never lost mid-flight.
 
 ## Responsive behavior
 
-The viewport centers the panel and scrolls when the content is taller than the screen. `size` caps the
-width; on mobile the panel is always full-width minus page padding.
+The panel is centred and capped at `max-w-lg`; on narrow viewports it keeps a 1rem gutter.
+Long content scrolls inside the popup rather than the page.
 
 ## Performance
 
-- Only one panel tree is mounted while open; content is unmounted on close.
-- Animates opacity and transform only; the backdrop uses a subtle blur (2px), which is cheap but can
-  be removed on low-end devices.
+- One popup tree is mounted only while open.
+- Animates opacity and scale only; no layout reads and no JavaScript animation loop.
 
 ## Notes for AI
 
-- Always pass a `title`; it is the accessible name.
-- For destructive actions, keep the confirm button's label specific ("Delete project", not "OK").
-- If you need a non-modal popover, use Base UI Popover instead of this component.
+- Always render a `DialogTitle`; it is the accessible name.
+- Keep the confirming action specific ("Delete project", not "OK").
+- Do not animate height inside the dialog; mount content instead.

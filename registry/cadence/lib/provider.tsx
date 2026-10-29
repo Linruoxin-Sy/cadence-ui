@@ -55,7 +55,7 @@ export function CadenceProvider({ mode = "full", children, className }: CadenceP
   return (
     <CadenceContext.Provider value={value}>
       <MotionConfig reducedMotion="user" transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}>
-        <div data-motion={mode} className={cn("contents", className)}>
+        <div data-motion={effective} className={cn("contents", className)}>
           {children}
         </div>
       </MotionConfig>

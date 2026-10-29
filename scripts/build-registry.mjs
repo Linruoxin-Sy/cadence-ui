@@ -65,7 +65,7 @@ for (const item of registry.items) {
     );
   if (!same(doc.data.registryDeps ?? [], item.registryDependencies ?? []))
     problems.push(`${item.name}: doc registryDeps differ from registry`);
-  if (!doc.data.motion?.length) problems.push(`${item.name}: frontmatter needs a motion recipe list`);
+  if (!Array.isArray(doc.data.motion)) problems.push(`${item.name}: frontmatter needs a motion recipe list`);
   if (!doc.data.intensity) problems.push(`${item.name}: frontmatter needs an intensity`);
 }
 
@@ -201,7 +201,7 @@ const overview = [
   "```",
   "",
   "```bash",
-  "npx shadcn@latest add @cadence/fade-in",
+  "npx shadcn@latest add @cadence/button",
   "```",
   "",
   "## Rules for agents",
@@ -210,6 +210,7 @@ const overview = [
   "- Read the item's `docs` and `meta.motion` before changing motion.",
   "- Keep the reduced-motion branch; never remove `data-motion`.",
   "- Use presets from `components/cadence/lib/motion.ts`; do not invent durations.",
+  "- Cadence is UI only: never pass a schema, resolver, or validation rule to a component (P11).",
   "",
   "## Components",
   "",

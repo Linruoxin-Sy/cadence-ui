@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site/header";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { ScrollProgress } from "@/registry/cadence/scroll-progress/scroll-progress";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cadence.dev"),
@@ -38,7 +37,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
         <CadenceProvider>
-          <ScrollProgress />
           <SiteHeader />
           <main>{children}</main>
           <footer className="mt-24 border-t border-border">

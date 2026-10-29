@@ -195,3 +195,43 @@
 - ❌ Some users will file issues asking for `asChild`; the docs must explain this upfront.
 
 **Alternatives**: support both (doubles the API surface and raises test costs).
+
+---
+
+## ADR-011 · Rebuild as an API-compatible superset of shadcn's catalogue
+
+**Context**: the first eight components (`fade-in`, `text-reveal`, `number-flow`, `morph-button`,
+`animated-tabs`, `motion-accordion`, `scroll-progress`, `motion-dialog`) each invented their own API.
+`MotionDialog` took `trigger`/`title`/`children`; shadcn's `Dialog` is compound. The components could
+not replace their shadcn counterparts, so "shadcn with better motion" was impossible. The catalogue
+target is now shadcn's 65 registry items, with 57 in the first scope (55 `registry:ui` + 2
+`registry:block`).
+
+**Decision**:
+
+1. The eight original components are archived (`v0.1.0-mvp`, `archive/mvp-8`) and removed. Their motion
+   capability is folded into the corresponding shadcn components; four become `extras/*` after 1.0.
+2. Every component keeps shadcn's id, exports, props, and `data-slot` values. Additions are allowed;
+   renames and removals are not (P8). `meta.upstream` records the pinned upstream style.
+3. Files install to `@components/cadence/<id>/` — a parallel tree next to `components/ui` — so a project
+   can migrate component by component without overwriting shadcn files.
+4. Motion is tiered T0–T5 (P9). T0 components stay static; each tier has its own gzip budget.
+5. The library is UI only (P11): components render invalid state from `aria-invalid`, never validate.
+   `form`, `native-select`, and `sonner` are therefore out of scope; `toast` is the notification surface.
+6. Intra-registry dependencies are namespaced (`@cadence/<id>`); a bare name resolves against the default
+   shadcn registry and would install the wrong file.
+
+**Consequences**:
+
+- ✅ A user can swap `@/components/ui/x` for `@/components/cadence/x` with only an import change.
+- ✅ shadcn and Cadence coexist during migration; no overwrite risk.
+- ✅ Scope, tier, and budget are explicit, so 57 components stay reviewable.
+- ❌ We copy upstream markup and must track drift; the parity manifest and quarterly sync are mandatory.
+- ❌ T0 components gain nothing but a new import path; the value is the motion-tiered rest and one
+  consistent API.
+- ❌ `meta.tier` now means the motion tier. ADR-008 reserved "tier" for a future Pro split; if that
+  happens it must use a different field (for example `meta.plan`).
+
+**Alternatives**: overwrite `@components/ui` (true drop-in, but collides with the user's shadcn files and
+with shadcn's own registry dependencies); keep inventing components (the current dead end); wrap shadcn
+without shipping source (contradicts ADR-001 and ADR-005).

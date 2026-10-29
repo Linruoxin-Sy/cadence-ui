@@ -10,6 +10,9 @@ description: Add Cadence to a Next.js or Vite project with the shadcn CLI, or co
 - A project initialized with `npx shadcn@latest init` and Base UI as the component library
 - `motion` is installed automatically by the CLI; no other runtime is required
 
+Cadence components are UI only. They render invalid state from `aria-invalid` but never validate
+a value; see [validation](/docs/validation) for the boundary.
+
 ## Next.js
 
 ```bash
@@ -32,7 +35,7 @@ Install the theme once, then any component:
 
 ```bash
 npx shadcn@latest add @cadence/cadence-theme
-npx shadcn@latest add @cadence/morph-button
+npx shadcn@latest add @cadence/button
 ```
 
 The CLI writes files into the `cadence/` folder under your components alias
@@ -85,7 +88,7 @@ Every item keeps relative imports (`../lib/motion`), so the folder can be moved 
 ### The CLI cannot find `@cadence`
 
 Add the `registries` entry to `components.json`, or install from the full URL:
-`npx shadcn@latest add https://cadence.dev/r/fade-in.json`.
+`npx shadcn@latest add https://cadence.dev/r/button.json`.
 
 ### Styles are missing
 

@@ -464,7 +464,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
   for (const mode of ["full", "reduced", "none"] as const) {
     test(`dialog ${reducedMotion} ${mode}`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion });
-      await page.goto(`/components/motion-dialog?motion=${mode}`);
+      await page.goto(`/components/dialog?motion=${mode}`);
       await page.getByRole("button", { name: "Open" }).click();
       const content = page.getByRole("dialog");
       await expect(content).toBeVisible();
@@ -484,8 +484,8 @@ Every component declares its Motion Contract in its documentation; tests read th
 
 ```ts
 const contract = {
-  "fade-in": { enter: ["opacity", "translateY"], reduced: ["opacity"] },
-  "motion-sheet": { enter: ["translateY"], exit: ["translateY"], gesture: ["drag"] },
+  button: { press: ["scale"], reduced: [] },
+  dialog: { enter: ["opacity", "scale"], exit: ["opacity", "scale"], reduced: ["opacity"] },
 };
 ```
 

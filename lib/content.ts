@@ -6,6 +6,7 @@ export interface DocFrontmatter {
   title: string;
   description: string;
   category?: string;
+  tier?: "T0" | "T1" | "T2" | "T3" | "T4" | "T5";
   motion?: string[];
   intensity?: "subtle" | "medium" | "expressive";
   complexity?: "S" | "M" | "L";
@@ -58,7 +59,7 @@ export async function getComponent(slug: string): Promise<Doc | null> {
   }
 }
 
-const guideOrder = ["installation", "theming", "motion"];
+const guideOrder = ["installation", "theming", "motion", "validation"];
 
 export async function listGuides(): Promise<Doc[]> {
   const dir = path.join(contentRoot, "docs");

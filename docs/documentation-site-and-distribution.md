@@ -16,9 +16,9 @@
   /docs/registry               Self-hosted registry / private distribution
   /docs/ai                     llms.txt / MCP / Skill
   /docs/changelog              Release notes
-/components                    Catalog: category + motion intensity + search
-  /components/fade-in
-  /components/morph-button
+/components                    Catalog: category + motion tier + search
+  /components/button
+  /components/dialog
   ...
 /blocks                        Composed examples (from v0.2)
 /lab                           Experimental components (no stability promise)
@@ -184,8 +184,8 @@ export async function GET(_: Request, { params }: { params: Promise<{ path: stri
 
 ## Components
 
-- [Fade in](https://cadence.dev/r/fade-in.md): Reveal content on scroll. (text, S)
-- [Morph button](https://cadence.dev/r/morph-button.md): Label and width morph. (feedback, M)
+- [Button](https://cadence.dev/r/button.md): Press feedback with a reduced branch. (form, T1)
+- [Dialog](https://cadence.dev/r/dialog.md): Modal that fades and settles. (overlay, T2)
   ...
 ```
 
@@ -281,7 +281,7 @@ npx create-next-app@latest my-app --ts --tailwind --app
 cd my-app
 npx shadcn@latest init            # choose Base UI
 # add the @cadence registry to components.json
-npx shadcn@latest add @cadence/morph-button
+npx shadcn@latest add @cadence/button
 # import and use it in page.tsx
 pnpm dev                          # see the motion; toggle system reduced motion to see the downgrade
 ```

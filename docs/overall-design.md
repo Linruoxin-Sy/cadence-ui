@@ -70,10 +70,10 @@ cadence-ui/
 │       │   ├── motion.ts         # motion presets (TS)
 │       │   ├── cn.ts             # className merging
 │       │   └── provider.tsx      # MotionConfig + intensity switch (optional provider)
-│       ├── fade-in/              # one directory per item
-│       │   └── fade-in.tsx
-│       ├── text-reveal/
-│       └── ...                   # 15 component directories in total
+│       ├── button/               # one directory per shadcn id
+│       │   └── button.tsx
+│       ├── dialog/
+│       └── ...                   # 57 components in total (55 ui + 2 blocks)
 ├── content/
 │   ├── components/<id>.mdx       # component docs (with frontmatter)
 │   ├── docs/*.mdx                # guides
@@ -139,7 +139,7 @@ Conclusions:
 | Lint + format        | Biome                | 2.x                        | one fast pass for lint, formatting, and import order                  |
 | Package manager      | pnpm                 | 10+                        | single package, no workspace (MVP stage)                              |
 
-> One repository, one Next app, no monorepo/Turborepo: 15 components do not need it. Split later, once the docs site and registry need independent deploys (reserved by ADR-009).
+> One repository, one Next app, no monorepo/Turborepo: 57 components still fit one build. Split later, once the docs site and registry need independent deploys (reserved by ADR-009).
 
 ---
 
@@ -157,9 +157,9 @@ Conclusions:
 ```
 
 ```bash
-npx shadcn@latest add @cadence/fade-in
+npx shadcn@latest add @cadence/button
 # or
-npx shadcn@latest add https://cadence.dev/r/fade-in.json
+npx shadcn@latest add https://cadence.dev/r/button.json
 ```
 
 Install result:
@@ -167,7 +167,7 @@ Install result:
 ```
 components/cadence/
 ├── lib/{cn.ts,motion.ts,provider.tsx}   # dependencies pulled in automatically
-├── fade-in/fade-in.tsx
+├── button/button.tsx
 └── ...
 ```
 
@@ -204,26 +204,28 @@ We ship a `cadence-base` (`registry:base`) item that pins the consumer's shadcn 
 
 ```jsonc
 {
-  "name": "morph-button",
+  "name": "button",
   "type": "registry:ui",
-  "title": "Morph button",
-  "description": "A button whose label and width morph between states on a spring.",
-  "categories": ["feedback", "motion"],
-  "dependencies": ["motion"],
-  "registryDependencies": ["cadence-motion", "cadence-utils"],
+  "title": "Button",
+  "description": "Triggers an action, with press feedback that collapses under reduced motion.",
+  "categories": ["form", "feedback"],
+  "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+  "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
   "files": [
     {
-      "path": "registry/cadence/morph-button/morph-button.tsx",
+      "path": "registry/cadence/button/button.tsx",
       "type": "registry:ui",
-      "target": "@components/cadence/morph-button/morph-button.tsx"
+      "target": "@components/cadence/button/button.tsx"
     }
   ],
-  "docs": "…markdown injected from content/components/morph-button.mdx…",
+  "docs": "…markdown injected from content/components/button.mdx…",
   "meta": {
-    "since": "0.1.0",
-    "motion": ["width-spring", "label-crossfade"],
-    "intensity": "medium",
-    "complexity": "M",
+    "since": "0.2.0",
+    "tier": "T1",
+    "motion": ["feedback.press"],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": { "registry": "shadcn", "style": "base-ui", "version": "2026-10" },
     "sourceSha": "abc1234"
   }
 }
@@ -245,7 +247,7 @@ We ship a `cadence-base` (`registry:base`) item that pins the consumer's shadcn 
 
 The frontmatter of `content/components/<id>.mdx` must match the metadata in `registry.json` (title/description/categories/deps); `check:registry` enforces this. At build time the body (frontmatter stripped) is written into the item's `docs` field.
 
-Benefit: an MCP/CLI client that fetches `fade-in.json` gets source and docs together, with no second request to the site.
+Benefit: an MCP/CLI client that fetches `button.json` gets source and docs together, with no second request to the site.
 
 ---
 
@@ -314,29 +316,25 @@ Exposed through Tailwind @theme (--ease-cadence-*, --animate-*)
 ```tsx
 "use client";
 
-import * as React from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
 
-export interface FadeInProps extends React.ComponentPropsWithoutRef<"div"> {
-  delay?: number;
-  distance?: number;
+export interface PanelProps extends React.ComponentPropsWithoutRef<"div"> {
+  open: boolean;
 }
 
-export function FadeIn({ delay = 0, distance = 12, className, ...props }: FadeInProps) {
-  const reduced = useReducedMotion();
+export function Panel({ open, className, ...props }: PanelProps) {
   const cm = useCadenceMotion();
 
   return (
     <motion.div
-      data-slot="fade-in"
-      data-motion={m.mode}
-      className={cn("will-change-[opacity,transform]", className)}
-      initial={reduced ? { opacity: 0 } : { opacity: 0, y: distance }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-10% 0px" }}
-      transition={cm.transition("reveal", { delay })}
+      data-slot="panel"
+      data-motion={cm.mode}
+      className={cn("rounded-lg border border-border", className)}
+      initial={false}
+      animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: cm.reduced ? 0 : 8 }}
+      transition={cm.transition("enter.pop")}
       {...props}
     />
   );

@@ -52,159 +52,53 @@
       "meta": {}
     },
     {
-      "name": "fade-in",
+      "name": "button",
       "type": "registry:ui",
-      "title": "Fade in",
-      "description": "Reveal content on scroll with a short rise and a reduced-motion fallback.",
+      "title": "Button",
+      "description": "Triggers an action, with press feedback that collapses under reduced motion.",
       "categories": [
-        "text",
-        "motion"
+        "form",
+        "feedback"
       ],
       "meta": {
-        "since": "0.1.0",
+        "since": "0.2.0",
+        "tier": "T1",
         "motion": [
-          "reveal"
-        ],
-        "intensity": "subtle",
-        "complexity": "S",
-        "sourceSha": "dev"
-      }
-    },
-    {
-      "name": "text-reveal",
-      "type": "registry:ui",
-      "title": "Text reveal",
-      "description": "Reveal a heading or paragraph word by word, with a single accessible sentence.",
-      "categories": [
-        "text",
-        "motion"
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": [
-          "text.reveal",
-          "reveal"
-        ],
-        "intensity": "medium",
-        "complexity": "M",
-        "sourceSha": "dev"
-      }
-    },
-    {
-      "name": "number-flow",
-      "type": "registry:ui",
-      "title": "Number flow",
-      "description": "A number that rolls from its previous value to the next, with a static accessible value.",
-      "categories": [
-        "feedback",
-        "motion"
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": [
-          "number.roll"
-        ],
-        "intensity": "medium",
-        "complexity": "M",
-        "sourceSha": "dev"
-      }
-    },
-    {
-      "name": "morph-button",
-      "type": "registry:ui",
-      "title": "Morph button",
-      "description": "A button whose label and width morph between idle, loading, success, and error.",
-      "categories": [
-        "feedback",
-        "motion"
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": [
-          "state.morph",
           "feedback.press"
         ],
-        "intensity": "medium",
-        "complexity": "M",
-        "sourceSha": "dev"
-      }
-    },
-    {
-      "name": "animated-tabs",
-      "type": "registry:ui",
-      "title": "Animated tabs",
-      "description": "Tabs with a shared-element indicator and an animated panel swap.",
-      "categories": [
-        "navigation",
-        "motion"
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": [
-          "layout.shared",
-          "reveal"
-        ],
-        "intensity": "medium",
-        "complexity": "M",
-        "sourceSha": "dev"
-      }
-    },
-    {
-      "name": "motion-accordion",
-      "type": "registry:ui",
-      "title": "Motion accordion",
-      "description": "An accordion whose panels spring open and closed, with a rotating chevron.",
-      "categories": [
-        "navigation",
-        "motion"
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": [
-          "state.morph"
-        ],
-        "intensity": "medium",
-        "complexity": "M",
-        "sourceSha": "dev"
-      }
-    },
-    {
-      "name": "scroll-progress",
-      "type": "registry:ui",
-      "title": "Scroll progress",
-      "description": "A reading-progress bar that follows the page scroll on a spring.",
-      "categories": [
-        "scroll",
-        "motion"
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": [
-          "scroll.progress"
-        ],
         "intensity": "subtle",
         "complexity": "S",
-        "sourceSha": "dev"
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "848d950"
       }
     },
     {
-      "name": "motion-dialog",
+      "name": "dialog",
       "type": "registry:ui",
-      "title": "Motion dialog",
-      "description": "A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit.",
+      "title": "Dialog",
+      "description": "A modal window that fades and settles in, with the open and close sequence interruptible.",
       "categories": [
-        "overlay",
-        "motion"
+        "overlay"
       ],
       "meta": {
-        "since": "0.1.0",
+        "since": "0.2.0",
+        "tier": "T2",
         "motion": [
           "popup.anchored",
           "exit.fade"
         ],
         "intensity": "medium",
         "complexity": "L",
-        "sourceSha": "dev"
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "848d950"
       }
     }
   ]

@@ -49,7 +49,7 @@
       "description": "Optional provider that wires prefers-reduced-motion, motion intensity, and shared defaults into one MotionConfig.",
       "categories": ["foundation"],
       "dependencies": ["motion"],
-      "registryDependencies": ["cadence-motion", "cadence-utils"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils"],
       "files": [
         {
           "path": "registry/cadence/lib/provider.tsx",
@@ -100,179 +100,56 @@
       }
     },
     {
-      "name": "fade-in",
+      "name": "button",
       "type": "registry:ui",
-      "title": "Fade in",
-      "description": "Reveal content on scroll with a short rise and a reduced-motion fallback.",
-      "categories": ["text", "motion"],
-      "dependencies": ["motion"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "title": "Button",
+      "description": "Triggers an action, with press feedback that collapses under reduced motion.",
+      "categories": ["form", "feedback"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/fade-in/fade-in.tsx",
+          "path": "registry/cadence/button/button.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/fade-in/fade-in.tsx"
+          "target": "@components/cadence/button/button.tsx"
         }
       ],
       "meta": {
-        "since": "0.1.0",
-        "motion": ["reveal"],
+        "since": "0.2.0",
+        "tier": "T1",
+        "motion": ["feedback.press"],
         "intensity": "subtle",
-        "complexity": "S"
+        "complexity": "S",
+        "upstream": { "registry": "shadcn", "style": "base-ui", "version": "2026-10" }
       }
     },
     {
-      "name": "text-reveal",
+      "name": "dialog",
       "type": "registry:ui",
-      "title": "Text reveal",
-      "description": "Reveal a heading or paragraph word by word, with a single accessible sentence.",
-      "categories": ["text", "motion"],
-      "dependencies": ["motion"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
+      "title": "Dialog",
+      "description": "A modal window that fades and settles in, with the open and close sequence interruptible.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider"
+      ],
       "files": [
         {
-          "path": "registry/cadence/text-reveal/text-reveal.tsx",
+          "path": "registry/cadence/dialog/dialog.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/text-reveal/text-reveal.tsx"
+          "target": "@components/cadence/dialog/dialog.tsx"
         }
       ],
       "meta": {
-        "since": "0.1.0",
-        "motion": ["text.reveal", "reveal"],
-        "intensity": "medium",
-        "complexity": "M"
-      }
-    },
-    {
-      "name": "number-flow",
-      "type": "registry:ui",
-      "title": "Number flow",
-      "description": "A number that rolls from its previous value to the next, with a static accessible value.",
-      "categories": ["feedback", "motion"],
-      "dependencies": ["motion"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
-      "files": [
-        {
-          "path": "registry/cadence/number-flow/number-flow.tsx",
-          "type": "registry:ui",
-          "target": "@components/cadence/number-flow/number-flow.tsx"
-        }
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": ["number.roll"],
-        "intensity": "medium",
-        "complexity": "M"
-      }
-    },
-    {
-      "name": "morph-button",
-      "type": "registry:ui",
-      "title": "Morph button",
-      "description": "A button whose label and width morph between idle, loading, success, and error.",
-      "categories": ["feedback", "motion"],
-      "dependencies": ["motion", "lucide-react"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
-      "files": [
-        {
-          "path": "registry/cadence/morph-button/morph-button.tsx",
-          "type": "registry:ui",
-          "target": "@components/cadence/morph-button/morph-button.tsx"
-        }
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": ["state.morph", "feedback.press"],
-        "intensity": "medium",
-        "complexity": "M"
-      }
-    },
-    {
-      "name": "animated-tabs",
-      "type": "registry:ui",
-      "title": "Animated tabs",
-      "description": "Tabs with a shared-element indicator and an animated panel swap.",
-      "categories": ["navigation", "motion"],
-      "dependencies": ["motion"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
-      "files": [
-        {
-          "path": "registry/cadence/animated-tabs/animated-tabs.tsx",
-          "type": "registry:ui",
-          "target": "@components/cadence/animated-tabs/animated-tabs.tsx"
-        }
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": ["layout.shared", "reveal"],
-        "intensity": "medium",
-        "complexity": "M"
-      }
-    },
-    {
-      "name": "motion-accordion",
-      "type": "registry:ui",
-      "title": "Motion accordion",
-      "description": "An accordion whose panels spring open and closed, with a rotating chevron.",
-      "categories": ["navigation", "motion"],
-      "dependencies": ["motion", "lucide-react"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
-      "files": [
-        {
-          "path": "registry/cadence/motion-accordion/motion-accordion.tsx",
-          "type": "registry:ui",
-          "target": "@components/cadence/motion-accordion/motion-accordion.tsx"
-        }
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": ["state.morph"],
-        "intensity": "medium",
-        "complexity": "M"
-      }
-    },
-    {
-      "name": "scroll-progress",
-      "type": "registry:ui",
-      "title": "Scroll progress",
-      "description": "A reading-progress bar that follows the page scroll on a spring.",
-      "categories": ["scroll", "motion"],
-      "dependencies": ["motion"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
-      "files": [
-        {
-          "path": "registry/cadence/scroll-progress/scroll-progress.tsx",
-          "type": "registry:ui",
-          "target": "@components/cadence/scroll-progress/scroll-progress.tsx"
-        }
-      ],
-      "meta": {
-        "since": "0.1.0",
-        "motion": ["scroll.progress"],
-        "intensity": "subtle",
-        "complexity": "S"
-      }
-    },
-    {
-      "name": "motion-dialog",
-      "type": "registry:ui",
-      "title": "Motion dialog",
-      "description": "A Base UI dialog whose panel rises and settles on a spring, interruptible mid-exit.",
-      "categories": ["overlay", "motion"],
-      "dependencies": ["@base-ui/react", "motion", "lucide-react"],
-      "registryDependencies": ["cadence-motion", "cadence-utils", "cadence-provider"],
-      "files": [
-        {
-          "path": "registry/cadence/motion-dialog/motion-dialog.tsx",
-          "type": "registry:ui",
-          "target": "@components/cadence/motion-dialog/motion-dialog.tsx"
-        }
-      ],
-      "meta": {
-        "since": "0.1.0",
+        "since": "0.2.0",
+        "tier": "T2",
         "motion": ["popup.anchored", "exit.fade"],
         "intensity": "medium",
-        "complexity": "L"
+        "complexity": "L",
+        "upstream": { "registry": "shadcn", "style": "base-ui", "version": "2026-10" }
       }
     }
   ]
