@@ -110,6 +110,17 @@ setup. Capability that survives:
 B0 is done when `pnpm registry:build && pnpm check` is green with only the foundation items plus
 the two pilot components.
 
+### 5.1 B0 verification (2026-10-29)
+
+- `pnpm check` green: 7 items, 2 components, 2 previews, tier budgets met, P11 clean.
+- A throwaway consumer project configured with
+  `"registries": { "@cadence": "http://127.0.0.1:4173/r/{name}.json" }` installed `@cadence/dialog`
+  with shadcn CLI 4.23. It wrote `components/cadence/{button,dialog}/`, pulled
+  `components/cadence/lib/{cn,motion,provider}`, installed `@base-ui/react`,
+  `class-variance-authority`, `motion`, and `lucide-react`, and kept every relative import intact.
+- The probe confirmed why dependencies must be namespaced: a bare `button` resolves against the
+  default shadcn registry. `registry:check` now rejects un-namespaced dependencies.
+
 ## 6. Architecture for 57 components
 
 ### 6.1 Layout
