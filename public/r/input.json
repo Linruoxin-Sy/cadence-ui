@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input",
+  "title": "Input",
+  "description": "A single-line text field whose invalid state is driven by aria-invalid.",
+  "dependencies": [
+    "@base-ui/react"
+  ],
+  "registryDependencies": [
+    "@cadence/cadence-utils"
+  ],
+  "files": [
+    {
+      "path": "registry/cadence/input/input.tsx",
+      "content": "import { Input as InputPrimitive } from \"@base-ui/react/input\";\nimport { cn } from \"../lib/cn\";\n\nexport interface InputProps extends InputPrimitive.Props {}\n\n/**\n * A single-line text field. T0: the field does not animate. The focus ring and\n * the invalid border are colour/shadow transitions, which is state feedback,\n * not motion — an input that grows or slides while typing is unusable.\n *\n * Invalid state is attribute-driven only (P11): pass `aria-invalid`, and this\n * component renders the destructive border and ring. It never decides whether a\n * value is valid; see [/docs/validation](/docs/validation).\n *\n * Base UI's input is field-aware, so it picks up `Field` context (label ids,\n * described-by wiring) when it is rendered inside one.\n */\nfunction Input({ className, type, ...props }: InputProps) {\n  return (\n    <InputPrimitive\n      type={type}\n      data-slot=\"input\"\n      className={cn(\n        \"h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm dark:bg-input/30\",\n        \"focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50\",\n        \"aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport { Input };\n",
+      "type": "registry:ui",
+      "target": "@components/cadence/input/input.tsx"
+    }
+  ],
+  "meta": {
+    "since": "0.2.0",
+    "tier": "T0",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "4ca3b90"
+  },
+  "docs": "## When to use\n\n- A single line of text the user types: email, name, slug, search, URL.\n- A field that needs a native input type (`email`, `password`, `tel`, `number`,\n  `file`) and therefore native mobile keyboards.\n- Anywhere the browser's autofill, password manager, or form submission should\n  work without a wrapper.\n\n## When not to use\n\n- Multi-line text; use `textarea`.\n- A choice from a fixed list; use `select` (or `combobox` when the list is long).\n- A value the app controls entirely, like a generated id. Render text, not a\n  disabled input.\n\n## Installation\n\n```bash\nnpx shadcn@latest add @cadence/input\n```\n\n## Usage\n\n```tsx\nimport { Input } from \"@/components/cadence/input/input\";\nimport { Label } from \"@/components/cadence/label/label\";\n\nexport function WorkspaceName() {\n  return (\n    <div className=\"grid gap-2\">\n      <Label htmlFor=\"workspace\">Workspace name</Label>\n      <Input id=\"workspace\" placeholder=\"Acme\" autoComplete=\"organization\" />\n    </div>\n  );\n}\n```\n\n## Examples\n\n### Invalid\n\n`aria-invalid` is the only switch. The component renders the destructive border and\nring; it never decides that the value is wrong.\n\n```tsx\n<Input aria-invalid=\"true\" aria-describedby=\"email-error\" defaultValue=\"ada@\" />\n<p id=\"email-error\" className=\"text-sm text-destructive\">\n  Enter a complete email address.\n</p>\n```\n\n### File input\n\n`file:` variants are already wired, so the native picker button picks up the\ntokens:\n\n```tsx\n<Input type=\"file\" accept=\"image/png\" />\n```\n\n### Controlled, Base UI style\n\n```tsx\nconst [value, setValue] = useState(\"\");\n\n<Input value={value} onValueChange={setValue} />;\n```\n\n## API\n\n| Prop            | Type                                | Default | Description                                        |\n| --------------- | ----------------------------------- | ------- | -------------------------------------------------- |\n| `type`          | `string`                            | –       | Native input type.                                 |\n| `value`         | `string \\| number \\| readonly string[]` | –   | Controlled value.                                  |\n| `defaultValue`  | same as `value`                     | –       | Uncontrolled initial value.                        |\n| `onValueChange` | `(value: string, details) => void`  | –       | Base UI change callback, in addition to `onChange`. |\n| `className`     | `string`                            | –       | Merged last.                                       |\n\nAll native input props are forwarded, including `disabled`, `readOnly`, `required`,\nand `aria-*`.\n\n## Motion contract\n\nNo motion (T0). An input that grows, slides, or fades while the user types is a\nbug: it moves the caret under the user's eyes.\n\n| Phase   | Properties | Token | Interruptible |\n| ------- | ---------- | ----- | ------------- |\n| –       | none       | –     | –             |\n| reduced | none       | –     | –             |\n| none    | none       | –     | –             |\n\n`transition-[color,box-shadow]` exists for the focus ring and the invalid border.\nBoth are colour/shadow state feedback on the design tokens, take no space, and do\nnot run on mount.\n\n## Validation and data ownership\n\nP11 draws the line: the component renders state, the user decides state.\n\n| The component does                                    | You do                                                    |\n| ----------------------------------------------------- | --------------------------------------------------------- |\n| Styles `aria-invalid=\"true\"` and `data-invalid`        | Deciding what \"valid\" means (required, format, length)    |\n| Renders whatever `aria-describedby` points at          | Writing the error text and the ids it lives on            |\n| Forwards `required`, `readOnly`, `disabled`, `name`    | Form state (react-hook-form, TanStack Form, server state)  |\n| Keeps focus visible and keyboard-reachable             | Submit, retry, error mapping, focus management             |\n\nThere is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation\nlibrary is imported. See [validation](/docs/validation).\n\n## Accessibility\n\n- Base UI's input is field-aware: inside a `field`, it receives the label id and\n  the description ids without extra wiring.\n- Always give it a name from a `label`; a placeholder is not a name.\n- `aria-invalid` plus a described error is the accessible failure state. Colour\n  alone is never the signal.\n- Never set `outline: none` in `className`; the focus ring is the only affordance\n  for keyboard users.\n\n## Notes for AI\n\n- Use `aria-invalid` and `aria-describedby` — never an `error` prop or internal\n  state.\n- Do not wrap the input in a div just to add a border; the component already owns\n  the border, radius, and focus ring.",
+  "categories": [
+    "form"
+  ],
+  "type": "registry:ui"
+}

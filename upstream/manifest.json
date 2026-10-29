@@ -59,6 +59,15 @@
         "label"
       ]
     },
+    "input": {
+      "path": "apps/v4/registry/bases/base/ui/input.tsx",
+      "exports": [
+        "Input"
+      ],
+      "slots": [
+        "input"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
 import { DialogPreview } from "./dialog";
+import { InputPreview } from "./input";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
 import { SeparatorPreview } from "./separator";
@@ -16,5 +17,6 @@ export const previews: Record<string, ComponentType> = {
   kbd: KbdPreview,
   separator: SeparatorPreview,
   label: LabelPreview,
+  input: InputPreview,
   dialog: DialogPreview,
 };

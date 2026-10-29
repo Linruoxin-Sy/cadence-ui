@@ -1,0 +1,139 @@
+---
+title: Input
+description: A single-line text field whose invalid state is driven by aria-invalid.
+category: form
+motion: []
+intensity: subtle
+complexity: S
+tier: T0
+since: 0.2.0
+deps: ["@base-ui/react"]
+registryDeps: ["@cadence/cadence-utils"]
+---
+
+## When to use
+
+- A single line of text the user types: email, name, slug, search, URL.
+- A field that needs a native input type (`email`, `password`, `tel`, `number`,
+  `file`) and therefore native mobile keyboards.
+- Anywhere the browser's autofill, password manager, or form submission should
+  work without a wrapper.
+
+## When not to use
+
+- Multi-line text; use `textarea`.
+- A choice from a fixed list; use `select` (or `combobox` when the list is long).
+- A value the app controls entirely, like a generated id. Render text, not a
+  disabled input.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/input
+```
+
+## Usage
+
+```tsx
+import { Input } from "@/components/cadence/input/input";
+import { Label } from "@/components/cadence/label/label";
+
+export function WorkspaceName() {
+  return (
+    <div className="grid gap-2">
+      <Label htmlFor="workspace">Workspace name</Label>
+      <Input id="workspace" placeholder="Acme" autoComplete="organization" />
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Invalid
+
+`aria-invalid` is the only switch. The component renders the destructive border and
+ring; it never decides that the value is wrong.
+
+```tsx
+<Input aria-invalid="true" aria-describedby="email-error" defaultValue="ada@" />
+<p id="email-error" className="text-sm text-destructive">
+  Enter a complete email address.
+</p>
+```
+
+### File input
+
+`file:` variants are already wired, so the native picker button picks up the
+tokens:
+
+```tsx
+<Input type="file" accept="image/png" />
+```
+
+### Controlled, Base UI style
+
+```tsx
+const [value, setValue] = useState("");
+
+<Input value={value} onValueChange={setValue} />;
+```
+
+## API
+
+| Prop            | Type                                | Default | Description                                        |
+| --------------- | ----------------------------------- | ------- | -------------------------------------------------- |
+| `type`          | `string`                            | –       | Native input type.                                 |
+| `value`         | `string \| number \| readonly string[]` | –   | Controlled value.                                  |
+| `defaultValue`  | same as `value`                     | –       | Uncontrolled initial value.                        |
+| `onValueChange` | `(value: string, details) => void`  | –       | Base UI change callback, in addition to `onChange`. |
+| `className`     | `string`                            | –       | Merged last.                                       |
+
+All native input props are forwarded, including `disabled`, `readOnly`, `required`,
+and `aria-*`.
+
+## Motion contract
+
+No motion (T0). An input that grows, slides, or fades while the user types is a
+bug: it moves the caret under the user's eyes.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+`transition-[color,box-shadow]` exists for the focus ring and the invalid border.
+Both are colour/shadow state feedback on the design tokens, take no space, and do
+not run on mount.
+
+## Validation and data ownership
+
+P11 draws the line: the component renders state, the user decides state.
+
+| The component does                                    | You do                                                    |
+| ----------------------------------------------------- | --------------------------------------------------------- |
+| Styles `aria-invalid="true"` and `data-invalid`        | Deciding what "valid" means (required, format, length)    |
+| Renders whatever `aria-describedby` points at          | Writing the error text and the ids it lives on            |
+| Forwards `required`, `readOnly`, `disabled`, `name`    | Form state (react-hook-form, TanStack Form, server state)  |
+| Keeps focus visible and keyboard-reachable             | Submit, retry, error mapping, focus management             |
+
+There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
+library is imported. See [validation](/docs/validation).
+
+## Accessibility
+
+- Base UI's input is field-aware: inside a `field`, it receives the label id and
+  the description ids without extra wiring.
+- Always give it a name from a `label`; a placeholder is not a name.
+- `aria-invalid` plus a described error is the accessible failure state. Colour
+  alone is never the signal.
+- Never set `outline: none` in `className`; the focus ring is the only affordance
+  for keyboard users.
+
+## Notes for AI
+
+- Use `aria-invalid` and `aria-describedby` — never an `error` prop or internal
+  state.
+- Do not wrap the input in a div just to add a border; the component already owns
+  the border, radius, and focus ring.
