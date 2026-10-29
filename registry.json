@@ -380,6 +380,34 @@
       }
     },
     {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "A placeholder pulse that marks where content will land.",
+      "categories": ["feedback", "data"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/skeleton/skeleton.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/skeleton/skeleton.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T4",
+        "motion": ["data.transition"],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

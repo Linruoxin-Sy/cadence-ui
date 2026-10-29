@@ -126,6 +126,15 @@
         "avatar-image"
       ]
     },
+    "skeleton": {
+      "path": "apps/v4/registry/bases/base/ui/skeleton.tsx",
+      "exports": [
+        "Skeleton"
+      ],
+      "slots": [
+        "skeleton"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

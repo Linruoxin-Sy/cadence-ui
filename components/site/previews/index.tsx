@@ -9,6 +9,7 @@ import { InputPreview } from "./input";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
 import { SeparatorPreview } from "./separator";
+import { SkeletonPreview } from "./skeleton";
 import { TextareaPreview } from "./textarea";
 
 /**
@@ -26,5 +27,6 @@ export const previews: Record<string, ComponentType> = {
   card: CardPreview,
   "aspect-ratio": AspectRatioPreview,
   avatar: AvatarPreview,
+  skeleton: SkeletonPreview,
   dialog: DialogPreview,
 };

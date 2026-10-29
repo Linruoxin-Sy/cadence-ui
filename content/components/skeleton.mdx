@@ -1,0 +1,150 @@
+---
+title: Skeleton
+description: A placeholder pulse that marks where content will land.
+category: feedback
+motion: [data.transition]
+intensity: subtle
+complexity: S
+tier: T4
+since: 0.2.0
+deps: ["motion"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+---
+
+## When to use
+
+- A first load longer than about 300 ms, where the shape of the incoming content is
+  known: a card, a table row, a list item, a comment.
+- A region that swaps content in place, so the layout does not jump when the real
+  content arrives.
+- A page that renders several independent regions which resolve at different times.
+
+## When not to use
+
+- A wait under 300 ms. The placeholder appears and disappears before it can be
+  read, which reads as a flicker.
+- An action the user just triggered (a save, a submit); use the button's own busy
+  state or a `spinner`, so the feedback lands where the user is looking.
+- Content whose shape you do not know. A placeholder that is the wrong shape is
+  worse than a spinner: it promises a layout that never arrives.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/skeleton
+```
+
+## Usage
+
+```tsx
+import { Skeleton } from "@/components/cadence/skeleton/skeleton";
+
+export function CardPlaceholder() {
+  return (
+    <div className="w-full max-w-sm space-y-3" aria-busy="true" aria-live="polite">
+      <Skeleton className="h-40 w-full rounded-xl" />
+      <Skeleton className="h-4 w-2/3" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Text lines
+
+```tsx
+<div className="space-y-2">
+  <Skeleton className="h-4 w-full" />
+  <Skeleton className="h-4 w-11/12" />
+  <Skeleton className="h-4 w-3/5" />
+</div>
+```
+
+### Avatar and name
+
+```tsx
+<div className="flex items-center gap-3">
+  <Skeleton className="size-10 rounded-full" />
+  <div className="space-y-2">
+    <Skeleton className="h-3 w-32" />
+    <Skeleton className="h-3 w-20" />
+  </div>
+</div>
+```
+
+### Swapping in the real content
+
+Keep the container mounted so the height is continuous; only the children change.
+
+```tsx
+<section aria-busy={loading}>
+  {loading ? <CardPlaceholder /> : <Card>…</Card>}
+</section>
+```
+
+## API
+
+| Prop        | Type     | Default | Description                                        |
+| ----------- | -------- | ------- | -------------------------------------------------- |
+| `className` | `string` | –       | Merged last — the shape (`h-4 w-2/3`) lives here.   |
+
+All native `div` props are forwarded. `data-slot="skeleton"` and `data-motion` are
+always set.
+
+## Motion contract
+
+Recipe: `data.transition`, a continuous opacity loop. It is implemented in CSS
+(`animate-pulse`) rather than in Motion, because a page can render dozens of
+placeholders and each Motion loop costs a frame callback; the pulse only touches
+`opacity`, so it can never trigger layout.
+
+| Phase   | Properties                | Token                          | Interruptible |
+| ------- | ------------------------- | ------------------------------ | ------------- |
+| pulse   | `opacity 1 → 0.5 → 1`     | `animate-pulse` (theme timing) | yes (CSS)     |
+| reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
+| none    | no animation; full opacity | `animate-none`                 | –             |
+
+Reduced keeps the pulse on purpose: M5 removes travel and scale, not opacity, and a
+static grey block is easier to mistake for content that already loaded. `none`
+stops it completely, which is what a screenshot test or a print stylesheet needs.
+
+## Keyboard interactions
+
+None. A skeleton is not focusable and never receives input; focus stays on whatever
+the user was doing when the region started loading.
+
+## Accessibility
+
+- The skeleton itself is decorative: its text is nothing, so it is not announced.
+- The **region** owns the state: `aria-busy="true"` while loading, removed when done.
+  Add `aria-live="polite"` there only if the region resolves without any other
+  change the user would notice.
+- Shape is a promise. Keep the placeholder's height close to the real content, or
+  the swap reintroduces exactly the layout shift the skeleton was meant to avoid.
+- Under `data-motion="none"` the block stays visible at full opacity: the loading
+  state is still communicated by shape and by `aria-busy`, never by motion alone.
+
+## Responsive behavior
+
+A skeleton takes its size from utilities, so it follows whatever grid it is dropped
+into. Avoid a hard-coded pixel height on a full-width block; use a ratio
+(`aspect-video`) or a relative height so the placeholder matches the real card at
+every breakpoint.
+
+## Performance
+
+- One CSS animation per element, on `opacity` only; no JS loop, no layout read.
+- The pulse is compositor-friendly, but the animation-system budget still applies:
+  fewer than twenty simultaneously animating elements. For a long list, render one
+  placeholder row per screen rather than one per future row.
+- No `will-change`: the browser promotes an opacity animation on its own.
+
+## Notes for AI
+
+- Never animate a skeleton into the real content with a custom cross-fade; swap the
+  children and let the container's height stay put.
+- Put the loading state on the region (`aria-busy`), not on each block.
+- Do not use a skeleton as a generic "loading…" indicator for an action; a `spinner`
+  next to the control is clearer.
