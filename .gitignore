@@ -9,6 +9,12 @@ coverage/
 playwright-report/
 test-results/
 
+# Upstream sources fetched for diffing; the pinned summary is committed in upstream/manifest.json.
+.cache/
+
+# Agent working files: session memory and local editor state stay on this machine.
+.workbuddy/
+
 # pnpm is the only supported package manager; keep other lockfiles out of the repo.
 package-lock.json
 yarn.lock
