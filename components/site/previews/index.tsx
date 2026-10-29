@@ -3,6 +3,7 @@ import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
 import { DialogPreview } from "./dialog";
 import { KbdPreview } from "./kbd";
+import { LabelPreview } from "./label";
 import { SeparatorPreview } from "./separator";
 
 /**
@@ -14,5 +15,6 @@ export const previews: Record<string, ComponentType> = {
   badge: BadgePreview,
   kbd: KbdPreview,
   separator: SeparatorPreview,
+  label: LabelPreview,
   dialog: DialogPreview,
 };

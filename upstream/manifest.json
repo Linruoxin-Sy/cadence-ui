@@ -50,6 +50,15 @@
         "separator"
       ]
     },
+    "label": {
+      "path": "apps/v4/registry/bases/base/ui/label.tsx",
+      "exports": [
+        "Label"
+      ],
+      "slots": [
+        "label"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [
