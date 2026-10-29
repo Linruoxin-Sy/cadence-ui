@@ -1,0 +1,123 @@
+---
+title: Badge
+description: A compact status label that stays still while the content around it animates.
+category: feedback
+motion: []
+intensity: subtle
+complexity: S
+tier: T0
+since: 0.2.0
+deps: ["@base-ui/react", "class-variance-authority"]
+registryDeps: ["@cadence/cadence-utils"]
+---
+
+## When to use
+
+- A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
+- A category or tag next to a title, where the colour carries the grouping.
+- A count attached to a navigation item or a filter chip.
+
+## When not to use
+
+- Anything the user must click to act; use `button` (a badge has no focus, no
+  press feedback, and no keyboard path).
+- More than about three words. A long label belongs in running text or in a `card`
+  header, not in a pill.
+- A status that changes while the user watches; use `toast` or an inline message,
+  because a badge swap is easy to miss.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/badge
+```
+
+## Usage
+
+```tsx
+import { Badge } from "@/components/cadence/badge/badge";
+
+export function Release() {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="font-medium">Parity plan</span>
+      <Badge variant="secondary">0.2.0</Badge>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Variants
+
+```tsx
+<Badge>Default</Badge>
+<Badge variant="secondary">Secondary</Badge>
+<Badge variant="outline">Outline</Badge>
+<Badge variant="ghost">Ghost</Badge>
+<Badge variant="destructive">Failed</Badge>
+<Badge variant="link">Changelog</Badge>
+```
+
+### With an icon
+
+```tsx
+import { Check } from "lucide-react";
+
+<Badge variant="outline">
+  <Check />
+  Verified
+</Badge>;
+```
+
+### As a link
+
+`render` replaces the element, so a badge stays a `span` unless you ask for
+something else. The `[a&]` selectors only switch on hover when it really is a link.
+
+```tsx
+<Badge variant="outline" render={<a href="/releases" />}>
+  3 releases
+</Badge>
+```
+
+## API
+
+| Prop        | Type                                                                                             | Default     | Description                                      |
+| ----------- | ------------------------------------------------------------------------------------------------ | ----------- | ------------------------------------------------ |
+| `variant`   | `"default" \| "secondary" \| "outline" \| "ghost" \| "destructive" \| "link"`                     | `"default"` | Visual weight.                                   |
+| `render`    | `ReactElement \| (props, state) => ReactElement`                                                  | –           | Base UI composition; replaces `asChild`.         |
+| `className` | `string`                                                                                          | –           | Merged last.                                     |
+
+`data-slot="badge"` and `data-variant` are rendered from the component's state, so
+you can restyle per variant from CSS without touching this file. All native span
+props are forwarded.
+
+## Motion contract
+
+No motion (T0). A badge labels content; it does not enter, leave, or move.
+
+| Phase   | Properties                          | Token | Interruptible |
+| ------- | ----------------------------------- | ----- | ------------- |
+| –       | none                                | –     | –             |
+| reduced | none                                | –     | –             |
+| none    | none                                | –     | –             |
+
+`transition-[color,box-shadow]` is state feedback on the design tokens (hover on a
+linked badge, the focus ring), not motion: it never moves the box and never runs
+on mount.
+
+## Accessibility
+
+- The badge is a `span`, so it is not in the tab order and has no role — the text
+  itself is the message.
+- Colour is never the only signal: every variant still carries readable text.
+- When rendered as a link it inherits the anchor's semantics, focus ring, and
+  keyboard behaviour, and gains `[a&]:hover` styles automatically.
+
+## Notes for AI
+
+- Never attach `onClick` to a badge; switch to `button` with `size="sm"`.
+- Do not animate a badge in or out. If the status changes, swap the text and let
+  `aria-live` on the surrounding region announce it.

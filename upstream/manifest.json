@@ -20,6 +20,16 @@
         "button"
       ]
     },
+    "badge": {
+      "path": "apps/v4/registry/bases/base/ui/badge.tsx",
+      "exports": [
+        "Badge",
+        "badgeVariants"
+      ],
+      "slots": [
+        "badge"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

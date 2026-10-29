@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
 import { DialogPreview } from "./dialog";
 
@@ -8,5 +9,6 @@ import { DialogPreview } from "./dialog";
  */
 export const previews: Record<string, ComponentType> = {
   button: ButtonPreview,
+  badge: BadgePreview,
   dialog: DialogPreview,
 };
