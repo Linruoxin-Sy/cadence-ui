@@ -6,7 +6,7 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: parity rebuild in progress. The eight original motion components were replaced by an API-compatible set; `button` and `dialog` are the pilots, and 55 more components are batched in [the parity plan](docs/parity-plan.md).
+> Status: **B0 complete.** The eight original motion components were removed and archived; the parity foundation (motion tiers, P11 checks, the `new-item` scaffold, and the `button`/`dialog` pilots) is in place. B1 (11 atoms) is next — see [the parity plan](docs/parity-plan.md).
 
 ## Install
 

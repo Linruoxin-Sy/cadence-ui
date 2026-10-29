@@ -1,9 +1,9 @@
 # Parity plan: shipping every shadcn component
 
-> Status: approved plan, v4 (2026-10). This document is the build record for the "parity" effort:
-> replace the eight original motion components with an API-compatible, motion-enhanced superset of
-> shadcn's component catalogue. It is the authority for scope, batching, and the contracts every
-> new component must satisfy. Architecture details remain in [overall-design.md](overall-design.md);
+> Status: **B0 complete (2026-10-29); B1 next.** This document is the build record for the "parity"
+> effort: replace the eight original motion components with an API-compatible, motion-enhanced
+> superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
+> every new component must satisfy. Architecture details remain in [overall-design.md](overall-design.md);
 > motion details remain in [animation-system.md](animation-system.md).
 
 ---
@@ -78,7 +78,7 @@ Hard rules:
   are allowed (`motion`, `loading` on `button`); renames are not.
 - Shared runtime stays in `registry/cadence/lib/` and is pulled in through `registryDependencies`.
 
-## 5. Removing the old components (B0)
+## 5. Removing the old components (B0) — ✅ complete
 
 ```bash
 git tag v0.1.0-mvp
@@ -197,19 +197,23 @@ and `data.transition`. Both must land in [animation-system.md](animation-system.
 Ordering is by dependency: atoms → structure → form controls → overlays → menus → disclosure →
 heavy data → compositions → AI.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   |
-|       | **Total**                  | **57** |            | **102**     |         |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status  |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | next    |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | planned |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | planned |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | planned |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned |
+|       | **Total**                  | **57** |            | **102**     |         |         |
+
+Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
+validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
+green, and a real `shadcn add` install was verified (see §5.1).
 
 ### B1 — atoms (11)
 
