@@ -268,6 +268,34 @@
       }
     },
     {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "A multi-line text field that grows with its content instead of a script.",
+      "categories": ["form"],
+      "dependencies": [],
+      "registryDependencies": ["@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/textarea/textarea.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/textarea/textarea.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

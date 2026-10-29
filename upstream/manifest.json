@@ -68,6 +68,15 @@
         "input"
       ]
     },
+    "textarea": {
+      "path": "apps/v4/registry/bases/base/ui/textarea.tsx",
+      "exports": [
+        "Textarea"
+      ],
+      "slots": [
+        "textarea"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

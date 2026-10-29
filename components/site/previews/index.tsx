@@ -6,6 +6,7 @@ import { InputPreview } from "./input";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
 import { SeparatorPreview } from "./separator";
+import { TextareaPreview } from "./textarea";
 
 /**
  * One preview module per component. Keep the map explicit: a missing entry is a
@@ -18,5 +19,6 @@ export const previews: Record<string, ComponentType> = {
   separator: SeparatorPreview,
   label: LabelPreview,
   input: InputPreview,
+  textarea: TextareaPreview,
   dialog: DialogPreview,
 };
