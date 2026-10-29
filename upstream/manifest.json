@@ -41,6 +41,15 @@
         "kbd-group"
       ]
     },
+    "separator": {
+      "path": "apps/v4/registry/bases/base/ui/separator.tsx",
+      "exports": [
+        "Separator"
+      ],
+      "slots": [
+        "separator"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [
