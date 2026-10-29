@@ -25,6 +25,13 @@ const NAMESPACE = "@cadence/";
 const VALIDATION_DEPS = ["zod", "react-hook-form", "@hookform/resolvers", "yup", "valibot", "joi", "superstruct"];
 const VALIDATION_IMPORT =
   /from\s+["'](zod|react-hook-form|@hookform\/resolvers|yup|valibot|joi|superstruct)(\/[^"']*)?["']/;
+/**
+ * Real animation code, not the word "motion" in a comment: a T0 component is
+ * allowed to explain why it stays still. Matches the Motion entry points, the
+ * animated JSX elements, and the imperative `animate()` helper.
+ */
+const ANIMATION_IMPORT =
+  /from\s+["']motion(\/react)?["']|AnimatePresence|<motion\.[a-z]|useMotionValue|useScroll\(|useTransform\(|\banimate\(|whileInView|whileTap/;
 
 const names = new Set(registry.items.map((item) => item.name));
 const exists = async (file) => {
@@ -108,7 +115,7 @@ for (const item of registry.items) {
       problems.push(`${item.name}: ${file.path} has no data-slot attribute`);
     }
 
-    const animated = isComponent(item) && /\bmotion\b|\banimate\(|AnimatePresence/.test(source);
+    const animated = isComponent(item) && ANIMATION_IMPORT.test(source);
     if (animated && !/useCadenceMotion|useReducedMotion|data-motion/.test(source)) {
       problems.push(`${item.name}: ${file.path} animates without a reduced-motion branch`);
     }
