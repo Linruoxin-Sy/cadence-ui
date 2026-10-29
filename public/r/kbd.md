@@ -1,0 +1,112 @@
+# Kbd
+
+> A keyboard key or shortcut hint, styled from the semantic tokens.
+
+- Registry item: /r/kbd.json
+- Install: `npx shadcn@latest add @cadence/kbd`
+- Type: registry:ui
+- Since: 0.2.0
+
+
+## When to use
+
+- A shortcut hinted next to a command: search, save, new item.
+- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.
+- Inside a `tooltip` or a `dropdown-menu` item, where space is short.
+
+## When not to use
+
+- A key that is part of running text. Write it in prose; a pill interrupts the
+  sentence.
+- A button that runs a command. A `kbd` is a label, not a control — it has no
+  keyboard path and no press state.
+- Long sequences of more than three keys. Put the shortcut in a table instead.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/kbd
+```
+
+## Usage
+
+```tsx
+import { Kbd, KbdGroup } from "@/components/cadence/kbd/kbd";
+
+export function ShortcutHint() {
+  return (
+    <span className="text-sm text-muted-foreground">
+      Search <KbdGroup><Kbd>⌘</Kbd><Kbd>K</Kbd></KbdGroup>
+    </span>
+  );
+}
+```
+
+## Examples
+
+### Single key
+
+```tsx
+<Kbd>Esc</Kbd>
+```
+
+### A combination
+
+`KbdGroup` renders the keys with one gap between them and keeps the sequence
+together for screen readers.
+
+```tsx
+<KbdGroup>
+  <Kbd>Ctrl</Kbd>
+  <Kbd>Shift</Kbd>
+  <Kbd>P</Kbd>
+</KbdGroup>
+```
+
+### Inside a tooltip
+
+A `Kbd` inside `data-slot="tooltip-content"` inverts its colours automatically, so
+the hint stays legible on the tooltip surface.
+
+```tsx
+<TooltipContent>
+  Save <Kbd>⌘S</Kbd>
+</TooltipContent>
+```
+
+## API
+
+| Part       | Props                        | Notes                                            |
+| ---------- | ---------------------------- | ------------------------------------------------ |
+| `Kbd`      | native `kbd` props           | One key. `data-slot="kbd"`.                      |
+| `KbdGroup` | native `kbd` props           | Wraps several keys with `data-slot="kbd-group"`. |
+
+## Motion contract
+
+No motion (T0). A key hint is a label; it must not pulse or slide while the user
+is reading it.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Accessibility
+
+- Renders a real `<kbd>` element, which assistive technology reports as keyboard
+  input — the same information a sighted user reads from the key shape.
+- The shortcut is text, so it survives every reduced-motion mode and every colour
+  theme.
+- If a hint is icon-only, put the key name in `aria-label` on the `Kbd`.
+- Do not attach `tabIndex`; a shortcut hint is not focusable.
+
+## Notes for AI
+
+- Use the platform's own glyphs (`⌘`, `⇧`, `↵`) rather than words, and keep one
+  `Kbd` per physical key.
+- If the shortcut is a live command, render a `button` and put the `Kbd` inside it.
+
+---
+
+Full index: /llms.txt

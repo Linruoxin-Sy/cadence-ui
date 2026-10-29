@@ -156,6 +156,34 @@
       }
     },
     {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "A keyboard key or shortcut hint, styled from the semantic tokens.",
+      "categories": ["utility"],
+      "dependencies": [],
+      "registryDependencies": ["@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/kbd/kbd.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/kbd/kbd.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

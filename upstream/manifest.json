@@ -30,6 +30,17 @@
         "badge"
       ]
     },
+    "kbd": {
+      "path": "apps/v4/registry/bases/base/ui/kbd.tsx",
+      "exports": [
+        "Kbd",
+        "KbdGroup"
+      ],
+      "slots": [
+        "kbd",
+        "kbd-group"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

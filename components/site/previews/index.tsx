@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
 import { DialogPreview } from "./dialog";
+import { KbdPreview } from "./kbd";
 
 /**
  * One preview module per component. Keep the map explicit: a missing entry is a
@@ -10,5 +11,6 @@ import { DialogPreview } from "./dialog";
 export const previews: Record<string, ComponentType> = {
   button: ButtonPreview,
   badge: BadgePreview,
+  kbd: KbdPreview,
   dialog: DialogPreview,
 };
