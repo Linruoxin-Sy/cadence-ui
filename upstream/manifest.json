@@ -98,6 +98,15 @@
         "card-title"
       ]
     },
+    "aspect-ratio": {
+      "path": "apps/v4/registry/bases/base/ui/aspect-ratio.tsx",
+      "exports": [
+        "AspectRatio"
+      ],
+      "slots": [
+        "aspect-ratio"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

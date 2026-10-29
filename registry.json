@@ -324,6 +324,34 @@
       }
     },
     {
+      "name": "aspect-ratio",
+      "type": "registry:ui",
+      "title": "Aspect Ratio",
+      "description": "Reserves a box at a fixed ratio so media cannot shift the layout.",
+      "categories": ["layout"],
+      "dependencies": [],
+      "registryDependencies": ["@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/aspect-ratio/aspect-ratio.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/aspect-ratio/aspect-ratio.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

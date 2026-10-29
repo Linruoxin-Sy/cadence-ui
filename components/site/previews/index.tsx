@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { AspectRatioPreview } from "./aspect-ratio";
 import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
 import { CardPreview } from "./card";
@@ -22,5 +23,6 @@ export const previews: Record<string, ComponentType> = {
   input: InputPreview,
   textarea: TextareaPreview,
   card: CardPreview,
+  "aspect-ratio": AspectRatioPreview,
   dialog: DialogPreview,
 };
