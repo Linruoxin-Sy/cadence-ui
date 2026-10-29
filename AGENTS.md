@@ -53,12 +53,13 @@ Rendering is not the finish line. After writing or editing a component, audit th
 1. **Declared = implemented = documented.** The recipe names in `registry.json` (`meta.motion`), in the
    `motion:` frontmatter of `content/components/<id>.mdx`, in that file's Motion contract table, and in the
    source (`cm.transition("<recipe>")`, or the CSS `data-starting-style` / `data-ending-style` transitions of a
-   CSS-only popup) must be the same set. A declared-but-unused recipe, or an animated transition with no
-   recipe behind it, is a defect.
+   CSS-only popup, or the `animate-*` loop of a continuous recipe — see animation-system §3.2) must be the same
+   set. A declared-but-unused recipe, or an animated transition with no recipe behind it, is a defect.
 2. **Tokens only.** No literal duration, easing tuple, distance, scale, or spring values under
    `registry/cadence/**` outside `lib/motion.ts` itself. Motion-driven parts use `cm.transition()`,
    `cm.distance`, `cm.spring`; CSS-only popups use token-backed `duration-*` and `ease-cadence-out` /
-   `ease-cadence-in-out`.
+   `ease-cadence-in-out`; continuous loops use the framework's `animate-*` opacity utility, which a project
+   retunes through its `--animate-*` theme token.
 3. **Three modes, three behaviours.** `full` plays the recipe; `reduced` keeps opacity and drops
    transform/scale/layout; `none` resolves to zero duration (`duration-0`, `{ duration: 0 }`, or no transition
    at all). Mapping `none` onto the `reduced` branch is a failure, not a shortcut.

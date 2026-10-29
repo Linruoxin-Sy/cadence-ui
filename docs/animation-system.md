@@ -102,25 +102,26 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 
 A recipe is a "reusable motion formula", returned by `useCadenceMotion().transition(recipe, opts)` or `variants(recipe)`. Components may only use the recipes below; adding a recipe means editing this document and going through review.
 
-| Recipe            | Purpose                                         | Key parameters                  | Implementation                                               | reduced behaviour                 |
-| ----------------- | ----------------------------------------------- | ------------------------------- | ------------------------------------------------------------ | --------------------------------- |
-| `reveal`          | Fade and rise on entering the viewport          | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                     | Fade only, no translation         |
-| `enter.pop`       | Popovers and cards appearing                    | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor        | Fade only                         |
-| `exit.fade`       | Element disappearing                            | `duration`                      | opacity to 0                                                 | Same (opacity kept)               |
-| `exit.shrink`     | Closing a popover                               | `scale`                         | scale to 0.96 + opacity                                      | Fade only                         |
-| `popup.anchored`  | Base UI popups                                  | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render` | No scale, pure cross-fade         |
-| `layout.move`     | List/grid reordering                            | `spring`                        | `layout` prop + `LayoutGroup`                                | Layout disabled, instant jump     |
-| `layout.shared`   | Shared elements (tab indicator, card expansion) | `layoutId`                      | `layoutId` + `spring.morph`                                  | Disabled, immediate switch        |
-| `list.stagger`    | Items appearing one by one                      | `stagger`, `delayChildren`      | variants + `staggerChildren`                                 | All fade in together (no stagger) |
-| `gesture.drag`    | Drag / swipe to dismiss                         | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back            | Dragging disabled, use a button   |
-| `scroll.progress` | Reading progress, parallax                      | `offset`                        | `useScroll` + `useSpring`                                    | Static value (no smoothing)       |
-| `scroll.story`    | Scroll-narrative timeline                       | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                     | End state shown directly          |
-| `text.reveal`     | Headline reveals word by word / line by line    | `by`, `stagger`                 | variants + child spans                                       | Whole block fades in              |
-| `text.split`      | Character by character (GSAP)                   | `type`                          | GSAP SplitText (optional)                                    | Shown as a whole                  |
-| `number.roll`     | Numeric changes                                 | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                            | New value shown directly          |
-| `state.morph`     | Width/height/label morphing                     | `axis`                          | `animate()` or `layout` + ResizeObserver                     | Immediate switch                  |
-| `feedback.press`  | Press feedback                                  | `scale`                         | `whileTap`                                                   | Colour change only                |
-| `theme.reveal`    | Theme-switch reveal                             | `origin`                        | View Transitions API (progressive enhancement)               | Immediate switch                  |
+| Recipe            | Purpose                                         | Key parameters                  | Implementation                                                                               | reduced behaviour                            |
+| ----------------- | ----------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `reveal`          | Fade and rise on entering the viewport          | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                                                     | Fade only, no translation                    |
+| `enter.pop`       | Popovers and cards appearing                    | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                        | Fade only                                    |
+| `exit.fade`       | Element disappearing                            | `duration`                      | opacity to 0                                                                                 | Same (opacity kept)                          |
+| `exit.shrink`     | Closing a popover                               | `scale`                         | scale to 0.96 + opacity                                                                      | Fade only                                    |
+| `popup.anchored`  | Base UI popups                                  | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                 | No scale, pure cross-fade                    |
+| `layout.move`     | List/grid reordering                            | `spring`                        | `layout` prop + `LayoutGroup`                                                                | Layout disabled, instant jump                |
+| `layout.shared`   | Shared elements (tab indicator, card expansion) | `layoutId`                      | `layoutId` + `spring.morph`                                                                  | Disabled, immediate switch                   |
+| `list.stagger`    | Items appearing one by one                      | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                 | All fade in together (no stagger)            |
+| `gesture.drag`    | Drag / swipe to dismiss                         | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                            | Dragging disabled, use a button              |
+| `scroll.progress` | Reading progress, parallax                      | `offset`                        | `useScroll` + `useSpring`                                                                    | Static value (no smoothing)                  |
+| `scroll.story`    | Scroll-narrative timeline                       | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                     | End state shown directly                     |
+| `text.reveal`     | Headline reveals word by word / line by line    | `by`, `stagger`                 | variants + child spans                                                                       | Whole block fades in                         |
+| `text.split`      | Character by character (GSAP)                   | `type`                          | GSAP SplitText (optional)                                                                    | Shown as a whole                             |
+| `number.roll`     | Numeric changes                                 | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                                                            | New value shown directly                     |
+| `data.transition` | Data surfaces changing state in place           | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")` | Loop kept (opacity only); transforms dropped |
+| `state.morph`     | Width/height/label morphing                     | `axis`                          | `animate()` or `layout` + ResizeObserver                                                     | Immediate switch                             |
+| `feedback.press`  | Press feedback                                  | `scale`                         | `whileTap`                                                                                   | Colour change only                           |
+| `theme.reveal`    | Theme-switch reveal                             | `origin`                        | View Transitions API (progressive enhancement)                                               | Immediate switch                             |
 
 ### 3.1 Code for the key recipes
 
@@ -266,6 +267,35 @@ export function ScrollStory({ children }: { children: React.ReactNode }) {
 }
 ```
 
+### 3.2 Continuous recipes run in CSS
+
+Some recipes do not end: a placeholder pulse, a shimmer, a marquee. A page can
+render dozens of these at once, and every Motion animation costs a frame callback
+and a tree outside React's control. So the **continuous form of a recipe is CSS**,
+and its timing comes from an `--animate-*` theme token rather than from a literal
+inside the component:
+
+```tsx
+// skeleton: `data.transition`, continuous form
+const pulse = cm.mode === "none" ? "animate-none" : "animate-pulse";
+
+<div data-slot="skeleton" data-motion={cm.mode} className={cn("bg-accent", pulse)} />;
+```
+
+Rules for the continuous form:
+
+1. **Opacity only** (or `filter`, at ≤ 4px blur). A loop on `transform` or on a
+   layout property keeps the compositor busy forever.
+2. **Gated by `data-motion`**: `none` resolves to `animate-none`, so a screenshot
+   test and a print stylesheet get a still frame.
+3. **Kept under `reduced`** when it is opacity-only: M5 removes travel and scale,
+   not the ability to see that something is loading. A loop that would need motion
+   to read its state must be replaced by a static state under `reduced`.
+4. **Declared, implemented, documented.** `meta.motion` and the docs table name the
+   recipe; the class in the component is the implementation. There is no
+   `cm.transition()` call because there is no JS animation — that is a property of
+   the continuous form, not a missing branch.
+
 ---
 
 ## 4. Four ways to integrate Base UI with Motion
@@ -375,6 +405,7 @@ export type Recipe =
   | "text.reveal"
   | "text.split"
   | "number.roll"
+  | "data.transition"
   | "state.morph"
   | "feedback.press"
   | "theme.reveal";

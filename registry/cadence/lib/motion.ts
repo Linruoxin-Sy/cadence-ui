@@ -46,6 +46,7 @@ export type Recipe =
   | "text.reveal"
   | "text.split"
   | "number.roll"
+  | "data.transition"
   | "state.morph"
   | "feedback.press";
 
@@ -75,6 +76,7 @@ const recipes: Record<Recipe, RecipeSpec> = {
   "text.reveal": { kind: "tween", duration: duration.slow, ease: ease.out },
   "text.split": { kind: "tween", duration: duration.slow, ease: ease.out },
   "number.roll": { kind: "spring", spring: "snappy" },
+  "data.transition": { kind: "tween", duration: duration.base, ease: ease.out },
   "state.morph": { kind: "spring", spring: "morph" },
   "feedback.press": { kind: "spring", spring: "press" },
 };
