@@ -65,9 +65,9 @@ npx shadcn@latest add @cadence/button
 ## Docs
 
 - [Installation](https://cadence.dev/docs/installation): registry setup, Next.js and Vite.
-- [Theming](https://cadence.dev/docs/theming): shadcn tokens, motion intensity, per-subtree overrides.
+- [Theming](https://cadence.dev/docs/theming): shadcn tokens, motion variables, per-subtree overrides.
 - [Motion](https://cadence.dev/docs/motion): tokens, recipes, reduced-motion rules.
-- [Validation](https://cadence.dev/docs/validation): what the components render and what the caller owns.
+- [Motion modes](https://cadence.dev/docs/motion-modes): full, reduced, none — what each one changes and who sets it.
 - [Install index](https://cadence.dev/r/registry.json): every item and its metadata.
 - [Catalog](https://cadence.dev/r/catalog.json): machine-readable catalog.
 - [Full context](https://cadence.dev/llms-full.txt): every component doc inline.
@@ -217,7 +217,8 @@ All native button props are forwarded.
 - Focus is visible through the ring tokens; disabled buttons are not focusable and keep
   `aria-disabled` semantics from Base UI.
 - `aria-invalid` drives the destructive border and ring. The component does not validate
-  anything: see [validation](/docs/validation).
+  anything — rules, schemas, and error copy stay in your form code; [Field](/components/field)
+  shows the pairing.
 
 ## Notes for AI
 
@@ -760,7 +761,8 @@ P11 draws the line: the component renders state, the user decides state.
 | Keeps focus visible and keyboard-reachable             | Submit, retry, error mapping, focus management             |
 
 There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
-library is imported. See [validation](/docs/validation).
+library is imported. [Field](/components/field) shows how the invalid state and its message
+are wired.
 
 ## Accessibility
 
@@ -1993,8 +1995,8 @@ P11 draws the line: the component renders state, you decide state.
 | Shows a description and an error at once                 | Writing the copy and the ids                               |
 
 There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
-library is imported. `FieldError` accepts messages, not rules. See
-[validation](/docs/validation).
+library is imported. `FieldError` accepts messages, not rules: the decision that a
+value is wrong, and the copy that says so, stay in your form code.
 
 ## Accessibility
 
@@ -2277,7 +2279,7 @@ P11: the group shows invalid state, it never decides it.
 | Renders the buttons you give it                           | Submit, retry, error mapping                             |
 
 There is no `validate`, `schema`, or `resolver` prop, and no validation library is
-imported. See [validation](/docs/validation).
+imported. [Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Accessibility
 
@@ -3029,7 +3031,8 @@ ring and the invalid ring, which is colour/shadow state feedback, not motion.
 | Forwards `required`, `name`, `value`, `disabled`     | Building the submitted payload                       |
 | Announces `aria-checked` for all three states        | Mapping the error to the field with `aria-describedby` |
 
-There is no `validate`, `schema`, or `rules` prop. See [validation](/docs/validation).
+There is no `validate`, `schema`, or `rules` prop. [Field](/components/field) shows how the
+invalid state and its message are wired.
 
 ## Responsive behavior
 
@@ -3203,7 +3206,8 @@ tabindex Base UI implements.
 | Forwards `name`, `required`, and the selection      | Server-side validation of the submitted value     |
 | Keeps arrow-key navigation within the group         | Focus policy after a failed submit                |
 
-There is no `validate` or `schema` prop. See [validation](/docs/validation).
+There is no `validate` or `schema` prop. [Field](/components/field) shows how the invalid
+state and its message are wired.
 
 ## Responsive behavior
 
@@ -3361,7 +3365,8 @@ decoration. What is dropped is the animation, so the movement is instant.
 | Exposes `aria-invalid` styling                   | Deciding whether the switch needs one at all     |
 | Renders the on/off state                         | Announcing that the change was saved             |
 
-There is no `validate` or `schema` prop. See [validation](/docs/validation).
+There is no `validate` or `schema` prop. [Field](/components/field) shows how the invalid state
+and its message are wired.
 
 ## Responsive behavior
 
@@ -3513,7 +3518,7 @@ transition would make it trail the thumb by one frame per move.
 | Styles `aria-invalid`                             | Writing the error text and its `aria-describedby` id |
 | Steps and clamps the value to `min`/`max`         | Server-side bounds and business rules               |
 
-See [validation](/docs/validation).
+[Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Responsive behavior
 
@@ -3670,7 +3675,7 @@ in every mode — otherwise a `none` user could not see the state.
 | Exposes `aria-invalid` styling                | Validation and error text                  |
 | Keeps the pressed state in `aria-pressed`     | Persisting it                              |
 
-See [validation](/docs/validation).
+[Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Responsive behavior
 
@@ -3862,7 +3867,7 @@ With `loopFocus` (default) the arrows wrap around at the ends.
 | Renders the visual pressed state                | Persisting the choice                     |
 | Exposes `aria-invalid` styling on items         | Validation and error text                 |
 
-See [validation](/docs/validation).
+[Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Responsive behavior
 
@@ -4057,7 +4062,8 @@ where the next character goes, so the loop buys nothing.
 | Reports every change and the completed value        | Verifying the code and mapping the server error   |
 | Keeps the paste path working                        | Re-sending a code, throttling attempts            |
 
-There is no `validate`, `schema`, or `rules` prop. See [validation](/docs/validation).
+There is no `validate`, `schema`, or `rules` prop. [Field](/components/field) shows how the
+invalid state and its message are wired.
 
 ## Responsive behavior
 

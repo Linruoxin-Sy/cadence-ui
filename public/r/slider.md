@@ -135,7 +135,7 @@ transition would make it trail the thumb by one frame per move.
 | Styles `aria-invalid`                             | Writing the error text and its `aria-describedby` id |
 | Steps and clamps the value to `min`/`max`         | Server-side bounds and business rules               |
 
-See [validation](/docs/validation).
+[Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Responsive behavior
 

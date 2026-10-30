@@ -63,9 +63,9 @@ npx shadcn@latest add @cadence/button
 ## Docs
 
 - [Installation](https://cadence.dev/docs/installation): registry setup, Next.js and Vite.
-- [Theming](https://cadence.dev/docs/theming): shadcn tokens, motion intensity, per-subtree overrides.
+- [Theming](https://cadence.dev/docs/theming): shadcn tokens, motion variables, per-subtree overrides.
 - [Motion](https://cadence.dev/docs/motion): tokens, recipes, reduced-motion rules.
-- [Validation](https://cadence.dev/docs/validation): what the components render and what the caller owns.
+- [Motion modes](https://cadence.dev/docs/motion-modes): full, reduced, none — what each one changes and who sets it.
 - [Install index](https://cadence.dev/r/registry.json): every item and its metadata.
 - [Catalog](https://cadence.dev/r/catalog.json): machine-readable catalog.
 - [Full context](https://cadence.dev/llms-full.txt): every component doc inline.

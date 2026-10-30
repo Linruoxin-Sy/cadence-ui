@@ -141,7 +141,7 @@ in every mode — otherwise a `none` user could not see the state.
 | Exposes `aria-invalid` styling                | Validation and error text                  |
 | Keeps the pressed state in `aria-pressed`     | Persisting it                              |
 
-See [validation](/docs/validation).
+[Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Responsive behavior
 

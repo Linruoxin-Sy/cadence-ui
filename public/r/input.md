@@ -116,7 +116,8 @@ P11 draws the line: the component renders state, the user decides state.
 | Keeps focus visible and keyboard-reachable             | Submit, retry, error mapping, focus management             |
 
 There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
-library is imported. See [validation](/docs/validation).
+library is imported. [Field](/components/field) shows how the invalid state and its message
+are wired.
 
 ## Accessibility
 

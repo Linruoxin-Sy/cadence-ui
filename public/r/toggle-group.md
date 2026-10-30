@@ -176,7 +176,7 @@ With `loopFocus` (default) the arrows wrap around at the ends.
 | Renders the visual pressed state                | Persisting the choice                     |
 | Exposes `aria-invalid` styling on items         | Validation and error text                 |
 
-See [validation](/docs/validation).
+[Field](/components/field) shows how the invalid state and its message are wired.
 
 ## Responsive behavior
 

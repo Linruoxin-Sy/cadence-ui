@@ -153,7 +153,8 @@ ring and the invalid ring, which is colour/shadow state feedback, not motion.
 | Forwards `required`, `name`, `value`, `disabled`     | Building the submitted payload                       |
 | Announces `aria-checked` for all three states        | Mapping the error to the field with `aria-describedby` |
 
-There is no `validate`, `schema`, or `rules` prop. See [validation](/docs/validation).
+There is no `validate`, `schema`, or `rules` prop. [Field](/components/field) shows how the
+invalid state and its message are wired.
 
 ## Responsive behavior
 

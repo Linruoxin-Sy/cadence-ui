@@ -142,7 +142,8 @@ decoration. What is dropped is the animation, so the movement is instant.
 | Exposes `aria-invalid` styling                   | Deciding whether the switch needs one at all     |
 | Renders the on/off state                         | Announcing that the change was saved             |
 
-There is no `validate` or `schema` prop. See [validation](/docs/validation).
+There is no `validate` or `schema` prop. [Field](/components/field) shows how the invalid state
+and its message are wired.
 
 ## Responsive behavior
 

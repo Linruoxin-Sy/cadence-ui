@@ -157,7 +157,8 @@ tabindex Base UI implements.
 | Forwards `name`, `required`, and the selection      | Server-side validation of the submitted value     |
 | Keeps arrow-key navigation within the group         | Focus policy after a failed submit                |
 
-There is no `validate` or `schema` prop. See [validation](/docs/validation).
+There is no `validate` or `schema` prop. [Field](/components/field) shows how the invalid
+state and its message are wired.
 
 ## Responsive behavior
 
