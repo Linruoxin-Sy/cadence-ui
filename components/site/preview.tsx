@@ -2,9 +2,8 @@
 
 import { Suspense, useState } from "react";
 import { Button } from "@/registry/cadence/button/button";
-import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
 import { Skeleton } from "@/registry/cadence/skeleton/skeleton";
-import { useMotionMode } from "./motion-mode";
 import { previews } from "./previews";
 
 /** 0.25× on this preview only: `timeScale` multiplies the tokens, it never edits them. */
@@ -31,14 +30,22 @@ export function Preview({ id }: { id: string }) {
  * provider that inherits the mode and only overrides `timeScale`.
  */
 export function PreviewFrame({ id, initialSlow = false }: { id: string; initialSlow?: boolean }) {
-  const { mode } = useMotionMode();
+  /**
+   * The page's *resolved* mode, which is not the same as the requested one: a
+   * visitor whose OS asks for reduced motion sees `reduced` even while the switch
+   * says `full`. Passing the resolved value down matters for more than the label —
+   * a nested provider that re-derives the mode from the media query is a second
+   * place for the answer to disagree with the page, and it did: the frame said
+   * `reduced` while the preview inside it rendered `full`.
+   */
+  const resolved = useCadenceMotion().mode;
   const [slow, setSlow] = useState(initialSlow);
 
   return (
-    <div data-preview={id} data-preview-motion={mode} className="rounded-xl border border-border bg-background">
+    <div data-preview={id} data-preview-motion={resolved} className="rounded-xl border border-border bg-background">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2">
         <p className="text-[11px] text-muted-foreground">
-          Motion <span className="font-medium text-foreground capitalize">{mode}</span>
+          Motion <span className="font-medium text-foreground capitalize">{resolved}</span>
           <span className="hidden sm:inline"> · change it in the header</span>
         </p>
         <Button
@@ -53,7 +60,7 @@ export function PreviewFrame({ id, initialSlow = false }: { id: string; initialS
       </div>
 
       <div className="p-6">
-        <CadenceProvider timeScale={slow ? SLOW_MOTION_SCALE : 1}>
+        <CadenceProvider mode={resolved} timeScale={slow ? SLOW_MOTION_SCALE : 1}>
           <Suspense fallback={<Skeleton className="h-24 w-full" />}>
             <Preview id={id} />
           </Suspense>
