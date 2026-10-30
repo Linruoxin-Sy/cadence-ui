@@ -43,6 +43,7 @@ These follow from the documents above; the documents are authoritative if they d
 - **Match upstream.** Exports and `data-slot` values are copied from shadcn; additions are allowed, renames and removals are not (`meta.upstream` records the pinned style).
 - **Intra-registry dependencies are namespaced.** Use `@cadence/<id>` in `registryDependencies`; a bare name resolves against the default shadcn registry and installs the wrong file.
 - **Docs are data.** `content/components/<id>.mdx` frontmatter must match `registry.json` (title, description, deps, registryDeps, motion, intensity, complexity, since, tier); the build fails when docs or metadata are missing.
+- **Docs code blocks are the `code-block` item.** `components/site/mdx.tsx` maps `pre` to `components/site/code-fence.tsx`, which highlights at build time; never hand-roll a `<pre>` in site chrome, and add a new fenced language to `code-highlight/highlight.tsx` (`tests/site/fence.test.tsx` fails otherwise).
 
 ## Motion conformance check
 

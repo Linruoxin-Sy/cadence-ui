@@ -103,6 +103,16 @@ Tables keep typeset's "wrap to fit" behaviour and get a plain `overflow-x-auto` 
 `typeset-scroll` is not used because it sets `width: max-content`, which would stop the props table from
 wrapping on desktop.
 
+A fenced block is an exception to "style the element": `Mdx` maps `pre` to
+`components/site/code-fence.tsx`, which renders the registry's `code-block` item, so all 224 fences under
+`content/**` and the install commands on the home page are the component the docs document. Typeset already
+excludes `[data-slot]` subtrees from its element rules, so a block is never restyled by the `pre` rule; the
+one thing it takes back is the flow margin, from the `.typeset-docs` rule in `app/globals.css`. Highlighting
+runs at build time — the pages are static, so Shiki tokenizes the fence while the page renders and the browser
+downloads no grammar — and the header carries the language and the copy control, because a floating copy
+action is invisible until hover and most fences on this site are commands to copy. A fence in a language the
+item does not bundle renders as plain text, which is the whole source either way.
+
 ### 2.4 Document entrance
 
 Each page makes its content `<article class="max-w-3xl py-12">` the entrance via
