@@ -58,6 +58,7 @@ npx shadcn@latest add @cadence/button
 - [Hover Card](https://cadence.dev/r/hover-card.md): A preview panel that opens from a link on hover or focus and disappears when the pointer leaves. (overlay)
 - [Sheet](https://cadence.dev/r/sheet.md): A panel that slides in from an edge of the screen and holds a focused task without leaving the page. (overlay)
 - [Drawer](https://cadence.dev/r/drawer.md): A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request. (overlay)
+- [Select](https://cadence.dev/r/select.md): A control that opens a list of options and keeps the chosen value in the trigger. (form)
 
 ## Docs
 

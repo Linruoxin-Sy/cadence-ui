@@ -1,0 +1,183 @@
+# Select
+
+> A control that opens a list of options and keeps the chosen value in the trigger.
+
+- Registry item: https://cadence.dev/r/select.json
+- Install: `npx shadcn@latest add @cadence/select`
+- Type: registry:ui
+- Since: 0.4.0
+- Motion recipes: popup.anchored, geometry.resize, handoff, state.morph
+
+## When to use
+
+- Choosing one value from a list that is too long for radios but too short to need search.
+- A compact form control where the current value should stay visible in the trigger.
+- A setting that changes the surface around it, so the value and its width should move together.
+
+## When not to use
+
+- Free-text or type-to-filter input. Use `combobox` once it ships, or an `input` with a datalist.
+- Two or three mutually exclusive options that should stay visible. Use `radio-group`.
+- Navigation between routes. Use a menu or links; a select submits a value, it does not navigate.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/select
+```
+
+## Usage
+
+```tsx
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/cadence/select/select";
+
+export function FrameworkSelect() {
+  return (
+    <Select defaultValue="next">
+      <SelectTrigger className="w-48" aria-label="Framework">
+        <SelectValue placeholder="Choose a framework" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="next">Next.js</SelectItem>
+        <SelectItem value="remix">Remix</SelectItem>
+        <SelectItem value="astro">Astro</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
+```
+
+## Examples
+
+### Sizes
+
+`size="sm"` is for dense toolbars and table rows; the default is the form height.
+
+```tsx
+<SelectTrigger size="sm">
+  <SelectValue />
+</SelectTrigger>
+```
+
+### Groups and labels
+
+`SelectGroup` and `SelectLabel` keep long lists legible. `SelectSeparator` splits unrelated groups.
+
+```tsx
+<SelectContent>
+  <SelectGroup>
+    <SelectLabel>Fruits</SelectLabel>
+    <SelectItem value="apple">Apple</SelectItem>
+    <SelectItem value="orange">Orange</SelectItem>
+  </SelectGroup>
+  <SelectSeparator />
+  <SelectGroup>
+    <SelectLabel>Vegetables</SelectLabel>
+    <SelectItem value="carrot">Carrot</SelectItem>
+  </SelectGroup>
+</SelectContent>
+```
+
+### Controlled value
+
+`value` and `onValueChange` make the select controlled; `defaultValue` keeps it uncontrolled.
+
+```tsx
+const [value, setValue] = useState("next");
+
+<Select value={value} onValueChange={setValue}>
+  …
+</Select>;
+```
+
+### Form submission
+
+The hidden input uses `name`; `required` makes an empty value fail native validation, but the component
+never decides whether a value is valid.
+
+```tsx
+<Select name="framework" required defaultValue="next">
+  …
+</Select>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Select` | `value`, `defaultValue`, `onValueChange`, `disabled`, `required`, `name`, `multiple`, `items` | Base UI root; `items` lets `SelectValue` render labels from data. |
+| `SelectTrigger` | `size` (`"sm" \| "default"`), native button props | Contains `SelectValue`; the chevron is rendered for you. |
+| `SelectValue` | `placeholder` | The selected label, or the placeholder when empty. |
+| `SelectContent` | `side`, `align`, `sideOffset`, `alignOffset`, `alignItemWithTrigger` | Portals, positions, and sizes to `--anchor-width`. |
+| `SelectItem` | `value`, `disabled` | Renders the label and the check indicator. |
+| `SelectGroup` / `SelectLabel` | group props | Purely structural. |
+| `SelectSeparator` | separator props | A single hairline. |
+| `SelectScrollUpButton` / `SelectScrollDownButton` | scroll-arrow props | Appear only when the list overflows. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| pointer selection | value slot width | `geometry.resize` | yes (physics-defined, clamped) |
+| pointer selection | label `x`/`y` from the item to the trigger | `handoff` | yes |
+| pointer selection | check `scale` / `opacity` | `state.morph` | yes |
+| open / close | popup `opacity` / `scale` | `popup.anchored` | yes |
+| reduced | width jumps, no flight, no scale; opacity stays | – | – |
+| none | every duration is zero | – | – |
+
+The trigger's label is laid out at its final width inside a clipped slot. Animating that slot's width
+folds the surface without re-wrapping the label, and the handoff's destination does not drift while
+the width settles. Keyboard selection has no origin, so it changes the width and lets the label swap
+without a flight; the pointer keeps the spatial handoff.
+
+## Keyboard interactions
+
+- `Enter` / `Space` / `ArrowDown` opens the list and focuses the selected item.
+- `ArrowUp` / `ArrowDown` moves the highlight; `Home` / `End` jump to the ends.
+- Typeahead letters move the highlight to the next matching label.
+- `Enter` selects; `Escape` closes without changing the value.
+- `Tab` closes the list and moves focus to the next control.
+
+## Accessibility
+
+- Base UI renders the trigger as a combobox and the popup as a listbox, wired with
+  `aria-expanded`, `aria-controls`, and `aria-activedescendant`.
+- Name the control with `aria-label` or a visible `SelectLabel`; the value alone is not a name.
+- The selected item keeps `aria-selected="true"`; the check is a visual duplicate, not the only signal.
+- Under reduced motion the value still changes and the check still appears; nothing is conveyed by
+  the flight alone.
+- The handoff clone is `aria-hidden`: screen readers hear the value once, from the trigger.
+
+## Responsive behavior
+
+The popup is at least `--anchor-width` wide and caps at `--available-height`, so it flips and scrolls
+inside the viewport. `alignItemWithTrigger` keeps the selected item over the trigger on touch, where a
+list attached below the finger is harder to read. The width animation is short and only touches the
+trigger, so a select in a toolbar does not reflow the page beyond its own row.
+
+## Performance
+
+- One measured width animation and, on pointer selection, one absolutely positioned label for the
+  duration of the handoff. No blur and no shadow animation.
+- Width is a layout property; it is allowed only on this T3 component and only through
+  `geometry.resize`, which jumps under reduced and none.
+- The list virtualisation is Base UI's; the component adds no per-item animation beyond the check
+  indicator.
+- Budget: T3 (12 KB gzip). If a page animates several selects at once, only the open one moves.
+
+## Notes for AI
+
+- Prefer `SelectValue placeholder="…"` over an empty first item; an empty item is a selectable value.
+- Keep item labels short and distinct; typeahead matches their text.
+- Do not add a separate "selected" class to the trigger; the value already carries the state.
+- For invalid state, pass `aria-invalid`; the trigger styles it from the attribute.
+
+---
+
+Full index: https://cadence.dev/llms.txt

@@ -15,7 +15,7 @@
       "name": "cadence-motion",
       "type": "registry:lib",
       "title": "Motion presets",
-      "description": "Durations, easings, springs, and recipe resolution shared by every Cadence component.",
+      "description": "Durations, easings, springs, geometry helpers, and recipe resolution shared by every Cadence component.",
       "categories": [
         "foundation"
       ],
@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -310,7 +310,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -333,7 +333,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -357,7 +357,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -381,7 +381,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -404,7 +404,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -428,7 +428,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -451,7 +451,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -474,7 +474,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -497,7 +497,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -525,7 +525,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -557,7 +557,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -582,7 +582,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -607,7 +607,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -632,7 +632,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -657,7 +657,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -682,7 +682,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -707,7 +707,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -732,7 +732,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -757,7 +757,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -789,7 +789,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -815,7 +815,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -841,7 +841,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -867,7 +867,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -893,7 +893,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
       }
     },
     {
@@ -919,7 +919,35 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c717537"
+        "sourceSha": "00043d5"
+      }
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A control that opens a list of options and keeps the chosen value in the trigger.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.4.0",
+        "tier": "T3",
+        "batch": "B5",
+        "motion": [
+          "popup.anchored",
+          "geometry.resize",
+          "handoff",
+          "state.morph"
+        ],
+        "intensity": "expressive",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "00043d5"
       }
     }
   ]
