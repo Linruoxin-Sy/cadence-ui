@@ -39,6 +39,9 @@ npx shadcn@latest add @cadence/button
 - [Alert](/r/alert.md): A message about the current state of the page, with an icon column and an action slot. (feedback)
 - [Empty](/r/empty.md): The resting state of a region that has nothing to show yet. (feedback, layout)
 - [Item](/r/item.md): A row in a list of like objects, with media, content, and actions. (data, layout)
+- [Field](/r/field.md): A labelled control with its description and error, without owning validation. (form)
+- [Button Group](/r/button-group.md): Adjacent controls joined into one shape. (form, layout)
+- [Input Group](/r/input-group.md): A text control framed with prefixes, suffixes, and buttons. (form)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs
@@ -1814,6 +1817,465 @@ that animates itself cannot be interrupted by the next render.
   density, not hierarchy.
 - Use `ItemSeparator`, not `border-b` on the row: the separator keeps the variant
   border colour independent of the divider.
+
+# Field
+
+A labelled control with its description and error, without owning validation.
+
+## When to use
+
+- Any control that needs a visible label plus a line of help: text, select, checkbox
+  group, radio group, a segmented choice.
+- A form where the error has to sit next to the control it belongs to, not in a
+  summary at the top.
+- A choice card — a `Field` that contains a whole control card — where the label is
+  the surface and the checked state is the selection.
+
+## When not to use
+
+- A single input with no label and no help. Do not wrap it; `input` already carries
+  its own border and focus ring.
+- A validation module. `Field` renders messages; it never produces them (P11).
+- A toolbar of loose controls. Group those with `button-group`, which has no label
+  semantics to offer.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/field
+```
+
+## Usage
+
+```tsx
+import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/cadence/field/field";
+import { Input } from "@/components/cadence/input/input";
+
+export function CompanyField() {
+  return (
+    <Field>
+      <FieldLabel htmlFor="company">Company</FieldLabel>
+      <FieldContent>
+        <Input id="company" />
+        <FieldDescription>Appears on the invoice header.</FieldDescription>
+      </FieldContent>
+    </Field>
+  );
+}
+```
+
+## Examples
+
+### Vertical, horizontal, responsive
+
+`orientation` decides where the label sits. `responsive` keeps a column until the
+`FieldGroup` reaches `md`, then turns into a row — the group is the container query
+root, so it works inside a sidebar or a dialog without a breakpoint for each.
+
+```tsx
+<FieldGroup>
+  <Field orientation="horizontal">…</Field>
+  <Field orientation="responsive">…</Field>
+</FieldGroup>
+```
+
+### An error, from the caller
+
+`FieldError` renders what it is given and returns `null` when it has nothing. Two
+messages become a list; duplicates collapse.
+
+```tsx
+<Field data-invalid="true">
+  <FieldLabel htmlFor="vat">VAT number</FieldLabel>
+  <FieldContent>
+    <Input id="vat" aria-invalid aria-describedby="vat-error" />
+    <FieldError id="vat-error" errors={[{ message: "Required" }, { message: "Not a work email" }]} />
+  </FieldContent>
+</Field>
+```
+
+### A set, a legend, and a divider
+
+```tsx
+<FieldSet>
+  <FieldLegend>Billing details</FieldLegend>
+  <FieldGroup>
+    <Field>…</Field>
+    <FieldSeparator>or</FieldSeparator>
+    <Field>…</Field>
+  </FieldGroup>
+</FieldSet>
+```
+
+### A choice card
+
+`FieldLabel` recognises a `Field` inside it and becomes the card: full width, border,
+padding, and a primary tint when the inner control is checked.
+
+```tsx
+<FieldLabel>
+  <Field orientation="horizontal">
+    <FieldContent>
+      <FieldTitle>Team plan</FieldTitle>
+      <FieldDescription>Unlimited projects.</FieldDescription>
+    </FieldContent>
+    <Checkbox name="plan" value="team" />
+  </Field>
+</FieldLabel>
+```
+
+## API
+
+| Part               | Props                        | Notes                                                          |
+| ------------------ | ---------------------------- | -------------------------------------------------------------- |
+| `Field`            | `orientation`, native props  | `vertical \| horizontal \| responsive`; `role="group"`, `data-orientation`. |
+| `FieldLabel`       | `Label` props                | A real `label`; click focuses the control.                      |
+| `FieldTitle`       | native div props             | Label-weight text that is not tied to a control.                |
+| `FieldDescription` | native props for `p`         | Muted help text, balanced in horizontal orientation.            |
+| `FieldError`       | `errors`, native div props   | `errors`: `{ message?: string }[]`. `role="alert"`, `null` when empty. |
+| `FieldGroup`       | native div props             | Container query root; vertical rhythm between fields.           |
+| `FieldContent`     | native div props             | Control plus description/error stack.                           |
+| `FieldSet`         | native props for `fieldset`  | Groups related fields; pairs with `FieldLegend`.                |
+| `FieldLegend`      | `variant`                    | `legend \| label` sizes the legend text.                        |
+| `FieldSeparator`   | `children`                   | Rule with optional centred text; exposes `data-content`.        |
+
+`data-slot` values: `field`, `field-label`, `field-description`, `field-error`,
+`field-group`, `field-content`, `field-set`, `field-legend`, `field-separator`,
+`field-separator-content`.
+
+## Motion contract
+
+No motion (T0). A field never animates — not on mount, not when the error appears.
+The error is the one thing the user must read immediately; fading or sliding it in
+delays the only information that matters, and it moves the control the user's cursor
+is in.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+`data-[invalid=true]` recolours the field's text on the destructive token. That is a
+colour change, not a motion, and it is never the only signal.
+
+## Validation and data ownership
+
+P11 draws the line: the component renders state, you decide state.
+
+| `Field` does                                            | You do                                                    |
+| ------------------------------------------------------- | --------------------------------------------------------- |
+| Renders the message it is given (`children` or `errors`) | Deciding what is invalid (required, format, async checks)  |
+| Marks the error `role="alert"`                           | Wiring `aria-invalid` and `aria-describedby` on the control |
+| Colours the field when `data-invalid` / `aria-invalid`   | Form state, submit, retry, focus management                |
+| Shows a description and an error at once                 | Writing the copy and the ids                               |
+
+There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
+library is imported. `FieldError` accepts messages, not rules. See
+[validation](/docs/validation).
+
+## Accessibility
+
+- `FieldLabel` is a `label`, so clicking it focuses the control it names. Always pass
+  `htmlFor` matching the control's `id`; a `FieldTitle` is not a substitute.
+- An error is `role="alert"`: it is announced when it appears. Point the control at it
+  with `aria-describedby` so the message is also part of the control's description.
+- `aria-invalid` on the control is what makes the state machine-readable; the
+  destructive colour is the sighted half of the same signal.
+- A horizontal field puts the label after the content in source order when the content
+  holds the control. Keep the DOM order label → control for a simple pair.
+
+## Notes for AI
+
+- Do not add an `error` prop to `Input`; put the message in `FieldError` and point
+  `aria-describedby` at it.
+- Use `FieldGroup` as the container, not a `space-y-*` div: the responsive
+  orientation depends on being inside a container query root.
+- `FieldError` returns `null` when it has no content, so it is safe to keep mounted.
+
+# Button Group
+
+Adjacent controls joined into one shape.
+
+## When to use
+
+- Two to five controls that act on the same object: bold/italic/underline, cut/copy,
+  approve/reject, a zoom stepper.
+- A segmented control where the current option is a button state (`variant="default"`
+  vs `"ghost"`), not a radio group.
+- A label plus an action, where the label should read as part of the control — use
+  `ButtonGroupText` for the static half.
+
+## When not to use
+
+- More than about five options. Beyond that the shape stops helping and a `select` or
+  a menu is faster.
+- Mutually exclusive choices that need arrow-key navigation and a form value. That is
+  `toggle-group`, or a `radio-group` inside a `field`.
+- A single button. The group adds nothing; use `button`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/button-group
+```
+
+## Usage
+
+```tsx
+import { Button } from "@/components/cadence/button/button";
+import { ButtonGroup } from "@/components/cadence/button-group/button-group";
+
+export function TextStyle() {
+  return (
+    <ButtonGroup aria-label="Text style">
+      <Button variant="outline" size="icon-sm" aria-label="Bold">
+        <Bold />
+      </Button>
+      <Button variant="outline" size="icon-sm" aria-label="Italic">
+        <Italic />
+      </Button>
+    </ButtonGroup>
+  );
+}
+```
+
+## Examples
+
+### Vertical
+
+`orientation="vertical"` stacks the same rules: only the outer corners are rounded,
+and the shared borders collapse.
+
+```tsx
+<ButtonGroup orientation="vertical" aria-label="Order">
+  <Button variant="outline" size="sm">Move up</Button>
+  <Button variant="outline" size="sm">Move down</Button>
+</ButtonGroup>
+```
+
+### Static text inside the group
+
+`ButtonGroupText` takes `render`, so the label can be a `label`, a `span`, or the
+router's own element without extra wrappers.
+
+```tsx
+<ButtonGroup aria-label="Zoom">
+  <ButtonGroupText>-</ButtonGroupText>
+  <Button variant="outline" size="sm">100%</Button>
+  <ButtonGroupSeparator />
+  <ButtonGroupText>+</ButtonGroupText>
+</ButtonGroup>
+```
+
+### A rule between two controls
+
+`ButtonGroupSeparator` stretches to the cross axis, so one component works in both
+orientations.
+
+```tsx
+<ButtonGroup>
+  <Button>Cut</Button>
+  <ButtonGroupSeparator />
+  <Button>Copy</Button>
+</ButtonGroup>
+```
+
+## API
+
+| Part                    | Props                     | Notes                                                          |
+| ----------------------- | ------------------------- | -------------------------------------------------------------- |
+| `ButtonGroup`           | `orientation`, native div | `horizontal \| vertical`; `role="group"`, `data-orientation`.  |
+| `ButtonGroupText`       | `render`, native div      | Static label; swapped element via Base UI `render`.            |
+| `ButtonGroupSeparator`  | `Separator` props         | Vertical by default; `self-stretch`, `bg-input`.               |
+| `buttonGroupVariants`   | `orientation`             | Exported for composing a custom group root.                    |
+
+The joining rules are `[&>*]` selectors, so any child that renders a `data-slot` — a
+button, an input, a select trigger — participates without a prop.
+
+## Motion contract
+
+No motion (T0). The group does not animate. Adjacent buttons share a border, and the
+only depth cue is `focus-visible:relative` plus `z-10`, which lifts the focused
+control above its neighbours so its ring is not clipped.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+The buttons inside keep their own press feedback; the group never adds a second
+animation on top of it.
+
+## Accessibility
+
+- `role="group"` needs a name: pass `aria-label` (or `aria-labelledby`) when there is
+  no visible heading. Without one, a screen reader says "group" and nothing else.
+- Tab order follows DOM order, not visual order. In `vertical`, keep the DOM order the
+  same as the visual stack.
+- Icon-only buttons inside a group must each carry an `aria-label`; the group label
+  does not name them.
+- Do not mark the active segment with colour alone — use `aria-pressed` on a toggle
+  button, or a `data-state` attribute your CSS keys off.
+
+## Notes for AI
+
+- Use `ButtonGroup` for actions on one object, `toggle-group` for a value the form
+  reads. They look alike and behave differently.
+- Do not add gaps between children: the rounded/border collapse is what makes the
+  group read as one control.
+- `ButtonGroupSeparator` is already `self-stretch`; do not set a height.
+
+# Input Group
+
+A text control framed with prefixes, suffixes, and buttons.
+
+## When to use
+
+- A field with a fixed prefix or suffix: a currency symbol, `https://`, a unit, a
+  domain.
+- A control that needs one inline action: search with a shortcut hint, a chooser with
+  a clear button, an invite field with a submit button.
+- A textarea with a footer — a character count, a send button — where the footer must
+  look attached to the field.
+
+## When not to use
+
+- A bare text field. Use `input`; the group would only re-create its border.
+- A whole toolbar of actions. Use `button-group` beside the field, or a `form` layout:
+  four buttons inside one field is a cramped target.
+- A label. Use `field` and `FieldLabel`; an addon is not an accessible name.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/input-group
+```
+
+## Usage
+
+```tsx
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/cadence/input-group/input-group";
+
+export function Domain() {
+  return (
+    <InputGroup>
+      <InputGroupAddon>
+        <InputGroupText>https://</InputGroupText>
+      </InputGroupAddon>
+      <InputGroupInput placeholder="cadence.dev" aria-label="Domain" />
+    </InputGroup>
+  );
+}
+```
+
+## Examples
+
+### Alignments
+
+`align` decides where the addon sits: `inline-start`, `inline-end`, `block-start`,
+`block-end`. The frame turns into a column for the block alignments, and the control
+gives up the padding on that side.
+
+```tsx
+<InputGroup>
+  <InputGroupAddon align="block-start">Recipient</InputGroupAddon>
+  <InputGroupInput aria-label="Recipient" />
+</InputGroup>
+```
+
+### A button in the frame
+
+`InputGroupButton` sizes itself on the addon scale (`xs`, `sm`, `icon-xs`,
+`icon-sm`), so it never towers over a 36px field. A click on a real button does not
+steal focus from the input — the addon's focus handler steps aside.
+
+```tsx
+<InputGroup>
+  <InputGroupInput placeholder="Search" aria-label="Search" />
+  <InputGroupAddon align="inline-end">
+    <InputGroupButton size="icon-xs" aria-label="Clear">×</InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>
+```
+
+### A textarea with a footer
+
+```tsx
+<InputGroup>
+  <InputGroupTextarea aria-label="Note" />
+  <InputGroupAddon align="block-end">
+    <InputGroupText>0/280</InputGroupText>
+    <InputGroupButton size="sm" className="ml-auto">Send</InputGroupButton>
+  </InputGroupAddon>
+</InputGroup>
+```
+
+## API
+
+| Part                  | Props                    | Notes                                                          |
+| --------------------- | ------------------------ | -------------------------------------------------------------- |
+| `InputGroup`          | native div props         | The frame; `role="group"`, focus and invalid state via `:has()`. |
+| `InputGroupAddon`     | `align`, native div      | `inline-start \| inline-end \| block-start \| block-end`, `data-align`. |
+| `InputGroupButton`    | `size`, `variant`, `type`| `xs \| sm \| icon-xs \| icon-sm`; ghost by default.            |
+| `InputGroupText`      | native span props        | Muted text or an icon; not a label.                            |
+| `InputGroupInput`     | `input` props            | Control with the frame's chrome removed; `data-slot="input-group-control"`. |
+| `InputGroupTextarea`  | `textarea` props         | Same, for multi-line.                                          |
+
+The frame watches `[data-slot=input-group-control]` for `:focus-visible` and
+`[aria-invalid=true]`, which is why the control can be borderless and the group still
+shows the ring.
+
+## Motion contract
+
+No motion (T0). The frame never animates. `transition-[color,box-shadow]` covers the
+focus ring and the invalid border — state feedback that takes no space and does not
+run on mount.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+## Validation and data ownership
+
+P11: the group shows invalid state, it never decides it.
+
+| `InputGroup` does                                        | You do                                                   |
+| -------------------------------------------------------- | -------------------------------------------------------- |
+| Draws the destructive border when a control is invalid    | Deciding what is invalid                                 |
+| Moves focus to the input when the addon is clicked        | Wiring `aria-invalid` and `aria-describedby`             |
+| Renders the buttons you give it                           | Submit, retry, error mapping                             |
+
+There is no `validate`, `schema`, or `resolver` prop, and no validation library is
+imported. See [validation](/docs/validation).
+
+## Accessibility
+
+- The addon text is not a name. Give the control an `aria-label`, or put a `FieldLabel`
+  around the group through `field`.
+- `role="group"` on the frame and on each addon groups the pieces for assistive tech;
+  add `aria-label` to the frame only if the group needs a name of its own.
+- The addon focuses the input on click — a convenience for pointer users. Keyboard
+  users tab straight into the control, which is already the shortest path.
+- Buttons inside the frame keep their own names. An icon-only clear button needs
+  `aria-label="Clear"`.
+- `aria-invalid` must be on the control, not on the frame; the frame reacts to it.
+
+## Notes for AI
+
+- Never wrap `input` in this group to "add a border"; the input already has one.
+- Put state on `InputGroupInput` (`aria-invalid`, `disabled`, `readOnly`) — the frame is
+  chrome, and it inherits the appearance.
+- Use `InputGroupButton`, not `Button`, inside the frame: the sizes are on the addon
+  scale, and the addon's click handler recognises it as a button.
 
 # Dialog
 

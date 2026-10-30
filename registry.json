@@ -506,6 +506,93 @@
       }
     },
     {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "A labelled control with its description and error, without owning validation.",
+      "categories": ["form"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": ["@cadence/cadence-utils", "@cadence/label", "@cadence/separator"],
+      "files": [
+        {
+          "path": "registry/cadence/field/field.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/field/field.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Adjacent controls joined into one shape.",
+      "categories": ["form", "layout"],
+      "dependencies": ["@base-ui/react", "class-variance-authority"],
+      "registryDependencies": ["@cadence/cadence-utils", "@cadence/separator"],
+      "files": [
+        {
+          "path": "registry/cadence/button-group/button-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/button-group/button-group.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "A text control framed with prefixes, suffixes, and buttons.",
+      "categories": ["form"],
+      "dependencies": ["class-variance-authority"],
+      "registryDependencies": ["@cadence/button", "@cadence/cadence-utils", "@cadence/input", "@cadence/textarea"],
+      "files": [
+        {
+          "path": "registry/cadence/input-group/input-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/input-group/input-group.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

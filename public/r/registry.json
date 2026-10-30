@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -307,7 +307,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -330,7 +330,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -354,7 +354,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     },
     {
@@ -378,7 +378,77 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
+      }
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "A labelled control with its description and error, without owning validation.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "931b594"
+      }
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Adjacent controls joined into one shape.",
+      "categories": [
+        "form",
+        "layout"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "931b594"
+      }
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "A text control framed with prefixes, suffixes, and buttons.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "931b594"
       }
     },
     {
@@ -404,7 +474,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "86a0ab6"
+        "sourceSha": "931b594"
       }
     }
   ]

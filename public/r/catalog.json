@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -388,7 +388,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -417,7 +417,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -447,7 +447,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -479,9 +479,104 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/item.md",
     "item": "/r/item.json"
+  },
+  {
+    "name": "field",
+    "type": "registry:ui",
+    "title": "Field",
+    "description": "A labelled control with its description and error, without owning validation.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/label",
+      "@cadence/separator"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "931b594",
+    "docs": "/r/field.md",
+    "item": "/r/field.json"
+  },
+  {
+    "name": "button-group",
+    "type": "registry:ui",
+    "title": "Button Group",
+    "description": "Adjacent controls joined into one shape.",
+    "categories": [
+      "form",
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/separator"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "931b594",
+    "docs": "/r/button-group.md",
+    "item": "/r/button-group.json"
+  },
+  {
+    "name": "input-group",
+    "type": "registry:ui",
+    "title": "Input Group",
+    "description": "A text control framed with prefixes, suffixes, and buttons.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-utils",
+      "@cadence/input",
+      "@cadence/textarea"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "931b594",
+    "docs": "/r/input-group.md",
+    "item": "/r/input-group.json"
   },
   {
     "name": "dialog",
@@ -516,7 +611,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "86a0ab6",
+    "sourceSha": "931b594",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   }

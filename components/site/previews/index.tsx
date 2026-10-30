@@ -4,10 +4,13 @@ import { AspectRatioPreview } from "./aspect-ratio";
 import { AvatarPreview } from "./avatar";
 import { BadgePreview } from "./badge";
 import { ButtonPreview } from "./button";
+import { ButtonGroupPreview } from "./button-group";
 import { CardPreview } from "./card";
 import { DialogPreview } from "./dialog";
 import { EmptyPreview } from "./empty";
+import { FieldPreview } from "./field";
 import { InputPreview } from "./input";
+import { InputGroupPreview } from "./input-group";
 import { ItemPreview } from "./item";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
@@ -35,4 +38,7 @@ export const previews: Record<string, ComponentType> = {
   alert: AlertPreview,
   empty: EmptyPreview,
   item: ItemPreview,
+  field: FieldPreview,
+  "button-group": ButtonGroupPreview,
+  "input-group": InputGroupPreview,
 };

@@ -1,0 +1,183 @@
+---
+title: Field
+description: A labelled control with its description and error, without owning validation.
+category: form
+motion: []
+intensity: subtle
+complexity: M
+tier: T0
+since: 0.2.0
+deps: ["class-variance-authority"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/label", "@cadence/separator"]
+---
+
+## When to use
+
+- Any control that needs a visible label plus a line of help: text, select, checkbox
+  group, radio group, a segmented choice.
+- A form where the error has to sit next to the control it belongs to, not in a
+  summary at the top.
+- A choice card — a `Field` that contains a whole control card — where the label is
+  the surface and the checked state is the selection.
+
+## When not to use
+
+- A single input with no label and no help. Do not wrap it; `input` already carries
+  its own border and focus ring.
+- A validation module. `Field` renders messages; it never produces them (P11).
+- A toolbar of loose controls. Group those with `button-group`, which has no label
+  semantics to offer.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/field
+```
+
+## Usage
+
+```tsx
+import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/cadence/field/field";
+import { Input } from "@/components/cadence/input/input";
+
+export function CompanyField() {
+  return (
+    <Field>
+      <FieldLabel htmlFor="company">Company</FieldLabel>
+      <FieldContent>
+        <Input id="company" />
+        <FieldDescription>Appears on the invoice header.</FieldDescription>
+      </FieldContent>
+    </Field>
+  );
+}
+```
+
+## Examples
+
+### Vertical, horizontal, responsive
+
+`orientation` decides where the label sits. `responsive` keeps a column until the
+`FieldGroup` reaches `md`, then turns into a row — the group is the container query
+root, so it works inside a sidebar or a dialog without a breakpoint for each.
+
+```tsx
+<FieldGroup>
+  <Field orientation="horizontal">…</Field>
+  <Field orientation="responsive">…</Field>
+</FieldGroup>
+```
+
+### An error, from the caller
+
+`FieldError` renders what it is given and returns `null` when it has nothing. Two
+messages become a list; duplicates collapse.
+
+```tsx
+<Field data-invalid="true">
+  <FieldLabel htmlFor="vat">VAT number</FieldLabel>
+  <FieldContent>
+    <Input id="vat" aria-invalid aria-describedby="vat-error" />
+    <FieldError id="vat-error" errors={[{ message: "Required" }, { message: "Not a work email" }]} />
+  </FieldContent>
+</Field>
+```
+
+### A set, a legend, and a divider
+
+```tsx
+<FieldSet>
+  <FieldLegend>Billing details</FieldLegend>
+  <FieldGroup>
+    <Field>…</Field>
+    <FieldSeparator>or</FieldSeparator>
+    <Field>…</Field>
+  </FieldGroup>
+</FieldSet>
+```
+
+### A choice card
+
+`FieldLabel` recognises a `Field` inside it and becomes the card: full width, border,
+padding, and a primary tint when the inner control is checked.
+
+```tsx
+<FieldLabel>
+  <Field orientation="horizontal">
+    <FieldContent>
+      <FieldTitle>Team plan</FieldTitle>
+      <FieldDescription>Unlimited projects.</FieldDescription>
+    </FieldContent>
+    <Checkbox name="plan" value="team" />
+  </Field>
+</FieldLabel>
+```
+
+## API
+
+| Part               | Props                        | Notes                                                          |
+| ------------------ | ---------------------------- | -------------------------------------------------------------- |
+| `Field`            | `orientation`, native props  | `vertical \| horizontal \| responsive`; `role="group"`, `data-orientation`. |
+| `FieldLabel`       | `Label` props                | A real `label`; click focuses the control.                      |
+| `FieldTitle`       | native div props             | Label-weight text that is not tied to a control.                |
+| `FieldDescription` | native props for `p`         | Muted help text, balanced in horizontal orientation.            |
+| `FieldError`       | `errors`, native div props   | `errors`: `{ message?: string }[]`. `role="alert"`, `null` when empty. |
+| `FieldGroup`       | native div props             | Container query root; vertical rhythm between fields.           |
+| `FieldContent`     | native div props             | Control plus description/error stack.                           |
+| `FieldSet`         | native props for `fieldset`  | Groups related fields; pairs with `FieldLegend`.                |
+| `FieldLegend`      | `variant`                    | `legend \| label` sizes the legend text.                        |
+| `FieldSeparator`   | `children`                   | Rule with optional centred text; exposes `data-content`.        |
+
+`data-slot` values: `field`, `field-label`, `field-description`, `field-error`,
+`field-group`, `field-content`, `field-set`, `field-legend`, `field-separator`,
+`field-separator-content`.
+
+## Motion contract
+
+No motion (T0). A field never animates — not on mount, not when the error appears.
+The error is the one thing the user must read immediately; fading or sliding it in
+delays the only information that matters, and it moves the control the user's cursor
+is in.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+`data-[invalid=true]` recolours the field's text on the destructive token. That is a
+colour change, not a motion, and it is never the only signal.
+
+## Validation and data ownership
+
+P11 draws the line: the component renders state, you decide state.
+
+| `Field` does                                            | You do                                                    |
+| ------------------------------------------------------- | --------------------------------------------------------- |
+| Renders the message it is given (`children` or `errors`) | Deciding what is invalid (required, format, async checks)  |
+| Marks the error `role="alert"`                           | Wiring `aria-invalid` and `aria-describedby` on the control |
+| Colours the field when `data-invalid` / `aria-invalid`   | Form state, submit, retry, focus management                |
+| Shows a description and an error at once                 | Writing the copy and the ids                               |
+
+There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
+library is imported. `FieldError` accepts messages, not rules. See
+[validation](/docs/validation).
+
+## Accessibility
+
+- `FieldLabel` is a `label`, so clicking it focuses the control it names. Always pass
+  `htmlFor` matching the control's `id`; a `FieldTitle` is not a substitute.
+- An error is `role="alert"`: it is announced when it appears. Point the control at it
+  with `aria-describedby` so the message is also part of the control's description.
+- `aria-invalid` on the control is what makes the state machine-readable; the
+  destructive colour is the sighted half of the same signal.
+- A horizontal field puts the label after the content in source order when the content
+  holds the control. Keep the DOM order label → control for a simple pair.
+
+## Notes for AI
+
+- Do not add an `error` prop to `Input`; put the message in `FieldError` and point
+  `aria-describedby` at it.
+- Use `FieldGroup` as the container, not a `space-y-*` div: the responsive
+  orientation depends on being inside a container query root.
+- `FieldError` returns `null` when it has no content, so it is safe to keep mounted.

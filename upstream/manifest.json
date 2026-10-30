@@ -196,6 +196,63 @@
         "item-title"
       ]
     },
+    "field": {
+      "path": "apps/v4/registry/bases/base/ui/field.tsx",
+      "exports": [
+        "Field",
+        "FieldContent",
+        "FieldDescription",
+        "FieldError",
+        "FieldGroup",
+        "FieldLabel",
+        "FieldLegend",
+        "FieldSeparator",
+        "FieldSet",
+        "FieldTitle"
+      ],
+      "slots": [
+        "field",
+        "field-content",
+        "field-description",
+        "field-error",
+        "field-group",
+        "field-label",
+        "field-legend",
+        "field-separator",
+        "field-separator-content",
+        "field-set"
+      ]
+    },
+    "button-group": {
+      "path": "apps/v4/registry/bases/base/ui/button-group.tsx",
+      "exports": [
+        "ButtonGroup",
+        "ButtonGroupSeparator",
+        "ButtonGroupText",
+        "buttonGroupVariants"
+      ],
+      "slots": [
+        "button-group",
+        "button-group-separator",
+        "button-group-text"
+      ]
+    },
+    "input-group": {
+      "path": "apps/v4/registry/bases/base/ui/input-group.tsx",
+      "exports": [
+        "InputGroup",
+        "InputGroupAddon",
+        "InputGroupButton",
+        "InputGroupInput",
+        "InputGroupText",
+        "InputGroupTextarea"
+      ],
+      "slots": [
+        "input-group",
+        "input-group-addon",
+        "input-group-control"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [
