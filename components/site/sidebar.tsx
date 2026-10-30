@@ -6,7 +6,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useId, useState } from "react";
 import { cn } from "@/registry/cadence/lib/cn";
+import { duration } from "@/registry/cadence/lib/motion";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
+import { SIDEBAR_EASE, SIDEBAR_ITEM, SIDEBAR_TIMING } from "./easing";
+import { Reveal } from "./reveal";
 
 export interface SidebarItem {
   slug: string;
@@ -27,24 +30,37 @@ export interface SidebarProps {
 /** Nothing is collapsed until the reader says so, so the first paint shows the whole map. */
 const NOTHING_CLOSED: ReadonlySet<string> = new Set();
 
+/**
+ * A disclosure body is a large block — the whole navigation column can unfold —
+ * so it rides past the `duration.page` token. The extra ~50ms matters: the last
+ * row only becomes visible at the bottom of the panel and its own entrance is
+ * 0.22s, so a 0.5s panel lets the container and that row stop together instead
+ * of the row fading on after the height has settled. `SIDEBAR_EASE` keeps the
+ * first half quick and the last few frames moving. Written as a ratio so
+ * `reduced` keeps its 0.6 factor and `none` still resolves to zero.
+ */
+const PANEL_TIME_SCALE = SIDEBAR_TIMING.panel / duration.base;
+
 function isActive(pathname: string, href: string) {
   return pathname === href;
 }
 
 function NavLink({ href, title, active }: { href: string; title: string; active: boolean }) {
   return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "block rounded-md px-2 py-1.5 text-[13px] leading-5 transition-colors",
-        active
-          ? "bg-muted font-medium text-foreground"
-          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-      )}
-    >
-      {title}
-    </Link>
+    <Reveal className="origin-left" {...SIDEBAR_ITEM}>
+      <Link
+        href={href}
+        aria-current={active ? "page" : undefined}
+        className={cn(
+          "block rounded-md px-2 py-1.5 text-[13px] leading-5 transition-colors",
+          active
+            ? "bg-muted font-medium text-foreground"
+            : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+        )}
+      >
+        {title}
+      </Link>
+    </Reveal>
   );
 }
 
@@ -116,9 +132,8 @@ function DisclosureHeader({
  */
 function Disclosure({ id, open, children }: { id: string; open: boolean; children: React.ReactNode }) {
   const cm = useCadenceMotion();
-  const transition = cm.reduced
-    ? { height: { duration: 0 }, opacity: cm.transition("reveal") }
-    : cm.transition("reveal");
+  const panel = { ...cm.transition("reveal", { timeScale: PANEL_TIME_SCALE }), ease: SIDEBAR_EASE };
+  const transition = cm.reduced ? { height: { duration: 0 }, opacity: panel } : panel;
 
   return (
     <AnimatePresence initial={false}>
