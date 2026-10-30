@@ -192,6 +192,17 @@
   --typeset-flow: 1.5em;
 }
 
+/* A fenced block renders through the registry's `code-block`
+   (`components/site/code-fence.tsx`). Typeset excludes every `[data-slot]` subtree
+   from its element rules, so the block is never restyled by its `pre` rule — and it
+   also does not inherit the flow margin that rule would have supplied. It takes the
+   margin here, in the preset's own unit, so a code block sits in the same rhythm as
+   a paragraph or a table. Scoped to the preset: the preview frame mounts a code
+   block outside `.typeset` and spaces it itself. */
+.typeset-docs :where([data-slot="code-block"]) {
+  margin-block-start: var(--typeset-flow);
+}
+
 /* Print never scrolls, so `DocumentEntrance`'s observer would leave a clipped
    body blank below the fold. The entrance is screen feedback, not content.
    `!important` is required because the hidden state is an inline style. */

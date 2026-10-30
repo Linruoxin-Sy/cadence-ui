@@ -1,6 +1,7 @@
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { ComponentProps } from "react";
 import remarkGfm from "remark-gfm";
+import { MdxCodeFence } from "./code-fence";
 
 /**
  * Renders the markdown body of a component or guide.
@@ -16,11 +17,12 @@ import remarkGfm from "remark-gfm";
  * `width: max-content` on the table, so the props table would stop wrapping at every
  * width. This wrapper scrolls only when the table cannot shrink further.
  *
- * `pre` is focusable because a code block that overflows scrolls horizontally, and a
- * scroll container with no keyboard-reachable content is an axe violation
- * (`scrollable-region-focusable`) — the tooltip's usage example was the first block
- * long enough to trigger it. One extra tab stop per block is the price of not
- * hiding the tail of a line from keyboard users.
+ * `pre` — a fenced block — is handed to the registry's `code-block` (see
+ * `components/site/code-fence.tsx`). The markdown does not carry the treatment: the
+ * fence, its language, and its copy control are the item's, so the docs site shows
+ * the component it documents rather than a second implementation of it. The block's
+ * own `pre` is focusable, which is what the `scrollable-region-focusable` rule asks
+ * for, so the override no longer adds a tab stop by hand.
  */
 export async function Mdx({ source }: { source: string }) {
   return (
@@ -34,12 +36,7 @@ export async function Mdx({ source }: { source: string }) {
               <table {...props}>{children}</table>
             </div>
           ),
-          pre: ({ children, ...props }: ComponentProps<"pre">) => (
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: axe's scrollable-region-focusable rule requires a horizontally scrollable code block to be keyboard reachable
-            <pre tabIndex={0} {...props}>
-              {children}
-            </pre>
-          ),
+          pre: ({ children }: ComponentProps<"pre">) => <MdxCodeFence>{children}</MdxCodeFence>,
         }}
       />
     </div>
