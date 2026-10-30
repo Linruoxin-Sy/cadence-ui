@@ -69,13 +69,19 @@ writing durations inline.
 
 ## Reduced motion
 
-Three layers, in order of precedence:
+A component never invents its own reduced variant. It asks the provider which mode is live and
+renders accordingly:
 
-1. **System** — `prefers-reduced-motion: reduce` disables transform and layout animations, keeps opacity.
-2. **Provider** — `mode="reduced"` halves travel and shortens timing; `mode="none"` disables animation.
-3. **Subtree** — `data-motion="none"` on any element turns animation off inside it.
+- `full` — the recipe as authored.
+- `reduced` — travel and scale dropped, tween durations ×0.6, opacity kept.
+- `none` — every duration zero.
 
-Components branch on `useCadenceMotion().reduced`, so a reduced render never depends on CSS alone.
+The mode comes from the OS `prefers-reduced-motion`, an enclosing `CadenceProvider`, or the
+`data-motion` attribute for plain CSS. Components branch on `useCadenceMotion().reduced`, so a
+reduced render never depends on a media query alone.
+
+The resolution order, the component contract, and the three-mode test matrix live in
+[Motion modes](/docs/motion-modes).
 
 ## Writing a component
 

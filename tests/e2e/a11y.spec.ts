@@ -24,6 +24,7 @@ const PAGES = [
   { path: "/docs", name: "guide index" },
   { path: "/docs/installation", name: "installation" },
   { path: "/docs/motion", name: "motion guide" },
+  { path: "/docs/motion-modes", name: "motion modes guide" },
 ] as const;
 
 for (const colorScheme of ["light", "dark"] as const) {

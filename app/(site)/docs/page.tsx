@@ -14,7 +14,7 @@ export default async function DocsPage() {
     <div className="max-w-3xl py-12">
       <h1 className="text-3xl font-semibold tracking-tight">Documentation</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        Three guides cover the whole system. Each component page adds its own API and motion contract.
+        These guides cover the whole system. Each component page adds its own API and motion contract.
       </p>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">

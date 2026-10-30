@@ -12,6 +12,7 @@
   /docs/installation           Installation (Next / Vite / manual)
   /docs/theming                Theming and tokens
   /docs/motion                 Motion system (the public version of the Animation system document)
+  /docs/motion-modes           Full / reduced / none: resolution, usage, test matrix
   /docs/accessibility          Accessibility commitments and checklist
   /docs/registry               Self-hosted registry / private distribution
   /docs/ai                     llms.txt / MCP / Skill

@@ -1,0 +1,281 @@
+---
+title: Motion modes
+description: Full, reduced, and none — one authored timing, three behaviours you can prove.
+---
+
+## Why a mode, and not a knob
+
+Timing is authored once, in `registry/cadence/lib/motion.ts`, and nothing in that file
+changes at runtime. What changes is how much of it a surface is allowed to use — and that
+is not a matter of taste. It is a question with three answers: the person can take the
+motion (`full`), the person asked for less (`reduced`), the motion must not run at all
+(`none`).
+
+The set is closed at three because each one has to be verifiable: a mode that cannot be
+enumerated in a test, screenshotted, or linked to is a promise nobody checks. A continuous
+"intensity" slider would be exactly that. An earlier draft shipped `--motion-intensity` and
+a set of distance tokens that nothing read; they were deleted. `meta.intensity` survives in
+the registry as documentation metadata — how loud a component's authored motion is, so a
+catalogue can group by it — but no token reads it and it is not adjustable at runtime.
+
+So a mode is not a look. `full` is the design; `reduced` and `none` are the design with a
+constraint applied in advance, which is why every component ships one implementation instead
+of three.
+
+## The three modes
+
+| What changes | `full` | `reduced` | `none` |
+| --- | --- | --- | --- |
+| Timing | authored tokens | tween durations ×0.6 (0.22s → 132ms) | zero |
+| Travel, scale, rotation | yes | dropped | dropped |
+| Height, layout, stagger | yes | dropped; the size jumps | dropped |
+| Opacity, colour, ring | yes | kept, shortest tween | final state, no transition |
+| Springs | as authored; continuity recipes keep velocity | collapse to a 0.16s tween | none |
+| `geometry.resize` | springs, clamped | zero duration | zero duration |
+| Set by | default | OS setting, or `CadenceProvider mode` | `CadenceProvider mode="none"`, `data-motion="none"` |
+
+Two rules sit under that table:
+
+- **`reduced` keeps the change, not the trip.** A dialog still arrives; it stops scaling
+  into place, and the clock shortens to 0.6× so the fade does not read as lag. Springs are
+  time-defined shapes chosen for a large travel, so they collapse to a plain 0.16s tween
+  rather than a squeezed spring.
+- **`none` is a forced downgrade, not a quieter `reduced`.** Every duration is exactly zero,
+  so a CSS-only popup and a Motion-driven panel both finish on the first frame. Nothing is
+  left to interrupt, and nothing is left mid-animation for a screenshot.
+
+## The same event, three answers
+
+| Event | `full` | `reduced` | `none` |
+| --- | --- | --- | --- |
+| Dialog opens | panel fades and settles from scale 0.96, backdrop cross-fades | panel cross-fades, no scale | painted open; computed `transform` is `none` |
+| Switch toggles | thumb travels to the far side, `state.morph` | thumb positioned instantly, colour still animates | instant |
+| `select` trigger follows a longer label | measured width springs up, clamped to the label | width jumps, opacity kept | instant |
+| Sidebar section opens | height and opacity together, `reveal` | fade only, height instant | instant |
+| Button pressed | scale 0.97 and back, `feedback.press` | colour change only | colour change only |
+
+Read the third row closely: in all three modes the label is fully visible at the end. A mode
+decides whether the size change is worth watching; it never decides whether the text is
+there.
+
+## How a mode is resolved
+
+Three inputs, one answer:
+
+1. **The request** — the nearest `CadenceProvider` `mode`, else the one it inherits, else `full`.
+2. **The OS** — `prefers-reduced-motion: reduce` downgrades a requested `full` to `reduced`.
+3. **`none` only yields to an explicit opt-in** — the OS preference never touches it, and
+   inheritance never lifts it. A nested `mode="full"` does, because that is a component
+   deliberately showing its motion.
+
+```tsx
+// registry/cadence/lib/provider.tsx
+const requested = mode ?? parent?.mode ?? "full";
+const effective = requested === "none" ? "none" : systemReduced ? "reduced" : requested;
+```
+
+Two consequences are deliberate:
+
+- **A subtree may opt down, never up past the user.** `mode="full"` on a page whose visitor
+  asked for reduced motion still resolves to `reduced`. The provider inherits a setting; it
+  does not overrule one.
+- **Inherit the resolved mode, not the requested one.** When the docs site nests a provider
+  around a preview it passes the page's *resolved* mode down. An inner provider that
+  re-derives the mode from the media query is a second place for the answer to disagree —
+  and it did, once: the frame said `reduced` while the preview inside rendered `full`.
+
+The resolved mode is written to `data-motion` on the provider's wrapper, so the DOM, the CSS
+clock, and `useCadenceMotion()` always name the same state.
+
+### Hydration
+
+The OS preference has no server value: the server can only answer `false`. Motion's own
+`useReducedMotion()` returns the media-query result on the first client render, which makes
+every `data-motion` in the tree a hydration mismatch — and a production build does not repair
+it, so a visitor who asked for reduced motion keeps the full tokens in the DOM. Cadence reads
+the media query through `useSyncExternalStore` instead, answering `false` for the server
+snapshot and the real value for the client snapshot, so React renders twice rather than
+disagreeing.
+
+## What a component receives
+
+```ts
+interface CadenceMotion {
+  mode: "full" | "reduced" | "none";
+  reduced: boolean; // mode !== "full" — drop transform, scale, layout
+  disabled: boolean; // mode === "none" — nothing may animate at all
+  timeScale: number;
+  transition: (recipe: Recipe, options?: MotionOptions) => Transition;
+  distance: typeof distance;
+  spring: typeof spring;
+}
+```
+
+`reduced` is true in **both** `reduced` and `none`, because both drop transform. That makes it
+the right flag for "should I render a scale?" and the wrong flag for "should this transition
+last zero?". A CSS-only part that decides the latter from `reduced` silently turns `reduced`
+into `none`; use `disabled`.
+
+`transition()` is the only place a recipe meets a mode:
+
+| Recipe | `full` | `reduced` | `none` |
+| --- | --- | --- | --- |
+| `reveal` | 0.22s, ease-out | 0.132s, ease-out | `{ duration: 0 }` |
+| `popup.anchored` | smooth spring, as authored | 0.16s tween, no spring | `{ duration: 0 }` |
+| `geometry.resize` | morph spring restated as physics, velocity kept | `{ duration: 0 }` | `{ duration: 0 }` |
+
+Continuity recipes (`layout.move`, `layout.shared`, `geometry.resize`, `handoff`) are the only
+ones restated as `stiffness` / `damping` / `mass`: they can be retargeted mid-flight, and a
+time-defined spring would restart from rest.
+
+## Using the modes
+
+### Nothing, by default
+
+The provider is optional. Without one, components fall back to `reduced` when the OS asks for
+it, and the CSS variables fall back through their own media query — so a page that never
+installs the provider is still honest about reduced motion.
+
+### One provider, one setting
+
+```tsx
+// app/layout.tsx
+<CadenceProvider>{children}</CadenceProvider>                 // full, unless the OS says otherwise
+<CadenceProvider mode="reduced">{children}</CadenceProvider>  // a dense product surface
+<CadenceProvider mode="none">{children}</CadenceProvider>     // screenshots, tests, embeds
+```
+
+Do not pass a mode prop to individual components. A mode belongs to the surface, not to a
+button; forty props are forty chances to disagree, and none of them can be changed by the
+reader who needs less motion.
+
+### Let the reader choose
+
+The docs site keeps a single segmented switch in the header. Precedence on load is
+`?motion=` → `localStorage` → `full`; choosing a mode writes back to both, so
+`?motion=reduced` is a link a reviewer can send and land on exactly that state.
+
+```tsx
+const [mode, setMode] = useState<CadenceMode>("full");
+
+// on change
+localStorage.setItem("cadence-motion", next);
+const url = new URL(window.location.href);
+if (next === "full") url.searchParams.delete("motion");
+else url.searchParams.set("motion", next);
+window.history.replaceState(null, "", url);
+```
+
+The switch is a convenience, never the source of truth: the OS setting still wins over `full`
+inside the provider, so a visitor who asked for reduced motion gets it without touching the
+control.
+
+### Calm one region
+
+A provider is the honest way to narrow a mode:
+
+```tsx
+<CadenceProvider mode="none">
+  <ChartCard />
+</CadenceProvider>
+```
+
+`data-motion="none"` on a wrapper is the CSS half only. It zeroes `--motion-duration-*` for
+plain markup below it, but every Cadence part stamps its own `data-motion` from the provider,
+and overlays portal out of the wrapper entirely — so an attribute on a `<div>` will not stop
+a dialog. Use it for your own CSS transitions; use a provider for Cadence components.
+
+### Show motion inside a quieter page
+
+```tsx
+<CadenceProvider mode="full">
+  <Preview />
+</CadenceProvider>
+```
+
+This is how a docs preview can demonstrate a spring on a page a reviewer has switched to
+`none`. It still yields to the OS preference, and it is the only way to lift `none`.
+
+### Slow motion for review
+
+```tsx
+<CadenceProvider timeScale={4}>…</CadenceProvider> // 0.25×, 4× the authored duration
+```
+
+`timeScale` multiplies durations, spring `visualDuration`, and delays, and re-derives the
+physical springs after scaling. It never edits a token, and it cannot revive a transition
+under `none`: scaling zero is still zero.
+
+## Writing a component for three modes
+
+```tsx
+"use client";
+import { motion } from "motion/react";
+import { useCadenceMotion } from "../lib/provider";
+
+export function Toast() {
+  const cm = useCadenceMotion();
+  return (
+    <motion.div
+      data-motion={cm.mode}
+      initial={{ opacity: 0, y: cm.reduced ? 0 : cm.distance.sm }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={cm.transition("reveal")}
+    />
+  );
+}
+```
+
+1. **Branch in the tree, not in a media query.** `@media (prefers-reduced-motion)` cannot
+   tell `reduced` from `none`, and it cannot see a provider at all.
+2. **`none` may not reuse the `reduced` branch.** Same ternary shape, different values:
+   `reduced` drops travel, `none` drops the transition.
+3. **Every animated part carries `data-motion={cm.mode}`.** It is how a CSS-only sibling and
+   a screenshot test know which mode is live.
+4. **Measured size goes through `geometry.resize`.** It is already zero-duration under
+   `reduced` and `none`; never tween layout "a little" under reduced — that is still layout
+   motion.
+5. **Nothing may be communicated by the animation alone.** Under `none` a dismissed toast
+   still needs its text, an error still needs `role="alert"`, a checked switch still needs
+   `aria-checked`.
+
+## Proving it
+
+`pnpm registry:check` proves a reduced branch exists. It does not prove the modes behave, so
+the matrix does:
+
+```ts
+for (const reducedMotion of ["no-preference", "reduce"] as const) {
+  for (const mode of ["full", "reduced", "none"] as const) {
+    test(`dialog ${reducedMotion} ${mode}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion });
+      await page.goto(`/components/dialog?motion=${mode}`);
+      await page.getByRole("button", { name: "Open" }).click();
+      const content = page.getByRole("dialog");
+      await expect(content).toBeVisible();
+      await expect.poll(() => content.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+      if (reducedMotion === "reduce" || mode !== "full") {
+        await expect.poll(() => content.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
+      }
+    });
+  }
+}
+```
+
+The unit layer asserts the cheaper half: `data-motion` is `full`, `reduced`, or `none` for the
+three renders, and the reduced render's initial style carries no transform.
+
+## The decisions behind it
+
+| Decision | Why |
+| --- | --- |
+| `reduced` keeps opacity | Dropping the fade too leaves a state change with no transition at all — a flash. Opacity carries no vestibular risk. |
+| The ×0.6 factor | Short enough to feel immediate, long enough to read as a transition rather than a glitch; the same factor lives on the CSS side, so both clocks agree. |
+| `none` is exactly `0`, not `0.01s` | A screenshot, a visual-regression baseline, and an embed test all need the settled frame on the first paint. Any non-zero duration leaves a mid-animation frame. |
+| The mode lives on a provider, not on every component | It is a setting of the surface. One provider can be changed by the reader; forty props cannot. `data-motion` then gives the CSS half a hook with no JS. |
+| Three modes, no fourth | Every mode is a test row and a screenshot baseline. A fourth would be a promise to verify something nobody can enumerate. |
+
+## Where to go next
+
+- Tokens and recipes: [Motion](/docs/motion).
+- The CSS side of the tokens: [Theming](/docs/theming).

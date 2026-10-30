@@ -115,7 +115,7 @@ export async function getComponent(slug: string): Promise<Doc | null> {
   }
 }
 
-const guideOrder = ["installation", "theming", "motion", "validation"];
+const guideOrder = ["installation", "theming", "motion", "motion-modes"];
 
 /** A guide the list does not know yet sorts after the known ones instead of before them. */
 const guideRank = (slug: string) => {

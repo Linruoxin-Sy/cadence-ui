@@ -111,7 +111,7 @@ Upstream source is fetched into `.cache/shadcn/` (gitignored) and summarised in 
 
 ## Documentation
 
-- Site: `/docs/installation`, `/docs/theming`, `/docs/motion`, `/docs/validation`, plus a page per component.
+- Site: `/docs/installation`, `/docs/theming`, `/docs/motion`, `/docs/motion-modes`, plus a page per component.
 - Machine-readable: `/llms.txt`, `/llms-full.txt`, `/r/registry.json`, `/r/catalog.json`, `/r/<id>.md`.
 - Design record: [overall design](docs/overall-design.md), [animation system](docs/animation-system.md), [documentation site and distribution](docs/documentation-site-and-distribution.md), [parity plan](docs/parity-plan.md), [ADRs](docs/adr.md).
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md); agent notes: [AGENTS.md](AGENTS.md).

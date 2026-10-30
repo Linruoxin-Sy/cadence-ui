@@ -57,23 +57,10 @@ Cadence follows the shadcn convention: a `dark` class on `<html>`. Set it before
 `CadenceProvider` accepts `mode`:
 
 ```tsx
-<CadenceProvider mode="full">…</CadenceProvider>   // default
+<CadenceProvider mode="full">…</CadenceProvider>    // default
 <CadenceProvider mode="reduced">…</CadenceProvider> // transform/scale dropped, timing ×0.6
 <CadenceProvider mode="none">…</CadenceProvider>    // no animation
 ```
 
-Use `reduced` for dense product surfaces, `none` for screenshots, tests, or users who ask for it.
-The OS setting `prefers-reduced-motion: reduce` always wins over `full`.
-
-## Per-subtree override
-
-The provider renders `data-motion` on a wrapper, and the CSS rules apply to any element with the
-attribute:
-
-```tsx
-<div data-motion="none">
-  <ChartCard />
-</div>
-```
-
-Use this to calm a single dense region without changing the whole app.
+The OS setting `prefers-reduced-motion: reduce` always wins over `full`. The three modes, how
+they resolve, and how to narrow one to a region: [Motion modes](/docs/motion-modes).

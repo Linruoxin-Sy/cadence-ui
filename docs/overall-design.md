@@ -59,7 +59,7 @@ cadence-ui/
 ├── app/                          # Next.js 16 App Router (docs site + registry routes)
 │   ├── (site)/                   # one shell for the guides and the catalog
 │   │   ├── layout.tsx            # sidebar + content column, mounted once per visit
-│   │   ├── docs/...              # installation, theming, motion, a11y, registry guides
+│   │   ├── docs/...              # installation, theming, motion, motion-modes guides
 │   │   └── components/...        # catalog + component detail pages (reads content/components/<id>.mdx)
 │   ├── r/[...path]/route.ts      # serves JSON/MD from public/r (with caching and CORS)
 │   ├── llms.txt/route.ts         # generated llms text

@@ -136,7 +136,7 @@ registry/cadence/
   dialog/dialog.tsx
   ...
 content/components/<id>.mdx
-content/docs/{installation,theming,motion,validation}.mdx
+content/docs/{installation,theming,motion,motion-modes}.mdx
 components/site/previews/<id>.tsx
 tests/components/<id>.test.tsx
 upstream/manifest.json        # pinned upstream API surface
