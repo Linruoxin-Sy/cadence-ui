@@ -375,14 +375,14 @@ export function Panel({ open, className, ...props }: PanelProps) {
 // provider.tsx (excerpt)
 "use client";
 import { MotionConfig } from "motion/react";
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext } from "react";
 
 type Mode = "full" | "reduced" | "none";
 
 const Ctx = createContext<{ mode: Mode; transition: (recipe: string, o?: object) => object } | null>(null);
 
 export function CadenceProvider({ mode = "full", children }: { mode?: Mode; children: React.ReactNode }) {
-  const transition = useMemo(() => recipeTable(mode), [mode]);
+  const transition = recipeTable(mode);
   return (
     <Ctx.Provider value={{ mode, transition }}>
       <MotionConfig reducedMotion="user" transition={{ duration: 0.24 }}>
@@ -439,6 +439,12 @@ configuration in `biome.json` enables Biome's `next` and `react` domains (the su
 config), keeps double quotes, semicolons, and a 120-column width, and parses Tailwind's at-rules in
 `app/globals.css`. Generated artifacts (`public/r/**`, `llms.txt`) and MDX content are excluded because the
 build owns their formatting.
+
+The docs build enables React Compiler (`reactCompiler: true` in `next.config.ts`, with
+`babel-plugin-react-compiler` in dev dependencies). The compiler owns render memoization for everything it
+builds, including the mirrored `registry/cadence/**` source, so do not add `useMemo`, `useCallback`, or
+`React.memo` for render performance. The one exception is a value freeze that must survive re-renders — the
+sidebar reveal's start timestamp — and it is documented at the call site as such.
 
 ### 10.2 build-registry steps
 
