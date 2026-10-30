@@ -1,66 +1,44 @@
+"use client";
+
+import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
-import { AlertPreview } from "./alert";
-import { AspectRatioPreview } from "./aspect-ratio";
-import { AvatarPreview } from "./avatar";
-import { BadgePreview } from "./badge";
-import { BreadcrumbPreview } from "./breadcrumb";
-import { ButtonPreview } from "./button";
-import { ButtonGroupPreview } from "./button-group";
-import { CardPreview } from "./card";
-import { CheckboxPreview } from "./checkbox";
-import { DialogPreview } from "./dialog";
-import { EmptyPreview } from "./empty";
-import { FieldPreview } from "./field";
-import { InputPreview } from "./input";
-import { InputGroupPreview } from "./input-group";
-import { InputOtpPreview } from "./input-otp";
-import { ItemPreview } from "./item";
-import { KbdPreview } from "./kbd";
-import { LabelPreview } from "./label";
-import { PaginationPreview } from "./pagination";
-import { ProgressPreview } from "./progress";
-import { RadioGroupPreview } from "./radio-group";
-import { SeparatorPreview } from "./separator";
-import { SkeletonPreview } from "./skeleton";
-import { SliderPreview } from "./slider";
-import { SpinnerPreview } from "./spinner";
-import { SwitchPreview } from "./switch";
-import { TextareaPreview } from "./textarea";
-import { TogglePreview } from "./toggle";
-import { ToggleGroupPreview } from "./toggle-group";
 
 /**
- * One preview module per component. Keep the map explicit: a missing entry is a
- * docs defect that the registry check reports, not a silent fallback.
+ * One preview module per component, loaded on demand.
+ *
+ * The map stays explicit on purpose: a missing entry is a docs defect that the registry
+ * check reports, not a silent fallback. Each entry is a `dynamic()` import rather than a
+ * static one, so a component page downloads its own preview (and the component it renders)
+ * instead of every preview and the whole library in the initial client bundle.
  */
 export const previews: Record<string, ComponentType> = {
-  button: ButtonPreview,
-  badge: BadgePreview,
-  kbd: KbdPreview,
-  separator: SeparatorPreview,
-  label: LabelPreview,
-  input: InputPreview,
-  textarea: TextareaPreview,
-  card: CardPreview,
-  "aspect-ratio": AspectRatioPreview,
-  avatar: AvatarPreview,
-  skeleton: SkeletonPreview,
-  dialog: DialogPreview,
-  alert: AlertPreview,
-  empty: EmptyPreview,
-  item: ItemPreview,
-  field: FieldPreview,
-  "button-group": ButtonGroupPreview,
-  "input-group": InputGroupPreview,
-  breadcrumb: BreadcrumbPreview,
-  pagination: PaginationPreview,
-  spinner: SpinnerPreview,
-  checkbox: CheckboxPreview,
-  "radio-group": RadioGroupPreview,
-  switch: SwitchPreview,
-  slider: SliderPreview,
-  toggle: TogglePreview,
-  "toggle-group": ToggleGroupPreview,
-  "input-otp": InputOtpPreview,
-  progress: ProgressPreview,
+  button: dynamic(() => import("./button").then((mod) => ({ default: mod.ButtonPreview }))),
+  badge: dynamic(() => import("./badge").then((mod) => ({ default: mod.BadgePreview }))),
+  kbd: dynamic(() => import("./kbd").then((mod) => ({ default: mod.KbdPreview }))),
+  separator: dynamic(() => import("./separator").then((mod) => ({ default: mod.SeparatorPreview }))),
+  label: dynamic(() => import("./label").then((mod) => ({ default: mod.LabelPreview }))),
+  input: dynamic(() => import("./input").then((mod) => ({ default: mod.InputPreview }))),
+  textarea: dynamic(() => import("./textarea").then((mod) => ({ default: mod.TextareaPreview }))),
+  card: dynamic(() => import("./card").then((mod) => ({ default: mod.CardPreview }))),
+  "aspect-ratio": dynamic(() => import("./aspect-ratio").then((mod) => ({ default: mod.AspectRatioPreview }))),
+  avatar: dynamic(() => import("./avatar").then((mod) => ({ default: mod.AvatarPreview }))),
+  skeleton: dynamic(() => import("./skeleton").then((mod) => ({ default: mod.SkeletonPreview }))),
+  dialog: dynamic(() => import("./dialog").then((mod) => ({ default: mod.DialogPreview }))),
+  alert: dynamic(() => import("./alert").then((mod) => ({ default: mod.AlertPreview }))),
+  empty: dynamic(() => import("./empty").then((mod) => ({ default: mod.EmptyPreview }))),
+  item: dynamic(() => import("./item").then((mod) => ({ default: mod.ItemPreview }))),
+  field: dynamic(() => import("./field").then((mod) => ({ default: mod.FieldPreview }))),
+  "button-group": dynamic(() => import("./button-group").then((mod) => ({ default: mod.ButtonGroupPreview }))),
+  "input-group": dynamic(() => import("./input-group").then((mod) => ({ default: mod.InputGroupPreview }))),
+  breadcrumb: dynamic(() => import("./breadcrumb").then((mod) => ({ default: mod.BreadcrumbPreview }))),
+  pagination: dynamic(() => import("./pagination").then((mod) => ({ default: mod.PaginationPreview }))),
+  spinner: dynamic(() => import("./spinner").then((mod) => ({ default: mod.SpinnerPreview }))),
+  checkbox: dynamic(() => import("./checkbox").then((mod) => ({ default: mod.CheckboxPreview }))),
+  "radio-group": dynamic(() => import("./radio-group").then((mod) => ({ default: mod.RadioGroupPreview }))),
+  switch: dynamic(() => import("./switch").then((mod) => ({ default: mod.SwitchPreview }))),
+  slider: dynamic(() => import("./slider").then((mod) => ({ default: mod.SliderPreview }))),
+  toggle: dynamic(() => import("./toggle").then((mod) => ({ default: mod.TogglePreview }))),
+  "toggle-group": dynamic(() => import("./toggle-group").then((mod) => ({ default: mod.ToggleGroupPreview }))),
+  "input-otp": dynamic(() => import("./input-otp").then((mod) => ({ default: mod.InputOtpPreview }))),
+  progress: dynamic(() => import("./progress").then((mod) => ({ default: mod.ProgressPreview }))),
 };
