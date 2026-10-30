@@ -46,6 +46,8 @@ npx shadcn@latest add @cadence/button
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 - [Checkbox](/r/checkbox.md): A control that allows the user to toggle between checked and not checked. (form)
 - [Radio Group](/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
+- [Switch](/r/switch.md): A control that toggles between on and off, with a thumb that travels between the two states. (form)
+- [Slider](/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
 
 ## Docs
 

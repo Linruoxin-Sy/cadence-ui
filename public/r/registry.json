@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -307,7 +307,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -330,7 +330,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -354,7 +354,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -378,7 +378,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -401,7 +401,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -425,7 +425,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -448,7 +448,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -471,7 +471,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -494,7 +494,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -519,7 +519,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -545,7 +545,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -570,7 +570,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
       }
     },
     {
@@ -595,7 +595,57 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c12c226"
+        "sourceSha": "3c16927"
+      }
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "A control that toggles between on and off, with a thumb that travels between the two states.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": [
+          "state.morph"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "3c16927"
+      }
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "An input where the user selects a value from a range by dragging a thumb.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": [
+          "feedback.press"
+        ],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "3c16927"
       }
     }
   ]

@@ -350,6 +350,28 @@
         "radio-group-indicator",
         "radio-group-item"
       ]
+    },
+    "switch": {
+      "path": "apps/v4/registry/bases/base/ui/switch.tsx",
+      "exports": [
+        "Switch"
+      ],
+      "slots": [
+        "switch",
+        "switch-thumb"
+      ]
+    },
+    "slider": {
+      "path": "apps/v4/registry/bases/base/ui/slider.tsx",
+      "exports": [
+        "Slider"
+      ],
+      "slots": [
+        "slider",
+        "slider-range",
+        "slider-thumb",
+        "slider-track"
+      ]
     }
   }
 }

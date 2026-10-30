@@ -770,6 +770,64 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "A control that toggles between on and off, with a thumb that travels between the two states.",
+      "categories": ["form"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/switch/switch.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/switch/switch.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": ["state.morph"],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "An input where the user selects a value from a range by dragging a thumb.",
+      "categories": ["form"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/slider/slider.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/slider/slider.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": ["feedback.press"],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

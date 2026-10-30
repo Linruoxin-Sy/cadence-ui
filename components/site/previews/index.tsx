@@ -20,7 +20,9 @@ import { PaginationPreview } from "./pagination";
 import { RadioGroupPreview } from "./radio-group";
 import { SeparatorPreview } from "./separator";
 import { SkeletonPreview } from "./skeleton";
+import { SliderPreview } from "./slider";
 import { SpinnerPreview } from "./spinner";
+import { SwitchPreview } from "./switch";
 import { TextareaPreview } from "./textarea";
 
 /**
@@ -51,4 +53,6 @@ export const previews: Record<string, ComponentType> = {
   spinner: SpinnerPreview,
   checkbox: CheckboxPreview,
   "radio-group": RadioGroupPreview,
+  switch: SwitchPreview,
+  slider: SliderPreview,
 };
