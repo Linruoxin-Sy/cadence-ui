@@ -1,6 +1,6 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (5 of 7 overlays shipped).**
+> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 complete — all seven overlays shipped.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -208,19 +208,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                                                                             |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ---------------------------------------------------------------------------------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                                                                            |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                                                                            |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                                                                            |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                                                                            |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (5/7: `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`) |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                                                                            |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                                                                            |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                                                                            |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                                                                            |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                                                                            |
-|       | **Total**                  | **57** |            | **102**     |         |                                                                                    |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status  |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned |
+|       | **Total**                  | **57** |            | **102**     |         |         |
 
 ### 7.0 Status discipline
 
@@ -240,8 +240,8 @@ these rows. Work that landed without updating them is a process defect, and the 
 
 Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
-green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2** and **B3** — see §7.1,
-§7.2 and §7.3.
+green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
+§7.1, §7.2, §7.3 and §7.4.
 
 ### B1 — atoms (11)
 
@@ -413,12 +413,39 @@ axe with zero violations, size budget, and dual-theme screenshots.
   browser pass covered `full` — the site has no mode switcher, so the manual reduced/none pass is the
   one gate item still open, for all three batches.
 
-### 7.4 B4 — 🔶 in progress (2026-10-30)
+### 7.4 B4 — ✅ complete (2026-10-30)
 
-- **Why not `next`:** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so one item of this
-  batch is already live. Marking the row `next` would have made §7.0's rule ("a batch whose row still says
-  `next` is not done") hide a shipped component.
-- **Shipped:** `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`. Remaining: `sheet`, `drawer`.
+- **Why it started as "in progress":** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so
+  one item of this batch was already live. Marking the row `next` would have made §7.0's rule ("a batch
+  whose row still says `next` is not done") hide a shipped component.
+- **Shipped:** `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`, `sheet`, `drawer` — all seven.
+  35 components, 40 registry items, 35 docs, 35 previews, 172 tests.
+- **Sheet (2026-10-30):** 10 exports and 10 `data-slot` values; the upstream manifest lists 8 exports
+  because its extractor skips the two wrapper re-exports, and `parity:check` reports the two extra as
+  additive.
+  - **The slide is the panel's own size.** Upstream translates by a fixed `2.5rem` per side; Cadence uses
+    `translate-*-full`, so the panel leaves from its own edge at every width without a distance token per
+    side. The transitioned property is `translate`, not `transform`, because Tailwind v4's `translate-*`
+    utilities write it individually — the same reason the dialogs transition `scale`. The e2e proves the
+    panel lands flush with its edge in all three modes.
+  - **Placement, close control, and footer geometry follow `new-york-v4`;** the durations are
+    `duration.base` for the panel and `duration.fast` for the backdrop, not upstream's `150ms`.
+- **Drawer (2026-10-30):** 11 exports and 13 `data-slot` values, on Base UI's own `Drawer`.
+  - **Re-implemented, not transliterated.** Upstream's file is mostly `cn-*` theme classes plus nested-drawer
+    stacking (`--stack-*`, bleed, peek). Cadence replaces the theme classes with its own utilities, keeps
+    snap points (`data-snap-points`, height from `--drawer-height`), and **skips the stacking chrome**:
+    nested drawers are not in the parity scope, and half a stacking implementation is worse than none.
+  - **The swipe is Base UI's, so `gesture.drag` is not declared.** The sheet follows
+    `--drawer-swipe-movement-*` in CSS and the backdrop fades on `--drawer-swipe-progress`; that is the
+    framework's gesture engine, not a recipe Cadence authors. `registry:check` caught the declaration as
+    unimplemented, which is the check doing its job. The rule now sits in
+    [animation-system.md](animation-system.md) §3: a gesture the primitive owns is not a recipe.
+  - **Release duration is a token.** Upstream scales the exit by velocity
+    (`calc(var(--drawer-swipe-strength) * 400ms)`); Cadence uses `duration.slow`. The swipe decides _where_
+    it settles; the token decides how long settling takes.
+  - **Reduced:** the closed-state slide is dropped, so the sheet appears and disappears in place — but the
+    drag still follows the finger, because that movement is the user's own. The unit test pins the class
+    branch for exactly this case.
 - **Tooltip (2026-10-30):** 33 components, 38 registry items, 33 docs, 33 previews, 158 tests. Upstream's
   four exports and four `data-slot` values exactly.
   - **The a11y gap in upstream, closed additively.** Base UI's tooltip wires neither `role="tooltip"` nor
@@ -488,15 +515,18 @@ axe with zero violations, size budget, and dual-theme screenshots.
   declared with `form: "css-transition"`, and `registry:check` now fails when a declared recipe has no
   implementation — which is how the gap was found.
 - **Browser proof (2026-10-30):** the Playwright matrix now exists. `tests/e2e/motion-matrix.spec.ts` runs
-  `button`, `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`, `switch` and `progress` across 3 modes × 2 system preferences and
-  asserts `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 85 tests, green.
+  `button`, `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`, `sheet`, `drawer`, `switch` and
+  `progress` across 3 modes × 2 system preferences and asserts `getComputedStyle` from a production build;
+  `tests/e2e/a11y.spec.ts` runs axe in both themes. 101 tests, green.
 - **Still open:** dual-theme screenshots for B1–B4. With a production build running in CI this is now a
   screenshot script, not an environment limitation.
-- **Order for the remaining two:** `sheet` / `drawer`, the only B4 items that need new variants (a side
-  panel and a bottom sheet with drag). Everything else in the batch shares the popup formula that
-  `dialog`, `alert-dialog`, `popover`, `tooltip` and `hover-card` now establish: `data-starting-style` /
+- **Batch gate:** `pnpm check`, `parity:check`, the Playwright matrix and axe are green; dual-theme
+  screenshots are the one gate item still open, for B1–B4. Batch B5 (menus and selection) is next — see the
+  table in §7.
+- **What the batch left behind for B5:** the popup formula B4 established — `data-starting-style` /
   `data-ending-style`, `--motion-duration-*`, `--motion-scale-in`, and a JSX branch on
-  `useCadenceMotion().reduced`.
+  `useCadenceMotion().reduced` — is what the menu stack needs too, so B5 starts from it rather than from a
+  blank file.
 
 #### Contract drift closed (2026-10-30)
 

@@ -1101,6 +1101,69 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "A panel that slides in from an edge of the screen and holds a focused task without leaving the page.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/sheet/sheet.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/sheet/sheet.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B4",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/drawer/drawer.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/drawer/drawer.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B4",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

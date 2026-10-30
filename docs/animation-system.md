@@ -166,6 +166,12 @@ Theme switching is deliberately absent. A view transition is a document-level op
 to no Motion `Transition`, so it cannot be a recipe and no component declares it. The site's theme
 toggle does it directly when it wants to.
 
+A gesture the primitive owns is not a recipe either. Base UI's drawer moves the sheet through
+`--drawer-swipe-*` custom properties, and those variables are the framework's gesture engine, not an
+animation Cadence authors: swapping them for `gesture.drag` would mean re-implementing the drag. So
+`drawer` declares `popup.anchored` + `exit.fade` and documents the swipe in its Motion contract table.
+`gesture.drag` stays in the catalogue for a component that drives Motion directly.
+
 ### 3.1 Code for the key recipes
 
 #### `popup.anchored` (anchored panels, CSS-only)

@@ -58,6 +58,8 @@ npx shadcn@latest add @cadence/button
 - [Popover](https://cadence.dev/r/popover.md): An anchored panel that opens next to its trigger and returns focus to it when it closes. (overlay)
 - [Tooltip](https://cadence.dev/r/tooltip.md): A short label that names a control on hover or focus, and disappears when the pointer leaves. (overlay)
 - [Hover Card](https://cadence.dev/r/hover-card.md): A preview panel that opens from a link on hover or focus and disappears when the pointer leaves. (overlay)
+- [Sheet](https://cadence.dev/r/sheet.md): A panel that slides in from an edge of the screen and holds a focused task without leaving the page. (overlay)
+- [Drawer](https://cadence.dev/r/drawer.md): A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request. (overlay)
 
 ## Docs
 
@@ -4906,3 +4908,341 @@ tap, and the content must not assume a pointer is nearby.
 - The trigger must have its own text or `aria-label`; the card is not its name.
 - Keep the card small: a person, a repository, a document summary, one action. If it needs scrolling, it
   wants to be a `popover` or a page.
+
+# Sheet
+
+A panel that slides in from an edge of the screen and holds a focused task without leaving the page.
+
+## When to use
+
+- A task that should keep the page in view: filters, a details panel, settings for the thing behind it.
+- A form too tall or too wide for a `popover`, opened on purpose and dismissed on purpose.
+- Mobile navigation or a secondary menu, where a full dialog would feel heavy.
+
+## When not to use
+
+- A confirmation that must be answered before anything continues. Use `alert-dialog`.
+- A hint about a control. Use `tooltip` or `hover-card`.
+- A flow with its own steps and URL. That is a page, not an overlay.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/sheet
+```
+
+This also installs `button`, which the sheet uses for its close control and its footer actions.
+
+## Usage
+
+```tsx
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet/sheet";
+import { Button } from "@/components/cadence/button/button";
+
+export function FiltersSheet() {
+  return (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" />}>Open filters</SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Filters</SheetTitle>
+          <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
+        </SheetHeader>
+        {/* the filter controls */}
+        <SheetFooter>
+          <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
+          <SheetClose render={<Button />}>Apply filters</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+## Examples
+
+### The four edges
+
+`side` is `"right"` by default; the panel takes its placement classes and its slide direction from it.
+
+```tsx
+<SheetContent side="left">…</SheetContent>
+<SheetContent side="top">…</SheetContent>
+<SheetContent side="bottom">…</SheetContent>
+```
+
+### Without the built-in close button
+
+The close button is a real control with a screen-reader-only label. Drop it when the footer already
+carries an obvious way out, but keep one of the two.
+
+```tsx
+<SheetContent showCloseButton={false}>…</SheetContent>
+```
+
+### A long list
+
+The panel is a flex column, so a scroll container goes around the part that overflows rather than on
+the close button's positioning context:
+
+```tsx
+<SheetContent>
+  <SheetHeader>…</SheetHeader>
+  <div className="flex-1 overflow-y-auto px-4">…</div>
+  <SheetFooter>…</SheetFooter>
+</SheetContent>
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Sheet open={open} onOpenChange={setOpen}>
+  <SheetContent>…</SheetContent>
+</Sheet>;
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Sheet` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI dialog root. |
+| `SheetTrigger` | native button props, `render` | Opens the sheet. |
+| `SheetContent` | `side` (`"right" \| "left" \| "top" \| "bottom"`), `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
+| `SheetOverlay` | `className` | Only needed when replacing `SheetContent`. |
+| `SheetPortal` | `container` | Available for a custom portal target. |
+| `SheetClose` | native button props, `render` | Closes the sheet. |
+| `SheetHeader` / `SheetFooter` | `className` | Padding and stacking only. |
+| `SheetTitle` | `className` | Required accessible name. |
+| `SheetDescription` | `className` | Supporting text. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.base` / `duration.fast` | yes |
+| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade` · `duration.fast` | yes |
+| reduced | opacity only, no translate; the duration tokens run at 0.6× (132ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so the panel is in place on the first frame | – | – |
+
+The slide is `translate-*-full`, the panel's own width or height, not a fixed distance: a side panel
+should enter from off its edge at every size, and a distance token would need one value per side. The
+transition list names `translate` rather than `transform` because Tailwind v4's `translate-*` utilities
+write the property individually — the same reason the dialogs transition `scale`.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Cycles focus inside the sheet; focus never reaches the page behind it. |
+| Escape | Closes the sheet and returns focus to the trigger. |
+| Enter / Space | Activates the focused control. |
+
+## Accessibility
+
+- Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`, focus
+  trapping, focus return, scroll lock, and Escape handling.
+- `SheetTitle` is required: a sheet without an accessible name is invalid. `SheetDescription` becomes
+  the description, so put the consequence there, not in a second paragraph.
+- The built-in close control is a button with a screen-reader-only "Close" label; it sits in the
+  top-right corner at every side and never traps the focus ring.
+- A destructive footer action uses `variant="destructive"` plus a specific verb; the colour is never the
+  only signal.
+
+## Responsive behavior
+
+A right or left sheet is `w-3/4` capped at `sm:max-w-sm`; a top or bottom sheet spans the width with an
+auto height. Long content should scroll inside a wrapper (see "A long list"), so the footer stays
+reachable and the page behind does not move.
+
+## Performance
+
+- One popup tree is mounted only while open; the overlay and panel unmount after the exit.
+- Animates `opacity` and `translate` only: the panel is `fixed` at its edge, so nothing reflows and the
+  page behind never reads layout.
+- The close control is a `Button`, so its press feedback obeys the same motion mode as the sheet.
+
+## Notes for AI
+
+- Use `sheet` for a task beside the page; use `alert-dialog` when the answer must be deliberate, and
+  `popover` when the content is small and anchored to a control.
+- Always render `SheetTitle`; put the side effect of closing (reset, discard) in the footer, not in the
+  title.
+- Name the footer action after its effect ("Apply filters"), not "OK".
+- If the sheet opens a form, remember P11: the sheet renders invalid state from `aria-invalid` but never
+  validates anything itself.
+
+# Drawer
+
+A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request.
+
+## When to use
+
+- A short task opened from the bottom of the screen, where the thumb is: move to, share, quick actions.
+- A list or explanation that the page behind should stay visible for — a bottom sheet covers the bottom,
+  not the context.
+- A panel the user expects to swipe away, because that is how sheets behave on touch devices.
+
+## When not to use
+
+- A decision that must be answered. Use `alert-dialog`; a drawer can be dragged shut.
+- A hint on a control. Use `tooltip` or `hover-card`.
+- A long multi-step flow. Use a page or a `sheet` with a footer; dragging half-way through a form is a
+  worse experience than a full surface.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/drawer
+```
+
+## Usage
+
+```tsx
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/cadence/drawer/drawer";
+import { Button } from "@/components/cadence/button/button";
+
+export function MoveConversation() {
+  return (
+    <Drawer showSwipeHandle>
+      <DrawerTrigger render={<Button variant="outline" />}>Move conversation</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Move conversation</DrawerTitle>
+          <DrawerDescription>Drag down to dismiss, or pick a destination.</DrawerDescription>
+        </DrawerHeader>
+        {/* the destinations */}
+        <DrawerFooter>
+          <DrawerClose render={<Button variant="outline" />}>Cancel</DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+```
+
+## Examples
+
+### A visible swipe handle
+
+`showSwipeHandle` draws the handle that says "drag me". It is `aria-hidden`: the drag is an accelerator,
+never the only way out — the close controls and Escape still work.
+
+```tsx
+<Drawer showSwipeHandle>…</Drawer>
+```
+
+### Swiping from another edge
+
+`swipeDirection` moves the sheet, its placement, and the direction it closes in. The default is `"down"`.
+
+```tsx
+<Drawer swipeDirection="right">…</Drawer>
+<Drawer swipeDirection="up">…</Drawer>
+```
+
+### Snap points
+
+`snapPoints` lets the sheet rest at more than one height; the peek is the smallest value. The overlay
+stays in step with the swipe, so the page behind returns as the sheet travels.
+
+```tsx
+<Drawer snapPoints={[0.5, 1]}>…</Drawer>
+```
+
+### Non-modal
+
+A drawer that should not lock the page passes `modal={false}`; the backdrop is skipped and the page
+stays interactive.
+
+```tsx
+<Drawer modal={false}>…</Drawer>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Drawer` | `open`, `defaultOpen`, `onOpenChange`, `modal`, `snapPoints`, `swipeDirection`, `showSwipeHandle` | `showSwipeHandle` is additive; `swipeDirection` defaults to `"down"` and `modal` to `true`. |
+| `DrawerTrigger` | native button props, `render` | Opens the drawer. |
+| `DrawerContent` | `render`, `className` | Renders portal, overlay (when modal), viewport, popup, and content. |
+| `DrawerOverlay` | `className` | Only needed when replacing `DrawerContent`. |
+| `DrawerSwipeHandle` | `className` | The handle; rendered for you when `showSwipeHandle` is set. |
+| `DrawerClose` | native button props, `render` | Closes the drawer. |
+| `DrawerHeader` / `DrawerFooter` | `className` | Stacking and spacing only. |
+| `DrawerTitle` | `className` | Required accessible name. |
+| `DrawerDescription` | `className` | Supporting text. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.slow` / `duration.fast` | yes |
+| drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | `gesture.drag` | yes (it is the gesture) |
+| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade` · `duration.slow` / `duration.fast` | yes |
+| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so the sheet is in place on the first frame | – | – |
+
+The drag keeps tracking the finger under `reduced`: that movement is the user's own, not authored motion,
+and a sheet that ignored the drag would be worse than one that follows it. The release animation uses the
+token duration rather than a velocity-scaled one — the swipe physics decide *where* the sheet settles,
+the token decides how long the settle takes.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Cycles focus inside a modal drawer. |
+| Escape | Closes the drawer and returns focus to the trigger. |
+| Enter / Space | Activates the focused control. |
+
+## Accessibility
+
+- Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`, focus
+  trapping, focus return, scroll lock, and Escape handling while the drawer is modal.
+- `DrawerTitle` is required: a drawer without an accessible name is invalid.
+- The swipe handle is `aria-hidden="true"` and is never the only way out. A user who cannot drag gets
+  the close controls, Escape, and the overlay press (for a modal drawer).
+- The content region scrolls on its own (`overflow-y-auto`), so a long list inside the sheet does not
+  move the page behind it.
+
+## Responsive behavior
+
+The default sheet sits at the bottom, spans the width, and caps its height at `calc(100dvh - 3rem)` so a
+strip of the page stays visible. `swipeDirection="left"` / `"right"` becomes a side panel at `w-3/4`,
+capped at `max-w-sm` from `sm` up. Snap points change the resting height without changing any of that
+geometry.
+
+## Performance
+
+- The drag writes CSS variables and a `transform`; it never touches layout or React state per frame.
+- The backdrop opacity is a `calc()` on the same variable, so the page behind dims as the sheet moves
+  without a second animation.
+- Entry and exit animate `transform` and `opacity` only. Nothing is measured during render.
+
+## Notes for AI
+
+- Use `drawer` for a short touch-first task from the bottom edge; use `sheet` for a side panel that
+  holds a form, and `alert-dialog` when the answer must be deliberate.
+- Always render `DrawerTitle`. `DrawerDescription` is the second line of the announcement.
+- Never make the swipe the only dismissal: keep a `DrawerClose`, and let Escape work.
+- For a list of actions, each row is a `DrawerClose` so choosing one closes the sheet.

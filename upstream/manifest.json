@@ -504,6 +504,62 @@
         "hover-card-portal",
         "hover-card-trigger"
       ]
+    },
+    "sheet": {
+      "path": "apps/v4/registry/bases/base/ui/sheet.tsx",
+      "exports": [
+        "Sheet",
+        "SheetClose",
+        "SheetContent",
+        "SheetDescription",
+        "SheetFooter",
+        "SheetHeader",
+        "SheetTitle",
+        "SheetTrigger"
+      ],
+      "slots": [
+        "sheet",
+        "sheet-close",
+        "sheet-content",
+        "sheet-description",
+        "sheet-footer",
+        "sheet-header",
+        "sheet-overlay",
+        "sheet-portal",
+        "sheet-title",
+        "sheet-trigger"
+      ]
+    },
+    "drawer": {
+      "path": "apps/v4/registry/bases/base/ui/drawer.tsx",
+      "exports": [
+        "Drawer",
+        "DrawerClose",
+        "DrawerContent",
+        "DrawerDescription",
+        "DrawerFooter",
+        "DrawerHeader",
+        "DrawerOverlay",
+        "DrawerPortal",
+        "DrawerSwipeHandle",
+        "DrawerTitle",
+        "DrawerTrigger"
+      ],
+      "slots": [
+        "drawer",
+        "drawer-close",
+        "drawer-content",
+        "drawer-description",
+        "drawer-footer",
+        "drawer-header",
+        "drawer-overlay",
+        "drawer-popup",
+        "drawer-portal",
+        "drawer-swipe-handle",
+        "drawer-title",
+        "drawer-trigger",
+        "drawer-viewport"
+      ]
     }
   }
 }

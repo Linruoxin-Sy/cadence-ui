@@ -1,0 +1,182 @@
+# Sheet
+
+> A panel that slides in from an edge of the screen and holds a focused task without leaving the page.
+
+- Registry item: https://cadence.dev/r/sheet.json
+- Install: `npx shadcn@latest add @cadence/sheet`
+- Type: registry:ui
+- Since: 0.3.0
+- Motion recipes: popup.anchored, exit.fade
+
+## When to use
+
+- A task that should keep the page in view: filters, a details panel, settings for the thing behind it.
+- A form too tall or too wide for a `popover`, opened on purpose and dismissed on purpose.
+- Mobile navigation or a secondary menu, where a full dialog would feel heavy.
+
+## When not to use
+
+- A confirmation that must be answered before anything continues. Use `alert-dialog`.
+- A hint about a control. Use `tooltip` or `hover-card`.
+- A flow with its own steps and URL. That is a page, not an overlay.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/sheet
+```
+
+This also installs `button`, which the sheet uses for its close control and its footer actions.
+
+## Usage
+
+```tsx
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet/sheet";
+import { Button } from "@/components/cadence/button/button";
+
+export function FiltersSheet() {
+  return (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" />}>Open filters</SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Filters</SheetTitle>
+          <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
+        </SheetHeader>
+        {/* the filter controls */}
+        <SheetFooter>
+          <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
+          <SheetClose render={<Button />}>Apply filters</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+```
+
+## Examples
+
+### The four edges
+
+`side` is `"right"` by default; the panel takes its placement classes and its slide direction from it.
+
+```tsx
+<SheetContent side="left">…</SheetContent>
+<SheetContent side="top">…</SheetContent>
+<SheetContent side="bottom">…</SheetContent>
+```
+
+### Without the built-in close button
+
+The close button is a real control with a screen-reader-only label. Drop it when the footer already
+carries an obvious way out, but keep one of the two.
+
+```tsx
+<SheetContent showCloseButton={false}>…</SheetContent>
+```
+
+### A long list
+
+The panel is a flex column, so a scroll container goes around the part that overflows rather than on
+the close button's positioning context:
+
+```tsx
+<SheetContent>
+  <SheetHeader>…</SheetHeader>
+  <div className="flex-1 overflow-y-auto px-4">…</div>
+  <SheetFooter>…</SheetFooter>
+</SheetContent>
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Sheet open={open} onOpenChange={setOpen}>
+  <SheetContent>…</SheetContent>
+</Sheet>;
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Sheet` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI dialog root. |
+| `SheetTrigger` | native button props, `render` | Opens the sheet. |
+| `SheetContent` | `side` (`"right" \| "left" \| "top" \| "bottom"`), `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
+| `SheetOverlay` | `className` | Only needed when replacing `SheetContent`. |
+| `SheetPortal` | `container` | Available for a custom portal target. |
+| `SheetClose` | native button props, `render` | Closes the sheet. |
+| `SheetHeader` / `SheetFooter` | `className` | Padding and stacking only. |
+| `SheetTitle` | `className` | Required accessible name. |
+| `SheetDescription` | `className` | Supporting text. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.base` / `duration.fast` | yes |
+| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade` · `duration.fast` | yes |
+| reduced | opacity only, no translate; the duration tokens run at 0.6× (132ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so the panel is in place on the first frame | – | – |
+
+The slide is `translate-*-full`, the panel's own width or height, not a fixed distance: a side panel
+should enter from off its edge at every size, and a distance token would need one value per side. The
+transition list names `translate` rather than `transform` because Tailwind v4's `translate-*` utilities
+write the property individually — the same reason the dialogs transition `scale`.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Cycles focus inside the sheet; focus never reaches the page behind it. |
+| Escape | Closes the sheet and returns focus to the trigger. |
+| Enter / Space | Activates the focused control. |
+
+## Accessibility
+
+- Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`, focus
+  trapping, focus return, scroll lock, and Escape handling.
+- `SheetTitle` is required: a sheet without an accessible name is invalid. `SheetDescription` becomes
+  the description, so put the consequence there, not in a second paragraph.
+- The built-in close control is a button with a screen-reader-only "Close" label; it sits in the
+  top-right corner at every side and never traps the focus ring.
+- A destructive footer action uses `variant="destructive"` plus a specific verb; the colour is never the
+  only signal.
+
+## Responsive behavior
+
+A right or left sheet is `w-3/4` capped at `sm:max-w-sm`; a top or bottom sheet spans the width with an
+auto height. Long content should scroll inside a wrapper (see "A long list"), so the footer stays
+reachable and the page behind does not move.
+
+## Performance
+
+- One popup tree is mounted only while open; the overlay and panel unmount after the exit.
+- Animates `opacity` and `translate` only: the panel is `fixed` at its edge, so nothing reflows and the
+  page behind never reads layout.
+- The close control is a `Button`, so its press feedback obeys the same motion mode as the sheet.
+
+## Notes for AI
+
+- Use `sheet` for a task beside the page; use `alert-dialog` when the answer must be deliberate, and
+  `popover` when the content is small and anchored to a control.
+- Always render `SheetTitle`; put the side effect of closing (reset, discard) in the footer, not in the
+  title.
+- Name the footer action after its effect ("Apply filters"), not "OK".
+- If the sheet opens a form, remember P11: the sheet renders invalid state from `aria-invalid` but never
+  validates anything itself.
+
+---
+
+Full index: https://cadence.dev/llms.txt

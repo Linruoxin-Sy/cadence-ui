@@ -316,6 +316,84 @@ test.describe("hover-card", () => {
   });
 });
 
+test.describe("sheet", () => {
+  // A dialog popup that moves: the panel slides by `translate`, not `scale`, so this
+  // block pins the duration tokens and proves the panel lands flush against its edge
+  // in every mode. The unit test owns the per-side class branch.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await openComponent(page, "sheet", requested, "sheet-trigger", mode);
+
+          await page.locator(scoped("sheet", '[data-slot="sheet-trigger"]')).first().click();
+          await expect(page.getByRole("dialog")).toBeVisible();
+          await page.waitForTimeout(400);
+
+          const sheet = page.locator('[data-slot="sheet-content"]');
+          await expect(sheet).toHaveAttribute("data-motion", mode);
+          await expect(sheet).toHaveAttribute("data-side", "right");
+          expect(await computed(page, '[data-slot="sheet-content"]', "transition-duration")).toBe(
+            { full: "0.22s", reduced: "0.132s", none: "0s" }[mode],
+          );
+          expect(await computed(page, '[data-slot="sheet-overlay"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          // Settled: nothing is left to translate, and the panel is flush with the
+          // right edge at every mode — the slide is entry dressing, not position.
+          expect(await computed(page, '[data-slot="sheet-content"]', "translate")).toBe("none");
+          const box = await sheet.boundingBox();
+          const width = await page.evaluate(() => window.innerWidth);
+          expect(Math.abs((box?.x ?? 0) + (box?.width ?? 0) - width)).toBeLessThan(1);
+        });
+      }
+    });
+  }
+});
+
+test.describe("drawer", () => {
+  // The one component whose motion is partly the user's: the matrix pins the token
+  // durations and the settled position, while the drag itself is Base UI's swipe
+  // variables and is asserted through the class branch in the unit test.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await openComponent(page, "drawer", requested, "drawer-trigger", mode);
+
+          await page.locator(scoped("drawer", '[data-slot="drawer-trigger"]')).first().click();
+          await expect(page.getByRole("dialog")).toBeVisible();
+          await page.waitForTimeout(500);
+
+          const popup = page.locator('[data-slot="drawer-popup"]');
+          await expect(popup).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="drawer-popup"]', "transition-duration")).toBe(
+            { full: "0.32s", reduced: "0.192s", none: "0s" }[mode],
+          );
+          expect(await computed(page, '[data-slot="drawer-overlay"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          // Settled at the bottom edge: the drag offset is zero and nothing is left
+          // to translate, so the sheet is where its placement says it is.
+          const box = await popup.boundingBox();
+          const height = await page.evaluate(() => window.innerHeight);
+          expect(Math.abs((box?.y ?? 0) + (box?.height ?? 0) - height)).toBeLessThan(1);
+        });
+      }
+    });
+  }
+});
+
 test.describe("switch", () => {
   for (const prefersReduced of PREFERENCES) {
     test.describe(preferenceName(prefersReduced), () => {

@@ -6,7 +6,7 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B3 complete; B4 in progress (5 of 7 overlays: dialog, alert-dialog, popover, tooltip, hover-card).** B0 removed the eight original motion
+> Status: **B3 complete; B4 complete (all seven overlays).** B0 removed the eight original motion
 > components and shipped the parity foundation; B1 added the eleven atoms (button, badge, kbd, separator,
 > label, input, textarea, card, aspect-ratio, avatar, skeleton) plus the upstream parity check; B2 added the
 > nine structure-and-feedback components (alert, empty, item, field, button-group, input-group, breadcrumb,
@@ -61,6 +61,8 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `popover` — anchored panel          | T2   | `popup.anchored`, `exit.fade` |
 | `tooltip` — hint on hover           | T2   | `popup.anchored`, `exit.fade` |
 | `hover-card` — preview panel        | T2   | `popup.anchored`, `exit.fade` |
+| `sheet` — edge panel                | T2   | `popup.anchored`, `exit.fade` |
+| `drawer` — bottom sheet             | T2   | `popup.anchored`, `exit.fade` |
 | `alert` — state message             | T0   | none                          |
 | `empty` — resting state             | T0   | none                          |
 | `item` — list row                   | T0   | none                          |
@@ -79,7 +81,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `input-otp` — one-time code         | T1   | `state.morph`                 |
 | `progress` — determinate completion | T4   | `data.transition`             |
 
-The remaining 24 components, their batches, and the motion tier for each are listed in
+The remaining 22 components, their batches, and the motion tier for each are listed in
 [docs/parity-plan.md](docs/parity-plan.md).
 
 ## Rules

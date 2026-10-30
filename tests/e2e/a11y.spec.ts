@@ -18,6 +18,8 @@ const PAGES = [
   { path: "/components/popover", name: "popover" },
   { path: "/components/tooltip", name: "tooltip" },
   { path: "/components/hover-card", name: "hover card" },
+  { path: "/components/sheet", name: "sheet" },
+  { path: "/components/drawer", name: "drawer" },
   { path: "/components/switch?motion=none", name: "switch in none mode" },
   { path: "/docs", name: "guide index" },
   { path: "/docs/installation", name: "installation" },

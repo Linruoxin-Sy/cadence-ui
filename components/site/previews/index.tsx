@@ -45,4 +45,6 @@ export const previews: Record<string, ComponentType> = {
   popover: dynamic(() => import("./popover").then((mod) => ({ default: mod.PopoverPreview }))),
   tooltip: dynamic(() => import("./tooltip").then((mod) => ({ default: mod.TooltipPreview }))),
   "hover-card": dynamic(() => import("./hover-card").then((mod) => ({ default: mod.HoverCardPreview }))),
+  sheet: dynamic(() => import("./sheet").then((mod) => ({ default: mod.SheetPreview }))),
+  drawer: dynamic(() => import("./drawer").then((mod) => ({ default: mod.DrawerPreview }))),
 };

@@ -56,6 +56,8 @@ npx shadcn@latest add @cadence/button
 - [Popover](https://cadence.dev/r/popover.md): An anchored panel that opens next to its trigger and returns focus to it when it closes. (overlay)
 - [Tooltip](https://cadence.dev/r/tooltip.md): A short label that names a control on hover or focus, and disappears when the pointer leaves. (overlay)
 - [Hover Card](https://cadence.dev/r/hover-card.md): A preview panel that opens from a link on hover or focus and disappears when the pointer leaves. (overlay)
+- [Sheet](https://cadence.dev/r/sheet.md): A panel that slides in from an edge of the screen and holds a focused task without leaving the page. (overlay)
+- [Drawer](https://cadence.dev/r/drawer.md): A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request. (overlay)
 
 ## Docs
 
