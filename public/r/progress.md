@@ -1,0 +1,166 @@
+# Progress
+
+> Displays an indicator showing the completion progress of a task.
+
+- Registry item: /r/progress.json
+- Install: `npx shadcn@latest add @cadence/progress`
+- Type: registry:ui
+- Since: 0.3.0
+- Motion recipes: data.transition
+
+## When to use
+
+- Work with a measurable end: an upload, an import, a multi-step build.
+- Work long enough that the user would otherwise wonder whether anything is
+  happening, and short enough that they will watch the bar.
+- A determinate value next to other numbers, where the bar is a second reading of
+  the same fact.
+
+## When not to use
+
+- Work of unknown duration. Pass `value={null}` for an indeterminate bar, or use
+  `spinner` when there is no bar to fill.
+- A page that is simply loading its own content; use `skeleton`.
+- A value that is not progressing toward an end, like a score. Render the number.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/progress
+```
+
+## Usage
+
+```tsx
+import { Progress } from "@/components/cadence/progress/progress";
+
+export function Upload() {
+  return <Progress value={40} aria-label="Uploading assets" />;
+}
+```
+
+`value` is required and may be `null` for indeterminate work. `Progress` renders
+its own track and indicator; `ProgressLabel` and `ProgressValue` go inside it as
+children.
+
+## Examples
+
+### Labelled, with the number
+
+```tsx
+<Progress value={uploaded} aria-label="Uploading assets">
+  <div className="flex w-full items-center justify-between">
+    <ProgressLabel>Uploading assets</ProgressLabel>
+    <ProgressValue />
+  </div>
+</Progress>
+```
+
+`ProgressValue` formats the value with `Intl.NumberFormat`; pass `format` or
+`locale` to the root to change it.
+
+### Indeterminate
+
+```tsx
+<Progress value={null} aria-label="Preparing preview" />
+```
+
+The fill fills the track and pulses. There is no sweep: a moving gradient says
+"indeterminate" with motion alone, which is exactly the anti-pattern in the motion
+system.
+
+### Custom range
+
+```tsx
+<Progress value={3} min={0} max={5} aria-label="Step 3 of 5">
+  <ProgressValue />
+</Progress>
+```
+
+`ProgressValue` renders `60%` for `3/5`; use `getAriaValueText` if you want "step 3
+of 5" announced instead.
+
+### Composed track
+
+```tsx
+<Progress value={72} aria-label="Storage">
+  <ProgressTrack className="h-1.5 bg-muted">
+    <ProgressIndicator className="bg-emerald-500" />
+  </ProgressTrack>
+</Progress>
+```
+
+Composing the track yourself replaces the default one. The indicator still reads
+the value from the root, so it keeps animating.
+
+## API
+
+### `Progress`
+
+| Prop              | Type                                  | Default | Description                                  |
+| ----------------- | ------------------------------------- | ------- | -------------------------------------------- |
+| `value`           | `number \| null`                      | –       | Required. `null` means indeterminate.        |
+| `min`, `max`      | `number`                              | `0`, `100` | Range.                                    |
+| `format`          | `Intl.NumberFormatOptions`            | –       | How `ProgressValue` formats the number.      |
+| `getAriaValueText`| `(value, raw) => string`              | –       | Human-readable value for assistive tech.     |
+| `className`       | `string`                              | –       | Merged last; the default is a wrap layout.   |
+
+### `ProgressTrack`, `ProgressIndicator`, `ProgressLabel`, `ProgressValue`
+
+Plain wrappers over Base UI's parts; each forwards `className` and native props.
+`ProgressIndicator` carries the motion.
+
+## Motion contract
+
+Recipe: `data.transition`, in both of its documented forms.
+
+| Phase         | Properties                     | Token            | Interruptible |
+| ------------- | ------------------------------ | ---------------- | ------------- |
+| value change  | `scaleX old → new` (one-shot)  | `data.transition`| yes           |
+| indeterminate | `opacity` pulse (continuous)   | `data.transition`| yes           |
+| reduced       | value jumps; pulse kept, opacity only | `data.transition` | yes     |
+| none          | no transition, `animate-none`  | –                | –             |
+
+The fill is a `scaleX` transform on an element that keeps the full track width, so
+a value change never triggers layout. Under `reduced` the fill jumps to the new
+value — position is information, the animation is not — while the indeterminate
+pulse survives, because opacity-only loading feedback is what M5 keeps.
+
+## Keyboard interactions
+
+No keyboard interaction: the progress bar is not focusable. If the user can cancel
+the work, put a `button` next to it.
+
+## Accessibility
+
+- Base UI puts `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, and
+  `aria-valuenow` on the root; `value={null}` omits `aria-valuenow`.
+- Give it a name with `aria-label`, or render `ProgressLabel` inside the root and
+  let Base UI wire it.
+- Announce completion outside the bar (text or `toast`); a full bar is not
+  announced by a screen reader on its own.
+- Never hide the percentage behind the animation: `ProgressValue` is the readable
+  copy of the same fact.
+
+## Responsive behavior
+
+The bar fills its container and stays 8px tall at every breakpoint. When it sits in
+a card header, keep the label and value on one line and let the bar take the next
+line — the default `flex-wrap` layout does this without extra classes.
+
+## Performance
+
+One Motion element. A determinate update animates a transform; an indeterminate bar
+runs a CSS opacity loop that the compositor owns, so a page with several bars does
+not schedule main-thread frames. Avoid driving `value` from `requestAnimationFrame`
+yourself; pass the real value and let the transition smooth it.
+
+## Notes for AI
+
+- `value` is required; pass `null` for indeterminate, never `undefined`.
+- Use `scaleX`, not width. A width transition relayouts the track every frame.
+- For work with no measurable end and no bar, use `spinner`, not a fake percentage.
+
+---
+
+Full index: /llms.txt

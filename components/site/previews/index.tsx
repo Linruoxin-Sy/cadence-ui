@@ -18,6 +18,7 @@ import { ItemPreview } from "./item";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
 import { PaginationPreview } from "./pagination";
+import { ProgressPreview } from "./progress";
 import { RadioGroupPreview } from "./radio-group";
 import { SeparatorPreview } from "./separator";
 import { SkeletonPreview } from "./skeleton";
@@ -61,4 +62,5 @@ export const previews: Record<string, ComponentType> = {
   toggle: TogglePreview,
   "toggle-group": ToggleGroupPreview,
   "input-otp": InputOtpPreview,
+  progress: ProgressPreview,
 };

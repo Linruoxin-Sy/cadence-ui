@@ -408,6 +408,23 @@
         "input-otp-separator",
         "input-otp-slot"
       ]
+    },
+    "progress": {
+      "path": "apps/v4/registry/bases/base/ui/progress.tsx",
+      "exports": [
+        "Progress",
+        "ProgressIndicator",
+        "ProgressLabel",
+        "ProgressTrack",
+        "ProgressValue"
+      ],
+      "slots": [
+        "progress",
+        "progress-indicator",
+        "progress-label",
+        "progress-track",
+        "progress-value"
+      ]
     }
   }
 }
