@@ -18,7 +18,7 @@ import {
 
 export function ItemPreview() {
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <ItemGroup className="max-w-md">
         <Item>
           <ItemMedia variant="icon">

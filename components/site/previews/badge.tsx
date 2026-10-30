@@ -7,8 +7,8 @@ const variants = ["default", "secondary", "outline", "ghost", "destructive", "li
 
 export function BadgePreview() {
   return (
-    <div className="space-y-8">
-      <div className="space-y-3">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Variants</p>
         <div className="flex flex-wrap items-center gap-2">
           {variants.map((variant) => (
@@ -19,7 +19,7 @@ export function BadgePreview() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">With icons</p>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">
@@ -37,7 +37,7 @@ export function BadgePreview() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">As a link</p>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" render={<a href="#releases" />}>

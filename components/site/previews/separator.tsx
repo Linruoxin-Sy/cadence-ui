@@ -4,10 +4,10 @@ import { Separator } from "@/registry/cadence/separator/separator";
 
 export function SeparatorPreview() {
   return (
-    <div className="space-y-8">
-      <div className="max-w-sm space-y-3">
+    <div className="flex flex-col gap-8">
+      <div className="max-w-sm flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Horizontal</p>
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <p className="text-sm">Signed in as ada@example.com.</p>
           <Separator />
           <p className="text-sm text-muted-foreground">Billing is handled by finance.</p>
@@ -16,7 +16,7 @@ export function SeparatorPreview() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Vertical</p>
         <div className="flex h-6 items-center gap-3 text-sm">
           <span>Draft</span>

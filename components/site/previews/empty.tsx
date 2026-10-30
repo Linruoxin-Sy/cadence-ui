@@ -13,7 +13,7 @@ import {
 
 export function EmptyPreview() {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant="icon">

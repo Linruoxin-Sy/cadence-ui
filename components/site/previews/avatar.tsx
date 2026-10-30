@@ -11,8 +11,8 @@ import {
 
 export function AvatarPreview() {
   return (
-    <div className="space-y-8">
-      <div className="space-y-3">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Sizes</p>
         <div className="flex items-center gap-3">
           <Avatar size="sm">
@@ -27,7 +27,7 @@ export function AvatarPreview() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
           Image, fallback, and presence
         </p>
@@ -50,7 +50,7 @@ export function AvatarPreview() {
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Group</p>
         <AvatarGroup>
           <Avatar>

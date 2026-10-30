@@ -6,7 +6,7 @@ import { Button } from "@/registry/cadence/button/button";
 
 export function AlertPreview() {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Alert>
         <CircleAlert />
         <AlertTitle>33 components left to ship</AlertTitle>

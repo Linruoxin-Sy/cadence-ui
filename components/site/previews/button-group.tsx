@@ -6,8 +6,8 @@ import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/c
 
 export function ButtonGroupPreview() {
   return (
-    <div className="space-y-8">
-      <div className="space-y-3">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Horizontal</p>
         <ButtonGroup aria-label="Text style">
           <Button variant="outline" size="icon-sm" aria-label="Bold">
@@ -31,7 +31,7 @@ export function ButtonGroupPreview() {
         </ButtonGroup>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Vertical</p>
         <ButtonGroup orientation="vertical" aria-label="Order">
           <Button variant="outline" size="sm">

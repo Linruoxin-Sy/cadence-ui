@@ -6,9 +6,9 @@ import { Spinner } from "@/registry/cadence/spinner/spinner";
 
 export function SpinnerPreview() {
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-8">
       <div className="grid gap-6 sm:grid-cols-2">
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Inline</p>
           <div className="flex items-center gap-3 text-sm">
             <Spinner />
@@ -20,7 +20,7 @@ export function SpinnerPreview() {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">In a button</p>
           <Button disabled size="sm">
             <Spinner />
@@ -32,7 +32,7 @@ export function SpinnerPreview() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">data-motion="none"</p>
         <CadenceProvider mode="none">
           <div className="flex items-center gap-3 text-sm">

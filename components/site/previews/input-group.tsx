@@ -14,7 +14,7 @@ import { Kbd } from "@/registry/cadence/kbd/kbd";
 
 export function InputGroupPreview() {
   return (
-    <div className="max-w-md space-y-5">
+    <div className="max-w-md flex flex-col gap-5">
       <InputGroup>
         <InputGroupAddon>
           <Search />

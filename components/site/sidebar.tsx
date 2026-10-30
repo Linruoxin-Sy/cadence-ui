@@ -166,7 +166,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
   const panelId = (key: string) => `${uid}-${key}`;
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <div>
         <DisclosureHeader
           open={isOpen("docs")}
@@ -175,7 +175,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
           label={<SectionLabel>Docs</SectionLabel>}
         />
         <Disclosure id={panelId("docs")} open={isOpen("docs")}>
-          <nav className="space-y-0.5 pt-1" aria-label="Docs">
+          <nav className="flex flex-col gap-0.5 pt-1" aria-label="Docs">
             {guides.map((guide) => (
               <NavLink
                 key={guide.slug}
@@ -211,7 +211,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
            * structure, not a heading the reader should scan for, so it is a quiet label over
            * an indented list rather than a third weight of link.
            */}
-          <div className="space-y-5 pt-2">
+          <div className="flex flex-col gap-5 pt-2">
             {groups.map((group) => {
               const id = `group:${group.id}`;
               const open = isOpen(id);
@@ -234,7 +234,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
                     }
                   />
                   <Disclosure id={panelId(id)} open={open}>
-                    <div className="mt-1 ml-3 space-y-0.5 border-l border-border pl-1">
+                    <div className="mt-1 ml-3 flex flex-col gap-0.5 border-l border-border pl-1">
                       {group.components.map((component) => (
                         <NavLink
                           key={component.slug}

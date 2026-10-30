@@ -4,8 +4,8 @@ import { Kbd, KbdGroup } from "@/registry/cadence/kbd/kbd";
 
 export function KbdPreview() {
   return (
-    <div className="space-y-8">
-      <div className="space-y-3">
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Keys</p>
         <div className="flex flex-wrap items-center gap-2">
           <Kbd>Esc</Kbd>
@@ -15,7 +15,7 @@ export function KbdPreview() {
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Combinations</p>
         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-2">
