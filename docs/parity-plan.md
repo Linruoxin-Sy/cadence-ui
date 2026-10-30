@@ -1,6 +1,6 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1 and B2 complete (2026-10-30); B3 next.** This document is the build record for the "parity"
+> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 next.** This document is the build record for the "parity"
 > effort: replace the eight original motion components with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
 > every new component must satisfy. Architecture details remain in [overall-design.md](overall-design.md);
@@ -212,8 +212,8 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
 | B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done |
 | B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | next    |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | planned |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | next    |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned |
@@ -239,7 +239,8 @@ these rows. Work that landed without updating them is a process defect, and the 
 
 Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
-green, and a real `shadcn add` install was verified (see §5.1). **B1** and **B2** — see §7.1 and §7.2.
+green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2** and **B3** — see §7.1,
+§7.2 and §7.3.
 
 ### B1 — atoms (11)
 
@@ -353,6 +354,63 @@ axe with zero violations, size budget, and dual-theme screenshots.
     `data-motion` and the three-mode branch.
 - **Not yet done:** dual-theme screenshots, same environment limitation as B1. The visual half of the
   batch gate stays open for both batches; everything else is verified.
+
+### 7.3 B3 — ✅ complete (2026-10-30)
+
+- **Scope shipped:** `checkbox`, `radio-group`, `switch`, `slider`, `toggle`, `toggle-group`,
+  `input-otp`, `progress`. 29 components, 34 registry items, 29 docs, 29 previews.
+- **Tiers and recipes:** seven T1 and one T4. `state.morph` ×4 (`checkbox`, `radio-group`, `switch`,
+  `input-otp`), `feedback.press` ×3 (`slider`, `toggle`, `toggle-group`), `data.transition` ×1
+  (`progress`). No new recipe was needed, but `state.morph`'s documented scope was widened from
+  "width/height/label" to "a control's own indicator", with a code example for the Base UI
+  render-state pattern — added to [animation-system.md](animation-system.md) §3 and §3.1 **before** the
+  components used it.
+- **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, tier
+  budgets, P11), `parity:check` against `96da9cc` (29 components, additive surface reported only), 114
+  tests across 29 files. All eight component pages return 200 from the dev server, each mounts its
+  preview, the SSR HTML carries `data-motion="full"`, and the sidebar renders the "Form controls" group
+  from `meta.batch` alone.
+- **CSS proof:** the compiled stylesheet contains the Base UI state variants these components depend on
+  (`data-checked`, `data-unchecked`, `data-pressed`, `data-spacing="0"`, `data-size="default"`), the
+  `gap: calc(var(--spacing) * var(--gap))` rule for `toggle-group`, and both `animate-pulse` and
+  `animate-none` for the indeterminate bar.
+- **Upstream pin:** `upstream/manifest.json` regenerated with `node scripts/sync-upstream.mjs`, so all
+  eight ids carry a pinned surface (`base` API, `new-york-v4` visuals, `2026-10`).
+- **Deviations recorded, not silent:**
+  - **`progress` exports all five Base UI parts**, not ny's single `Progress`, and `value` is required
+    (`null` for indeterminate) because that is the `base` surface. It also overrides Base UI's inline
+    `width: <value>%` with `width: 100%` + `scaleX`: a width transition would relayout the track on
+    every frame, which the performance rules forbid.
+  - **State comes from Base UI, not from props.** `checkbox`, `radio-group`, `switch`, `slider` and
+    `progress` animate through the primitive's `render` callback, because the indicator is unmounted
+    when unchecked and because uncontrolled state is invisible to the wrapper. Indicators are
+    `keepMounted` so they can animate out.
+  - **`switch` measures the thumb travel** (`track.clientWidth - thumb.offsetWidth`, refreshed from a
+    `ResizeObserver`) rather than upstream's `translate-x-[calc(100%-2px)]`, which hard-codes the track
+    border. Under `reduced` the thumb still ends in the right place and moves with `{ duration: 0 }`:
+    position is state, the animation is not.
+  - **`slider` forwards `aria-label` / `aria-labelledby` to every thumb's native range input.** Upstream
+    leaves that input unnamed; without the forwarding the control has no accessible name, which the axe
+    pass would flag in B4.
+  - **`input-otp`'s caret does not blink.** Upstream's `animate-caret-blink` is a continuous loop, and
+    T1 has no `data.transition` allocation in §6.3. The active slot's ring plus a static caret carry the
+    same information, and the component keeps `state.morph` only. The npm dependency `input-otp`
+    (1.5.0) is new to the repo.
+  - **`toggle` and `toggle-group` declare `feedback.press` only.** Their pressed fill is a colour
+    transition — state feedback, not motion — so declaring `state.morph` would have been a
+    declared-but-unused recipe. The group has no shared indicator in upstream's markup, and a sliding
+    one would move the neighbours the user is aiming at (that is `layout.move`, a T3 concern).
+  - **`separator` rolls are suppressed in two files**: `useSemanticElements` on
+    `input-otp`'s separator (`<hr>` is void and cannot hold the dash glyph) and `noArrayIndexKey` on the
+    slider thumb (a thumb's only identity is its index in the value array). Reasons sit above the line.
+  - **Test infrastructure gained two jsdom polyfills** in `tests/setup.ts`: `PointerEvent` (Base UI
+    replays a pointer event after every click on checkbox/radio/switch/toggle) and
+    `document.elementFromPoint` (`input-otp` probes it for the caret). Without them the suite throws
+    rather than fails, which hides real regressions.
+- **Not yet done:** dual-theme screenshots, same environment limitation as B1 and B2. The three motion
+  modes are proven per component by unit tests (`data-motion` plus the reduced/`none` branch), and the
+  browser pass covered `full` — the site has no mode switcher, so the manual reduced/none pass is the
+  one gate item still open, for all three batches.
 
 ## 8. Backlog
 
