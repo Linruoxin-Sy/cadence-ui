@@ -1,0 +1,153 @@
+# Tooltip
+
+> A short label that names a control on hover or focus, and disappears when the pointer leaves.
+
+- Registry item: https://cadence.dev/r/tooltip.json
+- Install: `npx shadcn@latest add @cadence/tooltip`
+- Type: registry:ui
+- Since: 0.3.0
+- Motion recipes: popup.anchored, exit.fade
+
+## When to use
+
+- An icon-only control whose meaning is not obvious from the icon alone.
+- The full value behind a truncated label, or a keyboard shortcut next to an action.
+- A hint that helps the first use of a dense control and is useless once learned.
+
+## When not to use
+
+- Anything the user must read to act: a tooltip disappears on scroll, touch, and Escape. If the content
+  matters, put it on the page or in a `popover`.
+- Interactive content. A tooltip cannot hold a button or a link; use `popover`.
+- The accessible name of a button that already has text. Two labels that disagree is worse than one.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/tooltip
+```
+
+Optionally wrap the app in `TooltipProvider` once to set one delay for every tooltip; Base UI does not
+require it.
+
+## Usage
+
+```tsx
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip/tooltip";
+import { Button } from "@/components/cadence/button/button";
+
+export function BoldTooltip() {
+  return (
+    <TooltipProvider delay={200}>
+      <Tooltip>
+        <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Bold">
+          <Bold />
+        </TooltipTrigger>
+        <TooltipContent>Bold (⌘B)</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+```
+
+## Examples
+
+### Side and alignment
+
+`side` defaults to `top` and the label flips when there is no room. The arrow moves with it; the panel
+grows out of `--transform-origin`, so the scale starts where the trigger meets the label.
+
+```tsx
+<TooltipContent side="right" align="start">
+  Right, aligned to the start
+</TooltipContent>
+```
+
+### A delay for the whole app
+
+`TooltipProvider` sets the delay once. Without it, Base UI's own default applies.
+
+```tsx
+<TooltipProvider delay={300}>
+  <App />
+</TooltipProvider>
+```
+
+### Disabled controls
+
+A disabled button does not emit pointer events, so wrap it and put the hint on the wrapper:
+
+```tsx
+<Tooltip>
+  <TooltipTrigger render={<span className="inline-flex" />}>
+    <Button disabled>Deploy</Button>
+  </TooltipTrigger>
+  <TooltipContent>Finish the required fields first</TooltipContent>
+</Tooltip>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `TooltipProvider` | `delay` | Optional. One delay for every tooltip inside. |
+| `Tooltip` | `open`, `defaultOpen`, `onOpenChange` | Base UI root. |
+| `TooltipTrigger` | native button props, `render` | Hover or focus target; carries `aria-describedby`. |
+| `TooltipContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, popup, and arrow. `side` defaults to `top`, `sideOffset` to `4`. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
+| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so the label appears on the first frame | – | – |
+
+A tooltip is small enough that `duration.fast` is already at the edge of readable: nothing here waits
+for an exit to finish. The arrow is part of the popup and moves with it, so it is never animated
+separately.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Focus shows the label; leaving hides it. |
+| Escape | Hides the label and leaves focus on the trigger. |
+| Enter / Space | Activates the trigger. The tooltip does not swallow the press. |
+
+Hover alone is never the only path: the tooltip opens on keyboard focus too, which is what makes it
+usable on touch and from a screen reader.
+
+## Accessibility
+
+- Base UI's own tooltip adds neither `role="tooltip"` nor `aria-describedby`; Cadence wires both. The
+  trigger points at the popup only while it is open — a closed popup would otherwise leave a dangling
+  id, which axe reports — and the popup is `role="tooltip"`.
+- The tooltip must not be the only name of a control. Give an icon button a real `aria-label`; the
+  tooltip is the extra sentence, not the name.
+- Text stays readable in both themes: `bg-foreground` / `text-background` invert, so the label keeps
+  contrast against whatever surface it floats over.
+- Escape dismisses it without moving focus, so a tooltip never traps a keyboard user.
+
+## Responsive behavior
+
+The label is `w-fit` with a `max-w-xs` cap and wraps at word boundaries (`text-balance`) instead of
+running off screen. Base UI flips the side and shifts the alignment when the viewport cannot fit it.
+
+## Performance
+
+- The popup tree is mounted only while the label is open; a page can carry dozens of tooltips without
+  paying for them all.
+- Animates `opacity` and `scale` only — no layout read, no measuring loop, no JavaScript animation.
+  Hover is not a state the component polls.
+
+## Notes for AI
+
+- Use a tooltip to name or explain a control, never to deliver information the user needs to proceed.
+- Do not put a link, button, or form inside it; use `popover`.
+- Give every icon-only trigger an `aria-label`: the tooltip complements the name, it does not replace it.
+
+---
+
+Full index: https://cadence.dev/llms.txt

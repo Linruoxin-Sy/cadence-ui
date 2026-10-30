@@ -39,6 +39,11 @@ export async function openComponent(page: Page, id: string, requested: Mode, slo
   await expect(page.locator(scoped(id, `[data-slot="${slot}"]`)).first()).toHaveAttribute("data-motion", expected, {
     timeout: 15_000,
   });
+  // `data-motion` is the *server* value too in the `full` + no-preference cell, so
+  // the assertion above can pass before React has attached a single handler and the
+  // click that follows becomes a no-op. Network idle means this route's chunks have
+  // arrived; waiting for it is what makes that cell deterministic.
+  await page.waitForLoadState("networkidle");
 }
 
 /** One computed property, resolved by the engine rather than by jsdom's empty defaults. */

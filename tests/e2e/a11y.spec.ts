@@ -16,6 +16,8 @@ const PAGES = [
   { path: "/components/dialog", name: "dialog" },
   { path: "/components/alert-dialog", name: "alert dialog" },
   { path: "/components/popover", name: "popover" },
+  { path: "/components/tooltip", name: "tooltip" },
+  { path: "/components/hover-card", name: "hover card" },
   { path: "/components/switch?motion=none", name: "switch in none mode" },
   { path: "/docs", name: "guide index" },
   { path: "/docs/installation", name: "installation" },

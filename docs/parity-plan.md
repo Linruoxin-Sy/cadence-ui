@@ -1,6 +1,6 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (`dialog`, `alert-dialog` and `popover` shipped).**
+> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (5 of 7 overlays shipped).**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -208,19 +208,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                                                    |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------------------------------------------------------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                                                   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                                                   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                                                   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                                                   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (3/7: `dialog`, `alert-dialog`, `popover`) |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                                                   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                                                   |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                                                   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                                                   |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                                                   |
-|       | **Total**                  | **57** |            | **102**     |         |                                                           |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                                                                             |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ---------------------------------------------------------------------------------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                                                                            |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                                                                            |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                                                                            |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                                                                            |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (5/7: `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`) |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                                                                            |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                                                                            |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                                                                            |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                                                                            |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                                                                            |
+|       | **Total**                  | **57** |            | **102**     |         |                                                                                    |
 
 ### 7.0 Status discipline
 
@@ -418,7 +418,25 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Why not `next`:** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so one item of this
   batch is already live. Marking the row `next` would have made §7.0's rule ("a batch whose row still says
   `next` is not done") hide a shipped component.
-- **Shipped:** `dialog`, `alert-dialog`, `popover`. Remaining: `tooltip`, `hover-card`, `sheet`, `drawer`.
+- **Shipped:** `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`. Remaining: `sheet`, `drawer`.
+- **Tooltip (2026-10-30):** 33 components, 38 registry items, 33 docs, 33 previews, 158 tests. Upstream's
+  four exports and four `data-slot` values exactly.
+  - **The a11y gap in upstream, closed additively.** Base UI's tooltip wires neither `role="tooltip"` nor
+    `aria-describedby` (a grep of the package finds no reference), so a screen reader got no announcement.
+    Cadence shares one `useId()` between trigger and popup through a small context: the popup carries the
+    id and `role="tooltip"`, and the trigger points at it **only while open** — a closed popup leaves the
+    reference dangling, which axe reports as an invalid IDREF. Exports and slots are unchanged.
+  - **The label is a description, not a name.** The trigger keeps its own `aria-label`; the docs and the
+    unit test both say so, and the test asserts `toHaveAccessibleDescription`.
+- **Hover card (2026-10-30):** 3 exports and 4 slots (the portal is a slot upstream), built on Base UI's
+  `PreviewCard`.
+  - **No role, no description, on purpose.** A card that may hold paragraphs and a button is neither the
+    trigger's name nor its description; Radix's hover card does not wire it either, and reading a whole
+    panel on every focus is noise. What makes it usable instead is that Base UI keeps the card open while
+    focus is inside it: the test tabs from the trigger into the card's `Follow` button and asserts the
+    panel is still there.
+  - **Placement follows upstream:** `side` defaults to `bottom`, `alignOffset` to `4` — the opposite of
+    the tooltip's `top`, because the card is a surface rather than a pointer.
 - **Popover (2026-10-30):** the first anchored panel. 31 components, 36 registry items, 31 docs,
   31 previews, 146 tests. Upstream's six exports and six `data-slot` values exactly — there is no
   `PopoverAnchor` because Base UI anchors to the trigger and has no anchor part, so adding one would have
@@ -438,6 +456,14 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Scaffold fix (2026-10-30):** `new-item.mjs` appended `previewKey: ComponentPreview` to
   `previews/index.tsx`, a bare identifier the map does not define — the first two scaffolds each needed a
   manual repair. It now appends the `dynamic()` entry the map is built from.
+- **Two test-infrastructure fixes (2026-10-30):**
+  - `openComponent()` now waits for network idle after the mode assertion. In the `full` + no-preference
+    cell the server HTML already says `full`, so the attribute wait could pass before React had attached
+    a handler and the following click became a no-op — which is exactly how one popover cell failed.
+  - `<pre>` is focusable in the MDX renderer. A usage block with a long import line scrolls
+    horizontally, and axe's `scrollable-region-focusable` flags a scroll region with no
+    keyboard-reachable content; the tooltip's usage example was the first block long enough to trigger
+    it. Biome's `noNoninteractiveTabindex` is suppressed on that one line, with the reason inline.
 - **Alert dialog (2026-10-30):** the second B4 item, built on the repaired dialog pattern. Same
   declarations (`popup.anchored` + `exit.fade`, `form: "css-transition"`), so the durations, the
   `data-starting-style` / `data-ending-style` classes and the three-mode assertions are the dialog's,
@@ -462,13 +488,15 @@ axe with zero violations, size budget, and dual-theme screenshots.
   declared with `form: "css-transition"`, and `registry:check` now fails when a declared recipe has no
   implementation — which is how the gap was found.
 - **Browser proof (2026-10-30):** the Playwright matrix now exists. `tests/e2e/motion-matrix.spec.ts` runs
-  `button`, `dialog`, `alert-dialog`, `switch` and `progress` across 3 modes × 2 system preferences and
-  asserts `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 67 tests, green.
+  `button`, `dialog`, `alert-dialog`, `popover`, `tooltip`, `hover-card`, `switch` and `progress` across 3 modes × 2 system preferences and
+  asserts `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 85 tests, green.
 - **Still open:** dual-theme screenshots for B1–B4. With a production build running in CI this is now a
   screenshot script, not an environment limitation.
-- **Order for the remaining four:** `tooltip` / `hover-card` (the same anchored implementation, now with a
-  token), then `sheet` / `drawer` (new side/bottom variants). Each keeps the `form: "css-transition"`
-  declaration and the three-mode assertions that `dialog` set.
+- **Order for the remaining two:** `sheet` / `drawer`, the only B4 items that need new variants (a side
+  panel and a bottom sheet with drag). Everything else in the batch shares the popup formula that
+  `dialog`, `alert-dialog`, `popover`, `tooltip` and `hover-card` now establish: `data-starting-style` /
+  `data-ending-style`, `--motion-duration-*`, `--motion-scale-in`, and a JSX branch on
+  `useCadenceMotion().reduced`.
 
 #### Contract drift closed (2026-10-30)
 

@@ -56,6 +56,8 @@ npx shadcn@latest add @cadence/button
 - [Progress](https://cadence.dev/r/progress.md): Displays an indicator showing the completion progress of a task. (feedback)
 - [Alert Dialog](https://cadence.dev/r/alert-dialog.md): A modal confirmation that interrupts the flow and needs an explicit choice before anything happens. (overlay)
 - [Popover](https://cadence.dev/r/popover.md): An anchored panel that opens next to its trigger and returns focus to it when it closes. (overlay)
+- [Tooltip](https://cadence.dev/r/tooltip.md): A short label that names a control on hover or focus, and disappears when the pointer leaves. (overlay)
+- [Hover Card](https://cadence.dev/r/hover-card.md): A preview panel that opens from a link on hover or focus and disappears when the pointer leaves. (overlay)
 
 ## Docs
 
@@ -4609,3 +4611,298 @@ default.
   what gets `aria-expanded`.
 - Do not simulate a modal confirmation with `modal`; it blocks outside interaction but still closes on
   Escape, which is not what a confirmation promises.
+
+# Tooltip
+
+A short label that names a control on hover or focus, and disappears when the pointer leaves.
+
+## When to use
+
+- An icon-only control whose meaning is not obvious from the icon alone.
+- The full value behind a truncated label, or a keyboard shortcut next to an action.
+- A hint that helps the first use of a dense control and is useless once learned.
+
+## When not to use
+
+- Anything the user must read to act: a tooltip disappears on scroll, touch, and Escape. If the content
+  matters, put it on the page or in a `popover`.
+- Interactive content. A tooltip cannot hold a button or a link; use `popover`.
+- The accessible name of a button that already has text. Two labels that disagree is worse than one.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/tooltip
+```
+
+Optionally wrap the app in `TooltipProvider` once to set one delay for every tooltip; Base UI does not
+require it.
+
+## Usage
+
+```tsx
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip/tooltip";
+import { Button } from "@/components/cadence/button/button";
+
+export function BoldTooltip() {
+  return (
+    <TooltipProvider delay={200}>
+      <Tooltip>
+        <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Bold">
+          <Bold />
+        </TooltipTrigger>
+        <TooltipContent>Bold (⌘B)</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+```
+
+## Examples
+
+### Side and alignment
+
+`side` defaults to `top` and the label flips when there is no room. The arrow moves with it; the panel
+grows out of `--transform-origin`, so the scale starts where the trigger meets the label.
+
+```tsx
+<TooltipContent side="right" align="start">
+  Right, aligned to the start
+</TooltipContent>
+```
+
+### A delay for the whole app
+
+`TooltipProvider` sets the delay once. Without it, Base UI's own default applies.
+
+```tsx
+<TooltipProvider delay={300}>
+  <App />
+</TooltipProvider>
+```
+
+### Disabled controls
+
+A disabled button does not emit pointer events, so wrap it and put the hint on the wrapper:
+
+```tsx
+<Tooltip>
+  <TooltipTrigger render={<span className="inline-flex" />}>
+    <Button disabled>Deploy</Button>
+  </TooltipTrigger>
+  <TooltipContent>Finish the required fields first</TooltipContent>
+</Tooltip>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `TooltipProvider` | `delay` | Optional. One delay for every tooltip inside. |
+| `Tooltip` | `open`, `defaultOpen`, `onOpenChange` | Base UI root. |
+| `TooltipTrigger` | native button props, `render` | Hover or focus target; carries `aria-describedby`. |
+| `TooltipContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, popup, and arrow. `side` defaults to `top`, `sideOffset` to `4`. |
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
+| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so the label appears on the first frame | – | – |
+
+A tooltip is small enough that `duration.fast` is already at the edge of readable: nothing here waits
+for an exit to finish. The arrow is part of the popup and moves with it, so it is never animated
+separately.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Focus shows the label; leaving hides it. |
+| Escape | Hides the label and leaves focus on the trigger. |
+| Enter / Space | Activates the trigger. The tooltip does not swallow the press. |
+
+Hover alone is never the only path: the tooltip opens on keyboard focus too, which is what makes it
+usable on touch and from a screen reader.
+
+## Accessibility
+
+- Base UI's own tooltip adds neither `role="tooltip"` nor `aria-describedby`; Cadence wires both. The
+  trigger points at the popup only while it is open — a closed popup would otherwise leave a dangling
+  id, which axe reports — and the popup is `role="tooltip"`.
+- The tooltip must not be the only name of a control. Give an icon button a real `aria-label`; the
+  tooltip is the extra sentence, not the name.
+- Text stays readable in both themes: `bg-foreground` / `text-background` invert, so the label keeps
+  contrast against whatever surface it floats over.
+- Escape dismisses it without moving focus, so a tooltip never traps a keyboard user.
+
+## Responsive behavior
+
+The label is `w-fit` with a `max-w-xs` cap and wraps at word boundaries (`text-balance`) instead of
+running off screen. Base UI flips the side and shifts the alignment when the viewport cannot fit it.
+
+## Performance
+
+- The popup tree is mounted only while the label is open; a page can carry dozens of tooltips without
+  paying for them all.
+- Animates `opacity` and `scale` only — no layout read, no measuring loop, no JavaScript animation.
+  Hover is not a state the component polls.
+
+## Notes for AI
+
+- Use a tooltip to name or explain a control, never to deliver information the user needs to proceed.
+- Do not put a link, button, or form inside it; use `popover`.
+- Give every icon-only trigger an `aria-label`: the tooltip complements the name, it does not replace it.
+
+# Hover Card
+
+A preview panel that opens from a link on hover or focus and disappears when the pointer leaves.
+
+## When to use
+
+- A preview of what a link leads to: a profile, a repository, a document — enough to decide whether to
+  click.
+- Context that helps a name make sense — the person behind an `@handle`, the project behind a package.
+- A short panel with one or two actions that should not interrupt the page.
+
+## When not to use
+
+- A label for an icon. Use `tooltip`: it is smaller, quicker, and announced as a description.
+- Content the user opened on purpose. Use `popover`: hover cards close when the pointer moves on, and
+  anything with a task in it deserves a deliberate open.
+- Information the user needs to answer a question. Nothing that appears and disappears on hover can be
+  the only place it lives.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/hover-card
+```
+
+## Usage
+
+```tsx
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card/hover-card";
+
+export function ReviewerCard() {
+  return (
+    <p>
+      Reviewed by{" "}
+      <HoverCard>
+        <HoverCardTrigger render={<a href="/u/linruoxin" />}>@linruoxin</HoverCardTrigger>
+        <HoverCardContent>
+          <p className="text-sm font-medium">Lin Ruoxin</p>
+          <p className="text-sm text-muted-foreground">Maintains the motion layer and the registry.</p>
+        </HoverCardContent>
+      </HoverCard>
+    </p>
+  );
+}
+```
+
+## Examples
+
+### With an action inside
+
+The card is not modal and does not trap focus, so a link or a button inside it works normally. Base UI
+keeps the card open while the pointer or focus is inside it, which is what makes the action reachable.
+
+```tsx
+<HoverCardContent>
+  <p className="text-sm font-medium">Lin Ruoxin</p>
+  <Button size="xs" variant="secondary">
+    Follow
+  </Button>
+</HoverCardContent>
+```
+
+### Placement
+
+`side` defaults to `bottom` — unlike a tooltip, which defaults to `top` — because the card is larger and
+reads better below the link. `alignOffset` defaults to `4` for the same reason.
+
+```tsx
+<HoverCardContent side="right" align="start">
+  …
+</HoverCardContent>
+```
+
+### A delay for the whole app
+
+`HoverCard` takes the same delay props as the Base UI root. A longer `delay` keeps a page of links from
+flashing cards at every pointer movement.
+
+```tsx
+<HoverCard delay={400}>…</HoverCard>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `HoverCard` | `open`, `defaultOpen`, `onOpenChange`, `delay`, `closeDelay` | Base UI root; `delay` is per card. |
+| `HoverCardTrigger` | native props, `render` | The link or button the card describes. |
+| `HoverCardContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, and popup. `side` defaults to `bottom`, `sideOffset` to `4`, `alignOffset` to `4`. |
+
+The portal renders `data-slot="hover-card-portal"`; the popup is `data-slot="hover-card-content"`. There
+is no `HoverCardArrow`: upstream's Base UI surface has none, and the card is a surface rather than a
+pointer.
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
+| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so the panel appears on the first frame | – | – |
+
+Same anchored motion as `popover` and `tooltip`: the scale starts at `--transform-origin`, which Base UI
+points at the trigger. Hover cards close when the pointer leaves, so the exit has to be short; `fast` is
+the anchored-surface duration the three share.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Focusing the trigger opens the card; moving focus into it keeps it open. |
+| Escape | Closes the card and returns focus to the trigger. |
+| Enter / Space | Follows the trigger link, or activates a control inside the card. |
+
+Keyboard focus opens the card for the same reason it does in a tooltip: without it, the content would
+exist only for pointer users.
+
+## Accessibility
+
+- The trigger carries the accessible name; the card is supplementary. That is why Cadence does not give
+  the popup `role="dialog"` or wire it as the trigger's description: a panel that may hold several
+  paragraphs and a button is neither a name nor a description, and a screen reader reading it on every
+  focus would be noise.
+- Interactive content inside the card is reachable in order: Tab moves from the trigger into the card's
+  links and buttons, and the card stays open while focus is inside it.
+- Hover is never the only path: focus opens it too, and Escape closes it, so the card never traps a
+  keyboard user.
+- If the card is the only place a piece of information exists, it is in the wrong component — move it
+  into the page or into a `popover`.
+
+## Responsive behavior
+
+The panel is `w-64` with `p-4`; Base UI flips it to another side and shifts the alignment when the
+viewport cannot fit it. On touch devices there is no hover: the trigger still opens the card on focus or
+tap, and the content must not assume a pointer is nearby.
+
+## Performance
+
+- Mounted only while open, so a page of links carries no extra popup trees.
+- Animates `opacity` and `scale` only: no layout reads, no `top`/`left` transition, no JavaScript
+  animation loop. The card follows the anchor through the positioner, not through React state.
+
+## Notes for AI
+
+- Use `hover-card` only for a preview of the linked thing; use `popover` for anything the user opens to
+  act, and `tooltip` for a label.
+- The trigger must have its own text or `aria-label`; the card is not its name.
+- Keep the card small: a person, a repository, a document summary, one action. If it needs scrolling, it
+  wants to be a `popover` or a page.

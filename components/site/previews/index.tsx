@@ -43,4 +43,6 @@ export const previews: Record<string, ComponentType> = {
   progress: dynamic(() => import("./progress").then((mod) => ({ default: mod.ProgressPreview }))),
   "alert-dialog": dynamic(() => import("./alert-dialog").then((mod) => ({ default: mod.AlertDialogPreview }))),
   popover: dynamic(() => import("./popover").then((mod) => ({ default: mod.PopoverPreview }))),
+  tooltip: dynamic(() => import("./tooltip").then((mod) => ({ default: mod.TooltipPreview }))),
+  "hover-card": dynamic(() => import("./hover-card").then((mod) => ({ default: mod.HoverCardPreview }))),
 };

@@ -475,6 +475,35 @@
         "popover-title",
         "popover-trigger"
       ]
+    },
+    "tooltip": {
+      "path": "apps/v4/registry/bases/base/ui/tooltip.tsx",
+      "exports": [
+        "Tooltip",
+        "TooltipContent",
+        "TooltipProvider",
+        "TooltipTrigger"
+      ],
+      "slots": [
+        "tooltip",
+        "tooltip-content",
+        "tooltip-provider",
+        "tooltip-trigger"
+      ]
+    },
+    "hover-card": {
+      "path": "apps/v4/registry/bases/base/ui/hover-card.tsx",
+      "exports": [
+        "HoverCard",
+        "HoverCardContent",
+        "HoverCardTrigger"
+      ],
+      "slots": [
+        "hover-card",
+        "hover-card-content",
+        "hover-card-portal",
+        "hover-card-trigger"
+      ]
     }
   }
 }

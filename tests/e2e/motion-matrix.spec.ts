@@ -215,6 +215,107 @@ test.describe("popover", () => {
   });
 });
 
+test.describe("tooltip", () => {
+  // Hover, not click: a tooltip is the one popup in the matrix that opens with a
+  // pointer move, and it is also the component whose `aria-describedby` only exists
+  // while the popup does.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="tooltip-content"]');
+          await openComponent(page, "tooltip", requested, "tooltip-trigger", mode);
+
+          await page.locator(scoped("tooltip", '[data-slot="tooltip-trigger"]')).first().hover();
+          await expect(page.getByRole("tooltip")).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const popup = page.locator('[data-slot="tooltip-content"]');
+          await expect(popup).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="tooltip-content"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+
+  test.describe("reduced keeps the fade and drops only the scale", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the label fades without the 0.96 settle", async ({ page }) => {
+      await recordScale(page, '[data-slot="tooltip-content"]');
+      await openComponent(page, "tooltip", "reduced", "tooltip-trigger");
+      await page.locator(scoped("tooltip", '[data-slot="tooltip-trigger"]')).first().hover();
+      await expect(page.getByRole("tooltip")).toBeVisible();
+      await page.waitForTimeout(300);
+
+      expect(await computed(page, '[data-slot="tooltip-content"]', "transition-property")).toContain("opacity");
+      expect(await computed(page, '[data-slot="tooltip-content"]', "transition-duration")).toBe("0.096s");
+      expect((await recordedScale(page)).min).toBe(1);
+    });
+  });
+});
+
+test.describe("hover-card", () => {
+  // The third anchored panel, and the only one with no role: its content is not a
+  // description, so the assertions target the content slot rather than a role.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="hover-card-content"]');
+          await openComponent(page, "hover-card", requested, "hover-card-trigger", mode);
+
+          await page.locator(scoped("hover-card", '[data-slot="hover-card-trigger"]')).first().hover();
+          await expect(page.locator('[data-slot="hover-card-content"]')).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const popup = page.locator('[data-slot="hover-card-content"]');
+          await expect(popup).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="hover-card-content"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+
+  test.describe("reduced keeps the fade and drops only the scale", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the panel fades without the 0.96 settle", async ({ page }) => {
+      await recordScale(page, '[data-slot="hover-card-content"]');
+      await openComponent(page, "hover-card", "reduced", "hover-card-trigger");
+      await page.locator(scoped("hover-card", '[data-slot="hover-card-trigger"]')).first().hover();
+      await expect(page.locator('[data-slot="hover-card-content"]')).toBeVisible();
+      await page.waitForTimeout(300);
+
+      expect(await computed(page, '[data-slot="hover-card-content"]', "transition-property")).toContain("opacity");
+      expect(await computed(page, '[data-slot="hover-card-content"]', "transition-duration")).toBe("0.096s");
+      expect((await recordedScale(page)).min).toBe(1);
+    });
+  });
+});
+
 test.describe("switch", () => {
   for (const prefersReduced of PREFERENCES) {
     test.describe(preferenceName(prefersReduced), () => {

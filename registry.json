@@ -1043,6 +1043,64 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A short label that names a control on hover or focus, and disappears when the pointer leaves.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/tooltip/tooltip.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/tooltip/tooltip.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B4",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "hover-card",
+      "type": "registry:ui",
+      "title": "Hover Card",
+      "description": "A preview panel that opens from a link on hover or focus and disappears when the pointer leaves.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/hover-card/hover-card.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/hover-card/hover-card.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B4",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }
