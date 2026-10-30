@@ -23,6 +23,15 @@ function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
+/**
+ * Motion contract (CSS-only, Base UI `data-starting-style` / `data-ending-style`):
+ * - full: the backdrop cross-fades on `duration.fast`; the panel fades and settles
+ *   from 0.95 scale on `duration.base`
+ * - reduced: the panel keeps the fade and drops the scale
+ * - none: both durations resolve to 0ms (the `--motion-duration-*` tokens are
+ *   zeroed by `[data-motion="none"]`), so the dialog appears and disappears on
+ *   the first frame
+ */
 function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) {
   const cm = useCadenceMotion();
 
@@ -31,8 +40,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
       data-slot="dialog-overlay"
       data-motion={cm.mode}
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/50 transition-opacity ease-out data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-        cm.reduced ? "duration-100" : "duration-200",
+        "fixed inset-0 isolate z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
         className,
       )}
       {...props}
@@ -57,8 +65,8 @@ function DialogContent({
         data-slot="dialog-content"
         data-motion={cm.mode}
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale,transform] ease-out data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 sm:max-w-lg",
-          cm.reduced ? "duration-100" : "duration-200 data-[ending-style]:scale-95 data-[starting-style]:scale-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 sm:max-w-lg",
+          !cm.reduced && "data-[ending-style]:scale-95 data-[starting-style]:scale-95",
           className,
         )}
         {...props}

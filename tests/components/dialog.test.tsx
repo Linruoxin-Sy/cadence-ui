@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/registry/cadence/dialog/dialog";
+import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 
 function Example() {
   return (
@@ -21,6 +22,14 @@ function Example() {
         <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function renderInMode(mode: NonNullable<CadenceProviderProps["mode"]>) {
+  return render(
+    <CadenceProvider mode={mode}>
+      <Example />
+    </CadenceProvider>,
   );
 }
 
@@ -46,5 +55,25 @@ describe("Dialog", () => {
     await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+
+  it.each([
+    ["full", true],
+    ["reduced", false],
+    ["none", false],
+  ] as const)("declares %s mode, and drops the scale outside full", async (mode, keepsScale) => {
+    renderInMode(mode);
+    await userEvent.click(screen.getByRole("button", { name: "Rename project" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveAttribute("data-motion", mode);
+    // The duration comes from the token, never from a literal: `data-motion="none"`
+    // zeroes the variable on the element itself, which is what makes `none` instant.
+    expect(dialog.className).toContain("duration-(--motion-duration-base)");
+    expect(dialog.className.includes("scale-95")).toBe(keepsScale);
+
+    const overlay = document.querySelector('[data-slot="dialog-overlay"]');
+    expect(overlay).toHaveAttribute("data-motion", mode);
+    expect(overlay?.className).toContain("duration-(--motion-duration-fast)");
   });
 });
