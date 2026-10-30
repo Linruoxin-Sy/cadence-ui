@@ -62,4 +62,9 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = vi.fn();
 }
 
+/** `input-otp` probes the element under the caret; jsdom has no hit testing. */
+if (!document.elementFromPoint) {
+  document.elementFromPoint = () => null;
+}
+
 window.scrollTo = vi.fn();

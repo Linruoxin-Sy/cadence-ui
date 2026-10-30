@@ -50,6 +50,7 @@ npx shadcn@latest add @cadence/button
 - [Slider](/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
 - [Toggle](/r/toggle.md): A two-state button that can be pressed or not pressed. (form)
 - [Toggle Group](/r/toggle-group.md): A set of two-state buttons that can be pressed one at a time or together. (form)
+- [Input OTP](/r/input-otp.md): A one-time password field that renders one slot per character. (form)
 
 ## Docs
 

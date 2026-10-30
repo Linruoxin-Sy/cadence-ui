@@ -393,6 +393,21 @@
         "toggle-group",
         "toggle-group-item"
       ]
+    },
+    "input-otp": {
+      "path": "apps/v4/registry/bases/base/ui/input-otp.tsx",
+      "exports": [
+        "InputOTP",
+        "InputOTPGroup",
+        "InputOTPSeparator",
+        "InputOTPSlot"
+      ],
+      "slots": [
+        "input-otp",
+        "input-otp-group",
+        "input-otp-separator",
+        "input-otp-slot"
+      ]
     }
   }
 }

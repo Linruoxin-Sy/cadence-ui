@@ -13,6 +13,7 @@ import { EmptyPreview } from "./empty";
 import { FieldPreview } from "./field";
 import { InputPreview } from "./input";
 import { InputGroupPreview } from "./input-group";
+import { InputOtpPreview } from "./input-otp";
 import { ItemPreview } from "./item";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
@@ -59,4 +60,5 @@ export const previews: Record<string, ComponentType> = {
   slider: SliderPreview,
   toggle: TogglePreview,
   "toggle-group": ToggleGroupPreview,
+  "input-otp": InputOtpPreview,
 };
