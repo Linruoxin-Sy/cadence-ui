@@ -218,6 +218,22 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned |
 |       | **Total**                  | **57** |            | **102**     |         |         |
 
+### 7.0 Status discipline
+
+A batch is the unit of completion, and this document is the only place that records it. **When a task
+finishes, mark it complete here in the same change** — not in a follow-up, not in a commit message, not
+only in the daily log:
+
+1. The batch's row in the table above becomes `✅ done`. Only the batch being worked on may say `next`.
+2. A verification subsection appears under §7 (`### 7.x B<n> — ✅ complete (date)`) listing what shipped,
+   the commands that were run and their real result, every deviation from this plan, and what is still
+   open.
+3. The status line at the top of this document names the last completed batch and the next one.
+
+A batch whose row still says `next` is not done. The plan is data, not a diary: the docs site groups the
+sidebar by `meta.batch`, the release notes read §7, and the next contributor decides where to start from
+these rows. Work that landed without updating them is a process defect, and the batch is not closed.
+
 Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
 green, and a real `shadcn add` install was verified (see §5.1).
@@ -265,7 +281,7 @@ green, and a real `shadcn add` install was verified (see §5.1).
 Every batch must pass: `pnpm check`, `parity:check`, manual `data-motion` full/reduced/none,
 axe with zero violations, size budget, and dual-theme screenshots.
 
-### 7.1 B1 verification (2026-10-29)
+### 7.1 B1 — ✅ complete (2026-10-29)
 
 - **Scope shipped:** `badge`, `kbd`, `separator`, `label`, `input`, `textarea`, `card`, `aspect-ratio`,
   `avatar`, `skeleton`, joining the `button` pilot. 12 components, 17 registry items, 12 docs, 12 previews.
