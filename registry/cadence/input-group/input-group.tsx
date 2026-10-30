@@ -70,9 +70,13 @@ export interface InputGroupAddonProps
 
 /**
  * The furniture around the control. Clicking it focuses the input — unless the
- * click landed on a button, which has its own job.
+ * click landed on a button, which has its own job, or the caller cancelled it.
+ *
+ * The internal handler runs first and the caller's runs too: spreading `props`
+ * last used to replace the focus behaviour outright, which is why the handler is
+ * composed instead of overridden.
  */
-function InputGroupAddon({ className, align = "inline-start", ...props }: InputGroupAddonProps) {
+function InputGroupAddon({ className, align = "inline-start", onClick, ...props }: InputGroupAddonProps) {
   return (
     <div
       role="group"
@@ -80,6 +84,8 @@ function InputGroupAddon({ className, align = "inline-start", ...props }: InputG
       data-align={align}
       className={cn(inputGroupAddonVariants({ align }), className)}
       onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
         if ((event.target as HTMLElement).closest("button")) {
           return;
         }
@@ -113,6 +119,10 @@ export interface InputGroupButtonProps
 /**
  * A button inside the frame. It sizes itself from the addon scale rather than the
  * page scale, so a clear button does not tower over a 36px field.
+ *
+ * `size` is forwarded to `Button` rather than written straight onto `data-size`:
+ * the old form left the attribute saying `xs` while the button still computed its
+ * own `default` height, so CSS targeting `data-size` disagreed with the pixels.
  */
 function InputGroupButton({
   className,
@@ -124,8 +134,8 @@ function InputGroupButton({
   return (
     <Button
       type={type}
-      data-size={size}
       variant={variant}
+      size={size}
       className={cn(inputGroupButtonVariants({ size }), className)}
       {...props}
     />
