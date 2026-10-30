@@ -31,7 +31,7 @@ npx shadcn@latest add @cadence/cadence-theme
 npx shadcn@latest add @cadence/button
 ```
 
-Files land in `components/cadence/` (`src/components/cadence/` in a `src/` project) and use relative imports, so no `tsconfig` change is needed. Wrapping the app in `CadenceProvider` is optional and gives one place to control motion intensity:
+Files land in `components/cadence/` (`src/components/cadence/` in a `src/` project) and use relative imports, so no `tsconfig` change is needed. Wrapping the app in `CadenceProvider` is optional and gives one place to switch motion mode:
 
 ```tsx
 import { CadenceProvider } from "@/components/cadence/lib/provider";

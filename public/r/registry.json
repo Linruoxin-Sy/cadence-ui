@@ -45,7 +45,7 @@
       "name": "cadence-theme",
       "type": "registry:theme",
       "title": "Cadence theme",
-      "description": "Motion CSS variables and intensity rules layered on top of the shadcn theme.",
+      "description": "Motion CSS variables and the three-mode duration overrides, layered on top of the shadcn theme.",
       "categories": [
         "foundation"
       ],
@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -310,7 +310,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -333,7 +333,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -357,7 +357,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -381,7 +381,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -404,7 +404,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -428,7 +428,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -451,7 +451,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -474,7 +474,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -497,7 +497,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -525,7 +525,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -557,7 +557,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -582,7 +582,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -607,7 +607,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -632,7 +632,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -657,7 +657,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -682,7 +682,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -707,7 +707,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -732,7 +732,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     },
     {
@@ -757,7 +757,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "c79d55b"
+        "sourceSha": "910b6ac"
       }
     }
   ]

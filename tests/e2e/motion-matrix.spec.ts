@@ -31,12 +31,12 @@ test.describe("button", () => {
         const mode = effectiveMode(requested, prefersReduced);
 
         test(`reports ${mode} for ?motion=${requested}`, async ({ page }) => {
-          await openComponent(page, "button", requested, "button");
+          await openComponent(page, "button", requested, "button", mode);
           await expect(page.getByRole("button", { name: "Button", exact: true })).toHaveAttribute("data-motion", mode);
         });
 
         test(`press scale: ?motion=${requested} → ${mode}`, async ({ page }) => {
-          await openComponent(page, "button", requested, "button");
+          await openComponent(page, "button", requested, "button", mode);
           const scale = await pressScale(page, scoped("button", '[data-slot="button"]'));
 
           if (mode === "full") {
@@ -62,7 +62,7 @@ test.describe("dialog", () => {
 
         test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await recordScale(page, '[data-slot="dialog-content"]');
-          await openComponent(page, "dialog", requested, "dialog-trigger");
+          await openComponent(page, "dialog", requested, "dialog-trigger", mode);
 
           await page.getByRole("button", { name: "Rename project" }).click();
           await expect(page.getByRole("dialog", { name: "Rename project" })).toBeVisible();
@@ -115,7 +115,7 @@ test.describe("switch", () => {
         const mode = effectiveMode(requested, prefersReduced);
 
         test(`thumb travel: ?motion=${requested} → ${mode}`, async ({ page }) => {
-          await openComponent(page, "switch", requested, "switch");
+          await openComponent(page, "switch", requested, "switch", mode);
           const thumb = page.locator('[data-slot="switch-thumb"]').nth(1);
           const x = () => thumb.evaluate((element) => new DOMMatrixReadOnly(getComputedStyle(element).transform).m41);
 
@@ -168,7 +168,7 @@ test.describe("progress", () => {
         const mode = effectiveMode(requested, prefersReduced);
 
         test(`fill: ?motion=${requested} → ${mode}`, async ({ page }) => {
-          await openComponent(page, "progress", requested, "progress");
+          await openComponent(page, "progress", requested, "progress", mode);
           const indicator = page.locator('[data-slot="progress-indicator"]').first();
           await expect(page.locator(scoped("progress", '[data-slot="progress"]')).first()).toHaveAttribute(
             "data-motion",

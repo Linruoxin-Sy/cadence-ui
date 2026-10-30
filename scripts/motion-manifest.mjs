@@ -31,6 +31,28 @@ export function recipeCatalogue(source) {
   return [...union[1].matchAll(/"([a-z][a-z.]*)"/g)].map((match) => match[1]);
 }
 
+/**
+ * Read the `Recipe` union out of §5 of the animation system document.
+ *
+ * This is the drift that survived a review: `theme.reveal` was listed in the docs,
+ * absent from `lib/motion.ts`, and nothing compared the two. The doc is the
+ * contract readers plan against, so a recipe that exists only there is a defect.
+ */
+export function documentedRecipes(markdown) {
+  const section = markdown.split("## 5. Composition-layer API")[1];
+  if (!section) throw new Error("docs/animation-system.md: cannot find `## 5. Composition-layer API`");
+  const union = section.match(/export type Recipe\s*=([\s\S]*?);/);
+  if (!union) throw new Error("docs/animation-system.md §5: cannot find the `Recipe` union");
+  return [...union[1].matchAll(/"([a-z][a-z.]*)"/g)].map((match) => match[1]);
+}
+
+/** Read the recipe names out of the §3 catalogue table (one row per recipe). */
+export function cataloguedRecipes(markdown) {
+  const section = markdown.split("## 3. Recipe catalogue")[1]?.split("### 3.1")[0];
+  if (!section) throw new Error("docs/animation-system.md: cannot find `## 3. Recipe catalogue`");
+  return [...section.matchAll(/^\|\s*`([a-z][a-z.]*)`/gm)].map((match) => match[1]);
+}
+
 /** Fold a declaration into `{ recipe, form }`. */
 export function normaliseMotion(entries = []) {
   return entries.map((entry) =>

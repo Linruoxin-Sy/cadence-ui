@@ -434,6 +434,52 @@ axe with zero violations, size budget, and dual-theme screenshots.
   (one `popup.anchored` implementation), then `sheet` / `drawer` (new side/bottom variants). Each keeps the
   `form: "css-transition"` declaration and the three-mode assertions that `dialog` set.
 
+#### Contract drift closed (2026-10-30)
+
+§8 carried six drifts as "fix before B4, in one change", because the six remaining overlays copy the
+`dialog` pattern and would otherwise have carried the disagreement into seven files. All six are closed:
+
+| Drift                                                                 | Resolution                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `theme.reveal` in §3 / §5 but not in `lib/motion.ts`                  | **Removed from the catalogue.** A view transition is a document-level operation with no Motion `Transition` behind it, and the only would-be consumer was the docs site's own chrome. §3 now says so in one sentence; `theme-toggle.tsx` is unchanged.                                                                                         |
+| `variants(recipe)` documented, absent from the provider               | **Removed from §5 and §3.** No shipped component calls it, and a public method with no consumer is a compatibility promise with nothing behind it. `transition()`, `distance`, `spring`, and the two mode flags are the API, and §5's snippet now matches `provider.tsx`.                                                                      |
+| Three copies of the motion tokens, all different                      | **One parsed contract.** `app/globals.css`, the `cadence-theme` item, and §2.3 declare the same five scopes: `theme` (`--ease-cadence-*`), `root`, `reduced`, `none`, and `system-reduced` (durations only). `scripts/motion-tokens.mjs` parses all three; `registry:check` fails on a missing variable, an extra scope, or a different value. |
+| `--motion-distance-*` / `--motion-intensity` shipped, read by nothing | **Removed, not wired.** Wiring them meant a second source of truth next to `lib/motion.ts` plus a DOM read in the provider to resolve them; the JS distances stay constants, and the CSS side keeps only what a CSS-only popup actually reads.                                                                                                 |
+| `spinner`'s `animate-spin` is a transform loop §3.2 did not allow     | **§3.2 gained the single-element rotation exception**, with five conditions (one element, rotation only, the rotation _is_ the information, still gated by `data-motion`, nothing larger than a glyph). Anything that moves content — a marquee, a sliding shimmer — stays rejected.                                                           |
+| `button` dropped upstream's `group/button` and `select-none`          | **Both restored** with a comment naming upstream, and a unit test asserts them: `parity:check` compares exports and `data-slot` only, so a dropped class is invisible to it.                                                                                                                                                                   |
+
+Two more phantoms surfaced while making the copies comparable, and are gone: §2.2 listed an
+`ease.spring` tuple that `lib/motion.ts` never had, and §2.3 listed `--motion-scale-in` and
+`--animate-shimmer`, which no file declared. The `prefers-reduced-motion` block now mirrors the
+`reduced` durations instead of zeroing a distance token nothing read, so a CSS-only popup in an app
+with no provider honours the OS setting.
+
+- **Checks:** `pnpm check` green — typecheck, Biome, `registry:check`, `parity:check` against
+  `96da9cc`, 132 tests across 31 files. `registry:check` also compares the §3 catalogue table, the §5
+  `Recipe` union, and `lib/motion.ts` (17 recipes each), and the three token copies (5 scopes each),
+  so both drift classes that survived a review are now caught by CI. Both comparisons were
+  negative-tested by hand: a changed value and a deleted variable each fail the check.
+- **Deviation from the plan's wording:** "byte-for-byte equivalent" became "the same parsed
+  `scope → variable → value` map". Three formats (CSS file, registry JSON, markdown fence) cannot be
+  textually identical, and a byte comparison would have to normalise them first anyway.
+- **Found and recorded, not fixed:** a `data-motion="full"` element nested inside a `reduced` or `none`
+  subtree inherits the parent's shortened or zeroed durations, because CSS variables cascade and no
+  `[data-motion="full"]` block restates the authored clock. JS transitions are unaffected —
+  `transitionFor()` reads the mode, not the variables — so only a CSS-only popup inside an
+  opted-back-in preview would look wrong. Fixing it needs a `full` block in all three copies that still
+  defers to the OS media query, which is a token-layer decision better made together with the single
+  shared popup CSS that `popover` / `tooltip` / `hover-card` will establish below.
+- **Browser proof, re-run 2026-10-30:** `pnpm build` produces all 40 pages and the compiled stylesheet
+  carries `[data-motion=reduced]`, `[data-motion=none]` and the reduced-duration media query, with no
+  `--motion-distance-*` or `--motion-intensity` left anywhere. `playwright test` is 49/49. This
+  environment has no Playwright-downloaded Chromium, so the run used `PLAYWRIGHT_CHANNEL=msedge`, the
+  fallback the config documents; the suite is not Chromium-specific.
+- **E2E defect found by that run:** `openComponent()` asserted the mode the URL _asked for_ rather than
+  the mode the provider _resolves_, so the `?motion=full` cell under `prefers-reduced-motion: reduce`
+  could never pass — the one cell where the two differ. The helper now takes the resolved mode, and
+  every matrix call site passes it. The 49-green claim in the bullet above is only true because of
+  that fix.
+
 ## 8. Backlog
 
 ### AI components (26, unscheduled)
@@ -451,21 +497,15 @@ Prerequisites before any AI batch is scheduled:
 
 ### Carried open work (2026-10-30 review)
 
-Everything the 2026-10-30 review proposed but did not land in the same change. It is recorded here, in the
-plan of record, so it does not depend on anyone remembering a separate document. Order is deliberate: the
-contract drift comes before B4, because the six remaining overlays copy the `dialog` pattern and would
-otherwise carry the disagreement into seven files.
+Everything the 2026-10-30 review proposed. It is recorded here, in the plan of record, so it does not
+depend on anyone remembering a separate document. The contract drift this section opened with was
+closed before the remaining B4 overlays were started, as the order required.
 
-**Contract drift — fix before B4, in one change**
+**Contract drift — closed 2026-10-30 (see §7.4)**
 
-| Item                                                                                                                                             | Acceptance                                                                          |
-| ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `theme.reveal` is in `animation-system.md` §3 and the §5 `Recipe` union, but not in `lib/motion.ts`, and `theme-toggle` uses no View Transition. | Either it ships (theme switch + `Recipe` entry + test) or the catalogue entry goes. |
-| §5 documents `useCadenceMotion().variants(recipe)`; the provider has no such method.                                                             | The §5 snippet is the real API, and it typechecks.                                  |
-| Motion tokens have three copies that disagree: `app/globals.css`, the `cadence-theme` item's `cssVars` / `css`, and `animation-system.md` §2.3.  | The three are byte-for-byte equivalent; `registry:check` compares them.             |
-| `--motion-distance-*` / `--motion-intensity` ship to users but nothing reads them — components use the constants in `lib/motion.ts`.             | Either wire them into the JS tokens or drop them from `cadence-theme`.              |
-| `spinner`'s `animate-spin` is a transform loop; §3.2 allows opacity loops only, and no exception is written.                                     | §3.2 gains the single-element-rotation exception, or the spinner stops rotating.    |
-| `button` dropped upstream's `group/button` and `select-none`. The parity check sees neither (it compares exports and `data-slot` only).          | Both classes are back, with a comment naming upstream as the reason.                |
+The six drifts this section opened with — `theme.reveal`, `variants()`, the three token copies, the
+unread `--motion-*` variables, the spinner's rotation, and the two missing `button` classes — are
+fixed, and both drift classes now have a CI check behind them. Nothing in that table is still open.
 
 **Tooling**
 
@@ -473,9 +513,11 @@ otherwise carry the disagreement into seven files.
   source (AST or a generated `.d.ts`). Exports and `data-slot` catch renames; they cannot catch a missing
   class, a changed default, or a prop that upstream added. Target: before B5, whose menu components are the
   most prop-heavy in the catalogue.
-- **Docs-side recipe validation.** `check-registry` parses the recipe table out of `lib/motion.ts`, so a
-  recipe that exists in the documentation but not in the code is invisible to CI — exactly how `theme.reveal`
-  survived. Extend the check to the `Recipe` union in `animation-system.md` §5 and to the frontmatter table.
+- **Docs-side recipe validation (half done).** `registry:check` now compares the §3 catalogue table and
+  the §5 `Recipe` union against `lib/motion.ts`, and fails on a recipe that exists in only one of them —
+  the drift that let `theme.reveal` survive. Still open: the per-component motion tables in
+  `content/components/<id>.mdx` and the recipe table in `content/docs/motion.mdx`, which are prose and
+  remain unchecked.
 - **`expectMotionContract()` helper.** The three-mode assertion is hand-written per component, and the two
   components missing it were the two that were broken. One shared helper that a new component must call.
 - **Site initial JS budget.** `next build` now produces a route-size report; measure `/components/button`

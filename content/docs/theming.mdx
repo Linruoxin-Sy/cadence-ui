@@ -1,6 +1,6 @@
 ---
 title: Theming
-description: Cadence layers motion tokens and an intensity switch on top of the shadcn theme.
+description: Cadence layers motion tokens and a three-mode switch on top of the shadcn theme.
 ---
 
 ## Tokens
@@ -21,19 +21,24 @@ follows, in both themes.
 
 ## Motion variables
 
-`cadence-theme` adds a small set of motion variables:
+`cadence-theme` adds the CSS side of the motion tokens:
 
 ```css
 :root {
-  --motion-distance-sm: 8px;
-  --motion-distance-md: 12px;
-  --motion-intensity: 1;
+  --motion-duration-instant: 100ms;
+  --motion-duration-fast: 160ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-slow: 320ms;
 }
 ```
 
-They exist so plain CSS transitions can follow the same distances as the JS components. The JS
-presets live in `components/cadence/lib/motion.ts` and are the source of truth for durations and
-springs.
+They exist so a CSS-only component — an overlay that animates through Base UI's `data-starting-style`
+/ `data-ending-style` — runs on the same clock as the Motion-driven ones, with no literal duration in
+its class list. `[data-motion="reduced"]` shortens them to 0.6×, `[data-motion="none"]` zeroes them,
+and a bare `prefers-reduced-motion: reduce` does the same for a page with no provider.
+
+The JS presets live in `components/cadence/lib/motion.ts` and are the source of truth for durations,
+easings, springs, and distances.
 
 ## Dark mode
 
@@ -47,13 +52,13 @@ Cadence follows the shadcn convention: a `dark` class on `<html>`. Set it before
 </script>
 ```
 
-## Motion intensity
+## Motion modes
 
 `CadenceProvider` accepts `mode`:
 
 ```tsx
 <CadenceProvider mode="full">…</CadenceProvider>   // default
-<CadenceProvider mode="reduced">…</CadenceProvider> // halved travel, shorter timing
+<CadenceProvider mode="reduced">…</CadenceProvider> // transform/scale dropped, timing ×0.6
 <CadenceProvider mode="none">…</CadenceProvider>    // no animation
 ```
 

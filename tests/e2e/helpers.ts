@@ -23,16 +23,20 @@ export function scoped(id: string, selector: string): string {
 }
 
 /**
- * Opens a component page with the mode in the URL and waits for it to reach the
- * DOM. The mode arrives through an effect (the provider reads `?motion=` on
+ * Opens a component page with the mode in the URL and waits for the resolved mode to
+ * reach the DOM. The mode arrives through an effect (the provider reads `?motion=` on
  * mount), so the server-rendered HTML is always `full`.
+ *
+ * `requested` is what the URL asks for; `expected` is what the provider resolves it to.
+ * They differ whenever the system preference forces `reduced` over `full`, so callers
+ * that know the cell of the 3 × 2 matrix must pass both.
  */
-export async function openComponent(page: Page, id: string, mode: Mode, slot: string) {
-  await page.goto(`/components/${id}?motion=${mode}`);
+export async function openComponent(page: Page, id: string, requested: Mode, slot: string, expected: Mode = requested) {
+  await page.goto(`/components/${id}?motion=${requested}`);
   // The mode arrives after hydration, and hydration waits for this route's client
   // chunks; under parallel workers that is occasionally slower than the default
   // assertion timeout. The assertion itself stays exact.
-  await expect(page.locator(scoped(id, `[data-slot="${slot}"]`)).first()).toHaveAttribute("data-motion", mode, {
+  await expect(page.locator(scoped(id, `[data-slot="${slot}"]`)).first()).toHaveAttribute("data-motion", expected, {
     timeout: 15_000,
   });
 }

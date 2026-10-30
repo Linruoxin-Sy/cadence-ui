@@ -18,15 +18,26 @@
 
 ## 2. Token system
 
-### 2.1 Three intensity levels
+### 2.1 One authored timing, three runtime modes
 
-| Intensity          | Distance | Duration factor | Fit                              |
-| ------------------ | -------- | --------------- | -------------------------------- |
-| `subtle`           | 0.5×     | 0.8×            | Internal tools, dense interfaces |
-| `medium` (default) | 1×       | 1×              | Most products                    |
-| `expressive`       | 1.25×    | 1.15×           | Marketing pages, portfolios      |
+There is no runtime "intensity" multiplier. Durations, distances, easings, and springs are authored
+once in `lib/motion.ts`; the only thing that changes at runtime is the mode (§6), and the system
+preference can force that mode.
 
-Intensity is a **design token**, not a component prop. Users adjust it with `CadenceProvider mode="full"` + `data-motion` or through CSS variables.
+| Mode      | What changes                                  | Set by                                              |
+| --------- | --------------------------------------------- | --------------------------------------------------- |
+| `full`    | nothing: the authored timing                  | default                                             |
+| `reduced` | transform/scale dropped, tween durations ×0.6 | `prefers-reduced-motion`, or the provider           |
+| `none`    | every duration `0`, no transition at all      | `CadenceProvider mode="none"`, `data-motion="none"` |
+
+`meta.intensity` (`subtle` / `medium` / `expressive`) is **documentation metadata**: it records how
+loud a component's authored motion is, so a catalogue can group by it. No token reads it, and it is
+not adjustable at runtime.
+
+> An earlier draft shipped `--motion-intensity`, `--motion-distance-*`, and `--motion-scale-in` to
+> users. Nothing read them: JS components resolve timing through `transitionFor()` from
+> `lib/motion.ts`, and CSS-only popups read `--motion-duration-*`. A token nobody reads is a promise
+> nobody keeps, so the unread ones were deleted rather than wired into a second source of truth.
 
 ### 2.2 Base tokens
 
@@ -44,7 +55,6 @@ export const ease = {
   out: [0.22, 1, 0.36, 1], // enter: fast start, slow settle
   inOut: [0.65, 0, 0.35, 1], // movement within the screen
   in: [0.7, 0, 0.84, 0], // exit
-  spring: "cubic-bezier(0.34, 1.56, 0.64, 1)", // CSS-only light overshoot
 } as const;
 
 export const spring = {
@@ -66,7 +76,6 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 @theme inline {
   --ease-cadence-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-cadence-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --animate-shimmer: shimmer 1.6s linear infinite;
 }
 
 :root {
@@ -74,34 +83,39 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
   --motion-duration-fast: 160ms;
   --motion-duration-base: 220ms;
   --motion-duration-slow: 320ms;
-  --motion-distance-sm: 8px;
-  --motion-scale-in: 0.96;
-  --motion-intensity: 1;
 }
 
+/* the same 0.6 factor transitionFor() applies to tween recipes */
 [data-motion="reduced"] {
-  --motion-intensity: 0.6;
-  --motion-distance-sm: 4px;
-  /* the same 0.6 factor transitionFor() applies to tween recipes */
+  --motion-duration-instant: 60ms;
   --motion-duration-fast: 96ms;
   --motion-duration-base: 132ms;
+  --motion-duration-slow: 192ms;
 }
+
+/* `none` is a forced downgrade: a CSS popup must finish on the first frame */
 [data-motion="none"] {
-  --motion-intensity: 0;
-  /* `none` is a forced downgrade: a CSS popup must finish on the first frame */
   --motion-duration-instant: 0ms;
   --motion-duration-fast: 0ms;
   --motion-duration-base: 0ms;
   --motion-duration-slow: 0ms;
 }
+
+/* no provider, and therefore no data-motion attribute: the OS preference still
+   has to shorten the CSS-only clock */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion-distance-sm: 0px;
+    --motion-duration-instant: 60ms;
+    --motion-duration-fast: 96ms;
+    --motion-duration-base: 132ms;
+    --motion-duration-slow: 192ms;
   }
 }
 ```
 
-`--ease-*` generates the `ease-cadence-out` utility class. Durations and distances stay as CSS variables or Motion presets rather than forced utilities (Tailwind's `--duration-*` is not a theme namespace). A CSS-only popup reads them through the shorthand arbitrary value:
+`--ease-*` generates the `ease-cadence-out` utility class. Durations stay CSS variables rather than
+forced utilities, because Tailwind's `--duration-*` is not a theme namespace. A CSS-only popup reads
+them through the shorthand arbitrary value:
 
 ```tsx
 // dialog.tsx — CSS-only, so the token is the class
@@ -111,11 +125,17 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 That is the only pattern that keeps `data-motion="none"` honest without a JS branch: the attribute zeroes
 the variables on the element itself, and the transition has nothing left to run.
 
+The block above exists in exactly three places — `app/globals.css`, the `cadence-theme` registry
+item, and this document. They are not kept in sync by hand: `registry:check` parses all three into a
+`scope → variable → value` map (`scripts/motion-tokens.mjs`) and fails on a scope, a variable, or a
+value that differs. Three formats cannot be textually identical, so "equivalent" means that parsed
+map, not the bytes.
+
 ---
 
 ## 3. Recipe catalogue
 
-A recipe is a "reusable motion formula", returned by `useCadenceMotion().transition(recipe, opts)` or `variants(recipe)`. Components may only use the recipes below; adding a recipe means editing this document and going through review.
+A recipe is a "reusable motion formula", returned by `useCadenceMotion().transition(recipe, opts)`. Components may only use the recipes below; adding a recipe means editing this document and going through review.
 
 | Recipe            | Purpose                                                                                                  | Key parameters                  | Implementation                                                                               | reduced behaviour                            |
 | ----------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------- |
@@ -136,7 +156,10 @@ A recipe is a "reusable motion formula", returned by `useCadenceMotion().transit
 | `data.transition` | Data surfaces changing state in place                                                                    | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")` | Loop kept (opacity only); transforms dropped |
 | `state.morph`     | A control's own indicator morphing between two states (label/width, check tick, radio dot, switch thumb) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state   | Indicator at full size, thumb jumps          |
 | `feedback.press`  | Press feedback                                                                                           | `scale`                         | `whileTap`                                                                                   | Colour change only                           |
-| `theme.reveal`    | Theme-switch reveal                                                                                      | `origin`                        | View Transitions API (progressive enhancement)                                               | Immediate switch                             |
+
+Theme switching is deliberately absent. A view transition is a document-level operation: it resolves
+to no Motion `Transition`, so it cannot be a recipe and no component declares it. The site's theme
+toggle does it directly when it wants to.
 
 ### 3.1 Code for the key recipes
 
@@ -337,6 +360,29 @@ Rules for the continuous form:
    `cm.transition()` call because there is no JS animation — that is a property of
    the continuous form, not a missing branch.
 
+#### The one exception: single-element rotation
+
+Rule 1 has exactly one carve-out. `spinner` uses `animate-spin`, which loops on
+`transform: rotate`. It qualifies because all five hold, and a component that misses
+one of them does not:
+
+1. **One element.** Not a row, not a list, not a whole surface.
+2. **Rotation only.** Nothing translates, scales, or changes size, so no layout is
+   read and no neighbour moves.
+3. **The rotation is the information.** A spinner means "work in progress"; a static
+   icon would say the opposite. Under `reduced` it keeps spinning for the same reason
+   an opacity loop does (M5 removes travel and scale, not the ability to see that
+   something is loading) — and the accessible name still carries the state:
+   `role="status"` + `aria-label="Loading"`.
+4. **Still gated by `data-motion`.** `none` resolves to `animate-none`, so a
+   screenshot, a print stylesheet, and a reduced-data page get a still frame.
+5. **Nothing beyond a glyph.** A logo, a hero image, or a card that rotates is
+   decoration and is rejected in review.
+
+Anything else that needs a transform loop — a marquee, a shimmer sliding across a
+surface — stays rejected: those move content, and content that moves forever is the
+compositor tax this section exists to prevent.
+
 ---
 
 ## 4. Four ways to integrate Base UI with Motion
@@ -448,8 +494,7 @@ export type Recipe =
   | "number.roll"
   | "data.transition"
   | "state.morph"
-  | "feedback.press"
-  | "theme.reveal";
+  | "feedback.press";
 
 export function useCadenceMotion(): {
   mode: CadenceMode;
@@ -458,7 +503,6 @@ export function useCadenceMotion(): {
   /** `mode === "none"` only: a CSS-driven component must resolve to zero duration */
   disabled: boolean;
   transition(recipe: Recipe, options?: { delay?: number; distance?: number; timeScale?: number }): Transition;
-  variants(recipe: Recipe): Variants;
   distance: typeof distance;
   spring: typeof spring;
 };
@@ -466,7 +510,7 @@ export function useCadenceMotion(): {
 
 Implementation notes:
 
-- `mode === "none"` → every transition is `{ duration: 0 }`, variants keep only the end state;
+- `mode === "none"` → every transition is `{ duration: 0 }`;
 - `mode === "reduced"` or a system preference → drop `y/x/scale/rotate/filter`, keep only `opacity`, duration ×0.6;
 - `timeScale` (provider prop, default `1`) multiplies durations, spring `visualDuration`, and delays; the docs
   site's 0.25× preview passes `4`. It scales nothing inside `none` — a disabled transition stays disabled;
@@ -482,11 +526,11 @@ Implementation notes:
 
 ## 6. Three-layer strategy for reducing motion
 
-| Layer     | Trigger                                                                      | Effect                                 | Implementation                                             |
-| --------- | ---------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
-| System    | `prefers-reduced-motion: reduce`                                             | Disable transform/layout, keep opacity | `MotionConfig reducedMotion="user"` + CSS media query      |
-| Product   | `data-motion="reduced"`                                                      | Half the distance, duration ×0.6       | Provider reads CSS variables/attributes and scales presets |
-| Component | `data-motion="none"` (local attribute) or a component's `disableMotion` prop | Force motion off for one component     | Branch on `useCadenceMotion().mode` inside the component   |
+| Layer     | Trigger                                                                      | Effect                                    | Implementation                                                   |
+| --------- | ---------------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| System    | `prefers-reduced-motion: reduce`                                             | Disable transform/layout, keep opacity    | `MotionConfig reducedMotion="user"` + CSS media query            |
+| Product   | `data-motion="reduced"`                                                      | Drop transform/scale, tween duration ×0.6 | `transitionFor()` folds it; the CSS variables carry the same 0.6 |
+| Component | `data-motion="none"` (local attribute) or a component's `disableMotion` prop | Force motion off for one component        | Branch on `useCadenceMotion().mode` inside the component         |
 
 **Hard constraint**: a component that expresses a state change _only_ through animation is unacceptable. Toast dismissal, error messages, and success ticks must be perceivable outside the animation via text, an icon, or `aria-live`.
 

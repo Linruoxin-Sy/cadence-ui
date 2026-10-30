@@ -69,7 +69,7 @@ cadence-ui/
 │       ├── lib/                  # shared runtime installed alongside components
 │       │   ├── motion.ts         # motion presets (TS)
 │       │   ├── cn.ts             # className merging
-│       │   └── provider.tsx      # MotionConfig + intensity switch (optional provider)
+│       │   └── provider.tsx      # MotionConfig + mode switch (optional provider)
 │       ├── button/               # one directory per shadcn id
 │       │   └── button.tsx
 │       ├── dialog/
@@ -261,7 +261,7 @@ shadcn base tokens (--background / --foreground / --primary / …)
         ↓ reused, never redefined
 Cadence semantic extensions (--surface / --border-subtle / --success / …, added only when necessary)
         ↓
-Motion tokens (--motion-duration-* / --motion-ease-* / --motion-distance-*)
+Motion tokens (--motion-duration-*, --ease-cadence-*)
         ↓
 Exposed through Tailwind @theme (--ease-cadence-*, --animate-*)
 ```
@@ -273,34 +273,38 @@ component has to look like the shadcn project it landed in, not like Cadence.
 
 ### 7.2 Installing the theme
 
-`cadence-theme` injects via the registry's `cssVars` (theme/light/dark), so users never hand-edit CSS:
+`cadence-theme` injects via the registry's `cssVars` + `css`, so users never hand-edit CSS. The
+durations are theme-independent, so there is no `dark` branch: `light` lands under `:root` and applies
+to both themes.
 
 ```jsonc
 {
   "name": "cadence-theme",
   "type": "registry:theme",
   "cssVars": {
-    "theme": { "--radius-control": "0.75rem" },
-    "light": { "--motion-intensity": "1" },
-    "dark": { "--motion-intensity": "1" }
+    "theme": { "--ease-cadence-out": "cubic-bezier(0.22, 1, 0.36, 1)" },
+    "light": { "--motion-duration-base": "220ms" }
   },
   "css": {
     "@layer base": {
-      "[data-motion='reduced']": { "--motion-intensity": "0.5" },
-      "[data-motion='none']": { "--motion-intensity": "0" }
+      "[data-motion='reduced']": { "--motion-duration-base": "132ms" },
+      "[data-motion='none']": { "--motion-duration-base": "0ms" }
     }
   }
 }
 ```
 
-### 7.3 Intensity switch
+This item, `app/globals.css`, and `animation-system.md` §2.3 are the same declaration set three times;
+`registry:check` parses all three (`scripts/motion-tokens.mjs`) and fails on any difference.
 
-| Attribute                               | Behaviour                                                  | Implementation                                                  |
-| --------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------- |
-| system `prefers-reduced-motion: reduce` | disable transform/layout motion, keep opacity              | `MotionConfig reducedMotion="user"` + CSS media query           |
-| `data-motion="full"` (default)          | all motion                                                 | —                                                               |
-| `data-motion="reduced"`                 | halve distance/scale, duration ×0.6, keep fades            | `useCadenceMotion()` reads the CSS variables and scales presets |
-| `data-motion="none"`                    | every animation duration 0, jump straight to the end state | CSS variables zeroed + Motion `transition={{duration:0}}`       |
+### 7.3 Mode switch
+
+| Attribute                               | Behaviour                                                  | Implementation                                                           |
+| --------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
+| system `prefers-reduced-motion: reduce` | disable transform/layout motion, keep opacity              | `MotionConfig reducedMotion="user"` + CSS media query                    |
+| `data-motion="full"` (default)          | all motion                                                 | —                                                                        |
+| `data-motion="reduced"`                 | drop transform/scale, tween duration ×0.6, keep fades      | `transitionFor()` folds the recipe; the CSS variables carry the same 0.6 |
+| `data-motion="none"`                    | every animation duration 0, jump straight to the end state | CSS variables zeroed + Motion `transition={{duration:0}}`                |
 
 > Semantics: the system preference beats the product switch; `none` is a forced downgrade for screen recordings, low-end devices, and tests.
 
@@ -399,7 +403,7 @@ export function useCadenceMotion() {
 
 Key points:
 
-- **The provider is never required**: components use `motion` components directly; the provider only centralises `MotionConfig` and the intensity switch. Without it components still work, they just cannot be downgraded globally.
+- **The provider is never required**: components use `motion` components directly; the provider only centralises `MotionConfig` and the mode switch. Without it components still work, they follow the system preference and cannot be downgraded globally.
 - For a smaller initial bundle, `LazyMotion` + `m` is optional (~5 KB initial + 24 KB feature bundle), but then every `motion.*` inside components must become `m.*` and a provider must wrap the app; the library does not do this by default, to avoid a mandatory provider.
 - `data-motion` sits on the wrapper, so CSS variables and JS read the same source.
 

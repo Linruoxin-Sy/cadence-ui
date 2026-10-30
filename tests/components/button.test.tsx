@@ -49,6 +49,15 @@ describe("Button", () => {
     expect(buttonVariants()).not.toContain("active:scale");
   });
 
+  it("keeps upstream's group hook and select-none", () => {
+    // Neither class is visible to `parity:check` (it compares exports and `data-slot`),
+    // so a silent drop is only caught here: the group hook is what lets a consumer
+    // style a slotted icon from the button's own state, select-none stops a
+    // double-click from selecting the label.
+    expect(buttonVariants()).toContain("group/button");
+    expect(buttonVariants()).toContain("select-none");
+  });
+
   it.each(["full", "reduced", "none"] as const)("carries data-motion=%s for the gesture branch", (mode) => {
     render(
       <CadenceProvider mode={mode}>

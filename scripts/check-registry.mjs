@@ -7,6 +7,7 @@
  *   - the tier decides the gzip budget (T0 4 KB … T4 14 KB), unless `meta.budget` overrides it
  *   - no component imports a validation library or an alias, and every animated file has a reduced branch
  *   - intra-registry dependencies are namespaced (`@cadence/<id>`) and exist
+ *   - the three copies of the CSS motion tokens agree (globals.css, cadence-theme, animation-system.md §2.3)
  *   - export names are unique across items (so one `export *` index works)
  *   - every documented component ships a preview module
  *
@@ -18,12 +19,15 @@ import { gzipSync } from "node:zlib";
 import matter from "gray-matter";
 import {
   calledRecipes,
+  cataloguedRecipes,
+  documentedRecipes,
   implementedForm,
   MOTION_FORMS,
   motionRecipes,
   normaliseMotion,
   recipeCatalogue,
 } from "./motion-manifest.mjs";
+import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
 
 const root = process.cwd();
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
@@ -211,6 +215,37 @@ for (const item of registry.items) {
         problems.push(`${item.name}: docs motion [${docRecipes}] != registry motion [${metaRecipes}]`);
       }
     }
+  }
+}
+
+// The CSS motion tokens are declared three times. Compare all three.
+const animationDocs = await readFile(path.join(root, "docs", "animation-system.md"), "utf8");
+const themeItem = registry.items.find((item) => item.name === "cadence-theme");
+problems.push(
+  ...compareTokenSources([
+    {
+      name: "app/globals.css",
+      parsed: parseCss(await readFile(path.join(root, "app", "globals.css"), "utf8")),
+    },
+    { name: "registry.json cadence-theme", parsed: parseRegistryTheme(themeItem ?? {}) },
+    { name: "docs/animation-system.md §2.3", parsed: parseDocTokens(animationDocs) },
+  ]),
+);
+
+// The recipe catalogue lives in lib/motion.ts; §3 and §5 of the animation system
+// document it. A recipe in one place and not the other is a contract drift that no
+// component-level check can see, so compare the three sets here.
+for (const source of [
+  { name: "docs/animation-system.md §3 catalogue table", recipes: cataloguedRecipes(animationDocs) },
+  { name: "docs/animation-system.md §5 Recipe union", recipes: documentedRecipes(animationDocs) },
+]) {
+  for (const recipe of source.recipes) {
+    if (!RECIPES.includes(recipe)) {
+      problems.push(`${source.name}: "${recipe}" is not a recipe in lib/motion.ts`);
+    }
+  }
+  for (const recipe of RECIPES) {
+    if (!source.recipes.includes(recipe)) problems.push(`${source.name}: missing "${recipe}" from lib/motion.ts`);
   }
 }
 
