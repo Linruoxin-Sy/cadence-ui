@@ -1,0 +1,179 @@
+---
+title: Item
+description: A row in a list of like objects, with media, content, and actions.
+category: data
+motion: []
+intensity: subtle
+complexity: M
+tier: T0
+since: 0.2.0
+deps: ["@base-ui/react", "class-variance-authority"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/separator"]
+---
+
+## When to use
+
+- A list of comparable objects where each row carries a name, a line of supporting
+  text, and an action: files, members, invoices, saved searches.
+- A row that must become a link as a whole, without nesting a button inside an
+  anchor.
+- A dense list where three sizes (`default`, `sm`, `xs`) cover a panel, a card, and a
+  sidebar strip respectively.
+
+## When not to use
+
+- Tabular data with columns that need to line up across rows. Use `table`: an item is
+  a sentence, not a grid.
+- A single object on its own page. Use `card`; the item's rhythm assumes siblings.
+- A selectable row inside a menu or a listbox. Those have their own roles and
+  keyboard model; use the menu or `command` component.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/item
+```
+
+## Usage
+
+```tsx
+import { FileText } from "lucide-react";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/cadence/item/item";
+
+export function Files() {
+  return (
+    <ItemGroup>
+      <Item>
+        <ItemMedia variant="icon">
+          <FileText />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>parity-plan.md</ItemTitle>
+          <ItemDescription>Edited 4 minutes ago by you.</ItemDescription>
+        </ItemContent>
+      </Item>
+    </ItemGroup>
+  );
+}
+```
+
+## Examples
+
+### A whole-row link
+
+`render` replaces the wrapper element (Base UI `render`, not `asChild`). The anchor
+keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
+
+```tsx
+<Item render={<a href="/files/plan" />}>
+  <ItemContent>
+    <ItemTitle>plan.pdf</ItemTitle>
+    <ItemDescription>2.4 MB</ItemDescription>
+  </ItemContent>
+</Item>
+```
+
+### Variants
+
+`default` is transparent, `outline` adds the border, `muted` fills the surface. The
+border is always present in the box model — only its colour changes — so switching
+variants never shifts the layout.
+
+```tsx
+<Item variant="outline" />
+<Item variant="muted" size="sm" />
+```
+
+### Separators
+
+`ItemSeparator` is a horizontal `Separator` with the vertical margins removed, so it
+sits flush between rows.
+
+```tsx
+<ItemGroup>
+  <Item>…</Item>
+  <ItemSeparator />
+  <Item>…</Item>
+</ItemGroup>
+```
+
+### Header and footer
+
+`ItemHeader` and `ItemFooter` take a full row (`basis-full`), for metadata above the
+title or a progress line below the content.
+
+```tsx
+<Item>
+  <ItemHeader>
+    <ItemTitle>Quarterly report</ItemTitle>
+    <Badge variant="outline">Draft</Badge>
+  </ItemHeader>
+  <ItemFooter>
+    <span className="text-xs text-muted-foreground">Updated 2h ago</span>
+  </ItemFooter>
+</Item>
+```
+
+## API
+
+| Part              | Props                                  | Notes                                                           |
+| ----------------- | -------------------------------------- | --------------------------------------------------------------- |
+| `Item`            | `variant`, `size`, `render`            | `variant`: `default \| outline \| muted`; `size`: `default \| sm \| xs`. |
+| `ItemGroup`       | native div props                       | `role="list"`; wraps rows and separators.                       |
+| `ItemMedia`       | `variant`                              | `default \| icon \| image`, exposed as `data-variant`.          |
+| `ItemContent`     | native div props                       | Grows; a second content block stops growing.                    |
+| `ItemTitle`       | native div props                       | One line, medium weight.                                        |
+| `ItemDescription` | native props for `p`                   | Clamped to two lines, muted.                                    |
+| `ItemActions`     | native div props                       | Right-aligned controls.                                         |
+| `ItemHeader`      | native div props                       | Full-width row above the content.                               |
+| `ItemFooter`      | native div props                       | Full-width row below the content.                               |
+| `ItemSeparator`   | `Separator` props                      | Horizontal rule with `my-0`.                                    |
+
+`Item` writes `data-slot="item"`, `data-variant`, and `data-size`; the other parts
+write their own `data-slot` (`item-media`, `item-content`, `item-title`,
+`item-description`, `item-actions`, `item-header`, `item-footer`,
+`item-separator`).
+
+## Motion contract
+
+No motion (T0). A row does not lift on hover or slide on mount. The only transition
+is `transition-colors` on the row and on a link inside it — state feedback that
+costs nothing and never moves the text the user is reading.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+If a list should arrive in sequence, that is `list.stagger` on the parent. A row
+that animates itself cannot be interrupted by the next render.
+
+## Accessibility
+
+- `ItemGroup` sets `role="list"`. Rows are `div`s (or an anchor via `render`), so
+  give the group a label when it is not already under a heading:
+  `aria-label="Files"`.
+- A row that links nowhere is a container. If the whole row is clickable, render an
+  anchor with `render` rather than adding `onClick` — the anchor is focusable,
+  middle-clickable, and announced as a link.
+- `ItemMedia variant="icon"` is decorative in most rows; add `aria-label` to the
+  icon only when it carries information the title does not.
+- Keep action buttons out of the tab order of a read-only list. Put them in
+  `ItemActions` and reveal them on hover **and** focus, never hover alone.
+
+## Notes for AI
+
+- Reach for `Item` when the row is a sentence about one object; reach for `table`
+  when the columns are the point.
+- `size="sm"` and `xs` do not change type: they change padding and gaps. Use them for
+  density, not hierarchy.
+- Use `ItemSeparator`, not `border-b` on the row: the separator keeps the variant
+  border colour independent of the divider.

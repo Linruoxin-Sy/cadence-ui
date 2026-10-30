@@ -135,6 +135,67 @@
         "skeleton"
       ]
     },
+    "alert": {
+      "path": "apps/v4/registry/bases/base/ui/alert.tsx",
+      "exports": [
+        "Alert",
+        "AlertAction",
+        "AlertDescription",
+        "AlertTitle"
+      ],
+      "slots": [
+        "alert",
+        "alert-action",
+        "alert-description",
+        "alert-title"
+      ]
+    },
+    "empty": {
+      "path": "apps/v4/registry/bases/base/ui/empty.tsx",
+      "exports": [
+        "Empty",
+        "EmptyContent",
+        "EmptyDescription",
+        "EmptyHeader",
+        "EmptyMedia",
+        "EmptyTitle"
+      ],
+      "slots": [
+        "empty",
+        "empty-content",
+        "empty-description",
+        "empty-header",
+        "empty-icon",
+        "empty-title"
+      ]
+    },
+    "item": {
+      "path": "apps/v4/registry/bases/base/ui/item.tsx",
+      "exports": [
+        "Item",
+        "ItemActions",
+        "ItemContent",
+        "ItemDescription",
+        "ItemFooter",
+        "ItemGroup",
+        "ItemHeader",
+        "ItemMedia",
+        "ItemSeparator",
+        "ItemTitle"
+      ],
+      "slots": [
+        "item",
+        "item-actions",
+        "item-content",
+        "item-description",
+        "item-footer",
+        "item-group",
+        "item-header",
+        "item-media",
+        "item-separator",
+        "item-title"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

@@ -34,6 +34,9 @@ npx shadcn@latest add @cadence/button
 - [Aspect Ratio](/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
 - [Avatar](/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
 - [Skeleton](/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
+- [Alert](/r/alert.md): A message about the current state of the page, with an icon column and an action slot. (feedback)
+- [Empty](/r/empty.md): The resting state of a region that has nothing to show yet. (feedback, layout)
+- [Item](/r/item.md): A row in a list of like objects, with media, content, and actions. (data, layout)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs

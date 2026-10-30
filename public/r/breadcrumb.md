@@ -1,0 +1,146 @@
+# Breadcrumb
+
+> The trail from the root to the current page.
+
+- Registry item: /r/breadcrumb.json
+- Install: `npx shadcn@latest add @cadence/breadcrumb`
+- Type: registry:ui
+- Since: 0.2.0
+
+
+## When to use
+
+- A hierarchy deeper than two levels, where the user needs to know where they are and
+  how to get back up: `Workspace / Projects / cadence-ui`.
+- A page reached through a drill-down — a file inside a folder inside a drive.
+- A trail that doubles as navigation: every ancestor is a link, the current page is
+  not.
+
+## When not to use
+
+- Two levels of depth. The header already links home; a trail of two items adds noise.
+- A wizard or a multi-step form. That is a progress indicator, and it must not let the
+  user jump to a step they have not reached.
+- A history of where the user came from ("back to search results"). That is a back
+  link, and it should look like one.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/breadcrumb
+```
+
+## Usage
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/cadence/breadcrumb/breadcrumb";
+
+export function Trail() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>plan.pdf</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+```
+
+## Examples
+
+### A deep trail that collapses
+
+`BreadcrumbEllipsis` stands in for the middle of a long path. Put a menu trigger next
+to it — the ellipsis itself is not interactive.
+
+```tsx
+<BreadcrumbItem>
+  <BreadcrumbEllipsis />
+</BreadcrumbItem>
+<BreadcrumbSeparator />
+```
+
+### A custom separator
+
+`BreadcrumbSeparator` takes any child; without one it renders a chevron at `size-3.5`.
+
+```tsx
+<BreadcrumbSeparator>
+  <span className="text-muted-foreground/60">/</span>
+</BreadcrumbSeparator>
+```
+
+### A router link
+
+`BreadcrumbLink` takes Base UI's `render`, so the framework's own link component keeps
+its prefetching and client-side navigation. The `data-slot` survives the swap.
+
+```tsx
+<BreadcrumbLink render={<Link href="/files" />}>Files</BreadcrumbLink>
+```
+
+## API
+
+| Part                   | Props                 | Notes                                                         |
+| ---------------------- | --------------------- | ------------------------------------------------------------- |
+| `Breadcrumb`           | native nav props      | `aria-label="breadcrumb"`.                                    |
+| `BreadcrumbList`       | native ol props       | Flex row that wraps; muted, small text.                       |
+| `BreadcrumbItem`       | native li props       | Inline flex, one gap.                                         |
+| `BreadcrumbLink`       | `render`, anchor props| Anchor by default; `data-slot="breadcrumb-link"`.             |
+| `BreadcrumbPage`       | native span props     | The current page: `aria-current="page"`, not a link.          |
+| `BreadcrumbSeparator`  | native li props       | `role="presentation"`, `aria-hidden`; chevron by default.     |
+| `BreadcrumbEllipsis`   | native span props     | Hidden from assistive tech; contains `sr-only` "More".        |
+
+## Motion contract
+
+No motion (T0). Nothing in a trail animates. A navigation landmark that fades or
+slides in is harder to find, and a trail that reflows on navigation makes the one
+stable thing on the page move.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+`transition-colors` on the link is hover feedback on the text colour only.
+
+## Accessibility
+
+- The `nav` is labelled "breadcrumb", so it becomes its own landmark; a page may have
+  several `nav`s and this is how they are told apart.
+- Order matters: `<ol>`/`<li>` gives the trail a length and a sequence, which is what
+  a screen reader announces ("list, 3 items").
+- The last item is `BreadcrumbPage`: `aria-current="page"`, `aria-disabled="true"`, and
+  not focusable. It is where the user already is, so linking it is a no-op that costs a
+  tab stop.
+- Separators are decorative — `role="presentation"` and `aria-hidden` — so the trail is
+  read as names, not as "chevron".
+- An ellipsis must not be the only way to reach the hidden ancestors: pair it with a
+  menu, or the collapsed path becomes unreachable.
+
+## Notes for AI
+
+- Do not wrap the current page in a link "for consistency". It is a `BreadcrumbPage`.
+- Do not put the trail in a `Card` header as decoration; it is navigation and belongs
+  near the top of the content region.
+- If the hierarchy is generated from a route, derive the trail from the route's
+  segments rather than hand-writing items — a trail that disagrees with the URL is
+  worse than none.
+
+---
+
+Full index: /llms.txt

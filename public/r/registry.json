@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -307,7 +307,78 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
+      }
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "A message about the current state of the page, with an icon column and an action slot.",
+      "categories": [
+        "feedback"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "86a0ab6"
+      }
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "The resting state of a region that has nothing to show yet.",
+      "categories": [
+        "feedback",
+        "layout"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "86a0ab6"
+      }
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "A row in a list of like objects, with media, content, and actions.",
+      "categories": [
+        "data",
+        "layout"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "86a0ab6"
       }
     },
     {
@@ -333,7 +404,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "022eb56"
+        "sourceSha": "86a0ab6"
       }
     }
   ]

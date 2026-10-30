@@ -1,0 +1,143 @@
+# Button Group
+
+> Adjacent controls joined into one shape.
+
+- Registry item: /r/button-group.json
+- Install: `npx shadcn@latest add @cadence/button-group`
+- Type: registry:ui
+- Since: 0.2.0
+
+
+## When to use
+
+- Two to five controls that act on the same object: bold/italic/underline, cut/copy,
+  approve/reject, a zoom stepper.
+- A segmented control where the current option is a button state (`variant="default"`
+  vs `"ghost"`), not a radio group.
+- A label plus an action, where the label should read as part of the control — use
+  `ButtonGroupText` for the static half.
+
+## When not to use
+
+- More than about five options. Beyond that the shape stops helping and a `select` or
+  a menu is faster.
+- Mutually exclusive choices that need arrow-key navigation and a form value. That is
+  `toggle-group`, or a `radio-group` inside a `field`.
+- A single button. The group adds nothing; use `button`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/button-group
+```
+
+## Usage
+
+```tsx
+import { Button } from "@/components/cadence/button/button";
+import { ButtonGroup } from "@/components/cadence/button-group/button-group";
+
+export function TextStyle() {
+  return (
+    <ButtonGroup aria-label="Text style">
+      <Button variant="outline" size="icon-sm" aria-label="Bold">
+        <Bold />
+      </Button>
+      <Button variant="outline" size="icon-sm" aria-label="Italic">
+        <Italic />
+      </Button>
+    </ButtonGroup>
+  );
+}
+```
+
+## Examples
+
+### Vertical
+
+`orientation="vertical"` stacks the same rules: only the outer corners are rounded,
+and the shared borders collapse.
+
+```tsx
+<ButtonGroup orientation="vertical" aria-label="Order">
+  <Button variant="outline" size="sm">Move up</Button>
+  <Button variant="outline" size="sm">Move down</Button>
+</ButtonGroup>
+```
+
+### Static text inside the group
+
+`ButtonGroupText` takes `render`, so the label can be a `label`, a `span`, or the
+router's own element without extra wrappers.
+
+```tsx
+<ButtonGroup aria-label="Zoom">
+  <ButtonGroupText>-</ButtonGroupText>
+  <Button variant="outline" size="sm">100%</Button>
+  <ButtonGroupSeparator />
+  <ButtonGroupText>+</ButtonGroupText>
+</ButtonGroup>
+```
+
+### A rule between two controls
+
+`ButtonGroupSeparator` stretches to the cross axis, so one component works in both
+orientations.
+
+```tsx
+<ButtonGroup>
+  <Button>Cut</Button>
+  <ButtonGroupSeparator />
+  <Button>Copy</Button>
+</ButtonGroup>
+```
+
+## API
+
+| Part                    | Props                     | Notes                                                          |
+| ----------------------- | ------------------------- | -------------------------------------------------------------- |
+| `ButtonGroup`           | `orientation`, native div | `horizontal \| vertical`; `role="group"`, `data-orientation`.  |
+| `ButtonGroupText`       | `render`, native div      | Static label; swapped element via Base UI `render`.            |
+| `ButtonGroupSeparator`  | `Separator` props         | Vertical by default; `self-stretch`, `bg-input`.               |
+| `buttonGroupVariants`   | `orientation`             | Exported for composing a custom group root.                    |
+
+The joining rules are `[&>*]` selectors, so any child that renders a `data-slot` — a
+button, an input, a select trigger — participates without a prop.
+
+## Motion contract
+
+No motion (T0). The group does not animate. Adjacent buttons share a border, and the
+only depth cue is `focus-visible:relative` plus `z-10`, which lifts the focused
+control above its neighbours so its ring is not clipped.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+The buttons inside keep their own press feedback; the group never adds a second
+animation on top of it.
+
+## Accessibility
+
+- `role="group"` needs a name: pass `aria-label` (or `aria-labelledby`) when there is
+  no visible heading. Without one, a screen reader says "group" and nothing else.
+- Tab order follows DOM order, not visual order. In `vertical`, keep the DOM order the
+  same as the visual stack.
+- Icon-only buttons inside a group must each carry an `aria-label`; the group label
+  does not name them.
+- Do not mark the active segment with colour alone — use `aria-pressed` on a toggle
+  button, or a `data-state` attribute your CSS keys off.
+
+## Notes for AI
+
+- Use `ButtonGroup` for actions on one object, `toggle-group` for a value the form
+  reads. They look alike and behave differently.
+- Do not add gaps between children: the rounded/border collapse is what makes the
+  group read as one control.
+- `ButtonGroupSeparator` is already `self-stretch`; do not set a height.
+
+---
+
+Full index: /llms.txt

@@ -36,6 +36,9 @@ npx shadcn@latest add @cadence/button
 - [Aspect Ratio](/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
 - [Avatar](/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
 - [Skeleton](/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
+- [Alert](/r/alert.md): A message about the current state of the page, with an icon column and an action slot. (feedback)
+- [Empty](/r/empty.md): The resting state of a region that has nothing to show yet. (feedback, layout)
+- [Item](/r/item.md): A row in a list of like objects, with media, content, and actions. (data, layout)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs
@@ -1367,6 +1370,450 @@ every breakpoint.
 - Put the loading state on the region (`aria-busy`), not on each block.
 - Do not use a skeleton as a generic "loading…" indicator for an action; a `spinner`
   next to the control is clearer.
+
+# Alert
+
+A message about the current state of the page, with an icon column and an action slot.
+
+## When to use
+
+- The result of an action the user just took, where the outcome needs a sentence of
+  explanation: a failed deploy, a partial import, a quota that is nearly full.
+- A state of the page that is not an error but changes what is possible — degraded
+  mode, read-only mode, a plan that expired yesterday.
+- A warning attached to a region rather than to a control, so it survives scrolling
+  away from the field it is about.
+
+## When not to use
+
+- A confirmation that needs no reading ("Saved"). Use `toast`: an alert stays in the
+  layout, and stale success messages become noise.
+- A decision that blocks progress. That is `alert-dialog`, which traps focus on
+  purpose.
+- Ordinary guidance or onboarding copy. An `alert` is a live region; using it for
+  static text makes screen readers interrupt the user for nothing.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/alert
+```
+
+## Usage
+
+```tsx
+import { CircleAlert } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/cadence/alert/alert";
+
+export function QuotaNotice() {
+  return (
+    <Alert>
+      <CircleAlert />
+      <AlertTitle>You are close to the build limit</AlertTitle>
+      <AlertDescription>12 of 15 builds used this month.</AlertDescription>
+    </Alert>
+  );
+}
+```
+
+## Examples
+
+### With an action
+
+`AlertAction` spans both grid rows, so it stays on the first line when the
+description wraps.
+
+```tsx
+<Alert variant="destructive">
+  <TriangleAlert />
+  <AlertTitle>Deploy failed</AlertTitle>
+  <AlertDescription>Build 42 exited with code 1.</AlertDescription>
+  <AlertAction>
+    <Button variant="outline" size="sm">Retry</Button>
+  </AlertAction>
+</Alert>
+```
+
+### Without an icon
+
+The icon column collapses to zero, so title and description sit flush left. Add an
+icon only when it tells the user something the title does not.
+
+```tsx
+<Alert>
+  <AlertTitle>Read-only mode</AlertTitle>
+  <AlertDescription>Billing needs attention before you can edit.</AlertDescription>
+</Alert>
+```
+
+### Destructive
+
+`variant="destructive"` colours the text and leaves the surface as a card. A red
+block is harder to read and competes with the page it sits on.
+
+```tsx
+<Alert variant="destructive">Payment declined</Alert>
+```
+
+## API
+
+| Part               | Props                    | Notes                                                          |
+| ------------------ | ------------------------ | -------------------------------------------------------------- |
+| `Alert`            | `variant`, native props  | `variant`: `"default" \| "destructive"`. Always `role="alert"`. |
+| `AlertTitle`       | native div props         | One line, medium weight, second grid column.                    |
+| `AlertDescription` | native div props         | Muted text; paragraphs inside keep relaxed leading.             |
+| `AlertAction`      | native div props         | Right-aligned slot, spans both rows.                            |
+
+Every part sets `data-slot` (`alert`, `alert-title`, `alert-description`,
+`alert-action`), so a consumer can restyle without new props:
+`[&>[data-slot=alert-title]]:text-base`.
+
+## Motion contract
+
+No motion (T0). An alert that slides or fades in draws attention to the animation
+instead of the message, and a message that is already on screen when the page loads
+did not change — animating it is decoration (P9).
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+The border and text colours are state feedback on the design tokens; they are not
+animated and carry no timing.
+
+## Accessibility
+
+- `role="alert"` makes the alert an assertive live region. Mount it when the state
+  appears; do not keep a permanent alert in the tree and toggle its text, because
+  every change interrupts whatever the screen reader was saying.
+- The icon is decorative — mark it `aria-hidden` if it duplicates the title. An
+  icon inside a link or a button is different: that one needs its own name.
+- `variant="destructive"` is colour plus a title that says what happened. Never rely
+  on the colour alone: the message has to be readable in greyscale.
+- The action is a real control. If it is the only way forward, it must be reachable
+  by keyboard and come after the message in DOM order (it does).
+
+## Notes for AI
+
+- Use an alert for a state that persists; use `toast` for a moment.
+- Keep exactly one `role="alert"` per message. Nesting parts does not add roles —
+  only `Alert` sets one.
+- Do not pass an `onClose` and hide it with opacity; that is a toast, not an alert.
+
+# Empty
+
+The resting state of a region that has nothing to show yet.
+
+## When to use
+
+- A list, table, or panel that is legitimately empty: no invoices, no results for
+  this filter, a folder nobody has filled yet.
+- An empty state that teaches the next step — a primary action, a link to a
+  template, or a line that explains what will appear here.
+- A region whose emptiness is a state, not a mistake: an inbox at zero, a fresh
+  workspace.
+
+## When not to use
+
+- While loading. Use `skeleton` when the shape of the incoming content is known,
+  and `spinner` when it is not.
+- A search that returned nothing because of a typo. That case needs the query echoed
+  back and the filter explained, not a generic illustration.
+- An error. An empty region is a normal state; a failed request is an `alert`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/empty
+```
+
+## Usage
+
+```tsx
+import { Inbox } from "lucide-react";
+import { Button } from "@/components/cadence/button/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/cadence/empty/empty";
+
+export function InvoicesEmpty() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Inbox />
+        </EmptyMedia>
+        <EmptyTitle>No invoices yet</EmptyTitle>
+        <EmptyDescription>Invoices you send will land here.</EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button size="sm">Create invoice</Button>
+      </EmptyContent>
+    </Empty>
+  );
+}
+```
+
+## Examples
+
+### Bounded or unbounded
+
+The root is a dashed container with generous padding, so it can stand in for a whole
+panel. Drop the boundary with a class when it already sits inside a bordered card.
+
+```tsx
+<Empty className="border">…</Empty>
+```
+
+### A second action
+
+`EmptyContent` is a column with a gap; put the secondary action underneath, or side
+by side with a row wrapper.
+
+```tsx
+<EmptyContent>
+  <Button size="sm">Import CSV</Button>
+  <Button size="sm" variant="ghost">Start from a template</Button>
+</EmptyContent>
+```
+
+### Icon or illustration
+
+`variant="icon"` puts the glyph on a muted surface; `default` leaves the media
+transparent for an illustration or a small chart.
+
+```tsx
+<EmptyMedia variant="icon">
+  <Inbox />
+</EmptyMedia>
+```
+
+## API
+
+| Part               | Props                   | Notes                                                          |
+| ------------------ | ----------------------- | -------------------------------------------------------------- |
+| `Empty`            | native div props        | Centred flex column, dashed boundary, `md:p-12`.               |
+| `EmptyHeader`      | native div props        | Stacks media, title, description; `max-w-sm`.                  |
+| `EmptyTitle`       | native div props        | Large, medium weight. Renders a `div`, not a heading.          |
+| `EmptyDescription` | native props for `p`    | Renders a `div` (upstream too): the copy often holds a block.  |
+| `EmptyMedia`       | `variant`               | `"default" \| "icon"`, exposed as `data-variant`.              |
+| `EmptyContent`     | native div props        | Actions; full width, `max-w-sm`, own gap.                      |
+
+`data-slot` values are `empty`, `empty-header`, `empty-title`,
+`empty-description`, `empty-icon`, `empty-content`.
+
+## Motion contract
+
+No motion (T0). An empty state is a resting state: it is what the region looks like
+when nothing is happening. Fading it in would make it look like content arriving,
+which is the one thing it is not.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+When the region swaps from empty to populated, that transition belongs to the list
+(`list.stagger` or `data.transition`), not to this component.
+
+## Accessibility
+
+- The root is a plain container: no role, no live region. Announce the change of
+  state in the region that owns it (`aria-live="polite"` on the list), not here.
+- `EmptyTitle` renders a `div`. If the empty state is the main content of a page,
+  put a real heading inside it so it appears in the outline.
+- The media is decorative. Pass `aria-hidden` to the icon, or give the surrounding
+  text the whole message — an icon alone never carries meaning.
+- Keep at least one action focusable. An empty state with no way forward is a dead
+  end; the primary action is the reason this component exists.
+
+## Notes for AI
+
+- One primary action per empty state. Two competing buttons read as a decision the
+  user is not ready to make.
+- Do not build an empty state out of `Card` plus padding; the boundary, the rhythm,
+  and the description width are already decided here.
+- Do not use `Empty` for a loading placeholder — `skeleton` keeps the layout stable,
+  which `Empty` does not.
+
+# Item
+
+A row in a list of like objects, with media, content, and actions.
+
+## When to use
+
+- A list of comparable objects where each row carries a name, a line of supporting
+  text, and an action: files, members, invoices, saved searches.
+- A row that must become a link as a whole, without nesting a button inside an
+  anchor.
+- A dense list where three sizes (`default`, `sm`, `xs`) cover a panel, a card, and a
+  sidebar strip respectively.
+
+## When not to use
+
+- Tabular data with columns that need to line up across rows. Use `table`: an item is
+  a sentence, not a grid.
+- A single object on its own page. Use `card`; the item's rhythm assumes siblings.
+- A selectable row inside a menu or a listbox. Those have their own roles and
+  keyboard model; use the menu or `command` component.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/item
+```
+
+## Usage
+
+```tsx
+import { FileText } from "lucide-react";
+import {
+  Item,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/cadence/item/item";
+
+export function Files() {
+  return (
+    <ItemGroup>
+      <Item>
+        <ItemMedia variant="icon">
+          <FileText />
+        </ItemMedia>
+        <ItemContent>
+          <ItemTitle>parity-plan.md</ItemTitle>
+          <ItemDescription>Edited 4 minutes ago by you.</ItemDescription>
+        </ItemContent>
+      </Item>
+    </ItemGroup>
+  );
+}
+```
+
+## Examples
+
+### A whole-row link
+
+`render` replaces the wrapper element (Base UI `render`, not `asChild`). The anchor
+keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
+
+```tsx
+<Item render={<a href="/files/plan" />}>
+  <ItemContent>
+    <ItemTitle>plan.pdf</ItemTitle>
+    <ItemDescription>2.4 MB</ItemDescription>
+  </ItemContent>
+</Item>
+```
+
+### Variants
+
+`default` is transparent, `outline` adds the border, `muted` fills the surface. The
+border is always present in the box model — only its colour changes — so switching
+variants never shifts the layout.
+
+```tsx
+<Item variant="outline" />
+<Item variant="muted" size="sm" />
+```
+
+### Separators
+
+`ItemSeparator` is a horizontal `Separator` with the vertical margins removed, so it
+sits flush between rows.
+
+```tsx
+<ItemGroup>
+  <Item>…</Item>
+  <ItemSeparator />
+  <Item>…</Item>
+</ItemGroup>
+```
+
+### Header and footer
+
+`ItemHeader` and `ItemFooter` take a full row (`basis-full`), for metadata above the
+title or a progress line below the content.
+
+```tsx
+<Item>
+  <ItemHeader>
+    <ItemTitle>Quarterly report</ItemTitle>
+    <Badge variant="outline">Draft</Badge>
+  </ItemHeader>
+  <ItemFooter>
+    <span className="text-xs text-muted-foreground">Updated 2h ago</span>
+  </ItemFooter>
+</Item>
+```
+
+## API
+
+| Part              | Props                                  | Notes                                                           |
+| ----------------- | -------------------------------------- | --------------------------------------------------------------- |
+| `Item`            | `variant`, `size`, `render`            | `variant`: `default \| outline \| muted`; `size`: `default \| sm \| xs`. |
+| `ItemGroup`       | native div props                       | `role="list"`; wraps rows and separators.                       |
+| `ItemMedia`       | `variant`                              | `default \| icon \| image`, exposed as `data-variant`.          |
+| `ItemContent`     | native div props                       | Grows; a second content block stops growing.                    |
+| `ItemTitle`       | native div props                       | One line, medium weight.                                        |
+| `ItemDescription` | native props for `p`                   | Clamped to two lines, muted.                                    |
+| `ItemActions`     | native div props                       | Right-aligned controls.                                         |
+| `ItemHeader`      | native div props                       | Full-width row above the content.                               |
+| `ItemFooter`      | native div props                       | Full-width row below the content.                               |
+| `ItemSeparator`   | `Separator` props                      | Horizontal rule with `my-0`.                                    |
+
+`Item` writes `data-slot="item"`, `data-variant`, and `data-size`; the other parts
+write their own `data-slot` (`item-media`, `item-content`, `item-title`,
+`item-description`, `item-actions`, `item-header`, `item-footer`,
+`item-separator`).
+
+## Motion contract
+
+No motion (T0). A row does not lift on hover or slide on mount. The only transition
+is `transition-colors` on the row and on a link inside it — state feedback that
+costs nothing and never moves the text the user is reading.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+If a list should arrive in sequence, that is `list.stagger` on the parent. A row
+that animates itself cannot be interrupted by the next render.
+
+## Accessibility
+
+- `ItemGroup` sets `role="list"`. Rows are `div`s (or an anchor via `render`), so
+  give the group a label when it is not already under a heading:
+  `aria-label="Files"`.
+- A row that links nowhere is a container. If the whole row is clickable, render an
+  anchor with `render` rather than adding `onClick` — the anchor is focusable,
+  middle-clickable, and announced as a link.
+- `ItemMedia variant="icon"` is decorative in most rows; add `aria-label` to the
+  icon only when it carries information the title does not.
+- Keep action buttons out of the tab order of a read-only list. Put them in
+  `ItemActions` and reveal them on hover **and** focus, never hover alone.
+
+## Notes for AI
+
+- Reach for `Item` when the row is a sentence about one object; reach for `table`
+  when the columns are the point.
+- `size="sm"` and `xs` do not change type: they change padding and gaps. Use them for
+  density, not hierarchy.
+- Use `ItemSeparator`, not `border-b` on the row: the separator keeps the variant
+  border colour independent of the divider.
 
 # Dialog
 

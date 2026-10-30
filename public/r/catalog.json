@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -388,9 +388,100 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
+  },
+  {
+    "name": "alert",
+    "type": "registry:ui",
+    "title": "Alert",
+    "description": "A message about the current state of the page, with an icon column and an action slot.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "86a0ab6",
+    "docs": "/r/alert.md",
+    "item": "/r/alert.json"
+  },
+  {
+    "name": "empty",
+    "type": "registry:ui",
+    "title": "Empty",
+    "description": "The resting state of a region that has nothing to show yet.",
+    "categories": [
+      "feedback",
+      "layout"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "86a0ab6",
+    "docs": "/r/empty.md",
+    "item": "/r/empty.json"
+  },
+  {
+    "name": "item",
+    "type": "registry:ui",
+    "title": "Item",
+    "description": "A row in a list of like objects, with media, content, and actions.",
+    "categories": [
+      "data",
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/separator"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "86a0ab6",
+    "docs": "/r/item.md",
+    "item": "/r/item.json"
   },
   {
     "name": "dialog",
@@ -425,7 +516,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "022eb56",
+    "sourceSha": "86a0ab6",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   }

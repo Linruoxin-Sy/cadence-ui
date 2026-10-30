@@ -1,0 +1,163 @@
+# Spinner
+
+> An indeterminate wait, rotating until the work finishes.
+
+- Registry item: /r/spinner.json
+- Install: `npx shadcn@latest add @cadence/spinner`
+- Type: registry:ui
+- Since: 0.2.0
+- Motion recipes: data.transition
+
+## When to use
+
+- An action the user just triggered: save, send, invite, publish. The spinner sits
+  where the user is looking — inside the button, or immediately beside it.
+- A wait with no measurable progress: a request that returns when it returns.
+- A region that is loading and whose shape you cannot predict. When you *can* predict
+  it, use `skeleton` instead: it keeps the layout stable.
+
+## When not to use
+
+- A wait under about 300 ms. The spinner appears and disappears before it can be read,
+  which reads as a flicker. Keep the button's label and disable it.
+- A known percentage. Use `progress`; a spinning wheel after "60%" is a regression.
+- A page that is loading its first paint. There is nothing to spin inside yet — a
+  skeleton or a server-rendered shell is better.
+- A decorative "we're working on it" on a marketing page. Motion without a state
+  change is decoration (P9).
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/spinner
+```
+
+## Usage
+
+```tsx
+import { Spinner } from "@/components/cadence/spinner/spinner";
+
+export function LoadingRegistry() {
+  return (
+    <div className="flex items-center gap-3 text-sm">
+      <Spinner />
+      <span className="text-muted-foreground">Loading the registry…</span>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Inside a button
+
+The button keeps its width because the spinner replaces nothing: keep the label and
+put the spinner in front of it, or reserve the label's space with `aria-live`.
+
+```tsx
+<Button disabled size="sm">
+  <Spinner />
+  Saving
+</Button>
+```
+
+### Sized by the caller
+
+The icon is `size-4` by default and inherits `currentColor`, so one class resizes and
+recolours it.
+
+```tsx
+<Spinner className="size-3 text-muted-foreground" />
+```
+
+### A specific label
+
+"Loading" is the default. Say what is loading when the surrounding text does not.
+
+```tsx
+<Spinner aria-label="Saving invoice" />
+```
+
+### Under `data-motion="none"`
+
+The rotation stops; the icon stays and the label still says "Loading". A stopped
+spinner is still a state, which is why `none` does not remove it from the tree.
+
+```tsx
+<CadenceProvider mode="none">
+  <Spinner />
+</CadenceProvider>
+```
+
+## API
+
+| Prop        | Type     | Default     | Description                                                    |
+| ----------- | -------- | ----------- | -------------------------------------------------------------- |
+| `className` | `string` | –           | Merged last — size and colour live here (`size-3`, `text-…`).   |
+| `aria-label`| `string` | `"Loading"` | The accessible name; pass a specific one when it helps.         |
+
+All native `svg` props are forwarded. `data-slot="spinner"` and `data-motion` are
+always set, and `role="status"` with the label is the announcement.
+
+## Motion contract
+
+Recipe: `data.transition`, continuous form. The loop is CSS (`animate-spin`) rather
+than Motion, for the same reason as `skeleton`: a spinner is by definition next to work
+the user is waiting on, and it must not add a frame callback to it. Only `transform`
+(rotation) changes, so the loop can never trigger layout.
+
+| Phase   | Properties          | Token                         | Interruptible |
+| ------- | ------------------- | ----------------------------- | ------------- |
+| spin    | `rotate 0 → 360deg` | `animate-spin` (theme timing) | yes (CSS)     |
+| reduced | same rotation       | `animate-spin`                | yes (CSS)     |
+| none    | none; icon static   | `animate-none`                | –             |
+
+Reduced keeps the rotation on purpose: M5 removes travel and scale, and a rotation in
+place is neither. A spinner that freezes under reduced motion would read as a frozen
+app. `none` stops it completely, which is what a screenshot test or a print stylesheet
+needs.
+
+## Keyboard interactions
+
+None. The spinner is not focusable and takes no input; focus stays on the control that
+started the work, which is where the user's next action will be.
+
+## Accessibility
+
+- `role="status"` is a polite live region: the label is announced when the spinner
+  appears, without interrupting. Do not wrap it in another `aria-live` region.
+- The label must carry the meaning. The rotation is never the only signal, and under
+  `data-motion="none"` it is not a signal at all.
+- Give the busy region `aria-busy="true"` and remove it when the work finishes, so the
+  state survives even if the spinner unmounts early.
+- Do not replace a button's label with a spinner and nothing else. Keep the word, or
+  add an `sr-only` copy, or the control loses its name mid-action.
+- Do not stack spinners. One per action; a page with five is a page with no feedback.
+
+## Responsive behavior
+
+The spinner is an inline icon, so it follows the text it sits in. Inside a button it
+keeps the button's height; inside a heading, size it down (`size-3`) or it will
+dominate the line. On touch targets, keep the surrounding button at least 44×44 by
+size, not by growing the icon.
+
+## Performance
+
+- One CSS animation per element, on `transform` only; no JS loop, no layout read.
+- Compositor-friendly, but the animation-system budget still applies: fewer than
+  twenty simultaneously animating elements. For a list of pending rows, render one
+  spinner for the list, not one per row.
+- No `will-change`: the browser promotes a transform animation on its own.
+
+## Notes for AI
+
+- Use `spinner` for an action, `skeleton` for a layout. Getting this backwards is the
+  most common loading-state mistake: a skeleton in a button, or a spinner where the
+  content shape was known all along.
+- Keep the button's text; add the spinner in front of it and disable the button.
+- Under `data-motion="none"` the icon stays visible. Do not hide it to "respect" the
+  preference — the state still has to be visible.
+
+---
+
+Full index: /llms.txt
