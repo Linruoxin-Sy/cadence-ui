@@ -79,7 +79,12 @@ function AvatarBadge({ className, ...props }: AvatarBadgeProps) {
 
 export interface AvatarGroupProps extends React.ComponentProps<"div"> {}
 
-/** Overlapping stack of avatars. Keep it to four or five; past that use `AvatarGroupCount`. */
+/**
+ * Overlapping stack of avatars. Keep it to four or five; past that use `AvatarGroupCount`.
+ *
+ * `-space-x-2` is upstream's overlap, kept on purpose: Tailwind has no negative
+ * `gap`, so the flex+gap rule cannot express it. It is spacing, not motion.
+ */
 function AvatarGroup({ className, ...props }: AvatarGroupProps) {
   return (
     <div

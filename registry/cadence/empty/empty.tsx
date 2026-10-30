@@ -9,15 +9,17 @@ export interface EmptyProps extends React.ComponentProps<"div"> {}
  * An empty state is a resting state, and a placeholder that flies in would
  * compete with the content that is supposed to replace it.
  *
- * The root is a flex column with a dashed boundary, so it can stand in for a
- * list, a table body, or a whole panel without a wrapper.
+ * The root is a flex column, so it can stand in for a list, a table body, or a
+ * whole panel without a wrapper. It deliberately carries no border: upstream has
+ * none either, and a `border-dashed` without a width would be invisible anyway —
+ * a consumer who wants a dashed frame adds `border border-dashed` themselves.
  */
 function Empty({ className, ...props }: EmptyProps) {
   return (
     <div
       data-slot="empty"
       className={cn(
-        "flex min-w-0 flex-1 flex-col items-center justify-center gap-6 rounded-lg border-dashed p-6 text-center text-balance md:p-12",
+        "flex min-w-0 flex-1 flex-col items-center justify-center gap-6 rounded-lg p-6 text-center text-balance md:p-12",
         className,
       )}
       {...props}
