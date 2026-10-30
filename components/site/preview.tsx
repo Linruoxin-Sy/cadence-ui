@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { Button } from "@/registry/cadence/button/button";
 import { CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
 import { Skeleton } from "@/registry/cadence/skeleton/skeleton";
+import { MeasuredHeight } from "./measured-height";
 import { previews } from "./previews";
 
 /** 0.25× on this preview only: `timeScale` multiplies the tokens, it never edits them. */
@@ -59,13 +60,17 @@ export function PreviewFrame({ id, initialSlow = false }: { id: string; initialS
         </Button>
       </div>
 
-      <div className="p-6">
-        <CadenceProvider mode={resolved} timeScale={slow ? SLOW_MOTION_SCALE : 1}>
+      <CadenceProvider mode={resolved} timeScale={slow ? SLOW_MOTION_SCALE : 1}>
+        {/* The body owns its height so the `Skeleton` → preview swap resizes the card
+            instead of jumping it (`geometry.resize`, animation-system §3.2). The
+            padding lives inside, so a focus ring or shadow is clipped at the padding
+            edge rather than at the preview's own box. */}
+        <MeasuredHeight className="p-6">
           <Suspense fallback={<Skeleton className="h-24 w-full" />}>
             <Preview id={id} />
           </Suspense>
-        </CadenceProvider>
-      </div>
+        </MeasuredHeight>
+      </CadenceProvider>
     </div>
   );
 }
