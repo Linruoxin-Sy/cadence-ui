@@ -70,6 +70,9 @@
   --motion-duration-fast: 160ms;
   --motion-duration-base: 220ms;
   --motion-duration-slow: 320ms;
+  /* The enter scale of an anchored panel: `scale.in` in `lib/motion.ts`, read by the
+     CSS-only popups so their `scale` is a token and not a number in a class. */
+  --motion-scale-in: 0.96;
 }
 
 .dark {

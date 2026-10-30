@@ -55,8 +55,8 @@ export function AlertDialogPreview() {
 
       <p className="text-xs text-muted-foreground">
         Click outside and nothing happens: an alert dialog refuses pointer dismissal, so the two buttons are the way out
-        (Escape still cancels). The overlay fades and the panel settles from 0.95 scale; under reduced motion only the
-        fade remains.
+        (Escape still cancels). The overlay fades and the panel settles from `--motion-scale-in` (0.96); under reduced
+        motion only the fade remains.
       </p>
     </div>
   );

@@ -53,6 +53,7 @@ npx shadcn@latest add @cadence/button
 - [Input OTP](https://cadence.dev/r/input-otp.md): A one-time password field that renders one slot per character. (form)
 - [Progress](https://cadence.dev/r/progress.md): Displays an indicator showing the completion progress of a task. (feedback)
 - [Alert Dialog](https://cadence.dev/r/alert-dialog.md): A modal confirmation that interrupts the flow and needs an explicit choice before anything happens. (overlay)
+- [Popover](https://cadence.dev/r/popover.md): An anchored panel that opens next to its trigger and returns focus to it when it closes. (overlay)
 
 ## Docs
 

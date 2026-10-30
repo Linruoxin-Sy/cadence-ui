@@ -35,9 +35,12 @@ loud a component's authored motion is, so a catalogue can group by it. No token 
 not adjustable at runtime.
 
 > An earlier draft shipped `--motion-intensity`, `--motion-distance-*`, and `--motion-scale-in` to
-> users. Nothing read them: JS components resolve timing through `transitionFor()` from
+> users while nothing read them: JS components resolve timing through `transitionFor()` from
 > `lib/motion.ts`, and CSS-only popups read `--motion-duration-*`. A token nobody reads is a promise
-> nobody keeps, so the unread ones were deleted rather than wired into a second source of truth.
+> nobody keeps, so the unread ones were deleted. `--motion-scale-in` came back with the anchored
+> panels (`popover`, `tooltip`, `hover-card`), which do read it: their scale is now a token rather
+> than a number in a class. `--motion-intensity` and the distance tokens have no reader and stay
+> gone; an anchored panel grows out of its anchor instead of sliding towards it (§3.1).
 
 ### 2.2 Base tokens
 
@@ -83,6 +86,8 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
   --motion-duration-fast: 160ms;
   --motion-duration-base: 220ms;
   --motion-duration-slow: 320ms;
+  /* the CSS side of `scale.in`; anchored panels read it for their enter scale */
+  --motion-scale-in: 0.96;
 }
 
 /* the same 0.6 factor transitionFor() applies to tween recipes */
@@ -162,6 +167,27 @@ to no Motion `Transition`, so it cannot be a recipe and no component declares it
 toggle does it directly when it wants to.
 
 ### 3.1 Code for the key recipes
+
+#### `popup.anchored` (anchored panels, CSS-only)
+
+```tsx
+const cm = useCadenceMotion();
+
+<Popover.Popup
+  data-motion={cm.mode}
+  className={cn(
+    "origin-(--transform-origin) transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast)",
+    "data-[starting-style]:opacity-0 data-[ending-style]:opacity-0",
+    !cm.reduced && "data-[starting-style]:scale-(--motion-scale-in) data-[ending-style]:scale-(--motion-scale-in)",
+  )}
+/>;
+```
+
+Base UI writes `--transform-origin` on the popup from the positioner, so the scale grows out of the
+anchor rather than out of the element's centre. No distance is involved: a slide would need a distance
+token plus one class per side, and it moves the edge the positioner just lined up. `dialog` and
+`alert-dialog` use the same shape without the anchor: they keep their centre origin and read the same
+`--motion-scale-in` and duration tokens.
 
 #### `reveal`
 

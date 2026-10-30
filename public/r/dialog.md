@@ -105,8 +105,8 @@ const [open, setOpen] = useState(false);
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
 | reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 

@@ -92,7 +92,7 @@ test.describe("dialog", () => {
   test.describe("reduced keeps the fade and drops only the scale", () => {
     test.use({ reducedMotion: "reduce" });
 
-    test("the panel fades without the 0.95 settle", async ({ page }) => {
+    test("the panel fades without the 0.96 settle", async ({ page }) => {
       await recordScale(page, '[data-slot="dialog-content"]');
       await openComponent(page, "dialog", "reduced", "dialog-trigger");
       await page.getByRole("button", { name: "Rename project" }).click();
@@ -149,7 +149,7 @@ test.describe("alert-dialog", () => {
   test.describe("reduced keeps the fade and drops only the scale", () => {
     test.use({ reducedMotion: "reduce" });
 
-    test("the panel fades without the 0.95 settle", async ({ page }) => {
+    test("the panel fades without the 0.96 settle", async ({ page }) => {
       await recordScale(page, '[data-slot="alert-dialog-content"]');
       await openComponent(page, "alert-dialog", "reduced", "alert-dialog-trigger");
       await page.locator(scoped("alert-dialog", '[data-slot="alert-dialog-trigger"]')).first().click();
@@ -158,6 +158,58 @@ test.describe("alert-dialog", () => {
 
       expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-property")).toContain("opacity");
       expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-duration")).toBe("0.132s");
+      expect((await recordedScale(page)).min).toBe(1);
+    });
+  });
+});
+
+test.describe("popover", () => {
+  // The first anchored panel in the matrix: it animates the scale from
+  // `--transform-origin` instead of the dialog's fixed centre, and it is the first
+  // component to read `--motion-scale-in`, so `none` and `reduced` are asserted on
+  // the same element that carries the transform.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="popover-content"]');
+          await openComponent(page, "popover", requested, "popover-trigger", mode);
+
+          await page.locator(scoped("popover", '[data-slot="popover-trigger"]')).first().click();
+          await expect(page.getByRole("dialog")).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const popup = page.locator('[data-slot="popover-content"]');
+          await expect(popup).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="popover-content"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+
+  test.describe("reduced keeps the fade and drops only the scale", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the panel fades without the 0.96 settle", async ({ page }) => {
+      await recordScale(page, '[data-slot="popover-content"]');
+      await openComponent(page, "popover", "reduced", "popover-trigger");
+      await page.locator(scoped("popover", '[data-slot="popover-trigger"]')).first().click();
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await page.waitForTimeout(300);
+
+      expect(await computed(page, '[data-slot="popover-content"]', "transition-property")).toContain("opacity");
+      expect(await computed(page, '[data-slot="popover-content"]', "transition-duration")).toBe("0.096s");
       expect((await recordedScale(page)).min).toBe(1);
     });
   });

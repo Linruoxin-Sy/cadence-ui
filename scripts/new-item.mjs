@@ -211,10 +211,12 @@ await writeFile(previewPath, preview);
 await writeFile(testPath, test);
 
 const indexSource = await readFile(previewIndexPath, "utf8");
-const importLine = `import { ${pascal}Preview } from "./${id}";`;
-const updatedIndex = indexSource
-  .replace(/(import \{ [A-Za-z]+ \} from "\.\/[a-z0-9-]+";\n)(?![\s\S]*import \{)/, `$1${importLine}\n`)
-  .replace(/\n\};/, `\n  ${id}: ${pascal}Preview,\n};`);
+// The map is built from `dynamic()` entries, so a scaffold adds one more of those. A
+// static import here would pull the preview into the initial bundle, and a bare
+// identifier (`popover: PopoverPreview`) is not even defined.
+const previewKey = /^[a-z][a-zA-Z0-9]*$/.test(id) ? id : JSON.stringify(id);
+const previewEntry = `  ${previewKey}: dynamic(() => import("./${id}").then((mod) => ({ default: mod.${pascal}Preview }))),`;
+const updatedIndex = indexSource.replace(/\n\};/, `\n${previewEntry}\n};`);
 await writeFile(previewIndexPath, updatedIndex);
 
 const registry = JSON.parse(await readFile(registryPath, "utf8"));

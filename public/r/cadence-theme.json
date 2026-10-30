@@ -12,7 +12,8 @@
       "--motion-duration-instant": "100ms",
       "--motion-duration-fast": "160ms",
       "--motion-duration-base": "220ms",
-      "--motion-duration-slow": "320ms"
+      "--motion-duration-slow": "320ms",
+      "--motion-scale-in": "0.96"
     }
   },
   "css": {

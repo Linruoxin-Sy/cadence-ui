@@ -148,12 +148,12 @@ upstream's Base UI port binds neither button, which would make the default usage
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
 | reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 
-The entrance is the dialog's, because this is the same popup: a fade under a 0.95-scale settle. The
+The entrance is the dialog's, because this is the same popup: a fade under a 0.96-scale settle. The
 motion is CSS-only — Base UI toggles `data-starting-style` / `data-ending-style` and the class list
 reads the duration tokens — so there is no JavaScript animation loop and nothing to interrupt by hand.
 Reopening during the exit reverses the fade rather than restarting it.

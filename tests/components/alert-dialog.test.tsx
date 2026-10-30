@@ -128,7 +128,7 @@ describe("AlertDialog", () => {
     // The duration comes from the token, never from a literal: `data-motion="none"`
     // zeroes the variable on the element itself, which is what makes `none` instant.
     expect(dialog.className).toContain("duration-(--motion-duration-base)");
-    expect(dialog.className.includes("scale-95")).toBe(keepsScale);
+    expect(dialog.className.includes("scale-(--motion-scale-in)")).toBe(keepsScale);
 
     const overlay = document.querySelector('[data-slot="alert-dialog-overlay"]');
     expect(overlay).toHaveAttribute("data-motion", mode);

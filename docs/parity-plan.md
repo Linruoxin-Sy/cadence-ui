@@ -1,6 +1,6 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (`dialog` and `alert-dialog` shipped).**
+> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (`dialog`, `alert-dialog` and `popover` shipped).**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -208,19 +208,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                                         |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ---------------------------------------------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                                        |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                                        |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                                        |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                                        |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (2/7: `dialog`, `alert-dialog`) |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                                        |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                                        |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                                        |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                                        |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                                        |
-|       | **Total**                  | **57** |            | **102**     |         |                                                |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                                                    |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------------------------------------------------------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                                                   |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                                                   |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                                                   |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                                                   |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (3/7: `dialog`, `alert-dialog`, `popover`) |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                                                   |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                                                   |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                                                   |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                                                   |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                                                   |
+|       | **Total**                  | **57** |            | **102**     |         |                                                           |
 
 ### 7.0 Status discipline
 
@@ -418,11 +418,30 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Why not `next`:** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so one item of this
   batch is already live. Marking the row `next` would have made §7.0's rule ("a batch whose row still says
   `next` is not done") hide a shipped component.
-- **Shipped:** `dialog`, `alert-dialog`. Remaining: `sheet`, `drawer`, `popover`, `tooltip`, `hover-card`.
-- **Alert dialog (2026-10-30):** the second B4 item, built on the repaired dialog pattern. 30 components,
-  35 registry items, 30 docs, 30 previews, 140 tests. Same declarations (`popup.anchored` + `exit.fade`,
-  `form: "css-transition"`), so the durations, the `data-starting-style` / `data-ending-style` classes and
-  the three-mode assertions are the dialog's, `data-slot` for `data-slot`.
+- **Shipped:** `dialog`, `alert-dialog`, `popover`. Remaining: `tooltip`, `hover-card`, `sheet`, `drawer`.
+- **Popover (2026-10-30):** the first anchored panel. 31 components, 36 registry items, 31 docs,
+  31 previews, 146 tests. Upstream's six exports and six `data-slot` values exactly — there is no
+  `PopoverAnchor` because Base UI anchors to the trigger and has no anchor part, so adding one would have
+  been surface with nothing behind it.
+  - **Anchored scale, and one token comes back.** The panel grows out of `--transform-origin`, which Base
+    UI writes from the positioner, from `--motion-scale-in` (0.96 = `scale.in`). That token was deleted
+    when nothing read it and is now read by four files, so it rejoined the three token copies;
+    `registry:check` compares them, so the copies cannot drift. `dialog` and `alert-dialog` migrated from
+    the literal `scale-95` to the same token, which removes the last literal scale in a shipped class list
+    (AGENTS.md's "tokens only" rule).
+  - **No slide, on purpose.** `new-york-v4` slides each panel in from its side (`slide-in-from-top-2` and
+    three more). Cadence does not: a slide needs a distance token and one class per side, and it moves the
+    edge the positioner just lined up away from the trigger. §3.1 of the animation system now shows this
+    implementation instead of leaving the recipe to prose.
+  - **E2E:** a `popover` block in the matrix (3 modes × 2 preferences + the reduced-only settle) and
+    `/components/popover` in the axe list, both in both themes. 67 tests, green.
+- **Scaffold fix (2026-10-30):** `new-item.mjs` appended `previewKey: ComponentPreview` to
+  `previews/index.tsx`, a bare identifier the map does not define — the first two scaffolds each needed a
+  manual repair. It now appends the `dynamic()` entry the map is built from.
+- **Alert dialog (2026-10-30):** the second B4 item, built on the repaired dialog pattern. Same
+  declarations (`popup.anchored` + `exit.fade`, `form: "css-transition"`), so the durations, the
+  `data-starting-style` / `data-ending-style` classes and the three-mode assertions are the dialog's,
+  `data-slot` for `data-slot`.
   - **`AlertDialogAction` and `AlertDialogCancel` both render Base UI's `Close`.** Upstream's Base UI port
     leaves `AlertDialogAction` as a plain `Button`, so the default usage would confirm nothing and leave the
     dialog open. Exports, `data-slot` values and props are unchanged — only the primitive behind the button
@@ -444,12 +463,12 @@ axe with zero violations, size budget, and dual-theme screenshots.
   implementation — which is how the gap was found.
 - **Browser proof (2026-10-30):** the Playwright matrix now exists. `tests/e2e/motion-matrix.spec.ts` runs
   `button`, `dialog`, `alert-dialog`, `switch` and `progress` across 3 modes × 2 system preferences and
-  asserts `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 58 tests, green.
+  asserts `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 67 tests, green.
 - **Still open:** dual-theme screenshots for B1–B4. With a production build running in CI this is now a
   screenshot script, not an environment limitation.
-- **Order for the remaining five:** `popover` / `tooltip` / `hover-card` (one `popup.anchored`
-  implementation), then `sheet` / `drawer` (new side/bottom variants). Each keeps the `form:
-  "css-transition"` declaration and the three-mode assertions that `dialog` set.
+- **Order for the remaining four:** `tooltip` / `hover-card` (the same anchored implementation, now with a
+  token), then `sheet` / `drawer` (new side/bottom variants). Each keeps the `form: "css-transition"`
+  declaration and the three-mode assertions that `dialog` set.
 
 #### Contract drift closed (2026-10-30)
 
@@ -484,11 +503,12 @@ with no provider honours the OS setting.
   `[data-motion="full"]` block restates the authored clock. JS transitions are unaffected —
   `transitionFor()` reads the mode, not the variables — so only a CSS-only popup inside an
   opted-back-in preview would look wrong. Fixing it needs a `full` block in all three copies that still
-  defers to the OS media query, which is a token-layer decision better made together with the single
-  shared popup CSS that `popover` / `tooltip` / `hover-card` will establish below.
-- **Browser proof, re-run 2026-10-30:** `pnpm build` produces all 40 pages and the compiled stylesheet
+  defers to the OS media query. The anchored panels did not need a shared module after all — the popup
+  formula is repeated per file, like `dialog` and `alert-dialog` — so this stays open as a token-layer
+  decision, not a popup one.
+- **Browser proof, re-run 2026-10-30 (numbers as of that change):** `pnpm build` produced all 40 pages and the compiled stylesheet
   carries `[data-motion=reduced]`, `[data-motion=none]` and the reduced-duration media query, with no
-  `--motion-distance-*` or `--motion-intensity` left anywhere. `playwright test` is 49/49. This
+  `--motion-distance-*` or `--motion-intensity` left anywhere. `playwright test` was 49/49. This
   environment has no Playwright-downloaded Chromium, so the run used `PLAYWRIGHT_CHANNEL=msedge`, the
   fallback the config documents; the suite is not Chromium-specific.
 - **E2E defect found by that run:** `openComponent()` asserted the mode the URL _asked for_ rather than

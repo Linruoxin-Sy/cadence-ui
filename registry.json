@@ -73,7 +73,8 @@
           "--motion-duration-instant": "100ms",
           "--motion-duration-fast": "160ms",
           "--motion-duration-base": "220ms",
-          "--motion-duration-slow": "320ms"
+          "--motion-duration-slow": "320ms",
+          "--motion-scale-in": "0.96"
         }
       },
       "css": {
@@ -410,7 +411,12 @@
         "since": "0.2.0",
         "tier": "T4",
         "batch": "B1",
-        "motion": [{ "recipe": "data.transition", "form": "continuous" }],
+        "motion": [
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -671,7 +677,12 @@
         "since": "0.2.0",
         "tier": "T4",
         "batch": "B2",
-        "motion": [{ "recipe": "data.transition", "form": "continuous" }],
+        "motion": [
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -706,8 +717,14 @@
         "tier": "T2",
         "batch": "B4",
         "motion": [
-          { "recipe": "popup.anchored", "form": "css-transition" },
-          { "recipe": "exit.fade", "form": "css-transition" }
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
@@ -980,11 +997,46 @@
         "tier": "T2",
         "batch": "B4",
         "motion": [
-          { "recipe": "popup.anchored", "form": "css-transition" },
-          { "recipe": "exit.fade", "form": "css-transition" }
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "An anchored panel that opens next to its trigger and returns focus to it when it closes.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/popover/popover.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/popover/popover.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B4",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "M",
         "upstream": {
           "registry": "shadcn",
           "style": "base-ui",

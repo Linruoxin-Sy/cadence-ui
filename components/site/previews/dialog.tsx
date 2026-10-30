@@ -39,8 +39,8 @@ export function DialogPreview() {
       </Dialog>
 
       <p className="text-xs text-muted-foreground">
-        The overlay fades and the panel settles from 0.95 scale. Close it mid-exit and reopen: the sequence reverses
-        instead of restarting. Under reduced motion only opacity animates.
+        The overlay fades and the panel settles from `--motion-scale-in` (0.96). Close it mid-exit and reopen: the
+        sequence reverses instead of restarting. Under reduced motion only opacity animates.
       </p>
     </div>
   );
