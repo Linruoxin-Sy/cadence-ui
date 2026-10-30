@@ -4,7 +4,7 @@ import { ThemeToggle } from "./theme-toggle";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         {/*
          * The wordmark carries the brand gradient (--brand-from → --brand-to, see
          * globals.css). It is the only place the brand appears: components and their
@@ -16,7 +16,7 @@ export function SiteHeader() {
         >
           Cadence UI
         </Link>
-        <nav className="flex items-center gap-5 text-sm text-muted-foreground">
+        <nav aria-label="Main" className="flex items-center gap-5 text-sm text-muted-foreground">
           <Link className="transition-colors hover:text-foreground" href="/components">
             Components
           </Link>

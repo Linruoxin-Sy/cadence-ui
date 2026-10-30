@@ -22,7 +22,7 @@ export default async function HomePage() {
   const featured = components.slice(0, 6);
 
   return (
-    <div className="mx-auto max-w-5xl px-6">
+    <div className="mx-auto max-w-6xl px-6">
       <section className="py-20 sm:py-28">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Animation-first · shadcn registry

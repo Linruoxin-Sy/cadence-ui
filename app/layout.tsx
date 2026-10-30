@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site/header";
-import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { MotionModeProvider } from "@/components/site/motion-mode";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cadence.dev"),
@@ -36,11 +36,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:border focus:border-border focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium"
+        >
+          Skip to content
+        </a>
         <CadenceProvider>
           <SiteHeader />
-          <main>{children}</main>
+          <main id="content">{children}</main>
           <footer className="mt-24 border-t border-border">
-            <div className="mx-auto flex max-w-5xl flex-col gap-2 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+            <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
               <p>Cadence UI · MIT licensed · Built with Base UI, Tailwind CSS v4, and Motion.</p>
               <p>
                 <a className="underline underline-offset-4 hover:text-foreground" href="/llms.txt">

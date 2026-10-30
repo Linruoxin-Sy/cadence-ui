@@ -117,6 +117,12 @@ export async function getComponent(slug: string): Promise<Doc | null> {
 
 const guideOrder = ["installation", "theming", "motion", "validation"];
 
+/** A guide the list does not know yet sorts after the known ones instead of before them. */
+const guideRank = (slug: string) => {
+  const index = guideOrder.indexOf(slug);
+  return index === -1 ? guideOrder.length : index;
+};
+
 export async function listGuides(): Promise<Doc[]> {
   const dir = path.join(contentRoot, "docs");
   const files = await readdir(dir);
@@ -125,7 +131,7 @@ export async function listGuides(): Promise<Doc[]> {
     if (!file.endsWith(".mdx")) continue;
     docs.push(await readDoc(path.join(dir, file)));
   }
-  return docs.sort((a, b) => guideOrder.indexOf(a.slug) - guideOrder.indexOf(b.slug));
+  return docs.sort((a, b) => guideRank(a.slug) - guideRank(b.slug));
 }
 
 export async function getGuide(slug: string): Promise<Doc | null> {
