@@ -26,7 +26,9 @@ export interface SliderProps<Value extends number | readonly number[] = number |
  * would make it lag behind the thumb by one frame per move.
  *
  * a11y: Base UI renders a native `input[type=range]` inside every thumb, so the
- * slider is keyboard-reachable and arrow keys step the value. Invalid state
+ * slider is keyboard-reachable and arrow keys step the value. `aria-label` is
+ * forwarded to each thumb with a distinct suffix — a range slider with two thumbs
+ * and one shared name reads as two controls with the same name. Invalid state
  * comes from `aria-invalid`; the component does not validate (P11).
  */
 function Slider<Value extends number | readonly number[] = number | readonly number[]>({
@@ -44,6 +46,13 @@ function Slider<Value extends number | readonly number[] = number | readonly num
     () => (Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max]),
     [value, defaultValue, min, max],
   );
+  const thumbCount = _values.length;
+
+  const labelFor = (index: number) => {
+    if (!ariaLabel || thumbCount === 1) return ariaLabel;
+    if (thumbCount === 2) return `${ariaLabel} (${index === 0 ? "minimum" : "maximum"})`;
+    return `${ariaLabel} (${index + 1} of ${thumbCount})`;
+  };
 
   return (
     <SliderPrimitive.Root
@@ -73,7 +82,7 @@ function Slider<Value extends number | readonly number[] = number | readonly num
             // biome-ignore lint/suspicious/noArrayIndexKey: a thumb has no identity beyond its position in the value array — Base UI's own `index` prop is the same number.
             key={index}
             index={index}
-            aria-label={ariaLabel}
+            aria-label={labelFor(index)}
             aria-labelledby={ariaLabelledBy}
             render={(thumbProps, state) => {
               const { className: thumbClassName, ...rest } = thumbProps as React.HTMLProps<HTMLDivElement>;
