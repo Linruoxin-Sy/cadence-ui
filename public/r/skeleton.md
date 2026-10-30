@@ -2,7 +2,7 @@
 
 > A placeholder pulse that marks where content will land.
 
-- Registry item: /r/skeleton.json
+- Registry item: https://cadence.dev/r/skeleton.json
 - Install: `npx shadcn@latest add @cadence/skeleton`
 - Type: registry:ui
 - Since: 0.2.0
@@ -148,4 +148,4 @@ every breakpoint.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

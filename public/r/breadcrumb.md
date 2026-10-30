@@ -2,7 +2,7 @@
 
 > The trail from the root to the current page.
 
-- Registry item: /r/breadcrumb.json
+- Registry item: https://cadence.dev/r/breadcrumb.json
 - Install: `npx shadcn@latest add @cadence/breadcrumb`
 - Type: registry:ui
 - Since: 0.2.0
@@ -143,4 +143,4 @@ stable thing on the page move.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

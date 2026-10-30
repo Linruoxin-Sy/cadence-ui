@@ -11,7 +11,11 @@
     "light": {
       "--motion-distance-sm": "8px",
       "--motion-distance-md": "12px",
-      "--motion-intensity": "1"
+      "--motion-intensity": "1",
+      "--motion-duration-instant": "100ms",
+      "--motion-duration-fast": "160ms",
+      "--motion-duration-base": "220ms",
+      "--motion-duration-slow": "320ms"
     },
     "dark": {
       "--motion-distance-sm": "8px",
@@ -23,11 +27,19 @@
     "@layer base": {
       "[data-motion='reduced']": {
         "--motion-distance-sm": "4px",
-        "--motion-distance-md": "6px"
+        "--motion-distance-md": "6px",
+        "--motion-duration-instant": "60ms",
+        "--motion-duration-fast": "96ms",
+        "--motion-duration-base": "132ms",
+        "--motion-duration-slow": "192ms"
       },
       "[data-motion='none']": {
         "--motion-distance-sm": "0px",
-        "--motion-distance-md": "0px"
+        "--motion-distance-md": "0px",
+        "--motion-duration-instant": "0ms",
+        "--motion-duration-fast": "0ms",
+        "--motion-duration-base": "0ms",
+        "--motion-duration-slow": "0ms"
       },
       "@media (prefers-reduced-motion: reduce)": {
         ":root": {

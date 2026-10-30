@@ -2,7 +2,7 @@
 
 > A labelled control with its description and error, without owning validation.
 
-- Registry item: /r/field.json
+- Registry item: https://cadence.dev/r/field.json
 - Install: `npx shadcn@latest add @cadence/field`
 - Type: registry:ui
 - Since: 0.2.0
@@ -181,4 +181,4 @@ library is imported. `FieldError` accepts messages, not rules. See
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

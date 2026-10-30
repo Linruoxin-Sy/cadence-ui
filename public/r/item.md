@@ -2,7 +2,7 @@
 
 > A row in a list of like objects, with media, content, and actions.
 
-- Registry item: /r/item.json
+- Registry item: https://cadence.dev/r/item.json
 - Install: `npx shadcn@latest add @cadence/item`
 - Type: registry:ui
 - Since: 0.2.0
@@ -177,4 +177,4 @@ that animates itself cannot be interrupted by the next render.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

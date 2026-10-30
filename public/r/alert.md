@@ -2,7 +2,7 @@
 
 > A message about the current state of the page, with an icon column and an action slot.
 
-- Registry item: /r/alert.json
+- Registry item: https://cadence.dev/r/alert.json
 - Install: `npx shadcn@latest add @cadence/alert`
 - Type: registry:ui
 - Since: 0.2.0
@@ -137,4 +137,4 @@ animated and carry no timing.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

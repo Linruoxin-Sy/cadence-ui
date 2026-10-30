@@ -2,7 +2,7 @@
 
 > A control that toggles between on and off, with a thumb that travels between the two states.
 
-- Registry item: /r/switch.json
+- Registry item: https://cadence.dev/r/switch.json
 - Install: `npx shadcn@latest add @cadence/switch`
 - Type: registry:ui
 - Since: 0.3.0
@@ -165,4 +165,4 @@ transition with no layout reads during interaction.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

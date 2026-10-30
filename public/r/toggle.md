@@ -2,7 +2,7 @@
 
 > A two-state button that can be pressed or not pressed.
 
-- Registry item: /r/toggle.json
+- Registry item: https://cadence.dev/r/toggle.json
 - Install: `npx shadcn@latest add @cadence/toggle`
 - Type: registry:ui
 - Since: 0.3.0
@@ -163,4 +163,4 @@ measurement.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

@@ -2,7 +2,7 @@
 
 > An accessible name for a form control, with no state of its own.
 
-- Registry item: /r/label.json
+- Registry item: https://cadence.dev/r/label.json
 - Install: `npx shadcn@latest add @cadence/label`
 - Type: registry:ui
 - Since: 0.2.0
@@ -110,4 +110,4 @@ which is an opacity change on a token, not an animation.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

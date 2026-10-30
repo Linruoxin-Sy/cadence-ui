@@ -2,7 +2,7 @@
 
 > A modal window that fades and settles in, with the open and close sequence interruptible.
 
-- Registry item: /r/dialog.json
+- Registry item: https://cadence.dev/r/dialog.json
 - Install: `npx shadcn@latest add @cadence/dialog`
 - Type: registry:ui
 - Since: 0.2.0
@@ -105,10 +105,10 @@ const [open, setOpen] = useState(false);
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` | yes (reopen mid-exit) |
-| reduced | opacity only, 100ms | `exit.fade` | yes |
-| none | instant | – | – |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 
 The panel stays mounted while its exit transition runs; Base UI delays unmount until the
 transition ends, so reopening mid-exit reverses cleanly.
@@ -147,4 +147,4 @@ Long content scrolls inside the popup rather than the page.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

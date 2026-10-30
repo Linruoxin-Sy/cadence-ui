@@ -2,7 +2,7 @@
 
 > A single-line text field whose invalid state is driven by aria-invalid.
 
-- Registry item: /r/input.json
+- Registry item: https://cadence.dev/r/input.json
 - Install: `npx shadcn@latest add @cadence/input`
 - Type: registry:ui
 - Since: 0.2.0
@@ -137,4 +137,4 @@ library is imported. See [validation](/docs/validation).
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

@@ -2,7 +2,7 @@
 
 > Reserves a box at a fixed ratio so media cannot shift the layout.
 
-- Registry item: /r/aspect-ratio.json
+- Registry item: https://cadence.dev/r/aspect-ratio.json
 - Install: `npx shadcn@latest add @cadence/aspect-ratio`
 - Type: registry:ui
 - Since: 0.2.0
@@ -114,4 +114,4 @@ transition here would reintroduce the layout shift it exists to prevent.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

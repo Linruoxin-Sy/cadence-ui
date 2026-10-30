@@ -2,7 +2,7 @@
 
 > A compact status label that stays still while the content around it animates.
 
-- Registry item: /r/badge.json
+- Registry item: https://cadence.dev/r/badge.json
 - Install: `npx shadcn@latest add @cadence/badge`
 - Type: registry:ui
 - Since: 0.2.0
@@ -121,4 +121,4 @@ on mount.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

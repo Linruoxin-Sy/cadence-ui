@@ -2,7 +2,7 @@
 
 > An input where the user selects a value from a range by dragging a thumb.
 
-- Registry item: /r/slider.json
+- Registry item: https://cadence.dev/r/slider.json
 - Install: `npx shadcn@latest add @cadence/slider`
 - Type: registry:ui
 - Since: 0.3.0
@@ -40,7 +40,9 @@ export function Volume() {
 
 `defaultValue` and `value` are always arrays: one entry per thumb. `aria-label`
 on the slider is forwarded to every thumb's native range input, which is what a
-screen reader announces.
+screen reader announces. A range slider gets one accessible name per thumb —
+`Price (minimum)` and `Price (maximum)` — because two inputs with the same name
+are indistinguishable.
 
 ## Examples
 
@@ -86,7 +88,7 @@ Give the vertical slider a height; the track fills it.
 | `step`               | `number`                          | `1`            | Snap increment.                                 |
 | `orientation`        | `"horizontal" \| "vertical"`      | `"horizontal"` | Axis.                                           |
 | `disabled`           | `boolean`                         | `false`        | Ignores pointer and keyboard.                   |
-| `aria-label`         | `string`                          | –              | Forwarded to each thumb's range input.          |
+| `aria-label`         | `string`                          | –              | Forwarded to each thumb, suffixed per thumb.    |
 | `className`          | `string`                          | –              | Merged last.                                    |
 
 Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchanged.
@@ -155,4 +157,4 @@ scale. No `layout` animation, no measurement per frame.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

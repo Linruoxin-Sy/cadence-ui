@@ -2,7 +2,7 @@
 
 > Page navigation that stays a link, not a button.
 
-- Registry item: /r/pagination.json
+- Registry item: https://cadence.dev/r/pagination.json
 - Install: `npx shadcn@latest add @cadence/pagination`
 - Type: registry:ui
 - Since: 0.2.0
@@ -155,4 +155,4 @@ If the new page's rows should arrive in sequence, that is `list.stagger` on the 
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

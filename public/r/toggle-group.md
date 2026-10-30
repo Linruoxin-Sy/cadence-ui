@@ -2,7 +2,7 @@
 
 > A set of two-state buttons that can be pressed one at a time or together.
 
-- Registry item: /r/toggle-group.json
+- Registry item: https://cadence.dev/r/toggle-group.json
 - Install: `npx shadcn@latest add @cadence/toggle-group`
 - Type: registry:ui
 - Since: 0.3.0
@@ -196,4 +196,4 @@ measurement, so a group of eight items costs nothing until one is pressed.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -379,7 +379,10 @@
     "tier": "T4",
     "batch": "B1",
     "motion": [
-      "data.transition"
+      {
+        "recipe": "data.transition",
+        "form": "continuous"
+      }
     ],
     "intensity": "subtle",
     "complexity": "S",
@@ -388,7 +391,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -417,7 +420,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -447,7 +450,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -479,7 +482,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -510,7 +513,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -542,7 +545,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -574,7 +577,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -604,7 +607,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -634,7 +637,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -659,7 +662,10 @@
     "tier": "T4",
     "batch": "B2",
     "motion": [
-      "data.transition"
+      {
+        "recipe": "data.transition",
+        "form": "continuous"
+      }
     ],
     "intensity": "subtle",
     "complexity": "S",
@@ -668,7 +674,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -695,8 +701,14 @@
     "tier": "T2",
     "batch": "B4",
     "motion": [
-      "popup.anchored",
-      "exit.fade"
+      {
+        "recipe": "popup.anchored",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "exit.fade",
+        "form": "css-transition"
+      }
     ],
     "intensity": "medium",
     "complexity": "L",
@@ -705,7 +717,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -740,7 +752,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -774,7 +786,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -807,7 +819,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -841,7 +853,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -876,7 +888,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -912,7 +924,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -947,7 +959,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -980,7 +992,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "e4fa3b3",
+    "sourceSha": "e7f44df",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   }

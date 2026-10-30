@@ -2,7 +2,7 @@
 
 > The resting state of a region that has nothing to show yet.
 
-- Registry item: /r/empty.json
+- Registry item: https://cadence.dev/r/empty.json
 - Install: `npx shadcn@latest add @cadence/empty`
 - Type: registry:ui
 - Since: 0.2.0
@@ -148,4 +148,4 @@ When the region swaps from empty to populated, that transition belongs to the li
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

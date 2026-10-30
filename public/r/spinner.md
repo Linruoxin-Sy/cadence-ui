@@ -2,7 +2,7 @@
 
 > An indeterminate wait, rotating until the work finishes.
 
-- Registry item: /r/spinner.json
+- Registry item: https://cadence.dev/r/spinner.json
 - Install: `npx shadcn@latest add @cadence/spinner`
 - Type: registry:ui
 - Since: 0.2.0
@@ -160,4 +160,4 @@ size, not by growing the icon.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

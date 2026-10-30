@@ -2,7 +2,7 @@
 
 > Displays an indicator showing the completion progress of a task.
 
-- Registry item: /r/progress.json
+- Registry item: https://cadence.dev/r/progress.json
 - Install: `npx shadcn@latest add @cadence/progress`
 - Type: registry:ui
 - Since: 0.3.0
@@ -163,4 +163,4 @@ yourself; pass the real value and let the transition smooth it.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

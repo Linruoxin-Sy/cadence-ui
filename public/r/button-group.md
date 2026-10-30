@@ -2,7 +2,7 @@
 
 > Adjacent controls joined into one shape.
 
-- Registry item: /r/button-group.json
+- Registry item: https://cadence.dev/r/button-group.json
 - Install: `npx shadcn@latest add @cadence/button-group`
 - Type: registry:ui
 - Since: 0.2.0
@@ -140,4 +140,4 @@ animation on top of it.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

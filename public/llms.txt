@@ -23,38 +23,42 @@ npx shadcn@latest add @cadence/button
 
 ## Components
 
-- [Button](/r/button.md): Triggers an action, with press feedback that collapses under reduced motion. (form, feedback)
-- [Badge](/r/badge.md): A compact status label that stays still while the content around it animates. (feedback)
-- [Kbd](/r/kbd.md): A keyboard key or shortcut hint, styled from the semantic tokens. (utility)
-- [Separator](/r/separator.md): A one-pixel rule that divides groups of content. (layout)
-- [Label](/r/label.md): An accessible name for a form control, with no state of its own. (form)
-- [Input](/r/input.md): A single-line text field whose invalid state is driven by aria-invalid. (form)
-- [Textarea](/r/textarea.md): A multi-line text field that grows with its content instead of a script. (form)
-- [Card](/r/card.md): A bounded surface for grouped content, with parts you can restyle. (layout)
-- [Aspect Ratio](/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
-- [Avatar](/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
-- [Skeleton](/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
-- [Alert](/r/alert.md): A message about the current state of the page, with an icon column and an action slot. (feedback)
-- [Empty](/r/empty.md): The resting state of a region that has nothing to show yet. (feedback, layout)
-- [Item](/r/item.md): A row in a list of like objects, with media, content, and actions. (data, layout)
-- [Field](/r/field.md): A labelled control with its description and error, without owning validation. (form)
-- [Button Group](/r/button-group.md): Adjacent controls joined into one shape. (form, layout)
-- [Input Group](/r/input-group.md): A text control framed with prefixes, suffixes, and buttons. (form)
-- [Breadcrumb](/r/breadcrumb.md): The trail from the root to the current page. (navigation)
-- [Pagination](/r/pagination.md): Page navigation that stays a link, not a button. (navigation)
-- [Spinner](/r/spinner.md): An indeterminate wait, rotating until the work finishes. (feedback)
-- [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
-- [Checkbox](/r/checkbox.md): A control that allows the user to toggle between checked and not checked. (form)
-- [Radio Group](/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
-- [Switch](/r/switch.md): A control that toggles between on and off, with a thumb that travels between the two states. (form)
-- [Slider](/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
-- [Toggle](/r/toggle.md): A two-state button that can be pressed or not pressed. (form)
-- [Toggle Group](/r/toggle-group.md): A set of two-state buttons that can be pressed one at a time or together. (form)
-- [Input OTP](/r/input-otp.md): A one-time password field that renders one slot per character. (form)
-- [Progress](/r/progress.md): Displays an indicator showing the completion progress of a task. (feedback)
+- [Button](https://cadence.dev/r/button.md): Triggers an action, with press feedback that collapses under reduced motion. (form, feedback)
+- [Badge](https://cadence.dev/r/badge.md): A compact status label that stays still while the content around it animates. (feedback)
+- [Kbd](https://cadence.dev/r/kbd.md): A keyboard key or shortcut hint, styled from the semantic tokens. (utility)
+- [Separator](https://cadence.dev/r/separator.md): A one-pixel rule that divides groups of content. (layout)
+- [Label](https://cadence.dev/r/label.md): An accessible name for a form control, with no state of its own. (form)
+- [Input](https://cadence.dev/r/input.md): A single-line text field whose invalid state is driven by aria-invalid. (form)
+- [Textarea](https://cadence.dev/r/textarea.md): A multi-line text field that grows with its content instead of a script. (form)
+- [Card](https://cadence.dev/r/card.md): A bounded surface for grouped content, with parts you can restyle. (layout)
+- [Aspect Ratio](https://cadence.dev/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
+- [Avatar](https://cadence.dev/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
+- [Skeleton](https://cadence.dev/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
+- [Alert](https://cadence.dev/r/alert.md): A message about the current state of the page, with an icon column and an action slot. (feedback)
+- [Empty](https://cadence.dev/r/empty.md): The resting state of a region that has nothing to show yet. (feedback, layout)
+- [Item](https://cadence.dev/r/item.md): A row in a list of like objects, with media, content, and actions. (data, layout)
+- [Field](https://cadence.dev/r/field.md): A labelled control with its description and error, without owning validation. (form)
+- [Button Group](https://cadence.dev/r/button-group.md): Adjacent controls joined into one shape. (form, layout)
+- [Input Group](https://cadence.dev/r/input-group.md): A text control framed with prefixes, suffixes, and buttons. (form)
+- [Breadcrumb](https://cadence.dev/r/breadcrumb.md): The trail from the root to the current page. (navigation)
+- [Pagination](https://cadence.dev/r/pagination.md): Page navigation that stays a link, not a button. (navigation)
+- [Spinner](https://cadence.dev/r/spinner.md): An indeterminate wait, rotating until the work finishes. (feedback)
+- [Dialog](https://cadence.dev/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
+- [Checkbox](https://cadence.dev/r/checkbox.md): A control that allows the user to toggle between checked and not checked. (form)
+- [Radio Group](https://cadence.dev/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
+- [Switch](https://cadence.dev/r/switch.md): A control that toggles between on and off, with a thumb that travels between the two states. (form)
+- [Slider](https://cadence.dev/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
+- [Toggle](https://cadence.dev/r/toggle.md): A two-state button that can be pressed or not pressed. (form)
+- [Toggle Group](https://cadence.dev/r/toggle-group.md): A set of two-state buttons that can be pressed one at a time or together. (form)
+- [Input OTP](https://cadence.dev/r/input-otp.md): A one-time password field that renders one slot per character. (form)
+- [Progress](https://cadence.dev/r/progress.md): Displays an indicator showing the completion progress of a task. (feedback)
 
 ## Docs
 
-- [/r/registry.json](/r/registry.json): install index
-- [/r/catalog.json](/r/catalog.json): machine-readable catalog
-- [/llms-full.txt](/llms-full.txt): every component doc inline
+- [Installation](https://cadence.dev/docs/installation): registry setup, Next.js and Vite.
+- [Theming](https://cadence.dev/docs/theming): shadcn tokens, motion intensity, per-subtree overrides.
+- [Motion](https://cadence.dev/docs/motion): tokens, recipes, reduced-motion rules.
+- [Validation](https://cadence.dev/docs/validation): what the components render and what the caller owns.
+- [Install index](https://cadence.dev/r/registry.json): every item and its metadata.
+- [Catalog](https://cadence.dev/r/catalog.json): machine-readable catalog.
+- [Full context](https://cadence.dev/llms-full.txt): every component doc inline.

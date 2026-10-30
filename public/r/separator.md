@@ -2,7 +2,7 @@
 
 > A one-pixel rule that divides groups of content.
 
-- Registry item: /r/separator.json
+- Registry item: https://cadence.dev/r/separator.json
 - Install: `npx shadcn@latest add @cadence/separator`
 - Type: registry:ui
 - Since: 0.2.0
@@ -107,4 +107,4 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

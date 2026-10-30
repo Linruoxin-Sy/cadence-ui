@@ -2,7 +2,7 @@
 
 > A keyboard key or shortcut hint, styled from the semantic tokens.
 
-- Registry item: /r/kbd.json
+- Registry item: https://cadence.dev/r/kbd.json
 - Install: `npx shadcn@latest add @cadence/kbd`
 - Type: registry:ui
 - Since: 0.2.0
@@ -109,4 +109,4 @@ is reading it.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

@@ -2,7 +2,7 @@
 
 > Triggers an action, with press feedback that collapses under reduced motion.
 
-- Registry item: /r/button.json
+- Registry item: https://cadence.dev/r/button.json
 - Install: `npx shadcn@latest add @cadence/button`
 - Type: registry:ui
 - Since: 0.2.0
@@ -135,8 +135,8 @@ All native button props are forwarded.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| press | `scale 1 → 0.98` while active | `spring.press` | yes (pointer up) |
-| release | `scale 0.98 → 1` | `spring.press` | yes |
+| press | `scale 1 → 0.97` while active | `spring.press` | yes (pointer up) |
+| release | `scale 0.97 → 1` | `spring.press` | yes |
 | reduced | no scale; colour and shadow only | – | – |
 | none | no scale; colour and shadow only | – | – |
 
@@ -156,4 +156,4 @@ All native button props are forwarded.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

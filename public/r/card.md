@@ -2,7 +2,7 @@
 
 > A bounded surface for grouped content, with parts you can restyle.
 
-- Registry item: /r/card.json
+- Registry item: https://cadence.dev/r/card.json
 - Install: `npx shadcn@latest add @cadence/card`
 - Type: registry:ui
 - Since: 0.2.0
@@ -142,4 +142,4 @@ not a property of the card.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

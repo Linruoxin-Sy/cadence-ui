@@ -2,7 +2,7 @@
 
 > A text control framed with prefixes, suffixes, and buttons.
 
-- Registry item: /r/input-group.json
+- Registry item: https://cadence.dev/r/input-group.json
 - Install: `npx shadcn@latest add @cadence/input-group`
 - Type: registry:ui
 - Since: 0.2.0
@@ -156,4 +156,4 @@ imported. See [validation](/docs/validation).
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

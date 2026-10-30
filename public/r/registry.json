@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -298,7 +298,10 @@
         "tier": "T4",
         "batch": "B1",
         "motion": [
-          "data.transition"
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          }
         ],
         "intensity": "subtle",
         "complexity": "S",
@@ -307,7 +310,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -330,7 +333,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -354,7 +357,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -378,7 +381,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -401,7 +404,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -425,7 +428,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -448,7 +451,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -471,7 +474,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -494,7 +497,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -510,7 +513,10 @@
         "tier": "T4",
         "batch": "B2",
         "motion": [
-          "data.transition"
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          }
         ],
         "intensity": "subtle",
         "complexity": "S",
@@ -519,7 +525,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -535,8 +541,14 @@
         "tier": "T2",
         "batch": "B4",
         "motion": [
-          "popup.anchored",
-          "exit.fade"
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
@@ -545,7 +557,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -570,7 +582,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -595,7 +607,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -620,7 +632,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -645,7 +657,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -670,7 +682,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -695,7 +707,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -720,7 +732,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     },
     {
@@ -745,7 +757,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "e4fa3b3"
+        "sourceSha": "e7f44df"
       }
     }
   ]

@@ -2,7 +2,7 @@
 
 > A control that allows the user to toggle between checked and not checked.
 
-- Registry item: /r/checkbox.json
+- Registry item: https://cadence.dev/r/checkbox.json
 - Install: `npx shadcn@latest add @cadence/checkbox`
 - Type: registry:ui
 - Since: 0.3.0
@@ -176,4 +176,4 @@ running loop.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

@@ -2,7 +2,7 @@
 
 > A one-time password field that renders one slot per character.
 
-- Registry item: /r/input-otp.json
+- Registry item: https://cadence.dev/r/input-otp.json
 - Install: `npx shadcn@latest add @cadence/input-otp`
 - Type: registry:ui
 - Since: 0.3.0
@@ -204,4 +204,4 @@ input, not from measurement.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

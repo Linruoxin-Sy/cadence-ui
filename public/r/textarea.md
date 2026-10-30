@@ -2,7 +2,7 @@
 
 > A multi-line text field that grows with its content instead of a script.
 
-- Registry item: /r/textarea.json
+- Registry item: https://cadence.dev/r/textarea.json
 - Install: `npx shadcn@latest add @cadence/textarea`
 - Type: registry:ui
 - Since: 0.2.0
@@ -124,4 +124,4 @@ reader hears it before the limit is hit.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

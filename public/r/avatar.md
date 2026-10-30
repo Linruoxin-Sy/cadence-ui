@@ -2,7 +2,7 @@
 
 > A profile image with a text fallback, a presence dot, and a stack of peers.
 
-- Registry item: /r/avatar.json
+- Registry item: https://cadence.dev/r/avatar.json
 - Install: `npx shadcn@latest add @cadence/avatar`
 - Type: registry:ui
 - Since: 0.2.0
@@ -119,4 +119,4 @@ the image errored, and a cross-fade would show a half-drawn face in the meantime
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt

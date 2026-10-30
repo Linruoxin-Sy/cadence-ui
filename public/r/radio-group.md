@@ -2,7 +2,7 @@
 
 > A set of checkable buttons where no more than one can be checked at a time.
 
-- Registry item: /r/radio-group.json
+- Registry item: https://cadence.dev/r/radio-group.json
 - Install: `npx shadcn@latest add @cadence/radio-group`
 - Type: registry:ui
 - Since: 0.3.0
@@ -179,4 +179,4 @@ CSS, so no measurement happens.
 
 ---
 
-Full index: /llms.txt
+Full index: https://cadence.dev/llms.txt
