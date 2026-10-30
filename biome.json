@@ -14,6 +14,7 @@
       "!.agents",
       "!skills-lock.json",
       "!**/.workbuddy",
+      "!test-results",
       "!**/upstream/manifest.json",
       "!**/*.mdx",
       "!next-env.d.ts",
@@ -44,9 +45,24 @@
       "react": "recommended"
     },
     "rules": {
-      "preset": "recommended"
+      "preset": "recommended",
+      "correctness": {
+        "noPlaywrightMissingAwait": "off"
+      }
     }
   },
+  "overrides": [
+    {
+      "includes": ["tests/e2e/**", "playwright.config.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noPlaywrightMissingAwait": "on"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double",
