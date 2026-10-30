@@ -11,6 +11,8 @@
       "!**/public/llms.txt",
       "!**/public/llms-full.txt",
       "!app/typeset.css",
+      "!.agents",
+      "!skills-lock.json",
       "!**/upstream/manifest.json",
       "!**/*.mdx",
       "!next-env.d.ts",

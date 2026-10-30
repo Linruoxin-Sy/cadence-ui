@@ -15,6 +15,10 @@ test-results/
 # Agent working files: session memory and local editor state stay on this machine.
 .workbuddy/
 
+# Installed agent skills. `skills-lock.json` records what is installed and from where,
+# the same way package-lock.json describes node_modules; the tree itself stays local.
+.agents/
+
 # pnpm is the only supported package manager; keep other lockfiles out of the repo.
 package-lock.json
 yarn.lock
