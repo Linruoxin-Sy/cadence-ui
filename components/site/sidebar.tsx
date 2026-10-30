@@ -1,8 +1,12 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback, useId, useState } from "react";
 import { cn } from "@/registry/cadence/lib/cn";
+import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 
 export interface SidebarItem {
   slug: string;
@@ -19,6 +23,9 @@ export interface SidebarProps {
   groups: SidebarGroup[];
   guides: SidebarItem[];
 }
+
+/** Nothing is collapsed until the reader says so, so the first paint shows the whole map. */
+const NOTHING_CLOSED: ReadonlySet<string> = new Set();
 
 function isActive(pathname: string, href: string) {
   return pathname === href;
@@ -41,84 +48,234 @@ function NavLink({ href, title, active }: { href: string; title: string; active:
   );
 }
 
-function Groups({ groups, guides, pathname }: SidebarProps & { pathname: string }) {
-  const total = groups.reduce((count, group) => count + group.components.length, 0);
-  const onIndex = pathname === "/components";
+/**
+ * The disclosure affordance. Down means "closed, click to open", up means "open,
+ * click to close"; the flip rides on `state.morph` like any other state indicator.
+ */
+function DisclosureChevron({ open }: { open: boolean }) {
+  const cm = useCadenceMotion();
 
   return (
-    <div className="space-y-7">
+    <motion.span
+      aria-hidden="true"
+      className="inline-flex shrink-0 text-muted-foreground/70 transition-colors group-hover/row:text-foreground"
+      animate={{ rotate: open ? 180 : 0 }}
+      transition={cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
+    >
+      <ChevronDown className="size-3.5" strokeWidth={2.25} />
+    </motion.span>
+  );
+}
+
+/**
+ * A whole-row toggle: label, count, and chevron are one hit target, so the pointer
+ * does not have to find a 14px icon. `aria-expanded` carries the state and the
+ * visible label carries the name — no `aria-label` to override it.
+ *
+ * The row is a `<button>`, which is why a section title here cannot also be a link:
+ * interactive content cannot nest inside a button. The components index stays
+ * reachable from the site header.
+ */
+function DisclosureHeader({
+  open,
+  controls,
+  onClick,
+  label,
+  meta,
+}: {
+  open: boolean;
+  controls: string;
+  onClick: () => void;
+  label: React.ReactNode;
+  meta?: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={open}
+      aria-controls={controls}
+      className="group/row flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-muted/60"
+    >
+      {label}
+      <span className="flex items-center gap-1">
+        {meta}
+        <DisclosureChevron open={open} />
+      </span>
+    </button>
+  );
+}
+
+/**
+ * Animated disclosure body. Takes its own rows out of the DOM when closed, so a
+ * collapsed section is not reachable by Tab and does not need `inert`.
+ *
+ * Full width animates height + opacity. Reduced keeps the fade and drops the
+ * height transition (layout motion is what reduced mode forbids); `none` gets a
+ * zero-duration transition, which resolves to an instant toggle.
+ */
+function Disclosure({ id, open, children }: { id: string; open: boolean; children: React.ReactNode }) {
+  const cm = useCadenceMotion();
+  const transition = cm.reduced
+    ? { height: { duration: 0 }, opacity: cm.transition("reveal") }
+    : cm.transition("reveal");
+
+  return (
+    <AnimatePresence initial={false}>
+      {open ? (
+        <motion.div
+          key="panel"
+          id={id}
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={transition}
+          className="overflow-hidden"
+        >
+          {children}
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}
+
+/** Section label: one weight of small caps, dimmed until the row is hovered. */
+function SectionLabel({ children, active }: { children: React.ReactNode; active?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "text-[11px] leading-5 font-medium uppercase tracking-[0.14em] transition-colors group-hover/row:text-foreground",
+        active ? "text-foreground" : "text-muted-foreground",
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+interface GroupsProps extends SidebarProps {
+  pathname: string;
+  isOpen: (id: string) => boolean;
+  onToggle: (id: string) => void;
+}
+
+function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
+  const total = groups.reduce((count, group) => count + group.components.length, 0);
+  const onIndex = pathname === "/components";
+  const uid = useId();
+  const panelId = (key: string) => `${uid}-${key}`;
+
+  return (
+    <div className="space-y-2">
       <div>
-        <p className="px-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          Getting started
-        </p>
-        <nav className="mt-2 space-y-0.5" aria-label="Guides">
-          {guides.map((guide) => (
-            <NavLink
-              key={guide.slug}
-              href={`/docs/${guide.slug}`}
-              title={guide.title}
-              active={isActive(pathname, `/docs/${guide.slug}`)}
-            />
-          ))}
-        </nav>
+        <DisclosureHeader
+          open={isOpen("docs")}
+          controls={panelId("docs")}
+          onClick={() => onToggle("docs")}
+          label={<SectionLabel>Docs</SectionLabel>}
+        />
+        <Disclosure id={panelId("docs")} open={isOpen("docs")}>
+          <nav className="space-y-0.5 pt-1" aria-label="Docs">
+            {guides.map((guide) => (
+              <NavLink
+                key={guide.slug}
+                href={`/docs/${guide.slug}`}
+                title={guide.title}
+                active={isActive(pathname, `/docs/${guide.slug}`)}
+              />
+            ))}
+          </nav>
+        </Disclosure>
       </div>
 
       <div>
-        {/*
-         * The label is the link to the index, so the index has one place to be "current"
-         * instead of a trailing link that duplicates the heading above it.
-         */}
-        <div className="flex items-baseline justify-between px-2">
-          <Link
-            href="/components"
-            aria-current={onIndex ? "page" : undefined}
-            className={cn(
-              "text-[11px] font-medium uppercase tracking-[0.14em] transition-colors",
-              onIndex ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            Components
-          </Link>
-          <span className={cn("text-[11px]", onIndex ? "text-foreground" : "text-muted-foreground")}>{total}</span>
-        </div>
-        {/*
-         * Second level: one block per parity batch (docs/parity-plan.md §7). The batch is
-         * structure, not a heading the reader should scan for, so it is a quiet label over
-         * an indented list rather than a third weight of link.
-         */}
-        <div className="mt-3 space-y-4">
-          {groups.map((group) => (
-            <nav key={group.id} aria-label={group.title}>
-              <div className="flex items-baseline justify-between px-2">
-                <p className="text-[11px] leading-5 font-medium text-muted-foreground/80">{group.title}</p>
-                <span className="text-[10px] tabular-nums text-muted-foreground/60">{group.components.length}</span>
-              </div>
-              <div className="mt-1 ml-3 space-y-0.5 border-l border-border pl-1">
-                {group.components.map((component) => (
-                  <NavLink
-                    key={component.slug}
-                    href={`/components/${component.slug}`}
-                    title={component.title}
-                    active={isActive(pathname, `/components/${component.slug}`)}
+        <DisclosureHeader
+          open={isOpen("components")}
+          controls={panelId("components")}
+          onClick={() => onToggle("components")}
+          label={<SectionLabel active={onIndex}>Components</SectionLabel>}
+          meta={
+            <span
+              className={cn(
+                "text-[11px] tabular-nums transition-colors group-hover/row:text-foreground",
+                onIndex ? "text-foreground" : "text-muted-foreground",
+              )}
+            >
+              {total}
+            </span>
+          }
+        />
+        <Disclosure id={panelId("components")} open={isOpen("components")}>
+          {/*
+           * Second level: one block per parity batch (docs/parity-plan.md §7). The batch is
+           * structure, not a heading the reader should scan for, so it is a quiet label over
+           * an indented list rather than a third weight of link.
+           */}
+          <div className="space-y-5 pt-2">
+            {groups.map((group) => {
+              const id = `group:${group.id}`;
+              const open = isOpen(id);
+
+              return (
+                <nav key={group.id} aria-label={group.title}>
+                  <DisclosureHeader
+                    open={open}
+                    controls={panelId(id)}
+                    onClick={() => onToggle(id)}
+                    label={
+                      <span className="text-[13px] leading-5 font-medium text-muted-foreground/80 transition-colors group-hover/row:text-foreground">
+                        {group.title}
+                      </span>
+                    }
+                    meta={
+                      <span className="text-[11px] tabular-nums text-muted-foreground/60">
+                        {group.components.length}
+                      </span>
+                    }
                   />
-                ))}
-              </div>
-            </nav>
-          ))}
-        </div>
+                  <Disclosure id={panelId(id)} open={open}>
+                    <div className="mt-1 ml-3 space-y-0.5 border-l border-border pl-1">
+                      {group.components.map((component) => (
+                        <NavLink
+                          key={component.slug}
+                          href={`/components/${component.slug}`}
+                          title={component.title}
+                          active={isActive(pathname, `/components/${component.slug}`)}
+                        />
+                      ))}
+                    </div>
+                  </Disclosure>
+                </nav>
+              );
+            })}
+          </div>
+        </Disclosure>
       </div>
     </div>
   );
 }
 
 /**
- * Documentation sidebar: guides first, then every component nested under its parity batch.
+ * Documentation sidebar: docs first, then every component nested under its parity batch.
+ * Every heading level is a disclosure, so a long catalogue can be folded down to the
+ * batch the reader is working in.
  *
  * Desktop: sticky column on the left. Mobile: a collapsed disclosure above the
  * content, so the page still starts with the article.
  */
 export function Sidebar({ groups, guides }: SidebarProps) {
   const pathname = usePathname();
+  const [closed, setClosed] = useState<ReadonlySet<string>>(NOTHING_CLOSED);
+
+  const isOpen = useCallback((id: string) => !closed.has(id), [closed]);
+  const onToggle = useCallback((id: string) => {
+    setClosed((previous) => {
+      const next = new Set(previous);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
 
   return (
     <>
@@ -130,13 +287,13 @@ export function Sidebar({ groups, guides }: SidebarProps) {
           </span>
         </summary>
         <div className="border-t border-border pt-4 pb-2">
-          <Groups groups={groups} guides={guides} pathname={pathname} />
+          <Groups groups={groups} guides={guides} pathname={pathname} isOpen={isOpen} onToggle={onToggle} />
         </div>
       </details>
 
       <aside className="hidden w-56 shrink-0 md:block">
         <div className="no-scrollbar sticky top-14 max-h-[calc(100dvh-3.5rem)] overflow-y-auto py-10 pr-2">
-          <Groups groups={groups} guides={guides} pathname={pathname} />
+          <Groups groups={groups} guides={guides} pathname={pathname} isOpen={isOpen} onToggle={onToggle} />
         </div>
       </aside>
     </>
