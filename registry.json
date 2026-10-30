@@ -954,6 +954,43 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert Dialog",
+      "description": "A modal confirmation that interrupts the flow and needs an explicit choice before anything happens.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/alert-dialog/alert-dialog.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/alert-dialog/alert-dialog.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B4",
+        "motion": [
+          { "recipe": "popup.anchored", "form": "css-transition" },
+          { "recipe": "exit.fade", "form": "css-transition" }
+        ],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

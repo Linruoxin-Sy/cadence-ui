@@ -41,4 +41,5 @@ export const previews: Record<string, ComponentType> = {
   "toggle-group": dynamic(() => import("./toggle-group").then((mod) => ({ default: mod.ToggleGroupPreview }))),
   "input-otp": dynamic(() => import("./input-otp").then((mod) => ({ default: mod.InputOtpPreview }))),
   progress: dynamic(() => import("./progress").then((mod) => ({ default: mod.ProgressPreview }))),
+  "alert-dialog": dynamic(() => import("./alert-dialog").then((mod) => ({ default: mod.AlertDialogPreview }))),
 };

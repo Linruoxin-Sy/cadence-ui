@@ -6,10 +6,12 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B2 complete.** B0 removed the eight original motion components and shipped the parity foundation;
-> B1 added the eleven atoms (button, badge, kbd, separator, label, input, textarea, card, aspect-ratio, avatar,
-> skeleton) plus the upstream parity check; B2 added the nine structure-and-feedback components (alert, empty,
-> item, field, button-group, input-group, breadcrumb, pagination, spinner). B3 (form controls) is next — see
+> Status: **B3 complete; B4 in progress (`dialog`, `alert-dialog`).** B0 removed the eight original motion
+> components and shipped the parity foundation; B1 added the eleven atoms (button, badge, kbd, separator,
+> label, input, textarea, card, aspect-ratio, avatar, skeleton) plus the upstream parity check; B2 added the
+> nine structure-and-feedback components (alert, empty, item, field, button-group, input-group, breadcrumb,
+> pagination, spinner); B3 added the eight form controls (checkbox, radio-group, switch, slider, toggle,
+> toggle-group, input-otp, progress); B4 is adding the overlays. See
 > [the parity plan](docs/parity-plan.md).
 
 ## Install
@@ -55,6 +57,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `avatar` — image with fallback      | T0   | none                          |
 | `skeleton` — loading placeholder    | T4   | `data.transition`             |
 | `dialog` — modal window             | T2   | `popup.anchored`, `exit.fade` |
+| `alert-dialog` — confirmation       | T2   | `popup.anchored`, `exit.fade` |
 | `alert` — state message             | T0   | none                          |
 | `empty` — resting state             | T0   | none                          |
 | `item` — list row                   | T0   | none                          |
@@ -64,8 +67,16 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `breadcrumb` — trail                | T0   | none                          |
 | `pagination` — page navigation      | T0   | none                          |
 | `spinner` — indeterminate wait      | T4   | `data.transition`             |
+| `checkbox` — binary choice          | T1   | `state.morph`                 |
+| `radio-group` — exclusive choice    | T1   | `state.morph`                 |
+| `switch` — on/off control           | T1   | `state.morph`                 |
+| `slider` — range control            | T1   | `feedback.press`              |
+| `toggle` — pressed state            | T1   | `feedback.press`              |
+| `toggle-group` — joined toggles     | T1   | `feedback.press`              |
+| `input-otp` — one-time code         | T1   | `state.morph`                 |
+| `progress` — determinate completion | T4   | `data.transition`             |
 
-The remaining 36 components, their batches, and the motion tier for each are listed in
+The remaining 27 components, their batches, and the motion tier for each are listed in
 [docs/parity-plan.md](docs/parity-plan.md).
 
 ## Rules

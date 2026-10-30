@@ -1,6 +1,6 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (`dialog` shipped as the B0 pilot).**
+> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (`dialog` and `alert-dialog` shipped).**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -208,19 +208,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                            |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------------------------------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                           |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                           |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                           |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                           |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (`dialog` shipped) |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                           |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                           |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                           |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                           |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                           |
-|       | **Total**                  | **57** |            | **102**     |         |                                   |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                                         |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ---------------------------------------------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                                        |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                                        |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                                        |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                                        |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (2/7: `dialog`, `alert-dialog`) |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                                        |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                                        |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                                        |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                                        |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                                        |
+|       | **Total**                  | **57** |            | **102**     |         |                                                |
 
 ### 7.0 Status discipline
 
@@ -418,21 +418,38 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Why not `next`:** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so one item of this
   batch is already live. Marking the row `next` would have made §7.0's rule ("a batch whose row still says
   `next` is not done") hide a shipped component.
-- **Shipped:** `dialog` only. Remaining: `alert-dialog`, `sheet`, `drawer`, `popover`, `tooltip`, `hover-card`.
+- **Shipped:** `dialog`, `alert-dialog`. Remaining: `sheet`, `drawer`, `popover`, `tooltip`, `hover-card`.
+- **Alert dialog (2026-10-30):** the second B4 item, built on the repaired dialog pattern. 30 components,
+  35 registry items, 30 docs, 30 previews, 140 tests. Same declarations (`popup.anchored` + `exit.fade`,
+  `form: "css-transition"`), so the durations, the `data-starting-style` / `data-ending-style` classes and
+  the three-mode assertions are the dialog's, `data-slot` for `data-slot`.
+  - **`AlertDialogAction` and `AlertDialogCancel` both render Base UI's `Close`.** Upstream's Base UI port
+    leaves `AlertDialogAction` as a plain `Button`, so the default usage would confirm nothing and leave the
+    dialog open. Exports, `data-slot` values and props are unchanged — only the primitive behind the button
+    is — and `parity:check` still reports the surface as matching.
+  - **Upstream's other props are kept:** `size="default" | "sm"` on the popup, the `AlertDialogMedia` slot
+    (12th export), and `variant` / `size` on both buttons. Visuals are `new-york-v4`'s, including the
+    `group/alert-dialog-content` layout that the header, footer and media read.
+  - **E2E:** the matrix gained an `alert-dialog` block (3 modes × 2 preferences + the reduced-only settle
+    test) and the axe page list gained `/components/alert-dialog`, both in both themes. A second overlay in
+    the matrix on purpose: it shares the popup CSS with `dialog` but not the markup, so a token regression
+    would otherwise show up in only one file.
+  - **Focus, verified rather than assumed:** focus lands on the cancel control — Base UI focuses the first
+    tabbable element — not on the destructive action, so a stray Enter cancels. The unit test asserts it and
+    the docs say it; the first draft claimed the popup itself took focus, and the test disproved it.
 - **Contract repair (2026-10-30):** the dialog's durations moved from the literals `duration-200` / `duration-100`
   onto `--motion-duration-base` / `--motion-duration-fast`, and `data-motion="none"` now resolves those
   variables to `0ms` instead of falling into the `reduced` branch. `popup.anchored` and `exit.fade` are
   declared with `form: "css-transition"`, and `registry:check` now fails when a declared recipe has no
   implementation — which is how the gap was found.
 - **Browser proof (2026-10-30):** the Playwright matrix now exists. `tests/e2e/motion-matrix.spec.ts` runs
-  `button`, `dialog`, `switch` and `progress` across 3 modes × 2 system preferences and asserts
-  `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 49 tests,
-  green. That closes the "Playwright mode matrix" half of the B1–B4 gate.
+  `button`, `dialog`, `alert-dialog`, `switch` and `progress` across 3 modes × 2 system preferences and
+  asserts `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 58 tests, green.
 - **Still open:** dual-theme screenshots for B1–B4. With a production build running in CI this is now a
   screenshot script, not an environment limitation.
-- **Order for the remaining six:** `alert-dialog` (reuses `dialog`), then `popover` / `tooltip` / `hover-card`
-  (one `popup.anchored` implementation), then `sheet` / `drawer` (new side/bottom variants). Each keeps the
-  `form: "css-transition"` declaration and the three-mode assertions that `dialog` set.
+- **Order for the remaining five:** `popover` / `tooltip` / `hover-card` (one `popup.anchored`
+  implementation), then `sheet` / `drawer` (new side/bottom variants). Each keeps the `form:
+  "css-transition"` declaration and the three-mode assertions that `dialog` set.
 
 #### Contract drift closed (2026-10-30)
 

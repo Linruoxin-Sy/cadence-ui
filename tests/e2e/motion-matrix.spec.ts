@@ -106,6 +106,63 @@ test.describe("dialog", () => {
   });
 });
 
+test.describe("alert-dialog", () => {
+  // A second overlay in the matrix on purpose: it shares the dialog's popup CSS but
+  // not its markup, so a token or a `data-*-style` regression would show up in only
+  // one of the two files if this block did not exist.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="alert-dialog-content"]');
+          await openComponent(page, "alert-dialog", requested, "alert-dialog-trigger", mode);
+
+          await page.locator(scoped("alert-dialog", '[data-slot="alert-dialog-trigger"]')).first().click();
+          await expect(page.getByRole("alertdialog")).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const popup = page.locator('[data-slot="alert-dialog-content"]');
+          await expect(popup).toHaveAttribute("data-motion", mode);
+
+          // The same duration tokens as `dialog`: `none` must zero them on the
+          // element, not fall back to the reduced values.
+          expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-duration")).toBe(
+            { full: "0.22s", reduced: "0.132s", none: "0s" }[mode],
+          );
+          expect(await computed(page, '[data-slot="alert-dialog-overlay"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+
+  test.describe("reduced keeps the fade and drops only the scale", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the panel fades without the 0.95 settle", async ({ page }) => {
+      await recordScale(page, '[data-slot="alert-dialog-content"]');
+      await openComponent(page, "alert-dialog", "reduced", "alert-dialog-trigger");
+      await page.locator(scoped("alert-dialog", '[data-slot="alert-dialog-trigger"]')).first().click();
+      await expect(page.getByRole("alertdialog")).toBeVisible();
+      await page.waitForTimeout(300);
+
+      expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-property")).toContain("opacity");
+      expect(await computed(page, '[data-slot="alert-dialog-content"]', "transition-duration")).toBe("0.132s");
+      expect((await recordedScale(page)).min).toBe(1);
+    });
+  });
+});
+
 test.describe("switch", () => {
   for (const prefersReduced of PREFERENCES) {
     test.describe(preferenceName(prefersReduced), () => {

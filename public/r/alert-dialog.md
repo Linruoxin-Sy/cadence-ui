@@ -1,0 +1,213 @@
+# Alert Dialog
+
+> A modal confirmation that interrupts the flow and needs an explicit choice before anything happens.
+
+- Registry item: https://cadence.dev/r/alert-dialog.json
+- Install: `npx shadcn@latest add @cadence/alert-dialog`
+- Type: registry:ui
+- Since: 0.3.0
+- Motion recipes: popup.anchored, exit.fade
+
+## When to use
+
+- A destructive or irreversible action — deleting a project, revoking a key, overwriting a draft — that the
+  user must confirm on purpose.
+- A decision the page cannot make for the user: move the workspace, leave without saving, end the session.
+- A step that must be acknowledged before anything else continues, where an accidental dismissal would be
+  the bug.
+
+## When not to use
+
+- A task with more than one decision or a form to fill in. Use `dialog`: it can be dismissed, and it should be.
+- A message that does not block anything. Use `alert` where it belongs on the page, or `toast` for a moment.
+- A hint attached to a control. Use `tooltip`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/alert-dialog
+```
+
+This also installs `button`, which the two actions render through.
+
+## Usage
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/cadence/alert-dialog/alert-dialog";
+import { Button } from "@/components/cadence/button/button";
+
+export function DeleteProject() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Every deployment and its logs go with it. This cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Keep project</AlertDialogCancel>
+          <AlertDialogAction variant="destructive">Delete project</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+```
+
+## Examples
+
+### A compact confirmation
+
+`size="sm"` caps the panel at `max-w-xs` and turns the footer into a two-column grid, which is what a
+yes/no question looks like. The dialog is centred and its header is centred with it.
+
+```tsx
+<AlertDialogContent size="sm">
+  <AlertDialogHeader>
+    <AlertDialogTitle>Archive this project?</AlertDialogTitle>
+    <AlertDialogDescription>It stops deploying. You can unarchive it later.</AlertDialogDescription>
+  </AlertDialogHeader>
+  <AlertDialogFooter>
+    <AlertDialogCancel>Cancel</AlertDialogCancel>
+    <AlertDialogAction>Archive</AlertDialogAction>
+  </AlertDialogFooter>
+</AlertDialogContent>
+```
+
+### With an icon
+
+`AlertDialogMedia` is a slot, not a decoration: put an icon in it and the header switches to the
+left-aligned, icon-first layout on `size="default"`.
+
+```tsx
+<AlertDialogHeader>
+  <AlertDialogMedia>
+    <Trash2 aria-hidden="true" />
+  </AlertDialogMedia>
+  <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+  <AlertDialogDescription>Every deployment goes with it.</AlertDialogDescription>
+</AlertDialogHeader>
+```
+
+### Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<AlertDialog open={open} onOpenChange={setOpen}>
+  <AlertDialogContent>…</AlertDialogContent>
+</AlertDialog>;
+```
+
+### A confirmation that is still working
+
+The component never owns a request. The caller passes the in-flight state, and the library keeps the
+button a button:
+
+```tsx
+<AlertDialogAction disabled={isDeleting} onClick={() => mutate()}>
+  {isDeleting ? "Deleting…" : "Delete project"}
+</AlertDialogAction>
+```
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `AlertDialog` | `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete` | Base UI root. Always modal; pointer dismissal is fixed off. |
+| `AlertDialogTrigger` | native button props, `render` | Opens the dialog. |
+| `AlertDialogContent` | `size` (`"default" \| "sm"`), `render`, `className` | Renders portal, overlay, and popup. |
+| `AlertDialogOverlay` | `className` | Only needed when replacing `AlertDialogContent`. |
+| `AlertDialogHeader` / `AlertDialogFooter` | `className` | Layout only. |
+| `AlertDialogMedia` | `className` | Icon slot; changes the header layout. |
+| `AlertDialogTitle` | `className` | Required accessible name. |
+| `AlertDialogDescription` | `className` | Supporting text; wire it to the decision, not the product. |
+| `AlertDialogAction` | `variant`, `size`, `onClick`, `render` | Confirming button. Closes the dialog after `onClick` runs. |
+| `AlertDialogCancel` | `variant` (`outline`), `size`, `onClick`, `render` | Dismissing button. Also closes the dialog. |
+
+Both buttons render Base UI's `Close`, so a confirmation ends the dialog instead of leaving it open —
+upstream's Base UI port binds neither button, which would make the default usage a no-op.
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.95 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.95` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
+
+The entrance is the dialog's, because this is the same popup: a fade under a 0.95-scale settle. The
+motion is CSS-only — Base UI toggles `data-starting-style` / `data-ending-style` and the class list
+reads the duration tokens — so there is no JavaScript animation loop and nothing to interrupt by hand.
+Reopening during the exit reverses the fade rather than restarting it.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Cycles focus inside the dialog. Focus never reaches the page behind it. |
+| Escape | Cancels: the dialog closes and focus returns to the trigger. |
+| Enter / Space | Activates the focused button — confirm or cancel, whichever has focus. |
+
+The outside press is the one path that is deliberately missing: clicking the overlay does nothing,
+which is the difference between this component and `dialog`.
+
+## Accessibility
+
+- Base UI provides `role="alertdialog"`, `aria-modal`, `aria-labelledby`, `aria-describedby`, focus
+  trapping, focus return, scroll lock, and the Escape path.
+- `AlertDialogTitle` is required: an alert dialog without an accessible name is invalid, and it is
+  announced as the first thing inside the popup. `AlertDialogDescription` becomes the description, so
+  put the consequence there, not in a second paragraph.
+- Focus lands on the cancel control, the first tabbable element inside the popup, not on the destructive
+  action — so a stray Enter cancels rather than confirms. Put `AlertDialogCancel` first in the footer for
+  that reason; the footer's column-reverse layout still shows the confirming action on top.
+- Destructive styling is colour plus a specific verb ("Delete project", not "OK"). Never rely on the
+  red alone; the label has to carry the meaning in greyscale and in a screen reader.
+- `AlertDialogMedia` is decorative when the title already says what happened. Mark the icon
+  `aria-hidden="true"` unless it is the only signal.
+
+## Responsive behavior
+
+The panel is centred with a 1rem gutter on narrow viewports: `max-w-lg` for the default size and
+`max-w-xs` for `size="sm"`. The footer stacks its buttons in reverse DOM order (the confirming action
+on top) below `sm`, and becomes a row that ends on the right above it. With `size="sm"` the two
+buttons split the width instead of stacking, so the two answers stay side by side at every size.
+
+## Performance
+
+- One popup tree is mounted only while open; the overlay and panel unmount after the exit transition.
+- Animates `opacity` and `scale` only: no layout reads, no `width`/`height` transition, and no
+  JavaScript animation running while the dialog sits open.
+- `AlertDialogAction` and `AlertDialogCancel` are ordinary `Button`s, so the press feedback is the
+  button's (a 0.97 scale that the same motion mode can drop).
+
+## Notes for AI
+
+- Reach for `alert-dialog` only when the answer must be deliberate. A form, a longer task, or anything
+  the user may want to dismiss belongs in `dialog`.
+- Always render `AlertDialogTitle`; it is the accessible name. Use `AlertDialogDescription` for the
+  consequence of the action, in one sentence.
+- Name the confirming button after its effect ("Delete project", "Leave without saving"), never "OK".
+- Both buttons close the dialog, so never hide the dialog manually in `onClick`; pass the work to the
+  caller instead.
+- Use `AlertDialogMedia` for an icon, not for an illustration: the slot is a 4rem square that changes
+  the header layout.
+
+---
+
+Full index: https://cadence.dev/llms.txt

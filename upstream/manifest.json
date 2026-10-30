@@ -7,7 +7,7 @@
   "pin": {
     "ref": "96da9cc7f1aa10580a3741664e2a77c721206c00",
     "date": "2026-10-27",
-    "syncedAt": "2026-10-29"
+    "syncedAt": "2026-10-30"
   },
   "items": {
     "button": {
@@ -424,6 +424,37 @@
         "progress-label",
         "progress-track",
         "progress-value"
+      ]
+    },
+    "alert-dialog": {
+      "path": "apps/v4/registry/bases/base/ui/alert-dialog.tsx",
+      "exports": [
+        "AlertDialog",
+        "AlertDialogAction",
+        "AlertDialogCancel",
+        "AlertDialogContent",
+        "AlertDialogDescription",
+        "AlertDialogFooter",
+        "AlertDialogHeader",
+        "AlertDialogMedia",
+        "AlertDialogOverlay",
+        "AlertDialogPortal",
+        "AlertDialogTitle",
+        "AlertDialogTrigger"
+      ],
+      "slots": [
+        "alert-dialog",
+        "alert-dialog-action",
+        "alert-dialog-cancel",
+        "alert-dialog-content",
+        "alert-dialog-description",
+        "alert-dialog-footer",
+        "alert-dialog-header",
+        "alert-dialog-media",
+        "alert-dialog-overlay",
+        "alert-dialog-portal",
+        "alert-dialog-title",
+        "alert-dialog-trigger"
       ]
     }
   }
