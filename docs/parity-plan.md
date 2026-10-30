@@ -424,7 +424,15 @@ axe with zero violations, size budget, and dual-theme screenshots.
   variables to `0ms` instead of falling into the `reduced` branch. `popup.anchored` and `exit.fade` are
   declared with `form: "css-transition"`, and `registry:check` now fails when a declared recipe has no
   implementation — which is how the gap was found.
-- **Still open:** dual-theme screenshots and the Playwright mode matrix, both inherited from B1–B3.
+- **Browser proof (2026-10-30):** the Playwright matrix now exists. `tests/e2e/motion-matrix.spec.ts` runs
+  `button`, `dialog`, `switch` and `progress` across 3 modes × 2 system preferences and asserts
+  `getComputedStyle` from a production build; `tests/e2e/a11y.spec.ts` runs axe in both themes. 49 tests,
+  green. That closes the "Playwright mode matrix" half of the B1–B4 gate.
+- **Still open:** dual-theme screenshots for B1–B4. With a production build running in CI this is now a
+  screenshot script, not an environment limitation.
+- **Order for the remaining six:** `alert-dialog` (reuses `dialog`), then `popover` / `tooltip` / `hover-card`
+  (one `popup.anchored` implementation), then `sheet` / `drawer` (new side/bottom variants). Each keeps the
+  `form: "css-transition"` declaration and the three-mode assertions that `dialog` set.
 
 ## 8. Backlog
 
@@ -440,6 +448,52 @@ Prerequisites before any AI batch is scheduled:
 2. A streaming message model agreed (chunking, state machine, cancel, retry).
 3. Upstream source obtained: most of these ids are not in shadcn's registry index, so parity
    checking has nothing to compare against until they are.
+
+### Carried open work (2026-10-30 review)
+
+Everything the 2026-10-30 review proposed but did not land in the same change. It is recorded here, in the
+plan of record, so it does not depend on anyone remembering a separate document. Order is deliberate: the
+contract drift comes before B4, because the six remaining overlays copy the `dialog` pattern and would
+otherwise carry the disagreement into seven files.
+
+**Contract drift — fix before B4, in one change**
+
+| Item                                                                                                                                             | Acceptance                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `theme.reveal` is in `animation-system.md` §3 and the §5 `Recipe` union, but not in `lib/motion.ts`, and `theme-toggle` uses no View Transition. | Either it ships (theme switch + `Recipe` entry + test) or the catalogue entry goes. |
+| §5 documents `useCadenceMotion().variants(recipe)`; the provider has no such method.                                                             | The §5 snippet is the real API, and it typechecks.                                  |
+| Motion tokens have three copies that disagree: `app/globals.css`, the `cadence-theme` item's `cssVars` / `css`, and `animation-system.md` §2.3.  | The three are byte-for-byte equivalent; `registry:check` compares them.             |
+| `--motion-distance-*` / `--motion-intensity` ship to users but nothing reads them — components use the constants in `lib/motion.ts`.             | Either wire them into the JS tokens or drop them from `cadence-theme`.              |
+| `spinner`'s `animate-spin` is a transform loop; §3.2 allows opacity loops only, and no exception is written.                                     | §3.2 gains the single-element-rotation exception, or the spinner stops rotating.    |
+| `button` dropped upstream's `group/button` and `select-none`. The parity check sees neither (it compares exports and `data-slot` only).          | Both classes are back, with a comment naming upstream as the reason.                |
+
+**Tooling**
+
+- **`parity` props surface.** Compare prop names, requiredness, and defaults against the pinned upstream
+  source (AST or a generated `.d.ts`). Exports and `data-slot` catch renames; they cannot catch a missing
+  class, a changed default, or a prop that upstream added. Target: before B5, whose menu components are the
+  most prop-heavy in the catalogue.
+- **Docs-side recipe validation.** `check-registry` parses the recipe table out of `lib/motion.ts`, so a
+  recipe that exists in the documentation but not in the code is invisible to CI — exactly how `theme.reveal`
+  survived. Extend the check to the `Recipe` union in `animation-system.md` §5 and to the frontmatter table.
+- **`expectMotionContract()` helper.** The three-mode assertion is hand-written per component, and the two
+  components missing it were the two that were broken. One shared helper that a new component must call.
+- **Site initial JS budget.** `next build` now produces a route-size report; measure `/components/button`
+  against the ≤120 KB gzip budget in [animation-system.md](animation-system.md) §7 and record the number.
+
+**Documentation site** — see
+[documentation-site-and-distribution.md](documentation-site-and-distribution.md) §2.2 for the promise these
+items close: preview variant switching and code view, install-command copy (the component exists at
+`components/site/copy-command.tsx` and is imported nowhere), search and category/intensity/complexity filters
+on the index, TOC / prev-next / "Edit this page" on component pages, `/r/[...path]` with immutable caching,
+the missing guide entries, and the sidebar's landmark / `aria-controls` / height-animation problems.
+
+**Metadata**
+
+- `meta.intensity` is `subtle` on 28 of 29 components, so the filter the site does not have yet would have no
+  discriminating power when it lands. Decide what the dimension means or drop it from the docs table.
+- T0 component docs omit the "Responsiveness and performance" section that the 12-section template promises,
+  and nothing enforces the template. Either the template is tier-specific or the section is written.
 
 ### Deferred and excluded
 

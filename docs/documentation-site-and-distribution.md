@@ -75,6 +75,11 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 
+**Built today:** slow motion, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
+and per-page dynamic loading of previews. Variant switching, the code block, and install copy are **not**
+built yet — `components/site/copy-command.tsx` exists but is mounted nowhere. The gap between this table and
+the site is tracked in [parity-plan.md](parity-plan.md) §8, not here; this section describes the target.
+
 ### 2.3 Body typography
 
 The MDX body is styled by [shadcn/typeset](https://ui.shadcn.com/docs/typeset), not by a typography layer of
