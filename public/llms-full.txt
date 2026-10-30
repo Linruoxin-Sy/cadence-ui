@@ -61,6 +61,7 @@ npx shadcn@latest add @cadence/button
 - [Sheet](https://cadence.dev/r/sheet.md): A panel that slides in from an edge of the screen and holds a focused task without leaving the page. (overlay)
 - [Drawer](https://cadence.dev/r/drawer.md): A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request. (overlay)
 - [Select](https://cadence.dev/r/select.md): A control that opens a list of options and keeps the chosen value in the trigger. (form)
+- [Code block](https://cadence.dev/r/code-block.md): A copyable code surface with an optional title, line numbers, diff markers, and a measured collapse. (ai)
 
 ## Docs
 
@@ -5427,3 +5428,317 @@ trigger, so a select in a toolbar does not reflow the page beyond its own row.
 - Keep item labels short and distinct; typeahead matches their text.
 - Do not add a separate "selected" class to the trigger; the value already carries the state.
 - For invalid state, pass `aria-invalid`; the trigger styles it from the attribute.
+
+# Code block
+
+A copyable code surface with an optional title, line numbers, diff markers, and a measured collapse.
+
+## When to use
+
+- A source snippet the reader is meant to copy: an install command, a route handler, a config file.
+- An answer from an assistant, where the block sits inside a message and the reader may want the code out of it.
+- Tool calls and their output — a shell run, a stack trace, a JSON payload — where the reader scans rather than reads.
+- A diff or a patch, where added and removed lines have to be distinguishable at a glance and without colour.
+- A long file that would dominate the page: cap it with `maxLines` and let the reader unfold it.
+
+## When not to use
+
+- A single value the reader copies — an API key, a URL, an id. Use the copy button on its own; a bordered code
+  surface gives a one-line value more weight than it deserves.
+- Inline code in a sentence. Use `<code>`, which the page's typeset styles.
+- Content that is not code and not output: a quote, a log line with no structure, a terminal transcript with
+  interactive prompts. A block that looks like code but is not sets the wrong expectation about copying.
+- A whole editor. This is a viewer; it has no caret, no selection model of its own, and no undo.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/code-block
+```
+
+The block installs `button` for the copy and fold controls, and `code-highlight` — the Shiki adapter — for syntax
+colouring. That second item is only downloaded when a block actually asks for a `language`.
+
+## Usage
+
+```tsx
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block/code-block";
+
+const install = `npx shadcn@latest add @cadence/code-block`;
+
+export function Install() {
+  return (
+    <CodeBlock language="bash">
+      <CodeBlockHeader>
+        <CodeBlockTitle>Terminal</CodeBlockTitle>
+        <CodeBlockActions>
+          <CodeBlockCopyButton value={install} />
+        </CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockContent>{install}</CodeBlockContent>
+    </CodeBlock>
+  );
+}
+```
+
+## Examples
+
+### Line numbers
+
+`lineNumbers` splits a string child into lines and numbers them from `startLine`. The gutter is a `::before` on
+each line, so the numbers are not part of a selection and do not travel with copied text.
+
+```tsx
+<CodeBlockContent lineNumbers startLine={42}>
+  {snippetFromTheMiddleOfAFile}
+</CodeBlockContent>
+```
+
+### Diff
+
+Map each line to a `CodeBlockLine` and pick its variant. `added` and `removed` carry a `+` / `−` marker as well as
+a tint, so the diff survives a monochrome screen and a colour-blind reader.
+
+```tsx
+<CodeBlockContent lineNumbers>
+  <CodeBlockLine variant="removed">const chunks = await reader.read();</CodeBlockLine>
+  <CodeBlockLine variant="added">for await (const chunk of reader) {"{"}</CodeBlockLine>
+  <CodeBlockLine>{"  controller.enqueue(chunk);"}</CodeBlockLine>
+  <CodeBlockLine variant="added">{"}"}</CodeBlockLine>
+</CodeBlockContent>
+```
+
+`highlighted` marks a line to call out without claiming it changed.
+
+### Folding a long file
+
+`maxLines` on `CodeBlock` caps the block; `CodeBlockExpandButton` unfolds it. Both are additive props — upstream
+shadcn leaves the fold to the consumer, and that composition still works if you would rather wire your own
+control to `expanded` / `onExpandedChange`.
+
+```tsx
+<CodeBlock maxLines={12}>
+  <CodeBlockHeader>
+    <CodeBlockTitle>app/api/chat/route.ts</CodeBlockTitle>
+    <CodeBlockActions>
+      <CodeBlockCopyButton value={source} />
+    </CodeBlockActions>
+  </CodeBlockHeader>
+  <CodeBlockContent lineNumbers>{source}</CodeBlockContent>
+  <CodeBlockFooter className="justify-center">
+    <CodeBlockExpandButton />
+  </CodeBlockFooter>
+</CodeBlock>
+```
+
+The button renders nothing while the content fits, so a short file never grows a dead control. The fold is
+measured from the rendered content, so it follows wrapped lines and whatever font size the page sets.
+
+### Tool output
+
+Output is not source: it wraps instead of scrolling sideways, and it is smaller. Use `variant="destructive"` when
+the run failed rather than recolouring the text yourself.
+
+```tsx
+<CodeBlock variant="destructive" size="sm">
+  <CodeBlockHeader>
+    <CodeBlockTitle>run_shell</CodeBlockTitle>
+  </CodeBlockHeader>
+  <CodeBlockContent wrap className="max-h-64">
+    {stderr}
+  </CodeBlockContent>
+</CodeBlock>
+```
+
+### Floating actions
+
+Put `CodeBlockActions` directly inside `CodeBlock`, with no header, and it floats over the top-end corner. It is
+revealed on hover and on focus, and it is permanently visible on a device that cannot hover.
+
+```tsx
+<CodeBlock>
+  <CodeBlockActions>
+    <CodeBlockCopyButton value={output} />
+  </CodeBlockActions>
+  <CodeBlockContent>{output}</CodeBlockContent>
+</CodeBlock>
+```
+
+### Highlighting
+
+Set `language` and a string child is tokenized; leave it out and the same child renders as plain text, which is
+what tool output wants. The tokenizer is [Shiki](https://shiki.style) in its JavaScript-regex mode, imported
+**dynamically**: a block without a `language` never downloads it, and a block with one downloads a single chunk
+plus the grammar for that language.
+
+```tsx
+<CodeBlock language="tsx">
+  <CodeBlockContent lineNumbers>{source}</CodeBlockContent>
+</CodeBlock>
+```
+
+Bundled languages: `bash` (`sh`, `shell`, `zsh`), `css`, `diff`, `html`, `javascript` (`js`), `json`, `jsx`,
+`markdown` (`md`), `python` (`py`), `sql`, `tsx`, `typescript` (`ts`), `yaml` (`yml`). An unknown language is not
+an error — the source stays plain. Add one by adding a row to `languages` in `code-highlight/highlight.tsx`.
+
+Two things are worth knowing about how it behaves:
+
+- **Colours are CSS variables, not fixed hex.** Each token carries `--shiki-light` and `--shiki-dark`, and the
+  span reads whichever one the current theme sets. Switching to dark re-colours the block without re-tokenizing.
+  The two themes are the **high-contrast** GitHub pair, chosen in the same file if you want your own: the plain
+  `github-light` paints parameters in orange at 3.5:1 on white, which fails WCAG AA on any block with a function
+  signature.
+- **Streaming tokenizes once per line.** The hook keeps the grammar state after the last complete line, so an
+  assistant appending a token re-tokenizes the line being written, not the block. Finished lines keep their nodes
+  — React does not re-render them.
+
+The first paint is plain: the highlighter is a separate chunk, so it arrives after hydration. If a flash of
+uncoloured code is not acceptable, highlight on the server and pass the nodes in — the same tokenizer is exported
+as a plain async function for exactly that:
+
+```tsx
+// Server Component: Shiki never reaches the client bundle.
+const lines = (await highlightCode(source, "tsx")) ?? [source];
+
+<CodeBlockContent lineNumbers>
+  {lines.map((line, index) => (
+    <CodeBlockLine key={index}>{line}</CodeBlockLine>
+  ))}
+</CodeBlockContent>;
+```
+
+A diff is a `CodeBlockLine` list, not a `language` (see above): the `+` / `−` markers say more than a colour, and a
+raw patch passed as a string with `language="diff"` would lose them. The `diff` grammar is there if you want the
+colours instead.
+
+Without a `language`, a string child stays **one text node** — the browser appends a chunk to it instead of
+reconciling a tree of spans, which is what makes a streaming output block cheap.
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `CodeBlock` | `variant`, `size`, native `div` props | `variant`: `default` \| `destructive`. `size`: `default` \| `sm`. |
+| | `maxLines`, `expanded`, `defaultExpanded`, `onExpandedChange` | Additive fold. Uncontrolled unless `expanded` is passed. |
+| | `language` | Additive. Highlights a string child; an unknown name renders plainly. |
+| `CodeBlockHeader` | native `div` props | Sits above the source; tightens the source's top padding. |
+| `CodeBlockTitle` | native `div` props | Truncates. Wrap it in an anchor to link to the file. |
+| `CodeBlockActions` | native `div` props | In a header it sits at the end; on its own it floats. |
+| `CodeBlockCopyButton` | `value` (required), all `Button` props | Copies `value`; `variant` defaults to `ghost`, `size` to `icon-xs`. |
+| `CodeBlockContent` | `wrap`, `lineNumbers`, `startLine`, `language`, native `pre` props | Always `dir="ltr"` and focusable (`tabIndex={0}`; pass `-1` to remove it). `language` overrides the block's. |
+| `CodeBlockLine` | `variant`, native `span` props | `default` \| `added` \| `removed` \| `highlighted`. |
+| `CodeBlockFooter` | native `div` props | Sits below the source; tightens its bottom padding. |
+| `CodeBlockExpandButton` | all `Button` props | Additive. Renders nothing unless the block overflows. |
+
+`CodeBlockContent` takes its `id` from the block, which is what `CodeBlockExpandButton` points
+`aria-controls` at. If you pass an `id` of your own for an anchor link, pass the same value to the button's
+`aria-controls` as well.
+
+Highlighting is a second item, installed automatically as a dependency of `code-block`:
+
+| `code-highlight` | Signature | Notes |
+| --- | --- | --- |
+| `highlightCode` | `(code: string, language: string) => Promise<ReactNode[][] \| null>` | For a Server Component or any await. `null` when the language is not bundled. |
+| `useHighlightedCode` | `(code: string, language?: string) => ReactNode[] \| null` | Client hook. `null` until the grammar loads, so the caller keeps its plain text. |
+| `loadHighlighter` | `(language: string) => Promise<Highlighter \| null>` | The lower-level form: `highlight(code, state)` returns lines plus the grammar state for the next chunk. |
+
+Every part carries a `data-slot` (`code-block`, `code-block-header`, `code-block-title`, `code-block-actions`,
+`code-block-copy-button`, `code-block-content`, `code-block-code`, `code-block-line`, `code-block-line-content`,
+`code-block-footer`, plus the additive `code-block-viewport` and `code-block-expand-button`), so a consumer can
+restyle without a wrapper.
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize` | yes (a second click retargets the spring) |
+| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition` | yes |
+| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph` | yes |
+| fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph` | yes |
+| reduced | fade and rotation stay; the height jumps, and the copy glyph swaps without scaling | `geometry.resize` resolves to `{ duration: 0 }` | – |
+| none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
+
+Two notes on the choices:
+
+- The fold animates a **measured** height rather than a `max-height` in a class. A class would need a magic number
+  per line count, and it would break the moment a line wraps. The spring is the token's, and the rendered height is
+  clamped to the content so it can never settle above or below the real size.
+- Under reduced motion the height change is a jump on purpose. Unfolding is information — the reader asked to see
+  more lines — and a 200 ms layout tween is exactly the motion the reduced mode exists to remove.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab | Reaches the copy button, the source, and the fold toggle, in that order. |
+| Arrow keys / Page Up / Page Down | Scroll the source once it has focus; a long line or a capped block scrolls without moving the page. |
+| Enter / Space | Copies, or toggles the fold. |
+| Cmd/Ctrl + C | Copies the selection — line numbers and diff markers are excluded, blank lines are kept. |
+
+## Accessibility
+
+- The source is a real `pre` > `code` and is focusable, so a keyboard user can scroll a block that overflows. A
+  `max-height` on the content keeps that true for capped blocks too.
+- Line numbers are drawn with generated content, so they stay out of the text selection and out of the accessibility
+  tree; the code is read as code, without a column of digits.
+- The copy button's accessible name is `Copy`, then `Copied`; a polite live region repeats the result, so the tick
+  is confirmation, not the only signal. A refused clipboard write leaves the glyph on `Copy` rather than claiming
+  success.
+- Diff lines carry a `+` / `−` marker next to the tint, so the change survives a monochrome display.
+- The fold toggle is a real button with `aria-expanded` and `aria-controls` pointing at the source, and it is not
+  rendered at all when there is nothing to unfold.
+- The block is `dir="ltr"` throughout, because code reads left to right even on an RTL page. The header follows the
+  page's direction.
+
+## Responsive behavior
+
+- `size="sm"` tightens the padding and drops the source to `text-xs` — the right weight for output inside a
+  message or a tool row.
+- Long lines scroll inside the block, never the page: the source owns the overflow, and the wrapper clips it.
+- `wrap` is for output, not for source. Wrapped source loses its indentation structure, which is the one thing code
+  formatting carries.
+- On a narrow screen the header's title truncates rather than wrapping, and the actions stay reachable — a touch
+  device always shows them, because there is no hover to reveal them with.
+
+## Performance
+
+- Without a `language`, a string child is one text node: streaming a chunk does not rebuild a subtree, only the
+  changed text is painted. With a `language`, each finished line is one node that is never re-created, and the
+  line being written is the only one re-tokenized.
+- One `ResizeObserver` per foldable block, and none for a block that cannot fold. The measurement is a read inside
+  the observer callback, never during render.
+- The fold animates `height` — a layout property, and the one place in this component that touches layout. It is
+  scoped to a leaf element whose neighbours do not move, it is clamped, and it resolves to zero duration under
+  reduced and none.
+- Everything else is `opacity` and `scale` on small elements: two glyphs and a chevron.
+- Shiki is a dynamic import. A block with no `language` never loads it; a block with one loads the engine and a
+  single grammar, both cached for the rest of the session. `getLoadedLanguages()` is checked first, so the second
+  `tsx` block on a page does not re-load anything.
+- Tokenizing runs on the main thread. It is fast (a screenful is a fraction of a millisecond in the JS engine), but
+  a thousand-line file is not free: cap it with `maxLines`, or hand the nodes in from a Server Component with
+  `highlightCode`.
+
+## Notes for AI
+
+- Reach for `code-block` for code, terminal output, tool calls, logs, diffs and stack traces. Never hand-roll a
+  `<pre>` — the copy affordance, the focus ring, and the fold are the point.
+- Give the block a `value` to copy that matches what is displayed. Passing a truncated string is the most common
+  bug: the reader copies less than they can see.
+- Tool output is not source: `size="sm"` with `wrap` and a `max-h-*` on the content. Errors use
+  `variant="destructive"` on `CodeBlock`; do not recolour the text.
+- When a stream is still arriving, keep rendering the same `<CodeBlockContent>` and let the string grow. Do not key
+  the block by content, and do not remount it — a remount restarts the fold measurement, drops focus, and throws
+  away the cached lines, so the whole block is tokenized again on the next chunk.
+- Pass `language` for source, and leave it out for tool output, logs and stack traces: a tokenizer that guesses at
+  output colours noise, and the plain path is the cheaper one.
+- The first paint is plain while the highlighter chunk loads. Do not hide the block until it is coloured; showing
+  the text immediately is the point.
+- Use `maxLines` for anything longer than a screenful, with `CodeBlockExpandButton` in the footer. Do not cap the
+  block by cropping the string.
