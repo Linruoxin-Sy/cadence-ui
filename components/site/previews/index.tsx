@@ -3,6 +3,7 @@ import { AlertPreview } from "./alert";
 import { AspectRatioPreview } from "./aspect-ratio";
 import { AvatarPreview } from "./avatar";
 import { BadgePreview } from "./badge";
+import { BreadcrumbPreview } from "./breadcrumb";
 import { ButtonPreview } from "./button";
 import { ButtonGroupPreview } from "./button-group";
 import { CardPreview } from "./card";
@@ -14,6 +15,7 @@ import { InputGroupPreview } from "./input-group";
 import { ItemPreview } from "./item";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
+import { PaginationPreview } from "./pagination";
 import { SeparatorPreview } from "./separator";
 import { SkeletonPreview } from "./skeleton";
 import { TextareaPreview } from "./textarea";
@@ -41,4 +43,6 @@ export const previews: Record<string, ComponentType> = {
   field: FieldPreview,
   "button-group": ButtonGroupPreview,
   "input-group": InputGroupPreview,
+  breadcrumb: BreadcrumbPreview,
+  pagination: PaginationPreview,
 };

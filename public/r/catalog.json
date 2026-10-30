@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -388,7 +388,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -417,7 +417,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -447,7 +447,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -479,7 +479,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -510,7 +510,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -542,7 +542,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -574,9 +574,69 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
+  },
+  {
+    "name": "breadcrumb",
+    "type": "registry:ui",
+    "title": "Breadcrumb",
+    "description": "The trail from the root to the current page.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "fa4bac4",
+    "docs": "/r/breadcrumb.md",
+    "item": "/r/breadcrumb.json"
+  },
+  {
+    "name": "pagination",
+    "type": "registry:ui",
+    "title": "Pagination",
+    "description": "Page navigation that stays a link, not a button.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "fa4bac4",
+    "docs": "/r/pagination.md",
+    "item": "/r/pagination.json"
   },
   {
     "name": "dialog",
@@ -611,7 +671,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "931b594",
+    "sourceSha": "fa4bac4",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   }

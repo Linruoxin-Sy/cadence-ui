@@ -253,6 +253,46 @@
         "input-group-control"
       ]
     },
+    "breadcrumb": {
+      "path": "apps/v4/registry/bases/base/ui/breadcrumb.tsx",
+      "exports": [
+        "Breadcrumb",
+        "BreadcrumbEllipsis",
+        "BreadcrumbItem",
+        "BreadcrumbLink",
+        "BreadcrumbList",
+        "BreadcrumbPage",
+        "BreadcrumbSeparator"
+      ],
+      "slots": [
+        "breadcrumb",
+        "breadcrumb-ellipsis",
+        "breadcrumb-item",
+        "breadcrumb-link",
+        "breadcrumb-list",
+        "breadcrumb-page",
+        "breadcrumb-separator"
+      ]
+    },
+    "pagination": {
+      "path": "apps/v4/registry/bases/base/ui/pagination.tsx",
+      "exports": [
+        "Pagination",
+        "PaginationContent",
+        "PaginationEllipsis",
+        "PaginationItem",
+        "PaginationLink",
+        "PaginationNext",
+        "PaginationPrevious"
+      ],
+      "slots": [
+        "pagination",
+        "pagination-content",
+        "pagination-ellipsis",
+        "pagination-item",
+        "pagination-link"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [

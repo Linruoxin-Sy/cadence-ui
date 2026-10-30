@@ -40,6 +40,8 @@ npx shadcn@latest add @cadence/button
 - [Field](/r/field.md): A labelled control with its description and error, without owning validation. (form)
 - [Button Group](/r/button-group.md): Adjacent controls joined into one shape. (form, layout)
 - [Input Group](/r/input-group.md): A text control framed with prefixes, suffixes, and buttons. (form)
+- [Breadcrumb](/r/breadcrumb.md): The trail from the root to the current page. (navigation)
+- [Pagination](/r/pagination.md): Page navigation that stays a link, not a button. (navigation)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
 
 ## Docs

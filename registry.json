@@ -593,6 +593,64 @@
       }
     },
     {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "The trail from the root to the current page.",
+      "categories": ["navigation"],
+      "dependencies": ["@base-ui/react", "lucide-react"],
+      "registryDependencies": ["@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/breadcrumb/breadcrumb.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/breadcrumb/breadcrumb.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "Page navigation that stays a link, not a button.",
+      "categories": ["navigation"],
+      "dependencies": ["lucide-react"],
+      "registryDependencies": ["@cadence/button", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/pagination/pagination.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/pagination/pagination.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",

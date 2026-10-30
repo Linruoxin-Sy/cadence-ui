@@ -1,0 +1,157 @@
+---
+title: Pagination
+description: Page navigation that stays a link, not a button.
+category: navigation
+motion: []
+intensity: subtle
+complexity: S
+tier: T0
+since: 0.2.0
+deps: ["lucide-react"]
+registryDeps: ["@cadence/button", "@cadence/cadence-utils"]
+---
+
+## When to use
+
+- A result set that is paged for a reason: the total is unknown, the data is remote, or
+  the URL should carry the page so it can be shared and reloaded.
+- A list where the user needs to jump to a specific page, not only step forward.
+- A table footer on the server, where the count lives in the response.
+
+## When not to use
+
+- A finite list that is already in memory. Render it, or a "load more" button — paging
+  something you already have is a worse experience than scrolling.
+- An infinite feed. There is no page to link to, so an anchor-based control lies.
+- A carousel or a wizard. Those step through slides or steps, and their controls are
+  buttons.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/pagination
+```
+
+## Usage
+
+```tsx
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/cadence/pagination/pagination";
+
+export function Pages({ page }: { page: number }) {
+  return (
+    <Pagination>
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious href={`?page=${page - 1}`} />
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationLink href="?page=1" isActive={page === 1}>
+            1
+          </PaginationLink>
+        </PaginationItem>
+        <PaginationItem>
+          <PaginationNext href={`?page=${page + 1}`} />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  );
+}
+```
+
+## Examples
+
+### A collapsed range
+
+`PaginationEllipsis` marks the pages that are not rendered. It is hidden from
+assistive tech, so the list stays short for a screen reader too.
+
+```tsx
+<PaginationItem>
+  <PaginationEllipsis />
+</PaginationItem>
+```
+
+### Custom labels
+
+`PaginationPrevious` and `PaginationNext` take `text`; the label is hidden below `sm`,
+where the chevron carries the meaning and the accessible name still says "Go to
+previous page".
+
+```tsx
+<PaginationPrevious href="?page=1" text="Back" />
+<PaginationNext href="?page=3" text="Forward" />
+```
+
+### Without a page in the URL
+
+Keep the anchor and intercept the click; do not swap it for a button. The anchor keeps
+middle-click, copy-link, and the "link" announcement.
+
+```tsx
+<PaginationLink
+  href="#"
+  onClick={(event) => {
+    event.preventDefault();
+    setPage(3);
+  }}
+>
+  3
+</PaginationLink>
+```
+
+## API
+
+| Part                  | Props                    | Notes                                                          |
+| --------------------- | ------------------------ | -------------------------------------------------------------- |
+| `Pagination`          | native nav props         | `aria-label="pagination"`, `role="navigation"`.                |
+| `PaginationContent`   | native ul props          | Row with a one-unit gap.                                       |
+| `PaginationItem`      | native li props          | One slot in the list.                                          |
+| `PaginationLink`      | `isActive`, `size`, anchors | Always an `<a>`; `aria-current="page"` and `data-active` when active. |
+| `PaginationPrevious`  | `text`, link props       | Chevron left; `aria-label="Go to previous page"`.              |
+| `PaginationNext`      | `text`, link props       | Chevron right; `aria-label="Go to next page"`.                 |
+| `PaginationEllipsis`  | native span props        | `aria-hidden`; contains `sr-only` "More pages".                |
+
+`size` comes from the button variants (`icon` by default), so the shape matches a
+button without becoming one.
+
+## Motion contract
+
+No motion (T0). A page change is a navigation: the content that changes is the list,
+not the control. Animating the pagination would animate the one thing that stays the
+same.
+
+| Phase   | Properties | Token | Interruptible |
+| ------- | ---------- | ----- | ------------- |
+| –       | none       | –     | –             |
+| reduced | none       | –     | –             |
+| none    | none       | –     | –             |
+
+If the new page's rows should arrive in sequence, that is `list.stagger` on the list.
+
+## Accessibility
+
+- `aria-label="pagination"` names the landmark, so it can be skipped or listed.
+- The current page is `aria-current="page"`. Colour and the outline variant are the
+  sighted half of the same signal — never the only one.
+- Previous and next carry a written `aria-label`, because their visible text is hidden
+  below `sm`. The chevron alone is not a name.
+- A disabled end state (`page 1`, no previous) should render the control without an
+  `href` and with `aria-disabled="true"`, not a link that 404s.
+- The ordered list gives the count; the ellipsis is decorative and must not be
+  focusable.
+
+## Notes for AI
+
+- Every control is an anchor. Do not replace it with `Button` — the shape comes from
+  `buttonVariants`, and Base UI's button would put `role="button"` on a link.
+- Keep `href` real (`?page=3`) even when a click handler takes over: it is what makes
+  the control shareable and middle-clickable.
+- Do not render more than about seven items; collapse the middle with
+  `PaginationEllipsis`.

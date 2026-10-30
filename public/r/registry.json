@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -307,7 +307,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -330,7 +330,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -354,7 +354,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -378,7 +378,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -401,7 +401,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -425,7 +425,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -448,7 +448,53 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
+      }
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "The trail from the root to the current page.",
+      "categories": [
+        "navigation"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "fa4bac4"
+      }
+    },
+    {
+      "name": "pagination",
+      "type": "registry:ui",
+      "title": "Pagination",
+      "description": "Page navigation that stays a link, not a button.",
+      "categories": [
+        "navigation"
+      ],
+      "meta": {
+        "since": "0.2.0",
+        "tier": "T0",
+        "batch": "B2",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "fa4bac4"
       }
     },
     {
@@ -474,7 +520,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "931b594"
+        "sourceSha": "fa4bac4"
       }
     }
   ]
