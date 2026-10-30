@@ -241,7 +241,8 @@ these rows. Work that landed without updating them is a process defect, and the 
 Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
-§7.1, §7.2, §7.3 and §7.4.
+§7.1, §7.2, §7.3 and §7.4. **B9 is open**: `code-block` landed ahead of the batch (see §7.5), and
+`attachment` + `bubble` are still to come.
 
 ### B1 — atoms (11)
 
@@ -277,9 +278,11 @@ green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**,
 
 `data-table`, `date-picker`.
 
-### B9 — AI first (2)
+### B9 — AI first (2 + 1 early)
 
-`attachment`, `bubble`. `marker` and `message` moved to the backlog.
+`attachment`, `bubble`. `marker` and `message` moved to the backlog. `code-block` shipped ahead of the
+batch (§7.5): it is the one AI component whose upstream source is already pinned, so it needed no new
+prerequisite to clear.
 
 ### Batch gate
 
@@ -575,13 +578,79 @@ with no provider honours the OS setting.
   every matrix call site passes it. The 49-green claim in the bullet above is only true because of
   that fix.
 
+### 7.5 `code-block` — B9, shipped early (2026-10-31)
+
+Not a batch: one item of B9, landed ahead of `attachment` and `bubble` because it is the only AI component
+whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/code-block.tsx`, 8 exports,
+10 `data-slot` values) and it needs no streaming model to be correct.
+
+- **Surface:** upstream's eight exports and ten slots exactly; one additive export,
+  `CodeBlockExpandButton` and one additive prop each for `language` / `maxLines`, plus one additive slot,
+  `code-block-viewport`. 37 components, 43 registry items (the highlighter is the 43rd), 37 docs,
+  37 previews.
+- **Highlighting shipped after the surface** (2026-10-31, same item): upstream splits it into a
+  `useHighlightedCode` hook backed by Shiki, and so does this item — `code-highlight` is a `registry:lib`
+  dependency holding `highlight.tsx` (the engine) and `use-highlighted-code.tsx` (the hook). Three
+  decisions made it a separate item rather than three files in `code-block`:
+  - **The dependency is the unit.** A consumer who only wants the surface still installs the adapter (the
+    registry has no optional dependencies), but the _runtime_ cost stays opt-in: the hook imports the
+    engine with a dynamic `import()`, so a block with no `language` never loads Shiki. `registry:check`'s
+    per-file `data-slot` rule also pushed the split — the engine renders no markup and owns no slot.
+  - **The JavaScript regex engine, not WASM.** A copied registry item cannot ship a `.wasm` asset and a
+    runtime path to it without breaking somewhere; `createJavaScriptRegexEngine({ forgiving: true })` gives
+    up a little speed and removes the asset question entirely.
+  - **Two themes, colour as a CSS variable.** `defaultColor: false` makes tokens carry `--shiki-light` /
+    `--shiki-dark`, and the span's class reads whichever the page sets. Dark mode re-colours without
+    re-tokenizing, and nothing new was added to the theme item: the palette is Shiki's, swappable in one
+    file rather than spread over `globals.css`.
+  - **Streaming.** The hook keeps the grammar state after the last complete line and tokenizes only what
+    arrived, so a chunk costs one line, not the file. `tests/components/code-highlight.test.tsx` proves it
+    by identity: a finished line's node object survives the next chunk.
+  - **First paint is plain.** The highlighter is a chunk, so SSR HTML and the first client frame are
+    uncoloured; `highlightCode()` is exported for a Server Component that would rather not flash.
+- **The fold is `geometry.resize`, measured, and cut on a line boundary.** `maxLines` + `overflowing` are
+  computed in a `ResizeObserver` from `scrollHeight` and the computed `line-height`, so wrapped lines and a
+  retuned `leading-*` both move the fold. Two details are worth recording because the first draft got them
+  wrong:
+  - The first measurement is written to the node before Motion takes the property over (`height.jump()` +
+    an inline write). Motion applies a motion value on the _next_ frame, so without it a folded block
+    paints at full height once, which is a layout shift the reader sees.
+  - The fold height is `paddingTop + floor(lineHeight × maxLines)` — **no bottom padding**. Including it
+    showed the top sliver of the next line instead of ending on a line boundary; the light-theme screenshot
+    is what caught it.
+- **Floating actions are `data.transition`, and a touch screen is not a hover.** With no header,
+  `CodeBlockActions` floats and fades in on hover or focus. `(hover: hover)` is read through
+  `useSyncExternalStore` (server snapshot `true`), so a device that cannot hover keeps the actions visible
+  instead of hiding a control it cannot summon. This is the only place the component re-renders on pointer
+  movement, which is why the reveal lives in its own context: the code subtree does not re-render with it.
+- **Copy and chevron are `state.morph`.** The copy glyph is two stacked spans, so the state change cannot
+  resize the button mid-press; under `reduced` the cross-fade stays and the scale is dropped; the chevron
+  flips with `{ duration: 0 }` under `reduced` because its direction is state, not decoration.
+- **`wrap` had to relax `min-w-max`.** Upstream keeps the code box `min-w-max` so a non-wrapping block
+  scrolls; with `wrap` that same class prevents wrapping and the output clips at the right edge. Found in
+  the tool-output example of the preview.
+- **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, T5 budget,
+  P11), `parity:check` against `96da9cc7f1aa`, 210 unit tests. `playwright test` 112/112 with
+  `PLAYWRIGHT_CHANNEL=msedge` (this environment has no Playwright-downloaded Chromium): a `code-block` block
+  in the motion matrix (3 modes × 2 preferences) and `/components/code-block` in the axe list, both themes,
+  zero violations. `next build` produced 48 pages.
+- **Dev-server note for the next contributor:** `next dev` in this sandbox cannot hydrate (its HMR socket is
+  rejected, one client chunk 404s, and the document entrance stays at `opacity: 0`), so the component looked
+  broken while the production build was correct. Verify against `next build` + `next start`, which is what
+  the e2e config already does.
+- **Still open:** `attachment`, `bubble`; ANSI colours for terminal output (Shiki ships no ANSI grammar —
+  escape codes render as text); streaming-specific motion (new code fading in place) — none of it blocks the
+  item.
+
 ## 8. Backlog
 
-### AI components (26, unscheduled)
+### AI components (25, unscheduled)
 
 Chat, Prompt Input, Message Scroller, Message, Marker, Model Selector, Reasoning, Chain of Thought,
 Tool, Task, Queue, Sources, Inline Citation, Plan, Confirmation, Checkpoint, Subagent, Terminal,
-Test Results, Context, File Tree, Suggestion, Code Block, Trace, Stack Trace, Questionnaire.
+Test Results, Context, File Tree, Suggestion, Trace, Stack Trace, Questionnaire.
+
+`code-block` left this list in 0.5.0 and is tracked in B9 instead (§7.5).
 
 Prerequisites before any AI batch is scheduled:
 
