@@ -36,7 +36,19 @@ const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : us
 function Switch({ className, size = "default", ...props }: SwitchProps) {
   const cm = useCadenceMotion();
   const thumbRef = useRef<HTMLSpanElement | null>(null);
-  const [travel, setTravel] = useState(0);
+  /**
+   * `null` until the track has been measured. The first render has no travel to
+   * apply — a checked switch that animated from that position would slide into
+   * place on every page load, and `initial={false}` does not prevent it because
+   * the value *changes* after the layout effect rather than at mount.
+   */
+  const [travel, setTravel] = useState<number | null>(null);
+  /**
+   * False until the measured travel has been painted once. Only then may a state
+   * change animate: the transition from "no distance yet" to "the real distance"
+   * is a jump, not a movement.
+   */
+  const [settled, setSettled] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
     const thumb = thumbRef.current;
@@ -51,6 +63,10 @@ function Switch({ className, size = "default", ...props }: SwitchProps) {
     observer.observe(thumb);
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (travel !== null && !settled) setSettled(true);
+  }, [travel, settled]);
 
   const mergedRef = useCallback((node: HTMLSpanElement | null) => {
     thumbRef.current = node;
@@ -91,8 +107,10 @@ function Switch({ className, size = "default", ...props }: SwitchProps) {
                 thumbClassName,
               )}
               initial={false}
-              animate={{ x: state.checked ? travel : 0 }}
-              transition={cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
+              animate={{ x: state.checked ? (travel ?? 0) : 0 }}
+              // Until the measured distance has been painted, there is nothing to
+              // animate *between*: jump into place, then spring on user input.
+              transition={!settled || cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
             />
           );
         }}
