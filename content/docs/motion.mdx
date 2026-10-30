@@ -8,7 +8,8 @@ description: The tokens, recipes, and reduced-motion rules every Cadence compone
 1. **Motion explains cause and effect.** If you cannot say what changed and why, remove it.
 2. **One protagonist at a time.** Do not move, scale, rotate, and recolor the same element at once.
 3. **Duration follows hierarchy.** Small controls are fast, panels are medium, whole sections are slow.
-4. **Interruptible by default.** Closing animations can be reversed by reopening.
+4. **Interruptible by default.** A layout spring that is retargeted mid-flight keeps the velocity it
+   already has.
 5. **Reduced motion is equivalent.** Drop travel and scale, keep the state change readable.
 
 ## Tokens
@@ -27,11 +28,17 @@ Durations are seconds, easings are cubic-bezier tuples, springs use Motion's spr
 | `ease.in` | `[0.7, 0, 0.84, 0]` | Exits |
 | `spring.press` | visualDuration 0.24, bounce 0.12 | Press feedback |
 | `spring.snappy` | visualDuration 0.26, bounce 0 | Popovers, small panels |
+| `spring.travel` | visualDuration 0.3, bounce 0 | Value handoffs, travel between two anchors |
 | `spring.smooth` | visualDuration 0.4, bounce 0 | Dialogs, layout |
 | `spring.morph` | visualDuration 0.42, bounce 0 | Shared elements, width changes |
 
 Do not invent new values. If a component needs a different feel, add a recipe to `lib/motion.ts`
 and document it.
+
+Springs are authored as `visualDuration + bounce`. The two layout recipes (`layout.move`,
+`layout.shared`) are restated as physical springs at runtime, after `timeScale`, so an interrupted
+animation keeps its speed; the other springs stay time-defined because their travel is small enough
+that inherited velocity would oscillate.
 
 ## Recipes
 
@@ -45,8 +52,8 @@ writing durations inline.
 | `exit.fade` | backdrops, dismissed layers | 0.16s ease-in |
 | `exit.shrink` | closing panels | 0.16s ease-in |
 | `popup.anchored` | dialog panel | smooth spring |
-| `layout.move` | reorder, list shifts | smooth spring |
-| `layout.shared` | tab indicator | morph spring |
+| `layout.move` | reorder, list shifts | smooth spring, physics (velocity kept) |
+| `layout.shared` | tab indicator | morph spring, physics (velocity kept) |
 | `list.stagger` | staggered lists | 0.22s + stagger |
 | `gesture.drag` | carousel, sheet | snappy spring |
 | `scroll.progress` | scroll bar | smooth spring |
@@ -55,7 +62,9 @@ writing durations inline.
 | `text.split` | per-character reveals (optional GSAP) | 0.32s |
 | `number.roll` | numeric values | snappy spring |
 | `data.transition` | skeletons, loading surfaces | opacity loop (CSS), 0.22s when one-shot |
-| `state.morph` | accordion, button width | morph spring |
+| `state.morph` | checkbox, radio, switch, input-otp | morph spring |
+| `geometry.resize` | accordion, button width, select trigger | morph spring, physics, clamped |
+| `handoff` | select value, toast origin | travel spring, physics |
 | `feedback.press` | buttons | press spring |
 
 ## Reduced motion
@@ -91,7 +100,8 @@ export function Example() {
 Five rules for new components:
 
 1. Import presets from `../lib/motion`; never hard-code a duration.
-2. Animate transform, opacity, or filter only. Height is allowed for disclosures.
+2. Animate transform, opacity, or filter only. Height is allowed for disclosures, and measured
+   width/height only through `geometry.resize` (clamped to the closed size, instant under reduced).
 3. Give every animation a reduced branch (opacity only, or none).
 4. Use `data-slot` on each part so consumers can target it with CSS.
 5. Add a Motion contract table to the component's docs.
@@ -120,8 +130,8 @@ If you want the slowdown inside your own app, it is a provider prop, not a token
 <CadenceProvider timeScale={4}>…</CadenceProvider>  // 0.25×, same as the docs preview
 ```
 
-`timeScale` multiplies durations, spring `visualDuration`, and delays. It never changes a token, and
-it cannot revive a transition under `none`.
+`timeScale` multiplies durations, spring `visualDuration`, and delays, and re-derives the physical
+springs after scaling. It never changes a token, and it cannot revive a transition under `none`.
 
 A nested provider inherits whatever it does not set, which is how the preview slows down without
 resetting the header's mode:

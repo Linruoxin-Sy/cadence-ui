@@ -63,6 +63,7 @@ export const ease = {
 export const spring = {
   press: { type: "spring", visualDuration: 0.24, bounce: 0.12 },
   snappy: { type: "spring", visualDuration: 0.26, bounce: 0 },
+  travel: { type: "spring", visualDuration: 0.3, bounce: 0 },
   smooth: { type: "spring", visualDuration: 0.4, bounce: 0 },
   morph: { type: "spring", visualDuration: 0.42, bounce: 0 },
 } as const;
@@ -71,6 +72,17 @@ export const distance = { xs: 4, sm: 8, md: 12, lg: 24, xl: 48 } as const;
 export const scale = { in: 0.96, pop: 1.02, press: 0.97 } as const;
 export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 ```
+
+Springs are **authored** as `visualDuration + bounce`, but not every recipe hands that form to
+Motion. `visualDuration` makes a spring _time-defined_: when an animation is interrupted, Motion
+discards the inherited velocity, so the new target starts from rest. That is the right trade for a
+press or a popup scale (the distance is tiny, and inherited velocity would oscillate), but it is the
+wrong trade for a layout recipe that can be retargeted mid-flight. Those recipes declare
+`continuity: "velocity"`, and `transitionFor()` restates the token as `stiffness`/`damping`/`mass`
+after applying `timeScale`. The spring is then _physics-defined_ and Motion carries the current
+velocity into the new target (`motion-dom`'s `spring.ts`, 13.5.1). The authored values do not change,
+the 4× preview still scales correctly, and the conversion lives in `lib/motion.ts` rather than in a
+component.
 
 ### 2.3 CSS-side exposure
 
@@ -142,25 +154,40 @@ map, not the bytes.
 
 A recipe is a "reusable motion formula", returned by `useCadenceMotion().transition(recipe, opts)`. Components may only use the recipes below; adding a recipe means editing this document and going through review.
 
-| Recipe            | Purpose                                                                                                  | Key parameters                  | Implementation                                                                               | reduced behaviour                            |
-| ----------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `reveal`          | Fade and rise on entering the viewport                                                                   | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                                                     | Fade only, no translation                    |
-| `enter.pop`       | Popovers and cards appearing                                                                             | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                        | Fade only                                    |
-| `exit.fade`       | Element disappearing                                                                                     | `duration`                      | opacity to 0                                                                                 | Same (opacity kept)                          |
-| `exit.shrink`     | Closing a popover                                                                                        | `scale`                         | scale to 0.96 + opacity                                                                      | Fade only                                    |
-| `popup.anchored`  | Base UI popups                                                                                           | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                 | No scale, pure cross-fade                    |
-| `layout.move`     | List/grid reordering                                                                                     | `spring`                        | `layout` prop + `LayoutGroup`                                                                | Layout disabled, instant jump                |
-| `layout.shared`   | Shared elements (tab indicator, card expansion)                                                          | `layoutId`                      | `layoutId` + `spring.morph`                                                                  | Disabled, immediate switch                   |
-| `list.stagger`    | Items appearing one by one                                                                               | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                 | All fade in together (no stagger)            |
-| `gesture.drag`    | Drag / swipe to dismiss                                                                                  | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                            | Dragging disabled, use a button              |
-| `scroll.progress` | Reading progress, parallax                                                                               | `offset`                        | `useScroll` + `useSpring`                                                                    | Static value (no smoothing)                  |
-| `scroll.story`    | Scroll-narrative timeline                                                                                | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                     | End state shown directly                     |
-| `text.reveal`     | Headline reveals word by word / line by line                                                             | `by`, `stagger`                 | variants + child spans                                                                       | Whole block fades in                         |
-| `text.split`      | Character by character (GSAP)                                                                            | `type`                          | GSAP SplitText (optional)                                                                    | Shown as a whole                             |
-| `number.roll`     | Numeric changes                                                                                          | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                                                            | New value shown directly                     |
-| `data.transition` | Data surfaces changing state in place                                                                    | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")` | Loop kept (opacity only); transforms dropped |
-| `state.morph`     | A control's own indicator morphing between two states (label/width, check tick, radio dot, switch thumb) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state   | Indicator at full size, thumb jumps          |
-| `feedback.press`  | Press feedback                                                                                           | `scale`                         | `whileTap`                                                                                   | Colour change only                           |
+| Recipe            | Purpose                                                                                 | Key parameters                  | Implementation                                                                               | reduced behaviour                            |
+| ----------------- | --------------------------------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `reveal`          | Fade and rise on entering the viewport                                                  | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                                                     | Fade only, no translation                    |
+| `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                        | Fade only                                    |
+| `exit.fade`       | Element disappearing                                                                    | `duration`                      | opacity to 0                                                                                 | Same (opacity kept)                          |
+| `exit.shrink`     | Closing a popover                                                                       | `scale`                         | scale to 0.96 + opacity                                                                      | Fade only                                    |
+| `popup.anchored`  | Base UI popups                                                                          | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                 | No scale, pure cross-fade                    |
+| `layout.move`     | List/grid reordering                                                                    | `spring`                        | `layout` prop + `LayoutGroup` + physics-defined spring                                       | Layout disabled, instant jump                |
+| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId`                      | `layoutId` + physics-defined `spring.morph`                                                  | Disabled, immediate switch                   |
+| `list.stagger`    | Items appearing one by one                                                              | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                 | All fade in together (no stagger)            |
+| `gesture.drag`    | Drag / swipe to dismiss                                                                 | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                            | Dragging disabled, use a button              |
+| `scroll.progress` | Reading progress, parallax                                                              | `offset`                        | `useScroll` + `useSpring`                                                                    | Static value (no smoothing)                  |
+| `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                     | End state shown directly                     |
+| `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                 | variants + child spans                                                                       | Whole block fades in                         |
+| `text.split`      | Character by character (GSAP)                                                           | `type`                          | GSAP SplitText (optional)                                                                    | Shown as a whole                             |
+| `number.roll`     | Numeric changes                                                                         | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                                                            | New value shown directly                     |
+| `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")` | Loop kept (opacity only); transforms dropped |
+| `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state   | Indicator at full size, thumb jumps          |
+| `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                   | `animate()` on a motion value; ResizeObserver on the content slot; clamp to the closed size  | Instant size change, opacity kept            |
+| `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                        | inverse transform from `measureOrigin()` + physics spring                                    | Cross-fade at the destination                |
+| `feedback.press`  | Press feedback                                                                          | `scale`                         | `whileTap`                                                                                   | Colour change only                           |
+
+Four recipes opt into `continuity: "velocity"`: `layout.move`, `layout.shared`, `geometry.resize`, and
+`handoff`. All four exist to be retargeted while they are still moving (a list reorders twice, a tab
+indicator is clicked mid-flight, a second option is selected before the first label lands), and all
+travel far enough that losing the velocity is visible. Every other spring stays time-defined on
+purpose: `press` is a sub-pixel scale and a popup scales by 4%, where Motion's own guard against
+inherited velocity exists for good reason. A recipe that needs continuity must be argued for in this
+table, not switched on in a component.
+
+`geometry.resize` is also the only recipe that resolves to zero duration under `reduced` instead of
+a short tween: a 160 ms width tween is still layout motion, and the size is information, so it
+jumps. `handoff` keeps the short tween under reduced but the component drops the transform and
+cross-fades at the destination.
 
 Theme switching is deliberately absent. A view transition is a document-level operation: it resolves
 to no Motion `Transition`, so it cannot be a recipe and no component declares it. The site's theme
@@ -207,9 +234,10 @@ const cm = useCadenceMotion();
 />;
 ```
 
-#### `state.morph` (label/width morphing)
+#### `geometry.resize` (label/width morphing)
 
 ```tsx
+const cm = useCadenceMotion();
 const width = useMotionValue<number | "auto">("auto");
 const slotRef = useRef<HTMLSpanElement>(null);
 
@@ -219,11 +247,11 @@ useLayoutEffect(() => {
   const ro = new ResizeObserver(([entry]) => {
     if (!entry) return;
     if (reduced) return width.jump(entry.contentRect.width);
-    animate(width, entry.contentRect.width, spring.morph);
+    animate(width, entry.contentRect.width, cm.transition("geometry.resize"));
   });
   ro.observe(el);
   return () => ro.disconnect();
-}, [reduced, width]);
+}, [cm, reduced, width]);
 
 <motion.span style={{ width }} className="inline-flex justify-center overflow-hidden">
   <AnimatePresence mode="popLayout" initial={false}>
@@ -240,7 +268,7 @@ useLayoutEffect(() => {
 </motion.span>;
 ```
 
-> Detail: the outgoing element must leave the document flow via `popLayout`, otherwise it stretches the container back to the old width. `ResizeObserver` only fires when content size changes, so it does not fight the animation (the animation changes the outer slot's width).
+> Detail: the outgoing element must leave the document flow via `popLayout`, otherwise it stretches the container back to the old width. `ResizeObserver` only fires when content size changes, so it does not fight the animation (the animation changes the outer slot's width). Clamp the _rendered_ width with `clampMeasuredSize(width, closedWidth)`: a physics-defined spring can cross its target once when it inherits velocity, and half a pixel under the new label is enough to ellipsize it.
 
 #### `state.morph` (control indicators: tick, dot, thumb)
 
@@ -526,6 +554,8 @@ export type Recipe =
   | "number.roll"
   | "data.transition"
   | "state.morph"
+  | "geometry.resize"
+  | "handoff"
   | "feedback.press";
 
 export function useCadenceMotion(): {
@@ -582,13 +612,20 @@ Implementation notes:
 
 Implementation rules:
 
-1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px.
+1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px. The two documented exceptions are disclosure height and `geometry.resize`: both are measured, clamped to the closed size, confined to T3 continuity components, and resolve to zero duration under reduced/none.
 2. **No layout-read loops**: `getBoundingClientRect` and `offsetWidth` are read inside event/`ResizeObserver` callbacks only, and reads precede writes.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
 4. **`layout` animations trigger layout measurement**: for lists over 50 items, switch to manual transform or paginate.
-5. **Springs must not overshoot**: `bounce ≤ 0.2` for UI elements; larger values are for marketing only.
+5. **Springs must not overshoot**: `bounce ≤ 0.2` for UI elements; larger values are for marketing only. A physics-defined spring that inherits velocity can still cross its target once, so measured geometry also clamps the rendered value (rule 9).
 6. **Lazy-load GSAP**: the `scroll.story` component imports `gsap` dynamically so it never hits first paint.
 7. **Keep `AnimatePresence` subtrees small**: wrap only the elements that need an exit, never a whole page.
+8. **Interruptible springs are physics-defined**: a recipe that can be retargeted mid-flight
+   (`layout.move`, `layout.shared`, `geometry.resize`, `handoff`) declares `continuity: "velocity"`,
+   and `transitionFor()` expands the token into `stiffness`/`damping`/`mass` after `timeScale`.
+   Never hand a `visualDuration` spring to an element that must reverse smoothly.
+9. **Measured geometry is clamped**: render `clampMeasuredSize(value, closedSize)` around the
+   animated width/height, so a label never dips under the width it needs. Clamp the rendered value,
+   not the spring: the underlying physics stays continuous.
 
 ---
 
@@ -677,6 +714,8 @@ CI check: the set of animated properties found in source ⊆ the declared contra
 - [ ] Which causality does this animation explain? (If you cannot say it in one sentence, delete it.)
 - [ ] Who is the protagonist? Is only one element moving at a time?
 - [ ] Can the close animation be smoothly interrupted by re-opening?
+- [ ] Do the layout springs keep their velocity when retargeted (physics-defined, not `visualDuration`)?
+- [ ] Is every measured size clamped to its closed size, and instant under reduced/none?
 - [ ] Under reduced motion, is the information complete and the state still recognisable?
 - [ ] Does it animate only transform/opacity/filter? Does it trigger layout?
 - [ ] Does it use this document's tokens and recipes? Are there new magic numbers?

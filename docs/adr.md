@@ -235,3 +235,95 @@ target is now shadcn's 65 registry items, with 57 in the first scope (55 `regist
 **Alternatives**: overwrite `@components/ui` (true drop-in, but collides with the user's shadcn files and
 with shadcn's own registry dependencies); keep inventing components (the current dead end); wrap shadcn
 without shipping source (contradicts ADR-001 and ADR-005).
+
+---
+
+## ADR-012 · Physics-defined springs for interruptible layout recipes
+
+**Context**: The motion contract promises that layout and shared-element animations are interruptible
+and re-entrant (M4): clicking a tab indicator or reordering a list mid-flight must reverse smoothly,
+not restart from rest. Motion's `visualDuration + bounce` springs are **time-defined**; in
+`motion-dom` 13.5.1 the spring generator resolves them and then deliberately zeroes inherited velocity
+(`inheritVelocity()` returns `0` for time-defined springs), because carried velocity oscillates
+small-range animations. So the contract was only true for tween recipes, while `layout.move` and
+`layout.shared` — the recipes whose whole purpose is mid-flight retargeting — were the ones losing
+their velocity.
+
+A blanket conversion of every spring to physics would fix the layout case and break the small ones:
+press scales by 3%, a checkbox tick by 4%, a popup by 4%. Motion's guard exists for exactly those.
+
+**Decision**:
+
+1. Keep authoring springs as `visualDuration + bounce`; `stiffness`/`damping` are **not** tokens.
+2. Add `physicalSpring(visualDuration, bounce)` to `lib/motion.ts`. It mirrors Motion's conversion:
+   `ω = 2π / (1.2·T)`, `stiffness = ω²`, `damping = 2(1-bounce)·ω`, `mass = 1`. The `1.2` is the
+   visual-settle factor from `motion-dom` 13.5.1's `spring.ts`; it makes `T` the point where the
+   spring is ~97% of the way there.
+3. Only recipes marked `continuity: "velocity"` expand. Initially that is `layout.move` and
+   `layout.shared`; every other spring stays time-defined.
+4. Expansion happens inside `transitionFor()` **after** `timeScale`, so the docs site's 4× preview
+   scales the physics exactly; `reduced` still collapses to a short tween and `none` still returns
+   `{ duration: 0 }`.
+5. The divergence is fixed at one seam: a component that wants continuity asks for the recipe, not
+   for a spring object.
+
+**Consequences**:
+
+- ✅ M4 becomes true for the recipes that advertise it, with no visual change at rest and no token
+  change.
+- ✅ `timeScale`, `reduced`, and `none` keep their existing semantics; only the full-mode spring shape
+  changes, and only after an interruption.
+- ✅ Small-range springs keep Motion's oscillation guard.
+- ❌ `VISUAL_SETTLE = 1.2` is a copy of library internals; a Motion upgrade must re-check
+  `spring.ts`, and a test pins the derived constants.
+- ❌ Physical springs ignore `duration` overrides (already documented as tween-only).
+- ❌ The benefit is dormant until `tabs`/reorder land; `state.morph` (check, dot, thumb) intentionally
+  stays time-defined until a measured-geometry recipe gives it a large-travel path.
+
+**Rejected**:
+
+- Convert every spring globally: risks oscillation on press, checkbox, radio, switch thumb, and
+  popups, which are precisely the small-range cases Motion protects.
+- Store `stiffness`/`damping` as authored tokens: loses the single authored timing, the 4× preview,
+  and the ability to retune a token without re-deriving two numbers.
+- Precompute transitions at module scope (as a single component can): cannot react to `timeScale` or
+  a nested provider.
+
+---
+
+## ADR-013 · Measured geometry and origin handoff are recipes, not component code
+
+**Status**: accepted; the recipes and geometry math landed first, and `select` pilots them in B5.
+
+**Context**: B5 needs three motions that do not exist as primitives: a trigger that resizes to its
+value, a label that flies from the option to the trigger, and a directional value swap for keyboard
+changes. Writing each one inside `select` would repeat the same measurement, clamping, reduced-motion,
+and origin-fallback decisions across `combobox`, `command`, `tabs`, and `accordion` — the exact
+per-component improvisation ADR-011 exists to stop.
+
+**Decision**:
+
+1. Add `geometry.resize` (measured width/height) and `handoff` (cross-tree origin flight) to the
+   recipe catalogue before any component uses them, with their reduced behaviour documented:
+   `geometry.resize` jumps under reduced, `handoff` cross-fades at the destination, `none` is instant.
+2. Measured geometry is clamped to its closed size; `bounce: 0` alone is not a no-overshoot guarantee
+   once velocity is inherited.
+3. `handoff` is pointer-only unless the component can name a visible source; keyboard and external
+   value changes fall back to the directional swap. The fallback is part of the recipe, not a
+   component branch.
+4. `layout.shared` remains the recipe for a persistent node (`layoutId`); `handoff` is for a source
+   that unmounts and a destination that mounts elsewhere.
+5. Width/height animation is allowed only on the continuity tier (T3+), inside an isolated host; it is
+   never the default for T0–T2.
+
+**Consequences**:
+
+- ✅ One implementation of measurement/clamping/origin for all selection surfaces.
+- ✅ Reduced and none behaviour is decided once, not per component.
+- ❌ The property budget in §7 gains an explicit "measured geometry" exception; this ADR must be
+  reflected there before implementation.
+- ❌ The measured host can reflow siblings; components must either isolate it or document the reflow.
+
+**Rejected**: implement the select first and extract later (guarantees drift across B5/B6); use
+`layoutId` for the label (the source unmounts, fonts and sizes differ, and `AnimatePresence` makes the
+handoff unreliable).

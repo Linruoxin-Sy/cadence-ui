@@ -17,13 +17,18 @@
       "name": "cadence-motion",
       "type": "registry:lib",
       "title": "Motion presets",
-      "description": "Durations, easings, springs, and recipe resolution shared by every Cadence component.",
+      "description": "Durations, easings, springs, geometry helpers, and recipe resolution shared by every Cadence component.",
       "categories": ["foundation"],
       "files": [
         {
           "path": "registry/cadence/lib/motion.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/motion.ts"
+        },
+        {
+          "path": "registry/cadence/lib/geometry.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/geometry.ts"
         }
       ]
     },

@@ -36,7 +36,7 @@ These follow from the documents above; the documents are authoritative if they d
 - **Shared code lives in `registry/cadence/lib/`.** Never reach for a host path such as `@/lib/utils`.
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
 - **Keep the reduced branch.** Every animated component must keep `useCadenceMotion().reduced` and `data-motion`; `data-motion="none"` must fully disable motion.
-- **Animate `transform`, `opacity`, or `filter` only.** No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
+- **Animate `transform`, `opacity`, or `filter` only.** Measured width/height goes through the `geometry.resize` recipe (clamped, T3+, never T0–T2), and disclosure height follows the same rule. No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
 - **Audit the animation before calling a component done.** After writing or editing a component, run the [motion conformance check](#motion-conformance-check): the declared recipes, the implementation, and the docs must agree, and all three modes must be proven. `registry:check` only proves that a reduced branch exists, not that it conforms.
 - **Base UI `render`, not `asChild`.** Use `data-slot` on every part and merge classes with `cn()` (user classes last).
 - **UI only, no validation (P11).** Never import `zod`, `react-hook-form`, `@hookform/resolvers`, `yup`, `valibot`, `joi`, or `superstruct`; never add `schema` / `resolver` / `validate` props. Render invalid state from `aria-invalid` / `data-invalid` only. `registry:check` enforces this.
@@ -66,9 +66,10 @@ Rendering is not the finish line. After writing or editing a component, audit th
 4. **The branch is in the tree.** Every animated part has `data-motion={cm.mode}` and reads
    `useCadenceMotion().reduced`; the reduced path is a JSX/class branch, not a media query alone. Under `none`
    no motion property (transform/opacity/filter) keeps a non-zero transition.
-5. **Properties stay in budget.** Motion touches only `transform`, `opacity`, `filter`. Colour, border, and
-   shadow transitions are allowed as state feedback, never as motion, and never through `transition: all` or a
-   `setTimeout`.
+5. **Properties stay in budget.** Motion touches `transform`, `opacity`, `filter`, plus measured
+   width/height through `geometry.resize` (clamped, T3+, instant under `reduced`/`none`). Colour, border,
+   and shadow transitions are allowed as state feedback, never as motion, and never through
+   `transition: all` or a `setTimeout`.
 6. **Tests prove the modes.** `tests/components/<id>.test.tsx` asserts the `data-motion` value for each mode and
    that the reduced (and `none`) render drops the transform. `registry:check` only proves a reduced branch
    exists; it does not prove any of the above.
