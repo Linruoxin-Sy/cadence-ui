@@ -28,12 +28,29 @@ const themeScript = `
 })();
 `;
 
+/**
+ * The markdown body paints hidden so `DocumentEntrance` can play on the client.
+ * Without JavaScript that state would never be undone, so the fallback belongs
+ * with the entrance, not in an optional enhancement.
+ */
+const noJavaScriptFallback = `
+[data-document-entrance] {
+  clip-path: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: theme bootstrap must run before first paint */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <noscript>
+          <style>{noJavaScriptFallback}</style>
+        </noscript>
       </head>
       <body className="min-h-dvh bg-background text-foreground antialiased">
         <a

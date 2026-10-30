@@ -191,3 +191,19 @@
   --typeset-leading: 1.7;
   --typeset-flow: 1.5em;
 }
+
+/* Print never scrolls, so `DocumentEntrance`'s observer would leave a clipped
+   body blank below the fold. The entrance is screen feedback, not content.
+   `!important` is required because the hidden state is an inline style. */
+@media print {
+  [data-document-entrance] {
+    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
+    clip-path: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
+    filter: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
+    opacity: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
+    transform: none !important;
+  }
+}
