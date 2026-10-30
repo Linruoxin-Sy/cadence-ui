@@ -1,0 +1,179 @@
+# Checkbox
+
+> A control that allows the user to toggle between checked and not checked.
+
+- Registry item: /r/checkbox.json
+- Install: `npx shadcn@latest add @cadence/checkbox`
+- Type: registry:ui
+- Since: 0.3.0
+- Motion recipes: state.morph
+
+## When to use
+
+- One independent yes/no choice: accept the terms, remember this device, include
+  archived items.
+- A set of choices where several can be true at once; use one checkbox per row.
+- A parent row that summarises children: pass `indeterminate` while the children
+  disagree.
+- A table row selection, where each row is its own decision.
+
+## When not to use
+
+- Exactly one of several options; use `radio-group`, which also gives arrow-key
+  navigation.
+- An immediate setting that applies the moment it is flipped; use `switch`.
+- A formatting command that acts on a selection; use `toggle`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/checkbox
+```
+
+## Usage
+
+```tsx
+import { Checkbox } from "@/components/cadence/checkbox/checkbox";
+import { Label } from "@/components/cadence/label/label";
+
+export function Terms() {
+  return (
+    <div className="flex items-start gap-3">
+      <Checkbox id="terms" />
+      <Label htmlFor="terms">Accept the terms of service</Label>
+    </div>
+  );
+}
+```
+
+`id` lands on the hidden input, so `htmlFor` on a `label` names the control and
+clicking the label toggles it.
+
+## Examples
+
+### Checked by default, and indeterminate
+
+```tsx
+<Checkbox defaultChecked />
+<Checkbox indeterminate />
+```
+
+`indeterminate` is a visual third state; `aria-checked="mixed"` is what a screen
+reader hears. It never replaces the checked state — pass `checked` too if the
+form needs a value.
+
+### Controlled
+
+```tsx
+const [accepted, setAccepted] = useState(false);
+
+<Checkbox checked={accepted} onCheckedChange={setAccepted} />;
+```
+
+### Invalid, with a described error
+
+```tsx
+<Checkbox id="terms" aria-invalid aria-describedby="terms-error" />
+<p id="terms-error" className="text-sm text-destructive">
+  You must accept the terms to continue.
+</p>
+```
+
+The ring turns destructive because `aria-invalid` is set. The component does not
+decide that anything is wrong.
+
+### In a row of settings
+
+```tsx
+<div className="flex items-start gap-3">
+  <Checkbox id="digest" className="mt-0.5" />
+  <div className="grid gap-1">
+    <Label htmlFor="digest">Send the weekly digest</Label>
+    <p className="text-sm text-muted-foreground">Every Monday, 09:00.</p>
+  </div>
+</div>
+```
+
+## API
+
+| Prop               | Type                              | Default | Description                                          |
+| ------------------ | --------------------------------- | ------- | ---------------------------------------------------- |
+| `checked`          | `boolean`                         | –       | Controlled state.                                    |
+| `defaultChecked`   | `boolean`                         | `false` | Uncontrolled initial state.                          |
+| `onCheckedChange`  | `(checked, details) => void`      | –       | Fired on click and on Space.                         |
+| `indeterminate`    | `boolean`                         | `false` | Mixed visual state for a parent row.                 |
+| `disabled`         | `boolean`                         | `false` | Ignores interaction and form submission.             |
+| `readOnly`         | `boolean`                         | `false` | Focusable, submitted, not changeable.                |
+| `required`         | `boolean`                         | `false` | Blocks form submission until checked.                |
+| `name`, `value`    | `string`                          | –       | Form field identity and submitted value.             |
+| `className`        | `string`                          | –       | Merged last.                                         |
+
+All native attributes are forwarded, including `aria-invalid` and
+`aria-describedby`.
+
+## Motion contract
+
+Recipe: `state.morph`. The tick is the protagonist — it fades in and settles from
+0.96 to full size when the box is checked, and reverses when it is cleared.
+
+| Phase   | Properties                    | Token          | Interruptible |
+| ------- | ----------------------------- | -------------- | ------------- |
+| check   | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph` | yes (re-click) |
+| clear   | the same pair, reversed       | `state.morph`  | yes           |
+| reduced | `opacity` only                | `state.morph`  | yes           |
+| none    | no transition                 | –              | –             |
+
+Only the indicator moves. The box itself keeps a `transition-shadow` for the focus
+ring and the invalid ring, which is colour/shadow state feedback, not motion.
+
+## Keyboard interactions
+
+| Keys          | Action                                     |
+| ------------- | ------------------------------------------ |
+| `Tab`         | Moves focus to the checkbox.               |
+| `Space`       | Toggles checked, unless `readOnly`.        |
+| `Shift+Tab`   | Moves focus to the previous control.       |
+
+## Accessibility
+
+- Base UI renders `role="checkbox"` on the visible element plus a hidden
+  `<input type="checkbox">`, so the control is in the form and in the tab order.
+- The tick is not the announcement: the state lives in `aria-checked`, which is
+  why the reduced and `none` branches stay usable.
+- Always pair the box with a `Label` (`htmlFor`) or an `aria-label`; a bare box
+  has no accessible name.
+- `indeterminate` announces as "mixed". Do not use it as a substitute for
+  `checked` in a form.
+
+## Validation and data ownership
+
+| The component does                                  | You do                                               |
+| --------------------------------------------------- | ---------------------------------------------------- |
+| Styles `aria-invalid` and forwards it to the input   | Deciding whether the box must be checked             |
+| Forwards `required`, `name`, `value`, `disabled`     | Building the submitted payload                       |
+| Announces `aria-checked` for all three states        | Mapping the error to the field with `aria-describedby` |
+
+There is no `validate`, `schema`, or `rules` prop. See [validation](/docs/validation).
+
+## Responsive behavior
+
+The control is fixed at 16px with a 44px touch target (the `after:` pseudo
+element extends the hit area), so it behaves the same at every breakpoint. Put the
+label beside it, not inside it; wrapping a checkbox in a label removes the
+`aria-describedby` chain.
+
+## Performance
+
+No JS animation loop: one Motion element per box, animating only `opacity` and
+`transform`. A list of 50 checkboxes is 50 short transitions on demand, never a
+running loop.
+
+## Notes for AI
+
+- Use `aria-invalid` + `aria-describedby` for errors; there is no `error` prop.
+- Do not add press animation to a checkbox; the tick is the only protagonist.
+- For "one of N", use `radio-group`; for an instant setting, use `switch`.
+
+---
+
+Full index: /llms.txt

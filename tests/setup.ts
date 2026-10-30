@@ -43,6 +43,21 @@ if (!window.matchMedia) {
   });
 }
 
+/**
+ * jsdom has no `PointerEvent`. Base UI's form controls dispatch one after a
+ * click to replay modifiers, so without this every pointer test on them throws
+ * `PointerEvent is not a constructor`. The mock only needs to be a MouseEvent
+ * subclass: none of the assertions read pointer geometry.
+ */
+if (!("PointerEvent" in window)) {
+  class PointerEventMock extends MouseEvent {
+    pointerId = 1;
+    pointerType = "mouse";
+    isPrimary = true;
+  }
+  Object.defineProperty(window, "PointerEvent", { writable: true, value: PointerEventMock });
+}
+
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = vi.fn();
 }

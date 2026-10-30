@@ -44,6 +44,8 @@ npx shadcn@latest add @cadence/button
 - [Pagination](/r/pagination.md): Page navigation that stays a link, not a button. (navigation)
 - [Spinner](/r/spinner.md): An indeterminate wait, rotating until the work finishes. (feedback)
 - [Dialog](/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
+- [Checkbox](/r/checkbox.md): A control that allows the user to toggle between checked and not checked. (form)
+- [Radio Group](/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
 
 ## Docs
 

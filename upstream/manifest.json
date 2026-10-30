@@ -328,6 +328,28 @@
         "dialog-title",
         "dialog-trigger"
       ]
+    },
+    "checkbox": {
+      "path": "apps/v4/registry/bases/base/ui/checkbox.tsx",
+      "exports": [
+        "Checkbox"
+      ],
+      "slots": [
+        "checkbox",
+        "checkbox-indicator"
+      ]
+    },
+    "radio-group": {
+      "path": "apps/v4/registry/bases/base/ui/radio-group.tsx",
+      "exports": [
+        "RadioGroup",
+        "RadioGroupItem"
+      ],
+      "slots": [
+        "radio-group",
+        "radio-group-indicator",
+        "radio-group-item"
+      ]
     }
   }
 }

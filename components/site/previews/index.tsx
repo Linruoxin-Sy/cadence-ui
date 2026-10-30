@@ -7,6 +7,7 @@ import { BreadcrumbPreview } from "./breadcrumb";
 import { ButtonPreview } from "./button";
 import { ButtonGroupPreview } from "./button-group";
 import { CardPreview } from "./card";
+import { CheckboxPreview } from "./checkbox";
 import { DialogPreview } from "./dialog";
 import { EmptyPreview } from "./empty";
 import { FieldPreview } from "./field";
@@ -16,6 +17,7 @@ import { ItemPreview } from "./item";
 import { KbdPreview } from "./kbd";
 import { LabelPreview } from "./label";
 import { PaginationPreview } from "./pagination";
+import { RadioGroupPreview } from "./radio-group";
 import { SeparatorPreview } from "./separator";
 import { SkeletonPreview } from "./skeleton";
 import { SpinnerPreview } from "./spinner";
@@ -47,4 +49,6 @@ export const previews: Record<string, ComponentType> = {
   breadcrumb: BreadcrumbPreview,
   pagination: PaginationPreview,
   spinner: SpinnerPreview,
+  checkbox: CheckboxPreview,
+  "radio-group": RadioGroupPreview,
 };

@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -307,7 +307,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -330,7 +330,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -354,7 +354,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -378,7 +378,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -401,7 +401,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -425,7 +425,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -448,7 +448,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -471,7 +471,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -494,7 +494,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -519,7 +519,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
       }
     },
     {
@@ -545,7 +545,57 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "38f1b27"
+        "sourceSha": "c12c226"
+      }
+    },
+    {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "A control that allows the user to toggle between checked and not checked.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": [
+          "state.morph"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "c12c226"
+      }
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio Group",
+      "description": "A set of checkable buttons where no more than one can be checked at a time.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": [
+          "state.morph"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "c12c226"
       }
     }
   ]
