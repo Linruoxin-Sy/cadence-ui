@@ -47,4 +47,5 @@ export const previews: Record<string, ComponentType> = {
   "hover-card": dynamic(() => import("./hover-card").then((mod) => ({ default: mod.HoverCardPreview }))),
   sheet: dynamic(() => import("./sheet").then((mod) => ({ default: mod.SheetPreview }))),
   drawer: dynamic(() => import("./drawer").then((mod) => ({ default: mod.DrawerPreview }))),
+  select: dynamic(() => import("./select").then((mod) => ({ default: mod.SelectPreview }))),
 };

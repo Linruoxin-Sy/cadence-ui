@@ -560,6 +560,32 @@
         "drawer-trigger",
         "drawer-viewport"
       ]
+    },
+    "select": {
+      "path": "apps/v4/registry/bases/base/ui/select.tsx",
+      "exports": [
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectLabel",
+        "SelectScrollDownButton",
+        "SelectScrollUpButton",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue"
+      ],
+      "slots": [
+        "select-content",
+        "select-group",
+        "select-item",
+        "select-label",
+        "select-scroll-down-button",
+        "select-scroll-up-button",
+        "select-separator",
+        "select-trigger",
+        "select-value"
+      ]
     }
   }
 }
