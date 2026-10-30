@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DocumentEntrance } from "@/components/site/document-entrance";
 import { Mdx } from "@/components/site/mdx";
 import { PreviewFrame } from "@/components/site/preview";
 import { getComponent, listComponents } from "@/lib/content";
@@ -23,7 +24,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
   if (!doc) notFound();
 
   return (
-    <article className="max-w-3xl py-12">
+    <DocumentEntrance as="article" className="max-w-3xl py-12">
       <nav className="text-xs text-muted-foreground">
         <Link className="underline underline-offset-4 hover:text-foreground" href="/components">
           Components
@@ -44,6 +45,6 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
       <section className="mt-4">
         <Mdx source={doc.body} />
       </section>
-    </article>
+    </DocumentEntrance>
   );
 }

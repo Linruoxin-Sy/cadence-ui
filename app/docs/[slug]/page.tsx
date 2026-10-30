@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { DocumentEntrance } from "@/components/site/document-entrance";
 import { Mdx } from "@/components/site/mdx";
 import { getGuide, listGuides } from "@/lib/content";
 
@@ -21,12 +22,12 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   if (!guide) notFound();
 
   return (
-    <article className="max-w-3xl py-12">
+    <DocumentEntrance as="article" className="max-w-3xl py-12">
       <h1 className="text-3xl font-semibold tracking-tight">{guide.title}</h1>
       <p className="mt-2 text-base text-muted-foreground">{guide.description}</p>
       <div className="mt-8">
         <Mdx source={guide.body} />
       </div>
-    </article>
+    </DocumentEntrance>
   );
 }
