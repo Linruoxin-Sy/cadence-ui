@@ -2,7 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { Button } from "@/registry/cadence/button/button";
+import { Button, buttonVariants } from "@/registry/cadence/button/button";
+import { CadenceProvider } from "@/registry/cadence/lib/provider";
 
 function CustomButton(props: ComponentProps<"button">) {
   return <button data-custom="yes" {...props} />;
@@ -39,5 +40,21 @@ describe("Button", () => {
     const button = screen.getByRole("button", { name: "Pricing" });
     expect(button).toHaveAttribute("data-custom", "yes");
     expect(button).toHaveAttribute("data-slot", "button");
+  });
+
+  it("leaves the press transform to Motion, not to a CSS transition", () => {
+    // A CSS transition on `scale` would double-write the property Motion owns, and it
+    // is what made the component's declared `feedback.press` recipe a dead reference.
+    expect(buttonVariants()).not.toMatch(/transition-\[[^\]]*\b(scale|transform|opacity)\b/);
+    expect(buttonVariants()).not.toContain("active:scale");
+  });
+
+  it.each(["full", "reduced", "none"] as const)("carries data-motion=%s for the gesture branch", (mode) => {
+    render(
+      <CadenceProvider mode={mode}>
+        <Button>Save</Button>
+      </CadenceProvider>,
+    );
+    expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute("data-motion", mode);
   });
 });

@@ -2,16 +2,21 @@
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
+import { motion } from "motion/react";
 import { cn } from "../lib/cn";
+import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
- * Press feedback is the only motion here: the control compresses to 0.98 while
+ * Press feedback is the only motion here: the control compresses to 0.97 while
  * active, then springs back on release. Under reduced motion the scale is
  * dropped and only the colour transition remains.
+ *
+ * The scale is not in the `transition-[…]` list on purpose: Motion owns the
+ * transform, and a CSS transition on the same property would double-write it.
  */
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium outline-none transition-[color,background-color,border-color,box-shadow,scale,transform,opacity] duration-150 ease-out focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium outline-none transition-[color,background-color,border-color,box-shadow] ease-out focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
@@ -49,7 +54,7 @@ export interface ButtonProps extends ButtonPrimitive.Props, VariantProps<typeof 
  * for composition.
  *
  * Motion contract:
- * - press: scale 1 → 0.98 on `spring.press`, released on pointer up
+ * - press: scale 1 → 0.97 on `spring.press`, released on pointer up
  * - reduced / none: no scale, colour transition only
  *
  * a11y: Base UI owns the disabled/focusable semantics; `aria-invalid` drives the
@@ -64,11 +69,13 @@ export function Button({ className, variant = "default", size = "default", ...pr
       data-variant={variant}
       data-size={size}
       data-motion={cm.mode}
-      className={cn(
-        buttonVariants({ variant, size }),
-        cm.reduced ? "active:scale-100" : "active:scale-[0.98]",
-        className,
-      )}
+      className={cn(buttonVariants({ variant, size }), className)}
+      render={
+        <motion.button
+          whileTap={cm.reduced ? undefined : { scale: scale.press }}
+          transition={cm.transition("feedback.press")}
+        />
+      }
       {...props}
     />
   );
