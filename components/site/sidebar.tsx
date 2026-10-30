@@ -223,12 +223,12 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
                     controls={panelId(id)}
                     onClick={() => onToggle(id)}
                     label={
-                      <span className="text-[13px] leading-5 font-medium text-muted-foreground/80 transition-colors group-hover/row:text-foreground">
+                      <span className="text-[13px] leading-5 font-medium text-muted-foreground transition-colors group-hover/row:text-foreground">
                         {group.title}
                       </span>
                     }
                     meta={
-                      <span className="text-[11px] tabular-nums text-muted-foreground/60">
+                      <span className="text-[11px] tabular-nums text-muted-foreground transition-colors group-hover/row:text-foreground">
                         {group.components.length}
                       </span>
                     }
