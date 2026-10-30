@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useId, useState } from "react";
+import { useId, useState } from "react";
 import { cn } from "@/registry/cadence/lib/cn";
 import { duration } from "@/registry/cadence/lib/motion";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
@@ -282,15 +282,15 @@ export function Sidebar({ groups, guides }: SidebarProps) {
   const pathname = usePathname();
   const [closed, setClosed] = useState<ReadonlySet<string>>(NOTHING_CLOSED);
 
-  const isOpen = useCallback((id: string) => !closed.has(id), [closed]);
-  const onToggle = useCallback((id: string) => {
+  const isOpen = (id: string) => !closed.has(id);
+  const onToggle = (id: string) => {
     setClosed((previous) => {
       const next = new Set(previous);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
-  }, []);
+  };
 
   return (
     <>

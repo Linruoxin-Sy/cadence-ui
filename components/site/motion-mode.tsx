@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import { Button } from "@/registry/cadence/button/button";
 import { cn } from "@/registry/cadence/lib/cn";
 import type { CadenceMode } from "@/registry/cadence/lib/motion";
@@ -51,7 +51,7 @@ export function MotionModeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const setMode = useCallback((next: CadenceMode) => {
+  const setMode = (next: CadenceMode) => {
     setModeState(next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
@@ -62,9 +62,9 @@ export function MotionModeProvider({ children }: { children: ReactNode }) {
     if (next === "full") url.searchParams.delete("motion");
     else url.searchParams.set("motion", next);
     window.history.replaceState(null, "", url);
-  }, []);
+  };
 
-  const value = useMemo(() => ({ mode, setMode }), [mode, setMode]);
+  const value = { mode, setMode };
 
   return (
     <MotionModeContext.Provider value={value}>

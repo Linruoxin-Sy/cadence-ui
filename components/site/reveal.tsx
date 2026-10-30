@@ -65,6 +65,10 @@ export function Reveal({
    * of becoming a second fade after the height has settled. The duration is
    * frozen when the row enters view; later renders must not shorten a running
    * animation.
+   *
+   * This is a timestamp latch, not render memoization: `useMemo` is the only
+   * thing that keeps `performance.now()` from being re-read on every render.
+   * React Compiler does not replace it, and neither does a compiler bailout.
    */
   const revealScale = useMemo(() => {
     if (!inView) return 1;
