@@ -1,7 +1,8 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 next.** This document is the build record for the "parity"
-> effort: replace the eight original motion components with an API-compatible, motion-enhanced
+> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 in progress (`dialog` shipped as the B0 pilot).**
+> This document is the build record for the "parity" effort: replace the eight original motion components
+> with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
 > every new component must satisfy. Architecture details remain in [overall-design.md](overall-design.md);
 > motion details remain in [animation-system.md](animation-system.md).
@@ -207,19 +208,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status  |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | next    |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned |
-|       | **Total**                  | **57** |            | **102**     |         |         |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                            |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------------------------------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                           |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                           |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                           |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                           |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | 🔶 in progress (`dialog` shipped) |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned                           |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned                           |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned                           |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned                           |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned                           |
+|       | **Total**                  | **57** |            | **102**     |         |                                   |
 
 ### 7.0 Status discipline
 
@@ -411,6 +412,19 @@ axe with zero violations, size budget, and dual-theme screenshots.
   modes are proven per component by unit tests (`data-motion` plus the reduced/`none` branch), and the
   browser pass covered `full` — the site has no mode switcher, so the manual reduced/none pass is the
   one gate item still open, for all three batches.
+
+### 7.4 B4 — 🔶 in progress (2026-10-30)
+
+- **Why not `next`:** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so one item of this
+  batch is already live. Marking the row `next` would have made §7.0's rule ("a batch whose row still says
+  `next` is not done") hide a shipped component.
+- **Shipped:** `dialog` only. Remaining: `alert-dialog`, `sheet`, `drawer`, `popover`, `tooltip`, `hover-card`.
+- **Contract repair (2026-10-30):** the dialog's durations moved from the literals `duration-200` / `duration-100`
+  onto `--motion-duration-base` / `--motion-duration-fast`, and `data-motion="none"` now resolves those
+  variables to `0ms` instead of falling into the `reduced` branch. `popup.anchored` and `exit.fade` are
+  declared with `form: "css-transition"`, and `registry:check` now fails when a declared recipe has no
+  implementation — which is how the gap was found.
+- **Still open:** dual-theme screenshots and the Playwright mode matrix, both inherited from B1–B3.
 
 ## 8. Backlog
 

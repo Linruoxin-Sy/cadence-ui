@@ -16,14 +16,18 @@ integration, not a visual primitive.
 
 - Styles the invalid state from an attribute, not from internal state: `aria-invalid="true"`
   turns the border and ring destructive.
-- Renders the error slot you give it (`FieldError`, or any element inside `Field`).
-- Wires `aria-describedby` / `aria-errormessage` to the ids of the elements it renders.
+- Renders the error slot you give it (`FieldError`, or any element inside `Field`), and marks it
+  `role="alert"` so the message is announced when it appears.
+- Leaves the id graph to you: the component renders the element, you put its `id` on the slot and
+  point the control's `aria-describedby` at it. Nothing is generated, so nothing can guess wrong.
 - Passes `disabled`, `required`, and `readOnly` through to the underlying control.
 - Keeps focus visible and the control keyboard reachable in every state.
 
 ## What you do
 
 - Decide validity: required, format, length, async uniqueness.
+- Wire `aria-invalid` on the control and `aria-describedby` at the error element's `id` — see
+  [Field](/components/field) for the pairing.
 - Provide the resolver or schema (zod, valibot, yup) and the form state library
   (react-hook-form, TanStack Form).
 - Submit, retry, and map server errors back to fields.
