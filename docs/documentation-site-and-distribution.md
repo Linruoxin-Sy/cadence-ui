@@ -99,6 +99,23 @@ Tables keep typeset's "wrap to fit" behaviour and get a plain `overflow-x-auto` 
 `typeset-scroll` is not used because it sets `width: max-content`, which would stop the props table from
 wrapping on desktop.
 
+### 2.4 Document entrance
+
+Each page makes its content `<article class="max-w-3xl py-12">` the entrance via
+`DocumentEntrance as="article"`, a site-only client component (`components/site/document-entrance.tsx`). The
+`.typeset` container inside it is untouched; the entrance belongs to the outer article, not to the markdown
+elements. On a guide page the article is the title, description, and body; on a component page it is the
+breadcrumb, header, preview, and body. The article rises 24px, fades from 0, clears a 4px blur, and opens a
+`clip-path` from zero height at the same time. The wipe runs on `duration.slow` with `ease.inOut` — quicker
+than the body's `duration.page` — so the edge leads and the content's rise, fade, and blur are still in
+progress as it uncovers them. The clip keeps the element's full box, so the entrance does not reflow the page.
+
+The server paints the hidden state. The root layout's `<noscript>` rule and the `@media print` rule in
+`app/globals.css` restore the body when the entrance cannot run. The component stays outside
+`registry/cadence/**`: a whole-body blur and a clip wipe exceed the shipped motion contract. Its timings still
+come from `lib/motion.ts`, and the `reduced` branch keeps opacity only while `none` resolves every duration to
+zero.
+
 ---
 
 ## 3. Data flow: one MDX drives every output
