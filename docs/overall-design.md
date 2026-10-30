@@ -57,9 +57,10 @@
 ```
 cadence-ui/
 ├── app/                          # Next.js 16 App Router (docs site + registry routes)
-│   ├── (docs)/docs/...           # installation, theming, motion, a11y, registry guides
-│   ├── components/[id]/page.tsx  # component detail page (reads content/components/<id>.mdx)
-│   ├── components/page.tsx       # catalog (category + motion intensity filter + search)
+│   ├── (site)/                   # one shell for the guides and the catalog
+│   │   ├── layout.tsx            # sidebar + content column, mounted once per visit
+│   │   ├── docs/...              # installation, theming, motion, a11y, registry guides
+│   │   └── components/...        # catalog + component detail pages (reads content/components/<id>.mdx)
 │   ├── r/[...path]/route.ts      # serves JSON/MD from public/r (with caching and CORS)
 │   ├── llms.txt/route.ts         # generated llms text
 │   └── api/mcp/route.ts          # MCP (v0.2)
@@ -92,6 +93,10 @@ cadence-ui/
 ├── package.json                  # scripts: dev/build/check/test/registry
 └── README.md / CHANGELOG.md / LICENSE
 ```
+
+`/docs/**` and `/components/**` share the `(site)` route group on purpose. The group owns the only sidebar
+mount, so crossing between the guides and the catalog keeps its disclosure state and does not re-arm the row
+entrance. Splitting them into sibling layouts remounts the navigation on every switch and replays the entrance.
 
 ### 3.1 Why the source tree mirrors the install tree
 
