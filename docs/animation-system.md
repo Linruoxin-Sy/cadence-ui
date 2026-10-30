@@ -102,26 +102,26 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 
 A recipe is a "reusable motion formula", returned by `useCadenceMotion().transition(recipe, opts)` or `variants(recipe)`. Components may only use the recipes below; adding a recipe means editing this document and going through review.
 
-| Recipe            | Purpose                                         | Key parameters                  | Implementation                                                                               | reduced behaviour                            |
-| ----------------- | ----------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `reveal`          | Fade and rise on entering the viewport          | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                                                     | Fade only, no translation                    |
-| `enter.pop`       | Popovers and cards appearing                    | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                        | Fade only                                    |
-| `exit.fade`       | Element disappearing                            | `duration`                      | opacity to 0                                                                                 | Same (opacity kept)                          |
-| `exit.shrink`     | Closing a popover                               | `scale`                         | scale to 0.96 + opacity                                                                      | Fade only                                    |
-| `popup.anchored`  | Base UI popups                                  | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                 | No scale, pure cross-fade                    |
-| `layout.move`     | List/grid reordering                            | `spring`                        | `layout` prop + `LayoutGroup`                                                                | Layout disabled, instant jump                |
-| `layout.shared`   | Shared elements (tab indicator, card expansion) | `layoutId`                      | `layoutId` + `spring.morph`                                                                  | Disabled, immediate switch                   |
-| `list.stagger`    | Items appearing one by one                      | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                 | All fade in together (no stagger)            |
-| `gesture.drag`    | Drag / swipe to dismiss                         | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                            | Dragging disabled, use a button              |
-| `scroll.progress` | Reading progress, parallax                      | `offset`                        | `useScroll` + `useSpring`                                                                    | Static value (no smoothing)                  |
-| `scroll.story`    | Scroll-narrative timeline                       | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                     | End state shown directly                     |
-| `text.reveal`     | Headline reveals word by word / line by line    | `by`, `stagger`                 | variants + child spans                                                                       | Whole block fades in                         |
-| `text.split`      | Character by character (GSAP)                   | `type`                          | GSAP SplitText (optional)                                                                    | Shown as a whole                             |
-| `number.roll`     | Numeric changes                                 | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                                                            | New value shown directly                     |
-| `data.transition` | Data surfaces changing state in place           | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")` | Loop kept (opacity only); transforms dropped |
-| `state.morph`     | Width/height/label morphing                     | `axis`                          | `animate()` or `layout` + ResizeObserver                                                     | Immediate switch                             |
-| `feedback.press`  | Press feedback                                  | `scale`                         | `whileTap`                                                                                   | Colour change only                           |
-| `theme.reveal`    | Theme-switch reveal                             | `origin`                        | View Transitions API (progressive enhancement)                                               | Immediate switch                             |
+| Recipe            | Purpose                                                                                                  | Key parameters                  | Implementation                                                                               | reduced behaviour                            |
+| ----------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `reveal`          | Fade and rise on entering the viewport                                                                   | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                                                     | Fade only, no translation                    |
+| `enter.pop`       | Popovers and cards appearing                                                                             | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                        | Fade only                                    |
+| `exit.fade`       | Element disappearing                                                                                     | `duration`                      | opacity to 0                                                                                 | Same (opacity kept)                          |
+| `exit.shrink`     | Closing a popover                                                                                        | `scale`                         | scale to 0.96 + opacity                                                                      | Fade only                                    |
+| `popup.anchored`  | Base UI popups                                                                                           | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                 | No scale, pure cross-fade                    |
+| `layout.move`     | List/grid reordering                                                                                     | `spring`                        | `layout` prop + `LayoutGroup`                                                                | Layout disabled, instant jump                |
+| `layout.shared`   | Shared elements (tab indicator, card expansion)                                                          | `layoutId`                      | `layoutId` + `spring.morph`                                                                  | Disabled, immediate switch                   |
+| `list.stagger`    | Items appearing one by one                                                                               | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                 | All fade in together (no stagger)            |
+| `gesture.drag`    | Drag / swipe to dismiss                                                                                  | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                            | Dragging disabled, use a button              |
+| `scroll.progress` | Reading progress, parallax                                                                               | `offset`                        | `useScroll` + `useSpring`                                                                    | Static value (no smoothing)                  |
+| `scroll.story`    | Scroll-narrative timeline                                                                                | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                     | End state shown directly                     |
+| `text.reveal`     | Headline reveals word by word / line by line                                                             | `by`, `stagger`                 | variants + child spans                                                                       | Whole block fades in                         |
+| `text.split`      | Character by character (GSAP)                                                                            | `type`                          | GSAP SplitText (optional)                                                                    | Shown as a whole                             |
+| `number.roll`     | Numeric changes                                                                                          | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                                                            | New value shown directly                     |
+| `data.transition` | Data surfaces changing state in place                                                                    | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")` | Loop kept (opacity only); transforms dropped |
+| `state.morph`     | A control's own indicator morphing between two states (label/width, check tick, radio dot, switch thumb) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state   | Indicator at full size, thumb jumps          |
+| `feedback.press`  | Press feedback                                                                                           | `scale`                         | `whileTap`                                                                                   | Colour change only                           |
+| `theme.reveal`    | Theme-switch reveal                                                                                      | `origin`                        | View Transitions API (progressive enhancement)                                               | Immediate switch                             |
 
 ### 3.1 Code for the key recipes
 
@@ -171,6 +171,32 @@ useLayoutEffect(() => {
 ```
 
 > Detail: the outgoing element must leave the document flow via `popLayout`, otherwise it stretches the container back to the old width. `ResizeObserver` only fires when content size changes, so it does not fight the animation (the animation changes the outer slot's width).
+
+#### `state.morph` (control indicators: tick, dot, thumb)
+
+Form controls own the state, so the animation is driven by the primitive's render
+state rather than by props the consumer passes. Base UI hands the current state to
+a `render` callback; Motion takes over the element from there. The indicator must
+be `keepMounted`, otherwise it unmounts before it can animate out.
+
+```tsx
+<CheckboxPrimitive.Indicator
+  keepMounted
+  render={(props, state) => (
+    <motion.span
+      {...props}
+      initial={false}
+      animate={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: reduced ? 1 : 0.96 }}
+      transition={cm.transition("state.morph")}
+    />
+  )}
+/>;
+```
+
+For a thumb whose end position is decided by layout (the switch), measure the
+travel instead of writing it down — `track.clientWidth - thumb.offsetWidth` — and
+re-measure from a `ResizeObserver`. Under `reduced` the thumb still moves to the
+new end, with `{ duration: 0 }`: position is information, the animation is not.
 
 #### `layout.shared` (Tabs indicator)
 
