@@ -48,4 +48,5 @@ export const previews: Record<string, ComponentType> = {
   sheet: dynamic(() => import("./sheet").then((mod) => ({ default: mod.SheetPreview }))),
   drawer: dynamic(() => import("./drawer").then((mod) => ({ default: mod.DrawerPreview }))),
   select: dynamic(() => import("./select").then((mod) => ({ default: mod.SelectPreview }))),
+  "code-block": dynamic(() => import("./code-block").then((mod) => ({ default: mod.CodeBlockPreview }))),
 };

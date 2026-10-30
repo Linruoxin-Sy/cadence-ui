@@ -479,6 +479,58 @@ test.describe("progress", () => {
   }
 });
 
+test.describe("code-block", () => {
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`fold: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await openComponent(page, "code-block", requested, "code-block", mode);
+
+          // The preview's first block is capped at eight lines, so it opens folded.
+          // The toggle is located by slot, not by name: its accessible name is the
+          // state ("Show all" / "Show less"), so a name locator is stale after the
+          // click it just performed.
+          const viewport = page.locator(scoped("code-block", '[data-slot="code-block-viewport"]')).first();
+          const toggle = page.locator(scoped("code-block", '[data-slot="code-block-expand-button"]')).first();
+          await expect(toggle).toHaveAccessibleName("Show all");
+          await expect(toggle).toHaveAttribute("aria-expanded", "false");
+
+          const contentId = (await viewport.locator("pre").first().getAttribute("id")) ?? "";
+          expect(contentId).not.toBe("");
+          await expect(toggle).toHaveAttribute("aria-controls", contentId);
+
+          const folded = await viewport.evaluate((element) => element.getBoundingClientRect().height);
+          await toggle.click();
+          await expect(toggle).toHaveAttribute("aria-expanded", "true");
+          await expect(toggle).toHaveAccessibleName("Show less");
+
+          // The end state is the same in every mode: the source is whole. What the
+          // modes change is how it gets there — a spring in `full`, a jump under
+          // `reduced` and `none` — which is the token's job, not this assertion's.
+          await expect
+            .poll(async () => viewport.evaluate((element) => element.getBoundingClientRect().height))
+            .toBeGreaterThan(folded);
+
+          // The fold is measured, so the viewport can never be shorter than the
+          // content it clips, and the toggle is a real button that reports the state.
+          await expect(viewport).toHaveAttribute("data-motion", mode);
+
+          // The preview asks for `tsx`, so the highlighter chunk has to have loaded
+          // and produced tokens — the one thing jsdom cannot prove, because there the
+          // dynamic import resolves but no layout ever follows it.
+          await expect(
+            page.locator(scoped("code-block", '[data-slot="code-block-code"] span[style*="--shiki-light"]')).first(),
+          ).toBeVisible();
+        });
+      }
+    });
+  }
+});
+
 /** Guards the one thing the matrix cannot: that a mode is reachable without a URL. */
 test("the header switch drives the same modes the URL does", async ({ page }) => {
   await page.goto("/components/button");

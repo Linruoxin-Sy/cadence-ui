@@ -1198,6 +1198,62 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "code-block",
+      "type": "registry:ui",
+      "title": "Code block",
+      "description": "A copyable code surface with an optional title, line numbers, diff markers, and a measured collapse.",
+      "categories": ["ai"],
+      "dependencies": ["class-variance-authority", "lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/code-highlight"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/code-block/code-block.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/code-block/code-block.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T5",
+        "batch": "B9",
+        "motion": ["data.transition", "state.morph", "geometry.resize"],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "code-highlight",
+      "type": "registry:lib",
+      "title": "Code highlighting",
+      "description": "The Shiki-backed tokenizer behind code-block: one node per line, streaming-aware, loaded on demand.",
+      "categories": ["utility"],
+      "dependencies": ["shiki"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/cadence/code-highlight/highlight.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/code-highlight/highlight.tsx"
+        },
+        {
+          "path": "registry/cadence/code-highlight/use-highlighted-code.tsx",
+          "type": "registry:hook",
+          "target": "@components/cadence/code-highlight/use-highlighted-code.tsx"
+        }
+      ]
     }
   ]
 }
