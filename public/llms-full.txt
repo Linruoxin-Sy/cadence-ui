@@ -5628,13 +5628,13 @@ reconciling a tree of spans, which is what makes a streaming output block cheap.
 | `CodeBlock` | `variant`, `size`, native `div` props | `variant`: `default` \| `destructive`. `size`: `default` \| `sm`. |
 | | `maxLines`, `expanded`, `defaultExpanded`, `onExpandedChange` | Additive fold. Uncontrolled unless `expanded` is passed. |
 | | `language` | Additive. Highlights a string child; an unknown name renders plainly. |
-| `CodeBlockHeader` | native `div` props | Sits above the source; tightens the source's top padding. |
+| `CodeBlockHeader` | native `div` props | Sits above the source and draws a full-width rule between the label and the code. |
 | `CodeBlockTitle` | native `div` props | Truncates. Wrap it in an anchor to link to the file. |
 | `CodeBlockActions` | native `div` props | In a header it sits at the end; on its own it floats. |
 | `CodeBlockCopyButton` | `value` (required), all `Button` props | Copies `value`; `variant` defaults to `ghost`, `size` to `icon-xs`. |
 | `CodeBlockContent` | `wrap`, `lineNumbers`, `startLine`, `language`, native `pre` props | Always `dir="ltr"` and focusable (`tabIndex={0}`; pass `-1` to remove it). `language` overrides the block's. |
 | `CodeBlockLine` | `variant`, native `span` props | `default` \| `added` \| `removed` \| `highlighted`. |
-| `CodeBlockFooter` | native `div` props | Sits below the source; tightens its bottom padding. |
+| `CodeBlockFooter` | native `div` props | Sits below the source and draws the matching rule above it. |
 | `CodeBlockExpandButton` | all `Button` props | Additive. Renders nothing unless the block overflows. |
 
 `CodeBlockContent` takes its `id` from the block, which is what `CodeBlockExpandButton` points
