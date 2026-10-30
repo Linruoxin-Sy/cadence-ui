@@ -828,6 +828,69 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "A two-state button that can be pressed or not pressed.",
+      "categories": ["form"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/toggle/toggle.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/toggle/toggle.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": ["feedback.press"],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle Group",
+      "description": "A set of two-state buttons that can be pressed one at a time or together.",
+      "categories": ["form"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-utils",
+        "@cadence/toggle"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/toggle-group/toggle-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/toggle-group/toggle-group.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": ["feedback.press"],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

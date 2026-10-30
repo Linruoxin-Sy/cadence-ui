@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -388,7 +388,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -417,7 +417,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -447,7 +447,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -479,7 +479,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -510,7 +510,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -542,7 +542,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -574,7 +574,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -604,7 +604,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -634,7 +634,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -668,7 +668,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -705,7 +705,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -740,7 +740,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -774,7 +774,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -807,7 +807,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -841,8 +841,79 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "3c16927",
+    "sourceSha": "6f62965",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
+  },
+  {
+    "name": "toggle",
+    "type": "registry:ui",
+    "title": "Toggle",
+    "description": "A two-state button that can be pressed or not pressed.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "6f62965",
+    "docs": "/r/toggle.md",
+    "item": "/r/toggle.json"
+  },
+  {
+    "name": "toggle-group",
+    "type": "registry:ui",
+    "title": "Toggle Group",
+    "description": "A set of two-state buttons that can be pressed one at a time or together.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils",
+      "@cadence/toggle"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "6f62965",
+    "docs": "/r/toggle-group.md",
+    "item": "/r/toggle-group.json"
   }
 ]

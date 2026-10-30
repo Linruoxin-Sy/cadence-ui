@@ -48,6 +48,8 @@ npx shadcn@latest add @cadence/button
 - [Radio Group](/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
 - [Switch](/r/switch.md): A control that toggles between on and off, with a thumb that travels between the two states. (form)
 - [Slider](/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
+- [Toggle](/r/toggle.md): A two-state button that can be pressed or not pressed. (form)
+- [Toggle Group](/r/toggle-group.md): A set of two-state buttons that can be pressed one at a time or together. (form)
 
 ## Docs
 

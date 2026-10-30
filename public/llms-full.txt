@@ -50,6 +50,8 @@ npx shadcn@latest add @cadence/button
 - [Radio Group](/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
 - [Switch](/r/switch.md): A control that toggles between on and off, with a thumb that travels between the two states. (form)
 - [Slider](/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
+- [Toggle](/r/toggle.md): A two-state button that can be pressed or not pressed. (form)
+- [Toggle Group](/r/toggle-group.md): A set of two-state buttons that can be pressed one at a time or together. (form)
 
 ## Docs
 
@@ -3515,3 +3517,350 @@ scale. No `layout` animation, no measurement per frame.
 - Values are arrays. `value={50}` is a type error; use `value={[50]}`.
 - Do not animate the fill. Motion here is press feedback only.
 - Pair with an `input` when the exact number must be typeable.
+
+# Toggle
+
+A two-state button that can be pressed or not pressed.
+
+## When to use
+
+- A formatting or mode command that stays on until it is turned off: bold,
+  italic, a preview pane, a grid/list switch.
+- A compact toolbar button whose pressed state is visible next to its neighbours.
+- A setting the user toggles repeatedly while working.
+
+## When not to use
+
+- The action is one-shot (save, delete, open); use `button`.
+- A setting that takes effect immediately and permanently, like a preference; use
+  `switch`.
+- A group of related toggles that should read as one control; use `toggle-group`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/toggle
+```
+
+## Usage
+
+```tsx
+import { Bold } from "lucide-react";
+import { Toggle } from "@/components/cadence/toggle/toggle";
+
+export function BoldToggle() {
+  return (
+    <Toggle aria-label="Bold" defaultPressed>
+      <Bold />
+    </Toggle>
+  );
+}
+```
+
+An icon-only toggle needs `aria-label`; the glyph is not a name.
+
+## Examples
+
+### Variants and sizes
+
+```tsx
+<Toggle>Default</Toggle>
+<Toggle variant="outline">Outline</Toggle>
+
+<Toggle size="sm">Small</Toggle>
+<Toggle size="lg">Large</Toggle>
+```
+
+`outline` gives the toggle a border, for toolbars that sit on a busy surface.
+
+### With a label
+
+```tsx
+<Toggle variant="outline">
+  <Bold />
+  Bold
+</Toggle>
+```
+
+`gap-2` is already in the base classes, so an icon and a label space themselves.
+
+### Controlled
+
+```tsx
+const [on, setOn] = useState(false);
+
+<Toggle pressed={on} onPressedChange={setOn} aria-label="Bold" />;
+```
+
+### Inside a form
+
+```tsx
+<Toggle name="bold" defaultPressed value="bold" />
+```
+
+A pressed toggle submits its `value`; an unpressed one submits nothing, like a
+checkbox.
+
+## API
+
+| Prop               | Type                          | Default     | Description                              |
+| ------------------ | ----------------------------- | ----------- | ---------------------------------------- |
+| `pressed`          | `boolean`                     | –           | Controlled state.                        |
+| `defaultPressed`   | `boolean`                     | `false`     | Uncontrolled initial state.              |
+| `onPressedChange`  | `(pressed, details) => void`  | –           | Fired on click and on Space/Enter.       |
+| `variant`          | `"default" \| "outline"`      | `"default"` | Visual weight.                           |
+| `size`             | `"sm" \| "default" \| "lg"`   | `"default"` | Height and minimum width.                |
+| `disabled`         | `boolean`                     | `false`     | Ignores interaction.                     |
+| `className`        | `string`                      | –           | Merged last.                             |
+
+`toggleVariants` is exported, so a custom part can share the same classes.
+
+## Motion contract
+
+Recipe: `feedback.press`. The button compresses to 0.97 while the pointer is down
+and springs back on release.
+
+| Phase   | Properties       | Token            | Interruptible |
+| ------- | ---------------- | ---------------- | ------------- |
+| press   | `scale 1 → 0.97` | `feedback.press` | yes           |
+| release | `scale 0.97 → 1` | `feedback.press` | yes           |
+| reduced | no scale; the pressed background is the only change | – | – |
+| none    | no scale         | –                | –             |
+
+The pressed background is a colour transition, which is state feedback and stays
+in every mode — otherwise a `none` user could not see the state.
+
+## Keyboard interactions
+
+| Keys    | Action                          |
+| ------- | ------------------------------- |
+| `Tab`   | Moves focus to the toggle.      |
+| `Space` | Toggles the pressed state.      |
+| `Enter` | Toggles the pressed state.      |
+
+## Accessibility
+
+- Base UI renders a real `<button type="button">` with `aria-pressed`, so assistive
+  technology announces it as a toggle button, not a plain button.
+- Icon-only toggles need `aria-label`; the pressed state is announced separately.
+- The pressed state is never colour-only: the fill and `aria-pressed` change
+  together, and the press scale is never the only feedback.
+- Avoid toggles in a navigation bar; a link that changes style is still a link.
+
+## Validation and data ownership
+
+| The component does                            | You do                                     |
+| --------------------------------------------- | ------------------------------------------ |
+| Forwards `name`, `value`, `disabled`          | Deciding what a pressed toggle means       |
+| Exposes `aria-invalid` styling                | Validation and error text                  |
+| Keeps the pressed state in `aria-pressed`     | Persisting it                              |
+
+See [validation](/docs/validation).
+
+## Responsive behavior
+
+Sizes are fixed; in a toolbar that must shrink, drop to `size="sm"` rather than
+scaling the button with a transform, which would blur the icon.
+
+## Performance
+
+One Motion element, pressing only on pointer down. No layout animation, no
+measurement.
+
+## Notes for AI
+
+- Use `toggle` for a command that stays on; use `switch` for a preference that
+  saves itself.
+- Always provide `aria-label` for icon-only toggles.
+- Do not add a `state.morph` label swap to a toggle; the press scale is the whole
+  contract.
+
+# Toggle Group
+
+A set of two-state buttons that can be pressed one at a time or together.
+
+## When to use
+
+- A small set of modes that belong to one control: text alignment, view density,
+  a time range.
+- A formatting toolbar where several marks can be active at once
+  (`multiple`).
+- Anywhere the options are icons and the choice should read as one segmented
+  control (`spacing={0}` + `variant="outline"`).
+
+## When not to use
+
+- Exactly one option with a text label and a longer list; use `radio-group`, which
+  exposes radio semantics rather than a row of toggle buttons.
+- A single independent on/off command; use `toggle`.
+- Navigation between pages; use `tabs`, which owns `role="tablist"`.
+
+## Installation
+
+```bash
+npx shadcn@latest add @cadence/toggle-group
+```
+
+Installing the group also installs `toggle`, because the items share its variant
+classes.
+
+## Usage
+
+```tsx
+import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group/toggle-group";
+
+export function Alignment() {
+  return (
+    <ToggleGroup variant="outline" defaultValue={["left"]} aria-label="Text alignment">
+      <ToggleGroupItem value="left" aria-label="Align left">
+        <AlignLeft />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="center" aria-label="Align center">
+        <AlignCenter />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="right" aria-label="Align right">
+        <AlignRight />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  );
+}
+```
+
+## Examples
+
+### Multiple
+
+```tsx
+<ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style">
+  <ToggleGroupItem value="bold" aria-label="Bold">
+    <Bold />
+  </ToggleGroupItem>
+  <ToggleGroupItem value="italic" aria-label="Italic">
+    <Italic />
+  </ToggleGroupItem>
+</ToggleGroup>
+```
+
+Without `multiple`, pressing an item releases the others.
+
+### Spacing
+
+```tsx
+<ToggleGroup variant="outline" spacing={0} aria-label="Range">
+  …
+</ToggleGroup>
+
+<ToggleGroup variant="outline" spacing={1} aria-label="Range">
+  …
+</ToggleGroup>
+```
+
+`spacing={0}` joins the borders into one segmented control; a positive value
+keeps the items apart in Tailwind spacing steps.
+
+### Vertical
+
+```tsx
+<ToggleGroup orientation="vertical" aria-label="Zoom">
+  …
+</ToggleGroup>
+```
+
+### Controlled
+
+```tsx
+const [value, setValue] = useState(["center"]);
+
+<ToggleGroup value={value} onValueChange={setValue} aria-label="Alignment">
+  …
+</ToggleGroup>;
+```
+
+The value is always an array, even without `multiple`.
+
+## API
+
+### `ToggleGroup`
+
+| Prop            | Type                                        | Default        | Description                              |
+| --------------- | ------------------------------------------- | -------------- | ---------------------------------------- |
+| `value`         | `readonly string[]`                         | –              | Controlled pressed values.               |
+| `defaultValue`  | `readonly string[]`                         | `[]`           | Uncontrolled initial values.             |
+| `onValueChange` | `(value: string[], details) => void`        | –              | Fired when any item changes.             |
+| `multiple`      | `boolean`                                   | `false`        | Allow more than one pressed item.        |
+| `spacing`       | `number`                                    | `0`            | Gap in Tailwind spacing steps.           |
+| `orientation`   | `"horizontal" \| "vertical"`                | `"horizontal"` | Axis, also drives arrow keys.            |
+| `variant`       | `"default" \| "outline"`                    | `"default"`    | Inherited by every item.                 |
+| `size`          | `"sm" \| "default" \| "lg"`                 | `"default"`    | Inherited by every item.                 |
+
+### `ToggleGroupItem`
+
+| Prop        | Type     | Default | Description                          |
+| ----------- | -------- | ------- | ------------------------------------ |
+| `value`     | `string` | –       | Required. Identifies the item.       |
+| `disabled`  | `boolean`| `false` | Keeps it visible but unpressable.    |
+| `className` | `string` | –       | Merged last.                         |
+
+## Motion contract
+
+Recipe: `feedback.press`, inherited by every item — pressing compresses that item
+and springs it back, exactly like a standalone `toggle`.
+
+| Phase   | Properties       | Token            | Interruptible |
+| ------- | ---------------- | ---------------- | ------------- |
+| press   | `scale 1 → 0.97` | `feedback.press` | yes           |
+| release | `scale 0.97 → 1` | `feedback.press` | yes           |
+| reduced | no scale; the pressed background carries the state | – | – |
+| none    | no scale         | –                | –             |
+
+The group itself does not animate. A shared sliding indicator would need the
+pressed item to change size, which would move the neighbours the user is aiming
+at — a T3 concern, not a press.
+
+## Keyboard interactions
+
+| Keys               | Action                                        |
+| ------------------ | --------------------------------------------- |
+| `Tab`              | Enters the group at the last pressed item.    |
+| `Arrow Right/Down` | Moves focus to the next item.                 |
+| `Arrow Left/Up`    | Moves focus to the previous item.             |
+| `Space` / `Enter`  | Presses the focused item.                     |
+
+With `loopFocus` (default) the arrows wrap around at the ends.
+
+## Accessibility
+
+- The group renders `role="group"`; each item is a `<button>` with `aria-pressed`.
+- Name the group with `aria-label` or `aria-labelledby` — a row of icon buttons
+  with no group name is announced as unrelated buttons.
+- Icon-only items need their own `aria-label`; the group name does not describe
+  them.
+- Do not use a toggle group where `role="tablist"` is correct; tabs imply a panel
+  that is shown, a toggle group implies state.
+
+## Validation and data ownership
+
+| The component does                              | You do                                    |
+| ----------------------------------------------- | ----------------------------------------- |
+| Forwards `disabled` and the pressed values      | Deciding whether a selection is required  |
+| Renders the visual pressed state                | Persisting the choice                     |
+| Exposes `aria-invalid` styling on items         | Validation and error text                 |
+
+See [validation](/docs/validation).
+
+## Responsive behavior
+
+Horizontal groups do not wrap; with more than about five items on a narrow screen,
+switch to `orientation="vertical"` or replace the group with a `select`.
+
+## Performance
+
+One Motion element per item, pressing on demand. No layout animation and no
+measurement, so a group of eight items costs nothing until one is pressed.
+
+## Notes for AI
+
+- `value` is an array in every mode, with or without `multiple`.
+- Use `spacing={0}` + `variant="outline"` for a segmented control.
+- For "one of N" with text labels, prefer `radio-group`; for panels, `tabs`.

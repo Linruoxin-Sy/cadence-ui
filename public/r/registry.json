@@ -74,7 +74,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -97,7 +97,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -120,7 +120,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -143,7 +143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -166,7 +166,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -189,7 +189,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -212,7 +212,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -235,7 +235,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -258,7 +258,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -281,7 +281,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -307,7 +307,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -330,7 +330,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -354,7 +354,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -378,7 +378,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -401,7 +401,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -425,7 +425,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -448,7 +448,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -471,7 +471,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -494,7 +494,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -519,7 +519,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -545,7 +545,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -570,7 +570,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -595,7 +595,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -620,7 +620,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
       }
     },
     {
@@ -645,7 +645,57 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "3c16927"
+        "sourceSha": "6f62965"
+      }
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "A two-state button that can be pressed or not pressed.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": [
+          "feedback.press"
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "6f62965"
+      }
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle Group",
+      "description": "A set of two-state buttons that can be pressed one at a time or together.",
+      "categories": [
+        "form"
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T1",
+        "batch": "B3",
+        "motion": [
+          "feedback.press"
+        ],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        },
+        "sourceSha": "6f62965"
       }
     }
   ]

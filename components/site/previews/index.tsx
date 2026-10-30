@@ -24,6 +24,8 @@ import { SliderPreview } from "./slider";
 import { SpinnerPreview } from "./spinner";
 import { SwitchPreview } from "./switch";
 import { TextareaPreview } from "./textarea";
+import { TogglePreview } from "./toggle";
+import { ToggleGroupPreview } from "./toggle-group";
 
 /**
  * One preview module per component. Keep the map explicit: a missing entry is a
@@ -55,4 +57,6 @@ export const previews: Record<string, ComponentType> = {
   "radio-group": RadioGroupPreview,
   switch: SwitchPreview,
   slider: SliderPreview,
+  toggle: TogglePreview,
+  "toggle-group": ToggleGroupPreview,
 };

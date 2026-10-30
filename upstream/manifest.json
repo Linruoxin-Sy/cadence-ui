@@ -372,6 +372,27 @@
         "slider-thumb",
         "slider-track"
       ]
+    },
+    "toggle": {
+      "path": "apps/v4/registry/bases/base/ui/toggle.tsx",
+      "exports": [
+        "Toggle",
+        "toggleVariants"
+      ],
+      "slots": [
+        "toggle"
+      ]
+    },
+    "toggle-group": {
+      "path": "apps/v4/registry/bases/base/ui/toggle-group.tsx",
+      "exports": [
+        "ToggleGroup",
+        "ToggleGroupItem"
+      ],
+      "slots": [
+        "toggle-group",
+        "toggle-group-item"
+      ]
     }
   }
 }
