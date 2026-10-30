@@ -49,6 +49,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "babel-plugin-react-compiler": "1.0.0",
     "gray-matter": "^4.0.3",
     "jsdom": "^26.1.0",
     "next-mdx-remote": "^5.0.0",
