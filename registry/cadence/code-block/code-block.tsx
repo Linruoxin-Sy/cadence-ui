@@ -505,7 +505,6 @@ function CodeBlockContent({
         style={{ counterReset: `line ${startLine - 1}`, ...style }}
         className={cn(
           "min-h-0 min-w-0 overflow-auto px-4 py-3 font-mono leading-relaxed text-start outline-none",
-          "group-has-data-[slot=code-block-footer]/code-block:pb-2",
           "group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
           wrap && "whitespace-pre-wrap break-words",
           className,
@@ -590,13 +589,17 @@ function CodeBlockLine({ className, variant = "default", children, ...props }: C
 
 export interface CodeBlockFooterProps extends React.ComponentProps<"div"> {}
 
-/** The row below the source — where the fold toggle and secondary actions go. */
+/**
+ * The row below the source — where the fold toggle and secondary actions go. It
+ * mirrors the header: a rule above it, and padding equal to the header's, so a
+ * folded block has the same seam on both sides of the code.
+ */
 function CodeBlockFooter({ className, ...props }: CodeBlockFooterProps) {
   return (
     <div
       data-slot="code-block-footer"
       className={cn(
-        "flex min-w-0 shrink-0 items-center gap-2 px-4 pb-4 text-muted-foreground group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:pb-3",
+        "flex min-w-0 shrink-0 items-center gap-2 border-t border-border px-4 py-3 text-muted-foreground group-data-[variant=destructive]/code-block:border-destructive/20 group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
         className,
       )}
       {...props}

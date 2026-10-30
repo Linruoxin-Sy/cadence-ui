@@ -212,7 +212,7 @@ reconciling a tree of spans, which is what makes a streaming output block cheap.
 | `CodeBlockCopyButton` | `value` (required), all `Button` props | Copies `value`; `variant` defaults to `ghost`, `size` to `icon-xs`. |
 | `CodeBlockContent` | `wrap`, `lineNumbers`, `startLine`, `language`, native `pre` props | Always `dir="ltr"` and focusable (`tabIndex={0}`; pass `-1` to remove it). `language` overrides the block's. |
 | `CodeBlockLine` | `variant`, native `span` props | `default` \| `added` \| `removed` \| `highlighted`. |
-| `CodeBlockFooter` | native `div` props | Sits below the source; tightens its bottom padding. |
+| `CodeBlockFooter` | native `div` props | Sits below the source and draws the matching rule above it. |
 | `CodeBlockExpandButton` | all `Button` props | Additive. Renders nothing unless the block overflows. |
 
 `CodeBlockContent` takes its `id` from the block, which is what `CodeBlockExpandButton` points
