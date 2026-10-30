@@ -2,7 +2,7 @@
 
 import type { Transition } from "motion/react";
 import { MotionConfig } from "motion/react";
-import { createContext, type ReactNode, useContext, useMemo, useSyncExternalStore } from "react";
+import { createContext, type ReactNode, useContext, useSyncExternalStore } from "react";
 import { cn } from "./cn";
 import { type CadenceMode, distance, type MotionOptions, type Recipe, spring, transitionFor } from "./motion";
 
@@ -105,7 +105,7 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
   const scale = timeScale ?? parent?.timeScale ?? 1;
   const systemReduced = useSystemReducedMotion();
   const effective: CadenceMode = requested === "none" ? "none" : systemReduced ? "reduced" : requested;
-  const value = useMemo(() => createMotion(effective, scale), [effective, scale]);
+  const value = createMotion(effective, scale);
 
   return (
     <CadenceContext.Provider value={value}>
@@ -122,5 +122,5 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
 export function useCadenceMotion(): CadenceMotion {
   const context = useContext(CadenceContext);
   const systemReduced = useSystemReducedMotion();
-  return useMemo(() => context ?? createMotion(systemReduced ? "reduced" : FALLBACK_MODE), [context, systemReduced]);
+  return context ?? createMotion(systemReduced ? "reduced" : FALLBACK_MODE);
 }

@@ -14,7 +14,6 @@ import {
   useContext,
   useEffect,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -80,8 +79,8 @@ function Select<Value, Multiple extends boolean | undefined = false>(
 ) {
   const [pending, setPending] = useState<HandoffSource | null>(null);
   const [flying, setFlying] = useState(false);
-  const labels = useMemo(() => (props.items ? null : collectLabels(props.children)), [props.children, props.items]);
-  const value = useMemo(() => ({ pending, setPending, flying, setFlying, labels }), [pending, flying, labels]);
+  const labels = props.items ? null : collectLabels(props.children);
+  const value = { pending, setPending, flying, setFlying, labels };
 
   return (
     <SelectContext.Provider value={value}>

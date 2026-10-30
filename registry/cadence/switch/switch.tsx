@@ -2,7 +2,7 @@
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
 import { type HTMLMotionProps, motion } from "motion/react";
-import { type Ref, type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type Ref, type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
 
@@ -68,10 +68,6 @@ function Switch({ className, size = "default", ...props }: SwitchProps) {
     if (travel !== null && !settled) setSettled(true);
   }, [travel, settled]);
 
-  const mergedRef = useCallback((node: HTMLSpanElement | null) => {
-    thumbRef.current = node;
-  }, []);
-
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
@@ -96,7 +92,7 @@ function Switch({ className, size = "default", ...props }: SwitchProps) {
             <motion.span
               {...(rest as HTMLMotionProps<"span">)}
               ref={(node: HTMLSpanElement | null) => {
-                mergedRef(node);
+                thumbRef.current = node;
                 if (typeof forwardedRef === "function") forwardedRef(node);
                 else if (forwardedRef) (forwardedRef as RefObject<HTMLSpanElement | null>).current = node;
               }}

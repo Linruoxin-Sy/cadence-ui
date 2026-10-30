@@ -3,7 +3,6 @@
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
 import { type HTMLMotionProps, motion } from "motion/react";
 import type * as React from "react";
-import { useMemo } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
@@ -42,10 +41,7 @@ function Slider<Value extends number | readonly number[] = number | readonly num
   ...props
 }: SliderProps<Value>) {
   const cm = useCadenceMotion();
-  const _values = useMemo(
-    () => (Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max]),
-    [value, defaultValue, min, max],
-  );
+  const _values = Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max];
   const thumbCount = _values.length;
 
   const labelFor = (index: number) => {

@@ -2,7 +2,6 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { useMemo } from "react";
 import { Label } from "../label/label";
 import { cn } from "../lib/cn";
 import { Separator } from "../separator/separator";
@@ -203,27 +202,20 @@ export interface FieldErrorProps extends React.ComponentProps<"div"> {
  * id: colour alone is not a signal.
  */
 function FieldError({ className, children, errors, ...props }: FieldErrorProps) {
-  const content = useMemo(() => {
-    if (children) {
-      return children;
-    }
+  let content: React.ReactNode = children;
 
-    if (!errors?.length) {
-      return null;
-    }
-
+  if (!content && errors?.length) {
     const uniqueErrors = [...new Map(errors.map((error) => [error?.message, error])).values()];
 
-    if (uniqueErrors.length === 1) {
-      return uniqueErrors[0]?.message;
-    }
-
-    return (
-      <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map((error) => (error?.message ? <li key={error.message}>{error.message}</li> : null))}
-      </ul>
-    );
-  }, [children, errors]);
+    content =
+      uniqueErrors.length === 1 ? (
+        uniqueErrors[0]?.message
+      ) : (
+        <ul className="ml-4 flex list-disc flex-col gap-1">
+          {uniqueErrors.map((error) => (error?.message ? <li key={error.message}>{error.message}</li> : null))}
+        </ul>
+      );
+  }
 
   if (!content) {
     return null;
