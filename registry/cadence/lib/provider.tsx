@@ -1,10 +1,38 @@
 "use client";
 
 import type { Transition } from "motion/react";
-import { MotionConfig, useReducedMotion } from "motion/react";
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { MotionConfig } from "motion/react";
+import { createContext, type ReactNode, useContext, useMemo, useSyncExternalStore } from "react";
 import { cn } from "./cn";
 import { type CadenceMode, distance, type MotionOptions, type Recipe, spring, transitionFor } from "./motion";
+
+const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(REDUCED_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+/**
+ * The OS preference, read in a way React can hydrate.
+ *
+ * Motion's own `useReducedMotion` returns the media query result on the first
+ * client render, while the server can only answer `false`. That is a hydration
+ * mismatch on every `data-motion` attribute in the tree, and a production build
+ * does not repair it: the server's `full` stays in the DOM, so a visitor who asks
+ * for reduced motion keeps the full-duration tokens — the exact failure this
+ * library promises not to have. Answering `false` for the server snapshot and the
+ * real value for the client snapshot makes React render twice instead of
+ * mismatching.
+ */
+function useSystemReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(REDUCED_QUERY).matches,
+    () => false,
+  );
+}
 
 export interface CadenceMotion {
   /** The effective mode: full, reduced (system preference or prop), or none. */
@@ -75,7 +103,7 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
   const parent = useContext(CadenceContext);
   const requested = mode ?? parent?.mode ?? FALLBACK_MODE;
   const scale = timeScale ?? parent?.timeScale ?? 1;
-  const systemReduced = useReducedMotion();
+  const systemReduced = useSystemReducedMotion();
   const effective: CadenceMode = requested === "none" ? "none" : systemReduced ? "reduced" : requested;
   const value = useMemo(() => createMotion(effective, scale), [effective, scale]);
 
@@ -93,6 +121,6 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
 /** The resolved motion config. Falls back to the system preference when no provider is present. */
 export function useCadenceMotion(): CadenceMotion {
   const context = useContext(CadenceContext);
-  const systemReduced = useReducedMotion();
+  const systemReduced = useSystemReducedMotion();
   return useMemo(() => context ?? createMotion(systemReduced ? "reduced" : FALLBACK_MODE), [context, systemReduced]);
 }
