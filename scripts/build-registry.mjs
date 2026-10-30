@@ -20,6 +20,8 @@ const root = process.cwd();
 const publicDir = path.join(root, "public");
 const outDir = path.join(publicDir, "r");
 const docsDir = path.join(root, "content", "components");
+/** Absolute base for every URL written into an artifact an agent may read alone. */
+const site = "https://cadence.dev";
 
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
 
@@ -150,7 +152,7 @@ for (const item of staged.items) {
     "",
     `> ${item.description}`,
     "",
-    `- Registry item: /r/${item.name}.json`,
+    `- Registry item: ${site}/r/${item.name}.json`,
     `- Install: \`${install}\``,
     `- Type: ${item.type}`,
     `- Since: ${item.meta?.since ?? "0.1.0"}`,
@@ -160,7 +162,7 @@ for (const item of staged.items) {
     "",
     "---",
     "",
-    `Full index: /llms.txt`,
+    `Full index: ${site}/llms.txt`,
     "",
   ]
     .filter((line) => line !== undefined)
@@ -203,7 +205,8 @@ await writeFile(
   )}\n`,
 );
 
-// llms.txt files.
+// llms.txt files. Every URL is absolute: an agent that reads this file has no
+// "current page" to resolve a relative link against.
 const components = staged.items.filter((item) => item.type === "registry:ui" || item.type === "registry:block");
 const overview = [
   "# Cadence UI",
@@ -232,14 +235,19 @@ const overview = [
   "## Components",
   "",
   ...components.map(
-    (item) => `- [${item.title}](/r/${item.name}.md): ${item.description} (${(item.categories ?? []).join(", ")})`,
+    (item) =>
+      `- [${item.title}](${site}/r/${item.name}.md): ${item.description} (${(item.categories ?? []).join(", ")})`,
   ),
   "",
   "## Docs",
   "",
-  "- [/r/registry.json](/r/registry.json): install index",
-  "- [/r/catalog.json](/r/catalog.json): machine-readable catalog",
-  "- [/llms-full.txt](/llms-full.txt): every component doc inline",
+  `- [Installation](${site}/docs/installation): registry setup, Next.js and Vite.`,
+  `- [Theming](${site}/docs/theming): shadcn tokens, motion intensity, per-subtree overrides.`,
+  `- [Motion](${site}/docs/motion): tokens, recipes, reduced-motion rules.`,
+  `- [Validation](${site}/docs/validation): what the components render and what the caller owns.`,
+  `- [Install index](${site}/r/registry.json): every item and its metadata.`,
+  `- [Catalog](${site}/r/catalog.json): machine-readable catalog.`,
+  `- [Full context](${site}/llms-full.txt): every component doc inline.`,
   "",
 ].join("\n");
 await writeFile(path.join(publicDir, "llms.txt"), overview);
