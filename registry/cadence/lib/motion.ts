@@ -55,6 +55,11 @@ export interface MotionOptions {
   delay?: number;
   /** Override the token duration (tween recipes only). */
   duration?: number;
+  /**
+   * Multiplies every duration, spring `visualDuration`, and delay. `1` is the
+   * authored timing; `4` is the "slow motion" used by the docs site.
+   */
+  timeScale?: number;
 }
 
 type RecipeSpec =
@@ -90,18 +95,19 @@ const recipes: Record<Recipe, RecipeSpec> = {
  */
 export function transitionFor(recipe: Recipe, mode: CadenceMode, options: MotionOptions = {}): Transition {
   if (mode === "none") return { duration: 0 };
-  const delay = options.delay ?? 0;
+  const timeScale = options.timeScale ?? 1;
+  const delay = (options.delay ?? 0) * timeScale;
   const spec = recipes[recipe];
 
   if (spec.kind === "spring") {
     if (mode === "reduced")
-      return { duration: duration.fast, ease: [...ease.out] as [number, number, number, number], delay };
-    return { ...spring[spec.spring], delay };
+      return { duration: duration.fast * timeScale, ease: [...ease.out] as [number, number, number, number], delay };
+    return { ...spring[spec.spring], visualDuration: spring[spec.spring].visualDuration * timeScale, delay };
   }
 
   const scaleFactor = mode === "reduced" ? 0.6 : 1;
   return {
-    duration: options.duration ?? spec.duration * scaleFactor,
+    duration: (options.duration ?? spec.duration * scaleFactor) * timeScale,
     ease: [...spec.ease] as [number, number, number, number],
     delay,
   };

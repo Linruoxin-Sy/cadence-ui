@@ -63,6 +63,14 @@
   --motion-distance-sm: 8px;
   --motion-distance-md: 12px;
   --motion-intensity: 1;
+
+  /* CSS-side duration tokens. Motion components read the same values from
+     `lib/motion.ts`; CSS-only popups read these variables so a `transform` /
+     `opacity` transition never carries a literal number. */
+  --motion-duration-instant: 100ms;
+  --motion-duration-fast: 160ms;
+  --motion-duration-base: 220ms;
+  --motion-duration-slow: 320ms;
 }
 
 .dark {
@@ -129,12 +137,25 @@
   --motion-distance-sm: 4px;
   --motion-distance-md: 6px;
   --motion-intensity: 0.6;
+  /* Same 0.6 factor `transitionFor()` applies to tween recipes, so a CSS popup
+     and a Motion one slow down by the same amount. */
+  --motion-duration-instant: 60ms;
+  --motion-duration-fast: 96ms;
+  --motion-duration-base: 132ms;
+  --motion-duration-slow: 192ms;
 }
 
+/* `none` is a forced downgrade, not a quiet version of `reduced`: every duration
+   resolves to zero so a CSS transition finishes on the first frame. Motion-driven
+   components get the same result from `transitionFor(recipe, "none")`. */
 [data-motion="none"] {
   --motion-distance-sm: 0px;
   --motion-distance-md: 0px;
   --motion-intensity: 0;
+  --motion-duration-instant: 0ms;
+  --motion-duration-fast: 0ms;
+  --motion-duration-base: 0ms;
+  --motion-duration-slow: 0ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

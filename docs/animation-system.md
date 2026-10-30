@@ -80,21 +80,36 @@ export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 }
 
 [data-motion="reduced"] {
-  --motion-intensity: 0.5;
+  --motion-intensity: 0.6;
   --motion-distance-sm: 4px;
+  /* the same 0.6 factor transitionFor() applies to tween recipes */
+  --motion-duration-fast: 96ms;
+  --motion-duration-base: 132ms;
 }
 [data-motion="none"] {
   --motion-intensity: 0;
+  /* `none` is a forced downgrade: a CSS popup must finish on the first frame */
+  --motion-duration-instant: 0ms;
+  --motion-duration-fast: 0ms;
+  --motion-duration-base: 0ms;
+  --motion-duration-slow: 0ms;
 }
 @media (prefers-reduced-motion: reduce) {
   :root {
     --motion-distance-sm: 0px;
-    --motion-duration-base: 0ms;
   }
 }
 ```
 
-`--ease-*` generates the `ease-cadence-out` utility class. Durations and distances stay as CSS variables or Motion presets rather than forced utilities (Tailwind's `--duration-*` is not a theme namespace).
+`--ease-*` generates the `ease-cadence-out` utility class. Durations and distances stay as CSS variables or Motion presets rather than forced utilities (Tailwind's `--duration-*` is not a theme namespace). A CSS-only popup reads them through the shorthand arbitrary value:
+
+```tsx
+// dialog.tsx — CSS-only, so the token is the class
+"transition-[opacity,scale] duration-(--motion-duration-base) ease-cadence-out";
+```
+
+That is the only pattern that keeps `data-motion="none"` honest without a JS branch: the attribute zeroes
+the variables on the element itself, and the transition has nothing left to run.
 
 ---
 
@@ -438,8 +453,11 @@ export type Recipe =
 
 export function useCadenceMotion(): {
   mode: CadenceMode;
+  /** drop transform / scale / layout — true for both `reduced` and `none` */
   reduced: boolean;
-  transition(recipe: Recipe, options?: { delay?: number; distance?: number }): Transition;
+  /** `mode === "none"` only: a CSS-driven component must resolve to zero duration */
+  disabled: boolean;
+  transition(recipe: Recipe, options?: { delay?: number; distance?: number; timeScale?: number }): Transition;
   variants(recipe: Recipe): Variants;
   distance: typeof distance;
   spring: typeof spring;
@@ -450,8 +468,15 @@ Implementation notes:
 
 - `mode === "none"` → every transition is `{ duration: 0 }`, variants keep only the end state;
 - `mode === "reduced"` or a system preference → drop `y/x/scale/rotate/filter`, keep only `opacity`, duration ×0.6;
+- `timeScale` (provider prop, default `1`) multiplies durations, spring `visualDuration`, and delays; the docs
+  site's 0.25× preview passes `4`. It scales nothing inside `none` — a disabled transition stays disabled;
+- a nested provider inherits the mode and the scale it does not set, so a subtree can slow down (or be
+  silenced) without resetting the page to `full`; passing `mode` explicitly is how it opts back in;
 - with no provider, return `full` (components work standalone, wrapping is not mandatory);
 - the object returned by `transition()` can be passed straight to Motion's `transition` prop, optionally composed with `delay`.
+
+> `reduced` and `disabled` are deliberately two flags. A component that branches on `reduced` alone
+> will keep a 100ms fade under `none` — that is the failure the two-flag split exists to prevent.
 
 ---
 
