@@ -18,6 +18,7 @@ import { LabelPreview } from "./label";
 import { PaginationPreview } from "./pagination";
 import { SeparatorPreview } from "./separator";
 import { SkeletonPreview } from "./skeleton";
+import { SpinnerPreview } from "./spinner";
 import { TextareaPreview } from "./textarea";
 
 /**
@@ -45,4 +46,5 @@ export const previews: Record<string, ComponentType> = {
   "input-group": InputGroupPreview,
   breadcrumb: BreadcrumbPreview,
   pagination: PaginationPreview,
+  spinner: SpinnerPreview,
 };

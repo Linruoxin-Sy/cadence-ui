@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -388,7 +388,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -417,7 +417,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -447,7 +447,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -479,7 +479,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -510,7 +510,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -542,7 +542,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -574,7 +574,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -604,7 +604,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -634,9 +634,43 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
+  },
+  {
+    "name": "spinner",
+    "type": "registry:ui",
+    "title": "Spinner",
+    "description": "An indeterminate wait, rotating until the work finishes.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.2.0",
+    "tier": "T4",
+    "batch": "B2",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "38f1b27",
+    "docs": "/r/spinner.md",
+    "item": "/r/spinner.json"
   },
   {
     "name": "dialog",
@@ -671,7 +705,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "fa4bac4",
+    "sourceSha": "38f1b27",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   }

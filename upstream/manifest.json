@@ -293,6 +293,15 @@
         "pagination-link"
       ]
     },
+    "spinner": {
+      "path": "apps/v4/registry/bases/base/ui/spinner.tsx",
+      "exports": [
+        "Spinner"
+      ],
+      "slots": [
+        "spinner"
+      ]
+    },
     "dialog": {
       "path": "apps/v4/registry/bases/base/ui/dialog.tsx",
       "exports": [
