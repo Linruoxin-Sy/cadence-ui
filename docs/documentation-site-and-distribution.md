@@ -64,14 +64,14 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 
 ### 2.2 Preview capabilities
 
-| Capability             | Implementation                                                                           | Value                         |
-| ---------------------- | ---------------------------------------------------------------------------------------- | ----------------------------- |
-| Variant switching      | `?variant=` + client state                                                               | One component, several shapes |
-| Slow motion 0.25×      | The preview locally multiplies duration tokens by 4 (`data-slow-motion`), never globally | Lets people see the details   |
-| Reduced-motion preview | Toggle `data-motion="reduced"`                                                           | Verifies the downgrade        |
-| Theme switching        | `data-theme` / `class="dark"`                                                            | Both themes                   |
-| Code copy              | Reads the registry `content`, never hand-written snippets                                | Docs and source never drift   |
-| Install copy           | `npx shadcn add @cadence/<id>`                                                           | Lowers the conversion barrier |
+| Capability             | Implementation                                                                                                                  | Value                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Variant switching      | `?variant=` + client state                                                                                                      | One component, several shapes                                                |
+| Slow motion 0.25×      | `CadenceProvider timeScale={4}` around the preview only, never globally                                                         | Lets people see the details                                                  |
+| Reduced-motion preview | One switch in the site header (`full` / `reduced` / `none`), mirrored in `?motion=`; the preview only reports the resolved mode | A mode is a setting; 29 copies of the switch would be 29 chances to disagree |
+| Theme switching        | `data-theme` / `class="dark"`                                                                                                   | Both themes                                                                  |
+| Code copy              | Reads the registry `content`, never hand-written snippets                                                                       | Docs and source never drift                                                  |
+| Install copy           | `npx shadcn add @cadence/<id>`                                                                                                  | Lowers the conversion barrier                                                |
 
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 

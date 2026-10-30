@@ -96,6 +96,41 @@ Five rules for new components:
 4. Use `data-slot` on each part so consumers can target it with CSS.
 5. Add a Motion contract table to the component's docs.
 
+## Previewing motion
+
+The three modes are switched **once, in the header**, and apply to the whole site: a mode is a
+setting, not a property of the page you happen to be reading. The choice is remembered
+(`localStorage`) and written into the URL, so `?motion=reduced` can be shared with a reviewer and
+still lands on exactly that state.
+
+Each component preview adds only a **0.25×** slowdown, because slowing down is about the component
+you are looking at, not about the site.
+
+```
+?motion=full | reduced | none      the site-wide mode
+?motion=none                       a link the Playwright matrix navigates to
+```
+
+`none` is a forced downgrade, not a quieter `reduced`: every duration resolves to zero, so CSS popups
+finish on the first frame exactly like Motion-driven ones.
+
+If you want the slowdown inside your own app, it is a provider prop, not a token edit:
+
+```tsx
+<CadenceProvider timeScale={4}>…</CadenceProvider>  // 0.25×, same as the docs preview
+```
+
+`timeScale` multiplies durations, spring `visualDuration`, and delays. It never changes a token, and
+it cannot revive a transition under `none`.
+
+A nested provider inherits whatever it does not set, which is how the preview slows down without
+resetting the header's mode:
+
+```tsx
+<CadenceProvider timeScale={4}>…</CadenceProvider>        // keeps the enclosing mode
+<CadenceProvider mode="full">…</CadenceProvider>          // deliberately opts back in
+```
+
 ## Performance budget
 
 | Metric | Budget |

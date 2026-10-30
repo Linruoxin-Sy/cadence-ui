@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MotionModeSwitch } from "./motion-mode";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
@@ -26,6 +27,9 @@ export function SiteHeader() {
           <a className="hidden transition-colors hover:text-foreground sm:inline" href="/r/registry.json">
             Registry
           </a>
+          {/* The site has exactly one motion-mode switch, and it lives here. */}
+          <span aria-hidden="true" className="hidden h-4 w-px bg-border sm:block" />
+          <MotionModeSwitch />
           <ThemeToggle />
         </nav>
       </div>

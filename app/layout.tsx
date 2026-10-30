@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
-        <CadenceProvider>
+        <MotionModeProvider>
           <SiteHeader />
           <main id="content">{children}</main>
           <footer className="mt-24 border-t border-border">
@@ -59,7 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </p>
             </div>
           </footer>
-        </CadenceProvider>
+        </MotionModeProvider>
       </body>
     </html>
   );
