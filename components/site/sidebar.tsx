@@ -135,7 +135,7 @@ export function Sidebar({ groups, guides }: SidebarProps) {
       </details>
 
       <aside className="hidden w-56 shrink-0 md:block">
-        <div className="sticky top-14 max-h-[calc(100dvh-3.5rem)] overflow-y-auto py-10 pr-2">
+        <div className="no-scrollbar sticky top-14 max-h-[calc(100dvh-3.5rem)] overflow-y-auto py-10 pr-2">
           <Groups groups={groups} guides={guides} pathname={pathname} />
         </div>
       </aside>
