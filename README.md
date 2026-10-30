@@ -87,7 +87,7 @@ The remaining 22 components, their batches, and the motion tier for each are lis
 ## Rules
 
 - **Same API as shadcn.** Exports, props, and `data-slot` values match upstream; additions are allowed, renames are not.
-- **UI only.** Components render invalid state from `aria-invalid`; they never validate a value, own a schema, or hold form state. See [validation](content/docs/validation.mdx).
+- **UI only.** Components render invalid state from `aria-invalid`; they never validate a value, own a schema, or hold form state. See [Field](content/components/field.mdx).
 - **Motion has a contract.** Every animation explains a state change; components that do not need motion stay still.
 - **Reduced motion is a branch, not a patch.** `data-motion="none"` turns everything off.
 
