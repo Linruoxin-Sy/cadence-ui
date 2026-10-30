@@ -1,10 +1,13 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0 and B1 complete (2026-10-29); B2 next.** This document is the build record for the "parity"
+> Status: **B0, B1 and B2 complete (2026-10-30); B3 next.** This document is the build record for the "parity"
 > effort: replace the eight original motion components with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
 > every new component must satisfy. Architecture details remain in [overall-design.md](overall-design.md);
 > motion details remain in [animation-system.md](animation-system.md).
+>
+> **Working rule — see §7.0:** when a batch or a component finishes, mark it complete **in this file**, in the
+> same change. A batch whose row still says `next` is not done, whatever the branch contains.
 
 ---
 
@@ -208,8 +211,8 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |
 | B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
 | B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | next    |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | planned |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | next    |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | planned |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
@@ -236,7 +239,7 @@ these rows. Work that landed without updating them is a process defect, and the 
 
 Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
-green, and a real `shadcn add` install was verified (see §5.1).
+green, and a real `shadcn add` install was verified (see §5.1). **B1** and **B2** — see §7.1 and §7.2.
 
 ### B1 — atoms (11)
 
@@ -312,6 +315,44 @@ axe with zero violations, size budget, and dual-theme screenshots.
     Tailwind utilities come from `new-york-v4`.
 - **Not yet done:** dual-theme screenshots. The headless browser in this environment could not write
   screenshots, so the visual half of the batch gate is still open; everything else is verified.
+
+### 7.2 B2 — ✅ complete (2026-10-30)
+
+- **Scope shipped:** `alert`, `empty`, `item`, `field`, `button-group`, `input-group`, `breadcrumb`,
+  `pagination`, `spinner`. 21 components, 26 registry items, 21 docs, 21 previews.
+- **Tiers:** eight T0 (structure) and one T4 (`spinner`). Nothing in this batch needed a new recipe: the
+  spinner reuses `data.transition` in its continuous form, exactly like `skeleton`, so
+  [animation-system.md](animation-system.md) is unchanged.
+- **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, tier
+  budgets, P11), `parity:check` against `96da9cc`, 79 tests across 21 files. All nine component pages
+  return 200 from the dev server, each mounts its preview, and the sidebar renders the new "Structure and
+  feedback" group from `meta.batch` alone.
+- **Upstream pin:** `upstream/manifest.json` regenerated with `node scripts/parity.mjs --write` so the nine
+  new ids carry a pinned surface (`base` API, `new-york-v4` visuals, `2026-10`).
+- **Deviations recorded, not silent:**
+  - **`pagination` renders anchors, not `Button`.** Upstream's Base UI source wraps an `<a>` in `Button`
+    with `nativeButton={false}`, and Base UI then puts `role="button"` and `tabIndex={0}` on the anchor:
+    page navigation would be announced as a row of buttons. Cadence applies `buttonVariants()` to the
+    anchor instead, so the control stays a link and keeps `data-slot`, `data-variant`, `data-size`, and
+    `aria-current`. This is the one place where the DOM differs from upstream on purpose.
+  - **Four files suppress one Biome rule each** (`useSemanticElements`, plus `useFocusableInteractive` on
+    `breadcrumb` and `useKeyWithClickEvents` on `input-group`). The roles are upstream's and they are
+    deliberate: `role="list"` on a div so a row can be an anchor through `render`, `role="group"` on the
+    field/button/input wrappers, `role="link"` + `aria-current` on the current crumb. The rule and the
+    reason live above the `"use client"` directive, because Biome only honours `biome-ignore-all` on the
+    first line.
+  - **`item` adds the `xs` size** (upstream `base` has three sizes, `new-york-v4` two) and writes
+    `data-slot` / `data-variant` / `data-size` through Base UI `state`, which is how upstream emits them.
+  - **Additive exports** follow B1's pattern: every part has an exported `…Props` interface, and the
+    `cva` variants (`alertVariants`, `itemVariants`, `fieldVariants`, `buttonGroupVariants`,
+    `inputGroupAddonVariants`, `inputGroupButtonVariants`, `emptyMediaVariants`, `itemMediaVariants`) are
+    exported so a consumer can build a custom part without forking the file. `parity:check` reports them
+    as additive, never as failures (P8).
+  - **T0 components carry no motion runtime,** as in B1: no `useCadenceMotion`, no `data-motion`, and a
+    `cadence-utils`-only dependency chain. `spinner` is the only component in the batch with
+    `data-motion` and the three-mode branch.
+- **Not yet done:** dual-theme screenshots, same environment limitation as B1. The visual half of the
+  batch gate stays open for both batches; everything else is verified.
 
 ## 8. Backlog
 

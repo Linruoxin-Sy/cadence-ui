@@ -6,9 +6,10 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B1 complete.** B0 removed the eight original motion components and shipped the parity foundation;
-> B1 adds the eleven atoms (button, badge, kbd, separator, label, input, textarea, card, aspect-ratio, avatar,
-> skeleton) plus the upstream parity check. B2 (structure and feedback) is next — see
+> Status: **B2 complete.** B0 removed the eight original motion components and shipped the parity foundation;
+> B1 added the eleven atoms (button, badge, kbd, separator, label, input, textarea, card, aspect-ratio, avatar,
+> skeleton) plus the upstream parity check; B2 added the nine structure-and-feedback components (alert, empty,
+> item, field, button-group, input-group, breadcrumb, pagination, spinner). B3 (form controls) is next — see
 > [the parity plan](docs/parity-plan.md).
 
 ## Install
@@ -54,8 +55,17 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `avatar` — image with fallback      | T0   | none                          |
 | `skeleton` — loading placeholder    | T4   | `data.transition`             |
 | `dialog` — modal window             | T2   | `popup.anchored`, `exit.fade` |
+| `alert` — state message             | T0   | none                          |
+| `empty` — resting state             | T0   | none                          |
+| `item` — list row                   | T0   | none                          |
+| `field` — labelled control          | T0   | none                          |
+| `button-group` — joined controls    | T0   | none                          |
+| `input-group` — framed field        | T0   | none                          |
+| `breadcrumb` — trail                | T0   | none                          |
+| `pagination` — page navigation      | T0   | none                          |
+| `spinner` — indeterminate wait      | T4   | `data.transition`             |
 
-The remaining 45 components, their batches, and the motion tier for each are listed in
+The remaining 36 components, their batches, and the motion tier for each are listed in
 [docs/parity-plan.md](docs/parity-plan.md).
 
 ## Rules
