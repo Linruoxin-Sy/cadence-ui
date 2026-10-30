@@ -14,6 +14,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/
 import os from "node:os";
 import path from "node:path";
 import matter from "gray-matter";
+import { motionRecipes } from "./motion-manifest.mjs";
 
 const root = process.cwd();
 const publicDir = path.join(root, "public");
@@ -67,6 +68,22 @@ for (const item of registry.items) {
     problems.push(`${item.name}: doc registryDeps differ from registry`);
   if (!Array.isArray(doc.data.motion)) problems.push(`${item.name}: frontmatter needs a motion recipe list`);
   if (!doc.data.intensity) problems.push(`${item.name}: frontmatter needs an intensity`);
+
+  // The frontmatter is the human copy of `meta`; compare every field, not just the
+  // ones that happen to be convenient. `check-registry` repeats this check so the
+  // gate also runs without a rebuild.
+  for (const key of ["tier", "since", "complexity", "intensity"]) {
+    if (doc.data[key] !== item.meta?.[key]) {
+      problems.push(
+        `${item.name}: doc ${key} "${doc.data[key]}" != registry ${key} "${item.meta?.[key] ?? "missing"}"`,
+      );
+    }
+  }
+  const docMotion = [...(doc.data.motion ?? [])].sort().join("|");
+  const metaMotion = motionRecipes(item.meta?.motion).sort().join("|");
+  if (docMotion !== metaMotion) {
+    problems.push(`${item.name}: doc motion [${docMotion}] != registry motion [${metaMotion}]`);
+  }
 }
 
 if (problems.length) {
@@ -137,7 +154,7 @@ for (const item of staged.items) {
     `- Install: \`${install}\``,
     `- Type: ${item.type}`,
     `- Since: ${item.meta?.since ?? "0.1.0"}`,
-    item.meta?.motion?.length ? `- Motion recipes: ${item.meta.motion.join(", ")}` : "",
+    item.meta?.motion?.length ? `- Motion recipes: ${motionRecipes(item.meta.motion).join(", ")}` : "",
     "",
     doc.body,
     "",

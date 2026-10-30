@@ -420,7 +420,7 @@
         "since": "0.2.0",
         "tier": "T4",
         "batch": "B1",
-        "motion": ["data.transition"],
+        "motion": [{ "recipe": "data.transition", "form": "continuous" }],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -681,7 +681,7 @@
         "since": "0.2.0",
         "tier": "T4",
         "batch": "B2",
-        "motion": ["data.transition"],
+        "motion": [{ "recipe": "data.transition", "form": "continuous" }],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -715,7 +715,10 @@
         "since": "0.2.0",
         "tier": "T2",
         "batch": "B4",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          { "recipe": "popup.anchored", "form": "css-transition" },
+          { "recipe": "exit.fade", "form": "css-transition" }
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {

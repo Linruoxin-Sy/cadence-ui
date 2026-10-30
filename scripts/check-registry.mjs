@@ -15,10 +15,31 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
+import matter from "gray-matter";
+import {
+  calledRecipes,
+  implementedForm,
+  MOTION_FORMS,
+  motionRecipes,
+  normaliseMotion,
+  recipeCatalogue,
+} from "./motion-manifest.mjs";
 
 const root = process.cwd();
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
 const problems = [];
+
+const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
+const docsDir = path.join(root, "content", "components");
+
+/** Frontmatter is the human-facing copy of `meta`; the two must not drift. */
+async function docFrontmatter(name) {
+  try {
+    return matter(await readFile(path.join(docsDir, `${name}.mdx`), "utf8")).data;
+  } catch {
+    return null;
+  }
+}
 
 const TIER_BUDGET = { T0: 4, T1: 6, T2: 10, T3: 12, T4: 14, T5: 12 };
 const NAMESPACE = "@cadence/";
@@ -68,6 +89,15 @@ for (const item of registry.items) {
         problems.push(`${item.name}: non-T0 components need at least one recipe in meta.motion`);
       }
       if (!item.meta?.intensity) problems.push(`${item.name}: missing meta.intensity`);
+
+      for (const { recipe, form } of normaliseMotion(item.meta?.motion)) {
+        if (!RECIPES.includes(recipe)) {
+          problems.push(`${item.name}: unknown recipe "${recipe}" — the catalogue lives in lib/motion.ts`);
+        }
+        if (!MOTION_FORMS.includes(form)) {
+          problems.push(`${item.name}: motion form "${form}" must be one of ${MOTION_FORMS.join(", ")}`);
+        }
+      }
     }
     // The sidebar groups components by batch, so a missing batch hides it from navigation.
     if (!/^B[1-9]$/.test(item.meta?.batch ?? "")) {
@@ -97,6 +127,7 @@ for (const item of registry.items) {
   }
 
   let bytes = 0;
+  const sources = [];
   for (const file of item.files ?? []) {
     const filePath = path.join(root, file.path);
     if (!(await exists(filePath))) {
@@ -107,6 +138,7 @@ for (const item of registry.items) {
       problems.push(`${item.name}: ${file.path} targets ${file.target}, expected ${expectedTarget(file.path)}`);
     }
     const source = await readFile(filePath, "utf8");
+    sources.push(source);
     const embedded = payload.files?.find((entry) => entry.path === file.path)?.content;
     if (embedded !== source) problems.push(`${item.name}: payload is stale for ${file.path}`);
     if (source.includes('from "@/') || source.includes("from '@/")) {
@@ -131,6 +163,53 @@ for (const item of registry.items) {
     const budgetKb = item.meta?.budget ? item.meta.budget / 1024 : (TIER_BUDGET[tier] ?? 8);
     if (bytes > budgetKb * 1024) {
       problems.push(`${item.name}: ${(bytes / 1024).toFixed(1)} KB gzip exceeds the ${budgetKb} KB budget for ${tier}`);
+    }
+  }
+
+  if (isComponent(item)) {
+    // Declared = implemented. A recipe with no implementation is a documentation
+    // claim, not a component behaviour; a `transition()` call with no declaration
+    // is an undeclared animation.
+    const declared = normaliseMotion(item.meta?.motion);
+    const called = [...new Set(sources.flatMap(calledRecipes))];
+
+    for (const { recipe, form } of declared) {
+      const implemented = sources.map((source) => implementedForm(source, recipe, form)).find(Boolean);
+      if (!implemented) {
+        problems.push(
+          `${item.name}: declares "${recipe}" (${form}) but nothing implements it — ` +
+            "add the transition, or mark the form as continuous",
+        );
+      }
+    }
+
+    for (const recipe of called) {
+      if (!declared.some((entry) => entry.recipe === recipe)) {
+        problems.push(`${item.name}: calls transition("${recipe}") without declaring it in meta.motion`);
+      }
+    }
+
+    // Declared = documented. The frontmatter is what readers and agents see.
+    const frontmatter = isComponent(item) ? await docFrontmatter(item.name) : null;
+    if (frontmatter) {
+      const pairs = [
+        ["title", item.title],
+        ["description", item.description],
+        ["tier", item.meta?.tier],
+        ["since", item.meta?.since],
+        ["complexity", item.meta?.complexity],
+        ["intensity", item.meta?.intensity],
+      ];
+      for (const [key, expected] of pairs) {
+        if (frontmatter[key] !== expected) {
+          problems.push(`${item.name}: docs frontmatter ${key} is "${frontmatter[key]}", registry says "${expected}"`);
+        }
+      }
+      const docRecipes = [...(frontmatter.motion ?? [])].sort().join("|");
+      const metaRecipes = motionRecipes(item.meta?.motion).sort().join("|");
+      if (docRecipes !== metaRecipes) {
+        problems.push(`${item.name}: docs motion [${docRecipes}] != registry motion [${metaRecipes}]`);
+      }
     }
   }
 }
