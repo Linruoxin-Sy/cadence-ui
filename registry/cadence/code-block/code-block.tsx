@@ -216,14 +216,24 @@ function CodeBlock({
 
 export interface CodeBlockHeaderProps extends React.ComponentProps<"div"> {}
 
-/** The row above the source: a label on the start side, actions on the end side. */
+/**
+ * The row above the source: a label on the start side, actions on the end side,
+ * and a rule between the label and the code.
+ *
+ * The rule is a border on the header rather than a `Separator` part: the seam has
+ * to span the block's full width, and the header is the only element that already
+ * does — a `Separator` would have to be pulled out of the header's padding the way
+ * `CodeBlockLine` is. The header is padded equally top and bottom, and the source's
+ * top padding repeats the header's bottom one, so the label and the first line sit
+ * the same distance from the rule and from the block's edges.
+ */
 function CodeBlockHeader({ className, ...props }: CodeBlockHeaderProps) {
   return (
     <CodeBlockHeaderContext.Provider value={true}>
       <div
         data-slot="code-block-header"
         className={cn(
-          "flex min-w-0 shrink-0 items-center gap-2 px-4 pt-4 text-muted-foreground group-data-[variant=destructive]/code-block:text-destructive group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:pt-3",
+          "flex min-w-0 shrink-0 items-center gap-2 border-b border-border px-4 py-3 text-muted-foreground group-data-[variant=destructive]/code-block:border-destructive/20 group-data-[variant=destructive]/code-block:text-destructive group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
           className,
         )}
         {...props}
@@ -494,9 +504,9 @@ function CodeBlockContent({
         tabIndex={0}
         style={{ counterReset: `line ${startLine - 1}`, ...style }}
         className={cn(
-          "min-h-0 min-w-0 overflow-auto px-4 py-4 font-mono leading-relaxed text-start outline-none",
-          "group-has-data-[slot=code-block-header]/code-block:pt-2 group-has-data-[slot=code-block-footer]/code-block:pb-2",
-          "group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-3 group-data-[size=sm]/code-block:group-has-data-[slot=code-block-header]/code-block:pt-1.5",
+          "min-h-0 min-w-0 overflow-auto px-4 py-3 font-mono leading-relaxed text-start outline-none",
+          "group-has-data-[slot=code-block-footer]/code-block:pb-2",
+          "group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
           wrap && "whitespace-pre-wrap break-words",
           className,
         )}
