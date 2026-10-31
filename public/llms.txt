@@ -59,6 +59,9 @@ npx shadcn@latest add @cadence/button
 - [Sheet](https://cadence.dev/r/sheet.md): Filters, details, and settings that keep the page in view. (overlay)
 - [Drawer](https://cadence.dev/r/drawer.md): Quick tasks on touch screens, such as share or move. (overlay)
 - [Select](https://cadence.dev/r/select.md): Choosing one value from a short list of options. (form)
+- [Dropdown Menu](https://cadence.dev/r/dropdown-menu.md): Row actions, filters, and view settings behind one button. (overlay)
+- [Context Menu](https://cadence.dev/r/context-menu.md): Right-click actions on a file, row, or canvas. (overlay)
+- [Menubar](https://cadence.dev/r/menubar.md): Application menus along the top of a window. (overlay)
 - [Code block](https://cadence.dev/r/code-block.md): Install commands, source snippets, and tool output. (ai)
 
 ## Docs
