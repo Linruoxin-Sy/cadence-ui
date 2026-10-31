@@ -63,3 +63,25 @@ describe("ToggleGroup", () => {
     expect(container.querySelector('[data-slot="toggle-group-item"]')).toHaveAttribute("data-motion", "none");
   });
 });
+
+describe("ToggleGroup orientation", () => {
+  it("lays a vertical group out as a column", () => {
+    const { container } = render(
+      <ToggleGroup orientation="vertical" variant="outline" aria-label="Zoom">
+        <ToggleGroupItem value="in" aria-label="Zoom in" />
+        <ToggleGroupItem value="out" aria-label="Zoom out" />
+      </ToggleGroup>,
+    );
+
+    // Base UI writes `data-orientation`; the layout follows it in JS, because a
+    // `data-vertical:` utility compiles to `[data-vertical]` — an attribute nothing
+    // sets — and the group would silently stay a row.
+    const group = container.querySelector('[data-slot="toggle-group"]');
+    const item = container.querySelector('[data-slot="toggle-group-item"]');
+
+    expect(group).toHaveAttribute("data-orientation", "vertical");
+    expect(group?.className).toContain("flex-col");
+    expect(item?.className).toContain("first:rounded-t-md");
+    expect(item?.className).not.toContain("first:rounded-l-md");
+  });
+});

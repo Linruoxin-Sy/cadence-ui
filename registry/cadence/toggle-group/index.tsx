@@ -65,7 +65,12 @@ function ToggleGroup({
       data-orientation={orientation}
       style={{ "--gap": spacing } as CSSProperties}
       className={cn(
-        "group/toggle-group flex w-fit items-center gap-[calc(var(--spacing)*var(--gap))] rounded-md data-vertical:flex-col data-vertical:items-stretch",
+        // Orientation is a JS branch, not a `data-vertical:` variant: Base UI writes
+        // `data-orientation="vertical"`, while the shorthand utility compiles to
+        // `[data-vertical]`, which nothing ever sets — a vertical group would lay out
+        // as a row.
+        "group/toggle-group flex w-fit gap-[calc(var(--spacing)*var(--gap))] rounded-md",
+        orientation === "vertical" ? "flex-col items-stretch" : "items-center",
         "data-[spacing=0]:data-[variant=outline]:shadow-xs",
         className,
       )}
@@ -83,6 +88,10 @@ function ToggleGroupItem({ className, children, variant, size, ...props }: Toggl
   const context = useContext(ToggleGroupContext);
   const resolvedVariant = context.variant ?? variant;
   const resolvedSize = context.size ?? size;
+  // The joined-control radii and the doubled-border fix follow the *group's*
+  // orientation, which an item cannot read from its own attributes.
+  const vertical = context.orientation === "vertical";
+  const joined = context.spacing === 0;
 
   return (
     <TogglePrimitive
@@ -94,9 +103,11 @@ function ToggleGroupItem({ className, children, variant, size, ...props }: Toggl
       className={cn(
         toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
         "w-auto min-w-0 shrink-0 px-3 focus:z-10 focus-visible:z-10",
-        "data-[spacing=0]:rounded-none data-[spacing=0]:shadow-none data-[spacing=0]:first:rounded-l-md data-[spacing=0]:last:rounded-r-md",
-        "data-[spacing=0]:data-[variant=outline]:border-l-0 data-[spacing=0]:data-[variant=outline]:first:border-l",
-        "data-vertical:data-[spacing=0]:data-[variant=outline]:border-t-0 data-vertical:data-[spacing=0]:data-[variant=outline]:first:border-t",
+        joined && "rounded-none shadow-none",
+        joined && (vertical ? "first:rounded-t-md last:rounded-b-md" : "first:rounded-l-md last:rounded-r-md"),
+        joined &&
+          resolvedVariant === "outline" &&
+          (vertical ? "border-t-0 first:border-t" : "border-l-0 first:border-l"),
         className,
       )}
       render={
