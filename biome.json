@@ -5,6 +5,7 @@
       "**",
       "!**/node_modules",
       "!**/.next",
+      "!**/.next-*",
       "!**/.cache",
       "!**/coverage",
       "!**/public/r",
