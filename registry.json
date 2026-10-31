@@ -1266,6 +1266,40 @@
       }
     },
     {
+      "name": "menubar",
+      "type": "registry:ui",
+      "title": "Menubar",
+      "description": "Application menus along the top of a window.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-utils",
+        "@cadence/dropdown-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/menubar/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/menubar/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.4.0",
+        "tier": "T2",
+        "batch": "B5",
+        "motion": ["popup.anchored", "exit.fade", "state.morph"],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "code-block",
       "type": "registry:ui",
       "title": "Code block",

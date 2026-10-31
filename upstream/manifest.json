@@ -1359,6 +1359,97 @@
         }
       }
     },
+    "menubar": {
+      "path": "apps/v4/registry/bases/base/ui/menubar.tsx",
+      "exports": [
+        "Menubar",
+        "MenubarCheckboxItem",
+        "MenubarContent",
+        "MenubarGroup",
+        "MenubarItem",
+        "MenubarLabel",
+        "MenubarMenu",
+        "MenubarPortal",
+        "MenubarRadioGroup",
+        "MenubarRadioItem",
+        "MenubarSeparator",
+        "MenubarShortcut",
+        "MenubarSub",
+        "MenubarSubContent",
+        "MenubarSubTrigger",
+        "MenubarTrigger"
+      ],
+      "slots": [
+        "menubar",
+        "menubar-checkbox-item",
+        "menubar-content",
+        "menubar-group",
+        "menubar-item",
+        "menubar-label",
+        "menubar-menu",
+        "menubar-portal",
+        "menubar-radio-group",
+        "menubar-radio-item",
+        "menubar-separator",
+        "menubar-shortcut",
+        "menubar-sub",
+        "menubar-sub-content",
+        "menubar-sub-trigger",
+        "menubar-trigger"
+      ],
+      "props": {
+        "Menubar": {
+          "className": null
+        },
+        "MenubarMenu": {},
+        "MenubarGroup": {},
+        "MenubarPortal": {},
+        "MenubarTrigger": {
+          "className": null
+        },
+        "MenubarContent": {
+          "className": null,
+          "align": "\"start\"",
+          "alignOffset": "-4",
+          "sideOffset": "8"
+        },
+        "MenubarItem": {
+          "className": null,
+          "inset": null,
+          "variant": "\"default\""
+        },
+        "MenubarCheckboxItem": {
+          "className": null,
+          "children": null,
+          "checked": null,
+          "inset": null
+        },
+        "MenubarRadioGroup": {},
+        "MenubarRadioItem": {
+          "className": null,
+          "children": null,
+          "inset": null
+        },
+        "MenubarLabel": {
+          "className": null,
+          "inset": null
+        },
+        "MenubarSeparator": {
+          "className": null
+        },
+        "MenubarShortcut": {
+          "className": null
+        },
+        "MenubarSub": {},
+        "MenubarSubTrigger": {
+          "className": null,
+          "inset": null
+        },
+        "MenubarSubContent": {
+          "className": null
+        }
+      }
+    },
     "code-block": {
       "path": "apps/v4/registry/bases/base/ui/code-block.tsx",
       "exports": [
