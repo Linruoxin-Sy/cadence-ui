@@ -55,7 +55,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "Triggers an action, with press feedback that collapses under reduced motion.",
+      "description": "Commands such as save, submit, and delete.",
       "categories": [
         "form",
         "feedback"
@@ -74,14 +74,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "badge",
       "type": "registry:ui",
       "title": "Badge",
-      "description": "A compact status label that stays still while the content around it animates.",
+      "description": "Statuses, counts, and categories.",
       "categories": [
         "feedback"
       ],
@@ -97,14 +97,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "kbd",
       "type": "registry:ui",
       "title": "Kbd",
-      "description": "A keyboard key or shortcut hint, styled from the semantic tokens.",
+      "description": "Keyboard shortcuts in tooltips, menus, and command lists.",
       "categories": [
         "utility"
       ],
@@ -120,14 +120,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "separator",
       "type": "registry:ui",
       "title": "Separator",
-      "description": "A one-pixel rule that divides groups of content.",
+      "description": "Dividing sections, menu groups, and toolbars.",
       "categories": [
         "layout"
       ],
@@ -143,14 +143,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "label",
       "type": "registry:ui",
       "title": "Label",
-      "description": "An accessible name for a form control, with no state of its own.",
+      "description": "Naming inputs, selects, and other form controls.",
       "categories": [
         "form"
       ],
@@ -166,14 +166,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
-      "description": "A single-line text field whose invalid state is driven by aria-invalid.",
+      "description": "Names, emails, search queries, and other short text.",
       "categories": [
         "form"
       ],
@@ -189,14 +189,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "textarea",
       "type": "registry:ui",
       "title": "Textarea",
-      "description": "A multi-line text field that grows with its content instead of a script.",
+      "description": "Comments, descriptions, and other longer text.",
       "categories": [
         "form"
       ],
@@ -212,14 +212,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "card",
       "type": "registry:ui",
       "title": "Card",
-      "description": "A bounded surface for grouped content, with parts you can restyle.",
+      "description": "Grouping related content, such as a summary or a record.",
       "categories": [
         "layout"
       ],
@@ -235,14 +235,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "aspect-ratio",
       "type": "registry:ui",
       "title": "Aspect Ratio",
-      "description": "Reserves a box at a fixed ratio so media cannot shift the layout.",
+      "description": "Images, videos, and embeds that must keep their shape.",
       "categories": [
         "layout"
       ],
@@ -258,14 +258,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",
-      "description": "A profile image with a text fallback, a presence dot, and a stack of peers.",
+      "description": "People in comments, assignees, and member lists.",
       "categories": [
         "data"
       ],
@@ -281,14 +281,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "skeleton",
       "type": "registry:ui",
       "title": "Skeleton",
-      "description": "A placeholder pulse that marks where content will land.",
+      "description": "Placeholders while cards, tables, and lists load.",
       "categories": [
         "feedback",
         "data"
@@ -310,14 +310,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "alert",
       "type": "registry:ui",
       "title": "Alert",
-      "description": "A message about the current state of the page, with an icon column and an action slot.",
+      "description": "Errors, warnings, and page-level status messages.",
       "categories": [
         "feedback"
       ],
@@ -333,14 +333,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "empty",
       "type": "registry:ui",
       "title": "Empty",
-      "description": "The resting state of a region that has nothing to show yet.",
+      "description": "Lists, tables, and panels with nothing to show yet.",
       "categories": [
         "feedback",
         "layout"
@@ -357,14 +357,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "item",
       "type": "registry:ui",
       "title": "Item",
-      "description": "A row in a list of like objects, with media, content, and actions.",
+      "description": "Rows in lists of files, members, and invoices.",
       "categories": [
         "data",
         "layout"
@@ -381,14 +381,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "field",
       "type": "registry:ui",
       "title": "Field",
-      "description": "A labelled control with its description and error, without owning validation.",
+      "description": "Form controls that need a label, help text, and error.",
       "categories": [
         "form"
       ],
@@ -404,14 +404,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "button-group",
       "type": "registry:ui",
       "title": "Button Group",
-      "description": "Adjacent controls joined into one shape.",
+      "description": "Toolbars and related actions on the same object.",
       "categories": [
         "form",
         "layout"
@@ -428,14 +428,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "input-group",
       "type": "registry:ui",
       "title": "Input Group",
-      "description": "A text control framed with prefixes, suffixes, and buttons.",
+      "description": "Currency fields, URLs, and inputs with inline actions.",
       "categories": [
         "form"
       ],
@@ -451,14 +451,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "breadcrumb",
       "type": "registry:ui",
       "title": "Breadcrumb",
-      "description": "The trail from the root to the current page.",
+      "description": "Hierarchy navigation, from the root to the current page.",
       "categories": [
         "navigation"
       ],
@@ -474,14 +474,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "pagination",
       "type": "registry:ui",
       "title": "Pagination",
-      "description": "Page navigation that stays a link, not a button.",
+      "description": "Long result sets, tables, and search results.",
       "categories": [
         "navigation"
       ],
@@ -497,14 +497,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "spinner",
       "type": "registry:ui",
       "title": "Spinner",
-      "description": "An indeterminate wait, rotating until the work finishes.",
+      "description": "Short waits such as saving, sending, or publishing.",
       "categories": [
         "feedback"
       ],
@@ -525,14 +525,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "A modal window that fades and settles in, with the open and close sequence interruptible.",
+      "description": "Focused tasks such as renaming, inviting, or confirming.",
       "categories": [
         "overlay"
       ],
@@ -557,14 +557,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "checkbox",
       "type": "registry:ui",
       "title": "Checkbox",
-      "description": "A control that allows the user to toggle between checked and not checked.",
+      "description": "Independent yes/no choices and multi-select lists.",
       "categories": [
         "form"
       ],
@@ -582,14 +582,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "radio-group",
       "type": "registry:ui",
       "title": "Radio Group",
-      "description": "A set of checkable buttons where no more than one can be checked at a time.",
+      "description": "Choosing one option from a small, fixed set.",
       "categories": [
         "form"
       ],
@@ -607,14 +607,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "switch",
       "type": "registry:ui",
       "title": "Switch",
-      "description": "A control that toggles between on and off, with a thumb that travels between the two states.",
+      "description": "Settings that take effect immediately, such as alerts or visibility.",
       "categories": [
         "form"
       ],
@@ -632,14 +632,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "slider",
       "type": "registry:ui",
       "title": "Slider",
-      "description": "An input where the user selects a value from a range by dragging a thumb.",
+      "description": "Volume, brightness, zoom, and price ranges.",
       "categories": [
         "form"
       ],
@@ -657,14 +657,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "toggle",
       "type": "registry:ui",
       "title": "Toggle",
-      "description": "A two-state button that can be pressed or not pressed.",
+      "description": "Bold, italic, preview, and other on/off modes.",
       "categories": [
         "form"
       ],
@@ -682,14 +682,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "toggle-group",
       "type": "registry:ui",
       "title": "Toggle Group",
-      "description": "A set of two-state buttons that can be pressed one at a time or together.",
+      "description": "Text alignment, view density, and other mode sets.",
       "categories": [
         "form"
       ],
@@ -707,14 +707,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "input-otp",
       "type": "registry:ui",
       "title": "Input OTP",
-      "description": "A one-time password field that renders one slot per character.",
+      "description": "Login codes, email verification, and device pairing.",
       "categories": [
         "form"
       ],
@@ -732,14 +732,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "progress",
       "type": "registry:ui",
       "title": "Progress",
-      "description": "Displays an indicator showing the completion progress of a task.",
+      "description": "Uploads, imports, and other work with a measurable end.",
       "categories": [
         "feedback"
       ],
@@ -757,14 +757,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "alert-dialog",
       "type": "registry:ui",
       "title": "Alert Dialog",
-      "description": "A modal confirmation that interrupts the flow and needs an explicit choice before anything happens.",
+      "description": "Destructive or irreversible actions that need confirmation.",
       "categories": [
         "overlay"
       ],
@@ -789,14 +789,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "popover",
       "type": "registry:ui",
       "title": "Popover",
-      "description": "An anchored panel that opens next to its trigger and returns focus to it when it closes.",
+      "description": "Filters, share links, and other controls tied to a trigger.",
       "categories": [
         "overlay"
       ],
@@ -815,14 +815,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "tooltip",
       "type": "registry:ui",
       "title": "Tooltip",
-      "description": "A short label that names a control on hover or focus, and disappears when the pointer leaves.",
+      "description": "Hints for icon buttons, shortcuts, and truncated values.",
       "categories": [
         "overlay"
       ],
@@ -841,14 +841,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "hover-card",
       "type": "registry:ui",
       "title": "Hover Card",
-      "description": "A preview panel that opens from a link on hover or focus and disappears when the pointer leaves.",
+      "description": "Previews of links, profiles, and repositories.",
       "categories": [
         "overlay"
       ],
@@ -867,14 +867,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "sheet",
       "type": "registry:ui",
       "title": "Sheet",
-      "description": "A panel that slides in from an edge of the screen and holds a focused task without leaving the page.",
+      "description": "Filters, details, and settings that keep the page in view.",
       "categories": [
         "overlay"
       ],
@@ -893,14 +893,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "drawer",
       "type": "registry:ui",
       "title": "Drawer",
-      "description": "A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request.",
+      "description": "Quick tasks on touch screens, such as share or move.",
       "categories": [
         "overlay"
       ],
@@ -919,14 +919,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "select",
       "type": "registry:ui",
       "title": "Select",
-      "description": "A control that opens a list of options and keeps the chosen value in the trigger.",
+      "description": "Choosing one value from a short list of options.",
       "categories": [
         "form"
       ],
@@ -947,14 +947,14 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {
       "name": "code-block",
       "type": "registry:ui",
       "title": "Code block",
-      "description": "A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse.",
+      "description": "Install commands, source snippets, and tool output.",
       "categories": [
         "ai"
       ],
@@ -975,7 +975,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "25da7fa"
+        "sourceSha": "3d771e3"
       }
     },
     {

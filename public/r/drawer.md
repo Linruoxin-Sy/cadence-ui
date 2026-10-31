@@ -1,6 +1,6 @@
 # Drawer
 
-> A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request.
+> Quick tasks on touch screens, such as share or move.
 
 - Registry item: https://cadence.dev/r/drawer.json
 - Install: `npx shadcn@latest add @cadence/drawer`

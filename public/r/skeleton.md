@@ -1,6 +1,6 @@
 # Skeleton
 
-> A placeholder pulse that marks where content will land.
+> Placeholders while cards, tables, and lists load.
 
 - Registry item: https://cadence.dev/r/skeleton.json
 - Install: `npx shadcn@latest add @cadence/skeleton`

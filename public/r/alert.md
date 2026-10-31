@@ -1,6 +1,6 @@
 # Alert
 
-> A message about the current state of the page, with an icon column and an action slot.
+> Errors, warnings, and page-level status messages.
 
 - Registry item: https://cadence.dev/r/alert.json
 - Install: `npx shadcn@latest add @cadence/alert`

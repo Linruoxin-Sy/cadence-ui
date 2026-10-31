@@ -1,6 +1,6 @@
 # Card
 
-> A bounded surface for grouped content, with parts you can restyle.
+> Grouping related content, such as a summary or a record.
 
 - Registry item: https://cadence.dev/r/card.json
 - Install: `npx shadcn@latest add @cadence/card`

@@ -1,6 +1,6 @@
 # Field
 
-> A labelled control with its description and error, without owning validation.
+> Form controls that need a label, help text, and error.
 
 - Registry item: https://cadence.dev/r/field.json
 - Install: `npx shadcn@latest add @cadence/field`

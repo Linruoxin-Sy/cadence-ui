@@ -1,6 +1,6 @@
 # Select
 
-> A control that opens a list of options and keeps the chosen value in the trigger.
+> Choosing one value from a short list of options.
 
 - Registry item: https://cadence.dev/r/select.json
 - Install: `npx shadcn@latest add @cadence/select`

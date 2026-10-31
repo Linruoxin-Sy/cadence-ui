@@ -1,6 +1,6 @@
 # Toggle
 
-> A two-state button that can be pressed or not pressed.
+> Bold, italic, preview, and other on/off modes.
 
 - Registry item: https://cadence.dev/r/toggle.json
 - Install: `npx shadcn@latest add @cadence/toggle`

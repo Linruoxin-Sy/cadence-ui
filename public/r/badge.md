@@ -1,6 +1,6 @@
 # Badge
 
-> A compact status label that stays still while the content around it animates.
+> Statuses, counts, and categories.
 
 - Registry item: https://cadence.dev/r/badge.json
 - Install: `npx shadcn@latest add @cadence/badge`

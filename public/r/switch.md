@@ -1,6 +1,6 @@
 # Switch
 
-> A control that toggles between on and off, with a thumb that travels between the two states.
+> Settings that take effect immediately, such as alerts or visibility.
 
 - Registry item: https://cadence.dev/r/switch.json
 - Install: `npx shadcn@latest add @cadence/switch`

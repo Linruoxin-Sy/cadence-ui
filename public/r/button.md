@@ -1,6 +1,6 @@
 # Button
 
-> Triggers an action, with press feedback that collapses under reduced motion.
+> Commands such as save, submit, and delete.
 
 - Registry item: https://cadence.dev/r/button.json
 - Install: `npx shadcn@latest add @cadence/button`

@@ -1,6 +1,6 @@
 # Pagination
 
-> Page navigation that stays a link, not a button.
+> Long result sets, tables, and search results.
 
 - Registry item: https://cadence.dev/r/pagination.json
 - Install: `npx shadcn@latest add @cadence/pagination`

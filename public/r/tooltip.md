@@ -1,6 +1,6 @@
 # Tooltip
 
-> A short label that names a control on hover or focus, and disappears when the pointer leaves.
+> Hints for icon buttons, shortcuts, and truncated values.
 
 - Registry item: https://cadence.dev/r/tooltip.json
 - Install: `npx shadcn@latest add @cadence/tooltip`

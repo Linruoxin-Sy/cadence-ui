@@ -1,6 +1,6 @@
 # Textarea
 
-> A multi-line text field that grows with its content instead of a script.
+> Comments, descriptions, and other longer text.
 
 - Registry item: https://cadence.dev/r/textarea.json
 - Install: `npx shadcn@latest add @cadence/textarea`

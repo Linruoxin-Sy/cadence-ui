@@ -1,6 +1,6 @@
 # Sheet
 
-> A panel that slides in from an edge of the screen and holds a focused task without leaving the page.
+> Filters, details, and settings that keep the page in view.
 
 - Registry item: https://cadence.dev/r/sheet.json
 - Install: `npx shadcn@latest add @cadence/sheet`

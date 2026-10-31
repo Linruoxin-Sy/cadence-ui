@@ -1,6 +1,6 @@
 # Radio Group
 
-> A set of checkable buttons where no more than one can be checked at a time.
+> Choosing one option from a small, fixed set.
 
 - Registry item: https://cadence.dev/r/radio-group.json
 - Install: `npx shadcn@latest add @cadence/radio-group`

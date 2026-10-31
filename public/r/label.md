@@ -1,6 +1,6 @@
 # Label
 
-> An accessible name for a form control, with no state of its own.
+> Naming inputs, selects, and other form controls.
 
 - Registry item: https://cadence.dev/r/label.json
 - Install: `npx shadcn@latest add @cadence/label`

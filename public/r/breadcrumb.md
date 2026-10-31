@@ -1,6 +1,6 @@
 # Breadcrumb
 
-> The trail from the root to the current page.
+> Hierarchy navigation, from the root to the current page.
 
 - Registry item: https://cadence.dev/r/breadcrumb.json
 - Install: `npx shadcn@latest add @cadence/breadcrumb`

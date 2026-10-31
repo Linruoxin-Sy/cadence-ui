@@ -25,43 +25,43 @@ npx shadcn@latest add @cadence/button
 
 ## Components
 
-- [Button](https://cadence.dev/r/button.md): Triggers an action, with press feedback that collapses under reduced motion. (form, feedback)
-- [Badge](https://cadence.dev/r/badge.md): A compact status label that stays still while the content around it animates. (feedback)
-- [Kbd](https://cadence.dev/r/kbd.md): A keyboard key or shortcut hint, styled from the semantic tokens. (utility)
-- [Separator](https://cadence.dev/r/separator.md): A one-pixel rule that divides groups of content. (layout)
-- [Label](https://cadence.dev/r/label.md): An accessible name for a form control, with no state of its own. (form)
-- [Input](https://cadence.dev/r/input.md): A single-line text field whose invalid state is driven by aria-invalid. (form)
-- [Textarea](https://cadence.dev/r/textarea.md): A multi-line text field that grows with its content instead of a script. (form)
-- [Card](https://cadence.dev/r/card.md): A bounded surface for grouped content, with parts you can restyle. (layout)
-- [Aspect Ratio](https://cadence.dev/r/aspect-ratio.md): Reserves a box at a fixed ratio so media cannot shift the layout. (layout)
-- [Avatar](https://cadence.dev/r/avatar.md): A profile image with a text fallback, a presence dot, and a stack of peers. (data)
-- [Skeleton](https://cadence.dev/r/skeleton.md): A placeholder pulse that marks where content will land. (feedback, data)
-- [Alert](https://cadence.dev/r/alert.md): A message about the current state of the page, with an icon column and an action slot. (feedback)
-- [Empty](https://cadence.dev/r/empty.md): The resting state of a region that has nothing to show yet. (feedback, layout)
-- [Item](https://cadence.dev/r/item.md): A row in a list of like objects, with media, content, and actions. (data, layout)
-- [Field](https://cadence.dev/r/field.md): A labelled control with its description and error, without owning validation. (form)
-- [Button Group](https://cadence.dev/r/button-group.md): Adjacent controls joined into one shape. (form, layout)
-- [Input Group](https://cadence.dev/r/input-group.md): A text control framed with prefixes, suffixes, and buttons. (form)
-- [Breadcrumb](https://cadence.dev/r/breadcrumb.md): The trail from the root to the current page. (navigation)
-- [Pagination](https://cadence.dev/r/pagination.md): Page navigation that stays a link, not a button. (navigation)
-- [Spinner](https://cadence.dev/r/spinner.md): An indeterminate wait, rotating until the work finishes. (feedback)
-- [Dialog](https://cadence.dev/r/dialog.md): A modal window that fades and settles in, with the open and close sequence interruptible. (overlay)
-- [Checkbox](https://cadence.dev/r/checkbox.md): A control that allows the user to toggle between checked and not checked. (form)
-- [Radio Group](https://cadence.dev/r/radio-group.md): A set of checkable buttons where no more than one can be checked at a time. (form)
-- [Switch](https://cadence.dev/r/switch.md): A control that toggles between on and off, with a thumb that travels between the two states. (form)
-- [Slider](https://cadence.dev/r/slider.md): An input where the user selects a value from a range by dragging a thumb. (form)
-- [Toggle](https://cadence.dev/r/toggle.md): A two-state button that can be pressed or not pressed. (form)
-- [Toggle Group](https://cadence.dev/r/toggle-group.md): A set of two-state buttons that can be pressed one at a time or together. (form)
-- [Input OTP](https://cadence.dev/r/input-otp.md): A one-time password field that renders one slot per character. (form)
-- [Progress](https://cadence.dev/r/progress.md): Displays an indicator showing the completion progress of a task. (feedback)
-- [Alert Dialog](https://cadence.dev/r/alert-dialog.md): A modal confirmation that interrupts the flow and needs an explicit choice before anything happens. (overlay)
-- [Popover](https://cadence.dev/r/popover.md): An anchored panel that opens next to its trigger and returns focus to it when it closes. (overlay)
-- [Tooltip](https://cadence.dev/r/tooltip.md): A short label that names a control on hover or focus, and disappears when the pointer leaves. (overlay)
-- [Hover Card](https://cadence.dev/r/hover-card.md): A preview panel that opens from a link on hover or focus and disappears when the pointer leaves. (overlay)
-- [Sheet](https://cadence.dev/r/sheet.md): A panel that slides in from an edge of the screen and holds a focused task without leaving the page. (overlay)
-- [Drawer](https://cadence.dev/r/drawer.md): A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request. (overlay)
-- [Select](https://cadence.dev/r/select.md): A control that opens a list of options and keeps the chosen value in the trigger. (form)
-- [Code block](https://cadence.dev/r/code-block.md): A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse. (ai)
+- [Button](https://cadence.dev/r/button.md): Commands such as save, submit, and delete. (form, feedback)
+- [Badge](https://cadence.dev/r/badge.md): Statuses, counts, and categories. (feedback)
+- [Kbd](https://cadence.dev/r/kbd.md): Keyboard shortcuts in tooltips, menus, and command lists. (utility)
+- [Separator](https://cadence.dev/r/separator.md): Dividing sections, menu groups, and toolbars. (layout)
+- [Label](https://cadence.dev/r/label.md): Naming inputs, selects, and other form controls. (form)
+- [Input](https://cadence.dev/r/input.md): Names, emails, search queries, and other short text. (form)
+- [Textarea](https://cadence.dev/r/textarea.md): Comments, descriptions, and other longer text. (form)
+- [Card](https://cadence.dev/r/card.md): Grouping related content, such as a summary or a record. (layout)
+- [Aspect Ratio](https://cadence.dev/r/aspect-ratio.md): Images, videos, and embeds that must keep their shape. (layout)
+- [Avatar](https://cadence.dev/r/avatar.md): People in comments, assignees, and member lists. (data)
+- [Skeleton](https://cadence.dev/r/skeleton.md): Placeholders while cards, tables, and lists load. (feedback, data)
+- [Alert](https://cadence.dev/r/alert.md): Errors, warnings, and page-level status messages. (feedback)
+- [Empty](https://cadence.dev/r/empty.md): Lists, tables, and panels with nothing to show yet. (feedback, layout)
+- [Item](https://cadence.dev/r/item.md): Rows in lists of files, members, and invoices. (data, layout)
+- [Field](https://cadence.dev/r/field.md): Form controls that need a label, help text, and error. (form)
+- [Button Group](https://cadence.dev/r/button-group.md): Toolbars and related actions on the same object. (form, layout)
+- [Input Group](https://cadence.dev/r/input-group.md): Currency fields, URLs, and inputs with inline actions. (form)
+- [Breadcrumb](https://cadence.dev/r/breadcrumb.md): Hierarchy navigation, from the root to the current page. (navigation)
+- [Pagination](https://cadence.dev/r/pagination.md): Long result sets, tables, and search results. (navigation)
+- [Spinner](https://cadence.dev/r/spinner.md): Short waits such as saving, sending, or publishing. (feedback)
+- [Dialog](https://cadence.dev/r/dialog.md): Focused tasks such as renaming, inviting, or confirming. (overlay)
+- [Checkbox](https://cadence.dev/r/checkbox.md): Independent yes/no choices and multi-select lists. (form)
+- [Radio Group](https://cadence.dev/r/radio-group.md): Choosing one option from a small, fixed set. (form)
+- [Switch](https://cadence.dev/r/switch.md): Settings that take effect immediately, such as alerts or visibility. (form)
+- [Slider](https://cadence.dev/r/slider.md): Volume, brightness, zoom, and price ranges. (form)
+- [Toggle](https://cadence.dev/r/toggle.md): Bold, italic, preview, and other on/off modes. (form)
+- [Toggle Group](https://cadence.dev/r/toggle-group.md): Text alignment, view density, and other mode sets. (form)
+- [Input OTP](https://cadence.dev/r/input-otp.md): Login codes, email verification, and device pairing. (form)
+- [Progress](https://cadence.dev/r/progress.md): Uploads, imports, and other work with a measurable end. (feedback)
+- [Alert Dialog](https://cadence.dev/r/alert-dialog.md): Destructive or irreversible actions that need confirmation. (overlay)
+- [Popover](https://cadence.dev/r/popover.md): Filters, share links, and other controls tied to a trigger. (overlay)
+- [Tooltip](https://cadence.dev/r/tooltip.md): Hints for icon buttons, shortcuts, and truncated values. (overlay)
+- [Hover Card](https://cadence.dev/r/hover-card.md): Previews of links, profiles, and repositories. (overlay)
+- [Sheet](https://cadence.dev/r/sheet.md): Filters, details, and settings that keep the page in view. (overlay)
+- [Drawer](https://cadence.dev/r/drawer.md): Quick tasks on touch screens, such as share or move. (overlay)
+- [Select](https://cadence.dev/r/select.md): Choosing one value from a short list of options. (form)
+- [Code block](https://cadence.dev/r/code-block.md): Install commands, source snippets, and tool output. (ai)
 
 ## Docs
 
@@ -78,7 +78,7 @@ npx shadcn@latest add @cadence/button
 
 # Button
 
-Triggers an action, with press feedback that collapses under reduced motion.
+Commands such as save, submit, and delete.
 
 ## Installation
 
@@ -229,7 +229,7 @@ All native button props are forwarded.
 
 # Badge
 
-A compact status label that stays still while the content around it animates.
+Statuses, counts, and categories.
 
 ## Installation
 
@@ -342,7 +342,7 @@ on mount.
 
 # Kbd
 
-A keyboard key or shortcut hint, styled from the semantic tokens.
+Keyboard shortcuts in tooltips, menus, and command lists.
 
 ## Installation
 
@@ -443,7 +443,7 @@ is reading it.
 
 # Separator
 
-A one-pixel rule that divides groups of content.
+Dividing sections, menu groups, and toolbars.
 
 ## Installation
 
@@ -542,7 +542,7 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
 
 # Label
 
-An accessible name for a form control, with no state of its own.
+Naming inputs, selects, and other form controls.
 
 ## Installation
 
@@ -644,7 +644,7 @@ which is an opacity change on a token, not an animation.
 
 # Input
 
-A single-line text field whose invalid state is driven by aria-invalid.
+Names, emails, search queries, and other short text.
 
 ## Installation
 
@@ -774,7 +774,7 @@ are wired.
 
 # Textarea
 
-A multi-line text field that grows with its content instead of a script.
+Comments, descriptions, and other longer text.
 
 ## Installation
 
@@ -890,7 +890,7 @@ reader hears it before the limit is hit.
 
 # Card
 
-A bounded surface for grouped content, with parts you can restyle.
+Grouping related content, such as a summary or a record.
 
 ## Installation
 
@@ -1024,7 +1024,7 @@ not a property of the card.
 
 # Aspect Ratio
 
-Reserves a box at a fixed ratio so media cannot shift the layout.
+Images, videos, and embeds that must keep their shape.
 
 ## Installation
 
@@ -1130,7 +1130,7 @@ transition here would reintroduce the layout shift it exists to prevent.
 
 # Avatar
 
-A profile image with a text fallback, a presence dot, and a stack of peers.
+People in comments, assignees, and member lists.
 
 ## Installation
 
@@ -1241,7 +1241,7 @@ the image errored, and a cross-fade would show a half-drawn face in the meantime
 
 # Skeleton
 
-A placeholder pulse that marks where content will land.
+Placeholders while cards, tables, and lists load.
 
 ## Installation
 
@@ -1381,7 +1381,7 @@ every breakpoint.
 
 # Alert
 
-A message about the current state of the page, with an icon column and an action slot.
+Errors, warnings, and page-level status messages.
 
 ## Installation
 
@@ -1510,7 +1510,7 @@ animated and carry no timing.
 
 # Empty
 
-The resting state of a region that has nothing to show yet.
+Lists, tables, and panels with nothing to show yet.
 
 ## Installation
 
@@ -1650,7 +1650,7 @@ When the region swaps from empty to populated, that transition belongs to the li
 
 # Item
 
-A row in a list of like objects, with media, content, and actions.
+Rows in lists of files, members, and invoices.
 
 ## Installation
 
@@ -1820,7 +1820,7 @@ that animates itself cannot be interrupted by the next render.
 
 # Field
 
-A labelled control with its description and error, without owning validation.
+Form controls that need a label, help text, and error.
 
 ## Installation
 
@@ -1993,7 +1993,7 @@ value is wrong, and the copy that says so, stay in your form code.
 
 # Button Group
 
-Adjacent controls joined into one shape.
+Toolbars and related actions on the same object.
 
 ## Installation
 
@@ -2125,7 +2125,7 @@ animation on top of it.
 
 # Input Group
 
-A text control framed with prefixes, suffixes, and buttons.
+Currency fields, URLs, and inputs with inline actions.
 
 ## Installation
 
@@ -2273,7 +2273,7 @@ imported. [Field](/components/field) shows how the invalid state and its message
 
 # Breadcrumb
 
-The trail from the root to the current page.
+Hierarchy navigation, from the root to the current page.
 
 ## Installation
 
@@ -2408,7 +2408,7 @@ stable thing on the page move.
 
 # Pagination
 
-Page navigation that stays a link, not a button.
+Long result sets, tables, and search results.
 
 ## Installation
 
@@ -2555,7 +2555,7 @@ If the new page's rows should arrive in sequence, that is `list.stagger` on the 
 
 # Spinner
 
-An indeterminate wait, rotating until the work finishes.
+Short waits such as saving, sending, or publishing.
 
 ## Installation
 
@@ -2707,7 +2707,7 @@ size, not by growing the icon.
 
 # Dialog
 
-A modal window that fades and settles in, with the open and close sequence interruptible.
+Focused tasks such as renaming, inviting, or confirming.
 
 ## Installation
 
@@ -2846,7 +2846,7 @@ Long content scrolls inside the popup rather than the page.
 
 # Checkbox
 
-A control that allows the user to toggle between checked and not checked.
+Independent yes/no choices and multi-select lists.
 
 ## Installation
 
@@ -3015,7 +3015,7 @@ running loop.
 
 # Radio Group
 
-A set of checkable buttons where no more than one can be checked at a time.
+Choosing one option from a small, fixed set.
 
 ## Installation
 
@@ -3187,7 +3187,7 @@ CSS, so no measurement happens.
 
 # Switch
 
-A control that toggles between on and off, with a thumb that travels between the two states.
+Settings that take effect immediately, such as alerts or visibility.
 
 ## Installation
 
@@ -3345,7 +3345,7 @@ transition with no layout reads during interaction.
 
 # Slider
 
-An input where the user selects a value from a range by dragging a thumb.
+Volume, brightness, zoom, and price ranges.
 
 ## Installation
 
@@ -3494,7 +3494,7 @@ scale. No `layout` animation, no measurement per frame.
 
 # Toggle
 
-A two-state button that can be pressed or not pressed.
+Bold, italic, preview, and other on/off modes.
 
 ## Installation
 
@@ -3649,7 +3649,7 @@ measurement.
 
 # Toggle Group
 
-A set of two-state buttons that can be pressed one at a time or together.
+Text alignment, view density, and other mode sets.
 
 ## Installation
 
@@ -3837,7 +3837,7 @@ measurement, so a group of eight items costs nothing until one is pressed.
 
 # Input OTP
 
-A one-time password field that renders one slot per character.
+Login codes, email verification, and device pairing.
 
 ## Installation
 
@@ -4034,7 +4034,7 @@ input, not from measurement.
 
 # Progress
 
-Displays an indicator showing the completion progress of a task.
+Uploads, imports, and other work with a measurable end.
 
 ## Installation
 
@@ -4189,7 +4189,7 @@ yourself; pass the real value and let the transition smooth it.
 
 # Alert Dialog
 
-A modal confirmation that interrupts the flow and needs an explicit choice before anything happens.
+Destructive or irreversible actions that need confirmation.
 
 ## Installation
 
@@ -4391,7 +4391,7 @@ buttons split the width instead of stacking, so the two answers stay side by sid
 
 # Popover
 
-An anchored panel that opens next to its trigger and returns focus to it when it closes.
+Filters, share links, and other controls tied to a trigger.
 
 ## Installation
 
@@ -4565,7 +4565,7 @@ default.
 
 # Tooltip
 
-A short label that names a control on hover or focus, and disappears when the pointer leaves.
+Hints for icon buttons, shortcuts, and truncated values.
 
 ## Installation
 
@@ -4707,7 +4707,7 @@ running off screen. Base UI flips the side and shifts the alignment when the vie
 
 # Hover Card
 
-A preview panel that opens from a link on hover or focus and disappears when the pointer leaves.
+Previews of links, profiles, and repositories.
 
 ## Installation
 
@@ -4856,7 +4856,7 @@ tap, and the content must not assume a pointer is nearby.
 
 # Sheet
 
-A panel that slides in from an edge of the screen and holds a focused task without leaving the page.
+Filters, details, and settings that keep the page in view.
 
 ## Installation
 
@@ -5027,7 +5027,7 @@ reachable and the page behind does not move.
 
 # Drawer
 
-A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request.
+Quick tasks on touch screens, such as share or move.
 
 ## Installation
 
@@ -5190,7 +5190,7 @@ geometry.
 
 # Select
 
-A control that opens a list of options and keeps the chosen value in the trigger.
+Choosing one value from a short list of options.
 
 ## Installation
 
@@ -5362,7 +5362,7 @@ trigger, so a select in a toolbar does not reflow the page beyond its own row.
 
 # Code block
 
-A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse.
+Install commands, source snippets, and tool output.
 
 ## Installation
 

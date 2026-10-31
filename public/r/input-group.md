@@ -1,6 +1,6 @@
 # Input Group
 
-> A text control framed with prefixes, suffixes, and buttons.
+> Currency fields, URLs, and inputs with inline actions.
 
 - Registry item: https://cadence.dev/r/input-group.json
 - Install: `npx shadcn@latest add @cadence/input-group`

@@ -1,6 +1,6 @@
 # Empty
 
-> The resting state of a region that has nothing to show yet.
+> Lists, tables, and panels with nothing to show yet.
 
 - Registry item: https://cadence.dev/r/empty.json
 - Install: `npx shadcn@latest add @cadence/empty`

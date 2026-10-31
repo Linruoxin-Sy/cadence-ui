@@ -1,6 +1,6 @@
 # Avatar
 
-> A profile image with a text fallback, a presence dot, and a stack of peers.
+> People in comments, assignees, and member lists.
 
 - Registry item: https://cadence.dev/r/avatar.json
 - Install: `npx shadcn@latest add @cadence/avatar`

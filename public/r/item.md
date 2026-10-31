@@ -1,6 +1,6 @@
 # Item
 
-> A row in a list of like objects, with media, content, and actions.
+> Rows in lists of files, members, and invoices.
 
 - Registry item: https://cadence.dev/r/item.json
 - Install: `npx shadcn@latest add @cadence/item`

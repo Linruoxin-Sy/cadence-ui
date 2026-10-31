@@ -1,6 +1,6 @@
 # Input OTP
 
-> A one-time password field that renders one slot per character.
+> Login codes, email verification, and device pairing.
 
 - Registry item: https://cadence.dev/r/input-otp.json
 - Install: `npx shadcn@latest add @cadence/input-otp`

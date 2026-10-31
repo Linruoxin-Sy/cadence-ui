@@ -1,6 +1,6 @@
 # Slider
 
-> An input where the user selects a value from a range by dragging a thumb.
+> Volume, brightness, zoom, and price ranges.
 
 - Registry item: https://cadence.dev/r/slider.json
 - Install: `npx shadcn@latest add @cadence/slider`

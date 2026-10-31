@@ -1,6 +1,6 @@
 # Kbd
 
-> A keyboard key or shortcut hint, styled from the semantic tokens.
+> Keyboard shortcuts in tooltips, menus, and command lists.
 
 - Registry item: https://cadence.dev/r/kbd.json
 - Install: `npx shadcn@latest add @cadence/kbd`

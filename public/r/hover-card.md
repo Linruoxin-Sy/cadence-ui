@@ -1,6 +1,6 @@
 # Hover Card
 
-> A preview panel that opens from a link on hover or focus and disappears when the pointer leaves.
+> Previews of links, profiles, and repositories.
 
 - Registry item: https://cadence.dev/r/hover-card.json
 - Install: `npx shadcn@latest add @cadence/hover-card`

@@ -1,6 +1,6 @@
 # Separator
 
-> A one-pixel rule that divides groups of content.
+> Dividing sections, menu groups, and toolbars.
 
 - Registry item: https://cadence.dev/r/separator.json
 - Install: `npx shadcn@latest add @cadence/separator`

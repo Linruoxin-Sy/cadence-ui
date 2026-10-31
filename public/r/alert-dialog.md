@@ -1,6 +1,6 @@
 # Alert Dialog
 
-> A modal confirmation that interrupts the flow and needs an explicit choice before anything happens.
+> Destructive or irreversible actions that need confirmation.
 
 - Registry item: https://cadence.dev/r/alert-dialog.json
 - Install: `npx shadcn@latest add @cadence/alert-dialog`

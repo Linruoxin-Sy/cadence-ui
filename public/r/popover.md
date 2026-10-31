@@ -1,6 +1,6 @@
 # Popover
 
-> An anchored panel that opens next to its trigger and returns focus to it when it closes.
+> Filters, share links, and other controls tied to a trigger.
 
 - Registry item: https://cadence.dev/r/popover.json
 - Install: `npx shadcn@latest add @cadence/popover`

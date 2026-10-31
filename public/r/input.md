@@ -1,6 +1,6 @@
 # Input
 
-> A single-line text field whose invalid state is driven by aria-invalid.
+> Names, emails, search queries, and other short text.
 
 - Registry item: https://cadence.dev/r/input.json
 - Install: `npx shadcn@latest add @cadence/input`

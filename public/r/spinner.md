@@ -1,6 +1,6 @@
 # Spinner
 
-> An indeterminate wait, rotating until the work finishes.
+> Short waits such as saving, sending, or publishing.
 
 - Registry item: https://cadence.dev/r/spinner.json
 - Install: `npx shadcn@latest add @cadence/spinner`

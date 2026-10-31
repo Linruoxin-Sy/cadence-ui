@@ -2,7 +2,7 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "kbd",
   "title": "Kbd",
-  "description": "A keyboard key or shortcut hint, styled from the semantic tokens.",
+  "description": "Keyboard shortcuts in tooltips, menus, and command lists.",
   "dependencies": [],
   "registryDependencies": [
     "@cadence/cadence-utils"
@@ -27,7 +27,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "25da7fa"
+    "sourceSha": "3d771e3"
   },
   "docs": "## Installation\n\n```install\nnpx shadcn@latest add @cadence/kbd\n```\n\n## Usage\n\n```tsx\nimport { Kbd, KbdGroup } from \"@/components/cadence/kbd\";\n\nexport function ShortcutHint() {\n  return (\n    <span className=\"text-sm text-muted-foreground\">\n      Search <KbdGroup><Kbd>⌘</Kbd><Kbd>K</Kbd></KbdGroup>\n    </span>\n  );\n}\n```\n\n## Single key\n\n```tsx\n<Kbd>Esc</Kbd>\n```\n\n## A combination\n\n`KbdGroup` renders the keys with one gap between them and keeps the sequence\ntogether for screen readers.\n\n```tsx\n<KbdGroup>\n  <Kbd>Ctrl</Kbd>\n  <Kbd>Shift</Kbd>\n  <Kbd>P</Kbd>\n</KbdGroup>\n```\n\n## Inside a tooltip\n\nA `Kbd` inside `data-slot=\"tooltip-content\"` inverts its colours automatically, so\nthe hint stays legible on the tooltip surface.\n\n```tsx\n<TooltipContent>\n  Save <Kbd>⌘S</Kbd>\n</TooltipContent>\n```\n\n## When to use\n\n- A shortcut hinted next to a command: search, save, new item.\n- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.\n- Inside a `tooltip` or a `dropdown-menu` item, where space is short.\n\n## When not to use\n\n- A key that is part of running text. Write it in prose; a pill interrupts the\n  sentence.\n- A button that runs a command. A `kbd` is a label, not a control — it has no\n  keyboard path and no press state.\n- Long sequences of more than three keys. Put the shortcut in a table instead.\n\n## API\n\n| Part       | Props                        | Notes                                            |\n| ---------- | ---------------------------- | ------------------------------------------------ |\n| `Kbd`      | native `kbd` props           | One key. `data-slot=\"kbd\"`.                      |\n| `KbdGroup` | native `kbd` props           | Wraps several keys with `data-slot=\"kbd-group\"`. |\n\n## Motion contract\n\nNo motion (T0). A key hint is a label; it must not pulse or slide while the user\nis reading it.\n\n| Phase   | Properties | Token | Interruptible |\n| ------- | ---------- | ----- | ------------- |\n| –       | none       | –     | –             |\n| reduced | none       | –     | –             |\n| none    | none       | –     | –             |\n\n## Accessibility\n\n- Renders a real `<kbd>` element, which assistive technology reports as keyboard\n  input — the same information a sighted user reads from the key shape.\n- The shortcut is text, so it survives every reduced-motion mode and every colour\n  theme.\n- If a hint is icon-only, put the key name in `aria-label` on the `Kbd`.\n- Do not attach `tabIndex`; a shortcut hint is not focusable.\n\n## Notes for AI\n\n- Use the platform's own glyphs (`⌘`, `⇧`, `↵`) rather than words, and keep one\n  `Kbd` per physical key.\n- If the shortcut is a live command, render a `button` and put the `Kbd` inside it.",
   "categories": [

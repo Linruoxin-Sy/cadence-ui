@@ -1,6 +1,6 @@
 # Progress
 
-> Displays an indicator showing the completion progress of a task.
+> Uploads, imports, and other work with a measurable end.
 
 - Registry item: https://cadence.dev/r/progress.json
 - Install: `npx shadcn@latest add @cadence/progress`

@@ -1,6 +1,6 @@
 # Button Group
 
-> Adjacent controls joined into one shape.
+> Toolbars and related actions on the same object.
 
 - Registry item: https://cadence.dev/r/button-group.json
 - Install: `npx shadcn@latest add @cadence/button-group`

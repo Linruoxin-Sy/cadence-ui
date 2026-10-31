@@ -1,6 +1,6 @@
 # Toggle Group
 
-> A set of two-state buttons that can be pressed one at a time or together.
+> Text alignment, view density, and other mode sets.
 
 - Registry item: https://cadence.dev/r/toggle-group.json
 - Install: `npx shadcn@latest add @cadence/toggle-group`

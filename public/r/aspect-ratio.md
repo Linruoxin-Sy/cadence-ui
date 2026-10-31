@@ -1,6 +1,6 @@
 # Aspect Ratio
 
-> Reserves a box at a fixed ratio so media cannot shift the layout.
+> Images, videos, and embeds that must keep their shape.
 
 - Registry item: https://cadence.dev/r/aspect-ratio.json
 - Install: `npx shadcn@latest add @cadence/aspect-ratio`

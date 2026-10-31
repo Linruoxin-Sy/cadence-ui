@@ -1,6 +1,6 @@
 # Code block
 
-> A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse.
+> Install commands, source snippets, and tool output.
 
 - Registry item: https://cadence.dev/r/code-block.json
 - Install: `npx shadcn@latest add @cadence/code-block`

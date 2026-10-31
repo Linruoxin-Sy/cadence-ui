@@ -1,6 +1,6 @@
 # Dialog
 
-> A modal window that fades and settles in, with the open and close sequence interruptible.
+> Focused tasks such as renaming, inviting, or confirming.
 
 - Registry item: https://cadence.dev/r/dialog.json
 - Install: `npx shadcn@latest add @cadence/dialog`
