@@ -117,17 +117,9 @@ deps: ["@base-ui/react", "motion"]
 registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
 ---
 
-## When to use
-
-- TODO: three to five concrete scenarios.
-
-## When not to use
-
-- TODO: name the alternative component.
-
 ## Installation
 
-\`\`\`bash
+\`\`\`install
 npx shadcn@latest add @cadence/${id}
 \`\`\`
 
@@ -140,6 +132,14 @@ export function Example() {
   return <${pascal}>Hello</${pascal}>;
 }
 \`\`\`
+
+## When to use
+
+- TODO: three to five concrete scenarios.
+
+## When not to use
+
+- TODO: name the alternative component.
 
 ## API
 
