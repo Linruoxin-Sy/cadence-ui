@@ -69,6 +69,42 @@ property on the root:
 <Card size="sm">…</Card>
 ```
 
+## Content-sized
+
+A card normally takes the width its parent gives it and the height its content
+needs. `fit="content"` turns that around: the surface is measured from its own
+content and pinned to it, so a parent that stretches its children — a `grid`
+row, `items-stretch`, `h-full` — cannot stretch the card either.
+
+The width is `w-fit`, so it resolves against the content and still re-wraps when
+the window narrows. The height comes from a `ResizeObserver` on the content box
+and is written in the frame the content changed. This is measurement, not
+motion: no recipe, no duration, nothing to skip under `prefers-reduced-motion` —
+the box is the same in every mode.
+
+```tsx
+<div className="grid grid-cols-2 gap-4">
+  <Card fit="content">
+    <CardHeader>
+      <CardTitle>Short</CardTitle>
+      <CardDescription>Two lines, and the card is two lines tall.</CardDescription>
+    </CardHeader>
+  </Card>
+  <Card>
+    <CardHeader>
+      <CardTitle>Stretched</CardTitle>
+      <CardDescription>This card fills the row, like a normal grid item.</CardDescription>
+    </CardHeader>
+    <CardContent>…and keeps the extra height it was given.</CardContent>
+  </Card>
+</div>
+```
+
+Reach for it when the content is the thing being compared and equal card heights
+would be a lie — a picker where each option shows its own details, a list where
+one row has an extra field. Do **not** use it to opt a card out of a layout the
+rest of the page follows: a grid of cards is usually meant to line up.
+
 ## Section boundaries
 
 Add a rule with utilities rather than a new part; the `[.border-b]` selectors are
@@ -95,24 +131,31 @@ already wired:
 
 ## API
 
-| Part              | Props                     | Notes                                                    |
-| ----------------- | ------------------------- | -------------------------------------------------------- |
-| `Card`            | `size`, native div props  | `size`: `"default" \| "sm"`. Sets `--card-spacing` and `data-size`. |
-| `CardHeader`      | native div props          | Grid header; reacts to `CardAction` and a bottom border.  |
-| `CardTitle`       | native div props          | Bold, leading-none. Does not create a heading.            |
-| `CardDescription` | native div props          | Muted supporting text.                                    |
-| `CardAction`      | native div props          | Top-right slot inside the header.                         |
-| `CardContent`     | native div props          | Body; carries the horizontal padding.                     |
-| `CardFooter`      | native div props          | Bottom row; reacts to a top border.                       |
+| Part              | Props                           | Notes                                                                              |
+| ----------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `Card`            | `size`, `fit`, native div props | `size` sets `--card-spacing` and `data-size`; `fit`: `"content"` hugs the content. |
+| `CardHeader`      | native div props                | Grid header; reacts to `CardAction` and a bottom border.                           |
+| `CardTitle`       | native div props                | Bold, leading-none. Does not create a heading.                                     |
+| `CardDescription` | native div props                | Muted supporting text.                                                             |
+| `CardAction`      | native div props                | Top-right slot inside the header.                                                  |
+| `CardContent`     | native div props                | Body; carries the horizontal padding.                                              |
+| `CardFooter`      | native div props                | Bottom row; reacts to a top border.                                                |
 
 Every part sets `data-slot`, so CSS can reach it:
-`[&>[data-slot=card-header]]:gap-4`.
+`[&>[data-slot=card-header]]:gap-4`. Under `fit="content"` the parts are wrapped
+in one `data-slot="card-flow"` box, which is the element the height is measured
+from — style the parts from the shell as before, and the flow box only if you
+need the measured layer itself.
 
 ## Motion contract
 
 No motion (T0). A card does not fade, lift, or scale in. If a group of cards should
 appear in sequence, that is a page-level `list.stagger` decision made by the parent,
 not a property of the card.
+
+`fit="content"` adds no row to the table below: the measured height is applied as
+soon as it is known, so there is no phase, no interpolation, and no reduced-motion
+branch to keep — the geometry is information, and both modes render it identically.
 
 | Phase   | Properties | Token | Interruptible |
 | ------- | ---------- | ----- | ------------- |
@@ -137,6 +180,9 @@ not a property of the card.
   `size` changes.
 - Do not add hover lift to a card that is not interactive. Motion on a static card
   is decoration (P9).
+- `fit="content"` is opt-in and per card. A grid of cards is meant to line up; only
+  reach for the content-sized variant when the differences between cards are the
+  information.
 
 ---
 
