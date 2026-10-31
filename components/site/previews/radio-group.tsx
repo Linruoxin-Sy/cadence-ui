@@ -1,7 +1,7 @@
 "use client";
 
-import { Label } from "@/registry/cadence/label/label";
-import { RadioGroup, RadioGroupItem } from "@/registry/cadence/radio-group/radio-group";
+import { Label } from "@/registry/cadence/label";
+import { RadioGroup, RadioGroupItem } from "@/registry/cadence/radio-group";
 
 const plans = [
   { value: "starter", label: "Starter", hint: "One project, one seat." },

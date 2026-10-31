@@ -12,8 +12,8 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/registry/cadence/alert-dialog/alert-dialog";
-import { Button } from "@/registry/cadence/button/button";
+} from "@/registry/cadence/alert-dialog";
+import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 
 function Example({ onConfirm }: { onConfirm?: () => void } = {}) {

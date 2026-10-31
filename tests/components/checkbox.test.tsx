@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { Checkbox } from "@/registry/cadence/checkbox/checkbox";
+import { Checkbox } from "@/registry/cadence/checkbox";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 
 function slot(container: HTMLElement) {

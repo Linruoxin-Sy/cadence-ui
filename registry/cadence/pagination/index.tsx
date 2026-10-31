@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
 import type * as React from "react";
-import { type ButtonProps, buttonVariants } from "../button/button";
+import { type ButtonProps, buttonVariants } from "../button";
 import { cn } from "../lib/cn";
 
 export interface PaginationProps extends React.ComponentProps<"nav"> {}

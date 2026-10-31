@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/cadence/tooltip/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/cadence/tooltip";
 
 function Example() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
-import { Label } from "@/registry/cadence/label/label";
-import { Switch } from "@/registry/cadence/switch/switch";
+import { Label } from "@/registry/cadence/label";
+import { Switch } from "@/registry/cadence/switch";
 
 export function SwitchPreview() {
   return (

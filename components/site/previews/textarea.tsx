@@ -1,7 +1,7 @@
 "use client";
 
-import { Label } from "@/registry/cadence/label/label";
-import { Textarea } from "@/registry/cadence/textarea/textarea";
+import { Label } from "@/registry/cadence/label";
+import { Textarea } from "@/registry/cadence/textarea";
 
 export function TextareaPreview() {
   return (

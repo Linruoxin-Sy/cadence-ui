@@ -8,7 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/registry/cadence/pagination/pagination";
+} from "@/registry/cadence/pagination";
 
 export function PaginationPreview() {
   return (

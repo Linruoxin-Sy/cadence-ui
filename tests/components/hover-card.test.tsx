@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/cadence/hover-card/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/cadence/hover-card";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 
 function Example() {

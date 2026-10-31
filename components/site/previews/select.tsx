@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select";
 
 const FRAMEWORKS = [
   { value: "next", label: "Next.js App Router" },

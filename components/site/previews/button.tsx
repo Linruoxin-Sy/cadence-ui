@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 
 export function ButtonPreview() {
   return (

@@ -11,8 +11,8 @@ import {
   FieldSeparator,
   FieldSet,
   FieldTitle,
-} from "@/registry/cadence/field/field";
-import { Input } from "@/registry/cadence/input/input";
+} from "@/registry/cadence/field";
+import { Input } from "@/registry/cadence/input";
 
 describe("Field", () => {
   it("names the control it labels", () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Bold, Italic, Underline } from "lucide-react";
-import { Toggle } from "@/registry/cadence/toggle/toggle";
+import { Toggle } from "@/registry/cadence/toggle";
 
 export function TogglePreview() {
   return (

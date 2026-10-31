@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/registry/cadence/button/button";
-import { Checkbox } from "@/registry/cadence/checkbox/checkbox";
-import { Label } from "@/registry/cadence/label/label";
+import { Button } from "@/registry/cadence/button";
+import { Checkbox } from "@/registry/cadence/checkbox";
+import { Label } from "@/registry/cadence/label";
 import {
   Popover,
   PopoverContent,
@@ -10,7 +10,7 @@ import {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
-} from "@/registry/cadence/popover/popover";
+} from "@/registry/cadence/popover";
 
 const COLUMNS = [
   { id: "column-name", label: "Name", checked: true },

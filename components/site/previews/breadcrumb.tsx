@@ -8,7 +8,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/registry/cadence/breadcrumb/breadcrumb";
+} from "@/registry/cadence/breadcrumb";
 
 export function BreadcrumbPreview() {
   return (

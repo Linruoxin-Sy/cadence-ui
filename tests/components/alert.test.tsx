@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/registry/cadence/alert/alert";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/registry/cadence/alert";
 
 describe("Alert", () => {
   it("renders every part with its slot", () => {

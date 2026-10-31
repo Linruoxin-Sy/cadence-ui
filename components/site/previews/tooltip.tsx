@@ -1,8 +1,8 @@
 "use client";
 
 import { Bold, Italic, Link2, Underline } from "lucide-react";
-import { Button } from "@/registry/cadence/button/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/cadence/tooltip/tooltip";
+import { Button } from "@/registry/cadence/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/cadence/tooltip";
 
 const FORMATS = [
   { id: "bold", label: "Bold", shortcut: "⌘B", icon: Bold },

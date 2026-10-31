@@ -14,7 +14,7 @@ import {
   CodeBlockTab,
   CodeBlockTabs,
   CodeBlockTitle,
-} from "@/registry/cadence/code-block/code-block";
+} from "@/registry/cadence/code-block";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 
 const SOURCE = `export function read() {

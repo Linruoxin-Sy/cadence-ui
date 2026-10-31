@@ -7,7 +7,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
-} from "@/registry/cadence/avatar/avatar";
+} from "@/registry/cadence/avatar";
 
 describe("Avatar", () => {
   it("renders the image and the fallback with their slots", () => {

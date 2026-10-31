@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import {
   Field,
   FieldContent,
@@ -11,8 +11,8 @@ import {
   FieldLegend,
   FieldSeparator,
   FieldSet,
-} from "@/registry/cadence/field/field";
-import { Input } from "@/registry/cadence/input/input";
+} from "@/registry/cadence/field";
+import { Input } from "@/registry/cadence/input";
 
 export function FieldPreview() {
   return (

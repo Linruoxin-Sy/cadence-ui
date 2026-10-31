@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Switch } from "@/registry/cadence/switch/switch";
+import { Switch } from "@/registry/cadence/switch";
 
 function root(container: HTMLElement) {
   const element = container.querySelector('[data-slot="switch"]');

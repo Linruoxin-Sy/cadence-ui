@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Separator } from "@/registry/cadence/separator/separator";
+import { Separator } from "@/registry/cadence/separator";
 
 describe("Separator", () => {
   it("renders an announced separator by default", () => {

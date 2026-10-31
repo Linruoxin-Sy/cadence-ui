@@ -1,6 +1,6 @@
 "use client";
 
-import { AspectRatio } from "@/registry/cadence/aspect-ratio/aspect-ratio";
+import { AspectRatio } from "@/registry/cadence/aspect-ratio";
 
 export function AspectRatioPreview() {
   return (

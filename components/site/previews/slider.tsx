@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Label } from "@/registry/cadence/label/label";
-import { Slider } from "@/registry/cadence/slider/slider";
+import { Label } from "@/registry/cadence/label";
+import { Slider } from "@/registry/cadence/slider";
 
 export function SliderPreview() {
   const [volume, setVolume] = useState([68]);

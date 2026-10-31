@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import { cn } from "@/registry/cadence/lib/cn";
 import type { CadenceMode } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";

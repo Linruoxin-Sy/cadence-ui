@@ -8,7 +8,7 @@ import { type CSSProperties, createContext, useContext } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
-import { toggleVariants } from "../toggle/toggle";
+import { toggleVariants } from "../toggle";
 
 const ToggleGroupContext = createContext<
   VariantProps<typeof toggleVariants> & {

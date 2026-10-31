@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
 
 describe("ToggleGroup", () => {
   it("renders the group and item slots with the shared variant", () => {

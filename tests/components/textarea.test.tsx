@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { Textarea } from "@/registry/cadence/textarea/textarea";
+import { Textarea } from "@/registry/cadence/textarea";
 
 describe("Textarea", () => {
   it("renders a textarea with its slot", () => {

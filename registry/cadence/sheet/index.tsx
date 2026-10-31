@@ -3,7 +3,7 @@
 import { Dialog as SheetPrimitive } from "@base-ui/react/dialog";
 import { X } from "lucide-react";
 import type * as React from "react";
-import { Button } from "../button/button";
+import { Button } from "../button";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
 

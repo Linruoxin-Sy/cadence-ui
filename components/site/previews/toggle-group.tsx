@@ -2,7 +2,7 @@
 
 import { AlignCenter, AlignLeft, AlignRight, Bold, Italic, Underline } from "lucide-react";
 import { useState } from "react";
-import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
 
 export function ToggleGroupPreview() {
   const [align, setAlign] = useState<string[]>(["left"]);

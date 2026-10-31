@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Slider } from "@/registry/cadence/slider/slider";
+import { Slider } from "@/registry/cadence/slider";
 
 function parts(container: HTMLElement) {
   return {

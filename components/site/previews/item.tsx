@@ -1,8 +1,8 @@
 "use client";
 
 import { Download, FileText, Folder } from "lucide-react";
-import { Badge } from "@/registry/cadence/badge/badge";
-import { Button } from "@/registry/cadence/button/button";
+import { Badge } from "@/registry/cadence/badge";
+import { Button } from "@/registry/cadence/button";
 import {
   Item,
   ItemActions,
@@ -14,7 +14,7 @@ import {
   ItemMedia,
   ItemSeparator,
   ItemTitle,
-} from "@/registry/cadence/item/item";
+} from "@/registry/cadence/item";
 
 export function ItemPreview() {
   return (

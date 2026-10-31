@@ -4,10 +4,10 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
-import { Button } from "../button/button";
-import { Input } from "../input/input";
+import { Button } from "../button";
+import { Input } from "../input";
 import { cn } from "../lib/cn";
-import { Textarea } from "../textarea/textarea";
+import { Textarea } from "../textarea";
 
 export interface InputGroupProps extends React.ComponentProps<"div"> {}
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Separator } from "@/registry/cadence/separator/separator";
+import { Separator } from "@/registry/cadence/separator";
 
 export function SeparatorPreview() {
   return (

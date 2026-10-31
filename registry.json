@@ -117,9 +117,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/button/button.tsx",
+          "path": "registry/cadence/button/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/button/button.tsx"
+          "target": "@components/cadence/button/index.tsx"
         }
       ],
       "meta": {
@@ -146,9 +146,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/badge/badge.tsx",
+          "path": "registry/cadence/badge/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/badge/badge.tsx"
+          "target": "@components/cadence/badge/index.tsx"
         }
       ],
       "meta": {
@@ -175,9 +175,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/kbd/kbd.tsx",
+          "path": "registry/cadence/kbd/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/kbd/kbd.tsx"
+          "target": "@components/cadence/kbd/index.tsx"
         }
       ],
       "meta": {
@@ -204,9 +204,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/separator/separator.tsx",
+          "path": "registry/cadence/separator/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/separator/separator.tsx"
+          "target": "@components/cadence/separator/index.tsx"
         }
       ],
       "meta": {
@@ -233,9 +233,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/label/label.tsx",
+          "path": "registry/cadence/label/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/label/label.tsx"
+          "target": "@components/cadence/label/index.tsx"
         }
       ],
       "meta": {
@@ -262,9 +262,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/input/input.tsx",
+          "path": "registry/cadence/input/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/input/input.tsx"
+          "target": "@components/cadence/input/index.tsx"
         }
       ],
       "meta": {
@@ -291,9 +291,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/textarea/textarea.tsx",
+          "path": "registry/cadence/textarea/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/textarea/textarea.tsx"
+          "target": "@components/cadence/textarea/index.tsx"
         }
       ],
       "meta": {
@@ -320,9 +320,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/card/card.tsx",
+          "path": "registry/cadence/card/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/card/card.tsx"
+          "target": "@components/cadence/card/index.tsx"
         }
       ],
       "meta": {
@@ -349,9 +349,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/aspect-ratio/aspect-ratio.tsx",
+          "path": "registry/cadence/aspect-ratio/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/aspect-ratio/aspect-ratio.tsx"
+          "target": "@components/cadence/aspect-ratio/index.tsx"
         }
       ],
       "meta": {
@@ -378,9 +378,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/avatar/avatar.tsx",
+          "path": "registry/cadence/avatar/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/avatar/avatar.tsx"
+          "target": "@components/cadence/avatar/index.tsx"
         }
       ],
       "meta": {
@@ -407,9 +407,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/skeleton/skeleton.tsx",
+          "path": "registry/cadence/skeleton/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/skeleton/skeleton.tsx"
+          "target": "@components/cadence/skeleton/index.tsx"
         }
       ],
       "meta": {
@@ -441,9 +441,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/alert/alert.tsx",
+          "path": "registry/cadence/alert/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/alert/alert.tsx"
+          "target": "@components/cadence/alert/index.tsx"
         }
       ],
       "meta": {
@@ -470,9 +470,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/empty/empty.tsx",
+          "path": "registry/cadence/empty/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/empty/empty.tsx"
+          "target": "@components/cadence/empty/index.tsx"
         }
       ],
       "meta": {
@@ -499,9 +499,9 @@
       "registryDependencies": ["@cadence/cadence-utils", "@cadence/separator"],
       "files": [
         {
-          "path": "registry/cadence/item/item.tsx",
+          "path": "registry/cadence/item/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/item/item.tsx"
+          "target": "@components/cadence/item/index.tsx"
         }
       ],
       "meta": {
@@ -528,9 +528,9 @@
       "registryDependencies": ["@cadence/cadence-utils", "@cadence/label", "@cadence/separator"],
       "files": [
         {
-          "path": "registry/cadence/field/field.tsx",
+          "path": "registry/cadence/field/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/field/field.tsx"
+          "target": "@components/cadence/field/index.tsx"
         }
       ],
       "meta": {
@@ -557,9 +557,9 @@
       "registryDependencies": ["@cadence/cadence-utils", "@cadence/separator"],
       "files": [
         {
-          "path": "registry/cadence/button-group/button-group.tsx",
+          "path": "registry/cadence/button-group/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/button-group/button-group.tsx"
+          "target": "@components/cadence/button-group/index.tsx"
         }
       ],
       "meta": {
@@ -586,9 +586,9 @@
       "registryDependencies": ["@cadence/button", "@cadence/cadence-utils", "@cadence/input", "@cadence/textarea"],
       "files": [
         {
-          "path": "registry/cadence/input-group/input-group.tsx",
+          "path": "registry/cadence/input-group/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/input-group/input-group.tsx"
+          "target": "@components/cadence/input-group/index.tsx"
         }
       ],
       "meta": {
@@ -615,9 +615,9 @@
       "registryDependencies": ["@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/breadcrumb/breadcrumb.tsx",
+          "path": "registry/cadence/breadcrumb/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/breadcrumb/breadcrumb.tsx"
+          "target": "@components/cadence/breadcrumb/index.tsx"
         }
       ],
       "meta": {
@@ -644,9 +644,9 @@
       "registryDependencies": ["@cadence/button", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/pagination/pagination.tsx",
+          "path": "registry/cadence/pagination/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/pagination/pagination.tsx"
+          "target": "@components/cadence/pagination/index.tsx"
         }
       ],
       "meta": {
@@ -673,9 +673,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/spinner/spinner.tsx",
+          "path": "registry/cadence/spinner/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/spinner/spinner.tsx"
+          "target": "@components/cadence/spinner/index.tsx"
         }
       ],
       "meta": {
@@ -712,9 +712,9 @@
       ],
       "files": [
         {
-          "path": "registry/cadence/dialog/dialog.tsx",
+          "path": "registry/cadence/dialog/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/dialog/dialog.tsx"
+          "target": "@components/cadence/dialog/index.tsx"
         }
       ],
       "meta": {
@@ -750,9 +750,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/checkbox/checkbox.tsx",
+          "path": "registry/cadence/checkbox/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/checkbox/checkbox.tsx"
+          "target": "@components/cadence/checkbox/index.tsx"
         }
       ],
       "meta": {
@@ -779,9 +779,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/radio-group/radio-group.tsx",
+          "path": "registry/cadence/radio-group/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/radio-group/radio-group.tsx"
+          "target": "@components/cadence/radio-group/index.tsx"
         }
       ],
       "meta": {
@@ -808,9 +808,9 @@
       "registryDependencies": ["@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/switch/switch.tsx",
+          "path": "registry/cadence/switch/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/switch/switch.tsx"
+          "target": "@components/cadence/switch/index.tsx"
         }
       ],
       "meta": {
@@ -837,9 +837,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/slider/slider.tsx",
+          "path": "registry/cadence/slider/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/slider/slider.tsx"
+          "target": "@components/cadence/slider/index.tsx"
         }
       ],
       "meta": {
@@ -866,9 +866,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/toggle/toggle.tsx",
+          "path": "registry/cadence/toggle/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/toggle/toggle.tsx"
+          "target": "@components/cadence/toggle/index.tsx"
         }
       ],
       "meta": {
@@ -900,9 +900,9 @@
       ],
       "files": [
         {
-          "path": "registry/cadence/toggle-group/toggle-group.tsx",
+          "path": "registry/cadence/toggle-group/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/toggle-group/toggle-group.tsx"
+          "target": "@components/cadence/toggle-group/index.tsx"
         }
       ],
       "meta": {
@@ -929,9 +929,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/input-otp/input-otp.tsx",
+          "path": "registry/cadence/input-otp/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/input-otp/input-otp.tsx"
+          "target": "@components/cadence/input-otp/index.tsx"
         }
       ],
       "meta": {
@@ -958,9 +958,9 @@
       "registryDependencies": ["@cadence/cadence-provider", "@cadence/cadence-utils"],
       "files": [
         {
-          "path": "registry/cadence/progress/progress.tsx",
+          "path": "registry/cadence/progress/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/progress/progress.tsx"
+          "target": "@components/cadence/progress/index.tsx"
         }
       ],
       "meta": {
@@ -992,9 +992,9 @@
       ],
       "files": [
         {
-          "path": "registry/cadence/alert-dialog/alert-dialog.tsx",
+          "path": "registry/cadence/alert-dialog/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/alert-dialog/alert-dialog.tsx"
+          "target": "@components/cadence/alert-dialog/index.tsx"
         }
       ],
       "meta": {
@@ -1030,9 +1030,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/popover/popover.tsx",
+          "path": "registry/cadence/popover/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/popover/popover.tsx"
+          "target": "@components/cadence/popover/index.tsx"
         }
       ],
       "meta": {
@@ -1059,9 +1059,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/tooltip/tooltip.tsx",
+          "path": "registry/cadence/tooltip/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/tooltip/tooltip.tsx"
+          "target": "@components/cadence/tooltip/index.tsx"
         }
       ],
       "meta": {
@@ -1088,9 +1088,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/hover-card/hover-card.tsx",
+          "path": "registry/cadence/hover-card/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/hover-card/hover-card.tsx"
+          "target": "@components/cadence/hover-card/index.tsx"
         }
       ],
       "meta": {
@@ -1122,9 +1122,9 @@
       ],
       "files": [
         {
-          "path": "registry/cadence/sheet/sheet.tsx",
+          "path": "registry/cadence/sheet/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/sheet/sheet.tsx"
+          "target": "@components/cadence/sheet/index.tsx"
         }
       ],
       "meta": {
@@ -1151,9 +1151,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/drawer/drawer.tsx",
+          "path": "registry/cadence/drawer/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/drawer/drawer.tsx"
+          "target": "@components/cadence/drawer/index.tsx"
         }
       ],
       "meta": {
@@ -1180,9 +1180,9 @@
       "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
       "files": [
         {
-          "path": "registry/cadence/select/select.tsx",
+          "path": "registry/cadence/select/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/select/select.tsx"
+          "target": "@components/cadence/select/index.tsx"
         }
       ],
       "meta": {
@@ -1215,9 +1215,9 @@
       ],
       "files": [
         {
-          "path": "registry/cadence/code-block/code-block.tsx",
+          "path": "registry/cadence/code-block/index.tsx",
           "type": "registry:ui",
-          "target": "@components/cadence/code-block/code-block.tsx"
+          "target": "@components/cadence/code-block/index.tsx"
         }
       ],
       "meta": {

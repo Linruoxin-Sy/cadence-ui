@@ -1,8 +1,8 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/registry/cadence/avatar/avatar";
-import { Button } from "@/registry/cadence/button/button";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/cadence/hover-card/hover-card";
+import { Avatar, AvatarFallback } from "@/registry/cadence/avatar";
+import { Button } from "@/registry/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/cadence/hover-card";
 
 export function HoverCardPreview() {
   return (

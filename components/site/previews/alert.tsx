@@ -1,8 +1,8 @@
 "use client";
 
 import { CircleAlert, TriangleAlert } from "lucide-react";
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/registry/cadence/alert/alert";
-import { Button } from "@/registry/cadence/button/button";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/registry/cadence/alert";
+import { Button } from "@/registry/cadence/button";
 
 export function AlertPreview() {
   return (

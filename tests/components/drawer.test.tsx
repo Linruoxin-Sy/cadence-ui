@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import {
   Drawer,
   DrawerClose,
@@ -11,7 +11,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/registry/cadence/drawer/drawer";
+} from "@/registry/cadence/drawer";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 
 function Example({ showSwipeHandle = true }: { showSwipeHandle?: boolean } = {}) {

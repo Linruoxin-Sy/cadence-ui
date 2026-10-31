@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Clock, GitBranch } from "lucide-react";
-import { Badge } from "@/registry/cadence/badge/badge";
+import { Badge } from "@/registry/cadence/badge";
 
 const variants = ["default", "secondary", "outline", "ghost", "destructive", "link"] as const;
 

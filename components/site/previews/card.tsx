@@ -1,7 +1,7 @@
 "use client";
 
-import { Badge } from "@/registry/cadence/badge/badge";
-import { Button } from "@/registry/cadence/button/button";
+import { Badge } from "@/registry/cadence/badge";
+import { Button } from "@/registry/cadence/button";
 import {
   Card,
   CardAction,
@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/registry/cadence/card/card";
+} from "@/registry/cadence/card";
 
 export function CardPreview() {
   return (

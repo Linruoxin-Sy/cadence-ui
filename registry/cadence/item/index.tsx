@@ -6,7 +6,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "../lib/cn";
-import { Separator } from "../separator/separator";
+import { Separator } from "../separator";
 
 export interface ItemGroupProps extends React.ComponentProps<"div"> {}
 

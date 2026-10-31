@@ -30,7 +30,7 @@ const cacheDir = path.join(root, ".cache", "shadcn", "base");
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
 
 const components = registry.items.filter((item) => item.type === "registry:ui" || item.type === "registry:block");
-const localPath = (item) => item.files?.[0]?.path ?? `registry/cadence/${item.name}/${item.name}.tsx`;
+const localPath = (item) => item.files?.[0]?.path ?? `registry/cadence/${item.name}/index.tsx`;
 
 const readOrNull = async (file) => {
   try {

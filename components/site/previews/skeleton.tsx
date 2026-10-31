@@ -1,7 +1,7 @@
 "use client";
 
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Skeleton } from "@/registry/cadence/skeleton/skeleton";
+import { Skeleton } from "@/registry/cadence/skeleton";
 
 function CardPlaceholder() {
   return (

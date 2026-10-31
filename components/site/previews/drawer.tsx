@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import {
   Drawer,
   DrawerClose,
@@ -11,7 +11,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/registry/cadence/drawer/drawer";
+} from "@/registry/cadence/drawer";
 
 const DESTINATIONS = ["Inbox", "Archive", "Read later"] as const;
 

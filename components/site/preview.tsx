@@ -1,9 +1,9 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
-import { Skeleton } from "@/registry/cadence/skeleton/skeleton";
+import { Skeleton } from "@/registry/cadence/skeleton";
 import { MeasuredHeight } from "./measured-height";
 import { previews } from "./previews";
 

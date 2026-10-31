@@ -1,7 +1,7 @@
 "use client";
 
-import { Input } from "@/registry/cadence/input/input";
-import { Label } from "@/registry/cadence/label/label";
+import { Input } from "@/registry/cadence/input";
+import { Label } from "@/registry/cadence/label";
 
 export function LabelPreview() {
   return (

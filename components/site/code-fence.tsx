@@ -7,7 +7,7 @@ import {
   CodeBlockHeader,
   CodeBlockLine,
   CodeBlockTitle,
-} from "@/registry/cadence/code-block/code-block";
+} from "@/registry/cadence/code-block";
 import { cn } from "@/registry/cadence/lib/cn";
 import { fenceTitle, readFence } from "./fence";
 import { highlightSource } from "./highlight";

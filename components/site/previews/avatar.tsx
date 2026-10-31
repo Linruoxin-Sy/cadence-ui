@@ -7,7 +7,7 @@ import {
   AvatarGroup,
   AvatarGroupCount,
   AvatarImage,
-} from "@/registry/cadence/avatar/avatar";
+} from "@/registry/cadence/avatar";
 
 export function AvatarPreview() {
   return (

@@ -1,7 +1,7 @@
 /**
  * Scaffolds a parity component:
  *
- *   registry/cadence/<id>/<id>.tsx
+ *   registry/cadence/<id>/index.tsx
  *   content/components/<id>.mdx
  *   components/site/previews/<id>.tsx   (registered in previews/index.tsx)
  *   tests/components/<id>.test.tsx
@@ -134,7 +134,7 @@ npx shadcn@latest add @cadence/${id}
 ## Usage
 
 \`\`\`tsx
-import { ${pascal} } from "@/components/cadence/${id}/${id}";
+import { ${pascal} } from "@/components/cadence/${id}";
 
 export function Example() {
   return <${pascal}>Hello</${pascal}>;
@@ -180,7 +180,7 @@ TODO.
 
 const preview = `"use client";
 
-import { ${pascal} } from "@/registry/cadence/${id}/${id}";
+import { ${pascal} } from "@/registry/cadence/${id}";
 
 export function ${pascal}Preview() {
   return (
@@ -193,7 +193,7 @@ export function ${pascal}Preview() {
 
 const test = `import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { ${pascal} } from "@/registry/cadence/${id}/${id}";
+import { ${pascal} } from "@/registry/cadence/${id}";
 
 describe("${pascal}", () => {
   it("renders with its data-slot", () => {
@@ -230,9 +230,9 @@ registry.items.push({
   registryDependencies: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
   files: [
     {
-      path: `registry/cadence/${id}/${id}.tsx`,
+      path: `registry/cadence/${id}/index.tsx`,
       type: "registry:ui",
-      target: `@components/cadence/${id}/${id}.tsx`,
+      target: `@components/cadence/${id}/index.tsx`,
     },
   ],
   meta: {
@@ -248,7 +248,7 @@ registry.items.push({
 await writeFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
 
 console.log(`✓ ${id} scaffolded
-  registry/cadence/${id}/${id}.tsx
+  registry/cadence/${id}/index.tsx
   content/components/${id}.mdx
   components/site/previews/${id}.tsx
   tests/components/${id}.test.tsx

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/registry/cadence/button/button";
-import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group/button-group";
+import { Button } from "@/registry/cadence/button";
+import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group";
 
 describe("ButtonGroup", () => {
   it("is a group with an orientation", () => {

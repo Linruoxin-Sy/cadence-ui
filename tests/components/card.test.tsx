@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/registry/cadence/card/card";
+} from "@/registry/cadence/card";
 
 function Example({ size }: { size?: "default" | "sm" }) {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import {
   Dialog,
   DialogClose,
@@ -11,9 +11,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/registry/cadence/dialog/dialog";
-import { Field, FieldLabel } from "@/registry/cadence/field/field";
-import { Input } from "@/registry/cadence/input/input";
+} from "@/registry/cadence/dialog";
+import { Field, FieldLabel } from "@/registry/cadence/field";
+import { Input } from "@/registry/cadence/input";
 
 export function DialogPreview() {
   const [open, setOpen] = useState(false);

@@ -14,7 +14,7 @@ import {
   CodeBlockTab,
   CodeBlockTabs,
   CodeBlockTitle,
-} from "@/registry/cadence/code-block/code-block";
+} from "@/registry/cadence/code-block";
 
 const STREAM = `export async function stream({ prompt, signal }: StreamOptions) {
   const response = await fetch("/api/chat", {

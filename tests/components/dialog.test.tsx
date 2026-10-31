@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import {
   Dialog,
   DialogClose,
@@ -9,7 +9,7 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "@/registry/cadence/dialog/dialog";
+} from "@/registry/cadence/dialog";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 
 function Example() {

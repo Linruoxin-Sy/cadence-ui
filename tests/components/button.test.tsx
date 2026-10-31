@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { Button, buttonVariants } from "@/registry/cadence/button/button";
+import { Button, buttonVariants } from "@/registry/cadence/button";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 
 function CustomButton(props: ComponentProps<"button">) {

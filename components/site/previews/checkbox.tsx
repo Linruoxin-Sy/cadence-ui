@@ -1,7 +1,7 @@
 "use client";
 
-import { Checkbox } from "@/registry/cadence/checkbox/checkbox";
-import { Label } from "@/registry/cadence/label/label";
+import { Checkbox } from "@/registry/cadence/checkbox";
+import { Label } from "@/registry/cadence/label";
 
 const rows = [
   { id: "terms", label: "Accept the terms of service", hint: "Required to create a workspace." },

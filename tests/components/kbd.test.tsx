@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Kbd, KbdGroup } from "@/registry/cadence/kbd/kbd";
+import { Kbd, KbdGroup } from "@/registry/cadence/kbd";
 
 describe("Kbd", () => {
   it("renders a real kbd element with its slot", () => {

@@ -2,7 +2,7 @@
 
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog";
 import type * as React from "react";
-import { Button, type ButtonProps } from "../button/button";
+import { Button, type ButtonProps } from "../button";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
 

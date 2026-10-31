@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Skeleton } from "@/registry/cadence/skeleton/skeleton";
+import { Skeleton } from "@/registry/cadence/skeleton";
 
 describe("Skeleton", () => {
   it("renders a placeholder with its slot", () => {

@@ -9,7 +9,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from "@/registry/cadence/select/select";
+} from "@/registry/cadence/select";
 
 function Demo({ mode }: { mode?: "full" | "reduced" | "none" }) {
   return (

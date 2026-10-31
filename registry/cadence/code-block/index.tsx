@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
 import { animate, type HTMLMotionProps, motion, useMotionValue } from "motion/react";
 import * as React from "react";
-import { Button } from "../button/button";
+import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";

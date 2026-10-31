@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Spinner } from "@/registry/cadence/spinner/spinner";
+import { Spinner } from "@/registry/cadence/spinner";
 
 describe("Spinner", () => {
   it("is a status region with a slot", () => {

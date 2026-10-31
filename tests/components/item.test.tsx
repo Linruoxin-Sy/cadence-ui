@@ -11,7 +11,7 @@ import {
   ItemMedia,
   ItemSeparator,
   ItemTitle,
-} from "@/registry/cadence/item/item";
+} from "@/registry/cadence/item";
 
 function Row(props: { size?: "default" | "sm" | "xs"; variant?: "default" | "outline" | "muted" }) {
   return (

@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/registry/cadence/button/button";
-import { Checkbox } from "@/registry/cadence/checkbox/checkbox";
-import { Label } from "@/registry/cadence/label/label";
+import { Button } from "@/registry/cadence/button";
+import { Checkbox } from "@/registry/cadence/checkbox";
+import { Label } from "@/registry/cadence/label";
 import {
   Sheet,
   SheetClose,
@@ -12,7 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/registry/cadence/sheet/sheet";
+} from "@/registry/cadence/sheet";
 
 const FILTERS = [
   { id: "sheet-open", label: "Open only", checked: true },

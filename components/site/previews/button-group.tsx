@@ -1,8 +1,8 @@
 "use client";
 
 import { Bold, Italic, Underline } from "lucide-react";
-import { Button } from "@/registry/cadence/button/button";
-import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group/button-group";
+import { Button } from "@/registry/cadence/button";
+import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group";
 
 export function ButtonGroupPreview() {
   return (

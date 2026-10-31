@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/registry/cadence/input-otp/input-otp";
-import { Label } from "@/registry/cadence/label/label";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/registry/cadence/input-otp";
+import { Label } from "@/registry/cadence/label";
 
 export function InputOtpPreview() {
   const [code, setCode] = useState("");

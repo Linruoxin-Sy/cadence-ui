@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { AspectRatio } from "@/registry/cadence/aspect-ratio/aspect-ratio";
+import { AspectRatio } from "@/registry/cadence/aspect-ratio";
 
 describe("AspectRatio", () => {
   it("renders a box with the ratio as a custom property", () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Mail, Search, X } from "lucide-react";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import {
   InputGroup,
   InputGroupAddon,
@@ -9,8 +9,8 @@ import {
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
-} from "@/registry/cadence/input-group/input-group";
-import { Kbd } from "@/registry/cadence/kbd/kbd";
+} from "@/registry/cadence/input-group";
+import { Kbd } from "@/registry/cadence/kbd";
 
 export function InputGroupPreview() {
   return (

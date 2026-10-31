@@ -1,6 +1,6 @@
 "use client";
 
-import { Kbd, KbdGroup } from "@/registry/cadence/kbd/kbd";
+import { Kbd, KbdGroup } from "@/registry/cadence/kbd";
 
 export function KbdPreview() {
   return (

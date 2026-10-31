@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Badge } from "@/registry/cadence/badge/badge";
+import { Badge } from "@/registry/cadence/badge";
 
 describe("Badge", () => {
   it("renders a span with the upstream slot and variant", () => {

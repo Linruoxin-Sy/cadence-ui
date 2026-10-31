@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 import {
   Sheet,
@@ -12,7 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/registry/cadence/sheet/sheet";
+} from "@/registry/cadence/sheet";
 
 function Example({ side }: { side?: "top" | "right" | "bottom" | "left" } = {}) {
   return (

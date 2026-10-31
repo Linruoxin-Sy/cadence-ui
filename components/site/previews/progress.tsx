@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Progress, ProgressLabel, ProgressValue } from "@/registry/cadence/progress/progress";
+import { Progress, ProgressLabel, ProgressValue } from "@/registry/cadence/progress";
 
 export function ProgressPreview() {
   const [uploaded, setUploaded] = useState(18);

@@ -7,7 +7,7 @@ import {
   CodeBlockPanel,
   CodeBlockTab,
   CodeBlockTabs,
-} from "@/registry/cadence/code-block/code-block";
+} from "@/registry/cadence/code-block";
 import { highlightSource } from "./highlight";
 import { installCommands } from "./install";
 

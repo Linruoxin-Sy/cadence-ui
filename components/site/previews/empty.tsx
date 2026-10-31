@@ -1,15 +1,8 @@
 "use client";
 
 import { Inbox, Plus } from "lucide-react";
-import { Button } from "@/registry/cadence/button/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/registry/cadence/empty/empty";
+import { Button } from "@/registry/cadence/button";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/registry/cadence/empty";
 
 export function EmptyPreview() {
   return (

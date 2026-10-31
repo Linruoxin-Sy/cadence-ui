@@ -8,7 +8,7 @@ import {
   InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
-} from "@/registry/cadence/input-group/input-group";
+} from "@/registry/cadence/input-group";
 
 describe("InputGroup", () => {
   it("frames a control and hands the styling to the frame", () => {

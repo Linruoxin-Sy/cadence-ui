@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Progress, ProgressLabel, ProgressValue } from "@/registry/cadence/progress/progress";
+import { Progress, ProgressLabel, ProgressValue } from "@/registry/cadence/progress";
 
 function indicator(container: HTMLElement) {
   const element = container.querySelector('[data-slot="progress-indicator"]');

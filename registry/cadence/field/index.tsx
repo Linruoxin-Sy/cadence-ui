@@ -2,9 +2,9 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { Label } from "../label/label";
+import { Label } from "../label";
 import { cn } from "../lib/cn";
-import { Separator } from "../separator/separator";
+import { Separator } from "../separator";
 
 export interface FieldSetProps extends React.ComponentProps<"fieldset"> {}
 

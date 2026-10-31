@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/registry/cadence/button/button";
+import { Button } from "@/registry/cadence/button";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Spinner } from "@/registry/cadence/spinner/spinner";
+import { Spinner } from "@/registry/cadence/spinner";
 
 export function SpinnerPreview() {
   return (

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Input } from "@/registry/cadence/input/input";
+import { Input } from "@/registry/cadence/input";
 
 describe("Input", () => {
   it("renders an input with its slot", () => {
