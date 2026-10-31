@@ -36,6 +36,7 @@ const SOURCE = `export async function stream({ prompt, signal }: StreamOptions) 
 const INSTALL = {
   pnpm: "pnpm dlx shadcn@latest add @cadence/code-block",
   npm: "npx shadcn@latest add @cadence/code-block",
+  yarn: "yarn dlx shadcn@latest add @cadence/code-block",
 };
 
 /**
@@ -68,6 +69,7 @@ export function CodeBlockPreview() {
             <CodeBlockTabs label="Package manager">
               <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
               <CodeBlockTab value="npm">npm</CodeBlockTab>
+              <CodeBlockTab value="yarn">yarn</CodeBlockTab>
             </CodeBlockTabs>
             <CodeBlockActions>
               <CodeBlockCopyButton values={INSTALL} />
@@ -75,6 +77,7 @@ export function CodeBlockPreview() {
           </CodeBlockHeader>
           <CodeBlockPanel value="pnpm">{INSTALL.pnpm}</CodeBlockPanel>
           <CodeBlockPanel value="npm">{INSTALL.npm}</CodeBlockPanel>
+          <CodeBlockPanel value="yarn">{INSTALL.yarn}</CodeBlockPanel>
         </CodeBlock>
       </div>
     </PreviewStack>
