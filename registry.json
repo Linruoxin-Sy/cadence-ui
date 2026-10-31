@@ -1208,6 +1208,35 @@
       }
     },
     {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Row actions, filters, and view settings behind one button.",
+      "categories": ["overlay"],
+      "dependencies": ["@base-ui/react", "lucide-react", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/dropdown-menu/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/dropdown-menu/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.4.0",
+        "tier": "T2",
+        "batch": "B5",
+        "motion": ["popup.anchored", "exit.fade", "state.morph"],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
       "name": "code-block",
       "type": "registry:ui",
       "title": "Code block",

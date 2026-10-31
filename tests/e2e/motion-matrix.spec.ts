@@ -634,6 +634,57 @@ test.describe("code-block", () => {
   }
 });
 
+test.describe("dropdown-menu", () => {
+  // The first menu in the matrix. Its panel is the popover's transition on Base UI's menu
+  // state attributes, and its check mark is the only JavaScript animation in B5, so this
+  // block pins both the token durations and the scale that `reduced` has to drop.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="dropdown-menu-content"]');
+          await openComponent(page, "dropdown-menu", requested, "dropdown-menu-trigger", mode);
+
+          await page.locator(scoped("dropdown-menu", '[data-slot="dropdown-menu-trigger"]')).first().click();
+          await expect(page.getByRole("menu")).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const panel = page.locator('[data-slot="dropdown-menu-content"]');
+          await expect(panel).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="dropdown-menu-content"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+
+  test.describe("reduced keeps the fade and drops only the scale", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the panel fades without the 0.96 settle", async ({ page }) => {
+      await recordScale(page, '[data-slot="dropdown-menu-content"]');
+      await openComponent(page, "dropdown-menu", "reduced", "dropdown-menu-trigger");
+      await page.locator(scoped("dropdown-menu", '[data-slot="dropdown-menu-trigger"]')).first().click();
+      await expect(page.getByRole("menu")).toBeVisible();
+      await page.waitForTimeout(300);
+
+      expect(await computed(page, '[data-slot="dropdown-menu-content"]', "transition-property")).toContain("opacity");
+      expect(await computed(page, '[data-slot="dropdown-menu-content"]', "transition-duration")).toBe("0.096s");
+      expect((await recordedScale(page)).min).toBe(1);
+    });
+  });
+});
+
 /** Guards the one thing the matrix cannot: that a mode is reachable without a URL. */
 test("the header switch drives the same modes the URL does", async ({ page }) => {
   await page.goto("/components/button");

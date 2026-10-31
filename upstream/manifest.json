@@ -1181,6 +1181,98 @@
         }
       }
     },
+    "dropdown-menu": {
+      "path": "apps/v4/registry/bases/base/ui/dropdown-menu.tsx",
+      "exports": [
+        "DropdownMenu",
+        "DropdownMenuCheckboxItem",
+        "DropdownMenuContent",
+        "DropdownMenuGroup",
+        "DropdownMenuItem",
+        "DropdownMenuLabel",
+        "DropdownMenuPortal",
+        "DropdownMenuRadioGroup",
+        "DropdownMenuRadioItem",
+        "DropdownMenuSeparator",
+        "DropdownMenuShortcut",
+        "DropdownMenuSub",
+        "DropdownMenuSubContent",
+        "DropdownMenuSubTrigger",
+        "DropdownMenuTrigger"
+      ],
+      "slots": [
+        "dropdown-menu",
+        "dropdown-menu-checkbox-item",
+        "dropdown-menu-checkbox-item-indicator",
+        "dropdown-menu-content",
+        "dropdown-menu-group",
+        "dropdown-menu-item",
+        "dropdown-menu-label",
+        "dropdown-menu-portal",
+        "dropdown-menu-radio-group",
+        "dropdown-menu-radio-item",
+        "dropdown-menu-radio-item-indicator",
+        "dropdown-menu-separator",
+        "dropdown-menu-shortcut",
+        "dropdown-menu-sub",
+        "dropdown-menu-sub-content",
+        "dropdown-menu-sub-trigger",
+        "dropdown-menu-trigger"
+      ],
+      "props": {
+        "DropdownMenu": {},
+        "DropdownMenuPortal": {},
+        "DropdownMenuTrigger": {},
+        "DropdownMenuContent": {
+          "align": "\"start\"",
+          "alignOffset": "0",
+          "side": "\"bottom\"",
+          "sideOffset": "4",
+          "className": null
+        },
+        "DropdownMenuGroup": {},
+        "DropdownMenuLabel": {
+          "className": null,
+          "inset": null
+        },
+        "DropdownMenuItem": {
+          "className": null,
+          "inset": null,
+          "variant": "\"default\""
+        },
+        "DropdownMenuSub": {},
+        "DropdownMenuSubTrigger": {
+          "className": null,
+          "inset": null,
+          "children": null
+        },
+        "DropdownMenuSubContent": {
+          "align": "\"start\"",
+          "alignOffset": "-3",
+          "side": "\"right\"",
+          "sideOffset": "0",
+          "className": null
+        },
+        "DropdownMenuCheckboxItem": {
+          "className": null,
+          "children": null,
+          "checked": null,
+          "inset": null
+        },
+        "DropdownMenuRadioGroup": {},
+        "DropdownMenuRadioItem": {
+          "className": null,
+          "children": null,
+          "inset": null
+        },
+        "DropdownMenuSeparator": {
+          "className": null
+        },
+        "DropdownMenuShortcut": {
+          "className": null
+        }
+      }
+    },
     "code-block": {
       "path": "apps/v4/registry/bases/base/ui/code-block.tsx",
       "exports": [

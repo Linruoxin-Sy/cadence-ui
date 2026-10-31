@@ -20,6 +20,7 @@ const PAGES = [
   { path: "/components/hover-card", name: "hover card" },
   { path: "/components/sheet", name: "sheet" },
   { path: "/components/drawer", name: "drawer" },
+  { path: "/components/dropdown-menu", name: "dropdown menu" },
   { path: "/components/switch?motion=none", name: "switch in none mode" },
   { path: "/components/code-block", name: "code block" },
   { path: "/docs", name: "guide index" },
