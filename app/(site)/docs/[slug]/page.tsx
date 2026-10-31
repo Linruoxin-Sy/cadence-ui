@@ -22,7 +22,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   if (!guide) notFound();
 
   return (
-    <DocumentEntrance as="article" className="max-w-3xl py-12">
+    <DocumentEntrance as="article" className="mx-auto max-w-3xl py-12">
       <h1 className="text-3xl font-semibold tracking-tight">{guide.title}</h1>
       <p className="mt-2 text-base text-muted-foreground">{guide.description}</p>
       <div className="mt-8">

@@ -24,7 +24,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
   if (!doc) notFound();
 
   return (
-    <DocumentEntrance as="article" className="max-w-3xl py-12">
+    <DocumentEntrance as="article" className="mx-auto max-w-3xl py-12">
       <nav className="text-xs text-muted-foreground">
         <Link className="underline underline-offset-4 hover:text-foreground" href="/components">
           Components

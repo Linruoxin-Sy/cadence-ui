@@ -11,7 +11,7 @@ export default async function DocsPage() {
   const guides = await listGuides();
 
   return (
-    <div className="max-w-3xl py-12">
+    <div className="mx-auto max-w-3xl py-12">
       <h1 className="text-3xl font-semibold tracking-tight">Documentation</h1>
       <p className="mt-3 text-sm text-muted-foreground">
         These guides cover the whole system. Each component page adds its own API and motion contract.
