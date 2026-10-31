@@ -196,11 +196,39 @@ and `data.transition`. Both must land in [animation-system.md](animation-system.
    `Installation` and `Usage` first, every other section flat `##`, one `##` per example. The **set** is the
    contract, not the count: examples run 2–6 and are named for what they show, `Keyboard interactions` /
    `Responsive behavior` / `Performance` appear from T1 up, `Validation and data ownership` on anything that
-   takes input, and every item carries the motion contract. A doc that omits a required section is
-   incomplete; a doc with an extra example is not.
+   takes input, and every item carries the motion contract. The frontmatter `description` is the subtitle
+   and follows §6.6. A doc that omits a required section is incomplete; a doc with an extra example is not.
 5. Preview module at `components/site/previews/<id>.tsx`.
 6. Unit test: render, `data-slot`, keyboard path, reduced branch.
 7. Payload rebuilt, `pnpm check` green, dual-theme screenshot in the PR.
+
+### 6.6 Documentation subtitles
+
+The subtitle is the `description` in `content/components/<id>.mdx` — mirrored in `registry.json`, rendered
+under the title on the component page, and repeated on `/components` and in `llms.txt`. It is a use-case
+line, not a pruned summary of the component.
+
+**It answers one question: where would I use this?** Name the screens, tasks, or content the component
+belongs to. Leave appearance, behaviour, animation, and API surface to the preview, the Motion contract,
+and the API table.
+
+| Rule              | Write                                                  | Not                                                             |
+| ----------------- | ------------------------------------------------------ | --------------------------------------------------------------- |
+| Name a situation  | `Destructive actions that need confirmation.`          | `A modal confirmation that interrupts the flow.`                |
+| Leave motion out  | `Focused tasks such as renaming or inviting.`          | `A modal that fades and settles in.`                            |
+| One short line    | `Statuses, counts, and categories.`                    | `A compact status label that animates with the page around it.` |
+| No prop inventory | `Login codes, email verification, and device pairing.` | `A one-time password field with slot and caret props.`          |
+| No marketing tone | `Errors, warnings, and page-level status messages.`    | `A beautiful, powerful way to show alerts.`                     |
+
+One short sentence or fragment, ideally ≤ 12 words. Plain words, one idea: the subtitle is the reader's
+next task, not a spec.
+
+- Do not repeat the title: the reader is already on the `Button` page, so no `A button that…`.
+- If the sentence would fit three different components, it is too vague; if it describes how the
+  component looks or moves, it is the wrong sentence.
+- The subtitle is one string in two places. Change the MDX frontmatter and `registry.json` together,
+  or `registry:check` fails.
+- Quality is reviewed, not automatically scored: `registry:check` compares the copies, not the tone.
 
 ## 7. Batches
 
