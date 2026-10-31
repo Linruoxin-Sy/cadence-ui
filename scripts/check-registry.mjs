@@ -162,6 +162,19 @@ for (const item of registry.items) {
     if (isComponent(item)) bytes += gzipSync(source).length;
   }
 
+  // Sources of the registry items this one installs, for the implementation half of the
+  // motion contract only (see below). One level is enough: a dependency that needs two
+  // levels can declare its own dependency's recipes the same way.
+  const dependencySources = [];
+  for (const dependency of item.registryDependencies ?? []) {
+    if (!dependency.startsWith(NAMESPACE)) continue;
+    const target = registry.items.find((entry) => entry.name === dependency.slice(NAMESPACE.length));
+    for (const file of target?.files ?? []) {
+      const filePath = path.join(root, file.path);
+      if (await exists(filePath)) dependencySources.push(await readFile(filePath, "utf8"));
+    }
+  }
+
   if (isComponent(item)) {
     const tier = item.meta?.tier ?? "T0";
     const budgetKb = item.meta?.budget ? item.meta.budget / 1024 : (TIER_BUDGET[tier] ?? 8);
@@ -174,11 +187,19 @@ for (const item of registry.items) {
     // Declared = implemented. A recipe with no implementation is a documentation
     // claim, not a component behaviour; a `transition()` call with no declaration
     // is an undeclared animation.
+    //
+    // The implementation may live in an item this one installs: `menubar` composes
+    // `dropdown-menu`, so the panel transition and the check mark are that item's code.
+    // The declaration is still the menubar's own, and an undeclared call is still only
+    // searched for in its own files — otherwise every item would inherit its dependency's
+    // declarations and the check would pass on nothing.
     const declared = normaliseMotion(item.meta?.motion);
     const called = [...new Set(sources.flatMap(calledRecipes))];
 
     for (const { recipe, form } of declared) {
-      const implemented = sources.map((source) => implementedForm(source, recipe, form)).find(Boolean);
+      const implemented = [...sources, ...dependencySources]
+        .map((source) => implementedForm(source, recipe, form))
+        .find(Boolean);
       if (!implemented) {
         problems.push(
           `${item.name}: declares "${recipe}" (${form}) but nothing implements it — ` +
