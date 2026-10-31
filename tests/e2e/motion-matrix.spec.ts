@@ -32,7 +32,12 @@ test.describe("button", () => {
 
         test(`reports ${mode} for ?motion=${requested}`, async ({ page }) => {
           await openComponent(page, "button", requested, "button", mode);
-          await expect(page.getByRole("button", { name: "Button", exact: true })).toHaveAttribute("data-motion", mode);
+          // The preview's first button is the default one; it is located by slot rather
+          // than by label so restyling the specimen does not break the matrix.
+          await expect(page.locator(scoped("button", '[data-slot="button"]')).first()).toHaveAttribute(
+            "data-motion",
+            mode,
+          );
         });
 
         test(`press scale: ?motion=${requested} → ${mode}`, async ({ page }) => {
@@ -404,11 +409,17 @@ test.describe("switch", () => {
 
         test(`thumb travel: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await openComponent(page, "switch", requested, "switch", mode);
-          const thumb = page.locator('[data-slot="switch-thumb"]').nth(1);
+          // The preview's first switch is the off one, so the press has somewhere to
+          // travel to. Both are addressed by id: their visible labels are decorative copy
+          // that changes with the specimen.
+          const thumb = page
+            .locator(scoped("switch", '[data-slot="switch"]'))
+            .first()
+            .locator('[data-slot="switch-thumb"]');
           const x = () => thumb.evaluate((element) => new DOMMatrixReadOnly(getComputedStyle(element).transform).m41);
 
           const start = await x();
-          await page.getByRole("switch", { name: "Deploy alerts" }).click();
+          await page.locator(scoped("switch", '[data-slot="switch"]')).first().click();
           await page.waitForTimeout(450);
 
           expect(await x()).toBeGreaterThan(start);
@@ -425,7 +436,10 @@ test.describe("switch", () => {
       const samples: number[] = [];
       (window as unknown as { __thumbSamples: number[] }).__thumbSamples = samples;
       const tick = () => {
-        const thumb = document.querySelector('[data-slot="switch-thumb"]');
+        // The checked switch, not the first one on the page: an unchecked thumb has no
+        // travel to measure, and the claim is about the one that starts at its end.
+        const switches = document.querySelectorAll('[data-slot="switch"]');
+        const thumb = switches[1]?.querySelector('[data-slot="switch-thumb"]');
         if (thumb) {
           const transform = getComputedStyle(thumb).transform;
           samples.push(transform === "none" ? 0 : new DOMMatrixReadOnly(transform).m41);
