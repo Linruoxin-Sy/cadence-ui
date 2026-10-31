@@ -441,6 +441,13 @@ export interface CodeBlockTabProps extends React.ComponentProps<"button"> {
  * One tab. The pill under it is the only animated part, and only the selected tab
  * renders one: Motion matches the two `layoutId`s and plays the travel between
  * them, so there is never a second pill to cross-fade.
+ *
+ * The label is on its own layer (`z-10`) while the pill stays at `auto`, and that is
+ * load-bearing rather than decoration. The pill belongs to the tab being entered; when
+ * that tab sits to the right of the one being left, its button comes later in the DOM,
+ * so an unlayered pill paints over the previous tab's label and wipes it for the length
+ * of the slide. Raising every label above every pill makes the travel symmetric: the
+ * highlight moves underneath the words, whichever direction it is going.
  */
 function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlockTabProps) {
   const cm = useCadenceMotion();
@@ -481,7 +488,7 @@ function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlo
           className="absolute inset-0 rounded-sm bg-muted"
         />
       ) : null}
-      <span className="relative">{children}</span>
+      <span className="relative z-10">{children}</span>
     </button>
   );
 }

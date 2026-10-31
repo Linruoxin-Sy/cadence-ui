@@ -480,6 +480,61 @@ test.describe("progress", () => {
 });
 
 test.describe("code-block", () => {
+  // The layering check samples a full-mode travel, so it opts out of the OS preference
+  // explicitly; the mode matrix below sets its own preference per cell.
+  test.use({ reducedMotion: "no-preference" });
+
+  /**
+   * Paint order is invisible to jsdom and identical at the end of the travel, so the
+   * only honest check is hit-testing mid-flight. The pill belongs to the tab being
+   * entered, and when that tab is to the right of the one being left its button comes
+   * later in the DOM: unlayered, the pill paints over the tab it left and wipes that
+   * label for the length of the slide. Every label sits on `z-10`, above the pill.
+   */
+  test("the travelling pill paints underneath the tab labels", async ({ page }) => {
+    await openComponent(page, "code-block", "full", "code-block", "full");
+
+    const list = page.locator('[data-slot="code-block-tabs"]').first();
+    const tabs = list.locator('[role="tab"]');
+
+    // The sampler starts before the click so the first frames — the ones where the
+    // pill still sits on the tab it is leaving — are part of the sample.
+    await page.evaluate(() => {
+      const blockList = document.querySelector('[data-slot="code-block-tabs"]');
+      const first = blockList?.querySelector<HTMLElement>('[data-slot="code-block-tab"]');
+      const store = window as unknown as { __pillLayers?: { pill: number; label: number; samples: number } };
+      store.__pillLayers = { pill: 0, label: 0, samples: 0 };
+
+      const tick = () => {
+        const layers = store.__pillLayers as { pill: number; label: number; samples: number };
+        // Re-read the label each frame: React replaces the span when the tab loses its
+        // indicator, so a captured node would be detached by the time we sample it.
+        const label = first?.lastElementChild;
+        if (label) {
+          const box = label.getBoundingClientRect();
+          const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+          layers.samples++;
+          if (hit?.getAttribute("data-slot") === "code-block-tab-indicator") layers.pill++;
+          if (hit === label) layers.label++;
+        }
+        if (layers.samples < 90) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+
+    await tabs.nth(2).click();
+    await page.waitForTimeout(800);
+
+    const hits = await page.evaluate(
+      () => (window as unknown as { __pillLayers: { pill: number; label: number; samples: number } }).__pillLayers,
+    );
+
+    // The sample point is over the label, so it must have been hit at least once…
+    expect(hits.label).toBeGreaterThan(0);
+    // …and the travelling pill must never have been the element on top of it.
+    expect(hits.pill).toBe(0);
+  });
+
   for (const prefersReduced of PREFERENCES) {
     test.describe(preferenceName(prefersReduced), () => {
       test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
