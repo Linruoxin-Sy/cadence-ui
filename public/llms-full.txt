@@ -5684,7 +5684,7 @@ reconciling a tree of spans, which is what makes a streaming output block cheap.
 | | `language` | Additive. Highlights a string child; an unknown name renders plainly. |
 | | `defaultTab`, `tab`, `onTabChange` | Additive switcher. Holds the selection the tabs, the panels and the copy button share. |
 | `CodeBlockHeader` | native `div` props | Sits above the source and draws a full-width rule between the label and the code. |
-| `CodeBlockTitle` | native `div` props | Truncates. Wrap it in an anchor to link to the file. |
+| `CodeBlockTitle` | native `div` props | Truncates. A tab's text style — 12px, medium, muted — so a header reads the same with or without a switcher. Wrap it in an anchor to link to the file. |
 | `CodeBlockTabs` | `label`, native `div` props | Additive. `role="tablist"`, one tab stop, arrow keys move within it. Needs a `CodeBlock` parent. |
 | `CodeBlockTab` | `value` (required), native `button` props | Additive. `role="tab"`; only the selected one renders the shared pill. |
 | `CodeBlockActions` | native `div` props | In a header it sits at the end; on its own it floats. |
