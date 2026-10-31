@@ -685,10 +685,11 @@ whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/cod
 - **Docs-site install fences became the switcher, without touching the markdown's meaning.**
   `content/components/*.mdx` marks its Installation fence ` ```install ` instead of ` ```bash `; the command
   inside is still the runnable `npx shadcn@latest add …`, so the `/r/<id>.md` payload an agent reads is
-  unchanged in substance. `components/site/install.ts` reads the registry spec out of it and restates it for
+  unchanged in substance. `components/site/package-manager.ts` reads the registry spec out of it and restates it for
   pnpm / npm / yarn (`pnpm dlx`, `npx`, `yarn dlx`), keeping whatever pin the fence wrote; a fence that does
-  not parse falls back to a terminal block. `tests/site/install.test.tsx` holds the content invariant that
-  every component doc uses the `install` fence.
+  not parse falls back to a terminal block. `tests/site/package-manager.test.tsx` holds the content invariant that
+  every component doc uses the `install` fence. (The module later widened to `package-manager` fences and one
+  remembered selection; see §2.3 of the docs-site document.)
 - **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, T5 budget,
   P11), `parity:check` against `96da9cc7f1aa`, 242 unit tests. `playwright test` with
   `PLAYWRIGHT_CHANNEL=msedge` cover a `code-block` block in the motion matrix (3 modes × 2 preferences, fold

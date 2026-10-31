@@ -123,13 +123,23 @@ downloads no grammar — and the header carries the language and the copy contro
 action is invisible until hover and most fences on this site are commands to copy. A fence in a language the
 item does not bundle renders as plain text, which is the whole source either way.
 
-One info string is not a language. ` ```install ` marks the one command a reader came for — `npx shadcn@latest
-add @cadence/<id>` — and `components/site/install-command.tsx` renders it as the code block's own tab switcher:
-pnpm (`pnpm dlx`), npm (`npx`) and yarn (`yarn dlx`), with the copy button following the selected tab. The
-command stays in the markdown, so the payload an agent reads at `/r/<id>.md` is still something it can run;
-`components/site/install.ts` does the reading and restating, and falls back to a terminal block for a fence it
-cannot parse. Every `content/components/*.mdx` uses that fence for its Installation section, which
-`tests/site/install.test.tsx` enforces.
+Two info strings are not languages. ` ```install ` marks the one command a component page opens
+with — `npx shadcn@latest add @cadence/<id>` — and ` ```package-manager ` marks any fence whose
+commands depend on the tool: create a project, `init`, add packages — `content/docs/installation.mdx`
+is made of them. Both render through `components/site/package-manager-fence.tsx`, which restates
+the source for pnpm (`pnpm dlx` / `pnpm add`), npm (`npx` / `npm install`) and yarn (`yarn dlx` /
+`yarn add`) with `components/site/package-manager.ts`, keeping whatever pin the fence wrote and
+leaving lines such as `cd` alone. A fence that does not parse falls back to a terminal block.
+
+The switcher is the registry's tab block with `tab` / `onTabChange` wired to
+`components/site/package-manager-preference.tsx`: one selection for the whole site, persisted under
+`cadence-package-manager`, so a click in one fence moves every other fence on the page and the next
+visit starts on the same manager. The command stays in the markdown, so the payload an agent reads
+at `/r/<id>.md` is still something it can run. Every `content/components/*.mdx` uses the `install`
+fence for its Installation section, and every package-manager fence in the installation guide
+parses, which `tests/site/package-manager.test.tsx` enforces; the shared, remembered selection is
+proven in `tests/site/package-manager-block.test.tsx` and, after hydration in a real browser, in
+`tests/e2e/package-manager.spec.ts`.
 
 ### 2.4 Document entrance
 
