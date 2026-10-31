@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0, B1, B2, B3 and B4 complete (2026-10-30); B5 in progress — `select`, `dropdown-menu`,
-> `context-menu` and `menubar` shipped, `combobox`, `command` and `toast` to come (2026-10-31).**
+> `context-menu`, `menubar` and `combobox` shipped, `command` and `toast` to come (2026-11-01).**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -290,9 +290,9 @@ Completed: **B0** — eight components removed and archived, the tier/P11 checks
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
 §7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
-here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus that
-followed. **B9 is open**: `code-block` landed ahead of the batch (see §7.5), and
-`attachment` + `bubble` are still to come.
+here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus and
+`combobox` that followed, and `command` + `toast` remain. **B9 is open**: `code-block` landed ahead of the
+batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B1 — atoms (11)
 
@@ -720,25 +720,29 @@ whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/cod
   escape codes render as text); streaming-specific motion (new code fading in place) — none of it blocks the
   item.
 
-### 7.6 B5 — in progress (2026-10-31)
+### 7.6 B5 — in progress (2026-10-31, updated 2026-11-01)
 
-Four of the seven items are shipped; the batch row says `next` because three are not.
+Five of the seven items are shipped; the batch row says `next` because `command` and `toast` are not.
 
-- **Scope shipped:** `select` (2026-10-30), `dropdown-menu`, `context-menu`, `menubar` (2026-10-31).
-  40 components, 46 registry items, 40 docs, 41 previews, 280 unit tests, 145 browser tests.
+- **Scope shipped:** `select` (2026-10-30), `dropdown-menu`, `context-menu`, `menubar` (2026-10-31),
+  `combobox` (2026-11-01). 41 components, 47 registry items, 41 docs, 42 previews, 290 unit tests,
+  154 browser tests.
 - **`select` was shipped unrecorded.** It reached `main` on 2026-10-30 with `meta.batch: "B5"`, and
   neither this table nor §7 mentioned it — the exact failure §7.0 describes, caught while choosing the
   next batch. It is included in the counts above and in the batch's verification, so the row now matches
   the branch.
-- **Tiers and recipes:** four T2 components, all declaring `popup.anchored` + `exit.fade` +
-  `state.morph`. No new recipe was needed: a menu is the popover's panel anchored to a trigger (or to a
-  pointer), and a check mark scaling in is `state.morph`, which B3 already widened to "a control's own
-  indicator".
+- **Tiers and recipes:** four T2 menus plus `select` (T3) and `combobox` (T2). No new recipe was needed: a
+  menu is the popover's panel anchored to a trigger (or to a pointer), a check mark scaling in is
+  `state.morph` — which B3 already widened to "a control's own indicator" — and `combobox` reuses the same
+  three on a field.
 - **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, tier
-  budgets, P11), `parity:check` against `96da9cc`, 280 unit tests across 47 files. `playwright test`
-  (145 tests, `PLAYWRIGHT_CHANNEL=msedge`) green against a production build: the motion matrix gained
-  `dropdown-menu`, `context-menu` and `menubar` blocks (3 modes × 2 preferences, plus the reduced-only
-  settle for the dropdown), and the axe page list gained all three pages in both themes.
+  budgets, P11), `parity:check` against `96da9cc`, 290 unit tests across 48 files. `playwright test`
+  (154 tests, `PLAYWRIGHT_CHANNEL=msedge --workers=3`) green against a production build: the motion matrix
+  gained `dropdown-menu`, `context-menu`, `menubar` and `combobox` blocks (3 modes × 2 preferences, plus the
+  reduced-only settle for the dropdown and the combobox), and the axe page list gained all four pages in
+  both themes. **The worker count is not incidental:** at the default 8 workers Edge crashes
+  (`code=3221226505`) and 12 tests fail on timeouts and lost pages; the same suite is 154/154 at 3. A
+  failure list full of `Target page, context or browser has been closed` is the harness, not a component.
 - **Tooling, the prerequisite §8 named for this batch:**
   - **The props surface is compared now.** `extractProps()` in `scripts/upstream-surface.mjs` reads each
     part's destructured props and their literal defaults; `upstream/manifest.json` carries them per item;
@@ -756,6 +760,12 @@ Four of the seven items are shipped; the batch row says `next` because three are
   - **A build can run beside a dev server again.** `next.config.ts` reads `CADENCE_DIST_DIR`, because a
     build deletes the `.next` a running `next dev` is serving; `.next-*` is gitignored and ignored by
     Biome. This is what made the browser pass possible in this environment.
+  - **The scaffold writes the path the registry points at (2026-11-01).** `new-item.mjs` created
+    `registry/cadence/<id>/<id>.tsx` while its registry item pointed at `<id>/index.tsx`, so every scaffold
+    needed a manual rename before `registry:build` would pass. It now writes `index.tsx`, proved by
+    scaffolding a throwaway item and deleting it. Two side effects of the same change are worth knowing:
+    a `CADENCE_DIST_DIR` build appends `.next-*/types` to `tsconfig.json`'s `include` (revert that file
+    before committing), and `biome check --write` must run after any script that rewrites JSON.
 - **Deviations recorded, not silent:**
   - **`DropdownMenuLabel` / `ContextMenuLabel` are not always a `GroupLabel`.** Base UI 1.9 throws
     (`MenuGroupContext is missing`) when `Menu.GroupLabel` renders outside `Menu.Group`, and shadcn's
@@ -783,9 +793,42 @@ Four of the seven items are shipped; the batch row says `next` because three are
     the `switch` block a switch named "Deploy alerts", neither of which the current previews render —
     both had been failing since the previews were rewritten. They now address the specimen by slot, so a
     copy change cannot break the matrix again.
-- **Still open:** `combobox`, `command`, `toast` — the rest of B5. Dual-theme screenshots for B1–B5 are
+  - **`combobox` is upstream's file, minus the theme classes.** `ComboboxPrimitive.Value` is a pass-through,
+    and `ComboboxClear` stays internal: upstream defines it and does not export it, so the undo affordance
+    belongs to `ComboboxInput`'s layout rather than to the public surface. All 16 upstream exports and all
+    16 upstream slots are present; `parity:check` reports exactly one addition, the
+    `combobox-item-indicator` slot that carries the tick's spring.
+  - **The addon's chevron reports `input-group-button`, not `combobox-trigger`.** The button is composed the
+    way upstream composes it — the input-group frame supplies the chrome through `render`, the trigger
+    supplies the behaviour — and Base UI's prop merge keeps the wrapper's `data-slot`. Both names exist in
+    the source (so `parity:check` sees both), a hand-placed `ComboboxTrigger` reports its own slot in the
+    DOM, and the unit test pins both facts instead of assuming one.
+  - **Both icon-only buttons gained a default `aria-label`.** Base UI names neither the trigger nor the
+    clear control, and an icon-only button with no accessible name is a `button-name` violation — the axe
+    pass would have failed on the page. `ComboboxChip` gives its remove button `Remove <chip>` when the chip
+    is a string. The labels sit before `{...props}`, so a caller can rename them; nothing was renamed or
+    removed.
+  - **The filter does not animate.** Typing replaces the list on every keystroke; `list.stagger` or
+    `layout.move` there would move rows under a moving caret, which is decoration rather than causality (P9).
+    The component declares the panel's two recipes and the tick, and nothing else.
+  - **The popup is a flex column.** Upstream sizes the panel and the list separately; here the panel caps at
+    `--available-height` and the list takes the rest (`min-h-0 flex-1 overflow-y-auto`), so the empty state
+    is a sibling of the list rather than a replacement for the whole panel and a long list scrolls inside
+    the panel instead of past it.
+  - **The visual classes are `new-york-v4`'s.** The Base UI source styles the family with `cn-combobox-*`
+    theme classes that only exist in shadcn's own style sheet; shipping them would make the component depend
+    on a file the consumer does not have. Same rule as B1: API and slots from `base`, utilities from
+    `new-york-v4`.
+  - **The clear glyph was 24px until a screenshot caught it.** `inputGroupButtonVariants({ size: "icon-xs" })`
+    sizes the box but not the glyph, and the clear control is not a `Button`, so it inherited no `[&_svg]`
+    size: a 24px X in a 24px box. Both icon controls now declare the glyph size themselves, which is also
+    what makes a hand-placed `ComboboxTrigger` render correctly without a `Button` behind it. jsdom and axe
+    both pass either way — this is the class the browser pass exists to catch, and it did.
+- **Still open:** `command`, `toast` — the rest of B5. Dual-theme screenshots for B1–B5 are
   still not generated: the browser pass now runs here, but nothing writes the images, so the visual half
-  of the batch gate remains a script that does not exist.
+  of the batch gate remains a script that does not exist. `combobox` was checked by hand in both themes
+  while it was written (closed and open, light and dark), which is how the clear glyph above was found;
+  those images live in `.cache`, not in the repo.
 
 ## 8. Backlog
 
