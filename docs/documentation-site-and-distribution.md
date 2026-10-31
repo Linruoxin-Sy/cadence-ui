@@ -33,20 +33,20 @@
 
 Every component page renders from the same MDX, in a fixed order:
 
-| #   | Section                             | Content requirements                                           |
-| --- | ----------------------------------- | -------------------------------------------------------------- |
-| 1   | Title + one sentence                | Matches the registry `description`                             |
-| 2   | Preview                             | Interactive; motion mode and speed come from the site header   |
-| 3   | Installation                        | CLI (4 package managers) + manual (file list)                  |
-| 4   | Usage                               | Smallest runnable code                                         |
-| 5   | Examples                            | 3–6 examples, each with code — see the flat-heading rule below |
-| 6   | When to use                         | 3–5 concrete scenarios                                         |
-| 7   | When not to use                     | Point to the alternative component (prevents misuse)           |
-| 8   | API                                 | Props table: type, default, description                        |
-| 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)           |
-| 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy           |
-| 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                        |
-| 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                      |
+| #   | Section                             | Content requirements                                                          |
+| --- | ----------------------------------- | ----------------------------------------------------------------------------- |
+| 1   | Title + use-case sentence           | Matches the registry `description`; see [parity-plan.md](parity-plan.md) §6.6 |
+| 2   | Preview                             | Interactive; motion mode and speed come from the site header                  |
+| 3   | Installation                        | CLI (4 package managers) + manual (file list)                                 |
+| 4   | Usage                               | Smallest runnable code                                                        |
+| 5   | Examples                            | 3–6 examples, each with code — see the flat-heading rule below                |
+| 6   | When to use                         | 3–5 concrete scenarios                                                        |
+| 7   | When not to use                     | Point to the alternative component (prevents misuse)                          |
+| 8   | API                                 | Props table: type, default, description                                       |
+| 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)                          |
+| 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy                          |
+| 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                                       |
+| 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                                     |
 
 The two sections a reader arrives for come first: `## Installation` opens every body, `## Usage`
 follows it. Someone who lands on the page to install the component never scrolls past a rationale
