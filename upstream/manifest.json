@@ -7,7 +7,7 @@
   "pin": {
     "ref": "96da9cc7f1aa10580a3741664e2a77c721206c00",
     "date": "2026-10-27",
-    "syncedAt": "2026-10-30"
+    "syncedAt": "2026-10-31"
   },
   "items": {
     "button": {
@@ -1179,6 +1179,102 @@
         "SelectScrollDownButton": {
           "className": null
         }
+      }
+    },
+    "combobox": {
+      "path": "apps/v4/registry/bases/base/ui/combobox.tsx",
+      "exports": [
+        "Combobox",
+        "ComboboxChip",
+        "ComboboxChips",
+        "ComboboxChipsInput",
+        "ComboboxCollection",
+        "ComboboxContent",
+        "ComboboxEmpty",
+        "ComboboxGroup",
+        "ComboboxInput",
+        "ComboboxItem",
+        "ComboboxLabel",
+        "ComboboxList",
+        "ComboboxSeparator",
+        "ComboboxTrigger",
+        "ComboboxValue",
+        "useComboboxAnchor"
+      ],
+      "slots": [
+        "combobox-chip",
+        "combobox-chip-input",
+        "combobox-chip-remove",
+        "combobox-chips",
+        "combobox-clear",
+        "combobox-collection",
+        "combobox-content",
+        "combobox-empty",
+        "combobox-group",
+        "combobox-item",
+        "combobox-label",
+        "combobox-list",
+        "combobox-separator",
+        "combobox-trigger",
+        "combobox-value",
+        "input-group-button"
+      ],
+      "props": {
+        "ComboboxValue": {},
+        "ComboboxTrigger": {
+          "className": null,
+          "children": null
+        },
+        "ComboboxClear": {
+          "className": null
+        },
+        "ComboboxInput": {
+          "className": null,
+          "children": null,
+          "disabled": "false",
+          "showTrigger": "true",
+          "showClear": "false"
+        },
+        "ComboboxContent": {
+          "className": null,
+          "side": "\"bottom\"",
+          "sideOffset": "6",
+          "align": "\"start\"",
+          "alignOffset": "0",
+          "anchor": null
+        },
+        "ComboboxList": {
+          "className": null
+        },
+        "ComboboxItem": {
+          "className": null,
+          "children": null
+        },
+        "ComboboxGroup": {
+          "className": null
+        },
+        "ComboboxLabel": {
+          "className": null
+        },
+        "ComboboxCollection": {},
+        "ComboboxEmpty": {
+          "className": null
+        },
+        "ComboboxSeparator": {
+          "className": null
+        },
+        "ComboboxChips": {
+          "className": null
+        },
+        "ComboboxChip": {
+          "className": null,
+          "children": null,
+          "showRemove": "true"
+        },
+        "ComboboxChipsInput": {
+          "className": null
+        },
+        "useComboboxAnchor": {}
       }
     },
     "dropdown-menu": {
