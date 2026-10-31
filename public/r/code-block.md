@@ -165,7 +165,8 @@ Four things worth knowing:
 
 - **The pill is a shared element.** Only the selected tab renders one, and Motion matches the two `layoutId`s,
   so it travels to the tab that was pressed rather than a second pill cross-fading in place. Press another tab
-  mid-flight and it retargets instead of restarting.
+  mid-flight and it retargets instead of restarting. The labels stay above it, so the pill crosses underneath
+  the neighbouring tabs instead of wiping the label of the tab it left.
 - **A panel is the content.** `CodeBlockPanel` renders `CodeBlockContent` and takes its props (`wrap`,
   `lineNumbers`, `language`), so a tabbed block keeps the fold, the numbering, the copy affordance and the focus
   ring a plain block has.
