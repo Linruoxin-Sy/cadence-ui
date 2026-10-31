@@ -11,23 +11,6 @@ deps: ["class-variance-authority"]
 registryDeps: ["@cadence/cadence-utils", "@cadence/label", "@cadence/separator"]
 ---
 
-## When to use
-
-- Any control that needs a visible label plus a line of help: text, select, checkbox
-  group, radio group, a segmented choice.
-- A form where the error has to sit next to the control it belongs to, not in a
-  summary at the top.
-- A choice card — a `Field` that contains a whole control card — where the label is
-  the surface and the checked state is the selection.
-
-## When not to use
-
-- A single input with no label and no help. Do not wrap it; `input` already carries
-  its own border and focus ring.
-- A validation module. `Field` renders messages; it never produces them (P11).
-- A toolbar of loose controls. Group those with `button-group`, which has no label
-  semantics to offer.
-
 ## Installation
 
 ```install
@@ -53,9 +36,7 @@ export function CompanyField() {
 }
 ```
 
-## Examples
-
-### Vertical, horizontal, responsive
+## Vertical, horizontal, responsive
 
 `orientation` decides where the label sits. `responsive` keeps a column until the
 `FieldGroup` reaches `md`, then turns into a row — the group is the container query
@@ -68,7 +49,7 @@ root, so it works inside a sidebar or a dialog without a breakpoint for each.
 </FieldGroup>
 ```
 
-### An error, from the caller
+## An error, from the caller
 
 `FieldError` renders what it is given and returns `null` when it has nothing. Two
 messages become a list; duplicates collapse.
@@ -83,7 +64,7 @@ messages become a list; duplicates collapse.
 </Field>
 ```
 
-### A set, a legend, and a divider
+## A set, a legend, and a divider
 
 ```tsx
 <FieldSet>
@@ -96,7 +77,7 @@ messages become a list; duplicates collapse.
 </FieldSet>
 ```
 
-### A choice card
+## A choice card
 
 `FieldLabel` recognises a `Field` inside it and becomes the card: full width, border,
 padding, and a primary tint when the inner control is checked.
@@ -112,6 +93,23 @@ padding, and a primary tint when the inner control is checked.
   </Field>
 </FieldLabel>
 ```
+
+## When to use
+
+- Any control that needs a visible label plus a line of help: text, select, checkbox
+  group, radio group, a segmented choice.
+- A form where the error has to sit next to the control it belongs to, not in a
+  summary at the top.
+- A choice card — a `Field` that contains a whole control card — where the label is
+  the surface and the checked state is the selection.
+
+## When not to use
+
+- A single input with no label and no help. Do not wrap it; `input` already carries
+  its own border and focus ring.
+- A validation module. `Field` renders messages; it never produces them (P11).
+- A toolbar of loose controls. Group those with `button-group`, which has no label
+  semantics to offer.
 
 ## API
 
@@ -148,6 +146,17 @@ is in.
 `data-[invalid=true]` recolours the field's text on the destructive token. That is a
 colour change, not a motion, and it is never the only signal.
 
+## Accessibility
+
+- `FieldLabel` is a `label`, so clicking it focuses the control it names. Always pass
+  `htmlFor` matching the control's `id`; a `FieldTitle` is not a substitute.
+- An error is `role="alert"`: it is announced when it appears. Point the control at it
+  with `aria-describedby` so the message is also part of the control's description.
+- `aria-invalid` on the control is what makes the state machine-readable; the
+  destructive colour is the sighted half of the same signal.
+- A horizontal field puts the label after the content in source order when the content
+  holds the control. Keep the DOM order label → control for a simple pair.
+
 ## Validation and data ownership
 
 P11 draws the line: the component renders state, you decide state.
@@ -162,17 +171,6 @@ P11 draws the line: the component renders state, you decide state.
 There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. `FieldError` accepts messages, not rules: the decision that a
 value is wrong, and the copy that says so, stay in your form code.
-
-## Accessibility
-
-- `FieldLabel` is a `label`, so clicking it focuses the control it names. Always pass
-  `htmlFor` matching the control's `id`; a `FieldTitle` is not a substitute.
-- An error is `role="alert"`: it is announced when it appears. Point the control at it
-  with `aria-describedby` so the message is also part of the control's description.
-- `aria-invalid` on the control is what makes the state machine-readable; the
-  destructive colour is the sighted half of the same signal.
-- A horizontal field puts the label after the content in source order when the content
-  holds the control. Keep the DOM order label → control for a simple pair.
 
 ## Notes for AI
 

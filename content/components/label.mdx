@@ -11,23 +11,6 @@ deps: []
 registryDeps: ["@cadence/cadence-utils"]
 ---
 
-## When to use
-
-- Every input, textarea, select, checkbox, radio, switch, and slider that needs a
-  visible name.
-- A group of controls that share one caption.
-- A field whose purpose is not obvious from the placeholder alone (which is
-  almost every field).
-
-## When not to use
-
-- As a placeholder. A placeholder disappears on the first keystroke and is not a
-  name; use a real `Label`.
-- As a heading. If the text introduces a section, use a heading so it appears in
-  the document outline.
-- For helper text or error text; those belong in the description/error slot so
-  they can be wired through `aria-describedby`.
-
 ## Installation
 
 ```install
@@ -50,9 +33,7 @@ export function EmailField() {
 }
 ```
 
-## Examples
-
-### Wrapping instead of `htmlFor`
+## Wrapping instead of `htmlFor`
 
 Either association works: `htmlFor` + `id`, or wrapping the control. Pick one per
 field and keep it consistent.
@@ -64,7 +45,7 @@ field and keep it consistent.
 </Label>
 ```
 
-### Disabled
+## Disabled
 
 The label follows the control without any prop: `peer-disabled:` handles a sibling
 control, `group-data-[disabled=true]:` handles a disabled `Field`.
@@ -75,6 +56,23 @@ control, `group-data-[disabled=true]:` handles a disabled `Field`.
 </Label>
 <Input id="slug" className="peer" disabled defaultValue="cadence" />
 ```
+
+## When to use
+
+- Every input, textarea, select, checkbox, radio, switch, and slider that needs a
+  visible name.
+- A group of controls that share one caption.
+- A field whose purpose is not obvious from the placeholder alone (which is
+  almost every field).
+
+## When not to use
+
+- As a placeholder. A placeholder disappears on the first keystroke and is not a
+  name; use a real `Label`.
+- As a heading. If the text introduces a section, use a heading so it appears in
+  the document outline.
+- For helper text or error text; those belong in the description/error slot so
+  they can be wired through `aria-describedby`.
 
 ## API
 

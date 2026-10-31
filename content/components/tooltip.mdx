@@ -11,19 +11,6 @@ deps: ["@base-ui/react", "motion"]
 registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
 ---
 
-## When to use
-
-- An icon-only control whose meaning is not obvious from the icon alone.
-- The full value behind a truncated label, or a keyboard shortcut next to an action.
-- A hint that helps the first use of a dense control and is useless once learned.
-
-## When not to use
-
-- Anything the user must read to act: a tooltip disappears on scroll, touch, and Escape. If the content
-  matters, put it on the page or in a `popover`.
-- Interactive content. A tooltip cannot hold a button or a link; use `popover`.
-- The accessible name of a button that already has text. Two labels that disagree is worse than one.
-
 ## Installation
 
 ```install
@@ -53,9 +40,7 @@ export function BoldTooltip() {
 }
 ```
 
-## Examples
-
-### Side and alignment
+## Side and alignment
 
 `side` defaults to `top` and the label flips when there is no room. The arrow moves with it; the panel
 grows out of `--transform-origin`, so the scale starts where the trigger meets the label.
@@ -66,7 +51,7 @@ grows out of `--transform-origin`, so the scale starts where the trigger meets t
 </TooltipContent>
 ```
 
-### A delay for the whole app
+## A delay for the whole app
 
 `TooltipProvider` sets the delay once. Without it, Base UI's own default applies.
 
@@ -76,7 +61,7 @@ grows out of `--transform-origin`, so the scale starts where the trigger meets t
 </TooltipProvider>
 ```
 
-### Disabled controls
+## Disabled controls
 
 A disabled button does not emit pointer events, so wrap it and put the hint on the wrapper:
 
@@ -88,6 +73,19 @@ A disabled button does not emit pointer events, so wrap it and put the hint on t
   <TooltipContent>Finish the required fields first</TooltipContent>
 </Tooltip>
 ```
+
+## When to use
+
+- An icon-only control whose meaning is not obvious from the icon alone.
+- The full value behind a truncated label, or a keyboard shortcut next to an action.
+- A hint that helps the first use of a dense control and is useless once learned.
+
+## When not to use
+
+- Anything the user must read to act: a tooltip disappears on scroll, touch, and Escape. If the content
+  matters, put it on the page or in a `popover`.
+- Interactive content. A tooltip cannot hold a button or a link; use `popover`.
+- The accessible name of a button that already has text. Two labels that disagree is worse than one.
 
 ## API
 

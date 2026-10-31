@@ -11,24 +11,6 @@ deps: ["lucide-react", "motion"]
 registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
 ---
 
-## When to use
-
-- An action the user just triggered: save, send, invite, publish. The spinner sits
-  where the user is looking — inside the button, or immediately beside it.
-- A wait with no measurable progress: a request that returns when it returns.
-- A region that is loading and whose shape you cannot predict. When you *can* predict
-  it, use `skeleton` instead: it keeps the layout stable.
-
-## When not to use
-
-- A wait under about 300 ms. The spinner appears and disappears before it can be read,
-  which reads as a flicker. Keep the button's label and disable it.
-- A known percentage. Use `progress`; a spinning wheel after "60%" is a regression.
-- A page that is loading its first paint. There is nothing to spin inside yet — a
-  skeleton or a server-rendered shell is better.
-- A decorative "we're working on it" on a marketing page. Motion without a state
-  change is decoration (P9).
-
 ## Installation
 
 ```install
@@ -50,9 +32,7 @@ export function LoadingRegistry() {
 }
 ```
 
-## Examples
-
-### Inside a button
+## Inside a button
 
 The button keeps its width because the spinner replaces nothing: keep the label and
 put the spinner in front of it, or reserve the label's space with `aria-live`.
@@ -64,7 +44,7 @@ put the spinner in front of it, or reserve the label's space with `aria-live`.
 </Button>
 ```
 
-### Sized by the caller
+## Sized by the caller
 
 The icon is `size-4` by default and inherits `currentColor`, so one class resizes and
 recolours it.
@@ -73,7 +53,7 @@ recolours it.
 <Spinner className="size-3 text-muted-foreground" />
 ```
 
-### A specific label
+## A specific label
 
 "Loading" is the default. Say what is loading when the surrounding text does not.
 
@@ -81,7 +61,7 @@ recolours it.
 <Spinner aria-label="Saving invoice" />
 ```
 
-### Under `data-motion="none"`
+## Under `data-motion="none"`
 
 The rotation stops; the icon stays and the label still says "Loading". A stopped
 spinner is still a state, which is why `none` does not remove it from the tree.
@@ -91,6 +71,24 @@ spinner is still a state, which is why `none` does not remove it from the tree.
   <Spinner />
 </CadenceProvider>
 ```
+
+## When to use
+
+- An action the user just triggered: save, send, invite, publish. The spinner sits
+  where the user is looking — inside the button, or immediately beside it.
+- A wait with no measurable progress: a request that returns when it returns.
+- A region that is loading and whose shape you cannot predict. When you *can* predict
+  it, use `skeleton` instead: it keeps the layout stable.
+
+## When not to use
+
+- A wait under about 300 ms. The spinner appears and disappears before it can be read,
+  which reads as a flicker. Keep the button's label and disable it.
+- A known percentage. Use `progress`; a spinning wheel after "60%" is a regression.
+- A page that is loading its first paint. There is nothing to spin inside yet — a
+  skeleton or a server-rendered shell is better.
+- A decorative "we're working on it" on a marketing page. Motion without a state
+  change is decoration (P9).
 
 ## API
 

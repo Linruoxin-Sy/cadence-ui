@@ -11,20 +11,6 @@ deps: []
 registryDeps: ["@cadence/cadence-utils"]
 ---
 
-## When to use
-
-- A sentence or a paragraph: a comment, a description, a commit message, a note.
-- A field where the user's text is longer than the visible box should be.
-- Anywhere the browser's native resize handle is useful.
-
-## When not to use
-
-- A single line (email, name, slug); use `input`.
-- Rich text. A `textarea` holds plain text; formatting needs an editor, which is
-  out of scope for this library.
-- A value that must stay fixed in height; a `textarea` grows, and a fixed box hides
-  the overflow from the user.
-
 ## Installation
 
 ```install
@@ -47,9 +33,7 @@ export function Comment() {
 }
 ```
 
-## Examples
-
-### Auto-growing
+## Auto-growing
 
 `field-sizing-content` lets the browser grow the box as the text gets longer. No
 JavaScript, no `ResizeObserver`, no layout read during render.
@@ -58,13 +42,13 @@ JavaScript, no `ResizeObserver`, no layout read during render.
 <Textarea className="min-h-16 max-h-48" placeholder="Type and watch the box grow" />
 ```
 
-### Resizable by the user
+## Resizable by the user
 
 ```tsx
 <Textarea className="resize-y" rows={3} />
 ```
 
-### Invalid
+## Invalid
 
 ```tsx
 <Textarea aria-invalid="true" aria-describedby="bio-error" />
@@ -72,6 +56,20 @@ JavaScript, no `ResizeObserver`, no layout read during render.
   Keep it under 280 characters.
 </p>
 ```
+
+## When to use
+
+- A sentence or a paragraph: a comment, a description, a commit message, a note.
+- A field where the user's text is longer than the visible box should be.
+- Anywhere the browser's native resize handle is useful.
+
+## When not to use
+
+- A single line (email, name, slug); use `input`.
+- Rich text. A `textarea` holds plain text; formatting needs an editor, which is
+  out of scope for this library.
+- A value that must stay fixed in height; a `textarea` grows, and a fixed box hides
+  the overflow from the user.
 
 ## API
 
@@ -94,6 +92,16 @@ a transition on it would lag behind the caret.
 | reduced | none       | –     | –             |
 | none    | none       | –     | –             |
 
+## Accessibility
+
+- Renders a native `<textarea>`, so Enter inserts a newline and Escape does not
+  close anything — expected behaviour in a form.
+- Give it a `label`, and never rely on the placeholder as a name.
+- If you cap the length with `maxLength`, say so in the description; a silent stop
+  in typing reads as a broken field.
+- `resize-y` keeps the horizontal layout stable; full `resize` lets a long word
+  break the page.
+
 ## Validation and data ownership
 
 Same contract as `input`: the field renders state, you own the state.
@@ -107,16 +115,6 @@ Same contract as `input`: the field renders state, you own the state.
 Character counters are yours to render: the component does not count. Keep the
 count in the description slot and point `aria-describedby` at it, so a screen
 reader hears it before the limit is hit.
-
-## Accessibility
-
-- Renders a native `<textarea>`, so Enter inserts a newline and Escape does not
-  close anything — expected behaviour in a form.
-- Give it a `label`, and never rely on the placeholder as a name.
-- If you cap the length with `maxLength`, say so in the description; a silent stop
-  in typing reads as a broken field.
-- `resize-y` keeps the horizontal layout stable; full `resize` lets a long word
-  break the page.
 
 ## Notes for AI
 

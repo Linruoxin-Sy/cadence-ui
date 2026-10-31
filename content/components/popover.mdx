@@ -11,19 +11,6 @@ deps: ["@base-ui/react", "motion"]
 registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
 ---
 
-## When to use
-
-- A small set of controls that belongs to the thing it is attached to: column visibility, a filter, a
-  share link, a colour picker.
-- Context that would crowd the page if it were always visible, but that the user opens on demand.
-- An edit that is scoped to one trigger and can be dismissed without losing the page.
-
-## When not to use
-
-- A confirmation that must be answered. Use `alert-dialog`: a popover can be dismissed by clicking away.
-- A task that needs the whole screen or a focus trap. Use `dialog` or `sheet`.
-- A one- or two-word hint on a control. Use `tooltip`, which cannot hold interactive content.
-
 ## Installation
 
 ```install
@@ -59,9 +46,7 @@ export function SharePopover() {
 }
 ```
 
-## Examples
-
-### Positioned by side
+## Positioned by side
 
 `side` and `align` choose the placement, and the panel flips when there is no room. The motion follows
 the anchor, not the side: the panel grows from `--transform-origin`, which Base UI points at the
@@ -73,7 +58,7 @@ trigger.
 </PopoverContent>
 ```
 
-### With a form
+## With a form
 
 The panel is a normal container, so `Field` and `Input` work inside it. Nothing traps focus: a popover
 is non-modal by default.
@@ -90,7 +75,7 @@ is non-modal by default.
 </PopoverContent>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -100,7 +85,7 @@ const [open, setOpen] = useState(false);
 </Popover>;
 ```
 
-### Modal when it has to be
+## Modal when it has to be
 
 A popover that holds a destructive control can trap focus and block the page behind it without becoming
 a dialog:
@@ -111,6 +96,19 @@ a dialog:
   <PopoverContent>…</PopoverContent>
 </Popover>
 ```
+
+## When to use
+
+- A small set of controls that belongs to the thing it is attached to: column visibility, a filter, a
+  share link, a colour picker.
+- Context that would crowd the page if it were always visible, but that the user opens on demand.
+- An edit that is scoped to one trigger and can be dismissed without losing the page.
+
+## When not to use
+
+- A confirmation that must be answered. Use `alert-dialog`: a popover can be dismissed by clicking away.
+- A task that needs the whole screen or a focus trap. Use `dialog` or `sheet`.
+- A one- or two-word hint on a control. Use `tooltip`, which cannot hold interactive content.
 
 ## API
 

@@ -11,21 +11,6 @@ deps: ["lucide-react"]
 registryDeps: ["@cadence/button", "@cadence/cadence-utils"]
 ---
 
-## When to use
-
-- A result set that is paged for a reason: the total is unknown, the data is remote, or
-  the URL should carry the page so it can be shared and reloaded.
-- A list where the user needs to jump to a specific page, not only step forward.
-- A table footer on the server, where the count lives in the response.
-
-## When not to use
-
-- A finite list that is already in memory. Render it, or a "load more" button — paging
-  something you already have is a worse experience than scrolling.
-- An infinite feed. There is no page to link to, so an anchor-based control lies.
-- A carousel or a wizard. Those step through slides or steps, and their controls are
-  buttons.
-
 ## Installation
 
 ```install
@@ -65,9 +50,7 @@ export function Pages({ page }: { page: number }) {
 }
 ```
 
-## Examples
-
-### A collapsed range
+## A collapsed range
 
 `PaginationEllipsis` marks the pages that are not rendered. It is hidden from
 assistive tech, so the list stays short for a screen reader too.
@@ -78,7 +61,7 @@ assistive tech, so the list stays short for a screen reader too.
 </PaginationItem>
 ```
 
-### Custom labels
+## Custom labels
 
 `PaginationPrevious` and `PaginationNext` take `text`; the label is hidden below `sm`,
 where the chevron carries the meaning and the accessible name still says "Go to
@@ -89,7 +72,7 @@ previous page".
 <PaginationNext href="?page=3" text="Forward" />
 ```
 
-### Without a page in the URL
+## Without a page in the URL
 
 Keep the anchor and intercept the click; do not swap it for a button. The anchor keeps
 middle-click, copy-link, and the "link" announcement.
@@ -105,6 +88,21 @@ middle-click, copy-link, and the "link" announcement.
   3
 </PaginationLink>
 ```
+
+## When to use
+
+- A result set that is paged for a reason: the total is unknown, the data is remote, or
+  the URL should carry the page so it can be shared and reloaded.
+- A list where the user needs to jump to a specific page, not only step forward.
+- A table footer on the server, where the count lives in the response.
+
+## When not to use
+
+- A finite list that is already in memory. Render it, or a "load more" button — paging
+  something you already have is a worse experience than scrolling.
+- An infinite feed. There is no page to link to, so an anchor-based control lies.
+- A carousel or a wizard. Those step through slides or steps, and their controls are
+  buttons.
 
 ## API
 
