@@ -37,7 +37,7 @@ classes.
 
 ```tsx
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
 
 export function Alignment() {
   return (

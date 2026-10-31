@@ -33,8 +33,8 @@ require it.
 ## Usage
 
 ```tsx
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip/tooltip";
-import { Button } from "@/components/cadence/button/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip";
+import { Button } from "@/components/cadence/button";
 
 export function BoldTooltip() {
   return (

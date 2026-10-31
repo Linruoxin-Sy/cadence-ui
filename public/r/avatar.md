@@ -30,7 +30,7 @@ npx shadcn@latest add @cadence/avatar
 ## Usage
 
 ```tsx
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/cadence/avatar/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/cadence/avatar";
 
 export function Author() {
   return (

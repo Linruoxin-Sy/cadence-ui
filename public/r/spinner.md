@@ -35,7 +35,7 @@ npx shadcn@latest add @cadence/spinner
 ## Usage
 
 ```tsx
-import { Spinner } from "@/components/cadence/spinner/spinner";
+import { Spinner } from "@/components/cadence/spinner";
 
 export function LoadingRegistry() {
   return (

@@ -29,7 +29,7 @@ npx shadcn@latest add @cadence/aspect-ratio
 ## Usage
 
 ```tsx
-import { AspectRatio } from "@/components/cadence/aspect-ratio/aspect-ratio";
+import { AspectRatio } from "@/components/cadence/aspect-ratio";
 
 export function Cover() {
   return (

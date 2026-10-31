@@ -37,8 +37,8 @@ import {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
-} from "@/components/cadence/popover/popover";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/popover";
+import { Button } from "@/components/cadence/button";
 
 export function SharePopover() {
   return (

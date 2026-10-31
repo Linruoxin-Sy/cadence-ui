@@ -31,7 +31,7 @@ npx shadcn@latest add @cadence/slider
 ## Usage
 
 ```tsx
-import { Slider } from "@/components/cadence/slider/slider";
+import { Slider } from "@/components/cadence/slider";
 
 export function Volume() {
   return <Slider defaultValue={[60]} max={100} aria-label="Volume" />;

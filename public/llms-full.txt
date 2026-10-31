@@ -89,7 +89,7 @@ npx shadcn@latest add @cadence/button
 ## Usage
 
 ```tsx
-import { Button } from "@/components/cadence/button/button";
+import { Button } from "@/components/cadence/button";
 
 export function Save() {
   return <Button onClick={save}>Save changes</Button>;
@@ -177,7 +177,7 @@ middle-click.
 
 ```tsx
 import Link from "next/link";
-import { buttonVariants } from "@/components/cadence/button/button";
+import { buttonVariants } from "@/components/cadence/button";
 
 <Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
   Pricing
@@ -255,7 +255,7 @@ npx shadcn@latest add @cadence/badge
 ## Usage
 
 ```tsx
-import { Badge } from "@/components/cadence/badge/badge";
+import { Badge } from "@/components/cadence/badge";
 
 export function Release() {
   return (
@@ -369,7 +369,7 @@ npx shadcn@latest add @cadence/kbd
 ## Usage
 
 ```tsx
-import { Kbd, KbdGroup } from "@/components/cadence/kbd/kbd";
+import { Kbd, KbdGroup } from "@/components/cadence/kbd";
 
 export function ShortcutHint() {
   return (
@@ -471,7 +471,7 @@ npx shadcn@latest add @cadence/separator
 ## Usage
 
 ```tsx
-import { Separator } from "@/components/cadence/separator/separator";
+import { Separator } from "@/components/cadence/separator";
 
 export function Account() {
   return (
@@ -576,8 +576,8 @@ npx shadcn@latest add @cadence/label
 ## Usage
 
 ```tsx
-import { Input } from "@/components/cadence/input/input";
-import { Label } from "@/components/cadence/label/label";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
 
 export function EmailField() {
   return (
@@ -678,8 +678,8 @@ npx shadcn@latest add @cadence/input
 ## Usage
 
 ```tsx
-import { Input } from "@/components/cadence/input/input";
-import { Label } from "@/components/cadence/label/label";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
 
 export function WorkspaceName() {
   return (
@@ -809,8 +809,8 @@ npx shadcn@latest add @cadence/textarea
 ## Usage
 
 ```tsx
-import { Label } from "@/components/cadence/label/label";
-import { Textarea } from "@/components/cadence/textarea/textarea";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
 
 export function Comment() {
   return (
@@ -934,8 +934,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/cadence/card/card";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/card";
+import { Button } from "@/components/cadence/button";
 
 export function Plan() {
   return (
@@ -1061,7 +1061,7 @@ npx shadcn@latest add @cadence/aspect-ratio
 ## Usage
 
 ```tsx
-import { AspectRatio } from "@/components/cadence/aspect-ratio/aspect-ratio";
+import { AspectRatio } from "@/components/cadence/aspect-ratio";
 
 export function Cover() {
   return (
@@ -1170,7 +1170,7 @@ npx shadcn@latest add @cadence/avatar
 ## Usage
 
 ```tsx
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/cadence/avatar/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/cadence/avatar";
 
 export function Author() {
   return (
@@ -1287,7 +1287,7 @@ npx shadcn@latest add @cadence/skeleton
 ## Usage
 
 ```tsx
-import { Skeleton } from "@/components/cadence/skeleton/skeleton";
+import { Skeleton } from "@/components/cadence/skeleton";
 
 export function CardPlaceholder() {
   return (
@@ -1431,7 +1431,7 @@ npx shadcn@latest add @cadence/alert
 
 ```tsx
 import { CircleAlert } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/cadence/alert/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/cadence/alert";
 
 export function QuotaNotice() {
   return (
@@ -1561,7 +1561,7 @@ npx shadcn@latest add @cadence/empty
 
 ```tsx
 import { Inbox } from "lucide-react";
-import { Button } from "@/components/cadence/button/button";
+import { Button } from "@/components/cadence/button";
 import {
   Empty,
   EmptyContent,
@@ -1569,7 +1569,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/cadence/empty/empty";
+} from "@/components/cadence/empty";
 
 export function InvoicesEmpty() {
   return (
@@ -1710,7 +1710,7 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from "@/components/cadence/item/item";
+} from "@/components/cadence/item";
 
 export function Files() {
   return (
@@ -1873,8 +1873,8 @@ npx shadcn@latest add @cadence/field
 ## Usage
 
 ```tsx
-import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/cadence/field/field";
-import { Input } from "@/components/cadence/input/input";
+import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
 
 export function CompanyField() {
   return (
@@ -2048,8 +2048,8 @@ npx shadcn@latest add @cadence/button-group
 ## Usage
 
 ```tsx
-import { Button } from "@/components/cadence/button/button";
-import { ButtonGroup } from "@/components/cadence/button-group/button-group";
+import { Button } from "@/components/cadence/button";
+import { ButtonGroup } from "@/components/cadence/button-group";
 
 export function TextStyle() {
   return (
@@ -2186,7 +2186,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-} from "@/components/cadence/input-group/input-group";
+} from "@/components/cadence/input-group";
 
 export function Domain() {
   return (
@@ -2338,7 +2338,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/cadence/breadcrumb/breadcrumb";
+} from "@/components/cadence/breadcrumb";
 
 export function Trail() {
   return (
@@ -2474,7 +2474,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/cadence/pagination/pagination";
+} from "@/components/cadence/pagination";
 
 export function Pages({ page }: { page: number }) {
   return (
@@ -2619,7 +2619,7 @@ npx shadcn@latest add @cadence/spinner
 ## Usage
 
 ```tsx
-import { Spinner } from "@/components/cadence/spinner/spinner";
+import { Spinner } from "@/components/cadence/spinner";
 
 export function LoadingRegistry() {
   return (
@@ -2778,8 +2778,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/cadence/dialog/dialog";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/dialog";
+import { Button } from "@/components/cadence/button";
 
 export function DeleteProject() {
   return (
@@ -2912,8 +2912,8 @@ npx shadcn@latest add @cadence/checkbox
 ## Usage
 
 ```tsx
-import { Checkbox } from "@/components/cadence/checkbox/checkbox";
-import { Label } from "@/components/cadence/label/label";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
 
 export function Terms() {
   return (
@@ -3081,8 +3081,8 @@ npx shadcn@latest add @cadence/radio-group
 ## Usage
 
 ```tsx
-import { RadioGroup, RadioGroupItem } from "@/components/cadence/radio-group/radio-group";
-import { Label } from "@/components/cadence/label/label";
+import { RadioGroup, RadioGroupItem } from "@/components/cadence/radio-group";
+import { Label } from "@/components/cadence/label";
 
 export function Plan() {
   return (
@@ -3256,8 +3256,8 @@ npx shadcn@latest add @cadence/switch
 ## Usage
 
 ```tsx
-import { Switch } from "@/components/cadence/switch/switch";
-import { Label } from "@/components/cadence/label/label";
+import { Switch } from "@/components/cadence/switch";
+import { Label } from "@/components/cadence/label";
 
 export function Public() {
   return (
@@ -3415,7 +3415,7 @@ npx shadcn@latest add @cadence/slider
 ## Usage
 
 ```tsx
-import { Slider } from "@/components/cadence/slider/slider";
+import { Slider } from "@/components/cadence/slider";
 
 export function Volume() {
   return <Slider defaultValue={[60]} max={100} aria-label="Volume" />;
@@ -3567,7 +3567,7 @@ npx shadcn@latest add @cadence/toggle
 
 ```tsx
 import { Bold } from "lucide-react";
-import { Toggle } from "@/components/cadence/toggle/toggle";
+import { Toggle } from "@/components/cadence/toggle";
 
 export function BoldToggle() {
   return (
@@ -3729,7 +3729,7 @@ classes.
 
 ```tsx
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
 
 export function Alignment() {
   return (
@@ -3921,7 +3921,7 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/cadence/input-otp/input-otp";
+} from "@/components/cadence/input-otp";
 
 export function Code() {
   return (
@@ -4113,7 +4113,7 @@ npx shadcn@latest add @cadence/progress
 ## Usage
 
 ```tsx
-import { Progress } from "@/components/cadence/progress/progress";
+import { Progress } from "@/components/cadence/progress";
 
 export function Upload() {
   return <Progress value={40} aria-label="Uploading assets" />;
@@ -4281,8 +4281,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/cadence/alert-dialog/alert-dialog";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
 
 export function DeleteProject() {
   return (
@@ -4479,8 +4479,8 @@ import {
   PopoverHeader,
   PopoverTitle,
   PopoverTrigger,
-} from "@/components/cadence/popover/popover";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/popover";
+import { Button } from "@/components/cadence/button";
 
 export function SharePopover() {
   return (
@@ -4651,8 +4651,8 @@ require it.
 ## Usage
 
 ```tsx
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip/tooltip";
-import { Button } from "@/components/cadence/button/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip";
+import { Button } from "@/components/cadence/button";
 
 export function BoldTooltip() {
   return (
@@ -4794,7 +4794,7 @@ npx shadcn@latest add @cadence/hover-card
 ## Usage
 
 ```tsx
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
 
 export function ReviewerCard() {
   return (
@@ -4953,8 +4953,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/cadence/sheet/sheet";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/sheet";
+import { Button } from "@/components/cadence/button";
 
 export function FiltersSheet() {
   return (
@@ -5126,8 +5126,8 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/cadence/drawer/drawer";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/drawer";
+import { Button } from "@/components/cadence/button";
 
 export function MoveConversation() {
   return (
@@ -5286,7 +5286,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/cadence/select/select";
+} from "@/components/cadence/select";
 
 export function FrameworkSelect() {
   return (
@@ -5471,7 +5471,7 @@ import {
   CodeBlockCopyButton,
   CodeBlockHeader,
   CodeBlockTitle,
-} from "@/components/cadence/code-block/code-block";
+} from "@/components/cadence/code-block";
 
 const install = `npx shadcn@latest add @cadence/code-block`;
 

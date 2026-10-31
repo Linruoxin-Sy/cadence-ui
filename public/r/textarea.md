@@ -31,8 +31,8 @@ npx shadcn@latest add @cadence/textarea
 ## Usage
 
 ```tsx
-import { Label } from "@/components/cadence/label/label";
-import { Textarea } from "@/components/cadence/textarea/textarea";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
 
 export function Comment() {
   return (

@@ -32,7 +32,7 @@ npx shadcn@latest add @cadence/toggle
 
 ```tsx
 import { Bold } from "lucide-react";
-import { Toggle } from "@/components/cadence/toggle/toggle";
+import { Toggle } from "@/components/cadence/toggle";
 
 export function BoldToggle() {
   return (

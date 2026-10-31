@@ -32,7 +32,7 @@ npx shadcn@latest add @cadence/badge
 ## Usage
 
 ```tsx
-import { Badge } from "@/components/cadence/badge/badge";
+import { Badge } from "@/components/cadence/badge";
 
 export function Release() {
   return (

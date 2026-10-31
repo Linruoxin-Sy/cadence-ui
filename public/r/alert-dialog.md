@@ -43,8 +43,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/cadence/alert-dialog/alert-dialog";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
 
 export function DeleteProject() {
   return (

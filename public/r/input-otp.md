@@ -39,7 +39,7 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/cadence/input-otp/input-otp";
+} from "@/components/cadence/input-otp";
 
 export function Code() {
   return (

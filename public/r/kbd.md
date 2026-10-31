@@ -31,7 +31,7 @@ npx shadcn@latest add @cadence/kbd
 ## Usage
 
 ```tsx
-import { Kbd, KbdGroup } from "@/components/cadence/kbd/kbd";
+import { Kbd, KbdGroup } from "@/components/cadence/kbd";
 
 export function ShortcutHint() {
   return (

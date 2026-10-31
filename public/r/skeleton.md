@@ -34,7 +34,7 @@ npx shadcn@latest add @cadence/skeleton
 ## Usage
 
 ```tsx
-import { Skeleton } from "@/components/cadence/skeleton/skeleton";
+import { Skeleton } from "@/components/cadence/skeleton";
 
 export function CardPlaceholder() {
   return (

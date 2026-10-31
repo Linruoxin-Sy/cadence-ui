@@ -33,8 +33,8 @@ npx shadcn@latest add @cadence/checkbox
 ## Usage
 
 ```tsx
-import { Checkbox } from "@/components/cadence/checkbox/checkbox";
-import { Label } from "@/components/cadence/label/label";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
 
 export function Terms() {
   return (

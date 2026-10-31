@@ -35,7 +35,7 @@ npx shadcn@latest add @cadence/empty
 
 ```tsx
 import { Inbox } from "lucide-react";
-import { Button } from "@/components/cadence/button/button";
+import { Button } from "@/components/cadence/button";
 import {
   Empty,
   EmptyContent,
@@ -43,7 +43,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-} from "@/components/cadence/empty/empty";
+} from "@/components/cadence/empty";
 
 export function InvoicesEmpty() {
   return (

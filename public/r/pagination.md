@@ -39,7 +39,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/cadence/pagination/pagination";
+} from "@/components/cadence/pagination";
 
 export function Pages({ page }: { page: number }) {
   return (

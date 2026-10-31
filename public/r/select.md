@@ -35,7 +35,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/cadence/select/select";
+} from "@/components/cadence/select";
 
 export function FrameworkSelect() {
   return (

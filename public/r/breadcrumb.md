@@ -40,7 +40,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/cadence/breadcrumb/breadcrumb";
+} from "@/components/cadence/breadcrumb";
 
 export function Trail() {
   return (

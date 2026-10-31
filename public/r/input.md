@@ -32,8 +32,8 @@ npx shadcn@latest add @cadence/input
 ## Usage
 
 ```tsx
-import { Input } from "@/components/cadence/input/input";
-import { Label } from "@/components/cadence/label/label";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
 
 export function WorkspaceName() {
   return (

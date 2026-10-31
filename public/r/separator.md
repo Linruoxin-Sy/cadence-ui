@@ -30,7 +30,7 @@ npx shadcn@latest add @cadence/separator
 ## Usage
 
 ```tsx
-import { Separator } from "@/components/cadence/separator/separator";
+import { Separator } from "@/components/cadence/separator";
 
 export function Account() {
   return (

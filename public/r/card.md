@@ -38,8 +38,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/cadence/card/card";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/card";
+import { Button } from "@/components/cadence/button";
 
 export function Plan() {
   return (

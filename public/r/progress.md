@@ -32,7 +32,7 @@ npx shadcn@latest add @cadence/progress
 ## Usage
 
 ```tsx
-import { Progress } from "@/components/cadence/progress/progress";
+import { Progress } from "@/components/cadence/progress";
 
 export function Upload() {
   return <Progress value={40} aria-label="Uploading assets" />;

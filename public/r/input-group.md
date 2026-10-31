@@ -38,7 +38,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
   InputGroupText,
-} from "@/components/cadence/input-group/input-group";
+} from "@/components/cadence/input-group";
 
 export function Domain() {
   return (

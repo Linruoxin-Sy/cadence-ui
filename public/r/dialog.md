@@ -40,8 +40,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/cadence/dialog/dialog";
-import { Button } from "@/components/cadence/button/button";
+} from "@/components/cadence/dialog";
+import { Button } from "@/components/cadence/button";
 
 export function DeleteProject() {
   return (

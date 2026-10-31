@@ -42,7 +42,7 @@ import {
   ItemGroup,
   ItemMedia,
   ItemTitle,
-} from "@/components/cadence/item/item";
+} from "@/components/cadence/item";
 
 export function Files() {
   return (

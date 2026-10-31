@@ -46,7 +46,7 @@ import {
   CodeBlockCopyButton,
   CodeBlockHeader,
   CodeBlockTitle,
-} from "@/components/cadence/code-block/code-block";
+} from "@/components/cadence/code-block";
 
 const install = `npx shadcn@latest add @cadence/code-block`;
 

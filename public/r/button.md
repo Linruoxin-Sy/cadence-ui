@@ -17,7 +17,7 @@ npx shadcn@latest add @cadence/button
 ## Usage
 
 ```tsx
-import { Button } from "@/components/cadence/button/button";
+import { Button } from "@/components/cadence/button";
 
 export function Save() {
   return <Button onClick={save}>Save changes</Button>;
@@ -105,7 +105,7 @@ middle-click.
 
 ```tsx
 import Link from "next/link";
-import { buttonVariants } from "@/components/cadence/button/button";
+import { buttonVariants } from "@/components/cadence/button";
 
 <Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
   Pricing

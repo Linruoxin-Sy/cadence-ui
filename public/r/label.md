@@ -34,8 +34,8 @@ npx shadcn@latest add @cadence/label
 ## Usage
 
 ```tsx
-import { Input } from "@/components/cadence/input/input";
-import { Label } from "@/components/cadence/label/label";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
 
 export function EmailField() {
   return (

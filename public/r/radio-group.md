@@ -31,8 +31,8 @@ npx shadcn@latest add @cadence/radio-group
 ## Usage
 
 ```tsx
-import { RadioGroup, RadioGroupItem } from "@/components/cadence/radio-group/radio-group";
-import { Label } from "@/components/cadence/label/label";
+import { RadioGroup, RadioGroupItem } from "@/components/cadence/radio-group";
+import { Label } from "@/components/cadence/label";
 
 export function Plan() {
   return (
