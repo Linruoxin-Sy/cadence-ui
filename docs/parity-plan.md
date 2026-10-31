@@ -74,7 +74,7 @@ Hard rules:
 
 ## 4. Installation model
 
-- Target: `@components/cadence/<id>/<id>.tsx` — a parallel tree next to `components/ui`. It never
+- Target: `@components/cadence/<id>/index.tsx` — a parallel tree next to `components/ui`. It never
   overwrites a shadcn file, so both can coexist while a project migrates.
 - IDs: identical to shadcn (`accordion`, `button`, `dialog`, …). Docs URLs therefore line up with
   upstream, which matters for humans and for LLM retrieval.
@@ -188,7 +188,7 @@ and `data.transition`. Both must land in [animation-system.md](animation-system.
 
 ### 6.5 Definition of done (per component)
 
-1. Source at `registry/cadence/<id>/<id>.tsx`, relative imports only, `data-slot` on every part.
+1. Source at `registry/cadence/<id>/index.tsx`, relative imports only, `data-slot` on every part.
 2. Exports and props match upstream (parity check), additive props documented.
 3. Registry item with `meta.tier`, `meta.batch`, `motion`, `intensity`, `complexity`, `upstream`.
 4. MDX: compact (9 sections) for T0–T1, standard (12) for T2+, including the motion contract and,

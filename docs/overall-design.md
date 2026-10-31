@@ -100,7 +100,7 @@ entrance. Splitting them into sibling layouts remounts the navigation on every s
 
 ### 3.1 Why the source tree mirrors the install tree
 
-The install target is `@components/cadence/<id>/<id>.tsx` (`@components` is resolved by the user's `components.json`). If the source also lives at `registry/cadence/<id>/<id>.tsx`, then the relative relationship between `registry/cadence/lib/motion.ts` and `registry/cadence/<id>/<id>.tsx` is **exactly the same** as the relationship between `components/cadence/lib/motion.ts` and `components/cadence/<id>/<id>.tsx` after install.
+The install target is `@components/cadence/<id>/index.tsx` (`@components` is resolved by the user's `components.json`), so consumers import `@/components/cadence/<id>` — the same shape as shadcn's `@/components/ui/<id>`. If the source also lives at `registry/cadence/<id>/index.tsx`, then the relative relationship between `registry/cadence/lib/motion.ts` and `registry/cadence/<id>/index.tsx` is **exactly the same** as the relationship between `components/cadence/lib/motion.ts` and `components/cadence/<id>/index.tsx` after install.
 
 Conclusions:
 
@@ -218,9 +218,9 @@ We ship a `cadence-base` (`registry:base`) item that pins the consumer's shadcn 
   "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
   "files": [
     {
-      "path": "registry/cadence/button/button.tsx",
+      "path": "registry/cadence/button/index.tsx",
       "type": "registry:ui",
-      "target": "@components/cadence/button/button.tsx"
+      "target": "@components/cadence/button/index.tsx"
     }
   ],
   "docs": "…markdown injected from content/components/button.mdx…",

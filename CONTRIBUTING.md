@@ -37,7 +37,7 @@ item. Then replace the stub body with the upstream API.
 
 A pull request is ready when the component has:
 
-1. **Source** in `registry/cadence/<id>/<id>.tsx`, relative imports only (`../lib/motion`), `data-slot`
+1. **Source** in `registry/cadence/<id>/index.tsx`, relative imports only (`../lib/motion`), `data-slot`
    on every part, and the same exports and props as shadcn.
 2. **Registry metadata**: `meta.tier`, `meta.batch` (the parity batch from
    [the plan](docs/parity-plan.md#7-batches)), `meta.motion`, `meta.intensity`, `meta.complexity`, and

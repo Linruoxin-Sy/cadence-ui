@@ -327,3 +327,46 @@ per-component improvisation ADR-011 exists to stop.
 **Rejected**: implement the select first and extract later (guarantees drift across B5/B6); use
 `layoutId` for the label (the source unmounts, fonts and sizes differ, and `AnimatePresence` makes the
 handoff unreliable).
+
+---
+
+## ADR-014 · Install a directory index, so a component imports as `@/components/cadence/<id>`
+
+**Status**: accepted; amends ADR-005 (the mirror invariant survives, the file name changes).
+
+**Context**: ADR-005 gave every component the install target `@components/cadence/<id>/<id>.tsx`, which
+makes the documented import `import { Button } from "@/components/cadence/button/button"`. The repeated
+`button/button` segment is noise on every line of every page, and it diverges from the shape the same user
+already types for a shadcn component (`@/components/ui/button`). The obvious fix — pointing `target` at the
+directory — does not work: `resolveFilePath` in `@shadcn/registry` concatenates an `@alias/...` target
+verbatim and never supplies a file name, so `@components/cadence/button` writes a file literally named
+`button`, which no bundler resolves.
+
+**Decision**:
+
+1. The source and the install target both become `registry/cadence/<id>/index.tsx` →
+   `@components/cadence/<id>/index.tsx`; the documented import is `@/components/cadence/<id>`.
+2. Everything ADR-005 depends on is unchanged: same depth, same relative relationships, so `../lib/motion`
+   and `../button` still resolve in both trees, and the build stays plain `shadcn build` with no rewriting.
+   `check-registry` keeps its derived `target = path minus the registry/cadence/ prefix` guard, so a
+   hand-written target still fails the gate.
+3. Multi-file items keep their named files and add an `index.tsx` entry point only when they have one
+   (`code-highlight` stays `highlight.tsx` + `use-highlighted-code.tsx`; it is a lib, not an entry point).
+4. Docs are the distribution channel, so the gate now proves the docs: `check-registry` parses every
+   `@/components/cadence/...` specifier in `content/**/*.mdx` and fails on a repeated id segment, an
+   explicit `/index`, or a specifier that resolves to no installed file.
+
+**Consequences**:
+
+- ✅ One import form, identical in shape to shadcn's, on every page and in every payload.
+- ✅ The directory-index resolution this relies on is a normal TS `bundler` / Next / Vite feature; the
+  alternative (flat `components/cadence/button.tsx`) would have dropped the per-component folder that
+  multi-file components need.
+- ❌ Consumers on 0.1 installs keep a stale `button/button.tsx` after re-adding; the old import keeps
+  working against a file that will never be updated. Pre-1.0, so this ships as a documented migration
+  (rewrite `@/components/cadence/<id>/<id>` → `@/components/cadence/<id>`, delete the old file).
+- ❌ File-name searches for `button.tsx` no longer find a component; editors show `index.tsx`.
+
+**Rejected**: a directory `target` (writes an extensionless file, per the context above); a barrel
+`index.ts` per component (37 extra forwarding files for no behaviour); flat `components/cadence/<id>.tsx`
+(loses the folder multi-file components need, and mixes them with the `lib/` subtree).
