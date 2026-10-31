@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/registry/cadence/button";
 import {
   Drawer,
@@ -12,43 +11,53 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/registry/cadence/drawer";
+import { PreviewRow, PreviewStack } from "./shell";
 
 const DESTINATIONS = ["Inbox", "Archive", "Read later"] as const;
 
+/**
+ * Three swipe directions, because the direction is what the gesture follows: down
+ * with a handle (the phone-shaped default), up, and from the side. The panel tracks
+ * the drag through `--drawer-swipe-*`, so the backdrop returns as you pull.
+ */
 export function DrawerPreview() {
-  const [open, setOpen] = useState(false);
+  const content = (
+    <>
+      <DrawerHeader>
+        <DrawerTitle>Move conversation</DrawerTitle>
+        <DrawerDescription>Drag the sheet back to dismiss, or pick a destination.</DrawerDescription>
+      </DrawerHeader>
+      <div className="flex flex-col gap-1 pt-2">
+        {DESTINATIONS.map((destination) => (
+          <DrawerClose key={destination} render={<Button variant="ghost" className="justify-start" />}>
+            {destination}
+          </DrawerClose>
+        ))}
+      </div>
+      <DrawerFooter>
+        <DrawerClose render={<Button variant="outline" />}>Cancel</DrawerClose>
+      </DrawerFooter>
+    </>
+  );
 
   return (
-    <div className="flex flex-col gap-4">
-      <Drawer open={open} onOpenChange={setOpen} showSwipeHandle>
-        <DrawerTrigger render={<Button variant="outline" />}>Move conversation</DrawerTrigger>
-        <DrawerContent>
-          <DrawerHeader>
-            <DrawerTitle>Move conversation</DrawerTitle>
-            <DrawerDescription>Drag the sheet down to dismiss, or pick a destination.</DrawerDescription>
-          </DrawerHeader>
-          <div className="flex flex-col gap-1 pt-2">
-            {DESTINATIONS.map((destination) => (
-              <DrawerClose
-                key={destination}
-                render={<Button variant="ghost" className="justify-start" />}
-                onClick={() => setOpen(false)}
-              >
-                {destination}
-              </DrawerClose>
-            ))}
-          </div>
-          <DrawerFooter>
-            <DrawerClose render={<Button variant="outline" />}>Cancel</DrawerClose>
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
+    <PreviewStack>
+      <PreviewRow className="gap-2">
+        <Drawer showSwipeHandle>
+          <DrawerTrigger render={<Button variant="outline" />}>Down</DrawerTrigger>
+          <DrawerContent>{content}</DrawerContent>
+        </Drawer>
 
-      <p className="text-xs text-muted-foreground">
-        The sheet tracks the drag through Base UI&apos;s swipe variables, so the backdrop comes back as you pull. Under
-        reduced motion it appears and disappears in place, and the swipe handle — the only signal that says &quot;drag
-        me&quot; — stays visible.
-      </p>
-    </div>
+        <Drawer swipeDirection="up">
+          <DrawerTrigger render={<Button variant="ghost" />}>Up</DrawerTrigger>
+          <DrawerContent>{content}</DrawerContent>
+        </Drawer>
+
+        <Drawer swipeDirection="right">
+          <DrawerTrigger render={<Button variant="ghost" />}>From the right</DrawerTrigger>
+          <DrawerContent>{content}</DrawerContent>
+        </Drawer>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

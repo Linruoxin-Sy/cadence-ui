@@ -1,23 +1,28 @@
 "use client";
 
-import { Bold, Italic, Underline } from "lucide-react";
+import { BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
 import { Button } from "@/registry/cadence/button";
 import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group";
+import { PreviewRow, PreviewStack } from "./shell";
 
+/**
+ * Two orientations, and the two ways a group holds non-buttons: `ButtonGroupText` for
+ * a readout, `ButtonGroupSeparator` for the rule between segments. A group only
+ * removes the inner radii — everything else is still a `Button`.
+ */
 export function ButtonGroupPreview() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Horizontal</p>
+    <PreviewStack>
+      <PreviewRow className="gap-4">
         <ButtonGroup aria-label="Text style">
           <Button variant="outline" size="icon-sm" aria-label="Bold">
-            <Bold />
+            <BoldIcon />
           </Button>
           <Button variant="outline" size="icon-sm" aria-label="Italic">
-            <Italic />
+            <ItalicIcon />
           </Button>
           <Button variant="outline" size="icon-sm" aria-label="Underline">
-            <Underline />
+            <UnderlineIcon />
           </Button>
         </ButtonGroup>
 
@@ -29,10 +34,9 @@ export function ButtonGroupPreview() {
           <ButtonGroupSeparator />
           <ButtonGroupText>+</ButtonGroupText>
         </ButtonGroup>
-      </div>
+      </PreviewRow>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Vertical</p>
+      <PreviewRow>
         <ButtonGroup orientation="vertical" aria-label="Order">
           <Button variant="outline" size="sm">
             Move up
@@ -44,7 +48,7 @@ export function ButtonGroupPreview() {
             Duplicate
           </Button>
         </ButtonGroup>
-      </div>
-    </div>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

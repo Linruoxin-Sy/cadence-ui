@@ -1,23 +1,28 @@
 "use client";
 
 import { Separator } from "@/registry/cadence/separator";
+import { PreviewRow, PreviewStack } from "./shell";
 
+/**
+ * Two orientations, and the two roles a rule can play: a real boundary that screen
+ * readers announce, and `decorative`, which is a line and nothing else. The vertical
+ * pair sits in a `h-6` row because a vertical separator takes its height from the
+ * box it divides.
+ */
 export function SeparatorPreview() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="max-w-sm flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Horizontal</p>
-        <div className="flex flex-col gap-3">
-          <p className="text-sm">Signed in as ada@example.com.</p>
+    <PreviewStack>
+      <PreviewRow>
+        <div className="grid w-72 gap-3 text-sm">
+          <span>Signed in as ada@example.com.</span>
           <Separator />
-          <p className="text-sm text-muted-foreground">Billing is handled by finance.</p>
+          <span className="text-muted-foreground">Billing is handled by finance.</span>
           <Separator decorative />
-          <p className="text-sm text-muted-foreground">The second rule is decorative: screen readers skip it.</p>
+          <span className="text-muted-foreground">This second rule is decorative.</span>
         </div>
-      </div>
+      </PreviewRow>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Vertical</p>
+      <PreviewRow>
         <div className="flex h-6 items-center gap-3 text-sm">
           <span>Draft</span>
           <Separator orientation="vertical" />
@@ -25,11 +30,7 @@ export function SeparatorPreview() {
           <Separator orientation="vertical" />
           <span className="text-muted-foreground">ada@example.com</span>
         </div>
-      </div>
-
-      <p className="text-xs text-muted-foreground">
-        One pixel, token-coloured, no transition. The boundary is the message.
-      </p>
-    </div>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

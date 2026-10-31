@@ -2,25 +2,34 @@
 
 import { Label } from "@/registry/cadence/label";
 import { RadioGroup, RadioGroupItem } from "@/registry/cadence/radio-group";
+import { PreviewStack } from "./shell";
 
-const plans = [
-  { value: "starter", label: "Starter", hint: "One project, one seat." },
-  { value: "team", label: "Team", hint: "Unlimited projects, five seats." },
-  { value: "scale", label: "Scale", hint: "SSO, audit log, priority support." },
-];
-
+/**
+ * A group, not a lone radio: the component's characteristic is that one option is
+ * chosen and the rest are not, plus the disabled option that stays visible but
+ * unavailable. Short labels keep four rows inside a row of the card.
+ */
 export function RadioGroupPreview() {
   return (
-    <RadioGroup defaultValue="team" aria-label="Plan" className="w-full max-w-md gap-4">
-      {plans.map((plan) => (
-        <div key={plan.value} className="flex items-start gap-3">
-          <RadioGroupItem id={`plan-${plan.value}`} value={plan.value} className="mt-0.5" />
-          <div className="grid gap-1">
-            <Label htmlFor={`plan-${plan.value}`}>{plan.label}</Label>
-            <p className="text-sm text-muted-foreground">{plan.hint}</p>
-          </div>
+    <PreviewStack>
+      <RadioGroup defaultValue="team" aria-label="Plan" className="w-full max-w-xs gap-3">
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="plan-starter" value="starter" />
+          <Label htmlFor="plan-starter">Starter</Label>
         </div>
-      ))}
-    </RadioGroup>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="plan-team" value="team" />
+          <Label htmlFor="plan-team">Team</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="plan-scale" value="scale" />
+          <Label htmlFor="plan-scale">Scale</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <RadioGroupItem id="plan-enterprise" value="enterprise" disabled />
+          <Label htmlFor="plan-enterprise">Enterprise</Label>
+        </div>
+      </RadioGroup>
+    </PreviewStack>
   );
 }

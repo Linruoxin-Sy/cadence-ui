@@ -8,50 +8,45 @@ import {
   AvatarGroupCount,
   AvatarImage,
 } from "@/registry/cadence/avatar";
+import { PreviewRow, PreviewStack } from "./shell";
 
+/**
+ * Three sizes, then the three things an avatar can be showing — an image with a
+ * presence dot, a fallback because the load failed, and a fallback because there was
+ * never an image — then the group, which overlaps its members and caps them with a
+ * count.
+ */
 export function AvatarPreview() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Sizes</p>
-        <div className="flex items-center gap-3">
-          <Avatar size="sm">
-            <AvatarFallback>AL</AvatarFallback>
-          </Avatar>
-          <Avatar>
-            <AvatarFallback>AL</AvatarFallback>
-          </Avatar>
-          <Avatar size="lg">
-            <AvatarFallback>AL</AvatarFallback>
-          </Avatar>
-        </div>
-      </div>
+    <PreviewStack>
+      <PreviewRow>
+        <Avatar size="sm">
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <Avatar>
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <Avatar size="lg">
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+      </PreviewRow>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          Image, fallback, and presence
-        </p>
-        <div className="flex items-center gap-3">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
-            <AvatarFallback>SC</AvatarFallback>
-            <AvatarBadge className="bg-emerald-600" />
-          </Avatar>
-          <Avatar>
-            <AvatarImage src="/missing-avatar.png" alt="Broken image" />
-            <AvatarFallback>GH</AvatarFallback>
-          </Avatar>
-          <Avatar>
-            <AvatarFallback>AL</AvatarFallback>
-          </Avatar>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          The second avatar points at a missing file: Base UI swaps in the fallback the moment the load fails.
-        </p>
-      </div>
+      <PreviewRow>
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
+          <AvatarFallback>SC</AvatarFallback>
+          <AvatarBadge className="bg-emerald-600" />
+        </Avatar>
+        <Avatar>
+          <AvatarImage src="/missing-avatar.png" alt="Broken image" />
+          <AvatarFallback>GH</AvatarFallback>
+        </Avatar>
+        <Avatar>
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+      </PreviewRow>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Group</p>
+      <PreviewRow>
         <AvatarGroup>
           <Avatar>
             <AvatarFallback>AL</AvatarFallback>
@@ -64,7 +59,7 @@ export function AvatarPreview() {
           </Avatar>
           <AvatarGroupCount>+3</AvatarGroupCount>
         </AvatarGroup>
-      </div>
-    </div>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

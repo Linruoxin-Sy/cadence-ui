@@ -1,34 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Progress, ProgressLabel, ProgressValue } from "@/registry/cadence/progress";
+import { PreviewStack } from "./shell";
 
+/**
+ * Three states: a determinate bar with its own label and readout, the indeterminate
+ * one (`value={null}`), and complete. The determinate bar animates its width through
+ * `geometry.resize`, so it is also the card's slowest thing to watch.
+ */
 export function ProgressPreview() {
-  const [uploaded, setUploaded] = useState(18);
-
-  useEffect(() => {
-    const timer = setInterval(() => setUploaded((value) => (value >= 100 ? 18 : value + 7)), 1200);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <div className="flex w-full max-w-md flex-col gap-8">
-      <Progress value={uploaded} aria-label="Uploading assets">
-        <div className="flex w-full items-center justify-between">
-          <ProgressLabel>Uploading assets</ProgressLabel>
-          <ProgressValue />
+    <PreviewStack>
+      <div className="grid w-full max-w-sm gap-5">
+        <Progress value={62} aria-label="Uploading assets">
+          <div className="flex w-full items-center justify-between">
+            <ProgressLabel>Uploading assets</ProgressLabel>
+            <ProgressValue />
+          </div>
+        </Progress>
+
+        <div className="grid gap-1">
+          <span className="text-sm">Preparing preview</span>
+          <Progress value={null} aria-label="Preparing preview" />
         </div>
-      </Progress>
 
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Preparing preview</span>
-        <Progress value={null} aria-label="Preparing preview" />
+        <div className="grid gap-1">
+          <span className="text-sm">Complete</span>
+          <Progress value={100} aria-label="Complete" />
+        </div>
       </div>
-
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Complete</span>
-        <Progress value={100} aria-label="Complete" />
-      </div>
-    </div>
+    </PreviewStack>
   );
 }

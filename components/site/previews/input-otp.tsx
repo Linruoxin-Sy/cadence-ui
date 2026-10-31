@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/registry/cadence/input-otp";
 import { Label } from "@/registry/cadence/label";
+import { PreviewStack } from "./shell";
 
+/**
+ * The six-box code with a separator between the groups, and the invalid variant.
+ * Type into the first one: the slots advance themselves, the caret follows, and the
+ * last box is where the paste lands.
+ */
 export function InputOtpPreview() {
   const [code, setCode] = useState("");
+  const [invalid, setInvalid] = useState("0000");
 
   return (
-    <div className="flex flex-col items-center gap-6">
+    <PreviewStack>
       <div className="grid gap-3">
         <Label htmlFor="otp">Verification code</Label>
         <InputOTP id="otp" maxLength={6} value={code} onChange={setCode} containerClassName="justify-center">
@@ -24,14 +31,17 @@ export function InputOtpPreview() {
             <InputOTPSlot index={5} />
           </InputOTPGroup>
         </InputOTP>
-        <p className="text-sm text-muted-foreground">
-          {code.length === 6 ? "Code complete. Verifying…" : `${6 - code.length} digits left.`}
-        </p>
       </div>
 
       <div className="grid gap-3">
         <Label htmlFor="otp-invalid">Invalid code</Label>
-        <InputOTP id="otp-invalid" maxLength={4} defaultValue="0000" containerClassName="justify-center">
+        <InputOTP
+          id="otp-invalid"
+          maxLength={4}
+          value={invalid}
+          onChange={setInvalid}
+          containerClassName="justify-center"
+        >
           <InputOTPGroup>
             <InputOTPSlot index={0} aria-invalid />
             <InputOTPSlot index={1} aria-invalid />
@@ -39,8 +49,7 @@ export function InputOtpPreview() {
             <InputOTPSlot index={3} aria-invalid />
           </InputOTPGroup>
         </InputOTP>
-        <p className="text-sm text-destructive">That code expired. Request a new one.</p>
       </div>
-    </div>
+    </PreviewStack>
   );
 }

@@ -11,43 +11,51 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/registry/cadence/popover";
+import { PreviewRow, PreviewStack } from "./shell";
 
 const COLUMNS = [
   { id: "column-name", label: "Name", checked: true },
   { id: "column-status", label: "Status", checked: true },
   { id: "column-owner", label: "Owner", checked: true },
   { id: "column-updated", label: "Updated", checked: false },
-  { id: "column-created", label: "Created", checked: false },
 ] as const;
 
+/**
+ * A popover is its content, so the specimen is the two contents it is used with: a
+ * header plus a list of controls, and a bare paragraph. `align` moves the panel under
+ * the trigger's left or right edge.
+ */
 export function PopoverPreview() {
   return (
-    <div className="flex flex-col gap-4">
-      <Popover>
-        <PopoverTrigger render={<Button variant="outline" />}>Visible columns</PopoverTrigger>
-        <PopoverContent align="start">
-          <PopoverHeader>
-            <PopoverTitle>Visible columns</PopoverTitle>
-            <PopoverDescription>Three of five columns are shown.</PopoverDescription>
-          </PopoverHeader>
-          <div className="flex flex-col gap-2">
-            {COLUMNS.map((column) => (
-              <div key={column.id} className="flex items-center gap-2">
-                <Checkbox id={column.id} defaultChecked={column.checked} />
-                <Label htmlFor={column.id} className="font-normal">
-                  {column.label}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
+    <PreviewStack>
+      <PreviewRow className="gap-3">
+        <Popover>
+          <PopoverTrigger render={<Button variant="outline" />}>Visible columns</PopoverTrigger>
+          <PopoverContent align="start">
+            <PopoverHeader>
+              <PopoverTitle>Visible columns</PopoverTitle>
+              <PopoverDescription>Three of four columns are shown.</PopoverDescription>
+            </PopoverHeader>
+            <div className="flex flex-col gap-2">
+              {COLUMNS.map((column) => (
+                <div key={column.id} className="flex items-center gap-2">
+                  <Checkbox id={column.id} defaultChecked={column.checked} />
+                  <Label htmlFor={column.id} className="font-normal">
+                    {column.label}
+                  </Label>
+                </div>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
 
-      <p className="text-xs text-muted-foreground">
-        The panel grows out of its anchor: Base UI sets <code>--transform-origin</code> where the trigger meets the
-        panel, so the scale starts there. Press Escape or click outside to close; the control you clicked keeps the
-        focus ring.
-      </p>
-    </div>
+        <Popover>
+          <PopoverTrigger render={<Button variant="ghost" />}>Plain content</PopoverTrigger>
+          <PopoverContent align="end" className="w-64 text-sm">
+            A popover is not a dialog: it does not trap focus and clicking outside closes it.
+          </PopoverContent>
+        </Popover>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

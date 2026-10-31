@@ -13,56 +13,54 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/registry/cadence/sheet";
+import { PreviewRow, PreviewStack } from "./shell";
 
-const FILTERS = [
-  { id: "sheet-open", label: "Open only", checked: true },
-  { id: "sheet-mine", label: "Assigned to me", checked: false },
-  { id: "sheet-stale", label: "No activity for 30 days", checked: false },
+const SIDES = [
+  { side: "right", label: "Right" },
+  { side: "left", label: "Left" },
+  { side: "top", label: "Top" },
+  { side: "bottom", label: "Bottom" },
 ] as const;
 
+/**
+ * The side is the component's characteristic, so the specimen is one trigger per
+ * edge: the panel enters from the edge it belongs to, sized by its own content. The
+ * right-hand panel carries the full composition — header, body, footer.
+ */
 export function SheetPreview() {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <Sheet>
-          <SheetTrigger render={<Button variant="outline" />}>Open filters</SheetTrigger>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
-              <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
-            </SheetHeader>
-            <div className="flex flex-col gap-3 px-4">
-              {FILTERS.map((filter) => (
-                <div key={filter.id} className="flex items-center gap-2">
-                  <Checkbox id={filter.id} defaultChecked={filter.checked} />
-                  <Label htmlFor={filter.id} className="font-normal">
-                    {filter.label}
+    <PreviewStack>
+      <PreviewRow className="gap-2">
+        {SIDES.map(({ side, label }) => (
+          <Sheet key={side}>
+            <SheetTrigger render={<Button variant={side === "right" ? "outline" : "ghost"} />}>{label}</SheetTrigger>
+            <SheetContent side={side}>
+              <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+                <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
+              </SheetHeader>
+              <div className="flex flex-col gap-3 px-4">
+                <div className="flex items-center gap-2">
+                  <Checkbox id={`sheet-open-${side}`} defaultChecked />
+                  <Label htmlFor={`sheet-open-${side}`} className="font-normal">
+                    Open only
                   </Label>
                 </div>
-              ))}
-            </div>
-            <SheetFooter>
-              <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
-              <SheetClose render={<Button />}>Apply filters</SheetClose>
-            </SheetFooter>
-          </SheetContent>
-        </Sheet>
-
-        <Sheet>
-          <SheetTrigger render={<Button variant="ghost" />}>Bottom sheet</SheetTrigger>
-          <SheetContent side="bottom">
-            <SheetHeader>
-              <SheetTitle>Keyboard shortcuts</SheetTitle>
-              <SheetDescription>The panel enters from the edge it belongs to.</SheetDescription>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
-      </div>
-
-      <p className="text-xs text-muted-foreground">
-        The panel slides in from its own edge by its own size: no fixed distance to re-tune per side. Under reduced
-        motion only the fade remains, and the backdrop shortens with it. Escape and the overlay both close it.
-      </p>
-    </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox id={`sheet-mine-${side}`} />
+                  <Label htmlFor={`sheet-mine-${side}`} className="font-normal">
+                    Assigned to me
+                  </Label>
+                </div>
+              </div>
+              <SheetFooter>
+                <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
+                <SheetClose render={<Button />}>Apply filters</SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        ))}
+      </PreviewRow>
+    </PreviewStack>
   );
 }

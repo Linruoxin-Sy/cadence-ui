@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2 } from "lucide-react";
+import { Trash2Icon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,17 +14,23 @@ import {
   AlertDialogTrigger,
 } from "@/registry/cadence/alert-dialog";
 import { Button } from "@/registry/cadence/button";
+import { PreviewRow, PreviewStack } from "./shell";
 
+/**
+ * Two sizes, and the two intensities a destructive confirmation has: the full panel
+ * with a media slot and a destructive action, and the `sm` panel for something that
+ * can be undone. Neither dismisses on an outside click.
+ */
 export function AlertDialogPreview() {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
+    <PreviewStack>
+      <PreviewRow className="gap-3">
         <AlertDialog>
           <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogMedia>
-                <Trash2 aria-hidden="true" />
+                <Trash2Icon aria-hidden="true" />
               </AlertDialogMedia>
               <AlertDialogTitle>Delete this project?</AlertDialogTitle>
               <AlertDialogDescription>
@@ -51,13 +57,7 @@ export function AlertDialogPreview() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-
-      <p className="text-xs text-muted-foreground">
-        Click outside and nothing happens: an alert dialog refuses pointer dismissal, so the two buttons are the way out
-        (Escape still cancels). The overlay fades and the panel settles from `--motion-scale-in` (0.96); under reduced
-        motion only the fade remains.
-      </p>
-    </div>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

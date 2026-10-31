@@ -1,57 +1,38 @@
 "use client";
 
-import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Skeleton } from "@/registry/cadence/skeleton";
+import { PreviewRow, PreviewStack } from "./shell";
 
-function CardPlaceholder() {
-  return (
-    <div className="w-full flex flex-col gap-3" aria-busy="true">
-      <Skeleton className="h-28 w-full rounded-lg" />
-      <Skeleton className="h-4 w-2/3" />
-      <Skeleton className="h-4 w-1/2" />
-    </div>
-  );
-}
-
+/**
+ * A skeleton is a shape, so the specimen is three shapes at the sizes they are
+ * actually used: a card placeholder, a list row, and a paragraph. The pulse is
+ * opacity-only, which is why it survives `reduced` and stops under `none`.
+ */
 export function SkeletonPreview() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="flex flex-col gap-3 lg:max-w-sm">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">Card</p>
-          <CardPlaceholder />
+    <PreviewStack>
+      <PreviewRow className="items-start gap-8">
+        <div className="w-56" aria-busy="true">
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="mt-3 h-4 w-2/3" />
+          <Skeleton className="mt-2 h-4 w-1/2" />
         </div>
 
-        <div className="flex flex-col gap-4 lg:max-w-sm">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">List row</p>
-          <div className="flex items-center gap-3" aria-busy="true">
+        <div className="w-56" aria-busy="true">
+          <div className="flex items-center gap-3">
             <Skeleton className="size-10 shrink-0 rounded-full" />
-            <div className="w-full flex flex-col gap-2">
+            <div className="grid w-full gap-2">
               <Skeleton className="h-3 w-32" />
               <Skeleton className="h-3 w-20" />
             </div>
           </div>
-          <div className="flex flex-col gap-2" aria-busy="true">
+          <div className="mt-4 grid gap-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-11/12" />
             <Skeleton className="h-4 w-3/5" />
           </div>
         </div>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">data-motion="none"</p>
-        <CadenceProvider mode="none">
-          <div className="flex items-center gap-3">
-            <Skeleton className="size-10 rounded-full" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-        </CadenceProvider>
-        <p className="text-xs text-muted-foreground">
-          The pulse is opacity-only, so reduced motion keeps it; <code>data-motion="none"</code> stops it and the shape
-          stays at full opacity.
-        </p>
-      </div>
-    </div>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

@@ -2,42 +2,44 @@
 
 import { Input } from "@/registry/cadence/input";
 import { Label } from "@/registry/cadence/label";
+import { PreviewStack } from "./shell";
 
+/**
+ * The field's states: resting, filled, invalid, disabled — plus the file input, the
+ * one `type` that restyles the control. Laid out as one grid rather than as rows, so
+ * the fifth field sits under the first column instead of floating in the middle.
+ *
+ * Invalid comes from `aria-invalid` alone; the component never validates anything.
+ */
 export function InputPreview() {
   return (
-    <div className="grid max-w-sm gap-6">
-      <div className="grid gap-2">
-        <Label htmlFor="input-preview-name">Workspace name</Label>
-        <Input id="input-preview-name" placeholder="Acme" autoComplete="organization" />
-      </div>
+    <PreviewStack>
+      <div className="grid w-full max-w-[30rem] grid-cols-2 gap-x-4 gap-y-5">
+        <div className="grid gap-2">
+          <Label htmlFor="input-preview-name">Workspace</Label>
+          <Input id="input-preview-name" placeholder="Acme" autoComplete="organization" />
+        </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="input-preview-invalid">Email</Label>
-        <Input
-          id="input-preview-invalid"
-          type="email"
-          defaultValue="ada@"
-          aria-invalid="true"
-          aria-describedby="input-preview-error"
-        />
-        <p id="input-preview-error" className="text-sm text-destructive">
-          Enter a complete email address.
-        </p>
-      </div>
+        <div className="grid gap-2">
+          <Label htmlFor="input-preview-filled">Filled</Label>
+          <Input id="input-preview-filled" type="email" defaultValue="ada@example.com" readOnly />
+        </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="input-preview-disabled">Slug</Label>
-        <Input id="input-preview-disabled" disabled defaultValue="cadence" />
-      </div>
+        <div className="grid gap-2">
+          <Label htmlFor="input-preview-invalid">Invalid</Label>
+          <Input id="input-preview-invalid" type="email" defaultValue="ada@" aria-invalid="true" readOnly />
+        </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="input-preview-file">Cover image</Label>
-        <Input id="input-preview-file" type="file" accept="image/png,image/jpeg" />
-      </div>
+        <div className="grid gap-2">
+          <Label htmlFor="input-preview-disabled">Disabled</Label>
+          <Input id="input-preview-disabled" disabled defaultValue="cadence" />
+        </div>
 
-      <p className="text-xs text-muted-foreground">
-        The field never validates. The destructive border comes from <code>aria-invalid</code> alone.
-      </p>
-    </div>
+        <div className="grid gap-2">
+          <Label htmlFor="input-preview-file">File</Label>
+          <Input id="input-preview-file" type="file" accept="image/png,image/jpeg" />
+        </div>
+      </div>
+    </PreviewStack>
   );
 }

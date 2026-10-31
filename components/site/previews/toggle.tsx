@@ -1,24 +1,33 @@
 "use client";
 
-import { Bold, Italic, Underline } from "lucide-react";
+import { BoldIcon, ItalicIcon } from "lucide-react";
 import { Toggle } from "@/registry/cadence/toggle";
+import { PreviewRow, PreviewStack } from "./shell";
 
+/**
+ * Both variants in both states, side by side: the pressed fill is the whole point of
+ * a toggle, and it only reads as a state next to its un-pressed twin. The second row
+ * carries the sizes and the disabled texture.
+ */
 export function TogglePreview() {
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="flex items-center gap-2">
-        <Toggle aria-label="Bold" defaultPressed>
-          <Bold />
+    <PreviewStack>
+      <PreviewRow>
+        <Toggle aria-label="Bold">
+          <BoldIcon />
         </Toggle>
-        <Toggle aria-label="Italic">
-          <Italic />
+        <Toggle aria-label="Bold (pressed)" defaultPressed>
+          <BoldIcon />
         </Toggle>
-        <Toggle aria-label="Underline" variant="outline">
-          <Underline />
+        <Toggle variant="outline" aria-label="Italic">
+          <ItalicIcon />
         </Toggle>
-      </div>
+        <Toggle variant="outline" aria-label="Italic (pressed)" defaultPressed>
+          <ItalicIcon />
+        </Toggle>
+      </PreviewRow>
 
-      <div className="flex items-center gap-2">
+      <PreviewRow>
         <Toggle size="sm" variant="outline">
           Small
         </Toggle>
@@ -26,7 +35,10 @@ export function TogglePreview() {
         <Toggle size="lg" variant="outline">
           Large
         </Toggle>
-      </div>
-    </div>
+        <Toggle variant="outline" disabled>
+          Disabled
+        </Toggle>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

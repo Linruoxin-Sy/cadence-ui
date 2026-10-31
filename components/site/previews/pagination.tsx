@@ -9,10 +9,16 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/registry/cadence/pagination";
+import { PreviewStack } from "./shell";
 
+/**
+ * The full trail with an ellipsis and a last page, then the compact one that only
+ * keeps Back / page / Forward. Every control is still an anchor, so `role="link"`
+ * and right-click survive; the shape comes from the button variants.
+ */
 export function PaginationPreview() {
   return (
-    <div className="flex flex-col gap-6">
+    <PreviewStack>
       <Pagination>
         <PaginationContent>
           <PaginationItem>
@@ -56,10 +62,6 @@ export function PaginationPreview() {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
-
-      <p className="text-center text-xs text-muted-foreground">
-        Every control is an anchor: <code>role="link"</code> survives, and the shape comes from the button variants.
-      </p>
-    </div>
+    </PreviewStack>
   );
 }

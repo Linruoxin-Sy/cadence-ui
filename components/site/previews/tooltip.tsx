@@ -1,39 +1,57 @@
 "use client";
 
-import { Bold, Italic, Link2, Underline } from "lucide-react";
+import { BoldIcon, ItalicIcon, Link2Icon, UnderlineIcon } from "lucide-react";
 import { Button } from "@/registry/cadence/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/cadence/tooltip";
+import { PreviewRow, PreviewStack } from "./shell";
 
-const FORMATS = [
-  { id: "bold", label: "Bold", shortcut: "⌘B", icon: Bold },
-  { id: "italic", label: "Italic", shortcut: "⌘I", icon: Italic },
-  { id: "underline", label: "Underline", shortcut: "⌘U", icon: Underline },
-  { id: "link", label: "Insert link", shortcut: "⌘K", icon: Link2 },
-] as const;
-
+/**
+ * Four placements on one row, each a different `side`, because the placement is the
+ * only thing a tooltip really decides. The content shows both shapes: a label with a
+ * shortcut, and a plain sentence.
+ */
 export function TooltipPreview() {
   return (
-    <TooltipProvider delay={200}>
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-1">
-          {FORMATS.map(({ id, label, shortcut, icon: Icon }) => (
-            <Tooltip key={id}>
-              <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label={label}>
-                <Icon />
-              </TooltipTrigger>
-              <TooltipContent>
-                {label} <span className="opacity-70">({shortcut})</span>
-              </TooltipContent>
-            </Tooltip>
-          ))}
-        </div>
+    <PreviewStack>
+      <TooltipProvider delay={150}>
+        <PreviewRow className="gap-2">
+          <Tooltip>
+            <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Bold">
+              <BoldIcon />
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              Bold <span className="opacity-70">(⌘B)</span>
+            </TooltipContent>
+          </Tooltip>
 
-        <p className="text-xs text-muted-foreground">
-          Hover a control, or tab to it: the label fades in and grows out of the anchor. Escape hides it and leaves
-          focus where it was. The shortcut is a hint, not the accessible name — each button has its own
-          <code className="mx-1">aria-label</code>.
-        </p>
-      </div>
-    </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Italic">
+              <ItalicIcon />
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              Italic <span className="opacity-70">(⌘I)</span>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Underline">
+              <UnderlineIcon />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Underline <span className="opacity-70">(⌘U)</span>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Insert link">
+              <Link2Icon />
+            </TooltipTrigger>
+            <TooltipContent side="left">
+              Insert link <span className="opacity-70">(⌘K)</span>
+            </TooltipContent>
+          </Tooltip>
+        </PreviewRow>
+      </TooltipProvider>
+    </PreviewStack>
   );
 }

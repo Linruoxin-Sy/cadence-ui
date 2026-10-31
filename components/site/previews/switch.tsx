@@ -2,35 +2,41 @@
 
 import { Label } from "@/registry/cadence/label";
 import { Switch } from "@/registry/cadence/switch";
+import { PreviewRow, PreviewStack } from "./shell";
 
+/**
+ * The switch's range is small on purpose: on and off, the `sm` size, and disabled.
+ * Both states are shown because a switch's state *is* its shape — an off specimen
+ * alone would never show the thumb travelling.
+ */
 export function SwitchPreview() {
   return (
-    <div className="flex w-full max-w-md flex-col gap-5">
-      <div className="flex items-center justify-between gap-4">
-        <div className="grid gap-1">
-          <Label htmlFor="switch-public">Public workspace</Label>
-          <p className="text-sm text-muted-foreground">Anyone with the link can read it.</p>
+    <PreviewStack>
+      <PreviewRow className="gap-6">
+        <div className="flex items-center gap-2">
+          <Switch id="switch-off" />
+          <Label htmlFor="switch-off">Off</Label>
         </div>
-        <Switch id="switch-public" defaultChecked />
-      </div>
-
-      <div className="flex items-center justify-between gap-4">
-        <div className="grid gap-1">
-          <Label htmlFor="switch-alerts">Deploy alerts</Label>
-          <p className="text-sm text-muted-foreground">A notification for every failed build.</p>
+        <div className="flex items-center gap-2">
+          <Switch id="switch-on" defaultChecked />
+          <Label htmlFor="switch-on">On</Label>
         </div>
-        <Switch id="switch-alerts" />
-      </div>
+      </PreviewRow>
 
-      <div className="flex items-center justify-between gap-4">
-        <Label htmlFor="switch-compact">Compact rows</Label>
-        <Switch id="switch-compact" size="sm" />
-      </div>
-
-      <div className="flex items-center justify-between gap-4">
-        <Label htmlFor="switch-locked">Require approval</Label>
-        <Switch id="switch-locked" disabled />
-      </div>
-    </div>
+      <PreviewRow className="gap-6">
+        <div className="flex items-center gap-2">
+          <Switch id="switch-small" size="sm" />
+          <Label htmlFor="switch-small">Small</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch id="switch-small-on" size="sm" defaultChecked />
+          <Label htmlFor="switch-small-on">Small, on</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch id="switch-disabled" disabled />
+          <Label htmlFor="switch-disabled">Disabled</Label>
+        </div>
+      </PreviewRow>
+    </PreviewStack>
   );
 }

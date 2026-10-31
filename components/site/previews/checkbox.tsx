@@ -2,33 +2,42 @@
 
 import { Checkbox } from "@/registry/cadence/checkbox";
 import { Label } from "@/registry/cadence/label";
+import { PreviewStack } from "./shell";
 
-const rows = [
-  { id: "terms", label: "Accept the terms of service", hint: "Required to create a workspace." },
-  { id: "digest", label: "Send the weekly digest", hint: "Every Monday, 09:00 in your timezone." },
-  { id: "beta", label: "Join the beta channel", hint: "Unstable builds, no support." },
-];
-
+/**
+ * Five states, because a checkbox has no variant: unchecked, checked, indeterminate,
+ * disabled, and invalid. The label is part of every specimen — a checkbox without one
+ * is a shape, not a control.
+ */
 export function CheckboxPreview() {
   return (
-    <div className="flex w-full max-w-md flex-col gap-4">
-      {rows.map((row, index) => (
-        <div key={row.id} className="flex items-start gap-3">
-          <Checkbox id={row.id} defaultChecked={index === 0} className="mt-0.5" />
-          <div className="grid gap-1">
-            <Label htmlFor={row.id}>{row.label}</Label>
-            <p className="text-sm text-muted-foreground">{row.hint}</p>
-          </div>
+    <PreviewStack>
+      <div className="grid w-full max-w-md grid-cols-2 gap-x-8 gap-y-4">
+        <div className="flex items-center gap-2">
+          <Checkbox id="checkbox-unchecked" />
+          <Label htmlFor="checkbox-unchecked">Unchecked</Label>
         </div>
-      ))}
 
-      <div className="flex items-start gap-3">
-        <Checkbox id="newsletter" indeterminate aria-invalid className="mt-0.5" />
-        <div className="grid gap-1">
-          <Label htmlFor="newsletter">Select all newsletters</Label>
-          <p className="text-sm text-destructive">Pick at least one channel.</p>
+        <div className="flex items-center gap-2">
+          <Checkbox id="checkbox-checked" defaultChecked />
+          <Label htmlFor="checkbox-checked">Checked</Label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Checkbox id="checkbox-indeterminate" indeterminate />
+          <Label htmlFor="checkbox-indeterminate">Indeterminate</Label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Checkbox id="checkbox-disabled" disabled defaultChecked />
+          <Label htmlFor="checkbox-disabled">Disabled</Label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Checkbox id="checkbox-invalid" aria-invalid="true" />
+          <Label htmlFor="checkbox-invalid">Invalid</Label>
         </div>
       </div>
-    </div>
+    </PreviewStack>
   );
 }
