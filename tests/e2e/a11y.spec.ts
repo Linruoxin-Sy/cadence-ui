@@ -23,6 +23,7 @@ const PAGES = [
   { path: "/components/dropdown-menu", name: "dropdown menu" },
   { path: "/components/context-menu", name: "context menu" },
   { path: "/components/menubar", name: "menubar" },
+  { path: "/components/combobox", name: "combobox" },
   { path: "/components/switch?motion=none", name: "switch in none mode" },
   { path: "/components/code-block", name: "code block" },
   { path: "/docs", name: "guide index" },

@@ -634,6 +634,61 @@ test.describe("code-block", () => {
   }
 });
 
+test.describe("combobox", () => {
+  // The batch's one field-with-a-popup: the panel is the same CSS transition as the menus,
+  // but it is anchored to an input rather than to a button, and the tick is the same
+  // `state.morph`. Proving the panel here is what keeps the token from being menu-specific.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="combobox-content"]');
+          await openComponent(page, "combobox", requested, "input-group", mode);
+
+          const input = page.locator(scoped("combobox", '[data-slot="input-group-control"]')).first();
+          await input.click();
+          await input.press("ArrowDown");
+          await expect(page.getByRole("listbox")).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const panel = page.locator('[data-slot="combobox-content"]');
+          await expect(panel).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="combobox-content"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+
+  test.describe("reduced keeps the fade and drops only the scale", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("the panel fades without the 0.96 settle", async ({ page }) => {
+      await recordScale(page, '[data-slot="combobox-content"]');
+      await openComponent(page, "combobox", "reduced", "input-group");
+      const input = page.locator(scoped("combobox", '[data-slot="input-group-control"]')).first();
+      await input.click();
+      await input.press("ArrowDown");
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await page.waitForTimeout(300);
+
+      expect(await computed(page, '[data-slot="combobox-content"]', "transition-property")).toContain("opacity");
+      expect(await computed(page, '[data-slot="combobox-content"]', "transition-duration")).toBe("0.096s");
+      expect((await recordedScale(page)).min).toBe(1);
+    });
+  });
+});
+
 test.describe("dropdown-menu", () => {
   // The first menu in the matrix. Its panel is the popover's transition on Base UI's menu
   // state attributes, and its check mark is the only JavaScript animation in B5, so this
