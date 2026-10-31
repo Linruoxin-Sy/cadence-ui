@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { SiteHeader } from "@/components/site/header";
 import { MotionModeProvider } from "@/components/site/motion-mode";
+import { PackageManagerProvider } from "@/components/site/package-manager-preference";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cadence.dev"),
@@ -60,22 +61,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <MotionModeProvider>
-          <SiteHeader />
-          <main id="content">{children}</main>
-          <footer className="mt-24 border-t border-border">
-            <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <p>Cadence UI · MIT licensed · Built with Base UI, Tailwind CSS v4, and Motion.</p>
-              <p>
-                <a className="underline underline-offset-4 hover:text-foreground" href="/llms.txt">
-                  llms.txt
-                </a>
-                <span className="px-2">·</span>
-                <a className="underline underline-offset-4 hover:text-foreground" href="/r/registry.json">
-                  registry
-                </a>
-              </p>
-            </div>
-          </footer>
+          {/* One package manager for every install command on the site; the choice is
+              remembered and shared, so the switchers never disagree. */}
+          <PackageManagerProvider>
+            <SiteHeader />
+            <main id="content">{children}</main>
+            <footer className="mt-24 border-t border-border">
+              <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                <p>Cadence UI · MIT licensed · Built with Base UI, Tailwind CSS v4, and Motion.</p>
+                <p>
+                  <a className="underline underline-offset-4 hover:text-foreground" href="/llms.txt">
+                    llms.txt
+                  </a>
+                  <span className="px-2">·</span>
+                  <a className="underline underline-offset-4 hover:text-foreground" href="/r/registry.json">
+                    registry
+                  </a>
+                </p>
+              </div>
+            </footer>
+          </PackageManagerProvider>
         </MotionModeProvider>
       </body>
     </html>
