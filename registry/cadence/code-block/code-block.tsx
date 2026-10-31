@@ -340,20 +340,20 @@ export interface CodeBlockTitleProps extends React.ComponentProps<"div"> {}
  * A filename or label. It truncates rather than wrapping, because the header is a
  * fixed-height row; wrap it in an anchor to make it a link to the file.
  *
- * It carries a tab's text style — `text-xs`, medium, muted — so a block with a
- * switcher and a block without one have the same header. A title that set its own
- * size made the two read as different components: the label sat larger and darker
- * next to a row of tabs that were neither.
+ * It carries the selected tab's text style — `text-xs`, medium, foreground, on the
+ * same 24px line box — so a block with a switcher and a block without one have the
+ * same header. A title that set its own size made the two read as different
+ * components: the label sat larger next to a row of tabs that were smaller. The
+ * line box is the height, not the text: 12px type on its default 16px line would
+ * make a titled header shorter than a tabbed one, and the two would step apart
+ * again the moment they sat side by side.
  */
 function CodeBlockTitle({ className, ...props }: CodeBlockTitleProps) {
   return (
     <div
       data-slot="code-block-title"
       className={cn(
-        // `leading-6` rather than a bare `text-xs`: the tab row is a 24px pill, so a
-        // title that kept 12px text's 16px line box would make a header without a
-        // switcher 8px shorter than one with it. Same text, same row height.
-        "min-w-0 truncate font-sans text-xs font-medium leading-6 text-muted-foreground group-data-[variant=destructive]/code-block:text-destructive",
+        "min-w-0 truncate font-sans text-xs font-medium leading-6 text-foreground group-data-[variant=destructive]/code-block:text-destructive",
         "[&_svg]:pointer-events-none [&_svg]:me-1.5 [&_svg]:inline-block [&_svg]:align-middle [&_svg:not([class*='size-'])]:size-3.5",
         className,
       )}
@@ -461,7 +461,7 @@ function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlo
       data-active={active || undefined}
       data-motion={cm.mode}
       className={cn(
-        "relative inline-flex h-6 shrink-0 cursor-pointer items-center rounded-sm px-2 text-xs font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active]:text-foreground",
+        "relative inline-flex h-6 shrink-0 cursor-pointer items-center rounded-sm px-2 text-xs font-medium leading-6 text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active]:text-foreground",
         className,
       )}
       {...props}
