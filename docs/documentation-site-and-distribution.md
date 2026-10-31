@@ -37,16 +37,26 @@ Every component page renders from the same MDX, in a fixed order:
 | --- | ----------------------------------- | ------------------------------------------------------------------ |
 | 1   | Title + one sentence                | Matches the registry `description`                                 |
 | 2   | Preview                             | Interactive; with "slow motion 0.25×" and "reduced motion" toggles |
-| 3   | When to use                         | 3–5 concrete scenarios                                             |
-| 4   | When not to use                     | Point to the alternative component (prevents misuse)               |
-| 5   | Installation                        | CLI (4 package managers) + manual (file list)                      |
-| 6   | Basic usage                         | Smallest runnable code                                             |
-| 7   | Variants and examples               | 3–6 examples, each with code                                       |
+| 3   | Installation                        | CLI (4 package managers) + manual (file list)                      |
+| 4   | Usage                               | Smallest runnable code                                             |
+| 5   | Examples                            | 3–6 examples, each with code — see the flat-heading rule below     |
+| 6   | When to use                         | 3–5 concrete scenarios                                             |
+| 7   | When not to use                     | Point to the alternative component (prevents misuse)               |
 | 8   | API                                 | Props table: type, default, description                            |
 | 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)               |
 | 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy               |
 | 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                            |
 | 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                          |
+
+The two sections a reader arrives for come first: `## Installation` opens every body, `## Usage`
+follows it. Someone who lands on the page to install the component never scrolls past a rationale
+to find the command.
+
+**Sections are flat.** Every section is a `##`; there is no `## Examples` wrapper holding `###`
+children. Each example is its own sibling section — `## Controlled`, `## Sizes`, `## Diff` — so the
+page reads as one even list and every example can be linked, searched, and skimmed on its own. Two
+levels appear only inside `## API`, where a component with distinct parts groups its props under
+`### \`PartName\``. Frontmatter is the only other structure.
 
 ### 2.1 The Motion contract section (this project's signature content)
 
@@ -174,7 +184,9 @@ Validation rules:
 - `title` / `description` / `category` / `deps` must match `registry.json` exactly;
 - every recipe in `motion` must exist in the recipe table of the Animation system document;
 - `since` must be a released version;
-- the body must contain the 12 section headings (a missing one fails the build).
+- the body must contain the §2 sections (a missing one fails the build), in that order, starting with
+  `## Installation`; every section is a `##`, and the Examples slot expands to one `##` per example, so the
+  count grows with the examples while the order does not.
 
 ### 3.2 Injecting the `docs` field
 
@@ -305,7 +317,7 @@ Package "how to choose a component, how to change motion, how to keep a11y" as `
 
 - [ ] `pnpm check` passes (typecheck + lint + registry + unit)
 - [ ] `pnpm test:e2e` passes (including the reduced-motion matrix)
-- [ ] The component page has all 12 sections and an interactive preview
+- [ ] The component page has all 12 sections in order, flat headings, and an interactive preview
 - [ ] Registry `docs` / `meta.motion` / `meta.intensity` are complete
 - [ ] Within the size budget (computed by `registry:check`)
 - [ ] Dual-theme screenshots (pasted in the PR)
