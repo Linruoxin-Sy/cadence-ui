@@ -36,6 +36,7 @@ function Slider<Value extends number | readonly number[] = number | readonly num
   value,
   min = 0,
   max = 100,
+  orientation = "horizontal",
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   ...props
@@ -43,6 +44,10 @@ function Slider<Value extends number | readonly number[] = number | readonly num
   const cm = useCadenceMotion();
   const _values = Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max];
   const thumbCount = _values.length;
+  // Orientation is a JS branch, not a `data-horizontal:` / `data-vertical:` variant:
+  // Base UI writes `data-orientation`, and the shorthand utility compiles to
+  // `[data-horizontal]`, which nothing sets — a vertical slider would lie down.
+  const vertical = orientation === "vertical";
 
   const labelFor = (index: number) => {
     if (!ariaLabel || thumbCount === 1) return ariaLabel;
@@ -59,17 +64,26 @@ function Slider<Value extends number | readonly number[] = number | readonly num
       min={min}
       max={max}
       thumbAlignment="edge"
-      className={cn("data-horizontal:w-full data-vertical:h-full", className)}
+      orientation={orientation}
+      className={cn(vertical ? "h-full" : "w-full", className)}
       {...props}
     >
-      <SliderPrimitive.Control className="relative flex w-full touch-none items-center select-none data-disabled:opacity-50 data-vertical:h-full data-vertical:w-auto data-vertical:flex-col">
+      <SliderPrimitive.Control
+        className={cn(
+          "relative flex touch-none select-none data-disabled:opacity-50",
+          vertical ? "h-full w-auto flex-col" : "w-full items-center",
+        )}
+      >
         <SliderPrimitive.Track
           data-slot="slider-track"
-          className="relative grow overflow-hidden rounded-full bg-muted select-none data-horizontal:h-1.5 data-horizontal:w-full data-vertical:h-full data-vertical:w-1.5"
+          className={cn(
+            "relative grow overflow-hidden rounded-full bg-muted select-none",
+            vertical ? "h-full w-1.5" : "h-1.5 w-full",
+          )}
         >
           <SliderPrimitive.Indicator
             data-slot="slider-range"
-            className="bg-primary select-none data-horizontal:h-full data-vertical:w-full"
+            className={cn("bg-primary select-none", vertical ? "w-full" : "h-full")}
           />
         </SliderPrimitive.Track>
         {Array.from({ length: _values.length }, (_, index) => (

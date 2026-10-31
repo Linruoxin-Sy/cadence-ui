@@ -64,3 +64,16 @@ describe("Slider", () => {
     expect(thumb.style.transform === "" || thumb.style.transform === "none").toBe(true);
   });
 });
+
+describe("Slider orientation", () => {
+  it("stands the control up when vertical", () => {
+    const { container } = render(<Slider orientation="vertical" defaultValue={[40]} aria-label="Level" />);
+
+    const root = container.querySelector('[data-slot="slider"]');
+    const track = container.querySelector('[data-slot="slider-track"]');
+
+    expect(root).toHaveAttribute("data-orientation", "vertical");
+    expect(track?.className).toContain("h-full");
+    expect(track?.className).not.toContain("h-1.5");
+  });
+});
