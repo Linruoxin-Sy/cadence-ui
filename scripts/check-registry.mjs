@@ -291,6 +291,50 @@ for (const item of registry.items) {
   }
 }
 
+// Docs are copy-paste source. Every `@/components/cadence/...` specifier in the user-facing
+// docs must resolve to a file the registry actually installs, written in the one canonical
+// form: the component's directory (`.../cadence/button`), never `.../cadence/button/button`
+// and never `.../cadence/button/index`. Without this gate a rename can land in registry.json
+// and silently leave 37 pages of stale import statements behind.
+const installable = new Set();
+for (const item of registry.items) {
+  for (const file of item.files ?? []) {
+    const target = file.target ?? "";
+    if (!target.startsWith("@components/")) continue;
+    const modulePath = target.slice("@components/".length).replace(/\.[tj]sx?$/, "");
+    installable.add(modulePath);
+    installable.add(modulePath.replace(/\/index$/, ""));
+  }
+}
+
+const docImports = new Map();
+for (const section of ["components", "docs"]) {
+  const entries = await readdir(path.join(root, "content", section)).catch(() => []);
+  for (const entry of entries) {
+    if (!entry.endsWith(".mdx")) continue;
+    const source = await readFile(path.join(root, "content", section, entry), "utf8");
+    for (const [, specifier] of source.matchAll(/from\s+["'](@\/components\/[^"']+)["']/g)) {
+      if (!docImports.has(specifier)) docImports.set(specifier, new Set());
+      docImports.get(specifier).add(`content/${section}/${entry}`);
+    }
+  }
+}
+
+for (const [specifier, files] of docImports) {
+  const relative = specifier.replace(/^@\/components\//, "");
+  // Only the Cadence subtree is ours to police; a doc may import the host's own `@/components/**`.
+  if (!relative.startsWith("cadence/")) continue;
+  const where = [...files].sort().join(", ");
+  const withoutLast = relative.split("/").slice(0, -1).join("/");
+  if (/^cadence\/[a-z0-9-]+\/[a-z0-9-]+$/.test(relative) && withoutLast.split("/")[1] === relative.split("/")[2]) {
+    problems.push(`${where}: "${specifier}" repeats the component id — write "@/components/${withoutLast}"`);
+  } else if (/\/index$/.test(relative)) {
+    problems.push(`${where}: "${specifier}" spells out the index file — write "@/components/${withoutLast}"`);
+  } else if (!installable.has(relative)) {
+    problems.push(`${where}: "${specifier}" does not resolve to any installed file`);
+  }
+}
+
 if (problems.length) {
   console.error(`Registry check failed:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
   process.exit(1);
