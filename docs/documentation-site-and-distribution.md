@@ -33,20 +33,20 @@
 
 Every component page renders from the same MDX, in a fixed order:
 
-| #   | Section                             | Content requirements                                               |
-| --- | ----------------------------------- | ------------------------------------------------------------------ |
-| 1   | Title + one sentence                | Matches the registry `description`                                 |
-| 2   | Preview                             | Interactive; with "slow motion 0.25×" and "reduced motion" toggles |
-| 3   | Installation                        | CLI (4 package managers) + manual (file list)                      |
-| 4   | Usage                               | Smallest runnable code                                             |
-| 5   | Examples                            | 3–6 examples, each with code — see the flat-heading rule below     |
-| 6   | When to use                         | 3–5 concrete scenarios                                             |
-| 7   | When not to use                     | Point to the alternative component (prevents misuse)               |
-| 8   | API                                 | Props table: type, default, description                            |
-| 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)               |
-| 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy               |
-| 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                            |
-| 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                          |
+| #   | Section                             | Content requirements                                           |
+| --- | ----------------------------------- | -------------------------------------------------------------- |
+| 1   | Title + one sentence                | Matches the registry `description`                             |
+| 2   | Preview                             | Interactive; motion mode and speed come from the site header   |
+| 3   | Installation                        | CLI (4 package managers) + manual (file list)                  |
+| 4   | Usage                               | Smallest runnable code                                         |
+| 5   | Examples                            | 3–6 examples, each with code — see the flat-heading rule below |
+| 6   | When to use                         | 3–5 concrete scenarios                                         |
+| 7   | When not to use                     | Point to the alternative component (prevents misuse)           |
+| 8   | API                                 | Props table: type, default, description                        |
+| 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)           |
+| 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy           |
+| 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                        |
+| 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                      |
 
 The two sections a reader arrives for come first: `## Installation` opens every body, `## Usage`
 follows it. Someone who lands on the page to install the component never scrolls past a rationale
@@ -75,21 +75,21 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 
 ### 2.2 Preview capabilities
 
-| Capability             | Implementation                                                                                                                  | Value                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Variant switching      | `?variant=` + client state                                                                                                      | One component, several shapes                                                |
-| Slow motion 0.25×      | `CadenceProvider timeScale={4}` around the preview only, never globally                                                         | Lets people see the details                                                  |
-| Reduced-motion preview | One switch in the site header (`full` / `reduced` / `none`), mirrored in `?motion=`; the preview only reports the resolved mode | A mode is a setting; 29 copies of the switch would be 29 chances to disagree |
-| Theme switching        | `data-theme` / `class="dark"`                                                                                                   | Both themes                                                                  |
-| Code copy              | Reads the registry `content`, never hand-written snippets                                                                       | Docs and source never drift                                                  |
-| Install copy           | `npx shadcn add @cadence/<id>`                                                                                                  | Lowers the conversion barrier                                                |
-| Loading transition     | `components/site/measured-height.tsx`: the preview body is measured and animates with `geometry.resize`                         | The card resizes when its example arrives instead of jumping                 |
+| Capability             | Implementation                                                                                                                        | Value                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Variant switching      | `?variant=` + client state                                                                                                            | One component, several shapes                                                |
+| Playback speed gear    | One `Select` in the site header (`2×` / `1×` / `0.5×` / `0.25×`); `CadenceProvider timeScale={1 / speed}`, never a token edit         | Lets people see the details                                                  |
+| Reduced-motion preview | One switch in the site header (`full` / `reduced` / `none`), mirrored in `?motion=`; the provider resolves it once for the whole site | A mode is a setting; 29 copies of the switch would be 29 chances to disagree |
+| Theme switching        | `data-theme` / `class="dark"`                                                                                                         | Both themes                                                                  |
+| Code copy              | Reads the registry `content`, never hand-written snippets                                                                             | Docs and source never drift                                                  |
+| Install copy           | `npx shadcn add @cadence/<id>`                                                                                                        | Lowers the conversion barrier                                                |
+| Loading transition     | `components/site/measured-height.tsx`: the preview body is measured and animates with `geometry.resize`                               | The card resizes when its example arrives instead of jumping                 |
 
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 
 The preview body is the one place the _site_ animates geometry: the frame mounts a `Skeleton` while a page's `dynamic()` import resolves, and the example that replaces it is usually a different height. `MeasuredHeight` keeps the height explicit (so the new content is laid out inside the old size and the spring starts where the reader already is), observes the content rather than the wrapper, and jumps instead of animating under `reduced` / `none`. What it cannot smooth is the server stream: a `Suspense` boundary whose fallback is in the HTML and whose content arrives in a later chunk is patched before hydration, with no JavaScript running to measure it — on a prerendered page that patch happens during parse, before the first paint. That case resizes without animating, by decision: covering it would mean giving up SSR for the previews (`dynamic(..., { ssr: false })`), and a preview that is already in the HTML before first paint is worth more than an animation nobody sees.
 
-**Built today:** slow motion, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
+**Built today:** the speed gear, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
 and per-page dynamic loading of previews. Variant switching of previews is **not** built yet. The gap between
 this table and the site is tracked in [parity-plan.md](parity-plan.md) §8, not here; this section describes
 the target.
@@ -376,4 +376,4 @@ Any step that requires "reading the source to figure it out" counts as a documen
 | MCP               | Yes (list/search/get/install/skill)                  | Yes + `get_motion_contract`                              |
 | Versions          | None                                                 | tag + `meta.since` + snapshot                            |
 | Tests             | None                                                 | unit + E2E + axe + visual                                |
-| Preview           | Private to the site                                  | Public, with slow-motion/reduced toggles                 |
+| Preview           | Private to the site                                  | Public, with mode and speed controls in the header       |

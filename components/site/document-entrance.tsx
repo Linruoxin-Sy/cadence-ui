@@ -94,8 +94,16 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
 
   const shown = cm.reduced ? RESTING : { opacity: 1, y: 0, filter: "blur(0px)", clipPath: CLIP_SHOWN };
 
-  const entrance = cm.transition("reveal", { timeScale: ENTRANCE_TIME_SCALE });
-  const clip = { ...cm.transition("reveal", { timeScale: CLIP_TIME_SCALE }), ease: CLIP_EASE };
+  /**
+   * These ratios are relative to the site, not absolute: a per-call `timeScale`
+   * replaces the provider's, so the header's speed gear has to be multiplied in
+   * here or the page entrance would keep its authored timing while every
+   * component around it slowed down.
+   */
+  const scale = ENTRANCE_TIME_SCALE * cm.timeScale;
+  const clipScale = CLIP_TIME_SCALE * cm.timeScale;
+  const entrance = cm.transition("reveal", { timeScale: scale });
+  const clip = { ...cm.transition("reveal", { timeScale: clipScale }), ease: CLIP_EASE };
   const transition = cm.reduced
     ? {
         ...entrance,

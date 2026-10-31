@@ -114,16 +114,18 @@ Five rules for new components:
 
 ## Previewing motion
 
-The three modes are switched **once, in the header**, and apply to the whole site: a mode is a
-setting, not a property of the page you happen to be reading. The choice is remembered
-(`localStorage`) and written into the URL, so `?motion=reduced` can be shared with a reviewer and
-still lands on exactly that state.
+The three modes and the playback speed are switched **once, in the header**, and apply to the whole
+site: they are settings, not properties of the page you happen to be reading. Both are remembered
+(`localStorage`) and written into the URL, so `?motion=reduced&speed=0.25` can be shared with a
+reviewer and still lands on exactly that state.
 
-Each component preview adds only a **0.25×** slowdown, because slowing down is about the component
-you are looking at, not about the site.
+The speed gear is `timeScale` with the fraction inverted — `0.25×` is `timeScale={4}` — and it
+covers the whole site rather than one preview, so a slow-motion pass shows a page's own entrances
+and the components on it in the same tempo.
 
 ```
 ?motion=full | reduced | none      the site-wide mode
+?speed=2 | 1 | 0.5 | 0.25          the site-wide playback speed
 ?motion=none                       a link the Playwright matrix navigates to
 ```
 

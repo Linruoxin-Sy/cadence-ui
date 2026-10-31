@@ -132,7 +132,12 @@ function DisclosureHeader({
  */
 function Disclosure({ id, open, children }: { id: string; open: boolean; children: React.ReactNode }) {
   const cm = useCadenceMotion();
-  const panel = { ...cm.transition("reveal", { timeScale: PANEL_TIME_SCALE }), ease: SIDEBAR_EASE };
+  // The ratio replaces the provider's `timeScale` rather than stacking on it, so
+  // the header's speed gear is multiplied in here (see `document-entrance.tsx`).
+  const panel = {
+    ...cm.transition("reveal", { timeScale: PANEL_TIME_SCALE * cm.timeScale }),
+    ease: SIDEBAR_EASE,
+  };
   const transition = cm.reduced ? { height: { duration: 0 }, opacity: panel } : panel;
 
   return (

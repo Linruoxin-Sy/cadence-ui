@@ -151,9 +151,10 @@ reader who needs less motion.
 
 ### Let the reader choose
 
-The docs site keeps a single segmented switch in the header. Precedence on load is
-`?motion=` → `localStorage` → `full`; choosing a mode writes back to both, so
-`?motion=reduced` is a link a reviewer can send and land on exactly that state.
+The docs site keeps a single segmented switch in the header, with a speed gear beside it — one
+control for what may move, one for how fast. Precedence on load is per setting: `?motion=` /
+`?speed=` → `localStorage` → `full` / `1×`. Choosing a value writes back to both, so
+`?motion=reduced&speed=0.25` is a link a reviewer can send and land on exactly that state.
 
 ```tsx
 const [mode, setMode] = useState<CadenceMode>("full");
@@ -165,6 +166,9 @@ if (next === "full") url.searchParams.delete("motion");
 else url.searchParams.set("motion", next);
 window.history.replaceState(null, "", url);
 ```
+
+The speed gear stores the fraction (`0.25×`) and hands the provider its reciprocal (`timeScale={4}`),
+because "quarter speed" is the thing a reader chose and the multiplier is how it is implemented.
 
 The switch is a convenience, never the source of truth: the OS setting still wins over `full`
 inside the provider, so a visitor who asked for reduced motion gets it without touching the

@@ -109,7 +109,9 @@ export function Reveal({
       transition={
         show
           ? {
-              ...cm.transition("reveal", { delay: cm.reduced ? 0 : delay, timeScale: revealScale }),
+              // The ratio replaces the provider's `timeScale`, so the header's speed
+              // gear is multiplied in here (see `document-entrance.tsx`).
+              ...cm.transition("reveal", { delay: cm.reduced ? 0 : delay, timeScale: revealScale * cm.timeScale }),
               ease: SIDEBAR_EASE,
             }
           : { duration: 0 }

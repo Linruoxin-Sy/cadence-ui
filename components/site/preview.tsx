@@ -1,14 +1,10 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { Button } from "@/registry/cadence/button";
-import { CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
+import { Suspense } from "react";
+import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 import { Skeleton } from "@/registry/cadence/skeleton";
 import { MeasuredHeight } from "./measured-height";
 import { previews } from "./previews";
-
-/** 0.25× on this preview only: `timeScale` multiplies the tokens, it never edits them. */
-const SLOW_MOTION_SCALE = 4;
 
 export function Preview({ id }: { id: string }) {
   const Component = previews[id];
@@ -21,26 +17,17 @@ export function Preview({ id }: { id: string }) {
 /**
  * The frame every component page mounts.
  *
- * It does **not** own the motion mode. A mode is a setting, and the site has one
- * switch for it in the header (`MotionModeSwitch`); this frame reads the resolved
- * mode and says so, so a reader who switched to `none` on another page knows why
- * the preview is still.
+ * It does **not** own the motion mode or the playback speed. Both are settings, and
+ * the site has one switch and one gear for them in the header (`MotionModeSwitch`,
+ * `MotionSpeedSelect`); this frame reads the resolved mode and says so, so a reader
+ * who switched to `none` on another page knows why the preview is still.
  *
- * What it does own is the 0.25× slowdown, which is per-preview by nature: you slow
- * down the thing you are looking at, not the whole site. It is applied by a nested
- * provider that inherits the mode and only overrides `timeScale`.
+ * The value is the *resolved* mode, not the requested one: a visitor whose OS asks
+ * for reduced motion sees `reduced` even while the switch says `full`, and the label
+ * has to agree with what the preview actually rendered.
  */
-export function PreviewFrame({ id, initialSlow = false }: { id: string; initialSlow?: boolean }) {
-  /**
-   * The page's *resolved* mode, which is not the same as the requested one: a
-   * visitor whose OS asks for reduced motion sees `reduced` even while the switch
-   * says `full`. Passing the resolved value down matters for more than the label —
-   * a nested provider that re-derives the mode from the media query is a second
-   * place for the answer to disagree with the page, and it did: the frame said
-   * `reduced` while the preview inside it rendered `full`.
-   */
+export function PreviewFrame({ id }: { id: string }) {
   const resolved = useCadenceMotion().mode;
-  const [slow, setSlow] = useState(initialSlow);
 
   return (
     <div data-preview={id} data-preview-motion={resolved} className="rounded-xl border border-border bg-background">
@@ -49,28 +36,17 @@ export function PreviewFrame({ id, initialSlow = false }: { id: string; initialS
           Motion <span className="font-medium text-foreground capitalize">{resolved}</span>
           <span className="hidden sm:inline"> · change it in the header</span>
         </p>
-        <Button
-          size="xs"
-          variant={slow ? "secondary" : "ghost"}
-          aria-pressed={slow}
-          onClick={() => setSlow((value) => !value)}
-          title="Slow every animation in this preview to a quarter speed"
-        >
-          0.25×
-        </Button>
       </div>
 
-      <CadenceProvider mode={resolved} timeScale={slow ? SLOW_MOTION_SCALE : 1}>
-        {/* The body owns its height so the `Skeleton` → preview swap resizes the card
-            instead of jumping it (`geometry.resize`, animation-system §3.2). The
-            padding lives inside, so a focus ring or shadow is clipped at the padding
-            edge rather than at the preview's own box. */}
-        <MeasuredHeight className="p-6">
-          <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-            <Preview id={id} />
-          </Suspense>
-        </MeasuredHeight>
-      </CadenceProvider>
+      {/* The body owns its height so the `Skeleton` → preview swap resizes the card
+          instead of jumping it (`geometry.resize`, animation-system §3.2). The
+          padding lives inside, so a focus ring or shadow is clipped at the padding
+          edge rather than at the preview's own box. */}
+      <MeasuredHeight className="p-6">
+        <Suspense fallback={<Skeleton className="h-24 w-full" />}>
+          <Preview id={id} />
+        </Suspense>
+      </MeasuredHeight>
     </div>
   );
 }

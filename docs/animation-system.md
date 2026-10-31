@@ -575,7 +575,8 @@ Implementation notes:
 - `mode === "none"` → every transition is `{ duration: 0 }`;
 - `mode === "reduced"` or a system preference → drop `y/x/scale/rotate/filter`, keep only `opacity`, duration ×0.6;
 - `timeScale` (provider prop, default `1`) multiplies durations, spring `visualDuration`, and delays; the docs
-  site's 0.25× preview passes `4`. It scales nothing inside `none` — a disabled transition stays disabled;
+  site's speed gear passes `4` for its `0.25×` setting. It scales nothing inside `none` — a disabled transition
+  stays disabled;
 - a nested provider inherits the mode and the scale it does not set, so a subtree can slow down (or be
   silenced) without resetting the page to `full`; passing `mode` explicitly is how it opts back in;
 - with no provider, return `full` (components work standalone, wrapping is not mandatory);
