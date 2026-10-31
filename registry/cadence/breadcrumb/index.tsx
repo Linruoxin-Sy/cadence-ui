@@ -18,8 +18,8 @@ export interface BreadcrumbProps extends React.ComponentProps<"nav"> {}
  * landmark. The last crumb is a `BreadcrumbPage` (not a link) marked
  * `aria-current="page"`.
  */
-function Breadcrumb({ ...props }: BreadcrumbProps) {
-  return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />;
+function Breadcrumb({ className, ...props }: BreadcrumbProps) {
+  return <nav aria-label="breadcrumb" data-slot="breadcrumb" className={cn(className)} {...props} />;
 }
 
 export interface BreadcrumbListProps extends React.ComponentProps<"ol"> {}
