@@ -83,11 +83,32 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 | Theme switching        | `data-theme` / `class="dark"`                                                                                                         | Both themes                                                                  |
 | Code copy              | Reads the registry `content`, never hand-written snippets                                                                             | Docs and source never drift                                                  |
 | Install copy           | `npx shadcn add @cadence/<id>`                                                                                                        | Lowers the conversion barrier                                                |
-| Loading transition     | `components/site/measured-height.tsx`: the preview body is measured and animates with `geometry.resize`                               | The card resizes when its example arrives instead of jumping                 |
+| Loading transition     | `components/site/measured-height.tsx`: the preview body is measured, and the height is applied in the frame it changed (`ADR-015`)    | The card is always the size of its example, and adds no motion of its own    |
 
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 
-The preview body is the one place the _site_ animates geometry: the frame mounts a `Skeleton` while a page's `dynamic()` import resolves, and the example that replaces it is usually a different height. `MeasuredHeight` keeps the height explicit (so the new content is laid out inside the old size and the spring starts where the reader already is), observes the content rather than the wrapper, and jumps instead of animating under `reduced` / `none`. What it cannot smooth is the server stream: a `Suspense` boundary whose fallback is in the HTML and whose content arrives in a later chunk is patched before hydration, with no JavaScript running to measure it — on a prerendered page that patch happens during parse, before the first paint. That case resizes without animating, by decision: covering it would mean giving up SSR for the previews (`dynamic(..., { ssr: false })`), and a preview that is already in the HTML before first paint is worth more than an animation nobody sees.
+The preview body is the one place the _site_ owns geometry: the frame mounts a `Skeleton` while a page's
+`dynamic()` import resolves, and the example that replaces it is usually a different height. `MeasuredHeight`
+keeps that height explicit — written in the frame the content changed, from a `ResizeObserver` on the content
+rather than on the wrapper — so the card around a preview is always the size of its example and never lags
+behind it.
+
+It does not tween, and that is a correction rather than a simplification. The first version animated the
+measurement with `geometry.resize`, and the trace showed why that could not work: the content it watches is
+itself animated (the code block folds on the same recipe), so the target changed on every delivery — about 95
+a second — and each delivery started a new spring. A restart discards the progress of the last one, so the
+spring never accelerated: it crept at a near-constant rate until the content stopped, then ran one real spring
+for the remaining three quarters of the distance. The reader sees an easing curve, not their example growing.
+Applying the measurement at once is the distinction in [ADR-015](adr.md): measured geometry is layout, not
+motion, so there is no recipe here, no token, and nothing for `reduced` / `none` to disable — all three modes
+render the same box.
+
+What the old version could not smooth is unchanged: a `Suspense` boundary whose fallback is in the HTML and
+whose content arrives in a later chunk is patched before hydration, with no JavaScript running to measure it —
+on a prerendered page that patch happens during parse, before the first paint. There is nothing to animate
+there in either version, and covering it would mean giving up SSR for the previews
+(`dynamic(..., { ssr: false })`); a preview that is already in the HTML before first paint is worth more than
+an animation nobody sees.
 
 **Built today:** the speed gear, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
 and per-page dynamic loading of previews. Variant switching of previews is **not** built yet. The gap between

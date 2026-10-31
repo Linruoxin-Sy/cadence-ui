@@ -33,10 +33,12 @@ export function PreviewFrame({ id }: { id: string }) {
 
   return (
     <div data-preview={id} data-preview-motion={resolved} className="rounded-xl border border-border bg-background">
-      {/* The body owns its height so the `Skeleton` → preview swap resizes the card
-          instead of jumping it (`geometry.resize`, animation-system §3.2). The
-          padding lives inside, so a focus ring or shadow is clipped at the padding
-          edge rather than at the preview's own box.
+      {/* The body owns its height so the card around the preview is the size of
+          what is inside it, measured on every change and applied at once: the
+          preview's own motion is the motion, and a second tween on top of it
+          reads as an easing curve (see `MeasuredHeight`). The padding lives
+          inside, so a focus ring or shadow is clipped at the padding edge rather
+          than at the preview's own box.
 
           `min-h-80` is the card's floor, not the preview's: every component page
           starts at the same height whatever it happens to show, so browsing the
