@@ -8,20 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A shortcut hinted next to a command: search, save, new item.
-- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.
-- Inside a `tooltip` or a `dropdown-menu` item, where space is short.
-
-## When not to use
-
-- A key that is part of running text. Write it in prose; a pill interrupts the
-  sentence.
-- A button that runs a command. A `kbd` is a label, not a control — it has no
-  keyboard path and no press state.
-- Long sequences of more than three keys. Put the shortcut in a table instead.
-
 ## Installation
 
 ```install
@@ -42,15 +28,13 @@ export function ShortcutHint() {
 }
 ```
 
-## Examples
-
-### Single key
+## Single key
 
 ```tsx
 <Kbd>Esc</Kbd>
 ```
 
-### A combination
+## A combination
 
 `KbdGroup` renders the keys with one gap between them and keeps the sequence
 together for screen readers.
@@ -63,7 +47,7 @@ together for screen readers.
 </KbdGroup>
 ```
 
-### Inside a tooltip
+## Inside a tooltip
 
 A `Kbd` inside `data-slot="tooltip-content"` inverts its colours automatically, so
 the hint stays legible on the tooltip surface.
@@ -73,6 +57,20 @@ the hint stays legible on the tooltip surface.
   Save <Kbd>⌘S</Kbd>
 </TooltipContent>
 ```
+
+## When to use
+
+- A shortcut hinted next to a command: search, save, new item.
+- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.
+- Inside a `tooltip` or a `dropdown-menu` item, where space is short.
+
+## When not to use
+
+- A key that is part of running text. Write it in prose; a pill interrupts the
+  sentence.
+- A button that runs a command. A `kbd` is a label, not a control — it has no
+  keyboard path and no press state.
+- Long sequences of more than three keys. Put the shortcut in a table instead.
 
 ## API
 

@@ -8,18 +8,6 @@
 - Since: 0.4.0
 - Motion recipes: popup.anchored, geometry.resize, handoff, state.morph
 
-## When to use
-
-- Choosing one value from a list that is too long for radios but too short to need search.
-- A compact form control where the current value should stay visible in the trigger.
-- A setting that changes the surface around it, so the value and its width should move together.
-
-## When not to use
-
-- Free-text or type-to-filter input. Use `combobox` once it ships, or an `input` with a datalist.
-- Two or three mutually exclusive options that should stay visible. Use `radio-group`.
-- Navigation between routes. Use a menu or links; a select submits a value, it does not navigate.
-
 ## Installation
 
 ```install
@@ -53,9 +41,7 @@ export function FrameworkSelect() {
 }
 ```
 
-## Examples
-
-### Sizes
+## Sizes
 
 `size="sm"` is for dense toolbars and table rows; the default is the form height.
 
@@ -65,7 +51,7 @@ export function FrameworkSelect() {
 </SelectTrigger>
 ```
 
-### Groups and labels
+## Groups and labels
 
 `SelectGroup` and `SelectLabel` keep long lists legible. `SelectSeparator` splits unrelated groups.
 
@@ -84,7 +70,7 @@ export function FrameworkSelect() {
 </SelectContent>
 ```
 
-### Controlled value
+## Controlled value
 
 `value` and `onValueChange` make the select controlled; `defaultValue` keeps it uncontrolled.
 
@@ -96,7 +82,7 @@ const [value, setValue] = useState("next");
 </Select>;
 ```
 
-### Form submission
+## Form submission
 
 The hidden input uses `name`; `required` makes an empty value fail native validation, but the component
 never decides whether a value is valid.
@@ -106,6 +92,18 @@ never decides whether a value is valid.
   …
 </Select>
 ```
+
+## When to use
+
+- Choosing one value from a list that is too long for radios but too short to need search.
+- A compact form control where the current value should stay visible in the trigger.
+- A setting that changes the surface around it, so the value and its width should move together.
+
+## When not to use
+
+- Free-text or type-to-filter input. Use `combobox` once it ships, or an `input` with a datalist.
+- Two or three mutually exclusive options that should stay visible. Use `radio-group`.
+- Navigation between routes. Use a menu or links; a select submits a value, it does not navigate.
 
 ## API
 

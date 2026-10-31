@@ -8,25 +8,6 @@
 - Since: 0.5.0
 - Motion recipes: data.transition, layout.shared, state.morph, geometry.resize
 
-## When to use
-
-- A source snippet the reader is meant to copy: an install command, a route handler, a config file.
-- An answer from an assistant, where the block sits inside a message and the reader may want the code out of it.
-- Tool calls and their output — a shell run, a stack trace, a JSON payload — where the reader scans rather than reads.
-- A diff or a patch, where added and removed lines have to be distinguishable at a glance and without colour.
-- A long file that would dominate the page: cap it with `maxLines` and let the reader unfold it.
-- One snippet in several forms — an install per package manager, a source file and its output — where the reader
-  should not have to scroll past variants that are not theirs.
-
-## When not to use
-
-- A single value the reader copies — an API key, a URL, an id. Use the copy button on its own; a bordered code
-  surface gives a one-line value more weight than it deserves.
-- Inline code in a sentence. Use `<code>`, which the page's typeset styles.
-- Content that is not code and not output: a quote, a log line with no structure, a terminal transcript with
-  interactive prompts. A block that looks like code but is not sets the wrong expectation about copying.
-- A whole editor. This is a viewer; it has no caret, no selection model of its own, and no undo.
-
 ## Installation
 
 ```install
@@ -65,9 +46,7 @@ export function Install() {
 }
 ```
 
-## Examples
-
-### Line numbers
+## Line numbers
 
 `lineNumbers` splits a string child into lines and numbers them from `startLine`. The gutter is a `::before` on
 each line, so the numbers are not part of a selection and do not travel with copied text.
@@ -78,7 +57,7 @@ each line, so the numbers are not part of a selection and do not travel with cop
 </CodeBlockContent>
 ```
 
-### Diff
+## Diff
 
 Map each line to a `CodeBlockLine` and pick its variant. `added` and `removed` carry a `+` / `−` marker as well as
 a tint, so the diff survives a monochrome screen and a colour-blind reader.
@@ -94,7 +73,7 @@ a tint, so the diff survives a monochrome screen and a colour-blind reader.
 
 `highlighted` marks a line to call out without claiming it changed.
 
-### Folding a long file
+## Folding a long file
 
 `maxLines` on `CodeBlock` caps the block; `CodeBlockExpandButton` unfolds it. Both are additive props — upstream
 shadcn leaves the fold to the consumer, and that composition still works if you would rather wire your own
@@ -118,7 +97,7 @@ control to `expanded` / `onExpandedChange`.
 The button renders nothing while the content fits, so a short file never grows a dead control. The fold is
 measured from the rendered content, so it follows wrapped lines and whatever font size the page sets.
 
-### Tool output
+## Tool output
 
 Output is not source: it wraps instead of scrolling sideways, and it is smaller. Use `variant="destructive"` when
 the run failed rather than recolouring the text yourself.
@@ -134,7 +113,7 @@ the run failed rather than recolouring the text yourself.
 </CodeBlock>
 ```
 
-### Floating actions
+## Floating actions
 
 Put `CodeBlockActions` directly inside `CodeBlock`, with no header, and it floats over the top-end corner. It is
 revealed on hover and on focus, and it is permanently visible on a device that cannot hover.
@@ -148,7 +127,7 @@ revealed on hover and on focus, and it is permanently visible on a device that c
 </CodeBlock>
 ```
 
-### Switching between variants
+## Switching between variants
 
 A snippet often has more than one right form: the same install for three package managers, a source file and
 its compiled output, a component and its test. `CodeBlockTabs` is the tab list over the source, `CodeBlockTab`
@@ -200,7 +179,7 @@ Four things worth knowing:
 `defaultTab` is uncontrolled; `tab` with `onTabChange` drives it from outside when the surrounding page has its
 own idea of which variant is current.
 
-### Highlighting
+## Highlighting
 
 Set `language` and a string child is tokenized; leave it out and the same child renders as plain text, which is
 what tool output wants. The tokenizer is [Shiki](https://shiki.style) in its JavaScript-regex mode, imported
@@ -249,6 +228,25 @@ colours instead.
 
 Without a `language`, a string child stays **one text node** — the browser appends a chunk to it instead of
 reconciling a tree of spans, which is what makes a streaming output block cheap.
+
+## When to use
+
+- A source snippet the reader is meant to copy: an install command, a route handler, a config file.
+- An answer from an assistant, where the block sits inside a message and the reader may want the code out of it.
+- Tool calls and their output — a shell run, a stack trace, a JSON payload — where the reader scans rather than reads.
+- A diff or a patch, where added and removed lines have to be distinguishable at a glance and without colour.
+- A long file that would dominate the page: cap it with `maxLines` and let the reader unfold it.
+- One snippet in several forms — an install per package manager, a source file and its output — where the reader
+  should not have to scroll past variants that are not theirs.
+
+## When not to use
+
+- A single value the reader copies — an API key, a URL, an id. Use the copy button on its own; a bordered code
+  surface gives a one-line value more weight than it deserves.
+- Inline code in a sentence. Use `<code>`, which the page's typeset styles.
+- Content that is not code and not output: a quote, a log line with no structure, a terminal transcript with
+  interactive prompts. A block that looks like code but is not sets the wrong expectation about copying.
+- A whole editor. This is a viewer; it has no caret, no selection model of its own, and no undo.
 
 ## API
 

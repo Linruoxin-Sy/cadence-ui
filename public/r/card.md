@@ -8,20 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A unit of content that belongs together: a summary, a plan, an account, a
-  record in a grid.
-- A surface that needs a header, an optional action, body content, and a footer.
-- A list of comparable items where the boundary itself carries meaning.
-
-## When not to use
-
-- To fake spacing. A card is a boundary; use padding if you only need breathing
-  room.
-- As a page layout. Nesting cards inside cards flattens the hierarchy.
-- For a modal or a popover; those are overlays with their own focus rules.
-
 ## Installation
 
 ```install
@@ -59,9 +45,7 @@ export function Plan() {
 }
 ```
 
-## Examples
-
-### Action in the header
+## Action in the header
 
 `CardHeader` switches to two columns when a `CardAction` is present — no extra
 prop, no manual grid.
@@ -76,7 +60,7 @@ prop, no manual grid.
 </CardHeader>
 ```
 
-### Compact
+## Compact
 
 `size="sm"` tightens every part at once, because the spacing lives in one custom
 property on the root:
@@ -85,7 +69,7 @@ property on the root:
 <Card size="sm">…</Card>
 ```
 
-### Section boundaries
+## Section boundaries
 
 Add a rule with utilities rather than a new part; the `[.border-b]` selectors are
 already wired:
@@ -94,6 +78,20 @@ already wired:
 <CardHeader className="border-b">…</CardHeader>
 <CardFooter className="border-t">…</CardFooter>
 ```
+
+## When to use
+
+- A unit of content that belongs together: a summary, a plan, an account, a
+  record in a grid.
+- A surface that needs a header, an optional action, body content, and a footer.
+- A list of comparable items where the boundary itself carries meaning.
+
+## When not to use
+
+- To fake spacing. A card is a boundary; use padding if you only need breathing
+  room.
+- As a page layout. Nesting cards inside cards flattens the hierarchy.
+- For a modal or a popover; those are overlays with their own focus rules.
 
 ## API
 

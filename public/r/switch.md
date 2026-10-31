@@ -8,21 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: state.morph
 
-## When to use
-
-- A setting that takes effect immediately: public/private, alerts on/off, a feature
-  flag.
-- A row in a settings list, where the label describes the thing and the switch
-  describes its state.
-- A preference with no submit button. Flipping it saves.
-
-## When not to use
-
-- The change is only applied on submit; use `checkbox`, which is the familiar form
-  control for a pending decision.
-- One of several options; use `radio-group`.
-- A formatting command on a selection; use `toggle`.
-
 ## Installation
 
 ```install
@@ -45,9 +30,7 @@ export function Public() {
 }
 ```
 
-## Examples
-
-### Sizes
+## Sizes
 
 ```tsx
 <Switch defaultChecked />
@@ -57,7 +40,7 @@ export function Public() {
 `size="sm"` keeps the same travel logic: the distance is measured from the track
 and the thumb, so restyling either keeps the end position correct.
 
-### Controlled
+## Controlled
 
 ```tsx
 const [on, setOn] = useState(false);
@@ -65,7 +48,7 @@ const [on, setOn] = useState(false);
 <Switch checked={on} onCheckedChange={setOn} aria-label="Alerts" />;
 ```
 
-### In a settings row
+## In a settings row
 
 ```tsx
 <div className="flex items-center justify-between gap-4">
@@ -77,7 +60,7 @@ const [on, setOn] = useState(false);
 </div>
 ```
 
-### Disabled
+## Disabled
 
 ```tsx
 <Switch disabled defaultChecked />
@@ -85,6 +68,21 @@ const [on, setOn] = useState(false);
 
 Disabled switches stay visible and announced; hiding them loses the information
 that the setting exists.
+
+## When to use
+
+- A setting that takes effect immediately: public/private, alerts on/off, a feature
+  flag.
+- A row in a settings list, where the label describes the thing and the switch
+  describes its state.
+- A preference with no submit button. Flipping it saves.
+
+## When not to use
+
+- The change is only applied on submit; use `checkbox`, which is the familiar form
+  control for a pending decision.
+- One of several options; use `radio-group`.
+- A formatting command on a selection; use `toggle`.
 
 ## API
 

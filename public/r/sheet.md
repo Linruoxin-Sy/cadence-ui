@@ -8,18 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: popup.anchored, exit.fade
 
-## When to use
-
-- A task that should keep the page in view: filters, a details panel, settings for the thing behind it.
-- A form too tall or too wide for a `popover`, opened on purpose and dismissed on purpose.
-- Mobile navigation or a secondary menu, where a full dialog would feel heavy.
-
-## When not to use
-
-- A confirmation that must be answered before anything continues. Use `alert-dialog`.
-- A hint about a control. Use `tooltip` or `hover-card`.
-- A flow with its own steps and URL. That is a page, not an overlay.
-
 ## Installation
 
 ```install
@@ -63,9 +51,7 @@ export function FiltersSheet() {
 }
 ```
 
-## Examples
-
-### The four edges
+## The four edges
 
 `side` is `"right"` by default; the panel takes its placement classes and its slide direction from it.
 
@@ -75,7 +61,7 @@ export function FiltersSheet() {
 <SheetContent side="bottom">…</SheetContent>
 ```
 
-### Without the built-in close button
+## Without the built-in close button
 
 The close button is a real control with a screen-reader-only label. Drop it when the footer already
 carries an obvious way out, but keep one of the two.
@@ -84,7 +70,7 @@ carries an obvious way out, but keep one of the two.
 <SheetContent showCloseButton={false}>…</SheetContent>
 ```
 
-### A long list
+## A long list
 
 The panel is a flex column, so a scroll container goes around the part that overflows rather than on
 the close button's positioning context:
@@ -97,7 +83,7 @@ the close button's positioning context:
 </SheetContent>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -106,6 +92,18 @@ const [open, setOpen] = useState(false);
   <SheetContent>…</SheetContent>
 </Sheet>;
 ```
+
+## When to use
+
+- A task that should keep the page in view: filters, a details panel, settings for the thing behind it.
+- A form too tall or too wide for a `popover`, opened on purpose and dismissed on purpose.
+- Mobile navigation or a secondary menu, where a full dialog would feel heavy.
+
+## When not to use
+
+- A confirmation that must be answered before anything continues. Use `alert-dialog`.
+- A hint about a control. Use `tooltip` or `hover-card`.
+- A flow with its own steps and URL. That is a page, not an overlay.
 
 ## API
 

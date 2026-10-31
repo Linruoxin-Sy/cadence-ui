@@ -8,20 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: popup.anchored, exit.fade
 
-## When to use
-
-- A destructive or irreversible action — deleting a project, revoking a key, overwriting a draft — that the
-  user must confirm on purpose.
-- A decision the page cannot make for the user: move the workspace, leave without saving, end the session.
-- A step that must be acknowledged before anything else continues, where an accidental dismissal would be
-  the bug.
-
-## When not to use
-
-- A task with more than one decision or a form to fill in. Use `dialog`: it can be dismissed, and it should be.
-- A message that does not block anything. Use `alert` where it belongs on the page, or `toast` for a moment.
-- A hint attached to a control. Use `tooltip`.
-
 ## Installation
 
 ```install
@@ -67,9 +53,7 @@ export function DeleteProject() {
 }
 ```
 
-## Examples
-
-### A compact confirmation
+## A compact confirmation
 
 `size="sm"` caps the panel at `max-w-xs` and turns the footer into a two-column grid, which is what a
 yes/no question looks like. The dialog is centred and its header is centred with it.
@@ -87,7 +71,7 @@ yes/no question looks like. The dialog is centred and its header is centred with
 </AlertDialogContent>
 ```
 
-### With an icon
+## With an icon
 
 `AlertDialogMedia` is a slot, not a decoration: put an icon in it and the header switches to the
 left-aligned, icon-first layout on `size="default"`.
@@ -102,7 +86,7 @@ left-aligned, icon-first layout on `size="default"`.
 </AlertDialogHeader>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -112,7 +96,7 @@ const [open, setOpen] = useState(false);
 </AlertDialog>;
 ```
 
-### A confirmation that is still working
+## A confirmation that is still working
 
 The component never owns a request. The caller passes the in-flight state, and the library keeps the
 button a button:
@@ -122,6 +106,20 @@ button a button:
   {isDeleting ? "Deleting…" : "Delete project"}
 </AlertDialogAction>
 ```
+
+## When to use
+
+- A destructive or irreversible action — deleting a project, revoking a key, overwriting a draft — that the
+  user must confirm on purpose.
+- A decision the page cannot make for the user: move the workspace, leave without saving, end the session.
+- A step that must be acknowledged before anything else continues, where an accidental dismissal would be
+  the bug.
+
+## When not to use
+
+- A task with more than one decision or a form to fill in. Use `dialog`: it can be dismissed, and it should be.
+- A message that does not block anything. Use `alert` where it belongs on the page, or `toast` for a moment.
+- A hint attached to a control. Use `tooltip`.
 
 ## API
 

@@ -8,23 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A list, table, or panel that is legitimately empty: no invoices, no results for
-  this filter, a folder nobody has filled yet.
-- An empty state that teaches the next step — a primary action, a link to a
-  template, or a line that explains what will appear here.
-- A region whose emptiness is a state, not a mistake: an inbox at zero, a fresh
-  workspace.
-
-## When not to use
-
-- While loading. Use `skeleton` when the shape of the incoming content is known,
-  and `spinner` when it is not.
-- A search that returned nothing because of a typo. That case needs the query echoed
-  back and the filter explained, not a generic illustration.
-- An error. An empty region is a normal state; a failed request is an `alert`.
-
 ## Installation
 
 ```install
@@ -63,9 +46,7 @@ export function InvoicesEmpty() {
 }
 ```
 
-## Examples
-
-### Bounded or unbounded
+## Bounded or unbounded
 
 The root is a dashed container with generous padding, so it can stand in for a whole
 panel. Drop the boundary with a class when it already sits inside a bordered card.
@@ -74,7 +55,7 @@ panel. Drop the boundary with a class when it already sits inside a bordered car
 <Empty className="border">…</Empty>
 ```
 
-### A second action
+## A second action
 
 `EmptyContent` is a column with a gap; put the secondary action underneath, or side
 by side with a row wrapper.
@@ -86,7 +67,7 @@ by side with a row wrapper.
 </EmptyContent>
 ```
 
-### Icon or illustration
+## Icon or illustration
 
 `variant="icon"` puts the glyph on a muted surface; `default` leaves the media
 transparent for an illustration or a small chart.
@@ -96,6 +77,23 @@ transparent for an illustration or a small chart.
   <Inbox />
 </EmptyMedia>
 ```
+
+## When to use
+
+- A list, table, or panel that is legitimately empty: no invoices, no results for
+  this filter, a folder nobody has filled yet.
+- An empty state that teaches the next step — a primary action, a link to a
+  template, or a line that explains what will appear here.
+- A region whose emptiness is a state, not a mistake: an inbox at zero, a fresh
+  workspace.
+
+## When not to use
+
+- While loading. Use `skeleton` when the shape of the incoming content is known,
+  and `spinner` when it is not.
+- A search that returned nothing because of a typo. That case needs the query echoed
+  back and the filter explained, not a generic illustration.
+- An error. An empty region is a normal state; a failed request is an `alert`.
 
 ## API
 

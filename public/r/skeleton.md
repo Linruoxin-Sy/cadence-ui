@@ -8,23 +8,6 @@
 - Since: 0.2.0
 - Motion recipes: data.transition
 
-## When to use
-
-- A first load longer than about 300 ms, where the shape of the incoming content is
-  known: a card, a table row, a list item, a comment.
-- A region that swaps content in place, so the layout does not jump when the real
-  content arrives.
-- A page that renders several independent regions which resolve at different times.
-
-## When not to use
-
-- A wait under 300 ms. The placeholder appears and disappears before it can be
-  read, which reads as a flicker.
-- An action the user just triggered (a save, a submit); use the button's own busy
-  state or a `spinner`, so the feedback lands where the user is looking.
-- Content whose shape you do not know. A placeholder that is the wrong shape is
-  worse than a spinner: it promises a layout that never arrives.
-
 ## Installation
 
 ```install
@@ -47,9 +30,7 @@ export function CardPlaceholder() {
 }
 ```
 
-## Examples
-
-### Text lines
+## Text lines
 
 ```tsx
 <div className="space-y-2">
@@ -59,7 +40,7 @@ export function CardPlaceholder() {
 </div>
 ```
 
-### Avatar and name
+## Avatar and name
 
 ```tsx
 <div className="flex items-center gap-3">
@@ -71,7 +52,7 @@ export function CardPlaceholder() {
 </div>
 ```
 
-### Swapping in the real content
+## Swapping in the real content
 
 Keep the container mounted so the height is continuous; only the children change.
 
@@ -80,6 +61,23 @@ Keep the container mounted so the height is continuous; only the children change
   {loading ? <CardPlaceholder /> : <Card>…</Card>}
 </section>
 ```
+
+## When to use
+
+- A first load longer than about 300 ms, where the shape of the incoming content is
+  known: a card, a table row, a list item, a comment.
+- A region that swaps content in place, so the layout does not jump when the real
+  content arrives.
+- A page that renders several independent regions which resolve at different times.
+
+## When not to use
+
+- A wait under 300 ms. The placeholder appears and disappears before it can be
+  read, which reads as a flicker.
+- An action the user just triggered (a save, a submit); use the button's own busy
+  state or a `spinner`, so the feedback lands where the user is looking.
+- Content whose shape you do not know. A placeholder that is the wrong shape is
+  worse than a spinner: it promises a layout that never arrives.
 
 ## API
 

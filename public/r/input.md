@@ -8,21 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A single line of text the user types: email, name, slug, search, URL.
-- A field that needs a native input type (`email`, `password`, `tel`, `number`,
-  `file`) and therefore native mobile keyboards.
-- Anywhere the browser's autofill, password manager, or form submission should
-  work without a wrapper.
-
-## When not to use
-
-- Multi-line text; use `textarea`.
-- A choice from a fixed list; use `select` (or `combobox` when the list is long).
-- A value the app controls entirely, like a generated id. Render text, not a
-  disabled input.
-
 ## Installation
 
 ```install
@@ -45,9 +30,7 @@ export function WorkspaceName() {
 }
 ```
 
-## Examples
-
-### Invalid
+## Invalid
 
 `aria-invalid` is the only switch. The component renders the destructive border and
 ring; it never decides that the value is wrong.
@@ -59,7 +42,7 @@ ring; it never decides that the value is wrong.
 </p>
 ```
 
-### File input
+## File input
 
 `file:` variants are already wired, so the native picker button picks up the
 tokens:
@@ -68,13 +51,28 @@ tokens:
 <Input type="file" accept="image/png" />
 ```
 
-### Controlled, Base UI style
+## Controlled, Base UI style
 
 ```tsx
 const [value, setValue] = useState("");
 
 <Input value={value} onValueChange={setValue} />;
 ```
+
+## When to use
+
+- A single line of text the user types: email, name, slug, search, URL.
+- A field that needs a native input type (`email`, `password`, `tel`, `number`,
+  `file`) and therefore native mobile keyboards.
+- Anywhere the browser's autofill, password manager, or form submission should
+  work without a wrapper.
+
+## When not to use
+
+- Multi-line text; use `textarea`.
+- A choice from a fixed list; use `select` (or `combobox` when the list is long).
+- A value the app controls entirely, like a generated id. Render text, not a
+  disabled input.
 
 ## API
 
@@ -104,6 +102,16 @@ bug: it moves the caret under the user's eyes.
 Both are colour/shadow state feedback on the design tokens, take no space, and do
 not run on mount.
 
+## Accessibility
+
+- Base UI's input is field-aware: inside a `field`, it receives the label id and
+  the description ids without extra wiring.
+- Always give it a name from a `label`; a placeholder is not a name.
+- `aria-invalid` plus a described error is the accessible failure state. Colour
+  alone is never the signal.
+- Never set `outline: none` in `className`; the focus ring is the only affordance
+  for keyboard users.
+
 ## Validation and data ownership
 
 P11 draws the line: the component renders state, the user decides state.
@@ -118,16 +126,6 @@ P11 draws the line: the component renders state, the user decides state.
 There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. [Field](/components/field) shows how the invalid state and its message
 are wired.
-
-## Accessibility
-
-- Base UI's input is field-aware: inside a `field`, it receives the label id and
-  the description ids without extra wiring.
-- Always give it a name from a `label`; a placeholder is not a name.
-- `aria-invalid` plus a described error is the accessible failure state. Colour
-  alone is never the signal.
-- Never set `outline: none` in `className`; the focus ring is the only affordance
-  for keyboard users.
 
 ## Notes for AI
 

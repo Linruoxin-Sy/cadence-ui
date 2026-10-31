@@ -8,18 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- An image, video, or embed whose intrinsic size is unknown until it loads.
-- A thumbnail grid that must not reflow as the images arrive.
-- A placeholder that will be replaced by media of a known shape.
-
-## When not to use
-
-- Fixed-size icons or avatars; give them a size and be done.
-- Text blocks. A ratio box around text clips exactly the content that needs to grow.
-- A container whose height should follow its content — that is a normal block.
-
 ## Installation
 
 ```install
@@ -40,9 +28,7 @@ export function Cover() {
 }
 ```
 
-## Examples
-
-### Square
+## Square
 
 ```tsx
 <AspectRatio ratio={1} className="overflow-hidden rounded-full">
@@ -50,7 +36,7 @@ export function Cover() {
 </AspectRatio>
 ```
 
-### Video
+## Video
 
 ```tsx
 <AspectRatio ratio={16 / 9}>
@@ -63,7 +49,7 @@ export function Cover() {
 </AspectRatio>
 ```
 
-### Multiple ratios in one grid
+## Multiple ratios in one grid
 
 Each box keeps its own ratio, so the grid stays stable while media loads:
 
@@ -74,6 +60,18 @@ Each box keeps its own ratio, so the grid stays stable while media loads:
   <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
 </div>
 ```
+
+## When to use
+
+- An image, video, or embed whose intrinsic size is unknown until it loads.
+- A thumbnail grid that must not reflow as the images arrive.
+- A placeholder that will be replaced by media of a known shape.
+
+## When not to use
+
+- Fixed-size icons or avatars; give them a size and be done.
+- Text blocks. A ratio box around text clips exactly the content that needs to grow.
+- A container whose height should follow its content — that is a normal block.
 
 ## API
 

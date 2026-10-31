@@ -8,20 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: state.morph
 
-## When to use
-
-- A short code the user reads from another surface: a login code, an email
-  verification, a device pairing code.
-- Anywhere a single input would force the user to count characters.
-- A code that arrives by SMS or authenticator app, where `autocomplete="one-time-code"`
-  lets the OS offer it.
-
-## When not to use
-
-- A password the user chooses; use `input type="password"`.
-- A long token that is pasted, not typed; use `input` with paste handling.
-- A numeric field that is not a code, like a quantity; use `input type="number"`.
-
 ## Installation
 
 ```install
@@ -62,9 +48,7 @@ export function Code() {
 
 `maxLength` must equal the number of slots. Each `InputOTPSlot` needs its `index`.
 
-## Examples
-
-### Controlled, with completion
+## Controlled, with completion
 
 ```tsx
 const [code, setCode] = useState("");
@@ -77,7 +61,7 @@ const [code, setCode] = useState("");
 `onComplete` fires once the last slot is filled. It is the right place to submit
 the code, not an effect that watches `code.length`.
 
-### Invalid
+## Invalid
 
 ```tsx
 <InputOTP maxLength={4} aria-label="Code" aria-invalid>
@@ -91,7 +75,7 @@ the code, not an effect that watches `code.length`.
 `aria-invalid` on a slot styles its border; the text beside the field carries the
 message.
 
-### Disabled
+## Disabled
 
 ```tsx
 <InputOTP maxLength={6} disabled aria-label="Code">
@@ -99,7 +83,7 @@ message.
 </InputOTP>
 ```
 
-### Without a separator
+## Without a separator
 
 ```tsx
 <InputOTP maxLength={4} aria-label="PIN" containerClassName="justify-center">
@@ -111,6 +95,20 @@ message.
   </InputOTPGroup>
 </InputOTP>
 ```
+
+## When to use
+
+- A short code the user reads from another surface: a login code, an email
+  verification, a device pairing code.
+- Anywhere a single input would force the user to count characters.
+- A code that arrives by SMS or authenticator app, where `autocomplete="one-time-code"`
+  lets the OS offer it.
+
+## When not to use
+
+- A password the user chooses; use `input type="password"`.
+- A long token that is pasted, not typed; use `input` with paste handling.
+- A numeric field that is not a code, like a quantity; use `input type="number"`.
 
 ## API
 

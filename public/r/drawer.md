@@ -8,20 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: popup.anchored, exit.fade
 
-## When to use
-
-- A short task opened from the bottom of the screen, where the thumb is: move to, share, quick actions.
-- A list or explanation that the page behind should stay visible for — a bottom sheet covers the bottom,
-  not the context.
-- A panel the user expects to swipe away, because that is how sheets behave on touch devices.
-
-## When not to use
-
-- A decision that must be answered. Use `alert-dialog`; a drawer can be dragged shut.
-- A hint on a control. Use `tooltip` or `hover-card`.
-- A long multi-step flow. Use a page or a `sheet` with a footer; dragging half-way through a form is a
-  worse experience than a full surface.
-
 ## Installation
 
 ```install
@@ -62,9 +48,7 @@ export function MoveConversation() {
 }
 ```
 
-## Examples
-
-### A visible swipe handle
+## A visible swipe handle
 
 `showSwipeHandle` draws the handle that says "drag me". It is `aria-hidden`: the drag is an accelerator,
 never the only way out — the close controls and Escape still work.
@@ -73,7 +57,7 @@ never the only way out — the close controls and Escape still work.
 <Drawer showSwipeHandle>…</Drawer>
 ```
 
-### Swiping from another edge
+## Swiping from another edge
 
 `swipeDirection` moves the sheet, its placement, and the direction it closes in. The default is `"down"`.
 
@@ -82,7 +66,7 @@ never the only way out — the close controls and Escape still work.
 <Drawer swipeDirection="up">…</Drawer>
 ```
 
-### Snap points
+## Snap points
 
 `snapPoints` lets the sheet rest at more than one height; the peek is the smallest value. The overlay
 stays in step with the swipe, so the page behind returns as the sheet travels.
@@ -91,7 +75,7 @@ stays in step with the swipe, so the page behind returns as the sheet travels.
 <Drawer snapPoints={[0.5, 1]}>…</Drawer>
 ```
 
-### Non-modal
+## Non-modal
 
 A drawer that should not lock the page passes `modal={false}`; the backdrop is skipped and the page
 stays interactive.
@@ -99,6 +83,20 @@ stays interactive.
 ```tsx
 <Drawer modal={false}>…</Drawer>
 ```
+
+## When to use
+
+- A short task opened from the bottom of the screen, where the thumb is: move to, share, quick actions.
+- A list or explanation that the page behind should stay visible for — a bottom sheet covers the bottom,
+  not the context.
+- A panel the user expects to swipe away, because that is how sheets behave on touch devices.
+
+## When not to use
+
+- A decision that must be answered. Use `alert-dialog`; a drawer can be dragged shut.
+- A hint on a control. Use `tooltip` or `hover-card`.
+- A long multi-step flow. Use a page or a `sheet` with a footer; dragging half-way through a form is a
+  worse experience than a full surface.
 
 ## API
 

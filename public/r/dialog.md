@@ -8,18 +8,6 @@
 - Since: 0.2.0
 - Motion recipes: popup.anchored, exit.fade
 
-## When to use
-
-- A focused task that must interrupt the page: rename, invite, confirm.
-- Content that needs a modal, a focus trap, and an obvious escape route.
-- A short form whose result matters more than the page behind it.
-
-## When not to use
-
-- Non-blocking hints and menus; use `popover` or `tooltip`.
-- Long multi-step flows; use a page or a wizard.
-- Mobile sheets with drag gestures; use `drawer`.
-
 ## Installation
 
 ```install
@@ -62,9 +50,7 @@ export function DeleteProject() {
 }
 ```
 
-## Examples
-
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -74,19 +60,31 @@ const [open, setOpen] = useState(false);
 </Dialog>;
 ```
 
-### Without the built-in close button
+## Without the built-in close button
 
 ```tsx
 <DialogContent showCloseButton={false}>…</DialogContent>
 ```
 
-### Footer with a close action
+## Footer with a close action
 
 ```tsx
 <DialogFooter showCloseButton>
   <Button>Save</Button>
 </DialogFooter>
 ```
+
+## When to use
+
+- A focused task that must interrupt the page: rename, invite, confirm.
+- Content that needs a modal, a focus trap, and an obvious escape route.
+- A short form whose result matters more than the page behind it.
+
+## When not to use
+
+- Non-blocking hints and menus; use `popover` or `tooltip`.
+- Long multi-step flows; use a page or a wizard.
+- Mobile sheets with drag gestures; use `drawer`.
 
 ## API
 

@@ -85,19 +85,6 @@ calls to action; four square sizes cover icon-only buttons.
 
 Icon-only buttons always need an `aria-label`: the glyph is not a name.
 
-## When to use
-
-- The primary action of a form, dialog, or toolbar.
-- A single, clearly labelled command: save, delete, invite.
-- Anywhere the user expects a physical press response.
-
-## When not to use
-
-- Navigation between routes; use a link styled with `buttonVariants`.
-- Toggling a persistent state; use `toggle` or `switch`.
-- Submitting a long-running job that needs its own progress surface; pair the button with a
-  spinner and a `disabled` state, or use `toast` for the result.
-
 ## Links
 
 For navigation, keep the link and take the styles: this preserves link semantics and
@@ -119,6 +106,19 @@ import { buttonVariants } from "@/components/cadence/button";
 ```tsx
 <Button render={<CopyButton />}>Copy</Button>
 ```
+
+## When to use
+
+- The primary action of a form, dialog, or toolbar.
+- A single, clearly labelled command: save, delete, invite.
+- Anywhere the user expects a physical press response.
+
+## When not to use
+
+- Navigation between routes; use a link styled with `buttonVariants`.
+- Toggling a persistent state; use `toggle` or `switch`.
+- Submitting a long-running job that needs its own progress surface; pair the button with a
+  spinner and a `disabled` state, or use `toast` for the result.
 
 ## API
 

@@ -8,20 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: feedback.press
 
-## When to use
-
-- A value where the rough position matters more than the exact number: volume,
-  brightness, zoom, opacity.
-- A range (two thumbs): price between, time window, budget band.
-- A filter where the user should feel the bounds instead of typing them.
-
-## When not to use
-
-- An exact number matters and the range is wide; pair a `slider` with an `input`,
-  or use `input` alone.
-- Fewer than about five discrete options; use `radio-group` or `toggle-group`.
-- A value with no natural order, like picking a colour name.
-
 ## Installation
 
 ```install
@@ -44,9 +30,7 @@ screen reader announces. A range slider gets one accessible name per thumb —
 `Price (minimum)` and `Price (maximum)` — because two inputs with the same name
 are indistinguishable.
 
-## Examples
-
-### Controlled
+## Controlled
 
 ```tsx
 const [volume, setVolume] = useState([60]);
@@ -54,7 +38,7 @@ const [volume, setVolume] = useState([60]);
 <Slider value={volume} onValueChange={setVolume} aria-label="Volume" />;
 ```
 
-### Range
+## Range
 
 ```tsx
 <Slider defaultValue={[120, 480]} min={0} max={600} step={10} aria-label="Price" />
@@ -63,7 +47,7 @@ const [volume, setVolume] = useState([60]);
 Two entries in the array give two thumbs; `minStepsBetweenValues` keeps them from
 crossing.
 
-### Vertical
+## Vertical
 
 ```tsx
 <Slider orientation="vertical" defaultValue={[40]} className="h-56" aria-label="Level" />
@@ -71,11 +55,25 @@ crossing.
 
 Give the vertical slider a height; the track fills it.
 
-### Disabled
+## Disabled
 
 ```tsx
 <Slider defaultValue={[40]} disabled aria-label="Volume" />
 ```
+
+## When to use
+
+- A value where the rough position matters more than the exact number: volume,
+  brightness, zoom, opacity.
+- A range (two thumbs): price between, time window, budget band.
+- A filter where the user should feel the bounds instead of typing them.
+
+## When not to use
+
+- An exact number matters and the range is wide; pair a `slider` with an `input`,
+  or use `input` alone.
+- Fewer than about five discrete options; use `radio-group` or `toggle-group`.
+- A value with no natural order, like picking a colour name.
 
 ## API
 

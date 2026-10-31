@@ -8,23 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A list of comparable objects where each row carries a name, a line of supporting
-  text, and an action: files, members, invoices, saved searches.
-- A row that must become a link as a whole, without nesting a button inside an
-  anchor.
-- A dense list where three sizes (`default`, `sm`, `xs`) cover a panel, a card, and a
-  sidebar strip respectively.
-
-## When not to use
-
-- Tabular data with columns that need to line up across rows. Use `table`: an item is
-  a sentence, not a grid.
-- A single object on its own page. Use `card`; the item's rhythm assumes siblings.
-- A selectable row inside a menu or a listbox. Those have their own roles and
-  keyboard model; use the menu or `command` component.
-
 ## Installation
 
 ```install
@@ -61,9 +44,7 @@ export function Files() {
 }
 ```
 
-## Examples
-
-### A whole-row link
+## A whole-row link
 
 `render` replaces the wrapper element (Base UI `render`, not `asChild`). The anchor
 keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
@@ -77,7 +58,7 @@ keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
 </Item>
 ```
 
-### Variants
+## Variants
 
 `default` is transparent, `outline` adds the border, `muted` fills the surface. The
 border is always present in the box model — only its colour changes — so switching
@@ -88,7 +69,7 @@ variants never shifts the layout.
 <Item variant="muted" size="sm" />
 ```
 
-### Separators
+## Separators
 
 `ItemSeparator` is a horizontal `Separator` with the vertical margins removed, so it
 sits flush between rows.
@@ -101,7 +82,7 @@ sits flush between rows.
 </ItemGroup>
 ```
 
-### Header and footer
+## Header and footer
 
 `ItemHeader` and `ItemFooter` take a full row (`basis-full`), for metadata above the
 title or a progress line below the content.
@@ -117,6 +98,23 @@ title or a progress line below the content.
   </ItemFooter>
 </Item>
 ```
+
+## When to use
+
+- A list of comparable objects where each row carries a name, a line of supporting
+  text, and an action: files, members, invoices, saved searches.
+- A row that must become a link as a whole, without nesting a button inside an
+  anchor.
+- A dense list where three sizes (`default`, `sm`, `xs`) cover a panel, a card, and a
+  sidebar strip respectively.
+
+## When not to use
+
+- Tabular data with columns that need to line up across rows. Use `table`: an item is
+  a sentence, not a grid.
+- A single object on its own page. Use `card`; the item's rhythm assumes siblings.
+- A selectable row inside a menu or a listbox. Those have their own roles and
+  keyboard model; use the menu or `command` component.
 
 ## API
 

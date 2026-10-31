@@ -8,19 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- Between groups inside a menu, a card footer, or a settings list.
-- Between a toolbar and its content, horizontally or vertically.
-- Inside a stack of sections that would otherwise merge visually.
-
-## When not to use
-
-- To create space. Use padding or `gap`; a rule is a boundary, not a spacer.
-- Between every list item. Repetition turns a boundary into noise — grouped
-  spacing does the same job with less ink.
-- As a decorative flourish in a hero. That is a background, not a separator.
-
 ## Installation
 
 ```install
@@ -43,9 +30,7 @@ export function Account() {
 }
 ```
 
-## Examples
-
-### Vertical
+## Vertical
 
 A vertical rule needs a height from its container. `self-stretch` in a flex row
 gives it one for free.
@@ -58,7 +43,7 @@ gives it one for free.
 </div>
 ```
 
-### Decorative
+## Decorative
 
 Upstream's Base UI separator is always announced. Mark a purely visual rule as
 decorative so screen readers skip it:
@@ -66,6 +51,19 @@ decorative so screen readers skip it:
 ```tsx
 <Separator decorative />
 ```
+
+## When to use
+
+- Between groups inside a menu, a card footer, or a settings list.
+- Between a toolbar and its content, horizontally or vertically.
+- Inside a stack of sections that would otherwise merge visually.
+
+## When not to use
+
+- To create space. Use padding or `gap`; a rule is a boundary, not a spacer.
+- Between every list item. Repetition turns a boundary into noise — grouped
+  spacing does the same job with less ink.
+- As a decorative flourish in a hero. That is a background, not a separator.
 
 ## API
 

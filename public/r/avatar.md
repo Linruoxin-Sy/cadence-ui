@@ -8,19 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A person or an entity next to content they own: a comment, an assignee, a commit.
-- A stack of participants, with a `+3` tile for the rest.
-- A presence indicator on a collaborator, via `AvatarBadge`.
-
-## When not to use
-
-- A logo that must stay legible at small sizes; use the image with a fixed box.
-- A decorative illustration; avatars imply a person or an account.
-- More than about five faces. Past that the stack stops being readable — use
-  `AvatarGroupCount` with a name list in the tooltip.
-
 ## Installation
 
 ```install
@@ -42,9 +29,7 @@ export function Author() {
 }
 ```
 
-## Examples
-
-### Sizes
+## Sizes
 
 `size` sets `data-size` on the root; every child reads it through `group/avatar`.
 
@@ -54,7 +39,7 @@ export function Author() {
 <Avatar size="lg">…</Avatar>
 ```
 
-### Presence
+## Presence
 
 ```tsx
 <Avatar>
@@ -64,7 +49,7 @@ export function Author() {
 </Avatar>
 ```
 
-### Group
+## Group
 
 ```tsx
 <AvatarGroup>
@@ -73,6 +58,19 @@ export function Author() {
   <AvatarGroupCount>+3</AvatarGroupCount>
 </AvatarGroup>
 ```
+
+## When to use
+
+- A person or an entity next to content they own: a comment, an assignee, a commit.
+- A stack of participants, with a `+3` tile for the rest.
+- A presence indicator on a collaborator, via `AvatarBadge`.
+
+## When not to use
+
+- A logo that must stay legible at small sizes; use the image with a fixed box.
+- A decorative illustration; avatars imply a person or an account.
+- More than about five faces. Past that the stack stops being readable — use
+  `AvatarGroupCount` with a name list in the tooltip.
 
 ## API
 

@@ -8,23 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- Two to five controls that act on the same object: bold/italic/underline, cut/copy,
-  approve/reject, a zoom stepper.
-- A segmented control where the current option is a button state (`variant="default"`
-  vs `"ghost"`), not a radio group.
-- A label plus an action, where the label should read as part of the control — use
-  `ButtonGroupText` for the static half.
-
-## When not to use
-
-- More than about five options. Beyond that the shape stops helping and a `select` or
-  a menu is faster.
-- Mutually exclusive choices that need arrow-key navigation and a form value. That is
-  `toggle-group`, or a `radio-group` inside a `field`.
-- A single button. The group adds nothing; use `button`.
-
 ## Installation
 
 ```install
@@ -51,9 +34,7 @@ export function TextStyle() {
 }
 ```
 
-## Examples
-
-### Vertical
+## Vertical
 
 `orientation="vertical"` stacks the same rules: only the outer corners are rounded,
 and the shared borders collapse.
@@ -65,7 +46,7 @@ and the shared borders collapse.
 </ButtonGroup>
 ```
 
-### Static text inside the group
+## Static text inside the group
 
 `ButtonGroupText` takes `render`, so the label can be a `label`, a `span`, or the
 router's own element without extra wrappers.
@@ -79,7 +60,7 @@ router's own element without extra wrappers.
 </ButtonGroup>
 ```
 
-### A rule between two controls
+## A rule between two controls
 
 `ButtonGroupSeparator` stretches to the cross axis, so one component works in both
 orientations.
@@ -91,6 +72,23 @@ orientations.
   <Button>Copy</Button>
 </ButtonGroup>
 ```
+
+## When to use
+
+- Two to five controls that act on the same object: bold/italic/underline, cut/copy,
+  approve/reject, a zoom stepper.
+- A segmented control where the current option is a button state (`variant="default"`
+  vs `"ghost"`), not a radio group.
+- A label plus an action, where the label should read as part of the control — use
+  `ButtonGroupText` for the static half.
+
+## When not to use
+
+- More than about five options. Beyond that the shape stops helping and a `select` or
+  a menu is faster.
+- Mutually exclusive choices that need arrow-key navigation and a form value. That is
+  `toggle-group`, or a `radio-group` inside a `field`.
+- A single button. The group adds nothing; use `button`.
 
 ## API
 

@@ -8,21 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
-- A category or tag next to a title, where the colour carries the grouping.
-- A count attached to a navigation item or a filter chip.
-
-## When not to use
-
-- Anything the user must click to act; use `button` (a badge has no focus, no
-  press feedback, and no keyboard path).
-- More than about three words. A long label belongs in running text or in a `card`
-  header, not in a pill.
-- A status that changes while the user watches; use `toast` or an inline message,
-  because a badge swap is easy to miss.
-
 ## Installation
 
 ```install
@@ -44,9 +29,7 @@ export function Release() {
 }
 ```
 
-## Examples
-
-### Variants
+## Variants
 
 ```tsx
 <Badge>Default</Badge>
@@ -57,7 +40,7 @@ export function Release() {
 <Badge variant="link">Changelog</Badge>
 ```
 
-### With an icon
+## With an icon
 
 ```tsx
 import { Check } from "lucide-react";
@@ -68,7 +51,7 @@ import { Check } from "lucide-react";
 </Badge>;
 ```
 
-### As a link
+## As a link
 
 `render` replaces the element, so a badge stays a `span` unless you ask for
 something else. The `[a&]` selectors only switch on hover when it really is a link.
@@ -78,6 +61,21 @@ something else. The `[a&]` selectors only switch on hover when it really is a li
   3 releases
 </Badge>
 ```
+
+## When to use
+
+- A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
+- A category or tag next to a title, where the colour carries the grouping.
+- A count attached to a navigation item or a filter chip.
+
+## When not to use
+
+- Anything the user must click to act; use `button` (a badge has no focus, no
+  press feedback, and no keyboard path).
+- More than about three words. A long label belongs in running text or in a `card`
+  header, not in a pill.
+- A status that changes while the user watches; use `toast` or an inline message,
+  because a badge swap is easy to miss.
 
 ## API
 

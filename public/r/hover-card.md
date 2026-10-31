@@ -8,21 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: popup.anchored, exit.fade
 
-## When to use
-
-- A preview of what a link leads to: a profile, a repository, a document — enough to decide whether to
-  click.
-- Context that helps a name make sense — the person behind an `@handle`, the project behind a package.
-- A short panel with one or two actions that should not interrupt the page.
-
-## When not to use
-
-- A label for an icon. Use `tooltip`: it is smaller, quicker, and announced as a description.
-- Content the user opened on purpose. Use `popover`: hover cards close when the pointer moves on, and
-  anything with a task in it deserves a deliberate open.
-- Information the user needs to answer a question. Nothing that appears and disappears on hover can be
-  the only place it lives.
-
 ## Installation
 
 ```install
@@ -50,9 +35,7 @@ export function ReviewerCard() {
 }
 ```
 
-## Examples
-
-### With an action inside
+## With an action inside
 
 The card is not modal and does not trap focus, so a link or a button inside it works normally. Base UI
 keeps the card open while the pointer or focus is inside it, which is what makes the action reachable.
@@ -66,7 +49,7 @@ keeps the card open while the pointer or focus is inside it, which is what makes
 </HoverCardContent>
 ```
 
-### Placement
+## Placement
 
 `side` defaults to `bottom` — unlike a tooltip, which defaults to `top` — because the card is larger and
 reads better below the link. `alignOffset` defaults to `4` for the same reason.
@@ -77,7 +60,7 @@ reads better below the link. `alignOffset` defaults to `4` for the same reason.
 </HoverCardContent>
 ```
 
-### A delay for the whole app
+## A delay for the whole app
 
 `HoverCard` takes the same delay props as the Base UI root. A longer `delay` keeps a page of links from
 flashing cards at every pointer movement.
@@ -85,6 +68,21 @@ flashing cards at every pointer movement.
 ```tsx
 <HoverCard delay={400}>…</HoverCard>
 ```
+
+## When to use
+
+- A preview of what a link leads to: a profile, a repository, a document — enough to decide whether to
+  click.
+- Context that helps a name make sense — the person behind an `@handle`, the project behind a package.
+- A short panel with one or two actions that should not interrupt the page.
+
+## When not to use
+
+- A label for an icon. Use `tooltip`: it is smaller, quicker, and announced as a description.
+- Content the user opened on purpose. Use `popover`: hover cards close when the pointer moves on, and
+  anything with a task in it deserves a deliberate open.
+- Information the user needs to answer a question. Nothing that appears and disappears on hover can be
+  the only place it lives.
 
 ## API
 

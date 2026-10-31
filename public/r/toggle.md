@@ -8,20 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: feedback.press
 
-## When to use
-
-- A formatting or mode command that stays on until it is turned off: bold,
-  italic, a preview pane, a grid/list switch.
-- A compact toolbar button whose pressed state is visible next to its neighbours.
-- A setting the user toggles repeatedly while working.
-
-## When not to use
-
-- The action is one-shot (save, delete, open); use `button`.
-- A setting that takes effect immediately and permanently, like a preference; use
-  `switch`.
-- A group of related toggles that should read as one control; use `toggle-group`.
-
 ## Installation
 
 ```install
@@ -45,9 +31,7 @@ export function BoldToggle() {
 
 An icon-only toggle needs `aria-label`; the glyph is not a name.
 
-## Examples
-
-### Variants and sizes
+## Variants and sizes
 
 ```tsx
 <Toggle>Default</Toggle>
@@ -59,7 +43,7 @@ An icon-only toggle needs `aria-label`; the glyph is not a name.
 
 `outline` gives the toggle a border, for toolbars that sit on a busy surface.
 
-### With a label
+## With a label
 
 ```tsx
 <Toggle variant="outline">
@@ -70,7 +54,7 @@ An icon-only toggle needs `aria-label`; the glyph is not a name.
 
 `gap-2` is already in the base classes, so an icon and a label space themselves.
 
-### Controlled
+## Controlled
 
 ```tsx
 const [on, setOn] = useState(false);
@@ -78,7 +62,7 @@ const [on, setOn] = useState(false);
 <Toggle pressed={on} onPressedChange={setOn} aria-label="Bold" />;
 ```
 
-### Inside a form
+## Inside a form
 
 ```tsx
 <Toggle name="bold" defaultPressed value="bold" />
@@ -86,6 +70,20 @@ const [on, setOn] = useState(false);
 
 A pressed toggle submits its `value`; an unpressed one submits nothing, like a
 checkbox.
+
+## When to use
+
+- A formatting or mode command that stays on until it is turned off: bold,
+  italic, a preview pane, a grid/list switch.
+- A compact toolbar button whose pressed state is visible next to its neighbours.
+- A setting the user toggles repeatedly while working.
+
+## When not to use
+
+- The action is one-shot (save, delete, open); use `button`.
+- A setting that takes effect immediately and permanently, like a preference; use
+  `switch`.
+- A group of related toggles that should read as one control; use `toggle-group`.
 
 ## API
 

@@ -8,24 +8,6 @@
 - Since: 0.2.0
 
 
-## When to use
-
-- The result of an action the user just took, where the outcome needs a sentence of
-  explanation: a failed deploy, a partial import, a quota that is nearly full.
-- A state of the page that is not an error but changes what is possible — degraded
-  mode, read-only mode, a plan that expired yesterday.
-- A warning attached to a region rather than to a control, so it survives scrolling
-  away from the field it is about.
-
-## When not to use
-
-- A confirmation that needs no reading ("Saved"). Use `toast`: an alert stays in the
-  layout, and stale success messages become noise.
-- A decision that blocks progress. That is `alert-dialog`, which traps focus on
-  purpose.
-- Ordinary guidance or onboarding copy. An `alert` is a live region; using it for
-  static text makes screen readers interrupt the user for nothing.
-
 ## Installation
 
 ```install
@@ -49,9 +31,7 @@ export function QuotaNotice() {
 }
 ```
 
-## Examples
-
-### With an action
+## With an action
 
 `AlertAction` spans both grid rows, so it stays on the first line when the
 description wraps.
@@ -67,7 +47,7 @@ description wraps.
 </Alert>
 ```
 
-### Without an icon
+## Without an icon
 
 The icon column collapses to zero, so title and description sit flush left. Add an
 icon only when it tells the user something the title does not.
@@ -79,7 +59,7 @@ icon only when it tells the user something the title does not.
 </Alert>
 ```
 
-### Destructive
+## Destructive
 
 `variant="destructive"` colours the text and leaves the surface as a card. A red
 block is harder to read and competes with the page it sits on.
@@ -87,6 +67,24 @@ block is harder to read and competes with the page it sits on.
 ```tsx
 <Alert variant="destructive">Payment declined</Alert>
 ```
+
+## When to use
+
+- The result of an action the user just took, where the outcome needs a sentence of
+  explanation: a failed deploy, a partial import, a quota that is nearly full.
+- A state of the page that is not an error but changes what is possible — degraded
+  mode, read-only mode, a plan that expired yesterday.
+- A warning attached to a region rather than to a control, so it survives scrolling
+  away from the field it is about.
+
+## When not to use
+
+- A confirmation that needs no reading ("Saved"). Use `toast`: an alert stays in the
+  layout, and stale success messages become noise.
+- A decision that blocks progress. That is `alert-dialog`, which traps focus on
+  purpose.
+- Ordinary guidance or onboarding copy. An `alert` is a live region; using it for
+  static text makes screen readers interrupt the user for nothing.
 
 ## API
 

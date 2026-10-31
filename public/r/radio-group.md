@@ -8,20 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: state.morph
 
-## When to use
-
-- A small, fixed set of options where exactly one applies: a plan, a priority, a
-  shipping method.
-- Anywhere seeing all the options at once matters more than saving space.
-- A setting that applies on submit, not immediately.
-
-## When not to use
-
-- Several answers can be true; use `checkbox`.
-- The setting applies the moment it changes; use `switch`.
-- More than about seven options, or a list that is filtered as you type; use
-  `select` or `combobox`, which handle long lists and search.
-
 ## Installation
 
 ```install
@@ -53,9 +39,7 @@ export function Plan() {
 Every item needs a `value`. The group is one form field: `name` goes on the
 group, not on the items.
 
-## Examples
-
-### Controlled
+## Controlled
 
 ```tsx
 const [plan, setPlan] = useState("team");
@@ -67,7 +51,7 @@ const [plan, setPlan] = useState("team");
 
 `onValueChange` receives the new value plus Base UI's event details.
 
-### Invalid
+## Invalid
 
 ```tsx
 <RadioGroup aria-invalid aria-describedby="plan-error" aria-label="Plan">
@@ -80,7 +64,7 @@ const [plan, setPlan] = useState("team");
 
 `aria-invalid` on the group styles the items and is announced with the group.
 
-### Disabled item
+## Disabled item
 
 ```tsx
 <RadioGroup defaultValue="starter" aria-label="Plan">
@@ -91,6 +75,20 @@ const [plan, setPlan] = useState("team");
 
 A disabled item is still visible and still announced, so the option does not
 appear to vanish.
+
+## When to use
+
+- A small, fixed set of options where exactly one applies: a plan, a priority, a
+  shipping method.
+- Anywhere seeing all the options at once matters more than saving space.
+- A setting that applies on submit, not immediately.
+
+## When not to use
+
+- Several answers can be true; use `checkbox`.
+- The setting applies the moment it changes; use `switch`.
+- More than about seven options, or a list that is filtered as you type; use
+  `select` or `combobox`, which handle long lists and search.
 
 ## API
 

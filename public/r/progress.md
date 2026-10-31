@@ -8,21 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: data.transition
 
-## When to use
-
-- Work with a measurable end: an upload, an import, a multi-step build.
-- Work long enough that the user would otherwise wonder whether anything is
-  happening, and short enough that they will watch the bar.
-- A determinate value next to other numbers, where the bar is a second reading of
-  the same fact.
-
-## When not to use
-
-- Work of unknown duration. Pass `value={null}` for an indeterminate bar, or use
-  `spinner` when there is no bar to fill.
-- A page that is simply loading its own content; use `skeleton`.
-- A value that is not progressing toward an end, like a score. Render the number.
-
 ## Installation
 
 ```install
@@ -43,9 +28,7 @@ export function Upload() {
 its own track and indicator; `ProgressLabel` and `ProgressValue` go inside it as
 children.
 
-## Examples
-
-### Labelled, with the number
+## Labelled, with the number
 
 ```tsx
 <Progress value={uploaded} aria-label="Uploading assets">
@@ -59,7 +42,7 @@ children.
 `ProgressValue` formats the value with `Intl.NumberFormat`; pass `format` or
 `locale` to the root to change it.
 
-### Indeterminate
+## Indeterminate
 
 ```tsx
 <Progress value={null} aria-label="Preparing preview" />
@@ -69,7 +52,7 @@ The fill fills the track and pulses. There is no sweep: a moving gradient says
 "indeterminate" with motion alone, which is exactly the anti-pattern in the motion
 system.
 
-### Custom range
+## Custom range
 
 ```tsx
 <Progress value={3} min={0} max={5} aria-label="Step 3 of 5">
@@ -80,7 +63,7 @@ system.
 `ProgressValue` renders `60%` for `3/5`; use `getAriaValueText` if you want "step 3
 of 5" announced instead.
 
-### Composed track
+## Composed track
 
 ```tsx
 <Progress value={72} aria-label="Storage">
@@ -92,6 +75,21 @@ of 5" announced instead.
 
 Composing the track yourself replaces the default one. The indicator still reads
 the value from the root, so it keeps animating.
+
+## When to use
+
+- Work with a measurable end: an upload, an import, a multi-step build.
+- Work long enough that the user would otherwise wonder whether anything is
+  happening, and short enough that they will watch the bar.
+- A determinate value next to other numbers, where the bar is a second reading of
+  the same fact.
+
+## When not to use
+
+- Work of unknown duration. Pass `value={null}` for an indeterminate bar, or use
+  `spinner` when there is no bar to fill.
+- A page that is simply loading its own content; use `skeleton`.
+- A value that is not progressing toward an end, like a score. Render the number.
 
 ## API
 

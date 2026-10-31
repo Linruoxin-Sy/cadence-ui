@@ -157,19 +157,6 @@ calls to action; four square sizes cover icon-only buttons.
 
 Icon-only buttons always need an `aria-label`: the glyph is not a name.
 
-## When to use
-
-- The primary action of a form, dialog, or toolbar.
-- A single, clearly labelled command: save, delete, invite.
-- Anywhere the user expects a physical press response.
-
-## When not to use
-
-- Navigation between routes; use a link styled with `buttonVariants`.
-- Toggling a persistent state; use `toggle` or `switch`.
-- Submitting a long-running job that needs its own progress surface; pair the button with a
-  spinner and a `disabled` state, or use `toast` for the result.
-
 ## Links
 
 For navigation, keep the link and take the styles: this preserves link semantics and
@@ -191,6 +178,19 @@ import { buttonVariants } from "@/components/cadence/button";
 ```tsx
 <Button render={<CopyButton />}>Copy</Button>
 ```
+
+## When to use
+
+- The primary action of a form, dialog, or toolbar.
+- A single, clearly labelled command: save, delete, invite.
+- Anywhere the user expects a physical press response.
+
+## When not to use
+
+- Navigation between routes; use a link styled with `buttonVariants`.
+- Toggling a persistent state; use `toggle` or `switch`.
+- Submitting a long-running job that needs its own progress surface; pair the button with a
+  spinner and a `disabled` state, or use `toast` for the result.
 
 ## API
 
@@ -231,21 +231,6 @@ All native button props are forwarded.
 
 A compact status label that stays still while the content around it animates.
 
-## When to use
-
-- A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
-- A category or tag next to a title, where the colour carries the grouping.
-- A count attached to a navigation item or a filter chip.
-
-## When not to use
-
-- Anything the user must click to act; use `button` (a badge has no focus, no
-  press feedback, and no keyboard path).
-- More than about three words. A long label belongs in running text or in a `card`
-  header, not in a pill.
-- A status that changes while the user watches; use `toast` or an inline message,
-  because a badge swap is easy to miss.
-
 ## Installation
 
 ```install
@@ -267,9 +252,7 @@ export function Release() {
 }
 ```
 
-## Examples
-
-### Variants
+## Variants
 
 ```tsx
 <Badge>Default</Badge>
@@ -280,7 +263,7 @@ export function Release() {
 <Badge variant="link">Changelog</Badge>
 ```
 
-### With an icon
+## With an icon
 
 ```tsx
 import { Check } from "lucide-react";
@@ -291,7 +274,7 @@ import { Check } from "lucide-react";
 </Badge>;
 ```
 
-### As a link
+## As a link
 
 `render` replaces the element, so a badge stays a `span` unless you ask for
 something else. The `[a&]` selectors only switch on hover when it really is a link.
@@ -301,6 +284,21 @@ something else. The `[a&]` selectors only switch on hover when it really is a li
   3 releases
 </Badge>
 ```
+
+## When to use
+
+- A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
+- A category or tag next to a title, where the colour carries the grouping.
+- A count attached to a navigation item or a filter chip.
+
+## When not to use
+
+- Anything the user must click to act; use `button` (a badge has no focus, no
+  press feedback, and no keyboard path).
+- More than about three words. A long label belongs in running text or in a `card`
+  header, not in a pill.
+- A status that changes while the user watches; use `toast` or an inline message,
+  because a badge swap is easy to miss.
 
 ## API
 
@@ -346,20 +344,6 @@ on mount.
 
 A keyboard key or shortcut hint, styled from the semantic tokens.
 
-## When to use
-
-- A shortcut hinted next to a command: search, save, new item.
-- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.
-- Inside a `tooltip` or a `dropdown-menu` item, where space is short.
-
-## When not to use
-
-- A key that is part of running text. Write it in prose; a pill interrupts the
-  sentence.
-- A button that runs a command. A `kbd` is a label, not a control — it has no
-  keyboard path and no press state.
-- Long sequences of more than three keys. Put the shortcut in a table instead.
-
 ## Installation
 
 ```install
@@ -380,15 +364,13 @@ export function ShortcutHint() {
 }
 ```
 
-## Examples
-
-### Single key
+## Single key
 
 ```tsx
 <Kbd>Esc</Kbd>
 ```
 
-### A combination
+## A combination
 
 `KbdGroup` renders the keys with one gap between them and keeps the sequence
 together for screen readers.
@@ -401,7 +383,7 @@ together for screen readers.
 </KbdGroup>
 ```
 
-### Inside a tooltip
+## Inside a tooltip
 
 A `Kbd` inside `data-slot="tooltip-content"` inverts its colours automatically, so
 the hint stays legible on the tooltip surface.
@@ -411,6 +393,20 @@ the hint stays legible on the tooltip surface.
   Save <Kbd>⌘S</Kbd>
 </TooltipContent>
 ```
+
+## When to use
+
+- A shortcut hinted next to a command: search, save, new item.
+- A key the user should press in a flow: `Tab`, `Esc`, `↑ ↓`.
+- Inside a `tooltip` or a `dropdown-menu` item, where space is short.
+
+## When not to use
+
+- A key that is part of running text. Write it in prose; a pill interrupts the
+  sentence.
+- A button that runs a command. A `kbd` is a label, not a control — it has no
+  keyboard path and no press state.
+- Long sequences of more than three keys. Put the shortcut in a table instead.
 
 ## API
 
@@ -449,19 +445,6 @@ is reading it.
 
 A one-pixel rule that divides groups of content.
 
-## When to use
-
-- Between groups inside a menu, a card footer, or a settings list.
-- Between a toolbar and its content, horizontally or vertically.
-- Inside a stack of sections that would otherwise merge visually.
-
-## When not to use
-
-- To create space. Use padding or `gap`; a rule is a boundary, not a spacer.
-- Between every list item. Repetition turns a boundary into noise — grouped
-  spacing does the same job with less ink.
-- As a decorative flourish in a hero. That is a background, not a separator.
-
 ## Installation
 
 ```install
@@ -484,9 +467,7 @@ export function Account() {
 }
 ```
 
-## Examples
-
-### Vertical
+## Vertical
 
 A vertical rule needs a height from its container. `self-stretch` in a flex row
 gives it one for free.
@@ -499,7 +480,7 @@ gives it one for free.
 </div>
 ```
 
-### Decorative
+## Decorative
 
 Upstream's Base UI separator is always announced. Mark a purely visual rule as
 decorative so screen readers skip it:
@@ -507,6 +488,19 @@ decorative so screen readers skip it:
 ```tsx
 <Separator decorative />
 ```
+
+## When to use
+
+- Between groups inside a menu, a card footer, or a settings list.
+- Between a toolbar and its content, horizontally or vertically.
+- Inside a stack of sections that would otherwise merge visually.
+
+## When not to use
+
+- To create space. Use padding or `gap`; a rule is a boundary, not a spacer.
+- Between every list item. Repetition turns a boundary into noise — grouped
+  spacing does the same job with less ink.
+- As a decorative flourish in a hero. That is a background, not a separator.
 
 ## API
 
@@ -550,23 +544,6 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
 
 An accessible name for a form control, with no state of its own.
 
-## When to use
-
-- Every input, textarea, select, checkbox, radio, switch, and slider that needs a
-  visible name.
-- A group of controls that share one caption.
-- A field whose purpose is not obvious from the placeholder alone (which is
-  almost every field).
-
-## When not to use
-
-- As a placeholder. A placeholder disappears on the first keystroke and is not a
-  name; use a real `Label`.
-- As a heading. If the text introduces a section, use a heading so it appears in
-  the document outline.
-- For helper text or error text; those belong in the description/error slot so
-  they can be wired through `aria-describedby`.
-
 ## Installation
 
 ```install
@@ -589,9 +566,7 @@ export function EmailField() {
 }
 ```
 
-## Examples
-
-### Wrapping instead of `htmlFor`
+## Wrapping instead of `htmlFor`
 
 Either association works: `htmlFor` + `id`, or wrapping the control. Pick one per
 field and keep it consistent.
@@ -603,7 +578,7 @@ field and keep it consistent.
 </Label>
 ```
 
-### Disabled
+## Disabled
 
 The label follows the control without any prop: `peer-disabled:` handles a sibling
 control, `group-data-[disabled=true]:` handles a disabled `Field`.
@@ -614,6 +589,23 @@ control, `group-data-[disabled=true]:` handles a disabled `Field`.
 </Label>
 <Input id="slug" className="peer" disabled defaultValue="cadence" />
 ```
+
+## When to use
+
+- Every input, textarea, select, checkbox, radio, switch, and slider that needs a
+  visible name.
+- A group of controls that share one caption.
+- A field whose purpose is not obvious from the placeholder alone (which is
+  almost every field).
+
+## When not to use
+
+- As a placeholder. A placeholder disappears on the first keystroke and is not a
+  name; use a real `Label`.
+- As a heading. If the text introduces a section, use a heading so it appears in
+  the document outline.
+- For helper text or error text; those belong in the description/error slot so
+  they can be wired through `aria-describedby`.
 
 ## API
 
@@ -654,21 +646,6 @@ which is an opacity change on a token, not an animation.
 
 A single-line text field whose invalid state is driven by aria-invalid.
 
-## When to use
-
-- A single line of text the user types: email, name, slug, search, URL.
-- A field that needs a native input type (`email`, `password`, `tel`, `number`,
-  `file`) and therefore native mobile keyboards.
-- Anywhere the browser's autofill, password manager, or form submission should
-  work without a wrapper.
-
-## When not to use
-
-- Multi-line text; use `textarea`.
-- A choice from a fixed list; use `select` (or `combobox` when the list is long).
-- A value the app controls entirely, like a generated id. Render text, not a
-  disabled input.
-
 ## Installation
 
 ```install
@@ -691,9 +668,7 @@ export function WorkspaceName() {
 }
 ```
 
-## Examples
-
-### Invalid
+## Invalid
 
 `aria-invalid` is the only switch. The component renders the destructive border and
 ring; it never decides that the value is wrong.
@@ -705,7 +680,7 @@ ring; it never decides that the value is wrong.
 </p>
 ```
 
-### File input
+## File input
 
 `file:` variants are already wired, so the native picker button picks up the
 tokens:
@@ -714,13 +689,28 @@ tokens:
 <Input type="file" accept="image/png" />
 ```
 
-### Controlled, Base UI style
+## Controlled, Base UI style
 
 ```tsx
 const [value, setValue] = useState("");
 
 <Input value={value} onValueChange={setValue} />;
 ```
+
+## When to use
+
+- A single line of text the user types: email, name, slug, search, URL.
+- A field that needs a native input type (`email`, `password`, `tel`, `number`,
+  `file`) and therefore native mobile keyboards.
+- Anywhere the browser's autofill, password manager, or form submission should
+  work without a wrapper.
+
+## When not to use
+
+- Multi-line text; use `textarea`.
+- A choice from a fixed list; use `select` (or `combobox` when the list is long).
+- A value the app controls entirely, like a generated id. Render text, not a
+  disabled input.
 
 ## API
 
@@ -750,6 +740,16 @@ bug: it moves the caret under the user's eyes.
 Both are colour/shadow state feedback on the design tokens, take no space, and do
 not run on mount.
 
+## Accessibility
+
+- Base UI's input is field-aware: inside a `field`, it receives the label id and
+  the description ids without extra wiring.
+- Always give it a name from a `label`; a placeholder is not a name.
+- `aria-invalid` plus a described error is the accessible failure state. Colour
+  alone is never the signal.
+- Never set `outline: none` in `className`; the focus ring is the only affordance
+  for keyboard users.
+
 ## Validation and data ownership
 
 P11 draws the line: the component renders state, the user decides state.
@@ -765,16 +765,6 @@ There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. [Field](/components/field) shows how the invalid state and its message
 are wired.
 
-## Accessibility
-
-- Base UI's input is field-aware: inside a `field`, it receives the label id and
-  the description ids without extra wiring.
-- Always give it a name from a `label`; a placeholder is not a name.
-- `aria-invalid` plus a described error is the accessible failure state. Colour
-  alone is never the signal.
-- Never set `outline: none` in `className`; the focus ring is the only affordance
-  for keyboard users.
-
 ## Notes for AI
 
 - Use `aria-invalid` and `aria-describedby` — never an `error` prop or internal
@@ -785,20 +775,6 @@ are wired.
 # Textarea
 
 A multi-line text field that grows with its content instead of a script.
-
-## When to use
-
-- A sentence or a paragraph: a comment, a description, a commit message, a note.
-- A field where the user's text is longer than the visible box should be.
-- Anywhere the browser's native resize handle is useful.
-
-## When not to use
-
-- A single line (email, name, slug); use `input`.
-- Rich text. A `textarea` holds plain text; formatting needs an editor, which is
-  out of scope for this library.
-- A value that must stay fixed in height; a `textarea` grows, and a fixed box hides
-  the overflow from the user.
 
 ## Installation
 
@@ -822,9 +798,7 @@ export function Comment() {
 }
 ```
 
-## Examples
-
-### Auto-growing
+## Auto-growing
 
 `field-sizing-content` lets the browser grow the box as the text gets longer. No
 JavaScript, no `ResizeObserver`, no layout read during render.
@@ -833,13 +807,13 @@ JavaScript, no `ResizeObserver`, no layout read during render.
 <Textarea className="min-h-16 max-h-48" placeholder="Type and watch the box grow" />
 ```
 
-### Resizable by the user
+## Resizable by the user
 
 ```tsx
 <Textarea className="resize-y" rows={3} />
 ```
 
-### Invalid
+## Invalid
 
 ```tsx
 <Textarea aria-invalid="true" aria-describedby="bio-error" />
@@ -847,6 +821,20 @@ JavaScript, no `ResizeObserver`, no layout read during render.
   Keep it under 280 characters.
 </p>
 ```
+
+## When to use
+
+- A sentence or a paragraph: a comment, a description, a commit message, a note.
+- A field where the user's text is longer than the visible box should be.
+- Anywhere the browser's native resize handle is useful.
+
+## When not to use
+
+- A single line (email, name, slug); use `input`.
+- Rich text. A `textarea` holds plain text; formatting needs an editor, which is
+  out of scope for this library.
+- A value that must stay fixed in height; a `textarea` grows, and a fixed box hides
+  the overflow from the user.
 
 ## API
 
@@ -869,6 +857,16 @@ a transition on it would lag behind the caret.
 | reduced | none       | –     | –             |
 | none    | none       | –     | –             |
 
+## Accessibility
+
+- Renders a native `<textarea>`, so Enter inserts a newline and Escape does not
+  close anything — expected behaviour in a form.
+- Give it a `label`, and never rely on the placeholder as a name.
+- If you cap the length with `maxLength`, say so in the description; a silent stop
+  in typing reads as a broken field.
+- `resize-y` keeps the horizontal layout stable; full `resize` lets a long word
+  break the page.
+
 ## Validation and data ownership
 
 Same contract as `input`: the field renders state, you own the state.
@@ -883,16 +881,6 @@ Character counters are yours to render: the component does not count. Keep the
 count in the description slot and point `aria-describedby` at it, so a screen
 reader hears it before the limit is hit.
 
-## Accessibility
-
-- Renders a native `<textarea>`, so Enter inserts a newline and Escape does not
-  close anything — expected behaviour in a form.
-- Give it a `label`, and never rely on the placeholder as a name.
-- If you cap the length with `maxLength`, say so in the description; a silent stop
-  in typing reads as a broken field.
-- `resize-y` keeps the horizontal layout stable; full `resize` lets a long word
-  break the page.
-
 ## Notes for AI
 
 - Do not implement auto-resize with a `scrollHeight` loop; `field-sizing-content`
@@ -903,20 +891,6 @@ reader hears it before the limit is hit.
 # Card
 
 A bounded surface for grouped content, with parts you can restyle.
-
-## When to use
-
-- A unit of content that belongs together: a summary, a plan, an account, a
-  record in a grid.
-- A surface that needs a header, an optional action, body content, and a footer.
-- A list of comparable items where the boundary itself carries meaning.
-
-## When not to use
-
-- To fake spacing. A card is a boundary; use padding if you only need breathing
-  room.
-- As a page layout. Nesting cards inside cards flattens the hierarchy.
-- For a modal or a popover; those are overlays with their own focus rules.
 
 ## Installation
 
@@ -955,9 +929,7 @@ export function Plan() {
 }
 ```
 
-## Examples
-
-### Action in the header
+## Action in the header
 
 `CardHeader` switches to two columns when a `CardAction` is present — no extra
 prop, no manual grid.
@@ -972,7 +944,7 @@ prop, no manual grid.
 </CardHeader>
 ```
 
-### Compact
+## Compact
 
 `size="sm"` tightens every part at once, because the spacing lives in one custom
 property on the root:
@@ -981,7 +953,7 @@ property on the root:
 <Card size="sm">…</Card>
 ```
 
-### Section boundaries
+## Section boundaries
 
 Add a rule with utilities rather than a new part; the `[.border-b]` selectors are
 already wired:
@@ -990,6 +962,20 @@ already wired:
 <CardHeader className="border-b">…</CardHeader>
 <CardFooter className="border-t">…</CardFooter>
 ```
+
+## When to use
+
+- A unit of content that belongs together: a summary, a plan, an account, a
+  record in a grid.
+- A surface that needs a header, an optional action, body content, and a footer.
+- A list of comparable items where the boundary itself carries meaning.
+
+## When not to use
+
+- To fake spacing. A card is a boundary; use padding if you only need breathing
+  room.
+- As a page layout. Nesting cards inside cards flattens the hierarchy.
+- For a modal or a popover; those are overlays with their own focus rules.
 
 ## API
 
@@ -1040,18 +1026,6 @@ not a property of the card.
 
 Reserves a box at a fixed ratio so media cannot shift the layout.
 
-## When to use
-
-- An image, video, or embed whose intrinsic size is unknown until it loads.
-- A thumbnail grid that must not reflow as the images arrive.
-- A placeholder that will be replaced by media of a known shape.
-
-## When not to use
-
-- Fixed-size icons or avatars; give them a size and be done.
-- Text blocks. A ratio box around text clips exactly the content that needs to grow.
-- A container whose height should follow its content — that is a normal block.
-
 ## Installation
 
 ```install
@@ -1072,9 +1046,7 @@ export function Cover() {
 }
 ```
 
-## Examples
-
-### Square
+## Square
 
 ```tsx
 <AspectRatio ratio={1} className="overflow-hidden rounded-full">
@@ -1082,7 +1054,7 @@ export function Cover() {
 </AspectRatio>
 ```
 
-### Video
+## Video
 
 ```tsx
 <AspectRatio ratio={16 / 9}>
@@ -1095,7 +1067,7 @@ export function Cover() {
 </AspectRatio>
 ```
 
-### Multiple ratios in one grid
+## Multiple ratios in one grid
 
 Each box keeps its own ratio, so the grid stays stable while media loads:
 
@@ -1106,6 +1078,18 @@ Each box keeps its own ratio, so the grid stays stable while media loads:
   <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
 </div>
 ```
+
+## When to use
+
+- An image, video, or embed whose intrinsic size is unknown until it loads.
+- A thumbnail grid that must not reflow as the images arrive.
+- A placeholder that will be replaced by media of a known shape.
+
+## When not to use
+
+- Fixed-size icons or avatars; give them a size and be done.
+- Text blocks. A ratio box around text clips exactly the content that needs to grow.
+- A container whose height should follow its content — that is a normal block.
 
 ## API
 
@@ -1148,19 +1132,6 @@ transition here would reintroduce the layout shift it exists to prevent.
 
 A profile image with a text fallback, a presence dot, and a stack of peers.
 
-## When to use
-
-- A person or an entity next to content they own: a comment, an assignee, a commit.
-- A stack of participants, with a `+3` tile for the rest.
-- A presence indicator on a collaborator, via `AvatarBadge`.
-
-## When not to use
-
-- A logo that must stay legible at small sizes; use the image with a fixed box.
-- A decorative illustration; avatars imply a person or an account.
-- More than about five faces. Past that the stack stops being readable — use
-  `AvatarGroupCount` with a name list in the tooltip.
-
 ## Installation
 
 ```install
@@ -1182,9 +1153,7 @@ export function Author() {
 }
 ```
 
-## Examples
-
-### Sizes
+## Sizes
 
 `size` sets `data-size` on the root; every child reads it through `group/avatar`.
 
@@ -1194,7 +1163,7 @@ export function Author() {
 <Avatar size="lg">…</Avatar>
 ```
 
-### Presence
+## Presence
 
 ```tsx
 <Avatar>
@@ -1204,7 +1173,7 @@ export function Author() {
 </Avatar>
 ```
 
-### Group
+## Group
 
 ```tsx
 <AvatarGroup>
@@ -1213,6 +1182,19 @@ export function Author() {
   <AvatarGroupCount>+3</AvatarGroupCount>
 </AvatarGroup>
 ```
+
+## When to use
+
+- A person or an entity next to content they own: a comment, an assignee, a commit.
+- A stack of participants, with a `+3` tile for the rest.
+- A presence indicator on a collaborator, via `AvatarBadge`.
+
+## When not to use
+
+- A logo that must stay legible at small sizes; use the image with a fixed box.
+- A decorative illustration; avatars imply a person or an account.
+- More than about five faces. Past that the stack stops being readable — use
+  `AvatarGroupCount` with a name list in the tooltip.
 
 ## API
 
@@ -1261,23 +1243,6 @@ the image errored, and a cross-fade would show a half-drawn face in the meantime
 
 A placeholder pulse that marks where content will land.
 
-## When to use
-
-- A first load longer than about 300 ms, where the shape of the incoming content is
-  known: a card, a table row, a list item, a comment.
-- A region that swaps content in place, so the layout does not jump when the real
-  content arrives.
-- A page that renders several independent regions which resolve at different times.
-
-## When not to use
-
-- A wait under 300 ms. The placeholder appears and disappears before it can be
-  read, which reads as a flicker.
-- An action the user just triggered (a save, a submit); use the button's own busy
-  state or a `spinner`, so the feedback lands where the user is looking.
-- Content whose shape you do not know. A placeholder that is the wrong shape is
-  worse than a spinner: it promises a layout that never arrives.
-
 ## Installation
 
 ```install
@@ -1300,9 +1265,7 @@ export function CardPlaceholder() {
 }
 ```
 
-## Examples
-
-### Text lines
+## Text lines
 
 ```tsx
 <div className="space-y-2">
@@ -1312,7 +1275,7 @@ export function CardPlaceholder() {
 </div>
 ```
 
-### Avatar and name
+## Avatar and name
 
 ```tsx
 <div className="flex items-center gap-3">
@@ -1324,7 +1287,7 @@ export function CardPlaceholder() {
 </div>
 ```
 
-### Swapping in the real content
+## Swapping in the real content
 
 Keep the container mounted so the height is continuous; only the children change.
 
@@ -1333,6 +1296,23 @@ Keep the container mounted so the height is continuous; only the children change
   {loading ? <CardPlaceholder /> : <Card>…</Card>}
 </section>
 ```
+
+## When to use
+
+- A first load longer than about 300 ms, where the shape of the incoming content is
+  known: a card, a table row, a list item, a comment.
+- A region that swaps content in place, so the layout does not jump when the real
+  content arrives.
+- A page that renders several independent regions which resolve at different times.
+
+## When not to use
+
+- A wait under 300 ms. The placeholder appears and disappears before it can be
+  read, which reads as a flicker.
+- An action the user just triggered (a save, a submit); use the button's own busy
+  state or a `spinner`, so the feedback lands where the user is looking.
+- Content whose shape you do not know. A placeholder that is the wrong shape is
+  worse than a spinner: it promises a layout that never arrives.
 
 ## API
 
@@ -1403,24 +1383,6 @@ every breakpoint.
 
 A message about the current state of the page, with an icon column and an action slot.
 
-## When to use
-
-- The result of an action the user just took, where the outcome needs a sentence of
-  explanation: a failed deploy, a partial import, a quota that is nearly full.
-- A state of the page that is not an error but changes what is possible — degraded
-  mode, read-only mode, a plan that expired yesterday.
-- A warning attached to a region rather than to a control, so it survives scrolling
-  away from the field it is about.
-
-## When not to use
-
-- A confirmation that needs no reading ("Saved"). Use `toast`: an alert stays in the
-  layout, and stale success messages become noise.
-- A decision that blocks progress. That is `alert-dialog`, which traps focus on
-  purpose.
-- Ordinary guidance or onboarding copy. An `alert` is a live region; using it for
-  static text makes screen readers interrupt the user for nothing.
-
 ## Installation
 
 ```install
@@ -1444,9 +1406,7 @@ export function QuotaNotice() {
 }
 ```
 
-## Examples
-
-### With an action
+## With an action
 
 `AlertAction` spans both grid rows, so it stays on the first line when the
 description wraps.
@@ -1462,7 +1422,7 @@ description wraps.
 </Alert>
 ```
 
-### Without an icon
+## Without an icon
 
 The icon column collapses to zero, so title and description sit flush left. Add an
 icon only when it tells the user something the title does not.
@@ -1474,7 +1434,7 @@ icon only when it tells the user something the title does not.
 </Alert>
 ```
 
-### Destructive
+## Destructive
 
 `variant="destructive"` colours the text and leaves the surface as a card. A red
 block is harder to read and competes with the page it sits on.
@@ -1482,6 +1442,24 @@ block is harder to read and competes with the page it sits on.
 ```tsx
 <Alert variant="destructive">Payment declined</Alert>
 ```
+
+## When to use
+
+- The result of an action the user just took, where the outcome needs a sentence of
+  explanation: a failed deploy, a partial import, a quota that is nearly full.
+- A state of the page that is not an error but changes what is possible — degraded
+  mode, read-only mode, a plan that expired yesterday.
+- A warning attached to a region rather than to a control, so it survives scrolling
+  away from the field it is about.
+
+## When not to use
+
+- A confirmation that needs no reading ("Saved"). Use `toast`: an alert stays in the
+  layout, and stale success messages become noise.
+- A decision that blocks progress. That is `alert-dialog`, which traps focus on
+  purpose.
+- Ordinary guidance or onboarding copy. An `alert` is a live region; using it for
+  static text makes screen readers interrupt the user for nothing.
 
 ## API
 
@@ -1534,23 +1512,6 @@ animated and carry no timing.
 
 The resting state of a region that has nothing to show yet.
 
-## When to use
-
-- A list, table, or panel that is legitimately empty: no invoices, no results for
-  this filter, a folder nobody has filled yet.
-- An empty state that teaches the next step — a primary action, a link to a
-  template, or a line that explains what will appear here.
-- A region whose emptiness is a state, not a mistake: an inbox at zero, a fresh
-  workspace.
-
-## When not to use
-
-- While loading. Use `skeleton` when the shape of the incoming content is known,
-  and `spinner` when it is not.
-- A search that returned nothing because of a typo. That case needs the query echoed
-  back and the filter explained, not a generic illustration.
-- An error. An empty region is a normal state; a failed request is an `alert`.
-
 ## Installation
 
 ```install
@@ -1589,9 +1550,7 @@ export function InvoicesEmpty() {
 }
 ```
 
-## Examples
-
-### Bounded or unbounded
+## Bounded or unbounded
 
 The root is a dashed container with generous padding, so it can stand in for a whole
 panel. Drop the boundary with a class when it already sits inside a bordered card.
@@ -1600,7 +1559,7 @@ panel. Drop the boundary with a class when it already sits inside a bordered car
 <Empty className="border">…</Empty>
 ```
 
-### A second action
+## A second action
 
 `EmptyContent` is a column with a gap; put the secondary action underneath, or side
 by side with a row wrapper.
@@ -1612,7 +1571,7 @@ by side with a row wrapper.
 </EmptyContent>
 ```
 
-### Icon or illustration
+## Icon or illustration
 
 `variant="icon"` puts the glyph on a muted surface; `default` leaves the media
 transparent for an illustration or a small chart.
@@ -1622,6 +1581,23 @@ transparent for an illustration or a small chart.
   <Inbox />
 </EmptyMedia>
 ```
+
+## When to use
+
+- A list, table, or panel that is legitimately empty: no invoices, no results for
+  this filter, a folder nobody has filled yet.
+- An empty state that teaches the next step — a primary action, a link to a
+  template, or a line that explains what will appear here.
+- A region whose emptiness is a state, not a mistake: an inbox at zero, a fresh
+  workspace.
+
+## When not to use
+
+- While loading. Use `skeleton` when the shape of the incoming content is known,
+  and `spinner` when it is not.
+- A search that returned nothing because of a typo. That case needs the query echoed
+  back and the filter explained, not a generic illustration.
+- An error. An empty region is a normal state; a failed request is an `alert`.
 
 ## API
 
@@ -1676,23 +1652,6 @@ When the region swaps from empty to populated, that transition belongs to the li
 
 A row in a list of like objects, with media, content, and actions.
 
-## When to use
-
-- A list of comparable objects where each row carries a name, a line of supporting
-  text, and an action: files, members, invoices, saved searches.
-- A row that must become a link as a whole, without nesting a button inside an
-  anchor.
-- A dense list where three sizes (`default`, `sm`, `xs`) cover a panel, a card, and a
-  sidebar strip respectively.
-
-## When not to use
-
-- Tabular data with columns that need to line up across rows. Use `table`: an item is
-  a sentence, not a grid.
-- A single object on its own page. Use `card`; the item's rhythm assumes siblings.
-- A selectable row inside a menu or a listbox. Those have their own roles and
-  keyboard model; use the menu or `command` component.
-
 ## Installation
 
 ```install
@@ -1729,9 +1688,7 @@ export function Files() {
 }
 ```
 
-## Examples
-
-### A whole-row link
+## A whole-row link
 
 `render` replaces the wrapper element (Base UI `render`, not `asChild`). The anchor
 keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
@@ -1745,7 +1702,7 @@ keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
 </Item>
 ```
 
-### Variants
+## Variants
 
 `default` is transparent, `outline` adds the border, `muted` fills the surface. The
 border is always present in the box model — only its colour changes — so switching
@@ -1756,7 +1713,7 @@ variants never shifts the layout.
 <Item variant="muted" size="sm" />
 ```
 
-### Separators
+## Separators
 
 `ItemSeparator` is a horizontal `Separator` with the vertical margins removed, so it
 sits flush between rows.
@@ -1769,7 +1726,7 @@ sits flush between rows.
 </ItemGroup>
 ```
 
-### Header and footer
+## Header and footer
 
 `ItemHeader` and `ItemFooter` take a full row (`basis-full`), for metadata above the
 title or a progress line below the content.
@@ -1785,6 +1742,23 @@ title or a progress line below the content.
   </ItemFooter>
 </Item>
 ```
+
+## When to use
+
+- A list of comparable objects where each row carries a name, a line of supporting
+  text, and an action: files, members, invoices, saved searches.
+- A row that must become a link as a whole, without nesting a button inside an
+  anchor.
+- A dense list where three sizes (`default`, `sm`, `xs`) cover a panel, a card, and a
+  sidebar strip respectively.
+
+## When not to use
+
+- Tabular data with columns that need to line up across rows. Use `table`: an item is
+  a sentence, not a grid.
+- A single object on its own page. Use `card`; the item's rhythm assumes siblings.
+- A selectable row inside a menu or a listbox. Those have their own roles and
+  keyboard model; use the menu or `command` component.
 
 ## API
 
@@ -1847,23 +1821,6 @@ that animates itself cannot be interrupted by the next render.
 
 A labelled control with its description and error, without owning validation.
 
-## When to use
-
-- Any control that needs a visible label plus a line of help: text, select, checkbox
-  group, radio group, a segmented choice.
-- A form where the error has to sit next to the control it belongs to, not in a
-  summary at the top.
-- A choice card — a `Field` that contains a whole control card — where the label is
-  the surface and the checked state is the selection.
-
-## When not to use
-
-- A single input with no label and no help. Do not wrap it; `input` already carries
-  its own border and focus ring.
-- A validation module. `Field` renders messages; it never produces them (P11).
-- A toolbar of loose controls. Group those with `button-group`, which has no label
-  semantics to offer.
-
 ## Installation
 
 ```install
@@ -1889,9 +1846,7 @@ export function CompanyField() {
 }
 ```
 
-## Examples
-
-### Vertical, horizontal, responsive
+## Vertical, horizontal, responsive
 
 `orientation` decides where the label sits. `responsive` keeps a column until the
 `FieldGroup` reaches `md`, then turns into a row — the group is the container query
@@ -1904,7 +1859,7 @@ root, so it works inside a sidebar or a dialog without a breakpoint for each.
 </FieldGroup>
 ```
 
-### An error, from the caller
+## An error, from the caller
 
 `FieldError` renders what it is given and returns `null` when it has nothing. Two
 messages become a list; duplicates collapse.
@@ -1919,7 +1874,7 @@ messages become a list; duplicates collapse.
 </Field>
 ```
 
-### A set, a legend, and a divider
+## A set, a legend, and a divider
 
 ```tsx
 <FieldSet>
@@ -1932,7 +1887,7 @@ messages become a list; duplicates collapse.
 </FieldSet>
 ```
 
-### A choice card
+## A choice card
 
 `FieldLabel` recognises a `Field` inside it and becomes the card: full width, border,
 padding, and a primary tint when the inner control is checked.
@@ -1948,6 +1903,23 @@ padding, and a primary tint when the inner control is checked.
   </Field>
 </FieldLabel>
 ```
+
+## When to use
+
+- Any control that needs a visible label plus a line of help: text, select, checkbox
+  group, radio group, a segmented choice.
+- A form where the error has to sit next to the control it belongs to, not in a
+  summary at the top.
+- A choice card — a `Field` that contains a whole control card — where the label is
+  the surface and the checked state is the selection.
+
+## When not to use
+
+- A single input with no label and no help. Do not wrap it; `input` already carries
+  its own border and focus ring.
+- A validation module. `Field` renders messages; it never produces them (P11).
+- A toolbar of loose controls. Group those with `button-group`, which has no label
+  semantics to offer.
 
 ## API
 
@@ -1984,6 +1956,17 @@ is in.
 `data-[invalid=true]` recolours the field's text on the destructive token. That is a
 colour change, not a motion, and it is never the only signal.
 
+## Accessibility
+
+- `FieldLabel` is a `label`, so clicking it focuses the control it names. Always pass
+  `htmlFor` matching the control's `id`; a `FieldTitle` is not a substitute.
+- An error is `role="alert"`: it is announced when it appears. Point the control at it
+  with `aria-describedby` so the message is also part of the control's description.
+- `aria-invalid` on the control is what makes the state machine-readable; the
+  destructive colour is the sighted half of the same signal.
+- A horizontal field puts the label after the content in source order when the content
+  holds the control. Keep the DOM order label → control for a simple pair.
+
 ## Validation and data ownership
 
 P11 draws the line: the component renders state, you decide state.
@@ -1999,17 +1982,6 @@ There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. `FieldError` accepts messages, not rules: the decision that a
 value is wrong, and the copy that says so, stay in your form code.
 
-## Accessibility
-
-- `FieldLabel` is a `label`, so clicking it focuses the control it names. Always pass
-  `htmlFor` matching the control's `id`; a `FieldTitle` is not a substitute.
-- An error is `role="alert"`: it is announced when it appears. Point the control at it
-  with `aria-describedby` so the message is also part of the control's description.
-- `aria-invalid` on the control is what makes the state machine-readable; the
-  destructive colour is the sighted half of the same signal.
-- A horizontal field puts the label after the content in source order when the content
-  holds the control. Keep the DOM order label → control for a simple pair.
-
 ## Notes for AI
 
 - Do not add an `error` prop to `Input`; put the message in `FieldError` and point
@@ -2021,23 +1993,6 @@ value is wrong, and the copy that says so, stay in your form code.
 # Button Group
 
 Adjacent controls joined into one shape.
-
-## When to use
-
-- Two to five controls that act on the same object: bold/italic/underline, cut/copy,
-  approve/reject, a zoom stepper.
-- A segmented control where the current option is a button state (`variant="default"`
-  vs `"ghost"`), not a radio group.
-- A label plus an action, where the label should read as part of the control — use
-  `ButtonGroupText` for the static half.
-
-## When not to use
-
-- More than about five options. Beyond that the shape stops helping and a `select` or
-  a menu is faster.
-- Mutually exclusive choices that need arrow-key navigation and a form value. That is
-  `toggle-group`, or a `radio-group` inside a `field`.
-- A single button. The group adds nothing; use `button`.
 
 ## Installation
 
@@ -2065,9 +2020,7 @@ export function TextStyle() {
 }
 ```
 
-## Examples
-
-### Vertical
+## Vertical
 
 `orientation="vertical"` stacks the same rules: only the outer corners are rounded,
 and the shared borders collapse.
@@ -2079,7 +2032,7 @@ and the shared borders collapse.
 </ButtonGroup>
 ```
 
-### Static text inside the group
+## Static text inside the group
 
 `ButtonGroupText` takes `render`, so the label can be a `label`, a `span`, or the
 router's own element without extra wrappers.
@@ -2093,7 +2046,7 @@ router's own element without extra wrappers.
 </ButtonGroup>
 ```
 
-### A rule between two controls
+## A rule between two controls
 
 `ButtonGroupSeparator` stretches to the cross axis, so one component works in both
 orientations.
@@ -2105,6 +2058,23 @@ orientations.
   <Button>Copy</Button>
 </ButtonGroup>
 ```
+
+## When to use
+
+- Two to five controls that act on the same object: bold/italic/underline, cut/copy,
+  approve/reject, a zoom stepper.
+- A segmented control where the current option is a button state (`variant="default"`
+  vs `"ghost"`), not a radio group.
+- A label plus an action, where the label should read as part of the control — use
+  `ButtonGroupText` for the static half.
+
+## When not to use
+
+- More than about five options. Beyond that the shape stops helping and a `select` or
+  a menu is faster.
+- Mutually exclusive choices that need arrow-key navigation and a form value. That is
+  `toggle-group`, or a `radio-group` inside a `field`.
+- A single button. The group adds nothing; use `button`.
 
 ## API
 
@@ -2156,22 +2126,6 @@ animation on top of it.
 
 A text control framed with prefixes, suffixes, and buttons.
 
-## When to use
-
-- A field with a fixed prefix or suffix: a currency symbol, `https://`, a unit, a
-  domain.
-- A control that needs one inline action: search with a shortcut hint, a chooser with
-  a clear button, an invite field with a submit button.
-- A textarea with a footer — a character count, a send button — where the footer must
-  look attached to the field.
-
-## When not to use
-
-- A bare text field. Use `input`; the group would only re-create its border.
-- A whole toolbar of actions. Use `button-group` beside the field, or a `form` layout:
-  four buttons inside one field is a cramped target.
-- A label. Use `field` and `FieldLabel`; an addon is not an accessible name.
-
 ## Installation
 
 ```install
@@ -2200,9 +2154,7 @@ export function Domain() {
 }
 ```
 
-## Examples
-
-### Alignments
+## Alignments
 
 `align` decides where the addon sits: `inline-start`, `inline-end`, `block-start`,
 `block-end`. The frame turns into a column for the block alignments, and the control
@@ -2215,7 +2167,7 @@ gives up the padding on that side.
 </InputGroup>
 ```
 
-### A button in the frame
+## A button in the frame
 
 `InputGroupButton` sizes itself on the addon scale (`xs`, `sm`, `icon-xs`,
 `icon-sm`), so it never towers over a 36px field. A click on a real button does not
@@ -2230,7 +2182,7 @@ steal focus from the input — the addon's focus handler steps aside.
 </InputGroup>
 ```
 
-### A textarea with a footer
+## A textarea with a footer
 
 ```tsx
 <InputGroup>
@@ -2241,6 +2193,22 @@ steal focus from the input — the addon's focus handler steps aside.
   </InputGroupAddon>
 </InputGroup>
 ```
+
+## When to use
+
+- A field with a fixed prefix or suffix: a currency symbol, `https://`, a unit, a
+  domain.
+- A control that needs one inline action: search with a shortcut hint, a chooser with
+  a clear button, an invite field with a submit button.
+- A textarea with a footer — a character count, a send button — where the footer must
+  look attached to the field.
+
+## When not to use
+
+- A bare text field. Use `input`; the group would only re-create its border.
+- A whole toolbar of actions. Use `button-group` beside the field, or a `form` layout:
+  four buttons inside one field is a cramped target.
+- A label. Use `field` and `FieldLabel`; an addon is not an accessible name.
 
 ## API
 
@@ -2269,6 +2237,18 @@ run on mount.
 | reduced | none       | –     | –             |
 | none    | none       | –     | –             |
 
+## Accessibility
+
+- The addon text is not a name. Give the control an `aria-label`, or put a `FieldLabel`
+  around the group through `field`.
+- `role="group"` on the frame and on each addon groups the pieces for assistive tech;
+  add `aria-label` to the frame only if the group needs a name of its own.
+- The addon focuses the input on click — a convenience for pointer users. Keyboard
+  users tab straight into the control, which is already the shortest path.
+- Buttons inside the frame keep their own names. An icon-only clear button needs
+  `aria-label="Clear"`.
+- `aria-invalid` must be on the control, not on the frame; the frame reacts to it.
+
 ## Validation and data ownership
 
 P11: the group shows invalid state, it never decides it.
@@ -2282,18 +2262,6 @@ P11: the group shows invalid state, it never decides it.
 There is no `validate`, `schema`, or `resolver` prop, and no validation library is
 imported. [Field](/components/field) shows how the invalid state and its message are wired.
 
-## Accessibility
-
-- The addon text is not a name. Give the control an `aria-label`, or put a `FieldLabel`
-  around the group through `field`.
-- `role="group"` on the frame and on each addon groups the pieces for assistive tech;
-  add `aria-label` to the frame only if the group needs a name of its own.
-- The addon focuses the input on click — a convenience for pointer users. Keyboard
-  users tab straight into the control, which is already the shortest path.
-- Buttons inside the frame keep their own names. An icon-only clear button needs
-  `aria-label="Clear"`.
-- `aria-invalid` must be on the control, not on the frame; the frame reacts to it.
-
 ## Notes for AI
 
 - Never wrap `input` in this group to "add a border"; the input already has one.
@@ -2305,22 +2273,6 @@ imported. [Field](/components/field) shows how the invalid state and its message
 # Breadcrumb
 
 The trail from the root to the current page.
-
-## When to use
-
-- A hierarchy deeper than two levels, where the user needs to know where they are and
-  how to get back up: `Workspace / Projects / cadence-ui`.
-- A page reached through a drill-down — a file inside a folder inside a drive.
-- A trail that doubles as navigation: every ancestor is a link, the current page is
-  not.
-
-## When not to use
-
-- Two levels of depth. The header already links home; a trail of two items adds noise.
-- A wizard or a multi-step form. That is a progress indicator, and it must not let the
-  user jump to a step they have not reached.
-- A history of where the user came from ("back to search results"). That is a back
-  link, and it should look like one.
 
 ## Installation
 
@@ -2357,9 +2309,7 @@ export function Trail() {
 }
 ```
 
-## Examples
-
-### A deep trail that collapses
+## A deep trail that collapses
 
 `BreadcrumbEllipsis` stands in for the middle of a long path. Put a menu trigger next
 to it — the ellipsis itself is not interactive.
@@ -2371,7 +2321,7 @@ to it — the ellipsis itself is not interactive.
 <BreadcrumbSeparator />
 ```
 
-### A custom separator
+## A custom separator
 
 `BreadcrumbSeparator` takes any child; without one it renders a chevron at `size-3.5`.
 
@@ -2381,7 +2331,7 @@ to it — the ellipsis itself is not interactive.
 </BreadcrumbSeparator>
 ```
 
-### A router link
+## A router link
 
 `BreadcrumbLink` takes Base UI's `render`, so the framework's own link component keeps
 its prefetching and client-side navigation. The `data-slot` survives the swap.
@@ -2389,6 +2339,22 @@ its prefetching and client-side navigation. The `data-slot` survives the swap.
 ```tsx
 <BreadcrumbLink render={<Link href="/files" />}>Files</BreadcrumbLink>
 ```
+
+## When to use
+
+- A hierarchy deeper than two levels, where the user needs to know where they are and
+  how to get back up: `Workspace / Projects / cadence-ui`.
+- A page reached through a drill-down — a file inside a folder inside a drive.
+- A trail that doubles as navigation: every ancestor is a link, the current page is
+  not.
+
+## When not to use
+
+- Two levels of depth. The header already links home; a trail of two items adds noise.
+- A wizard or a multi-step form. That is a progress indicator, and it must not let the
+  user jump to a step they have not reached.
+- A history of where the user came from ("back to search results"). That is a back
+  link, and it should look like one.
 
 ## API
 
@@ -2443,21 +2409,6 @@ stable thing on the page move.
 
 Page navigation that stays a link, not a button.
 
-## When to use
-
-- A result set that is paged for a reason: the total is unknown, the data is remote, or
-  the URL should carry the page so it can be shared and reloaded.
-- A list where the user needs to jump to a specific page, not only step forward.
-- A table footer on the server, where the count lives in the response.
-
-## When not to use
-
-- A finite list that is already in memory. Render it, or a "load more" button — paging
-  something you already have is a worse experience than scrolling.
-- An infinite feed. There is no page to link to, so an anchor-based control lies.
-- A carousel or a wizard. Those step through slides or steps, and their controls are
-  buttons.
-
 ## Installation
 
 ```install
@@ -2497,9 +2448,7 @@ export function Pages({ page }: { page: number }) {
 }
 ```
 
-## Examples
-
-### A collapsed range
+## A collapsed range
 
 `PaginationEllipsis` marks the pages that are not rendered. It is hidden from
 assistive tech, so the list stays short for a screen reader too.
@@ -2510,7 +2459,7 @@ assistive tech, so the list stays short for a screen reader too.
 </PaginationItem>
 ```
 
-### Custom labels
+## Custom labels
 
 `PaginationPrevious` and `PaginationNext` take `text`; the label is hidden below `sm`,
 where the chevron carries the meaning and the accessible name still says "Go to
@@ -2521,7 +2470,7 @@ previous page".
 <PaginationNext href="?page=3" text="Forward" />
 ```
 
-### Without a page in the URL
+## Without a page in the URL
 
 Keep the anchor and intercept the click; do not swap it for a button. The anchor keeps
 middle-click, copy-link, and the "link" announcement.
@@ -2537,6 +2486,21 @@ middle-click, copy-link, and the "link" announcement.
   3
 </PaginationLink>
 ```
+
+## When to use
+
+- A result set that is paged for a reason: the total is unknown, the data is remote, or
+  the URL should carry the page so it can be shared and reloaded.
+- A list where the user needs to jump to a specific page, not only step forward.
+- A table footer on the server, where the count lives in the response.
+
+## When not to use
+
+- A finite list that is already in memory. Render it, or a "load more" button — paging
+  something you already have is a worse experience than scrolling.
+- An infinite feed. There is no page to link to, so an anchor-based control lies.
+- A carousel or a wizard. Those step through slides or steps, and their controls are
+  buttons.
 
 ## API
 
@@ -2592,24 +2556,6 @@ If the new page's rows should arrive in sequence, that is `list.stagger` on the 
 
 An indeterminate wait, rotating until the work finishes.
 
-## When to use
-
-- An action the user just triggered: save, send, invite, publish. The spinner sits
-  where the user is looking — inside the button, or immediately beside it.
-- A wait with no measurable progress: a request that returns when it returns.
-- A region that is loading and whose shape you cannot predict. When you *can* predict
-  it, use `skeleton` instead: it keeps the layout stable.
-
-## When not to use
-
-- A wait under about 300 ms. The spinner appears and disappears before it can be read,
-  which reads as a flicker. Keep the button's label and disable it.
-- A known percentage. Use `progress`; a spinning wheel after "60%" is a regression.
-- A page that is loading its first paint. There is nothing to spin inside yet — a
-  skeleton or a server-rendered shell is better.
-- A decorative "we're working on it" on a marketing page. Motion without a state
-  change is decoration (P9).
-
 ## Installation
 
 ```install
@@ -2631,9 +2577,7 @@ export function LoadingRegistry() {
 }
 ```
 
-## Examples
-
-### Inside a button
+## Inside a button
 
 The button keeps its width because the spinner replaces nothing: keep the label and
 put the spinner in front of it, or reserve the label's space with `aria-live`.
@@ -2645,7 +2589,7 @@ put the spinner in front of it, or reserve the label's space with `aria-live`.
 </Button>
 ```
 
-### Sized by the caller
+## Sized by the caller
 
 The icon is `size-4` by default and inherits `currentColor`, so one class resizes and
 recolours it.
@@ -2654,7 +2598,7 @@ recolours it.
 <Spinner className="size-3 text-muted-foreground" />
 ```
 
-### A specific label
+## A specific label
 
 "Loading" is the default. Say what is loading when the surrounding text does not.
 
@@ -2662,7 +2606,7 @@ recolours it.
 <Spinner aria-label="Saving invoice" />
 ```
 
-### Under `data-motion="none"`
+## Under `data-motion="none"`
 
 The rotation stops; the icon stays and the label still says "Loading". A stopped
 spinner is still a state, which is why `none` does not remove it from the tree.
@@ -2672,6 +2616,24 @@ spinner is still a state, which is why `none` does not remove it from the tree.
   <Spinner />
 </CadenceProvider>
 ```
+
+## When to use
+
+- An action the user just triggered: save, send, invite, publish. The spinner sits
+  where the user is looking — inside the button, or immediately beside it.
+- A wait with no measurable progress: a request that returns when it returns.
+- A region that is loading and whose shape you cannot predict. When you *can* predict
+  it, use `skeleton` instead: it keeps the layout stable.
+
+## When not to use
+
+- A wait under about 300 ms. The spinner appears and disappears before it can be read,
+  which reads as a flicker. Keep the button's label and disable it.
+- A known percentage. Use `progress`; a spinning wheel after "60%" is a regression.
+- A page that is loading its first paint. There is nothing to spin inside yet — a
+  skeleton or a server-rendered shell is better.
+- A decorative "we're working on it" on a marketing page. Motion without a state
+  change is decoration (P9).
 
 ## API
 
@@ -2746,18 +2708,6 @@ size, not by growing the icon.
 
 A modal window that fades and settles in, with the open and close sequence interruptible.
 
-## When to use
-
-- A focused task that must interrupt the page: rename, invite, confirm.
-- Content that needs a modal, a focus trap, and an obvious escape route.
-- A short form whose result matters more than the page behind it.
-
-## When not to use
-
-- Non-blocking hints and menus; use `popover` or `tooltip`.
-- Long multi-step flows; use a page or a wizard.
-- Mobile sheets with drag gestures; use `drawer`.
-
 ## Installation
 
 ```install
@@ -2800,9 +2750,7 @@ export function DeleteProject() {
 }
 ```
 
-## Examples
-
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -2812,19 +2760,31 @@ const [open, setOpen] = useState(false);
 </Dialog>;
 ```
 
-### Without the built-in close button
+## Without the built-in close button
 
 ```tsx
 <DialogContent showCloseButton={false}>…</DialogContent>
 ```
 
-### Footer with a close action
+## Footer with a close action
 
 ```tsx
 <DialogFooter showCloseButton>
   <Button>Save</Button>
 </DialogFooter>
 ```
+
+## When to use
+
+- A focused task that must interrupt the page: rename, invite, confirm.
+- Content that needs a modal, a focus trap, and an obvious escape route.
+- A short form whose result matters more than the page behind it.
+
+## When not to use
+
+- Non-blocking hints and menus; use `popover` or `tooltip`.
+- Long multi-step flows; use a page or a wizard.
+- Mobile sheets with drag gestures; use `drawer`.
 
 ## API
 
@@ -2887,22 +2847,6 @@ Long content scrolls inside the popup rather than the page.
 
 A control that allows the user to toggle between checked and not checked.
 
-## When to use
-
-- One independent yes/no choice: accept the terms, remember this device, include
-  archived items.
-- A set of choices where several can be true at once; use one checkbox per row.
-- A parent row that summarises children: pass `indeterminate` while the children
-  disagree.
-- A table row selection, where each row is its own decision.
-
-## When not to use
-
-- Exactly one of several options; use `radio-group`, which also gives arrow-key
-  navigation.
-- An immediate setting that applies the moment it is flipped; use `switch`.
-- A formatting command that acts on a selection; use `toggle`.
-
 ## Installation
 
 ```install
@@ -2928,9 +2872,7 @@ export function Terms() {
 `id` lands on the hidden input, so `htmlFor` on a `label` names the control and
 clicking the label toggles it.
 
-## Examples
-
-### Checked by default, and indeterminate
+## Checked by default, and indeterminate
 
 ```tsx
 <Checkbox defaultChecked />
@@ -2941,7 +2883,7 @@ clicking the label toggles it.
 reader hears. It never replaces the checked state — pass `checked` too if the
 form needs a value.
 
-### Controlled
+## Controlled
 
 ```tsx
 const [accepted, setAccepted] = useState(false);
@@ -2949,7 +2891,7 @@ const [accepted, setAccepted] = useState(false);
 <Checkbox checked={accepted} onCheckedChange={setAccepted} />;
 ```
 
-### Invalid, with a described error
+## Invalid, with a described error
 
 ```tsx
 <Checkbox id="terms" aria-invalid aria-describedby="terms-error" />
@@ -2961,7 +2903,7 @@ const [accepted, setAccepted] = useState(false);
 The ring turns destructive because `aria-invalid` is set. The component does not
 decide that anything is wrong.
 
-### In a row of settings
+## In a row of settings
 
 ```tsx
 <div className="flex items-start gap-3">
@@ -2972,6 +2914,22 @@ decide that anything is wrong.
   </div>
 </div>
 ```
+
+## When to use
+
+- One independent yes/no choice: accept the terms, remember this device, include
+  archived items.
+- A set of choices where several can be true at once; use one checkbox per row.
+- A parent row that summarises children: pass `indeterminate` while the children
+  disagree.
+- A table row selection, where each row is its own decision.
+
+## When not to use
+
+- Exactly one of several options; use `radio-group`, which also gives arrow-key
+  navigation.
+- An immediate setting that applies the moment it is flipped; use `switch`.
+- A formatting command that acts on a selection; use `toggle`.
 
 ## API
 
@@ -3058,20 +3016,6 @@ running loop.
 
 A set of checkable buttons where no more than one can be checked at a time.
 
-## When to use
-
-- A small, fixed set of options where exactly one applies: a plan, a priority, a
-  shipping method.
-- Anywhere seeing all the options at once matters more than saving space.
-- A setting that applies on submit, not immediately.
-
-## When not to use
-
-- Several answers can be true; use `checkbox`.
-- The setting applies the moment it changes; use `switch`.
-- More than about seven options, or a list that is filtered as you type; use
-  `select` or `combobox`, which handle long lists and search.
-
 ## Installation
 
 ```install
@@ -3103,9 +3047,7 @@ export function Plan() {
 Every item needs a `value`. The group is one form field: `name` goes on the
 group, not on the items.
 
-## Examples
-
-### Controlled
+## Controlled
 
 ```tsx
 const [plan, setPlan] = useState("team");
@@ -3117,7 +3059,7 @@ const [plan, setPlan] = useState("team");
 
 `onValueChange` receives the new value plus Base UI's event details.
 
-### Invalid
+## Invalid
 
 ```tsx
 <RadioGroup aria-invalid aria-describedby="plan-error" aria-label="Plan">
@@ -3130,7 +3072,7 @@ const [plan, setPlan] = useState("team");
 
 `aria-invalid` on the group styles the items and is announced with the group.
 
-### Disabled item
+## Disabled item
 
 ```tsx
 <RadioGroup defaultValue="starter" aria-label="Plan">
@@ -3141,6 +3083,20 @@ const [plan, setPlan] = useState("team");
 
 A disabled item is still visible and still announced, so the option does not
 appear to vanish.
+
+## When to use
+
+- A small, fixed set of options where exactly one applies: a plan, a priority, a
+  shipping method.
+- Anywhere seeing all the options at once matters more than saving space.
+- A setting that applies on submit, not immediately.
+
+## When not to use
+
+- Several answers can be true; use `checkbox`.
+- The setting applies the moment it changes; use `switch`.
+- More than about seven options, or a list that is filtered as you type; use
+  `select` or `combobox`, which handle long lists and search.
 
 ## API
 
@@ -3232,21 +3188,6 @@ CSS, so no measurement happens.
 
 A control that toggles between on and off, with a thumb that travels between the two states.
 
-## When to use
-
-- A setting that takes effect immediately: public/private, alerts on/off, a feature
-  flag.
-- A row in a settings list, where the label describes the thing and the switch
-  describes its state.
-- A preference with no submit button. Flipping it saves.
-
-## When not to use
-
-- The change is only applied on submit; use `checkbox`, which is the familiar form
-  control for a pending decision.
-- One of several options; use `radio-group`.
-- A formatting command on a selection; use `toggle`.
-
 ## Installation
 
 ```install
@@ -3269,9 +3210,7 @@ export function Public() {
 }
 ```
 
-## Examples
-
-### Sizes
+## Sizes
 
 ```tsx
 <Switch defaultChecked />
@@ -3281,7 +3220,7 @@ export function Public() {
 `size="sm"` keeps the same travel logic: the distance is measured from the track
 and the thumb, so restyling either keeps the end position correct.
 
-### Controlled
+## Controlled
 
 ```tsx
 const [on, setOn] = useState(false);
@@ -3289,7 +3228,7 @@ const [on, setOn] = useState(false);
 <Switch checked={on} onCheckedChange={setOn} aria-label="Alerts" />;
 ```
 
-### In a settings row
+## In a settings row
 
 ```tsx
 <div className="flex items-center justify-between gap-4">
@@ -3301,7 +3240,7 @@ const [on, setOn] = useState(false);
 </div>
 ```
 
-### Disabled
+## Disabled
 
 ```tsx
 <Switch disabled defaultChecked />
@@ -3309,6 +3248,21 @@ const [on, setOn] = useState(false);
 
 Disabled switches stay visible and announced; hiding them loses the information
 that the setting exists.
+
+## When to use
+
+- A setting that takes effect immediately: public/private, alerts on/off, a feature
+  flag.
+- A row in a settings list, where the label describes the thing and the switch
+  describes its state.
+- A preference with no submit button. Flipping it saves.
+
+## When not to use
+
+- The change is only applied on submit; use `checkbox`, which is the familiar form
+  control for a pending decision.
+- One of several options; use `radio-group`.
+- A formatting command on a selection; use `toggle`.
 
 ## API
 
@@ -3392,20 +3346,6 @@ transition with no layout reads during interaction.
 
 An input where the user selects a value from a range by dragging a thumb.
 
-## When to use
-
-- A value where the rough position matters more than the exact number: volume,
-  brightness, zoom, opacity.
-- A range (two thumbs): price between, time window, budget band.
-- A filter where the user should feel the bounds instead of typing them.
-
-## When not to use
-
-- An exact number matters and the range is wide; pair a `slider` with an `input`,
-  or use `input` alone.
-- Fewer than about five discrete options; use `radio-group` or `toggle-group`.
-- A value with no natural order, like picking a colour name.
-
 ## Installation
 
 ```install
@@ -3428,9 +3368,7 @@ screen reader announces. A range slider gets one accessible name per thumb —
 `Price (minimum)` and `Price (maximum)` — because two inputs with the same name
 are indistinguishable.
 
-## Examples
-
-### Controlled
+## Controlled
 
 ```tsx
 const [volume, setVolume] = useState([60]);
@@ -3438,7 +3376,7 @@ const [volume, setVolume] = useState([60]);
 <Slider value={volume} onValueChange={setVolume} aria-label="Volume" />;
 ```
 
-### Range
+## Range
 
 ```tsx
 <Slider defaultValue={[120, 480]} min={0} max={600} step={10} aria-label="Price" />
@@ -3447,7 +3385,7 @@ const [volume, setVolume] = useState([60]);
 Two entries in the array give two thumbs; `minStepsBetweenValues` keeps them from
 crossing.
 
-### Vertical
+## Vertical
 
 ```tsx
 <Slider orientation="vertical" defaultValue={[40]} className="h-56" aria-label="Level" />
@@ -3455,11 +3393,25 @@ crossing.
 
 Give the vertical slider a height; the track fills it.
 
-### Disabled
+## Disabled
 
 ```tsx
 <Slider defaultValue={[40]} disabled aria-label="Volume" />
 ```
+
+## When to use
+
+- A value where the rough position matters more than the exact number: volume,
+  brightness, zoom, opacity.
+- A range (two thumbs): price between, time window, budget band.
+- A filter where the user should feel the bounds instead of typing them.
+
+## When not to use
+
+- An exact number matters and the range is wide; pair a `slider` with an `input`,
+  or use `input` alone.
+- Fewer than about five discrete options; use `radio-group` or `toggle-group`.
+- A value with no natural order, like picking a colour name.
 
 ## API
 
@@ -3543,20 +3495,6 @@ scale. No `layout` animation, no measurement per frame.
 
 A two-state button that can be pressed or not pressed.
 
-## When to use
-
-- A formatting or mode command that stays on until it is turned off: bold,
-  italic, a preview pane, a grid/list switch.
-- A compact toolbar button whose pressed state is visible next to its neighbours.
-- A setting the user toggles repeatedly while working.
-
-## When not to use
-
-- The action is one-shot (save, delete, open); use `button`.
-- A setting that takes effect immediately and permanently, like a preference; use
-  `switch`.
-- A group of related toggles that should read as one control; use `toggle-group`.
-
 ## Installation
 
 ```install
@@ -3580,9 +3518,7 @@ export function BoldToggle() {
 
 An icon-only toggle needs `aria-label`; the glyph is not a name.
 
-## Examples
-
-### Variants and sizes
+## Variants and sizes
 
 ```tsx
 <Toggle>Default</Toggle>
@@ -3594,7 +3530,7 @@ An icon-only toggle needs `aria-label`; the glyph is not a name.
 
 `outline` gives the toggle a border, for toolbars that sit on a busy surface.
 
-### With a label
+## With a label
 
 ```tsx
 <Toggle variant="outline">
@@ -3605,7 +3541,7 @@ An icon-only toggle needs `aria-label`; the glyph is not a name.
 
 `gap-2` is already in the base classes, so an icon and a label space themselves.
 
-### Controlled
+## Controlled
 
 ```tsx
 const [on, setOn] = useState(false);
@@ -3613,7 +3549,7 @@ const [on, setOn] = useState(false);
 <Toggle pressed={on} onPressedChange={setOn} aria-label="Bold" />;
 ```
 
-### Inside a form
+## Inside a form
 
 ```tsx
 <Toggle name="bold" defaultPressed value="bold" />
@@ -3621,6 +3557,20 @@ const [on, setOn] = useState(false);
 
 A pressed toggle submits its `value`; an unpressed one submits nothing, like a
 checkbox.
+
+## When to use
+
+- A formatting or mode command that stays on until it is turned off: bold,
+  italic, a preview pane, a grid/list switch.
+- A compact toolbar button whose pressed state is visible next to its neighbours.
+- A setting the user toggles repeatedly while working.
+
+## When not to use
+
+- The action is one-shot (save, delete, open); use `button`.
+- A setting that takes effect immediately and permanently, like a preference; use
+  `switch`.
+- A group of related toggles that should read as one control; use `toggle-group`.
 
 ## API
 
@@ -3700,22 +3650,6 @@ measurement.
 
 A set of two-state buttons that can be pressed one at a time or together.
 
-## When to use
-
-- A small set of modes that belong to one control: text alignment, view density,
-  a time range.
-- A formatting toolbar where several marks can be active at once
-  (`multiple`).
-- Anywhere the options are icons and the choice should read as one segmented
-  control (`spacing={0}` + `variant="outline"`).
-
-## When not to use
-
-- Exactly one option with a text label and a longer list; use `radio-group`, which
-  exposes radio semantics rather than a row of toggle buttons.
-- A single independent on/off command; use `toggle`.
-- Navigation between pages; use `tabs`, which owns `role="tablist"`.
-
 ## Installation
 
 ```install
@@ -3748,9 +3682,7 @@ export function Alignment() {
 }
 ```
 
-## Examples
-
-### Multiple
+## Multiple
 
 ```tsx
 <ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style">
@@ -3765,7 +3697,7 @@ export function Alignment() {
 
 Without `multiple`, pressing an item releases the others.
 
-### Spacing
+## Spacing
 
 ```tsx
 <ToggleGroup variant="outline" spacing={0} aria-label="Range">
@@ -3780,7 +3712,7 @@ Without `multiple`, pressing an item releases the others.
 `spacing={0}` joins the borders into one segmented control; a positive value
 keeps the items apart in Tailwind spacing steps.
 
-### Vertical
+## Vertical
 
 ```tsx
 <ToggleGroup orientation="vertical" aria-label="Zoom">
@@ -3788,7 +3720,7 @@ keeps the items apart in Tailwind spacing steps.
 </ToggleGroup>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [value, setValue] = useState(["center"]);
@@ -3799,6 +3731,22 @@ const [value, setValue] = useState(["center"]);
 ```
 
 The value is always an array, even without `multiple`.
+
+## When to use
+
+- A small set of modes that belong to one control: text alignment, view density,
+  a time range.
+- A formatting toolbar where several marks can be active at once
+  (`multiple`).
+- Anywhere the options are icons and the choice should read as one segmented
+  control (`spacing={0}` + `variant="outline"`).
+
+## When not to use
+
+- Exactly one option with a text label and a longer list; use `radio-group`, which
+  exposes radio semantics rather than a row of toggle buttons.
+- A single independent on/off command; use `toggle`.
+- Navigation between pages; use `tabs`, which owns `role="tablist"`.
 
 ## API
 
@@ -3890,20 +3838,6 @@ measurement, so a group of eight items costs nothing until one is pressed.
 
 A one-time password field that renders one slot per character.
 
-## When to use
-
-- A short code the user reads from another surface: a login code, an email
-  verification, a device pairing code.
-- Anywhere a single input would force the user to count characters.
-- A code that arrives by SMS or authenticator app, where `autocomplete="one-time-code"`
-  lets the OS offer it.
-
-## When not to use
-
-- A password the user chooses; use `input type="password"`.
-- A long token that is pasted, not typed; use `input` with paste handling.
-- A numeric field that is not a code, like a quantity; use `input type="number"`.
-
 ## Installation
 
 ```install
@@ -3944,9 +3878,7 @@ export function Code() {
 
 `maxLength` must equal the number of slots. Each `InputOTPSlot` needs its `index`.
 
-## Examples
-
-### Controlled, with completion
+## Controlled, with completion
 
 ```tsx
 const [code, setCode] = useState("");
@@ -3959,7 +3891,7 @@ const [code, setCode] = useState("");
 `onComplete` fires once the last slot is filled. It is the right place to submit
 the code, not an effect that watches `code.length`.
 
-### Invalid
+## Invalid
 
 ```tsx
 <InputOTP maxLength={4} aria-label="Code" aria-invalid>
@@ -3973,7 +3905,7 @@ the code, not an effect that watches `code.length`.
 `aria-invalid` on a slot styles its border; the text beside the field carries the
 message.
 
-### Disabled
+## Disabled
 
 ```tsx
 <InputOTP maxLength={6} disabled aria-label="Code">
@@ -3981,7 +3913,7 @@ message.
 </InputOTP>
 ```
 
-### Without a separator
+## Without a separator
 
 ```tsx
 <InputOTP maxLength={4} aria-label="PIN" containerClassName="justify-center">
@@ -3993,6 +3925,20 @@ message.
   </InputOTPGroup>
 </InputOTP>
 ```
+
+## When to use
+
+- A short code the user reads from another surface: a login code, an email
+  verification, a device pairing code.
+- Anywhere a single input would force the user to count characters.
+- A code that arrives by SMS or authenticator app, where `autocomplete="one-time-code"`
+  lets the OS offer it.
+
+## When not to use
+
+- A password the user chooses; use `input type="password"`.
+- A long token that is pasted, not typed; use `input` with paste handling.
+- A numeric field that is not a code, like a quantity; use `input type="number"`.
 
 ## API
 
@@ -4089,21 +4035,6 @@ input, not from measurement.
 
 Displays an indicator showing the completion progress of a task.
 
-## When to use
-
-- Work with a measurable end: an upload, an import, a multi-step build.
-- Work long enough that the user would otherwise wonder whether anything is
-  happening, and short enough that they will watch the bar.
-- A determinate value next to other numbers, where the bar is a second reading of
-  the same fact.
-
-## When not to use
-
-- Work of unknown duration. Pass `value={null}` for an indeterminate bar, or use
-  `spinner` when there is no bar to fill.
-- A page that is simply loading its own content; use `skeleton`.
-- A value that is not progressing toward an end, like a score. Render the number.
-
 ## Installation
 
 ```install
@@ -4124,9 +4055,7 @@ export function Upload() {
 its own track and indicator; `ProgressLabel` and `ProgressValue` go inside it as
 children.
 
-## Examples
-
-### Labelled, with the number
+## Labelled, with the number
 
 ```tsx
 <Progress value={uploaded} aria-label="Uploading assets">
@@ -4140,7 +4069,7 @@ children.
 `ProgressValue` formats the value with `Intl.NumberFormat`; pass `format` or
 `locale` to the root to change it.
 
-### Indeterminate
+## Indeterminate
 
 ```tsx
 <Progress value={null} aria-label="Preparing preview" />
@@ -4150,7 +4079,7 @@ The fill fills the track and pulses. There is no sweep: a moving gradient says
 "indeterminate" with motion alone, which is exactly the anti-pattern in the motion
 system.
 
-### Custom range
+## Custom range
 
 ```tsx
 <Progress value={3} min={0} max={5} aria-label="Step 3 of 5">
@@ -4161,7 +4090,7 @@ system.
 `ProgressValue` renders `60%` for `3/5`; use `getAriaValueText` if you want "step 3
 of 5" announced instead.
 
-### Composed track
+## Composed track
 
 ```tsx
 <Progress value={72} aria-label="Storage">
@@ -4173,6 +4102,21 @@ of 5" announced instead.
 
 Composing the track yourself replaces the default one. The indicator still reads
 the value from the root, so it keeps animating.
+
+## When to use
+
+- Work with a measurable end: an upload, an import, a multi-step build.
+- Work long enough that the user would otherwise wonder whether anything is
+  happening, and short enough that they will watch the bar.
+- A determinate value next to other numbers, where the bar is a second reading of
+  the same fact.
+
+## When not to use
+
+- Work of unknown duration. Pass `value={null}` for an indeterminate bar, or use
+  `spinner` when there is no bar to fill.
+- A page that is simply loading its own content; use `skeleton`.
+- A value that is not progressing toward an end, like a score. Render the number.
 
 ## API
 
@@ -4246,20 +4190,6 @@ yourself; pass the real value and let the transition smooth it.
 
 A modal confirmation that interrupts the flow and needs an explicit choice before anything happens.
 
-## When to use
-
-- A destructive or irreversible action — deleting a project, revoking a key, overwriting a draft — that the
-  user must confirm on purpose.
-- A decision the page cannot make for the user: move the workspace, leave without saving, end the session.
-- A step that must be acknowledged before anything else continues, where an accidental dismissal would be
-  the bug.
-
-## When not to use
-
-- A task with more than one decision or a form to fill in. Use `dialog`: it can be dismissed, and it should be.
-- A message that does not block anything. Use `alert` where it belongs on the page, or `toast` for a moment.
-- A hint attached to a control. Use `tooltip`.
-
 ## Installation
 
 ```install
@@ -4305,9 +4235,7 @@ export function DeleteProject() {
 }
 ```
 
-## Examples
-
-### A compact confirmation
+## A compact confirmation
 
 `size="sm"` caps the panel at `max-w-xs` and turns the footer into a two-column grid, which is what a
 yes/no question looks like. The dialog is centred and its header is centred with it.
@@ -4325,7 +4253,7 @@ yes/no question looks like. The dialog is centred and its header is centred with
 </AlertDialogContent>
 ```
 
-### With an icon
+## With an icon
 
 `AlertDialogMedia` is a slot, not a decoration: put an icon in it and the header switches to the
 left-aligned, icon-first layout on `size="default"`.
@@ -4340,7 +4268,7 @@ left-aligned, icon-first layout on `size="default"`.
 </AlertDialogHeader>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -4350,7 +4278,7 @@ const [open, setOpen] = useState(false);
 </AlertDialog>;
 ```
 
-### A confirmation that is still working
+## A confirmation that is still working
 
 The component never owns a request. The caller passes the in-flight state, and the library keeps the
 button a button:
@@ -4360,6 +4288,20 @@ button a button:
   {isDeleting ? "Deleting…" : "Delete project"}
 </AlertDialogAction>
 ```
+
+## When to use
+
+- A destructive or irreversible action — deleting a project, revoking a key, overwriting a draft — that the
+  user must confirm on purpose.
+- A decision the page cannot make for the user: move the workspace, leave without saving, end the session.
+- A step that must be acknowledged before anything else continues, where an accidental dismissal would be
+  the bug.
+
+## When not to use
+
+- A task with more than one decision or a form to fill in. Use `dialog`: it can be dismissed, and it should be.
+- A message that does not block anything. Use `alert` where it belongs on the page, or `toast` for a moment.
+- A hint attached to a control. Use `tooltip`.
 
 ## API
 
@@ -4450,19 +4392,6 @@ buttons split the width instead of stacking, so the two answers stay side by sid
 
 An anchored panel that opens next to its trigger and returns focus to it when it closes.
 
-## When to use
-
-- A small set of controls that belongs to the thing it is attached to: column visibility, a filter, a
-  share link, a colour picker.
-- Context that would crowd the page if it were always visible, but that the user opens on demand.
-- An edit that is scoped to one trigger and can be dismissed without losing the page.
-
-## When not to use
-
-- A confirmation that must be answered. Use `alert-dialog`: a popover can be dismissed by clicking away.
-- A task that needs the whole screen or a focus trap. Use `dialog` or `sheet`.
-- A one- or two-word hint on a control. Use `tooltip`, which cannot hold interactive content.
-
 ## Installation
 
 ```install
@@ -4498,9 +4427,7 @@ export function SharePopover() {
 }
 ```
 
-## Examples
-
-### Positioned by side
+## Positioned by side
 
 `side` and `align` choose the placement, and the panel flips when there is no room. The motion follows
 the anchor, not the side: the panel grows from `--transform-origin`, which Base UI points at the
@@ -4512,7 +4439,7 @@ trigger.
 </PopoverContent>
 ```
 
-### With a form
+## With a form
 
 The panel is a normal container, so `Field` and `Input` work inside it. Nothing traps focus: a popover
 is non-modal by default.
@@ -4529,7 +4456,7 @@ is non-modal by default.
 </PopoverContent>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -4539,7 +4466,7 @@ const [open, setOpen] = useState(false);
 </Popover>;
 ```
 
-### Modal when it has to be
+## Modal when it has to be
 
 A popover that holds a destructive control can trap focus and block the page behind it without becoming
 a dialog:
@@ -4550,6 +4477,19 @@ a dialog:
   <PopoverContent>…</PopoverContent>
 </Popover>
 ```
+
+## When to use
+
+- A small set of controls that belongs to the thing it is attached to: column visibility, a filter, a
+  share link, a colour picker.
+- Context that would crowd the page if it were always visible, but that the user opens on demand.
+- An edit that is scoped to one trigger and can be dismissed without losing the page.
+
+## When not to use
+
+- A confirmation that must be answered. Use `alert-dialog`: a popover can be dismissed by clicking away.
+- A task that needs the whole screen or a focus trap. Use `dialog` or `sheet`.
+- A one- or two-word hint on a control. Use `tooltip`, which cannot hold interactive content.
 
 ## API
 
@@ -4626,19 +4566,6 @@ default.
 
 A short label that names a control on hover or focus, and disappears when the pointer leaves.
 
-## When to use
-
-- An icon-only control whose meaning is not obvious from the icon alone.
-- The full value behind a truncated label, or a keyboard shortcut next to an action.
-- A hint that helps the first use of a dense control and is useless once learned.
-
-## When not to use
-
-- Anything the user must read to act: a tooltip disappears on scroll, touch, and Escape. If the content
-  matters, put it on the page or in a `popover`.
-- Interactive content. A tooltip cannot hold a button or a link; use `popover`.
-- The accessible name of a button that already has text. Two labels that disagree is worse than one.
-
 ## Installation
 
 ```install
@@ -4668,9 +4595,7 @@ export function BoldTooltip() {
 }
 ```
 
-## Examples
-
-### Side and alignment
+## Side and alignment
 
 `side` defaults to `top` and the label flips when there is no room. The arrow moves with it; the panel
 grows out of `--transform-origin`, so the scale starts where the trigger meets the label.
@@ -4681,7 +4606,7 @@ grows out of `--transform-origin`, so the scale starts where the trigger meets t
 </TooltipContent>
 ```
 
-### A delay for the whole app
+## A delay for the whole app
 
 `TooltipProvider` sets the delay once. Without it, Base UI's own default applies.
 
@@ -4691,7 +4616,7 @@ grows out of `--transform-origin`, so the scale starts where the trigger meets t
 </TooltipProvider>
 ```
 
-### Disabled controls
+## Disabled controls
 
 A disabled button does not emit pointer events, so wrap it and put the hint on the wrapper:
 
@@ -4703,6 +4628,19 @@ A disabled button does not emit pointer events, so wrap it and put the hint on t
   <TooltipContent>Finish the required fields first</TooltipContent>
 </Tooltip>
 ```
+
+## When to use
+
+- An icon-only control whose meaning is not obvious from the icon alone.
+- The full value behind a truncated label, or a keyboard shortcut next to an action.
+- A hint that helps the first use of a dense control and is useless once learned.
+
+## When not to use
+
+- Anything the user must read to act: a tooltip disappears on scroll, touch, and Escape. If the content
+  matters, put it on the page or in a `popover`.
+- Interactive content. A tooltip cannot hold a button or a link; use `popover`.
+- The accessible name of a button that already has text. Two labels that disagree is worse than one.
 
 ## API
 
@@ -4770,21 +4708,6 @@ running off screen. Base UI flips the side and shifts the alignment when the vie
 
 A preview panel that opens from a link on hover or focus and disappears when the pointer leaves.
 
-## When to use
-
-- A preview of what a link leads to: a profile, a repository, a document — enough to decide whether to
-  click.
-- Context that helps a name make sense — the person behind an `@handle`, the project behind a package.
-- A short panel with one or two actions that should not interrupt the page.
-
-## When not to use
-
-- A label for an icon. Use `tooltip`: it is smaller, quicker, and announced as a description.
-- Content the user opened on purpose. Use `popover`: hover cards close when the pointer moves on, and
-  anything with a task in it deserves a deliberate open.
-- Information the user needs to answer a question. Nothing that appears and disappears on hover can be
-  the only place it lives.
-
 ## Installation
 
 ```install
@@ -4812,9 +4735,7 @@ export function ReviewerCard() {
 }
 ```
 
-## Examples
-
-### With an action inside
+## With an action inside
 
 The card is not modal and does not trap focus, so a link or a button inside it works normally. Base UI
 keeps the card open while the pointer or focus is inside it, which is what makes the action reachable.
@@ -4828,7 +4749,7 @@ keeps the card open while the pointer or focus is inside it, which is what makes
 </HoverCardContent>
 ```
 
-### Placement
+## Placement
 
 `side` defaults to `bottom` — unlike a tooltip, which defaults to `top` — because the card is larger and
 reads better below the link. `alignOffset` defaults to `4` for the same reason.
@@ -4839,7 +4760,7 @@ reads better below the link. `alignOffset` defaults to `4` for the same reason.
 </HoverCardContent>
 ```
 
-### A delay for the whole app
+## A delay for the whole app
 
 `HoverCard` takes the same delay props as the Base UI root. A longer `delay` keeps a page of links from
 flashing cards at every pointer movement.
@@ -4847,6 +4768,21 @@ flashing cards at every pointer movement.
 ```tsx
 <HoverCard delay={400}>…</HoverCard>
 ```
+
+## When to use
+
+- A preview of what a link leads to: a profile, a repository, a document — enough to decide whether to
+  click.
+- Context that helps a name make sense — the person behind an `@handle`, the project behind a package.
+- A short panel with one or two actions that should not interrupt the page.
+
+## When not to use
+
+- A label for an icon. Use `tooltip`: it is smaller, quicker, and announced as a description.
+- Content the user opened on purpose. Use `popover`: hover cards close when the pointer moves on, and
+  anything with a task in it deserves a deliberate open.
+- Information the user needs to answer a question. Nothing that appears and disappears on hover can be
+  the only place it lives.
 
 ## API
 
@@ -4921,18 +4857,6 @@ tap, and the content must not assume a pointer is nearby.
 
 A panel that slides in from an edge of the screen and holds a focused task without leaving the page.
 
-## When to use
-
-- A task that should keep the page in view: filters, a details panel, settings for the thing behind it.
-- A form too tall or too wide for a `popover`, opened on purpose and dismissed on purpose.
-- Mobile navigation or a secondary menu, where a full dialog would feel heavy.
-
-## When not to use
-
-- A confirmation that must be answered before anything continues. Use `alert-dialog`.
-- A hint about a control. Use `tooltip` or `hover-card`.
-- A flow with its own steps and URL. That is a page, not an overlay.
-
 ## Installation
 
 ```install
@@ -4976,9 +4900,7 @@ export function FiltersSheet() {
 }
 ```
 
-## Examples
-
-### The four edges
+## The four edges
 
 `side` is `"right"` by default; the panel takes its placement classes and its slide direction from it.
 
@@ -4988,7 +4910,7 @@ export function FiltersSheet() {
 <SheetContent side="bottom">…</SheetContent>
 ```
 
-### Without the built-in close button
+## Without the built-in close button
 
 The close button is a real control with a screen-reader-only label. Drop it when the footer already
 carries an obvious way out, but keep one of the two.
@@ -4997,7 +4919,7 @@ carries an obvious way out, but keep one of the two.
 <SheetContent showCloseButton={false}>…</SheetContent>
 ```
 
-### A long list
+## A long list
 
 The panel is a flex column, so a scroll container goes around the part that overflows rather than on
 the close button's positioning context:
@@ -5010,7 +4932,7 @@ the close button's positioning context:
 </SheetContent>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [open, setOpen] = useState(false);
@@ -5019,6 +4941,18 @@ const [open, setOpen] = useState(false);
   <SheetContent>…</SheetContent>
 </Sheet>;
 ```
+
+## When to use
+
+- A task that should keep the page in view: filters, a details panel, settings for the thing behind it.
+- A form too tall or too wide for a `popover`, opened on purpose and dismissed on purpose.
+- Mobile navigation or a secondary menu, where a full dialog would feel heavy.
+
+## When not to use
+
+- A confirmation that must be answered before anything continues. Use `alert-dialog`.
+- A hint about a control. Use `tooltip` or `hover-card`.
+- A flow with its own steps and URL. That is a page, not an overlay.
 
 ## API
 
@@ -5094,20 +5028,6 @@ reachable and the page behind does not move.
 
 A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request.
 
-## When to use
-
-- A short task opened from the bottom of the screen, where the thumb is: move to, share, quick actions.
-- A list or explanation that the page behind should stay visible for — a bottom sheet covers the bottom,
-  not the context.
-- A panel the user expects to swipe away, because that is how sheets behave on touch devices.
-
-## When not to use
-
-- A decision that must be answered. Use `alert-dialog`; a drawer can be dragged shut.
-- A hint on a control. Use `tooltip` or `hover-card`.
-- A long multi-step flow. Use a page or a `sheet` with a footer; dragging half-way through a form is a
-  worse experience than a full surface.
-
 ## Installation
 
 ```install
@@ -5148,9 +5068,7 @@ export function MoveConversation() {
 }
 ```
 
-## Examples
-
-### A visible swipe handle
+## A visible swipe handle
 
 `showSwipeHandle` draws the handle that says "drag me". It is `aria-hidden`: the drag is an accelerator,
 never the only way out — the close controls and Escape still work.
@@ -5159,7 +5077,7 @@ never the only way out — the close controls and Escape still work.
 <Drawer showSwipeHandle>…</Drawer>
 ```
 
-### Swiping from another edge
+## Swiping from another edge
 
 `swipeDirection` moves the sheet, its placement, and the direction it closes in. The default is `"down"`.
 
@@ -5168,7 +5086,7 @@ never the only way out — the close controls and Escape still work.
 <Drawer swipeDirection="up">…</Drawer>
 ```
 
-### Snap points
+## Snap points
 
 `snapPoints` lets the sheet rest at more than one height; the peek is the smallest value. The overlay
 stays in step with the swipe, so the page behind returns as the sheet travels.
@@ -5177,7 +5095,7 @@ stays in step with the swipe, so the page behind returns as the sheet travels.
 <Drawer snapPoints={[0.5, 1]}>…</Drawer>
 ```
 
-### Non-modal
+## Non-modal
 
 A drawer that should not lock the page passes `modal={false}`; the backdrop is skipped and the page
 stays interactive.
@@ -5185,6 +5103,20 @@ stays interactive.
 ```tsx
 <Drawer modal={false}>…</Drawer>
 ```
+
+## When to use
+
+- A short task opened from the bottom of the screen, where the thumb is: move to, share, quick actions.
+- A list or explanation that the page behind should stay visible for — a bottom sheet covers the bottom,
+  not the context.
+- A panel the user expects to swipe away, because that is how sheets behave on touch devices.
+
+## When not to use
+
+- A decision that must be answered. Use `alert-dialog`; a drawer can be dragged shut.
+- A hint on a control. Use `tooltip` or `hover-card`.
+- A long multi-step flow. Use a page or a `sheet` with a footer; dragging half-way through a form is a
+  worse experience than a full surface.
 
 ## API
 
@@ -5259,18 +5191,6 @@ geometry.
 
 A control that opens a list of options and keeps the chosen value in the trigger.
 
-## When to use
-
-- Choosing one value from a list that is too long for radios but too short to need search.
-- A compact form control where the current value should stay visible in the trigger.
-- A setting that changes the surface around it, so the value and its width should move together.
-
-## When not to use
-
-- Free-text or type-to-filter input. Use `combobox` once it ships, or an `input` with a datalist.
-- Two or three mutually exclusive options that should stay visible. Use `radio-group`.
-- Navigation between routes. Use a menu or links; a select submits a value, it does not navigate.
-
 ## Installation
 
 ```install
@@ -5304,9 +5224,7 @@ export function FrameworkSelect() {
 }
 ```
 
-## Examples
-
-### Sizes
+## Sizes
 
 `size="sm"` is for dense toolbars and table rows; the default is the form height.
 
@@ -5316,7 +5234,7 @@ export function FrameworkSelect() {
 </SelectTrigger>
 ```
 
-### Groups and labels
+## Groups and labels
 
 `SelectGroup` and `SelectLabel` keep long lists legible. `SelectSeparator` splits unrelated groups.
 
@@ -5335,7 +5253,7 @@ export function FrameworkSelect() {
 </SelectContent>
 ```
 
-### Controlled value
+## Controlled value
 
 `value` and `onValueChange` make the select controlled; `defaultValue` keeps it uncontrolled.
 
@@ -5347,7 +5265,7 @@ const [value, setValue] = useState("next");
 </Select>;
 ```
 
-### Form submission
+## Form submission
 
 The hidden input uses `name`; `required` makes an empty value fail native validation, but the component
 never decides whether a value is valid.
@@ -5357,6 +5275,18 @@ never decides whether a value is valid.
   …
 </Select>
 ```
+
+## When to use
+
+- Choosing one value from a list that is too long for radios but too short to need search.
+- A compact form control where the current value should stay visible in the trigger.
+- A setting that changes the surface around it, so the value and its width should move together.
+
+## When not to use
+
+- Free-text or type-to-filter input. Use `combobox` once it ships, or an `input` with a datalist.
+- Two or three mutually exclusive options that should stay visible. Use `radio-group`.
+- Navigation between routes. Use a menu or links; a select submits a value, it does not navigate.
 
 ## API
 
@@ -5433,25 +5363,6 @@ trigger, so a select in a toolbar does not reflow the page beyond its own row.
 
 A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse.
 
-## When to use
-
-- A source snippet the reader is meant to copy: an install command, a route handler, a config file.
-- An answer from an assistant, where the block sits inside a message and the reader may want the code out of it.
-- Tool calls and their output — a shell run, a stack trace, a JSON payload — where the reader scans rather than reads.
-- A diff or a patch, where added and removed lines have to be distinguishable at a glance and without colour.
-- A long file that would dominate the page: cap it with `maxLines` and let the reader unfold it.
-- One snippet in several forms — an install per package manager, a source file and its output — where the reader
-  should not have to scroll past variants that are not theirs.
-
-## When not to use
-
-- A single value the reader copies — an API key, a URL, an id. Use the copy button on its own; a bordered code
-  surface gives a one-line value more weight than it deserves.
-- Inline code in a sentence. Use `<code>`, which the page's typeset styles.
-- Content that is not code and not output: a quote, a log line with no structure, a terminal transcript with
-  interactive prompts. A block that looks like code but is not sets the wrong expectation about copying.
-- A whole editor. This is a viewer; it has no caret, no selection model of its own, and no undo.
-
 ## Installation
 
 ```install
@@ -5490,9 +5401,7 @@ export function Install() {
 }
 ```
 
-## Examples
-
-### Line numbers
+## Line numbers
 
 `lineNumbers` splits a string child into lines and numbers them from `startLine`. The gutter is a `::before` on
 each line, so the numbers are not part of a selection and do not travel with copied text.
@@ -5503,7 +5412,7 @@ each line, so the numbers are not part of a selection and do not travel with cop
 </CodeBlockContent>
 ```
 
-### Diff
+## Diff
 
 Map each line to a `CodeBlockLine` and pick its variant. `added` and `removed` carry a `+` / `−` marker as well as
 a tint, so the diff survives a monochrome screen and a colour-blind reader.
@@ -5519,7 +5428,7 @@ a tint, so the diff survives a monochrome screen and a colour-blind reader.
 
 `highlighted` marks a line to call out without claiming it changed.
 
-### Folding a long file
+## Folding a long file
 
 `maxLines` on `CodeBlock` caps the block; `CodeBlockExpandButton` unfolds it. Both are additive props — upstream
 shadcn leaves the fold to the consumer, and that composition still works if you would rather wire your own
@@ -5543,7 +5452,7 @@ control to `expanded` / `onExpandedChange`.
 The button renders nothing while the content fits, so a short file never grows a dead control. The fold is
 measured from the rendered content, so it follows wrapped lines and whatever font size the page sets.
 
-### Tool output
+## Tool output
 
 Output is not source: it wraps instead of scrolling sideways, and it is smaller. Use `variant="destructive"` when
 the run failed rather than recolouring the text yourself.
@@ -5559,7 +5468,7 @@ the run failed rather than recolouring the text yourself.
 </CodeBlock>
 ```
 
-### Floating actions
+## Floating actions
 
 Put `CodeBlockActions` directly inside `CodeBlock`, with no header, and it floats over the top-end corner. It is
 revealed on hover and on focus, and it is permanently visible on a device that cannot hover.
@@ -5573,7 +5482,7 @@ revealed on hover and on focus, and it is permanently visible on a device that c
 </CodeBlock>
 ```
 
-### Switching between variants
+## Switching between variants
 
 A snippet often has more than one right form: the same install for three package managers, a source file and
 its compiled output, a component and its test. `CodeBlockTabs` is the tab list over the source, `CodeBlockTab`
@@ -5625,7 +5534,7 @@ Four things worth knowing:
 `defaultTab` is uncontrolled; `tab` with `onTabChange` drives it from outside when the surrounding page has its
 own idea of which variant is current.
 
-### Highlighting
+## Highlighting
 
 Set `language` and a string child is tokenized; leave it out and the same child renders as plain text, which is
 what tool output wants. The tokenizer is [Shiki](https://shiki.style) in its JavaScript-regex mode, imported
@@ -5674,6 +5583,25 @@ colours instead.
 
 Without a `language`, a string child stays **one text node** — the browser appends a chunk to it instead of
 reconciling a tree of spans, which is what makes a streaming output block cheap.
+
+## When to use
+
+- A source snippet the reader is meant to copy: an install command, a route handler, a config file.
+- An answer from an assistant, where the block sits inside a message and the reader may want the code out of it.
+- Tool calls and their output — a shell run, a stack trace, a JSON payload — where the reader scans rather than reads.
+- A diff or a patch, where added and removed lines have to be distinguishable at a glance and without colour.
+- A long file that would dominate the page: cap it with `maxLines` and let the reader unfold it.
+- One snippet in several forms — an install per package manager, a source file and its output — where the reader
+  should not have to scroll past variants that are not theirs.
+
+## When not to use
+
+- A single value the reader copies — an API key, a URL, an id. Use the copy button on its own; a bordered code
+  surface gives a one-line value more weight than it deserves.
+- Inline code in a sentence. Use `<code>`, which the page's typeset styles.
+- Content that is not code and not output: a quote, a log line with no structure, a terminal transcript with
+  interactive prompts. A block that looks like code but is not sets the wrong expectation about copying.
+- A whole editor. This is a viewer; it has no caret, no selection model of its own, and no undo.
 
 ## API
 

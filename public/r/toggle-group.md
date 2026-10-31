@@ -8,22 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: feedback.press
 
-## When to use
-
-- A small set of modes that belong to one control: text alignment, view density,
-  a time range.
-- A formatting toolbar where several marks can be active at once
-  (`multiple`).
-- Anywhere the options are icons and the choice should read as one segmented
-  control (`spacing={0}` + `variant="outline"`).
-
-## When not to use
-
-- Exactly one option with a text label and a longer list; use `radio-group`, which
-  exposes radio semantics rather than a row of toggle buttons.
-- A single independent on/off command; use `toggle`.
-- Navigation between pages; use `tabs`, which owns `role="tablist"`.
-
 ## Installation
 
 ```install
@@ -56,9 +40,7 @@ export function Alignment() {
 }
 ```
 
-## Examples
-
-### Multiple
+## Multiple
 
 ```tsx
 <ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style">
@@ -73,7 +55,7 @@ export function Alignment() {
 
 Without `multiple`, pressing an item releases the others.
 
-### Spacing
+## Spacing
 
 ```tsx
 <ToggleGroup variant="outline" spacing={0} aria-label="Range">
@@ -88,7 +70,7 @@ Without `multiple`, pressing an item releases the others.
 `spacing={0}` joins the borders into one segmented control; a positive value
 keeps the items apart in Tailwind spacing steps.
 
-### Vertical
+## Vertical
 
 ```tsx
 <ToggleGroup orientation="vertical" aria-label="Zoom">
@@ -96,7 +78,7 @@ keeps the items apart in Tailwind spacing steps.
 </ToggleGroup>
 ```
 
-### Controlled
+## Controlled
 
 ```tsx
 const [value, setValue] = useState(["center"]);
@@ -107,6 +89,22 @@ const [value, setValue] = useState(["center"]);
 ```
 
 The value is always an array, even without `multiple`.
+
+## When to use
+
+- A small set of modes that belong to one control: text alignment, view density,
+  a time range.
+- A formatting toolbar where several marks can be active at once
+  (`multiple`).
+- Anywhere the options are icons and the choice should read as one segmented
+  control (`spacing={0}` + `variant="outline"`).
+
+## When not to use
+
+- Exactly one option with a text label and a longer list; use `radio-group`, which
+  exposes radio semantics rather than a row of toggle buttons.
+- A single independent on/off command; use `toggle`.
+- Navigation between pages; use `tabs`, which owns `role="tablist"`.
 
 ## API
 

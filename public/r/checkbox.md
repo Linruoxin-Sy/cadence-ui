@@ -8,22 +8,6 @@
 - Since: 0.3.0
 - Motion recipes: state.morph
 
-## When to use
-
-- One independent yes/no choice: accept the terms, remember this device, include
-  archived items.
-- A set of choices where several can be true at once; use one checkbox per row.
-- A parent row that summarises children: pass `indeterminate` while the children
-  disagree.
-- A table row selection, where each row is its own decision.
-
-## When not to use
-
-- Exactly one of several options; use `radio-group`, which also gives arrow-key
-  navigation.
-- An immediate setting that applies the moment it is flipped; use `switch`.
-- A formatting command that acts on a selection; use `toggle`.
-
 ## Installation
 
 ```install
@@ -49,9 +33,7 @@ export function Terms() {
 `id` lands on the hidden input, so `htmlFor` on a `label` names the control and
 clicking the label toggles it.
 
-## Examples
-
-### Checked by default, and indeterminate
+## Checked by default, and indeterminate
 
 ```tsx
 <Checkbox defaultChecked />
@@ -62,7 +44,7 @@ clicking the label toggles it.
 reader hears. It never replaces the checked state — pass `checked` too if the
 form needs a value.
 
-### Controlled
+## Controlled
 
 ```tsx
 const [accepted, setAccepted] = useState(false);
@@ -70,7 +52,7 @@ const [accepted, setAccepted] = useState(false);
 <Checkbox checked={accepted} onCheckedChange={setAccepted} />;
 ```
 
-### Invalid, with a described error
+## Invalid, with a described error
 
 ```tsx
 <Checkbox id="terms" aria-invalid aria-describedby="terms-error" />
@@ -82,7 +64,7 @@ const [accepted, setAccepted] = useState(false);
 The ring turns destructive because `aria-invalid` is set. The component does not
 decide that anything is wrong.
 
-### In a row of settings
+## In a row of settings
 
 ```tsx
 <div className="flex items-start gap-3">
@@ -93,6 +75,22 @@ decide that anything is wrong.
   </div>
 </div>
 ```
+
+## When to use
+
+- One independent yes/no choice: accept the terms, remember this device, include
+  archived items.
+- A set of choices where several can be true at once; use one checkbox per row.
+- A parent row that summarises children: pass `indeterminate` while the children
+  disagree.
+- A table row selection, where each row is its own decision.
+
+## When not to use
+
+- Exactly one of several options; use `radio-group`, which also gives arrow-key
+  navigation.
+- An immediate setting that applies the moment it is flipped; use `switch`.
+- A formatting command that acts on a selection; use `toggle`.
 
 ## API
 
