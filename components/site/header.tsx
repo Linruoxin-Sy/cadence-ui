@@ -5,7 +5,12 @@ import { ThemeToggle } from "./theme-toggle";
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+      {/*
+       * Full-bleed chrome: the bar spans the viewport and only the padding insets
+       * the wordmark and the nav. A centred max-width bar would leave the docs
+       * sidebar, which sits at the left edge, visually detached from the logo.
+       */}
+      <div className="flex h-14 w-full items-center justify-between px-6">
         {/*
          * The wordmark carries the brand gradient (--brand-from → --brand-to, see
          * globals.css). It is the only place the brand appears: components and their
