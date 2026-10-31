@@ -41,6 +41,7 @@ These follow from the documents above; the documents are authoritative if they d
 - **Base UI `render`, not `asChild`.** Use `data-slot` on every part and merge classes with `cn()` (user classes last).
 - **UI only, no validation (P11).** Never import `zod`, `react-hook-form`, `@hookform/resolvers`, `yup`, `valibot`, `joi`, or `superstruct`; never add `schema` / `resolver` / `validate` props. Render invalid state from `aria-invalid` / `data-invalid` only. `registry:check` enforces this.
 - **Match upstream.** Exports, `data-slot` values, props, and their defaults are copied from shadcn; additions are allowed, renames, removals, and silent default changes are not (`meta.upstream` records the pinned style). A difference the visual style forces is recorded in `meta.parity.props` with a reason — `parity:check` fails on an unrecorded difference and on a record that no longer applies.
+- **Upstream tooling is the CLI's `build`, never the skill's `add`.** Cadence authors a registry; it is not a shadcn consumer. There is no `components.json`, and the source tree is a hand-written mirror on purpose. Read upstream from `upstream/manifest.json` or `npx shadcn@latest docs <id>`; never run `shadcn init` / `add` / `apply` here. See [shadcn tooling boundary](#shadcn-tooling-boundary).
 - **Intra-registry dependencies are namespaced.** Use `@cadence/<id>` in `registryDependencies`; a bare name resolves against the default shadcn registry and installs the wrong file.
 - **Docs are data.** `content/components/<id>.mdx` frontmatter must match `registry.json` (title, description, deps, registryDeps, motion, intensity, complexity, since, tier); the build fails when docs or metadata are missing.
 - **Docs have a fixed section order, not a fixed section count.** `## Installation` then `## Usage` open every body; everything after them is a flat `##` — one section per example, no `## Examples` wrapper (only `## API` may group props under `### \`Part\``). Order and membership come from §2 of [docs/documentation-site-and-distribution.md](docs/documentation-site-and-distribution.md); how many examples you write is yours. `scripts/new-item.mjs` scaffolds this order.
@@ -111,3 +112,33 @@ the check compares payloads against source and fails on stale artifacts.
 6. Add `tests/components/<id>.test.tsx`: render, `data-slot`, keyboard path, `reduced` and `none` modes.
 7. Run the [motion conformance check](#motion-conformance-check) above and fix every failed item.
 8. Rebuild payloads, run `pnpm check`, and paste dual-theme screenshots in the PR.
+
+## shadcn tooling boundary
+
+The repository installs `shadcn` as a devDependency and vendors shadcn's own agent skill at
+`.agents/skills/shadcn/` (pinned by `skills-lock.json`, excluded from Biome). Both are useful in exactly one
+direction: reading. The skill is `user-invocable: false` and its description auto-triggers on "shadcn/ui" and
+"component registries", which is every component task in this repo — so this section is the guard, not advice.
+
+**Allowed**
+
+- `npx shadcn@latest docs <id>` — the live API and examples for the upstream component, when
+  `upstream/manifest.json` gives you the surface but not the intent.
+- `pnpm registry:build` — `scripts/build-registry.mjs` shells out to `shadcn build` to emit `public/r/*.json`.
+  That is the only shadcn invocation in the pipeline, and it takes an explicit registry path, not a project.
+- `.agents/skills/shadcn/registry.md` — the registry schema (item types, `include`, dependency rules), which
+  applies to this repo.
+
+**Forbidden**
+
+- `shadcn init` / `add` / `apply` / `create` — they scaffold a consumer project: `components.json`,
+  `components/ui/**`, rewritten import aliases. That would put a second, unparitied copy of a component next to
+  the mirrored one, and no check would notice.
+- `--preset` codes — the visual style is pinned in `upstream/manifest.json` (`visualStyle`, `pin.ref`). Moving it
+  is a `pnpm upstream:sync --ref <sha>` decision recorded in the manifest, never a preset.
+- Trusting the skill's injected project context — it runs `shadcn info` in a repo without `components.json`, so
+  its `aliases`, `resolvedPaths`, `style`, and `base` fields are empty or wrong. `base-ui` here comes from
+  `meta.upstream.style` in `registry.json`.
+
+When parity is the question, the answer comes from `upstream/manifest.json` plus `pnpm parity:check` — not from
+the CLI, and not from the skill.
