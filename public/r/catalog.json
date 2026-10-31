@@ -102,7 +102,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -132,7 +132,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -159,7 +159,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -188,7 +188,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -215,7 +215,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -271,7 +271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -298,7 +298,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -325,7 +325,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -354,7 +354,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -391,7 +391,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -420,7 +420,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -450,7 +450,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -482,7 +482,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -513,7 +513,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -545,7 +545,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -577,7 +577,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -607,7 +607,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -637,7 +637,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -674,7 +674,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -717,7 +717,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -752,7 +752,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -786,7 +786,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -819,7 +819,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -853,7 +853,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -888,7 +888,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -924,7 +924,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -959,7 +959,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -992,7 +992,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1034,7 +1034,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1069,7 +1069,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1104,7 +1104,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -1139,7 +1139,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -1176,7 +1176,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -1211,7 +1211,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -1249,7 +1249,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -1289,7 +1289,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "68da5ca",
+    "sourceSha": "94be6f5",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
