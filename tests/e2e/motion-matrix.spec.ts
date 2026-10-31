@@ -487,6 +487,40 @@ test.describe("code-block", () => {
       for (const requested of MODES) {
         const mode = effectiveMode(requested, prefersReduced);
 
+        test(`tabs: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await openComponent(page, "code-block", requested, "code-block", mode);
+
+          const list = page.locator('[data-slot="code-block-tabs"]').first();
+          const tabs = list.locator('[role="tab"]');
+          const yarn = tabs.nth(2);
+          await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
+
+          await yarn.click();
+          await expect(yarn).toHaveAttribute("aria-selected", "true");
+          await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "false");
+
+          // The end state is the same in all three modes: one pill, over the tab that
+          // was pressed, and the panel of that variant is the visible one. How the
+          // pill gets there is the recipe's job — a shared element in `full`, an
+          // in-place paint under `reduced` (no `layoutId`) and `none` (zero duration).
+          const pill = list.locator('[data-slot="code-block-tab-indicator"]');
+          await expect(pill).toHaveCount(1);
+          // Polled rather than sampled once: in `full` the pill is still travelling
+          // when the click returns, and "it lands on the pressed tab" is the claim.
+          await expect
+            .poll(async () => {
+              const [pillBox, tabBox] = [await pill.boundingBox(), await yarn.boundingBox()];
+              return Math.abs((pillBox?.x ?? 0) - (tabBox?.x ?? 0));
+            })
+            .toBeLessThan(1);
+
+          // The panel swap is what the tabs are for: a hidden panel is not painted,
+          // and the visible one holds this variant's command.
+          await expect(page.locator('[data-slot="code-block-panel"]:not([hidden]) pre').first()).toHaveText(
+            /yarn dlx shadcn@latest add/,
+          );
+        });
+
         test(`fold: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await openComponent(page, "code-block", requested, "code-block", mode);
 

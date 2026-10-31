@@ -45,7 +45,7 @@ function useCanHover(): boolean {
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
 
 interface CodeBlockContextValue {
-  /** The id `CodeBlockExpandButton` points `aria-controls` at. */
+  /** The id `CodeBlockExpandButton` points `aria-controls` at. Also prefixes every tab and panel id. */
   contentId: string;
   /** Set by `CodeBlock`; a fold only exists when this is a number. */
   maxLines?: number;
@@ -56,6 +56,9 @@ interface CodeBlockContextValue {
   /** True when the content is taller than `maxLines`, and the toggle therefore does something. */
   overflowing: boolean;
   setOverflowing: (next: boolean) => void;
+  /** The variant `CodeBlockTabs` currently shows. `undefined` when the block has no tabs. */
+  tab?: string;
+  setTab: (tab: string) => void;
 }
 
 const CodeBlockContext = React.createContext<CodeBlockContextValue | null>(null);
@@ -75,6 +78,62 @@ const CodeBlockContentContext = React.createContext(false);
  * does not re-render the code itself — the content is the largest subtree here.
  */
 const CodeBlockRevealContext = React.createContext(true);
+
+/**
+ * A value folded into something an `id` can hold: a tab value is a human word
+ * (`pnpm`, `ts`, `@cadence/button`), and the id has to survive all of them.
+ */
+function idPart(value: string): string {
+  return value.replace(/[^a-zA-Z0-9_-]+/g, "-");
+}
+
+/** The tab and panel parts are meaningless without the selection they share. */
+function useCodeBlockPart(part: string): CodeBlockContextValue {
+  const block = React.useContext(CodeBlockContext);
+  if (!block) throw new Error(`${part} has to be rendered inside <CodeBlock>.`);
+  return block;
+}
+
+/**
+ * The three ids one variant needs. Built in one place because the tab, its panel
+ * and the content inside it have to agree, and because a second panel sharing the
+ * block's `contentId` would put the same `id` on two `pre` elements.
+ */
+function partIds(contentId: string, value: string) {
+  const base = `${contentId}-${idPart(value)}`;
+  return { tab: `${base}-tab`, panel: `${base}-panel`, content: `${base}-content` };
+}
+
+/**
+ * The value of the block's first tab, read from its children.
+ *
+ * `defaultTab` is the way to choose; this exists so a block that forgets it is not
+ * a block with every variant showing at once. The walk goes through the header and
+ * any wrapper around the tab list, and stops at a panel, whose content is source
+ * rather than a tab.
+ *
+ * A render-time read rather than an effect, on purpose: a static page is already in
+ * the HTML before hydration, and selecting on mount would paint every variant for a
+ * frame and then hide all but one.
+ */
+function firstTabValue(children: React.ReactNode): string | undefined {
+  let found: string | undefined;
+
+  const visit = (nodes: React.ReactNode) => {
+    React.Children.forEach(nodes, (child) => {
+      if (found || !React.isValidElement<{ children?: React.ReactNode; value?: string }>(child)) return;
+      if (child.type === CodeBlockTab) {
+        if (child.props.value) found = child.props.value;
+        return;
+      }
+      if (child.type === CodeBlockPanel) return;
+      visit(child.props.children);
+    });
+  };
+
+  visit(children);
+  return found;
+}
 
 const codeBlockVariants = cva(
   "group/code-block relative flex w-full min-w-0 flex-col overflow-hidden rounded-lg text-sm has-[[data-slot=code-block-content]:focus-visible]:ring-3",
@@ -116,6 +175,14 @@ export interface CodeBlockProps extends React.ComponentProps<"div">, VariantProp
    * source renders as plain text — which is what tool output wants.
    */
   language?: string;
+  /**
+   * Additive: the tab shown first. Only meaningful with `CodeBlockTabs` and
+   * `CodeBlockPanel`; a block with neither is a single source and ignores it.
+   */
+  defaultTab?: string;
+  /** Controlled tab. Omit it and the block keeps its own state. */
+  tab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
 /**
@@ -130,7 +197,9 @@ export interface CodeBlockProps extends React.ComponentProps<"div">, VariantProp
  * - fold / unfold: the viewport's measured height, `geometry.resize`
  * - floating actions: fade in on hover and focus, `data.transition`
  * - copy tick and chevron: swap in place, `state.morph`
- * - reduced: opacity and rotation stay, the height jumps (size is information)
+ * - tab indicator: one pill shared between tabs, `layout.shared`
+ * - reduced: opacity and rotation stay, the height jumps (size is information),
+ *   and the tab pill changes tabs without travelling
  * - none: every transition resolves to zero duration
  *
  * a11y: the block is a plain region; the source is focusable so a keyboard user can
@@ -145,6 +214,9 @@ function CodeBlock({
   defaultExpanded = false,
   onExpandedChange,
   language,
+  defaultTab,
+  tab,
+  onTabChange,
   onPointerEnter,
   onPointerLeave,
   onFocus,
@@ -157,11 +229,13 @@ function CodeBlock({
   const contentId = React.useId();
 
   const [uncontrolledExpanded, setUncontrolledExpanded] = React.useState(defaultExpanded);
+  const [uncontrolledTab, setUncontrolledTab] = React.useState(defaultTab);
   const [overflowing, setOverflowing] = React.useState(false);
   const [hovered, setHovered] = React.useState(false);
   const [focused, setFocused] = React.useState(false);
 
   const isExpanded = expanded ?? uncontrolledExpanded;
+  const activeTab = tab ?? uncontrolledTab ?? firstTabValue(children);
 
   const toggle = React.useCallback(() => {
     const next = !isExpanded;
@@ -169,9 +243,27 @@ function CodeBlock({
     onExpandedChange?.(next);
   }, [expanded, isExpanded, onExpandedChange]);
 
+  const setTab = React.useCallback(
+    (next: string) => {
+      if (tab === undefined) setUncontrolledTab(next);
+      onTabChange?.(next);
+    },
+    [onTabChange, tab],
+  );
+
   const value = React.useMemo<CodeBlockContextValue>(
-    () => ({ contentId, maxLines, language, expanded: isExpanded, toggle, overflowing, setOverflowing }),
-    [contentId, isExpanded, language, maxLines, overflowing, toggle],
+    () => ({
+      contentId,
+      maxLines,
+      language,
+      expanded: isExpanded,
+      toggle,
+      overflowing,
+      setOverflowing,
+      tab: activeTab,
+      setTab,
+    }),
+    [activeTab, contentId, isExpanded, language, maxLines, overflowing, setTab, toggle],
   );
 
   // A pointer-driven reveal is meaningless without a pointer that hovers; those
@@ -262,6 +354,130 @@ function CodeBlockTitle({ className, ...props }: CodeBlockTitleProps) {
   );
 }
 
+export interface CodeBlockTabsProps extends React.ComponentProps<"div"> {
+  /** The tab list's accessible name. Override it when the tabs are not about a language. */
+  label?: string;
+}
+
+/**
+ * The switcher: one row of tabs over the source, for the cases where a snippet has
+ * more than one right form — a language and its compiled output, a file and its
+ * test, and most often an install command in three package managers.
+ *
+ * The selection lives on `CodeBlock`, not here, because the header's copy button
+ * has to follow it: a switcher whose copy button still copies the first variant is
+ * worse than no switcher at all.
+ *
+ * Motion contract:
+ * - indicator: one `bg-muted` pill shared between tabs, `layout.shared`; it travels
+ *   to the selected tab and is retargeted mid-flight if another is pressed
+ * - reduced: the pill is per tab instead of shared, so it appears in place with no
+ *   travel; `none` resolves the shared transition to zero duration
+ *
+ * a11y: a real `tablist` of `role="tab"` buttons with a roving `tabindex` — only the
+ * selected tab is a tab stop, and Arrow keys / Home / End move between them, which
+ * is the pattern a screen reader announces as tabs rather than as a radio group.
+ */
+function CodeBlockTabs({ className, label = "Language", children, onKeyDown, ...props }: CodeBlockTabsProps) {
+  const block = useCodeBlockPart("CodeBlockTabs");
+  const listRef = React.useRef<HTMLDivElement>(null);
+
+  const move = (step: number | "first" | "last") => {
+    const tabs = [...(listRef.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])];
+    if (!tabs.length) return;
+    const current = tabs.findIndex((tab) => tab.dataset.active !== undefined);
+    const index =
+      step === "first" ? 0 : step === "last" ? tabs.length - 1 : (current + step + tabs.length) % tabs.length;
+    const next = tabs[index];
+    if (!next?.dataset.value) return;
+    block.setTab(next.dataset.value);
+    next.focus();
+  };
+
+  return (
+    <div
+      ref={listRef}
+      role="tablist"
+      aria-label={label}
+      data-slot="code-block-tabs"
+      className={cn("flex min-w-0 items-center gap-0.5 overflow-x-auto", className)}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented) return;
+
+        const forward = event.key === "ArrowRight" || event.key === "ArrowDown";
+        const backward = event.key === "ArrowLeft" || event.key === "ArrowUp";
+        const edge = event.key === "Home" || event.key === "End";
+        if (!forward && !backward && !edge) return;
+
+        // A tab list is a single tab stop, so once one of its tabs has focus the
+        // arrow keys move within the list — the ARIA tabs pattern, not a radio group.
+        event.preventDefault();
+        if (event.key === "Home") move("first");
+        else if (event.key === "End") move("last");
+        else move(forward ? 1 : -1);
+      }}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+export interface CodeBlockTabProps extends React.ComponentProps<"button"> {
+  /** What this tab selects. A `CodeBlockPanel` with the same value is the panel it shows. */
+  value: string;
+}
+
+/**
+ * One tab. The pill under it is the only animated part, and only the selected tab
+ * renders one: Motion matches the two `layoutId`s and plays the travel between
+ * them, so there is never a second pill to cross-fade.
+ */
+function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlockTabProps) {
+  const cm = useCadenceMotion();
+  const block = useCodeBlockPart("CodeBlockTab");
+  const active = block.tab === value;
+  const ids = partIds(block.contentId, value);
+
+  return (
+    <button
+      type="button"
+      role="tab"
+      id={ids.tab}
+      aria-selected={active}
+      aria-controls={ids.panel}
+      tabIndex={active ? 0 : -1}
+      data-slot="code-block-tab"
+      data-value={value}
+      data-active={active || undefined}
+      data-motion={cm.mode}
+      className={cn(
+        "relative inline-flex h-6 shrink-0 items-center rounded-sm px-2 text-xs font-medium text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active]:text-foreground",
+        className,
+      )}
+      {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        block.setTab(value);
+      }}
+    >
+      {active ? (
+        <motion.span
+          aria-hidden="true"
+          data-slot="code-block-tab-indicator"
+          // A shared element is the travel; under reduced motion there is no travel
+          // to keep, so the pill mounts where the selection landed.
+          layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}
+          transition={cm.reduced ? { duration: 0 } : cm.transition("layout.shared")}
+          className="absolute inset-0 rounded-sm bg-muted"
+        />
+      ) : null}
+      <span className="relative">{children}</span>
+    </button>
+  );
+}
+
 export interface CodeBlockActionsProps extends React.ComponentProps<"div"> {}
 
 /**
@@ -308,14 +524,25 @@ function CodeBlockActions({ className, children, ...props }: CodeBlockActionsPro
   );
 }
 
-export interface CodeBlockCopyButtonProps extends React.ComponentProps<typeof Button> {
-  /** The text to copy. Required: a copy button that guesses its source copies the wrong thing. */
-  value: string;
-}
+/** Exactly one source of truth: a single value, or one per tab. */
+type CodeBlockCopyValue =
+  | { value: string; values?: never }
+  | {
+      /** The text to copy, per tab value. The button copies the tab the block is showing. */
+      values: Record<string, string>;
+      value?: never;
+    };
+
+export type CodeBlockCopyButtonProps = Omit<React.ComponentProps<typeof Button>, "value"> & CodeBlockCopyValue;
 
 /**
- * Copies `value` and swaps its glyph to a tick. The two glyphs are stacked rather
- * than swapped in and out, so the state change cannot resize the button mid-press.
+ * Copies the block's text and swaps its glyph to a tick. The two glyphs are stacked
+ * rather than swapped in and out, so the state change cannot resize the button
+ * mid-press.
+ *
+ * With `values`, it follows the block's tab — the reason the selection lives on
+ * `CodeBlock` rather than on the tab list. A tab whose value is missing from the
+ * map copies nothing rather than a neighbouring variant's text.
  *
  * The visible glyph is `aria-hidden`; the button's name carries the state
  * ("Copy" / "Copied") and a polite live region repeats it, so the tick is never the
@@ -323,6 +550,7 @@ export interface CodeBlockCopyButtonProps extends React.ComponentProps<typeof Bu
  */
 function CodeBlockCopyButton({
   value,
+  values,
   className,
   variant = "ghost",
   size = "icon-xs",
@@ -331,13 +559,19 @@ function CodeBlockCopyButton({
   ...props
 }: CodeBlockCopyButtonProps) {
   const cm = useCadenceMotion();
-  const [copied, setCopied] = React.useState(false);
+  const block = React.useContext(CodeBlockContext);
+  // The text that was copied, not a flag: a tick that survived a tab switch would
+  // claim the variant the reader is now looking at was the one copied.
+  const [copiedText, setCopiedText] = React.useState<string | null>(null);
+
+  const text = values ? (block?.tab ? (values[block.tab] ?? "") : (Object.values(values)[0] ?? "")) : (value ?? "");
+  const copied = copiedText !== null && copiedText === text;
 
   React.useEffect(() => {
-    if (!copied) return;
-    const timeout = window.setTimeout(() => setCopied(false), COPIED_RESET_MS);
+    if (copiedText === null) return;
+    const timeout = window.setTimeout(() => setCopiedText(null), COPIED_RESET_MS);
     return () => window.clearTimeout(timeout);
-  }, [copied]);
+  }, [copiedText]);
 
   const swap = cm.transition("state.morph");
   const tickOnly = cm.reduced;
@@ -358,8 +592,8 @@ function CodeBlockCopyButton({
           // A clipboard write can be refused (permission, an insecure origin); the
           // glyph then stays on "copy" instead of claiming a success.
           void navigator.clipboard
-            ?.writeText(value)
-            .then(() => setCopied(true))
+            ?.writeText(text)
+            .then(() => setCopiedText(text))
             .catch(() => {});
         }}
       >
@@ -536,6 +770,44 @@ function CodeBlockContent({
   );
 }
 
+export interface CodeBlockPanelProps extends CodeBlockContentProps {
+  /** Which tab shows this panel. A panel whose value is not selected is hidden, not unmounted. */
+  value: string;
+}
+
+/**
+ * One variant of the snippet, shown while its tab is selected. It renders the
+ * source itself — the panel and the `role="tabpanel"` wrapper are the same element
+ * a block without tabs would have had anyway — so a switched block keeps the copy
+ * affordance, the focus ring, and the fold the plain content has.
+ *
+ * Every panel stays mounted, hidden with the `hidden` attribute: a tab switch is a
+ * look at what is already there, and remounting would throw away the panel's
+ * scroll position. `hidden` also takes the inactive panels out of the tab order, so
+ * only the visible source is focusable. The height is the selected panel's; it is
+ * not animated, because the size of the block is information.
+ */
+function CodeBlockPanel({ value, className, ...props }: CodeBlockPanelProps) {
+  const block = useCodeBlockPart("CodeBlockPanel");
+  const ids = partIds(block.contentId, value);
+  // No tab at all means no switcher, and a panel is then just the source in its
+  // `tabpanel` wrapper: hiding it would leave a block with nothing in it.
+  const selected = block.tab === undefined || block.tab === value;
+
+  return (
+    <div
+      role="tabpanel"
+      id={ids.panel}
+      aria-labelledby={ids.tab}
+      hidden={!selected}
+      data-slot="code-block-panel"
+      className={cn("min-w-0", className)}
+    >
+      <CodeBlockContent id={ids.content} {...props} />
+    </div>
+  );
+}
+
 const codeBlockLineVariants = cva(
   "relative block -mx-4 px-4 after:absolute after:start-1 after:top-0 after:select-none after:text-muted-foreground group-data-[size=sm]/code-block:-mx-3 group-data-[size=sm]/code-block:px-3",
   {
@@ -623,7 +895,11 @@ function CodeBlockExpandButton({ className, children, onClick, ...props }: CodeB
 
   if (!block || block.maxLines === undefined || !block.overflowing) return null;
 
-  const { expanded, toggle, contentId } = block;
+  const { expanded, toggle, contentId, tab } = block;
+
+  // In a tabbed block each variant owns its own `pre`, so the control names the
+  // panel that is showing rather than a source id only one variant could carry.
+  const controls = tab ? partIds(contentId, tab).panel : contentId;
 
   return (
     <Button
@@ -633,7 +909,7 @@ function CodeBlockExpandButton({ className, children, onClick, ...props }: CodeB
       variant="ghost"
       size="xs"
       aria-expanded={expanded}
-      aria-controls={contentId}
+      aria-controls={controls}
       className={cn("gap-1 text-muted-foreground", className)}
       {...props}
       onClick={(event) => {
@@ -664,5 +940,8 @@ export {
   CodeBlockFooter,
   CodeBlockHeader,
   CodeBlockLine,
+  CodeBlockPanel,
+  CodeBlockTab,
+  CodeBlockTabs,
   CodeBlockTitle,
 };

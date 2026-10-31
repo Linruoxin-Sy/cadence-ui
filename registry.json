@@ -1203,7 +1203,7 @@
       "name": "code-block",
       "type": "registry:ui",
       "title": "Code block",
-      "description": "A copyable code surface with an optional title, line numbers, diff markers, and a measured collapse.",
+      "description": "A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse.",
       "categories": ["ai"],
       "dependencies": ["class-variance-authority", "lucide-react", "motion"],
       "registryDependencies": [
@@ -1224,7 +1224,7 @@
         "since": "0.5.0",
         "tier": "T5",
         "batch": "B9",
-        "motion": ["data.transition", "state.morph", "geometry.resize"],
+        "motion": ["data.transition", "layout.shared", "state.morph", "geometry.resize"],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {

@@ -10,6 +10,9 @@ import {
   CodeBlockFooter,
   CodeBlockHeader,
   CodeBlockLine,
+  CodeBlockPanel,
+  CodeBlockTab,
+  CodeBlockTabs,
   CodeBlockTitle,
 } from "@/registry/cadence/code-block/code-block";
 
@@ -37,6 +40,12 @@ const PATCH = [
   { variant: "added" as const, text: "  if (signal.aborted) break;" },
   { variant: "added" as const, text: "}" },
 ];
+
+const INSTALL = {
+  pnpm: "pnpm dlx shadcn@latest add @cadence/code-block",
+  npm: "npx shadcn@latest add @cadence/code-block",
+  yarn: "yarn dlx shadcn@latest add @cadence/code-block",
+};
 
 const FAILURE = `TypeError: Cannot read properties of undefined (reading 'chunk')
     at consume (app/api/chat/route.ts:42:18)
@@ -70,6 +79,31 @@ export function CodeBlockPreview() {
           The fold is measured, not assumed: eight lines of source, a spring to unfold, and a chevron that turns once.
           The colours come from a highlighter that loads only because this block asked for <code>tsx</code>, and the
           finished lines are never tokenized twice while a stream arrives.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          Tabs — one snippet, three package managers
+        </p>
+        <CodeBlock defaultTab="pnpm" language="bash">
+          <CodeBlockHeader>
+            <CodeBlockTabs label="Package manager">
+              <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+              <CodeBlockTab value="npm">npm</CodeBlockTab>
+              <CodeBlockTab value="yarn">yarn</CodeBlockTab>
+            </CodeBlockTabs>
+            <CodeBlockActions>
+              <CodeBlockCopyButton values={INSTALL} />
+            </CodeBlockActions>
+          </CodeBlockHeader>
+          <CodeBlockPanel value="pnpm">{INSTALL.pnpm}</CodeBlockPanel>
+          <CodeBlockPanel value="npm">{INSTALL.npm}</CodeBlockPanel>
+          <CodeBlockPanel value="yarn">{INSTALL.yarn}</CodeBlockPanel>
+        </CodeBlock>
+        <p className="text-xs text-muted-foreground">
+          The pill is one shared element, so it travels to the tab that was pressed instead of a second pill fading in;
+          the copy button follows the selection, and the panels are hidden rather than unmounted.
         </p>
       </div>
 

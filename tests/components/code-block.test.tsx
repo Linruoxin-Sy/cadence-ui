@@ -10,6 +10,9 @@ import {
   CodeBlockFooter,
   CodeBlockHeader,
   CodeBlockLine,
+  CodeBlockPanel,
+  CodeBlockTab,
+  CodeBlockTabs,
   CodeBlockTitle,
 } from "@/registry/cadence/code-block/code-block";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
@@ -181,6 +184,159 @@ describe("CodeBlock", () => {
     vi.unstubAllGlobals();
   });
 
+  it("switches variants with a tab list that follows the tabs pattern", async () => {
+    const { container } = render(
+      <CodeBlock defaultTab="pnpm">
+        <CodeBlockHeader>
+          <CodeBlockTabs label="Package manager">
+            <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+            <CodeBlockTab value="npm">npm</CodeBlockTab>
+          </CodeBlockTabs>
+        </CodeBlockHeader>
+        <CodeBlockPanel value="pnpm">pnpm dlx shadcn@latest add @cadence/button</CodeBlockPanel>
+        <CodeBlockPanel value="npm">npx shadcn@latest add @cadence/button</CodeBlockPanel>
+      </CodeBlock>,
+    );
+
+    const list = screen.getByRole("tablist", { name: "Package manager" });
+    const pnpm = within(list).getByRole("tab", { name: "pnpm" });
+    const npm = within(list).getByRole("tab", { name: "npm" });
+
+    expect(pnpm).toHaveAttribute("aria-selected", "true");
+    // One tab stop for the whole list: the unselected tab is not a stop of its own.
+    expect(pnpm).toHaveAttribute("tabindex", "0");
+    expect(npm).toHaveAttribute("tabindex", "-1");
+
+    const shown = screen.getByRole("tabpanel");
+    expect(shown).toHaveTextContent("pnpm dlx");
+    expect(pnpm).toHaveAttribute("aria-controls", shown.id);
+    expect(shown).toHaveAttribute("aria-labelledby", pnpm.id);
+
+    await userEvent.click(npm);
+
+    expect(npm).toHaveAttribute("aria-selected", "true");
+    expect(pnpm).toHaveAttribute("aria-selected", "false");
+
+    // Both panels stay in the tree; the unselected one is hidden, which is also what
+    // takes its focusable source out of the tab order.
+    const panels = [...container.querySelectorAll('[data-slot="code-block-panel"]')];
+    expect(panels).toHaveLength(2);
+    expect(panels[0]).toHaveAttribute("hidden");
+    expect(panels[1]).not.toHaveAttribute("hidden");
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("npx shadcn@latest");
+  });
+
+  it("selects the first tab when the block was given no defaultTab", () => {
+    const { container } = render(
+      <CodeBlock>
+        <CodeBlockHeader>
+          <CodeBlockTabs>
+            <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+            <CodeBlockTab value="npm">npm</CodeBlockTab>
+          </CodeBlockTabs>
+        </CodeBlockHeader>
+        <CodeBlockPanel value="pnpm">pnpm add</CodeBlockPanel>
+        <CodeBlockPanel value="npm">npm i</CodeBlockPanel>
+      </CodeBlock>,
+    );
+
+    expect(screen.getByRole("tab", { name: "pnpm" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("pnpm add");
+
+    // Each variant's source needs its own id: three panels sharing the block's
+    // `contentId` would put the same id on three `pre` elements.
+    const ids = [...container.querySelectorAll("[id]")].map((element) => element.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("moves between tabs with the arrow keys and Home/End", async () => {
+    render(
+      <CodeBlock defaultTab="pnpm">
+        <CodeBlockTabs label="Package manager">
+          <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+          <CodeBlockTab value="npm">npm</CodeBlockTab>
+          <CodeBlockTab value="yarn">yarn</CodeBlockTab>
+        </CodeBlockTabs>
+        <CodeBlockPanel value="pnpm">pnpm</CodeBlockPanel>
+        <CodeBlockPanel value="npm">npm</CodeBlockPanel>
+        <CodeBlockPanel value="yarn">yarn</CodeBlockPanel>
+      </CodeBlock>,
+    );
+
+    const pnpm = screen.getByRole("tab", { name: "pnpm" });
+    // The selected tab is the list's only tab stop, so one Tab lands on it.
+    await userEvent.tab();
+    expect(pnpm).toHaveFocus();
+
+    await userEvent.keyboard("{ArrowRight}");
+    expect(screen.getByRole("tab", { name: "npm" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tab", { name: "npm" })).toHaveFocus();
+
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(pnpm).toHaveAttribute("aria-selected", "true");
+
+    // Wrapping is part of the pattern: one step back from the first tab is the last.
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("tab", { name: "yarn" })).toHaveAttribute("aria-selected", "true");
+
+    await userEvent.keyboard("{Home}");
+    expect(pnpm).toHaveAttribute("aria-selected", "true");
+
+    await userEvent.keyboard("{End}");
+    expect(screen.getByRole("tab", { name: "yarn" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("copies the variant the reader is looking at", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+
+    render(
+      <CodeBlock defaultTab="pnpm">
+        <CodeBlockHeader>
+          <CodeBlockTabs>
+            <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+            <CodeBlockTab value="npm">npm</CodeBlockTab>
+          </CodeBlockTabs>
+          <CodeBlockActions>
+            <CodeBlockCopyButton values={{ pnpm: "pnpm add", npm: "npm i" }} />
+          </CodeBlockActions>
+        </CodeBlockHeader>
+        <CodeBlockPanel value="pnpm">pnpm add</CodeBlockPanel>
+        <CodeBlockPanel value="npm">npm i</CodeBlockPanel>
+      </CodeBlock>,
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+    expect(writeText).toHaveBeenLastCalledWith("pnpm add");
+
+    await userEvent.click(screen.getByRole("tab", { name: "npm" }));
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+    expect(writeText).toHaveBeenLastCalledWith("npm i");
+    vi.unstubAllGlobals();
+  });
+
+  it("does not animate the tab pill's travel under reduced motion", () => {
+    const { container } = render(
+      <CadenceProvider mode="reduced">
+        <CodeBlock defaultTab="pnpm">
+          <CodeBlockTabs>
+            <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+            <CodeBlockTab value="npm">npm</CodeBlockTab>
+          </CodeBlockTabs>
+          <CodeBlockPanel value="pnpm">pnpm</CodeBlockPanel>
+          <CodeBlockPanel value="npm">npm</CodeBlockPanel>
+        </CodeBlock>
+      </CadenceProvider>,
+    );
+
+    // No `layoutId` means no shared-element travel: the pill is painted where the
+    // selection landed, which is information; the journey is decoration.
+    const pill = slot(container, "code-block-tab-indicator");
+    expect(pill).toBeInTheDocument();
+    expect(pill.style.transform).toBe("");
+  });
+
   it("folds to maxLines and reports the state on the toggle", async () => {
     stubMeasurement();
 
@@ -231,16 +387,25 @@ describe("CodeBlock", () => {
   it.each(["full", "reduced", "none"] as const)("carries data-motion=%s on every animated part", (mode) => {
     const { container } = render(
       <CadenceProvider mode={mode}>
-        <CodeBlock maxLines={3}>
-          <CodeBlockActions>
-            <CodeBlockCopyButton value={SOURCE} />
-          </CodeBlockActions>
-          <CodeBlockContent>{SOURCE}</CodeBlockContent>
+        <CodeBlock maxLines={3} defaultTab="pnpm">
+          <CodeBlockHeader>
+            <CodeBlockTabs>
+              <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+              <CodeBlockTab value="npm">npm</CodeBlockTab>
+            </CodeBlockTabs>
+            <CodeBlockActions>
+              <CodeBlockCopyButton value={SOURCE} />
+            </CodeBlockActions>
+          </CodeBlockHeader>
+          <CodeBlockPanel value="pnpm">{SOURCE}</CodeBlockPanel>
+          <CodeBlockPanel value="npm">{SOURCE}</CodeBlockPanel>
         </CodeBlock>
       </CadenceProvider>,
     );
 
-    for (const name of ["code-block", "code-block-actions", "code-block-viewport", "code-block-copy-button"]) {
+    // The header's actions do not move — only the floating row fades — so the tab
+    // and the copy button are the animated parts a tabbed block adds.
+    for (const name of ["code-block", "code-block-tab", "code-block-viewport", "code-block-copy-button"]) {
       expect(slot(container, name)).toHaveAttribute("data-motion", mode);
     }
   });
