@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CodeFence } from "@/components/site/code-fence";
+import { PackageManagerFence } from "@/components/site/package-manager-fence";
 import { listComponents } from "@/lib/content";
 
 const principles = [
@@ -35,7 +35,7 @@ export default async function HomePage() {
           Motion for animation, and a documented reduced-motion branch for every component.
         </p>
         <div className="mt-8 max-w-md">
-          <CodeFence source="npx shadcn@latest add @cadence/button" language="bash" size="sm" />
+          <PackageManagerFence source="npx shadcn@latest add @cadence/button" size="sm" />
         </div>
         <div className="mt-4 flex gap-4 text-sm">
           <Link className="font-medium underline underline-offset-4" href="/components">
@@ -111,7 +111,7 @@ export default async function HomePage() {
           and the optional provider. No runtime package, no global CSS, no lock-in.
         </p>
         <div className="mt-5 max-w-md">
-          <CodeFence source="npx shadcn@latest add @cadence/cadence-theme" language="bash" size="sm" />
+          <PackageManagerFence source="npx shadcn@latest add @cadence/cadence-theme" size="sm" />
         </div>
       </section>
     </div>

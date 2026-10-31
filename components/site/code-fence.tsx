@@ -11,8 +11,8 @@ import {
 import { cn } from "@/registry/cadence/lib/cn";
 import { fenceTitle, readFence } from "./fence";
 import { highlightSource } from "./highlight";
-import { INSTALL_FENCE, installTarget } from "./install";
-import { InstallCommand } from "./install-command";
+import { hasPackageManagerCommand, INSTALL_FENCE, installTarget, PACKAGE_MANAGER_FENCE } from "./package-manager";
+import { PackageManagerFence } from "./package-manager-fence";
 
 export interface CodeFenceProps {
   /** The source to show. It is also what the copy button copies — never a shortened form. */
@@ -59,12 +59,14 @@ export async function CodeFence({ source, language, title, size = "default", cla
  * the whole migration: the markdown does not change, and a `pre` that is not a
  * fence (hand-written JSX in a body) still renders as one.
  *
- * An `install` fence is the one info string that is not a language. It holds the one
- * command a reader came for — `npx shadcn@latest add …` — and becomes the switcher
- * that shows the same install in pnpm, npm and yarn. The markdown keeps the command
- * itself, so the payload an agent reads at `/r/<id>.md` still carries something
- * runnable, and a fence that does not parse as an install falls back to a plain
- * terminal block rather than a switcher over nothing.
+ * Two info strings are not languages. An `install` fence holds the one command a
+ * component page opens with — `npx shadcn@latest add …` — and a `package-manager`
+ * fence holds any command whose form depends on the tool: create a project, `init`,
+ * add packages. Both become the switcher that shows the same source in pnpm, npm and
+ * yarn, so all of them share one remembered choice. The markdown keeps one runnable
+ * command per fence, so the payload an agent reads at `/r/<id>.md` is still something
+ * it can run; a fence that does not parse falls back to a terminal block rather than
+ * a switcher over nothing.
  *
  * The old override made the `pre` focusable by hand, because a block that scrolls
  * sideways has to be reachable from the keyboard. The item's own content owns that
@@ -78,11 +80,21 @@ export async function MdxCodeFence({ children }: { children?: ReactNode }) {
     return <pre tabIndex={0}>{children}</pre>;
   }
 
-  // `install` is the one info string that is not a language: the command is read
-  // first, and only a fence that actually installs something becomes a switcher.
+  // `install` is read first, and only a fence that actually installs something becomes
+  // a switcher. `package-manager` is the wider form, for the docs that show a whole
+  // setup sequence rather than one registry item.
   if (fence.language === INSTALL_FENCE && installTarget(fence.source)) {
-    return <InstallCommand source={fence.source} />;
+    return <PackageManagerFence source={fence.source} />;
+  }
+  if (fence.language === PACKAGE_MANAGER_FENCE && hasPackageManagerCommand(fence.source)) {
+    return <PackageManagerFence source={fence.source} />;
   }
 
-  return <CodeFence source={fence.source} language={fence.language} />;
+  // A marked fence that no rule could read is still a shell transcript. Rendering it
+  // with its own info string would label the header "package-manager" and leave the
+  // command uncoloured, which is a worse terminal than a terminal.
+  const language =
+    fence.language === INSTALL_FENCE || fence.language === PACKAGE_MANAGER_FENCE ? "bash" : fence.language;
+
+  return <CodeFence source={fence.source} language={language} />;
 }

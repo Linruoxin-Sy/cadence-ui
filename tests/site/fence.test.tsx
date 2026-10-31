@@ -3,7 +3,7 @@ import path from "node:path";
 import { createElement } from "react";
 import { describe, expect, it } from "vitest";
 import { fenceTitle, readFence } from "@/components/site/fence";
-import { INSTALL_FENCE } from "@/components/site/install";
+import { INSTALL_FENCE, PACKAGE_MANAGER_FENCE } from "@/components/site/package-manager";
 import { resolveLanguage } from "@/registry/cadence/code-highlight/highlight";
 
 /** The shape MDX emits for a fence: `pre > code.language-<id> > "source"`. */
@@ -110,10 +110,11 @@ describe("content fences", () => {
         inside = true;
         const language = line.slice(3).trim();
         // A fence with no info string is deliberate: it holds plain output.
-        // `install` is not a language either: the site renders that fence as the
-        // package-manager switcher (see `components/site/install-command.tsx`) and
-        // colours its three commands with the `bash` grammar itself.
-        if (!language || language === INSTALL_FENCE) continue;
+        // `install` and `package-manager` are not languages either: the site renders
+        // those fences as the package-manager switcher (see
+        // `components/site/package-manager-block.tsx`) and colours their commands with
+        // the `bash` grammar itself.
+        if (!language || language === INSTALL_FENCE || language === PACKAGE_MANAGER_FENCE) continue;
         if (!resolveLanguage(language)) unhighlighted.push(`${file}: ${language}`);
       }
     }

@@ -13,9 +13,12 @@ description: Add Cadence to a Next.js or Vite project with the shadcn CLI, or co
 Cadence components are UI only. They render invalid state from `aria-invalid` but never validate
 a value; the boundary is the same one [Field](/components/field) demonstrates.
 
+Every command below is shown for pnpm, npm, and yarn. The tab you pick is remembered in your
+browser and applies to every install command on the site, so switching it once switches them all.
+
 ## Next.js
 
-```bash
+```package-manager
 npx create-next-app@latest my-app --ts --tailwind --app
 cd my-app
 npx shadcn@latest init -b base-ui
@@ -33,7 +36,7 @@ Then register the Cadence registry once in `components.json`:
 
 Install the theme once, then any component:
 
-```bash
+```package-manager
 npx shadcn@latest add @cadence/cadence-theme
 npx shadcn@latest add @cadence/button
 ```
@@ -44,8 +47,8 @@ The CLI writes files into the `cadence/` folder under your components alias
 
 ## Vite
 
-```bash
-npm create vite@latest my-app -- --template react-ts
+```package-manager
+npx create-vite@latest my-app --template react-ts
 cd my-app
 npx shadcn@latest init -b base-ui
 ```
@@ -75,11 +78,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Manual installation
 
-1. Install the packages: `pnpm add motion lucide-react @base-ui/react clsx tailwind-merge` (or the npm/yarn equivalent).
-2. Copy `lib/motion.ts`, `lib/cn.ts`, and `lib/provider.tsx` from the registry item into
+Start with the packages the CLI would have installed:
+
+```package-manager
+npm install motion lucide-react @base-ui/react clsx tailwind-merge
+```
+
+Then copy the files by hand:
+
+1. Copy `lib/motion.ts`, `lib/cn.ts`, and `lib/provider.tsx` from the registry item into
    `components/cadence/lib/`.
-3. Copy the component folder into `components/cadence/<id>/`.
-4. Copy the `docs` body from `/r/<id>.json` if you want the documentation next to the code.
+2. Copy the component folder into `components/cadence/<id>/`.
+3. Copy the `docs` body from `/r/<id>.json` if you want the documentation next to the code.
 
 Every item keeps relative imports (`../lib/motion`), so the folder can be moved as a whole.
 
