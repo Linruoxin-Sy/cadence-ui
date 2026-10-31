@@ -347,7 +347,7 @@ axe with zero violations, size budget, and dual-theme screenshots.
     `aria-current`. This is the one place where the DOM differs from upstream on purpose.
   - **Four files suppress one Biome rule each** (`useSemanticElements`, plus `useFocusableInteractive` on
     `breadcrumb` and `useKeyWithClickEvents` on `input-group`). The roles are upstream's and they are
-    deliberate: `role="list"` on a div so a row can be an anchor through `render`, `role="group"` on the
+    deliberate: `role="group"` on the item group so a row can be an anchor through `render`, `role="group"` on the
     field/button/input wrappers, `role="link"` + `aria-current` on the current crumb. The rule and the
     reason live above the `"use client"` directive, because Biome only honours `biome-ignore-all` on the
     first line.

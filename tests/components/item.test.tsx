@@ -37,7 +37,7 @@ describe("Item", () => {
       </ItemGroup>,
     );
 
-    expect(screen.getByRole("list")).toHaveAttribute("data-slot", "item-group");
+    expect(screen.getByRole("group")).toHaveAttribute("data-slot", "item-group");
     expect(screen.getByText("Header")).toHaveAttribute("data-slot", "item-header");
     expect(screen.getByText("plan.pdf")).toHaveAttribute("data-slot", "item-title");
     expect(screen.getByText("2.4 MB · updated today")).toHaveAttribute("data-slot", "item-description");
@@ -69,5 +69,23 @@ describe("Item", () => {
     expect(link.tagName).toBe("A");
     expect(link).toHaveAttribute("href", "/files/plan");
     expect(link).toHaveAttribute("data-slot", "item");
+  });
+
+  it("keeps a linking row a link inside a labelled group", () => {
+    render(
+      <ItemGroup aria-label="Files">
+        <Item render={<a href="/files/plan" />}>
+          <ItemContent>
+            <ItemTitle>plan.pdf</ItemTitle>
+          </ItemContent>
+        </Item>
+      </ItemGroup>,
+    );
+
+    // `role="list"` on the group would force `role="listitem"` onto every row, and that
+    // role would override the anchor's: the row would stop being announced as a link.
+    // A group accepts either kind of row and still carries the label.
+    expect(screen.getByRole("group", { name: "Files" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "plan.pdf" })).toBeInTheDocument();
   });
 });

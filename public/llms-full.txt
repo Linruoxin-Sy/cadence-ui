@@ -1765,7 +1765,7 @@ title or a progress line below the content.
 | Part              | Props                                  | Notes                                                           |
 | ----------------- | -------------------------------------- | --------------------------------------------------------------- |
 | `Item`            | `variant`, `size`, `render`            | `variant`: `default \| outline \| muted`; `size`: `default \| sm \| xs`. |
-| `ItemGroup`       | native div props                       | `role="list"`; wraps rows and separators.                       |
+| `ItemGroup`       | native div props                       | `role="group"`; wraps rows and separators.                      |
 | `ItemMedia`       | `variant`                              | `default \| icon \| image`, exposed as `data-variant`.          |
 | `ItemContent`     | native div props                       | Grows; a second content block stops growing.                    |
 | `ItemTitle`       | native div props                       | One line, medium weight.                                        |
@@ -1797,9 +1797,10 @@ that animates itself cannot be interrupted by the next render.
 
 ## Accessibility
 
-- `ItemGroup` sets `role="list"`. Rows are `div`s (or an anchor via `render`), so
-  give the group a label when it is not already under a heading:
-  `aria-label="Files"`.
+- `ItemGroup` sets `role="group"`, not `role="list"`: a row may be a container or an
+  anchor via `render`, and a list would require every child to be a `listitem` —
+  which would strip that anchor of its link role. Give the group a label when it is
+  not already under a heading: `aria-label="Files"`.
 - A row that links nowhere is a container. If the whole row is clickable, render an
   anchor with `render` rather than adding `onClick` — the anchor is focusable,
   middle-clickable, and announced as a link.

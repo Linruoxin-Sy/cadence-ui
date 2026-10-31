@@ -1,4 +1,4 @@
-// biome-ignore-all lint/a11y/useSemanticElements: ItemGroup is a div with role="list" so a row can be an anchor via `render`; a <ul> would force a <li> per row and break that swap.
+// biome-ignore-all lint/a11y/useSemanticElements: ItemGroup is a div so a row can be an anchor via `render`; a <ul> would force a <li> per row and break that swap.
 "use client";
 
 import { mergeProps } from "@base-ui/react/merge-props";
@@ -10,11 +10,18 @@ import { Separator } from "../separator";
 
 export interface ItemGroupProps extends React.ComponentProps<"div"> {}
 
-/** `role="list"` pairs with `Item`'s implicit listitem semantics when the items are read aloud. */
+/**
+ * A labelled container, **not** a list.
+ *
+ * `role="list"` would require every child to be a `listitem`, and a row may be an
+ * anchor (`render`); forcing `role="listitem"` onto that anchor would strip it of its
+ * link role, which is the one thing the docs promise it keeps. A group accepts either
+ * kind of row and still takes an `aria-label`, so "Files" is announced either way.
+ */
 function ItemGroup({ className, ...props }: ItemGroupProps) {
   return (
     <div
-      role="list"
+      role="group"
       data-slot="item-group"
       className={cn("group/item-group flex w-full flex-col", className)}
       {...props}
