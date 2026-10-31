@@ -1,0 +1,206 @@
+---
+title: Context Menu
+description: Right-click actions on a file, row, or canvas.
+category: overlay
+motion: [popup.anchored, exit.fade, state.morph]
+intensity: medium
+complexity: L
+tier: T2
+since: 0.4.0
+deps: ["@base-ui/react", "lucide-react", "motion"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+---
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/context-menu
+```
+
+## Usage
+
+```tsx
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/cadence/context-menu";
+
+export function FileContextMenu({ file }: { file: File }) {
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger className="flex h-32 items-center justify-center rounded-lg border border-dashed text-sm">
+        {file.name}
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={() => open(file)}>Open</ContextMenuItem>
+        <ContextMenuItem onClick={() => rename(file)}>Rename</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
+}
+```
+
+## Where the panel opens
+
+The menu opens at the pointer, not under an edge of the trigger, so `side` and `align`
+describe the fallback used when the pointer is near a viewport edge. The defaults —
+`side="right"`, `alignOffset={4}` — place the panel just clear of the cursor.
+
+```tsx
+<ContextMenuContent side="bottom" align="center" alignOffset={12}>
+  …
+</ContextMenuContent>
+```
+
+## Beside a row menu
+
+A context menu and a `dropdown-menu` on the same row answer the same question twice, and
+users expect the same entries in both. Render the item list once and pass it to both:
+
+```tsx
+const actions = (
+  <>
+    <ContextMenuItem onClick={() => open(file)}>Open</ContextMenuItem>
+    <ContextMenuItem onClick={() => rename(file)}>Rename</ContextMenuItem>
+  </>
+);
+
+<ContextMenu>
+  <ContextMenuTrigger>{file.name}</ContextMenuTrigger>
+  <ContextMenuContent>{actions}</ContextMenuContent>
+</ContextMenu>;
+```
+
+## Selection items
+
+`ContextMenuCheckboxItem` and `ContextMenuRadioGroup` / `ContextMenuRadioItem` keep the panel
+open, so a user can set options without reopening it. `ContextMenuShortcut` is a
+right-aligned hint; the component binds no keys.
+
+```tsx
+<ContextMenuCheckboxItem defaultChecked onCheckedChange={setHidden}>
+  Hidden files
+</ContextMenuCheckboxItem>
+
+<ContextMenuRadioGroup value={sort} onValueChange={setSort}>
+  <ContextMenuRadioItem value="name">Name</ContextMenuRadioItem>
+  <ContextMenuRadioItem value="date">Date modified</ContextMenuRadioItem>
+</ContextMenuRadioGroup>
+```
+
+## Submenus
+
+```tsx
+<ContextMenuSub>
+  <ContextMenuSubTrigger>Open with</ContextMenuSubTrigger>
+  <ContextMenuSubContent>
+    <ContextMenuItem onClick={() => openWith("editor")}>Editor</ContextMenuItem>
+    <ContextMenuItem onClick={() => openWith("preview")}>Preview</ContextMenuItem>
+  </ContextMenuSubContent>
+</ContextMenuSub>
+```
+
+## When to use
+
+- A canvas, map, or list of files where the object itself is the target.
+- A table row with more actions than fit in a cell.
+- A destructive action that should be one gesture away, not one visible button.
+
+## When not to use
+
+- An action a user needs to discover. A context menu is invisible until someone
+  right-clicks; put the primary action in the row and keep the menu for the rest.
+- A single toggle. Use a `checkbox` or `switch` that is always visible.
+- The same list on a touch device only: a long-press competes with scroll and text
+  selection. Keep a visible `dropdown-menu` as well.
+
+## API
+
+### `ContextMenu`
+
+`open`, `defaultOpen`, `onOpenChange`, `modal` (default `true`).
+
+### `ContextMenuTrigger`
+
+Native div props and `render`. The trigger is the area that listens for `contextmenu` and
+long-press; it renders a `div` by default, so give it the box you want to be right-clickable.
+
+### `ContextMenuContent`
+
+| Prop          | Type                                     | Default     | Description                                   |
+| ------------- | ---------------------------------------- | ----------- | --------------------------------------------- |
+| `side`        | `"top" \| "bottom" \| "left" \| "right"` | `"right"`   | Fallback side when the pointer is at an edge. |
+| `align`       | `"start" \| "center" \| "end"`            | `"start"`   | Alignment along that side.                    |
+| `sideOffset`  | `number`                                 | `0`         | Gap from the pointer.                         |
+| `alignOffset` | `number`                                 | `4`         | Shift along the alignment axis.               |
+| `className`   | `string`                                 | –           | Merged last.                                  |
+
+### Items
+
+`ContextMenuItem` (`onClick`, `disabled`, `inset`, `variant`), `ContextMenuCheckboxItem`,
+`ContextMenuRadioGroup`, `ContextMenuRadioItem`, `ContextMenuSub`, `ContextMenuSubTrigger`,
+`ContextMenuSubContent` — the same parts and props as `dropdown-menu`, with context-menu
+slots.
+
+### Structure
+
+`ContextMenuGroup`, `ContextMenuLabel`, `ContextMenuSeparator`, `ContextMenuShortcut`,
+`ContextMenuPortal`.
+
+## Motion contract
+
+| Phase         | Properties                                        | Token             | Interruptible |
+| ------------- | ------------------------------------------------- | ----------------- | ------------- |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored` · `duration.fast` | yes |
+| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade` · `duration.fast` | yes |
+| check / radio | mark `opacity` + `scale`                          | `state.morph`     | yes           |
+| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade` | yes           |
+| none          | every `--motion-duration-*` resolves to `0ms`; the mark jumps | –      | –             |
+
+The panel grows out of the point that was pressed. That is the whole reason the recipe is
+anchored rather than centred: a context menu belongs to the place it was summoned, and a
+scale from the pointer says so without moving the panel.
+
+## Keyboard interactions
+
+| Keys                      | Action                                                        |
+| ------------------------- | ------------------------------------------------------------- |
+| `Shift+F10` / Context Menu key | Opens the menu at the focused element.                   |
+| `ArrowDown` / `ArrowUp`   | Moves the highlight.                                          |
+| Typeahead letters         | Highlights the next item starting with them.                  |
+| `Enter` / `Space`         | Runs the highlighted item.                                    |
+| `ArrowRight` / `ArrowLeft` | Opens or closes a submenu.                                   |
+| `Escape`                  | Closes the menu and returns focus to the trigger.             |
+
+## Accessibility
+
+- The trigger keeps the browser's own `contextmenu` event: the menu opens from the keyboard
+  with `Shift+F10` or the dedicated key, which is what a screen reader user presses.
+- The panel is `role="menu"` and the items are `menuitem` / `menuitemcheckbox` /
+  `menuitemradio`, so "right-click for options" is announced as a menu, not as a tooltip.
+- On touch, Base UI opens the menu on a long press and cancels it if the finger moves —
+  which is why the same actions must also be reachable from a visible control.
+- Focus returns to the trigger on close, so a keyboard user does not lose their place.
+
+## Responsive behavior
+
+The panel flips to the side with room and shifts along the cross axis to stay inside the
+viewport, so a right-click near the bottom-right corner opens up and to the left. On a
+narrow screen it caps at `--available-height` and scrolls rather than overflowing.
+
+## Performance
+
+- One portal while open, one CSS transition on `opacity` and `scale`, no per-frame work.
+- The trigger adds one listener, not one per item: Base UI handles the event at the root.
+- Budget: T2 (10 KB gzip). The item and submenu parts share their classes with
+  `dropdown-menu` but not its file, so the two install independently.
+
+## Notes for AI
+
+- Use `onClick` for the action; there is no `onSelect` on Base UI's menu item.
+- Do not hide the only path to an action behind a context menu — pair it with a visible
+  control, because a context menu is undiscoverable and unavailable on most touch flows.
+- `ContextMenuTrigger` is the right-click area, so its content is what the user aims at;
+  avoid making the whole page a trigger.

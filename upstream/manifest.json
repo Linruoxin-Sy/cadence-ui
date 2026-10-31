@@ -1273,6 +1273,92 @@
         }
       }
     },
+    "context-menu": {
+      "path": "apps/v4/registry/bases/base/ui/context-menu.tsx",
+      "exports": [
+        "ContextMenu",
+        "ContextMenuCheckboxItem",
+        "ContextMenuContent",
+        "ContextMenuGroup",
+        "ContextMenuItem",
+        "ContextMenuLabel",
+        "ContextMenuPortal",
+        "ContextMenuRadioGroup",
+        "ContextMenuRadioItem",
+        "ContextMenuSeparator",
+        "ContextMenuShortcut",
+        "ContextMenuSub",
+        "ContextMenuSubContent",
+        "ContextMenuSubTrigger",
+        "ContextMenuTrigger"
+      ],
+      "slots": [
+        "context-menu",
+        "context-menu-checkbox-item",
+        "context-menu-content",
+        "context-menu-group",
+        "context-menu-item",
+        "context-menu-label",
+        "context-menu-portal",
+        "context-menu-radio-group",
+        "context-menu-radio-item",
+        "context-menu-separator",
+        "context-menu-shortcut",
+        "context-menu-sub",
+        "context-menu-sub-content",
+        "context-menu-sub-trigger",
+        "context-menu-trigger"
+      ],
+      "props": {
+        "ContextMenu": {},
+        "ContextMenuPortal": {},
+        "ContextMenuTrigger": {
+          "className": null
+        },
+        "ContextMenuContent": {
+          "className": null,
+          "align": "\"start\"",
+          "alignOffset": "4",
+          "side": "\"right\"",
+          "sideOffset": "0"
+        },
+        "ContextMenuGroup": {},
+        "ContextMenuLabel": {
+          "className": null,
+          "inset": null
+        },
+        "ContextMenuItem": {
+          "className": null,
+          "inset": null,
+          "variant": "\"default\""
+        },
+        "ContextMenuSub": {},
+        "ContextMenuSubTrigger": {
+          "className": null,
+          "inset": null,
+          "children": null
+        },
+        "ContextMenuSubContent": {},
+        "ContextMenuCheckboxItem": {
+          "className": null,
+          "children": null,
+          "checked": null,
+          "inset": null
+        },
+        "ContextMenuRadioGroup": {},
+        "ContextMenuRadioItem": {
+          "className": null,
+          "children": null,
+          "inset": null
+        },
+        "ContextMenuSeparator": {
+          "className": null
+        },
+        "ContextMenuShortcut": {
+          "className": null
+        }
+      }
+    },
     "code-block": {
       "path": "apps/v4/registry/bases/base/ui/code-block.tsx",
       "exports": [

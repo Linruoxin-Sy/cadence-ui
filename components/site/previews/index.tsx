@@ -49,5 +49,6 @@ export const previews: Record<string, ComponentType> = {
   drawer: dynamic(() => import("./drawer").then((mod) => ({ default: mod.DrawerPreview }))),
   select: dynamic(() => import("./select").then((mod) => ({ default: mod.SelectPreview }))),
   "dropdown-menu": dynamic(() => import("./dropdown-menu").then((mod) => ({ default: mod.DropdownMenuPreview }))),
+  "context-menu": dynamic(() => import("./context-menu").then((mod) => ({ default: mod.ContextMenuPreview }))),
   "code-block": dynamic(() => import("./code-block").then((mod) => ({ default: mod.CodeBlockPreview }))),
 };

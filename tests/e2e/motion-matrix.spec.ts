@@ -685,6 +685,44 @@ test.describe("dropdown-menu", () => {
   });
 });
 
+test.describe("context-menu", () => {
+  // The same panel as `dropdown-menu` with one difference that matters: it scales from
+  // the pointer rather than from a trigger edge. Its classes are a separate copy, so a
+  // token regression in that copy would otherwise pass the whole suite.
+  for (const prefersReduced of PREFERENCES) {
+    test.describe(preferenceName(prefersReduced), () => {
+      test.use({ reducedMotion: prefersReduced ? "reduce" : "no-preference" });
+
+      for (const requested of MODES) {
+        const mode = effectiveMode(requested, prefersReduced);
+
+        test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
+          await recordScale(page, '[data-slot="context-menu-content"]');
+          await openComponent(page, "context-menu", requested, "context-menu-trigger", mode);
+
+          await page
+            .locator(scoped("context-menu", '[data-slot="context-menu-trigger"]'))
+            .first()
+            .click({ button: "right" });
+          await expect(page.getByRole("menu")).toBeVisible();
+          await page.waitForTimeout(300);
+
+          const panel = page.locator('[data-slot="context-menu-content"]');
+          await expect(panel).toHaveAttribute("data-motion", mode);
+          expect(await computed(page, '[data-slot="context-menu-content"]', "transition-duration")).toBe(
+            { full: "0.16s", reduced: "0.096s", none: "0s" }[mode],
+          );
+
+          const enter = await recordedScale(page);
+          expect(enter.frames).toBeGreaterThan(3);
+          if (mode === "full") expect(enter.min).toBeLessThan(0.99);
+          else expect(enter.min).toBe(1);
+        });
+      }
+    });
+  }
+});
+
 /** Guards the one thing the matrix cannot: that a mode is reachable without a URL. */
 test("the header switch drives the same modes the URL does", async ({ page }) => {
   await page.goto("/components/button");
