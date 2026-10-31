@@ -59,7 +59,7 @@ const pascal = id
   .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
   .join("");
 
-const sourcePath = path.join(root, "registry", "cadence", id, `${id}.tsx`);
+const sourcePath = path.join(root, "registry", "cadence", id, "index.tsx");
 const docPath = path.join(root, "content", "components", `${id}.mdx`);
 const previewPath = path.join(root, "components", "site", "previews", `${id}.tsx`);
 const testPath = path.join(root, "tests", "components", `${id}.test.tsx`);
