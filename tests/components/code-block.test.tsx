@@ -384,6 +384,17 @@ describe("CodeBlock", () => {
     expect(slot(container, "code-block-content")).toHaveAttribute("tabindex", "0");
   });
 
+  it("paints the source's scrollbar from theme tokens, not the OS palette", () => {
+    const { container } = render(<CodeBlockContent>{SOURCE}</CodeBlockContent>);
+    const className = slot(container, "code-block-content").className;
+
+    // A native bar follows the operating system, so a dark page on a light system
+    // gets a white bar down the code. Both the width and the colour have to come
+    // from the theme for the two to agree.
+    expect(className).toContain("scrollbar-width:thin");
+    expect(className).toContain("var(--muted-foreground)");
+  });
+
   it.each(["full", "reduced", "none"] as const)("carries data-motion=%s on every animated part", (mode) => {
     const { container } = render(
       <CadenceProvider mode={mode}>

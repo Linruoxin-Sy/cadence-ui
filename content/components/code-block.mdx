@@ -348,11 +348,15 @@ Three notes on the choices:
 - `size="sm"` tightens the padding and drops the source to `text-xs` — the right weight for output inside a
   message or a tool row.
 - Long lines scroll inside the block, never the page: the source owns the overflow, and the wrapper clips it.
+  The bar is thin and drawn in the theme's own grey rather than the OS's, because a native scrollbar follows the
+  operating system and not the page — a dark page on a light system would otherwise get a white bar down the code.
 - `wrap` is for output, not for source. Wrapped source loses its indentation structure, which is the one thing code
   formatting carries.
 - On a narrow screen the header's title truncates rather than wrapping, and the actions stay reachable — a touch
   device always shows them, because there is no hover to reveal them with. The tab list scrolls sideways on its
-  own when three tabs and a title do not fit, so the copy button keeps its place.
+  own when three tabs and a title do not fit, so the copy button keeps its place. That row scrolls without a bar:
+  a track in a 24px control strip reads as a second seam under the label, and the arrow keys and a swipe move it
+  anyway.
 
 ## Performance
 

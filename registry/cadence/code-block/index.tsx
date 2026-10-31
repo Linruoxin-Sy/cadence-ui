@@ -15,6 +15,22 @@ import { useCadenceMotion } from "../lib/provider";
 /** How long the copy button shows its tick before returning to the copy glyph. */
 const COPIED_RESET_MS = 2000;
 
+/**
+ * A native bar takes the OS palette, not the page's — a dark page on a light OS gets
+ * a white bar down the code. `::-webkit-*` is only the Safari-17 fallback: Chromium
+ * ignores it once `scrollbar-width` is set.
+ */
+const scrollBar = [
+  "[scrollbar-width:thin]",
+  "[scrollbar-color:color-mix(in_oklab,var(--muted-foreground)_30%,transparent)_transparent]",
+  "[&::-webkit-scrollbar]:size-2.5",
+  "[&::-webkit-scrollbar-thumb]:rounded-full",
+  "[&::-webkit-scrollbar-thumb]:bg-muted-foreground/30",
+].join(" ");
+
+/** The tab strip keeps its sideways scroll but not the bar: a 24px row would grow, and draw a second seam, only where it overflows. */
+const scrollStrip = "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
 const HOVER_QUERY = "(hover: hover)";
 
 function subscribeHover(onChange: () => void) {
@@ -408,7 +424,7 @@ function CodeBlockTabs({ className, label = "Language", children, onKeyDown, ...
       role="tablist"
       aria-label={label}
       data-slot="code-block-tabs"
-      className={cn("flex min-w-0 items-center gap-0.5 overflow-x-auto", className)}
+      className={cn("flex min-w-0 items-center gap-0.5 overflow-x-auto", scrollStrip, className)}
       onKeyDown={(event) => {
         onKeyDown?.(event);
         if (event.defaultPrevented) return;
@@ -754,6 +770,7 @@ function CodeBlockContent({
         style={{ counterReset: `line ${startLine - 1}`, ...style }}
         className={cn(
           "min-h-0 min-w-0 overflow-auto px-4 py-3 font-mono leading-relaxed text-start outline-none",
+          scrollBar,
           "group-data-[size=sm]/code-block:px-3 group-data-[size=sm]/code-block:py-2",
           wrap && "whitespace-pre-wrap break-words",
           className,
