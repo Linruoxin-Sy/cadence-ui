@@ -3,7 +3,9 @@
  *
  *   - exports:      an upstream export we do not have is a rename or a removal (P8)
  *   - data-slot:    an upstream slot we do not render breaks consumers' CSS (P8)
- *   - additive:     extra exports and slots are allowed, and reported, not failed
+ *   - props:        an upstream part's prop names and declared defaults, per part, so a
+ *                   prop that was dropped or a default that moved is not invisible
+ *   - additive:     extra exports, slots and props are allowed, and reported, not failed
  *   - meta.upstream.version must still match the pinned commit's month
  *
  * Reads the committed upstream/manifest.json, so it runs offline. Refresh that
@@ -17,7 +19,7 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { extractExports, extractSlots } from "./upstream-surface.mjs";
+import { extractExports, extractProps, extractSlots } from "./upstream-surface.mjs";
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -59,6 +61,7 @@ if (mode === "write") {
       path: `apps/v4/registry/bases/${manifest.primitiveBase ?? "base"}/ui/${item.name}.tsx`,
       exports: extractExports(source),
       slots: extractSlots(source),
+      props: extractProps(source),
     };
   }
   if (unreadable.length) {
@@ -72,9 +75,30 @@ if (mode === "write") {
 
 const problems = [];
 const additive = [];
+const accepted = [];
 const checked = [];
 
 const pinMonth = typeof manifest.pin?.date === "string" ? manifest.pin.date.slice(0, 7) : null;
+
+/**
+ * A deviation an item records in `meta.parity.props`, because upstream's Base UI API
+ * and its `new-york-v4` visuals disagree and Cadence followed the visuals. Silence is
+ * not an option twice: the entry must carry a reason, and it is a problem once the
+ * deviation it describes no longer exists.
+ */
+function recordedDeviations(item) {
+  const entries = item.meta?.parity?.props ?? [];
+  const byPath = new Map();
+  for (const entry of entries) {
+    const deviation = typeof entry === "string" ? { path: entry, reason: "" } : entry;
+    if (!deviation?.path?.includes(".") || !deviation.reason) {
+      problems.push(`${item.name}: meta.parity.props entries need a "Part.prop" path and a reason`);
+      continue;
+    }
+    byPath.set(deviation.path, deviation);
+  }
+  return byPath;
+}
 
 for (const item of components) {
   const upstream = manifest.items[item.name];
@@ -98,8 +122,45 @@ for (const item of components) {
 
   for (const name of missingExports) problems.push(`${item.name}: upstream export "${name}" is missing or renamed`);
   for (const slot of missingSlots) problems.push(`${item.name}: upstream data-slot="${slot}" is missing or renamed`);
-  if (extraExports.length || extraSlots.length) {
-    additive.push({ name: item.name, exports: extraExports, slots: extraSlots });
+
+  // Props, part by part. A part missing locally is already an export failure, so only
+  // the parts both files declare are compared. A prop without a default may be
+  // forwarded through `...props` upstream and read on our side; a prop upstream gives
+  // a default to is one it acts on, and a dropped one changes behaviour silently.
+  const props = extractProps(source);
+  const declaredProps = upstream.props ?? {};
+  const deviations = recordedDeviations(item);
+  const deviated = new Set();
+  const extraProps = [];
+  for (const [part, declared] of Object.entries(declaredProps)) {
+    const mine = props[part];
+    if (!mine) continue;
+    for (const [prop, fallback] of Object.entries(declared)) {
+      const key = `${part}.${prop}`;
+      const missing = !(prop in mine);
+      const drifted = !missing && fallback !== null && mine[prop] !== null && fallback !== mine[prop];
+      if (!missing && !drifted) continue;
+
+      const deviation = deviations.get(key);
+      if (deviation) {
+        deviated.add(key);
+        accepted.push({ name: item.name, path: key, reason: deviation.reason });
+        continue;
+      }
+      if (missing) problems.push(`${item.name}: upstream prop "${key}" is missing or renamed`);
+      else problems.push(`${item.name}: prop default drifted — ${key}: ${mine[prop]} != upstream ${fallback}`);
+    }
+    const extra = Object.keys(mine).filter((prop) => !(prop in declared));
+    if (extra.length) extraProps.push(`${part}.{${extra.join(",")}}`);
+  }
+  for (const path of deviations.keys()) {
+    if (!deviated.has(path)) {
+      problems.push(`${item.name}: meta.parity.props records "${path}", but it no longer differs from upstream`);
+    }
+  }
+
+  if (extraExports.length || extraSlots.length || extraProps.length) {
+    additive.push({ name: item.name, exports: extraExports, slots: extraSlots, props: extraProps });
   }
 
   const declared = item.meta?.upstream?.version;
@@ -114,12 +175,21 @@ const stale = Object.keys(manifest.items).filter((name) => !components.some((ite
 for (const name of stale) problems.push(`${name}: pinned upstream item has no registry item any more`);
 
 if (asJson) {
-  console.log(JSON.stringify({ ok: problems.length === 0, checked, problems, additive }, null, 2));
+  console.log(JSON.stringify({ ok: problems.length === 0, checked, problems, additive, accepted }, null, 2));
 } else {
+  if (accepted.length) {
+    const lines = accepted.map(({ name, path: key, reason }) => `  · ${name}: ${key} — ${reason}`);
+    const tail = verbose ? `:\n${lines.join("\n")}` : ` (+${accepted.length}, pass --verbose to list)`;
+    console.log(`parity: recorded prop deviations, allowed by meta.parity${tail}`);
+  }
   if (additive.length) {
     const lines = additive.map(
-      ({ name, exports: extraE, slots: extraS }) =>
-        `  · ${name}: ${[...extraE.map((n) => `export ${n}`), ...extraS.map((s) => `slot ${s}`)].join(", ")}`,
+      ({ name, exports: extraE, slots: extraS, props: extraP = [] }) =>
+        `  · ${name}: ${[
+          ...extraE.map((n) => `export ${n}`),
+          ...extraS.map((s) => `slot ${s}`),
+          ...extraP.map((p) => `prop ${p}`),
+        ].join(", ")}`,
     );
     const tail = verbose ? `:\n${lines.join("\n")}` : ` (+${additive.length} items, pass --verbose to list)`;
     console.log(`parity: additive surface, allowed by P8${tail}`);

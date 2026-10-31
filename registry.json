@@ -916,6 +916,14 @@
           "registry": "shadcn",
           "style": "base-ui",
           "version": "2026-10"
+        },
+        "parity": {
+          "props": [
+            {
+              "path": "ToggleGroup.spacing",
+              "reason": "base defaults spacing to 2, new-york-v4 to 0. Cadence follows the visuals: 0 is the segmented control every shadcn example shows, and the gap is one prop away."
+            }
+          ]
         }
       }
     },
