@@ -191,8 +191,13 @@ and `data.transition`. Both must land in [animation-system.md](animation-system.
 1. Source at `registry/cadence/<id>/index.tsx`, relative imports only, `data-slot` on every part.
 2. Exports and props match upstream (parity check), additive props documented.
 3. Registry item with `meta.tier`, `meta.batch`, `motion`, `intensity`, `complexity`, `upstream`.
-4. MDX: compact (9 sections) for T0–T1, standard (12) for T2+, including the motion contract and,
-   for input components, the "Validation and data ownership" section.
+4. MDX at `content/components/<id>.mdx`: the sections of
+   [documentation-site-and-distribution.md](documentation-site-and-distribution.md) §2, in that order —
+   `Installation` and `Usage` first, every other section flat `##`, one `##` per example. The **set** is the
+   contract, not the count: examples run 2–6 and are named for what they show, `Keyboard interactions` /
+   `Responsive behavior` / `Performance` appear from T1 up, `Validation and data ownership` on anything that
+   takes input, and every item carries the motion contract. A doc that omits a required section is
+   incomplete; a doc with an extra example is not.
 5. Preview module at `components/site/previews/<id>.tsx`.
 6. Unit test: render, `data-slot`, keyboard path, reduced branch.
 7. Payload rebuilt, `pnpm check` green, dual-theme screenshot in the PR.
@@ -760,12 +765,12 @@ With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
 
 ## 11. Risks
 
-| Risk                                               | Mitigation                                                     |
-| -------------------------------------------------- | -------------------------------------------------------------- |
-| Upstream API drift across 57 hand-maintained files | Pinned manifest, parity check, quarterly sync, `meta.upstream` |
-| Size budget unrealistic for upstream source        | Tier budgets plus `meta.budget` exceptions with reasons        |
-| Every component animating                          | T0 is a real tier; "one cause" review rejects decoration       |
-| Data Table / Date Picker written as primitives     | They are `registry:block` with a guide template                |
-| AI upstream instability                            | Backlog until prerequisites are met                            |
-| Documentation load (57 × 9–12 sections)            | `new-item.mjs` scaffolding plus three templates                |
-| Existing users of the eight components             | Tagged release, migration note (import path only)              |
+| Risk                                                 | Mitigation                                                     |
+| ---------------------------------------------------- | -------------------------------------------------------------- |
+| Upstream API drift across 57 hand-maintained files   | Pinned manifest, parity check, quarterly sync, `meta.upstream` |
+| Size budget unrealistic for upstream source          | Tier budgets plus `meta.budget` exceptions with reasons        |
+| Every component animating                            | T0 is a real tier; "one cause" review rejects decoration       |
+| Data Table / Date Picker written as primitives       | They are `registry:block` with a guide template                |
+| AI upstream instability                              | Backlog until prerequisites are met                            |
+| Documentation load (57 pages, 12 section slots each) | `new-item.mjs` scaffolding plus the §2 template                |
+| Existing users of the eight components               | Tagged release, migration note (import path only)              |
