@@ -80,9 +80,9 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 The preview body is the one place the _site_ animates geometry: the frame mounts a `Skeleton` while a page's `dynamic()` import resolves, and the example that replaces it is usually a different height. `MeasuredHeight` keeps the height explicit (so the new content is laid out inside the old size and the spring starts where the reader already is), observes the content rather than the wrapper, and jumps instead of animating under `reduced` / `none`. What it cannot smooth is the server stream: a `Suspense` boundary whose fallback is in the HTML and whose content arrives in a later chunk is patched before hydration, with no JavaScript running to measure it — on a prerendered page that patch happens during parse, before the first paint. That case resizes without animating, by decision: covering it would mean giving up SSR for the previews (`dynamic(..., { ssr: false })`), and a preview that is already in the HTML before first paint is worth more than an animation nobody sees.
 
 **Built today:** slow motion, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
-and per-page dynamic loading of previews. Variant switching, the code block, and install copy are **not**
-built yet — `components/site/copy-command.tsx` exists but is mounted nowhere. The gap between this table and
-the site is tracked in [parity-plan.md](parity-plan.md) §8, not here; this section describes the target.
+and per-page dynamic loading of previews. Variant switching of previews is **not** built yet. The gap between
+this table and the site is tracked in [parity-plan.md](parity-plan.md) §8, not here; this section describes
+the target.
 
 ### 2.3 Body typography
 
@@ -112,6 +112,14 @@ runs at build time — the pages are static, so Shiki tokenizes the fence while 
 downloads no grammar — and the header carries the language and the copy control, because a floating copy
 action is invisible until hover and most fences on this site are commands to copy. A fence in a language the
 item does not bundle renders as plain text, which is the whole source either way.
+
+One info string is not a language. ` ```install ` marks the one command a reader came for — `npx shadcn@latest
+add @cadence/<id>` — and `components/site/install-command.tsx` renders it as the code block's own tab switcher:
+pnpm (`pnpm dlx`), npm (`npx`) and yarn (`yarn dlx`), with the copy button following the selected tab. The
+command stays in the markdown, so the payload an agent reads at `/r/<id>.md` is still something it can run;
+`components/site/install.ts` does the reading and restating, and falls back to a terminal block for a fence it
+cannot parse. Every `content/components/*.mdx` uses that fence for its Installation section, which
+`tests/site/install.test.tsx` enforces.
 
 ### 2.4 Document entrance
 

@@ -584,9 +584,13 @@ Not a batch: one item of B9, landed ahead of `attachment` and `bubble` because i
 whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/code-block.tsx`, 8 exports,
 10 `data-slot` values) and it needs no streaming model to be correct.
 
-- **Surface:** upstream's eight exports and ten slots exactly; one additive export,
-  `CodeBlockExpandButton` and one additive prop each for `language` / `maxLines`, plus one additive slot,
-  `code-block-viewport`. 37 components, 43 registry items (the highlighter is the 43rd), 37 docs,
+- **Surface:** upstream's eight exports (`CodeBlock`, `CodeBlockActions`, `CodeBlockContent`,
+  `CodeBlockCopyButton`, `CodeBlockFooter`, `CodeBlockHeader`, `CodeBlockLine`, `CodeBlockTitle`) and ten
+  slots exactly, plus four additive exports — the fold control `CodeBlockExpandButton` and the switcher
+  `CodeBlockTabs` / `CodeBlockTab` / `CodeBlockPanel`. Additive props: `language` / `maxLines` on the block,
+  `defaultTab` / `tab` / `onTabChange` for the selection, and `values` on the copy button. Additive slots:
+  `code-block-viewport`, `code-block-tabs`, `code-block-tab`, `code-block-tab-indicator`, `code-block-panel`,
+  `code-block-expand-button`. 37 components, 43 registry items (the highlighter is the 43rd), 37 docs,
   37 previews.
 - **Highlighting shipped after the surface** (2026-10-31, same item): upstream splits it into a
   `useHighlightedCode` hook backed by Shiki, and so does this item — `code-highlight` is a `registry:lib`
@@ -629,11 +633,34 @@ whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/cod
 - **`wrap` had to relax `min-w-max`.** Upstream keeps the code box `min-w-max` so a non-wrapping block
   scrolls; with `wrap` that same class prevents wrapping and the output clips at the right edge. Found in
   the tool-output example of the preview.
+- **The switcher is a fifth recipe, `layout.shared`, and one pill.** `CodeBlockTabs` / `CodeBlockTab` /
+  `CodeBlockPanel` answer the case upstream leaves to the consumer: one snippet in several right forms — an
+  install per package manager, a source file and its output. Three decisions are worth recording:
+  - **The selection lives on `CodeBlock`, not on the tab list.** The header's copy button has to follow it,
+    and a control outside the tab list cannot reach its state. `CodeBlockCopyButton` therefore takes
+    `values` (one string per tab) as well as `value`, and copies whichever variant is showing.
+  - **Only the selected tab renders a pill, with a shared `layoutId`.** Motion matches the two, so the pill
+    travels to the pressed tab and retargets mid-flight instead of a second pill cross-fading. Under
+    `reduced` the `layoutId` is dropped entirely: which tab is current is information, the travel is not.
+  - **Panels are hidden, not unmounted.** A tab switch is a look at what is already there, so it cannot
+    lose the reader's scroll position, and `hidden` takes the inactive source out of the tab order. The
+    height changes instantly rather than animating — the size of the block is information, and the only
+    layout animation here stays the fold.
+  - **One `pre` per panel, and one id per `pre`.** The block's `contentId` cannot be reused inside three
+    panels, so `partIds()` builds `…-tab` / `…-panel` / `…-content` from it in one place;
+    `CodeBlockExpandButton` points `aria-controls` at the shown panel when the block has tabs.
+- **Docs-site install fences became the switcher, without touching the markdown's meaning.**
+  `content/components/*.mdx` marks its Installation fence ` ```install ` instead of ` ```bash `; the command
+  inside is still the runnable `npx shadcn@latest add …`, so the `/r/<id>.md` payload an agent reads is
+  unchanged in substance. `components/site/install.ts` reads the registry spec out of it and restates it for
+  pnpm / npm / yarn (`pnpm dlx`, `npx`, `yarn dlx`), keeping whatever pin the fence wrote; a fence that does
+  not parse falls back to a terminal block. `tests/site/install.test.tsx` holds the content invariant that
+  every component doc uses the `install` fence.
 - **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, T5 budget,
-  P11), `parity:check` against `96da9cc7f1aa`, 210 unit tests. `playwright test` 112/112 with
-  `PLAYWRIGHT_CHANNEL=msedge` (this environment has no Playwright-downloaded Chromium): a `code-block` block
-  in the motion matrix (3 modes × 2 preferences) and `/components/code-block` in the axe list, both themes,
-  zero violations. `next build` produced 48 pages.
+  P11), `parity:check` against `96da9cc7f1aa`, 242 unit tests. `playwright test` with
+  `PLAYWRIGHT_CHANNEL=msedge` cover a `code-block` block in the motion matrix (3 modes × 2 preferences, fold
+  and tab pill) and `/components/code-block` in the axe list, both themes, zero violations. `next build`
+  produced 48 pages.
 - **Dev-server note for the next contributor:** `next dev` in this sandbox cannot hydrate (its HMR socket is
   rejected, one client chunk 404s, and the document entrance stays at `opacity: 0`), so the component looked
   broken while the production build was correct. Verify against `next build` + `next start`, which is what
