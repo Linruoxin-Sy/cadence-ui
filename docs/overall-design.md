@@ -212,7 +212,7 @@ We ship a `cadence-base` (`registry:base`) item that pins the consumer's shadcn 
   "name": "button",
   "type": "registry:ui",
   "title": "Button",
-  "description": "Triggers an action, with press feedback that collapses under reduced motion.",
+  "description": "Commands such as save, submit, and delete.",
   "categories": ["form", "feedback"],
   "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
   "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
