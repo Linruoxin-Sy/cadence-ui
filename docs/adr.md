@@ -370,3 +370,42 @@ verbatim and never supplies a file name, so `@components/cadence/button` writes 
 **Rejected**: a directory `target` (writes an extensionless file, per the context above); a barrel
 `index.ts` per component (37 extra forwarding files for no behaviour); flat `components/cadence/<id>.tsx`
 (loses the folder multi-file components need, and mixes them with the `lib/` subtree).
+
+---
+
+## ADR-015 · A measured size applied at once is layout, not motion
+
+**Status**: accepted; `card` pilots it with `fit="content"`.
+
+**Context**: `card` needs a box that is the size of what is inside it even when the parent hands it a
+different one — a `grid` row, `items-stretch`, `h-full`. ADR-013 routes measured width/height through
+`geometry.resize`, which is a spring: it is the right answer for a trigger that _moves_ to its new label,
+and the wrong one for a surface whose content simply changed, because a spring there reads as the card
+lagging behind its own text. Reusing the recipe also drags in a tier it does not need (ADR-013 §5 allows
+measured animation only on T3+) and a reduced-motion branch for motion that does not exist.
+
+**Decision**:
+
+1. Measurement and motion are separate decisions. A size that is _observed and applied in the frame the
+   content changed_ is layout: no recipe, no token, no tween, no `data-motion`. A size that _travels_
+   over time stays `geometry.resize` and ADR-013 applies unchanged.
+2. A component may therefore observe geometry at any tier, as long as nothing is interpolated. It must
+   keep the observation off the box it writes to (observe the content flow, size the shell), or the
+   observer feeds its own animation.
+3. A zero measurement is not a size. Hidden panels and mounts inside collapsed parents report `0`, and
+   pinning to it collapses a card the reader is about to see; `auto` stays until there is a real number.
+4. Because nothing is animated, the three modes render identically and the contract table keeps no row
+   for it. The docs say so in prose instead.
+
+**Consequences**:
+
+- ✅ Card follows its content with no spring, no clamp, and nothing to skip under `prefers-reduced-motion`.
+- ✅ The rule stays checkable: `check-registry` looks for animation imports, and this path has none.
+- ❌ One more shape to reason about when auditing a component: "does it measure, or does it move?"
+- ❌ In a plain flow the pin duplicates what `fit-content` already does; it earns its keep only when a
+  parent pushes a size onto the card, and it costs one observer per fitted card.
+- ❌ A consumer who wanted the resize to _feel_ animated now has to add that themselves; the component
+  will not do it, and adding a recipe here would need a new ADR.
+
+**Rejected**: `geometry.resize` on `card` (spring lag on a passive surface, plus a T3-only mechanism on a
+T0 atom); a `rAF` lerp with a hand-written constant (a motion token in disguise, outside the catalogue).
