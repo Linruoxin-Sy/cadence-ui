@@ -9,7 +9,7 @@
  *
  * Usage:
  *   node scripts/new-item.mjs --name tooltip --tier T2 --batch B4 --title "Tooltip" \
- *     --description "A short label shown on hover or focus." [--category overlay] \
+ *     --description "Hints for icon buttons, shortcuts, and truncated values." [--category overlay] \
  *     [--motion popup.anchored] [--intensity subtle] [--complexity M] [--since 0.3.0]
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
