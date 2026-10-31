@@ -1,12 +1,12 @@
 # Code block
 
-> A copyable code surface with an optional title, line numbers, diff markers, and a measured collapse.
+> A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse.
 
 - Registry item: https://cadence.dev/r/code-block.json
 - Install: `npx shadcn@latest add @cadence/code-block`
 - Type: registry:ui
 - Since: 0.5.0
-- Motion recipes: data.transition, state.morph, geometry.resize
+- Motion recipes: data.transition, layout.shared, state.morph, geometry.resize
 
 ## When to use
 
@@ -15,6 +15,8 @@
 - Tool calls and their output — a shell run, a stack trace, a JSON payload — where the reader scans rather than reads.
 - A diff or a patch, where added and removed lines have to be distinguishable at a glance and without colour.
 - A long file that would dominate the page: cap it with `maxLines` and let the reader unfold it.
+- One snippet in several forms — an install per package manager, a source file and its output — where the reader
+  should not have to scroll past variants that are not theirs.
 
 ## When not to use
 
@@ -27,7 +29,7 @@
 
 ## Installation
 
-```bash
+```install
 npx shadcn@latest add @cadence/code-block
 ```
 
@@ -146,6 +148,58 @@ revealed on hover and on focus, and it is permanently visible on a device that c
 </CodeBlock>
 ```
 
+### Switching between variants
+
+A snippet often has more than one right form: the same install for three package managers, a source file and
+its compiled output, a component and its test. `CodeBlockTabs` is the tab list over the source, `CodeBlockTab`
+is one tab, and `CodeBlockPanel` is the source that tab shows.
+
+The selection lives on `CodeBlock`, not on the tab list, because the header's copy button has to follow it: give
+`CodeBlockCopyButton` `values` instead of `value` and it copies whichever variant is on screen — a switcher whose
+copy button still copies the first command is worse than no switcher.
+
+```tsx
+const install = {
+  pnpm: "pnpm dlx shadcn@latest add @cadence/code-block",
+  npm: "npx shadcn@latest add @cadence/code-block",
+  yarn: "yarn dlx shadcn@latest add @cadence/code-block",
+};
+
+<CodeBlock defaultTab="pnpm">
+  <CodeBlockHeader>
+    <CodeBlockTabs label="Package manager">
+      <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+      <CodeBlockTab value="npm">npm</CodeBlockTab>
+      <CodeBlockTab value="yarn">yarn</CodeBlockTab>
+    </CodeBlockTabs>
+    <CodeBlockActions>
+      <CodeBlockCopyButton values={install} />
+    </CodeBlockActions>
+  </CodeBlockHeader>
+  <CodeBlockPanel value="pnpm">{install.pnpm}</CodeBlockPanel>
+  <CodeBlockPanel value="npm">{install.npm}</CodeBlockPanel>
+  <CodeBlockPanel value="yarn">{install.yarn}</CodeBlockPanel>
+</CodeBlock>
+```
+
+Four things worth knowing:
+
+- **The pill is a shared element.** Only the selected tab renders one, and Motion matches the two `layoutId`s,
+  so it travels to the tab that was pressed rather than a second pill cross-fading in place. Press another tab
+  mid-flight and it retargets instead of restarting.
+- **A panel is the content.** `CodeBlockPanel` renders `CodeBlockContent` and takes its props (`wrap`,
+  `lineNumbers`, `language`), so a tabbed block keeps the fold, the numbering, the copy affordance and the focus
+  ring a plain block has.
+- **Panels are hidden, not unmounted.** Every variant stays in the tree behind the `hidden` attribute: a tab
+  switch is a look at what is already there, so it cannot lose the reader's scroll position, and only the visible
+  source is focusable.
+- **The height is the selected panel's.** It changes instantly — the size of the block is information, and the
+  one layout animation on this component is the fold. Keep variants that differ by a line or two in the same
+  block; a tab that doubles the height wants two blocks.
+
+`defaultTab` is uncontrolled; `tab` with `onTabChange` drives it from outside when the surrounding page has its
+own idea of which variant is current.
+
 ### Highlighting
 
 Set `language` and a string child is tokenized; leave it out and the same child renders as plain text, which is
@@ -203,11 +257,15 @@ reconciling a tree of spans, which is what makes a streaming output block cheap.
 | `CodeBlock` | `variant`, `size`, native `div` props | `variant`: `default` \| `destructive`. `size`: `default` \| `sm`. |
 | | `maxLines`, `expanded`, `defaultExpanded`, `onExpandedChange` | Additive fold. Uncontrolled unless `expanded` is passed. |
 | | `language` | Additive. Highlights a string child; an unknown name renders plainly. |
+| | `defaultTab`, `tab`, `onTabChange` | Additive switcher. Holds the selection the tabs, the panels and the copy button share. |
 | `CodeBlockHeader` | native `div` props | Sits above the source and draws a full-width rule between the label and the code. |
 | `CodeBlockTitle` | native `div` props | Truncates. Wrap it in an anchor to link to the file. |
+| `CodeBlockTabs` | `label`, native `div` props | Additive. `role="tablist"`, one tab stop, arrow keys move within it. Needs a `CodeBlock` parent. |
+| `CodeBlockTab` | `value` (required), native `button` props | Additive. `role="tab"`; only the selected one renders the shared pill. |
 | `CodeBlockActions` | native `div` props | In a header it sits at the end; on its own it floats. |
-| `CodeBlockCopyButton` | `value` (required), all `Button` props | Copies `value`; `variant` defaults to `ghost`, `size` to `icon-xs`. |
+| `CodeBlockCopyButton` | `value` or `values`, all `Button` props | Copies `value`, or `values[tab]` when the block switches variants. `variant` defaults to `ghost`, `size` to `icon-xs`. |
 | `CodeBlockContent` | `wrap`, `lineNumbers`, `startLine`, `language`, native `pre` props | Always `dir="ltr"` and focusable (`tabIndex={0}`; pass `-1` to remove it). `language` overrides the block's. |
+| `CodeBlockPanel` | `value` (required), all `CodeBlockContent` props | Additive. One variant: renders the content, stays mounted, hidden while another tab is selected. |
 | `CodeBlockLine` | `variant`, native `span` props | `default` \| `added` \| `removed` \| `highlighted`. |
 | `CodeBlockFooter` | native `div` props | Sits below the source and draws the matching rule above it. |
 | `CodeBlockExpandButton` | all `Button` props | Additive. Renders nothing unless the block overflows. |
@@ -224,8 +282,9 @@ Highlighting is a second item, installed automatically as a dependency of `code-
 | `useHighlightedCode` | `(code: string, language?: string) => ReactNode[] \| null` | Client hook. `null` until the grammar loads, so the caller keeps its plain text. |
 | `loadHighlighter` | `(language: string) => Promise<Highlighter \| null>` | The lower-level form: `highlight(code, state)` returns lines plus the grammar state for the next chunk. |
 
-Every part carries a `data-slot` (`code-block`, `code-block-header`, `code-block-title`, `code-block-actions`,
-`code-block-copy-button`, `code-block-content`, `code-block-code`, `code-block-line`, `code-block-line-content`,
+Every part carries a `data-slot` (`code-block`, `code-block-header`, `code-block-title`, `code-block-tabs`,
+`code-block-tab`, `code-block-tab-indicator`, `code-block-actions`, `code-block-copy-button`,
+`code-block-panel`, `code-block-content`, `code-block-code`, `code-block-line`, `code-block-line-content`,
 `code-block-footer`, plus the additive `code-block-viewport` and `code-block-expand-button`), so a consumer can
 restyle without a wrapper.
 
@@ -237,24 +296,30 @@ restyle without a wrapper.
 | floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition` | yes |
 | copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph` | yes |
 | fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph` | yes |
-| reduced | fade and rotation stay; the height jumps, and the copy glyph swaps without scaling | `geometry.resize` resolves to `{ duration: 0 }` | – |
+| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared` | yes (a third tab pressed mid-travel retargets it) |
+| reduced | fade and rotation stay; the height jumps, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize` resolves to `{ duration: 0 }` | – |
 | none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
 
-Two notes on the choices:
+Three notes on the choices:
 
 - The fold animates a **measured** height rather than a `max-height` in a class. A class would need a magic number
   per line count, and it would break the moment a line wraps. The spring is the token's, and the rendered height is
   clamped to the content so it can never settle above or below the real size.
 - Under reduced motion the height change is a jump on purpose. Unfolding is information — the reader asked to see
   more lines — and a 200 ms layout tween is exactly the motion the reduced mode exists to remove.
+- The tab pill is a shared element only in full mode. Reduced motion drops the `layoutId`, so the pill is painted
+  where the selection landed: which tab is current is information, the travel between them is not. A panel change
+  never animates its height for the same reason.
 
 ## Keyboard interactions
 
 | Keys | Action |
 | --- | --- |
-| Tab | Reaches the copy button, the source, and the fold toggle, in that order. |
+| Tab | Reaches the tab list (once), the selected tab, the copy button, the source, and the fold toggle. |
+| Arrow Left / Right | Moves between tabs and selects the one it lands on — a tab list is one tab stop, not one stop per tab. |
+| Home / End | Jumps to the first or the last tab. |
 | Arrow keys / Page Up / Page Down | Scroll the source once it has focus; a long line or a capped block scrolls without moving the page. |
-| Enter / Space | Copies, or toggles the fold. |
+| Enter / Space | Copies, selects the focused tab, or toggles the fold. |
 | Cmd/Ctrl + C | Copies the selection — line numbers and diff markers are excluded, blank lines are kept. |
 
 ## Accessibility
@@ -269,6 +334,10 @@ Two notes on the choices:
 - Diff lines carry a `+` / `−` marker next to the tint, so the change survives a monochrome display.
 - The fold toggle is a real button with `aria-expanded` and `aria-controls` pointing at the source, and it is not
   rendered at all when there is nothing to unfold.
+- The switcher is the ARIA tabs pattern: `role="tablist"` with a name (`label`, "Language" by default), tabs that
+  carry `aria-selected` and point `aria-controls` at their panel, one tab stop with a roving `tabindex`, and
+  `role="tabpanel"` panels labelled by their tab. Inactive panels are `hidden`, which takes their focusable source
+  out of the tab order.
 - The block is `dir="ltr"` throughout, because code reads left to right even on an RTL page. The header follows the
   page's direction.
 
@@ -280,7 +349,8 @@ Two notes on the choices:
 - `wrap` is for output, not for source. Wrapped source loses its indentation structure, which is the one thing code
   formatting carries.
 - On a narrow screen the header's title truncates rather than wrapping, and the actions stay reachable — a touch
-  device always shows them, because there is no hover to reveal them with.
+  device always shows them, because there is no hover to reveal them with. The tab list scrolls sideways on its
+  own when three tabs and a title do not fit, so the copy button keeps its place.
 
 ## Performance
 
@@ -317,6 +387,10 @@ Two notes on the choices:
   the text immediately is the point.
 - Use `maxLines` for anything longer than a screenful, with `CodeBlockExpandButton` in the footer. Do not cap the
   block by cropping the string.
+- When a snippet has more than one right form — an install for pnpm, npm and yarn, a source and its output — use
+  `CodeBlockTabs` / `CodeBlockTab` / `CodeBlockPanel`, and give the header's `CodeBlockCopyButton` `values` so it
+  copies the variant on screen. Do not stack two blocks with a hand-rolled toggle, and do not put unrelated files
+  behind tabs: a tab is the same snippet in another form, not a second snippet.
 
 ---
 

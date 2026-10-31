@@ -10,7 +10,7 @@
 
 ## Installation
 
-```bash
+```install
 npx shadcn@latest add @cadence/button
 ```
 

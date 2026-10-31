@@ -22,7 +22,7 @@
 
 ## Installation
 
-```bash
+```install
 npx shadcn@latest add @cadence/select
 ```
 

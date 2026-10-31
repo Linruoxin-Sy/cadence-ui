@@ -59,7 +59,7 @@ npx shadcn@latest add @cadence/button
 - [Sheet](https://cadence.dev/r/sheet.md): A panel that slides in from an edge of the screen and holds a focused task without leaving the page. (overlay)
 - [Drawer](https://cadence.dev/r/drawer.md): A bottom sheet that opens over the page, follows a drag, and closes on swipe or on request. (overlay)
 - [Select](https://cadence.dev/r/select.md): A control that opens a list of options and keeps the chosen value in the trigger. (form)
-- [Code block](https://cadence.dev/r/code-block.md): A copyable code surface with an optional title, line numbers, diff markers, and a measured collapse. (ai)
+- [Code block](https://cadence.dev/r/code-block.md): A copyable code surface with a tabbed switcher, line numbers, diff markers, and a measured collapse. (ai)
 
 ## Docs
 
