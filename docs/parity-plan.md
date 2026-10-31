@@ -1,6 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2 and B3 complete (2026-10-30); B4 complete — all seven overlays shipped.**
+> Status: **B0, B1, B2, B3 and B4 complete (2026-10-30); B5 in progress — `select`, `dropdown-menu`,
+> `context-menu` and `menubar` shipped, `combobox`, `command` and `toast` to come (2026-10-31).**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -160,6 +161,20 @@ upstream/manifest.json        # pinned upstream API surface
 `tier` drives the size budget, the docs template, and how deep the tests go. Categories are
 `layout`, `form`, `navigation`, `overlay`, `feedback`, `data`, `ai`, `utility`.
 
+One optional key sits next to `upstream`: `parity`, a list of the differences from upstream that the
+visual style forces, each with the path and the reason.
+
+```jsonc
+"parity": {
+  "props": [
+    { "path": "ToggleGroup.spacing", "reason": "base defaults to 2, new-york-v4 to 0" }
+  ]
+}
+```
+
+`parity:check` fails on a difference that is not recorded and on a record that no longer describes one,
+so the list stays a statement about the current code rather than a history of it (§7.6).
+
 ### 6.3 Motion tiers
 
 | Tier | Definition                  | Examples                                                   | Allowed recipes                                     |
@@ -248,7 +263,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done |
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | planned |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | next    |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned |
@@ -274,7 +289,9 @@ these rows. Work that landed without updating them is a process defect, and the 
 Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
-§7.1, §7.2, §7.3 and §7.4. **B9 is open**: `code-block` landed ahead of the batch (see §7.5), and
+§7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
+here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus that
+followed. **B9 is open**: `code-block` landed ahead of the batch (see §7.5), and
 `attachment` + `bubble` are still to come.
 
 ### B1 — atoms (11)
@@ -703,6 +720,73 @@ whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/cod
   escape codes render as text); streaming-specific motion (new code fading in place) — none of it blocks the
   item.
 
+### 7.6 B5 — in progress (2026-10-31)
+
+Four of the seven items are shipped; the batch row says `next` because three are not.
+
+- **Scope shipped:** `select` (2026-10-30), `dropdown-menu`, `context-menu`, `menubar` (2026-10-31).
+  40 components, 46 registry items, 40 docs, 41 previews, 280 unit tests, 145 browser tests.
+- **`select` was shipped unrecorded.** It reached `main` on 2026-10-30 with `meta.batch: "B5"`, and
+  neither this table nor §7 mentioned it — the exact failure §7.0 describes, caught while choosing the
+  next batch. It is included in the counts above and in the batch's verification, so the row now matches
+  the branch.
+- **Tiers and recipes:** four T2 components, all declaring `popup.anchored` + `exit.fade` +
+  `state.morph`. No new recipe was needed: a menu is the popover's panel anchored to a trigger (or to a
+  pointer), and a check mark scaling in is `state.morph`, which B3 already widened to "a control's own
+  indicator".
+- **Checks:** `pnpm check` green — typecheck, Biome, `registry:check` (targets, payload freshness, tier
+  budgets, P11), `parity:check` against `96da9cc`, 280 unit tests across 47 files. `playwright test`
+  (145 tests, `PLAYWRIGHT_CHANNEL=msedge`) green against a production build: the motion matrix gained
+  `dropdown-menu`, `context-menu` and `menubar` blocks (3 modes × 2 preferences, plus the reduced-only
+  settle for the dropdown), and the axe page list gained all three pages in both themes.
+- **Tooling, the prerequisite §8 named for this batch:**
+  - **The props surface is compared now.** `extractProps()` in `scripts/upstream-surface.mjs` reads each
+    part's destructured props and their literal defaults; `upstream/manifest.json` carries them per item;
+    `parity:check` fails on a prop upstream declares and we do not, and on a default that moved. Extra
+    props are reported as additive, like extra exports. Both failure paths were negative-tested by hand
+    (a changed `sideOffset` default, and a recorded deviation that no longer differs).
+  - **`meta.parity.props` records a deliberate difference.** The check found one real conflict on its
+    first run: `base` defaults `ToggleGroup.spacing` to `2`, `new-york-v4` to `0`, and Cadence follows
+    the visuals. The entry names the prop and carries the reason; `parity:check` fails when a recorded
+    deviation stops being true, so the list cannot rot into fiction.
+  - **`registry:check` follows `registryDependencies` for the implementation half of the motion
+    contract.** `menubar` declares the three recipes and implements none of them — the panel and the
+    check mark are `dropdown-menu`'s code, installed through a dependency. Declaration and the
+    undeclared-call search stay per item; only "is there an implementation" looks one level down.
+  - **A build can run beside a dev server again.** `next.config.ts` reads `CADENCE_DIST_DIR`, because a
+    build deletes the `.next` a running `next dev` is serving; `.next-*` is gitignored and ignored by
+    Biome. This is what made the browser pass possible in this environment.
+- **Deviations recorded, not silent:**
+  - **`DropdownMenuLabel` / `ContextMenuLabel` are not always a `GroupLabel`.** Base UI 1.9 throws
+    (`MenuGroupContext is missing`) when `Menu.GroupLabel` renders outside `Menu.Group`, and shadcn's
+    Base UI source renders the label at the top level of a menu. The label therefore reads a small
+    context the `Group` wrapper provides: inside a group it is the group's own label (and its
+    `aria-labelledby`), outside one it is a plain caption element with the same slot — which is what
+    `new-york-v4` renders. Exports and slots are unchanged.
+  - **`DropdownMenuSub` renders no element.** It is `Menu.SubmenuRoot`, a context provider, so
+    `data-slot="dropdown-menu-sub"` exists in the source (and in `parity:check`) but never in the DOM.
+    Upstream has the same shape; the unit test says so where it would otherwise look like a missing slot.
+  - **The menubar owns no motion of its own.** Its root carries `data-motion` and no transition: moving
+    between open menus replaces one panel with another, and there is no shared element to animate, so a
+    sliding highlight on the bar would be decoration (P9).
+  - **Item classes are duplicated across the three menus, on purpose.** A shared `lib/menu-parts` item
+    would add a registry dependency to three components and drift from upstream's one-file-per-menu
+    layout; the e2e matrix therefore asserts the context menu's panel separately, so a token regression
+    in its copy cannot hide behind the dropdown's.
+  - **`dropdown-menu` items run on `onClick`.** Base UI's menu item has no `onSelect`, so the docs say
+    `onClick` and the "does the handler fire" test pins it.
+  - **`breadcrumb` gained `className`.** The new prop comparison found the root spreading props without
+    naming `className`; the class is now merged with `cn()` like every other part. No visual change.
+  - **`toggle-group` is the first recorded deviation** (see the tooling bullet): `spacing` defaults to
+    `0`, not the `2` the Base UI API declares, because the visual style is `new-york-v4`.
+  - **Two pre-existing e2e failures repaired.** The `button` block located a button named "Button" and
+    the `switch` block a switch named "Deploy alerts", neither of which the current previews render —
+    both had been failing since the previews were rewritten. They now address the specimen by slot, so a
+    copy change cannot break the matrix again.
+- **Still open:** `combobox`, `command`, `toast` — the rest of B5. Dual-theme screenshots for B1–B5 are
+  still not generated: the browser pass now runs here, but nothing writes the images, so the visual half
+  of the batch gate remains a script that does not exist.
+
 ## 8. Backlog
 
 ### AI components (25, unscheduled)
@@ -734,10 +818,11 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
 
 **Tooling**
 
-- **`parity` props surface.** Compare prop names, requiredness, and defaults against the pinned upstream
-  source (AST or a generated `.d.ts`). Exports and `data-slot` catch renames; they cannot catch a missing
-  class, a changed default, or a prop that upstream added. Target: before B5, whose menu components are the
-  most prop-heavy in the catalogue.
+- **`parity` props surface — done 2026-10-31 (see §7.6).** `parity:check` now compares each part's prop
+  names and declared defaults against the pinned upstream source, and `meta.parity.props` records a
+  difference the visual style forces. What it still cannot see: the class lists themselves (a dropped
+  utility is invisible to every check — the B4 review found two by hand), and type-level requiredness,
+  because most props come from a Base UI type no regex can resolve.
 - **Docs-side recipe validation (half done).** `registry:check` now compares the §3 catalogue table and
   the §5 `Recipe` union against `lib/motion.ts`, and fails on a recipe that exists in only one of them —
   the drift that let `theme.reveal` survive. Still open: the per-component motion tables in
@@ -773,13 +858,13 @@ the missing guide entries, and the sidebar's landmark / `aria-controls` / height
 
 ## 9. Tooling
 
-| Script                         | Change                                                                                              |
-| ------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `scripts/new-item.mjs`         | New. Scaffolds source, docs, preview, test, registry item from a tier-specific template             |
-| `scripts/check-registry.mjs`   | Tier budgets, banned validation deps, required `meta.tier`/`meta.upstream`, block type support      |
-| `scripts/parity.mjs`           | ✅ Compares exports + `data-slot` values against `upstream/manifest.json`; `--write` regenerates it |
-| `scripts/sync-upstream.mjs`    | ✅ Fetches upstream `base` source into `.cache/shadcn` at a pinned commit, writes the manifest      |
-| `scripts/upstream-surface.mjs` | ✅ Shared export/`data-slot` extraction, so both sides of the comparison use one parser             |
+| Script                         | Change                                                                                                            |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `scripts/new-item.mjs`         | New. Scaffolds source, docs, preview, test, registry item from a tier-specific template                           |
+| `scripts/check-registry.mjs`   | Tier budgets, banned validation deps, required `meta.tier`/`meta.upstream`, block type support                    |
+| `scripts/parity.mjs`           | ✅ Compares exports, `data-slot` values and part props against `upstream/manifest.json`; `--write` regenerates it |
+| `scripts/sync-upstream.mjs`    | ✅ Fetches upstream `base` source into `.cache/shadcn` at a pinned commit, writes the manifest                    |
+| `scripts/upstream-surface.mjs` | ✅ Shared export/`data-slot`/prop extraction, so both sides of the comparison use one parser                      |
 
 ## 10. Schedule
 
