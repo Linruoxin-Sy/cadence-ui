@@ -31,6 +31,8 @@ export const scale = { in: 0.96, pop: 1.02, press: 0.97 } as const;
 /** Embla attraction units, calibrated against the data.transition duration (not ms). */
 export const carouselClock = { unitsPerSecond: 100 } as const;
 
+export const reducedDurationScale = 0.6;
+
 export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 
 /**
@@ -168,7 +170,7 @@ export function transitionFor(recipe: Recipe, mode: CadenceMode, options: Motion
     return { ...token, visualDuration, delay };
   }
 
-  const scaleFactor = mode === "reduced" ? 0.6 : 1;
+  const scaleFactor = mode === "reduced" ? reducedDurationScale : 1;
   return {
     duration: (options.duration ?? spec.duration * scaleFactor) * timeScale,
     ease: [...spec.ease] as [number, number, number, number],

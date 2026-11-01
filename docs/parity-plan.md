@@ -1206,6 +1206,9 @@ the batch row now says `gate open` because the earlier components still lack vis
   commit, with source and generated artifacts in separate commits.
 - **Remaining:** closes Navigation Menu only. B7 is 3/5; resizable then sidebar. Historical B1–B5
   visual gates, B8/B9 and all unclosed §8 carried work remain open. B6 stays closed.
+- **Coordinator conformance review:** extracted the duplicated reduced-duration multiplier into
+  `lib/motion.ts`'s `reducedDurationScale` token. Both `transitionFor()` and the local popup clock
+  read it. Timing and browser behavior are unchanged; the full 398-test check passes again.
 
 ## 8. Backlog
 

@@ -34,6 +34,9 @@ preference can force that mode.
 loud a component's authored motion is, so a catalogue can group by it. No token reads it, and it is
 not adjustable at runtime.
 
+The reduced tween multiplier is exported as `reducedDurationScale` from `lib/motion.ts`.
+CSS popup adapters and `transitionFor()` read that same token rather than repeating the multiplier.
+
 > An earlier draft shipped `--motion-intensity`, `--motion-distance-*`, and `--motion-scale-in` to
 > users while nothing read them: JS components resolve timing through `transitionFor()` from
 > `lib/motion.ts`, and CSS-only popups read `--motion-duration-*`. A token nobody reads is a promise

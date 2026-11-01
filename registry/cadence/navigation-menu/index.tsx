@@ -5,7 +5,7 @@ import { cva } from "class-variance-authority";
 import { ChevronDownIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "../lib/cn";
-import { duration } from "../lib/motion";
+import { duration, reducedDurationScale } from "../lib/motion";
 import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
 
 /** Base UI 1.6 focus sentinels are tabbable. They must not be aria-hidden.
@@ -40,7 +40,7 @@ function useNavigationGuards(ref: React.Ref<HTMLElement> | undefined) {
 
 // Portals and explicit nested modes must own their clock, including full inside none.
 function clock(cm: CadenceMotion): React.CSSProperties {
-  const factor = cm.disabled ? 0 : (cm.reduced ? 0.6 : 1) * cm.timeScale;
+  const factor = cm.disabled ? 0 : (cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
   return {
     "--motion-duration-fast": `${duration.fast * factor}s`,
     "--motion-duration-slow": `${duration.slow * factor}s`,
