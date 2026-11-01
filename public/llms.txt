@@ -75,6 +75,7 @@ npx shadcn@latest add @cadence/button
 - [Chart](https://cadence.dev/r/chart.md): Responsive data charts with themed tooltips and legends. (collection)
 - [Calendar](https://cadence.dev/r/calendar.md): Select dates, multiple days, and ranges with accessible month navigation. (collection)
 - [Navigation Menu](https://cadence.dev/r/navigation-menu.md): Site navigation with shared popup content and interruptible sizing. (navigation)
+- [Resizable](https://cadence.dev/r/resizable.md): Adjustable split panels with pointer and keyboard resizing. (layout)
 
 ## Docs
 
