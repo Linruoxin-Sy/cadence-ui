@@ -59,4 +59,5 @@ export const previews: Record<string, ComponentType> = {
   collapsible: dynamic(() => import("./collapsible").then((mod) => ({ default: mod.CollapsiblePreview }))),
   tabs: dynamic(() => import("./tabs").then((mod) => ({ default: mod.TabsPreview }))),
   table: dynamic(() => import("./table").then((mod) => ({ default: mod.TablePreview }))),
+  carousel: dynamic(() => import("./carousel").then((mod) => ({ default: mod.CarouselPreview }))),
 };

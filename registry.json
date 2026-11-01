@@ -1586,6 +1586,40 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "Carousel",
+      "description": "A swipeable collection with previous and next controls.",
+      "categories": ["layout"],
+      "dependencies": ["embla-carousel-react@8.6.0", "lucide-react"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/carousel/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/carousel/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.4.0",
+        "tier": "T4",
+        "batch": "B6",
+        "motion": ["data.transition"],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

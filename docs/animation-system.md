@@ -420,6 +420,39 @@ export function ScrollStory({ children }: { children: React.ReactNode }) {
 }
 ```
 
+### 3.1.1 `data.transition` for Embla collections
+
+Carousel uses the engine form of `data.transition`: Embla 8.6.0 exclusively owns track
+translation, snap geometry, loop relocation, dragging, focus and resize. Never add a CSS or
+Motion transform writer to its track. Position is state, like the Switch thumb: reduced/none
+retain the selected slide's translate and direct pointer tracking, but every autonomous engine
+interpolation resolves to zero. There is no entrance/exit animation or opacity fallback to add.
+
+Resolve `cm.transition("data.transition").duration` in full, retaining
+`duration.base * cm.timeScale` as the base option under reduced/none. The engine options must stay stable
+across mode changes; the policy clamps the runtime clock. Convert with the shared
+`carouselClock.unitsPerSecond` calibration (100 engine attraction units per authored second,
+not milliseconds or a wall-clock guarantee). Default full timing is therefore duration.base →
+22 attraction units; timeScale scales this value. Explicit `opts.duration`, including breakpoint
+values, remains caller-owned in full mode. On pointer release, use the engine's effective base
+duration instead of DragHandler's hard-coded 25/43-unit release clock. Embla retains its native
+friction, momentum target and interruption from the current location/velocity.
+
+A private lifecycle plugin wraps each fresh engine's `scrollBody.useDuration`: full passes values
+through; reduced/none clamp all calls to zero, including drag tracking/release, API calls with
+`jump=false`, focus and user plugins using the engine. Restore on destroy and reattach on reInit.
+Apply the current mode through a ref so mode changes do not reinitialize or reset selection;
+when downgrading in flight, flush the engine's existing target through update/render immediately.
+Plugins that create independent CSS/WAAPI animations or automatic advance own those behaviours;
+callers must stop autonomous plugins for reduced/none and provide pause controls for autoplay.
+Do not silently remove user plugins. Navigation buttons inherit Button's `feedback.press` recipe;
+it remains declared on Button rather than duplicated on Carousel.
+
+Only transforms animate; no track layout tween or render-time measurement. Browser proof must cover
+three modes × system preferences, correct final position, reversal, drag release, both axes,
+loop/options, plugins/API, dynamic slides and resize. Engine internals are pinned to 8.6.0 and must
+be reviewed on upgrade. CSS-only computed transition assertions alone cannot prove this engine.
+
 ### 3.2 Continuous recipes run in CSS
 
 Some recipes do not end: a placeholder pulse, a shimmer, a marquee. A page can

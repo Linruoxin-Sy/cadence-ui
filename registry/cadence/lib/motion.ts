@@ -28,6 +28,9 @@ export const spring = {
 
 export const distance = { xs: 4, sm: 8, md: 12, lg: 24, xl: 48 } as const;
 export const scale = { in: 0.96, pop: 1.02, press: 0.97 } as const;
+/** Embla attraction units, calibrated against the data.transition duration (not ms). */
+export const carouselClock = { unitsPerSecond: 100 } as const;
+
 export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 
 /**

@@ -1865,6 +1865,52 @@
           "className": null
         }
       }
+    },
+    "carousel": {
+      "path": "apps/v4/registry/bases/base/ui/carousel.tsx",
+      "exports": [
+        "Carousel",
+        "CarouselApi",
+        "CarouselContent",
+        "CarouselItem",
+        "CarouselNext",
+        "CarouselPrevious",
+        "useCarousel"
+      ],
+      "slots": [
+        "carousel",
+        "carousel-content",
+        "carousel-item",
+        "carousel-next",
+        "carousel-previous"
+      ],
+      "props": {
+        "useCarousel": {},
+        "Carousel": {
+          "orientation": "\"horizontal\"",
+          "opts": null,
+          "setApi": null,
+          "plugins": null,
+          "className": null,
+          "children": null
+        },
+        "CarouselContent": {
+          "className": null
+        },
+        "CarouselItem": {
+          "className": null
+        },
+        "CarouselPrevious": {
+          "className": null,
+          "variant": "\"outline\"",
+          "size": "\"icon-sm\""
+        },
+        "CarouselNext": {
+          "className": null,
+          "variant": "\"outline\"",
+          "size": "\"icon-sm\""
+        }
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
-> open for earlier components; B6 accordion, collapsible, tabs and table shipped, carousel is next.**
+> open for earlier components; B6 accordion, collapsible, tabs, table and carousel shipped, scroll-area is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -265,7 +265,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 4/6 shipped |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 5/6 shipped |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned     |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
@@ -320,7 +320,7 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B6 — disclosure and collections (6)
 
-`accordion`, `collapsible`, `tabs` and `table` shipped (§7.9–7.12). Next: `carousel`, then `scroll-area`.
+`accordion`, `collapsible`, `tabs`, `table` and `carousel` shipped (§7.9–7.13). Next: `scroll-area`.
 
 ### B7 — heavy data and navigation (5)
 
@@ -1019,6 +1019,51 @@ the batch row now says `gate open` because the earlier components still lack vis
 - **Remaining:** B6 is 4/6 shipped; carousel is next, then scroll-area. B7/B8/B9 and §8 carried work
   remain scheduled/open. Historical B1–B5 visual gates, including earlier B5 select/menu evidence,
   remain open. This closes table only and does not establish overall parity completion.
+
+### 7.13 B6 carousel — shipped (2026-11-01)
+
+- **Surface:** seven fixed exports (including CarouselApi and useCarousel), five upstream slots.
+  Exact Base and new-york-v4 sources cached at the unchanged `96da9cc7f1aa` pin; only carousel
+  appended with the shared upstream surface extractors. Native refs/styles/classes, Button render
+  and event overrides, opts, plugins and setApi remain available. Base icon-sm default retained
+  with the visual source's round size-8 controls. Content props/ref still target the inner track,
+  while its fixed outer viewport owns the carousel-content slot/ref. ArrowLeft/Right navigate on
+  both axes, preserving the pinned behaviour. Caller capture/onClick overrides remain upstream-owned.
+- **Dependency:** exact embla-carousel-react 8.6.0, committed separately; its engine internals are
+  deliberately version-bound. No pin movement, pipeline change or consumer scaffolding.
+- **Motion audit:** declared = implemented = documented data.transition, with the Embla engine form
+  documented in animation-system §3.1.1 before implementation. Shared carouselClock calibration
+  maps duration.base to 22 engine attraction units; timeScale scales the default, explicit full-mode
+  opts.duration/breakpoints remain caller-owned. Pointer release uses the effective base token clock.
+  A private lifecycle plugin clamps every fresh engine's useDuration to zero for reduced/none,
+  including drag and explicit API/plugin requests. Mode changes preserve engine/selection and settle
+  in-flight targets. Full retargeting keeps location and native velocity. Track/loop translate is
+  required state positioning; reduced/none retain it and direct dragging while removing autonomous
+  interpolation. Composed Button owns feedback.press; no duplicate declaration. No new recipe,
+  CSS transform writer, layout animation, timers or render-time measurement. Independent plugin
+  animation/autoplay remains caller-owned and documented; user plugins are not silently removed.
+- **Proof:** full pnpm check passes 363 tests in 58 files, including eight Carousel tests for refs,
+  parts/slots, native props, API/options/plugins, caller render/events, axis/keyboard, subscription
+  cleanup, mode clocks and stable mode-change identity. Isolated .next-carousel production build
+  passes (59 pages). Edge on port 3119, two workers: nine targeted tests pass. Three requested modes
+  × two OS preferences prove actual frame interpolation or immediate correct position, API jump=false,
+  drag/release, loop, dynamic slides, horizontal/vertical axes, keyboard and parent/viewport resize.
+  Additional proof covers live in-flight downgrade, RTL, dragFree, caller watchDrag=false and a narrow
+  duration breakpoint that cannot bypass none. Full reverse navigation is sampled mid-flight to
+  prove continuous position and correct final alignment. Dual-theme desktop/390px full-page axe has
+  zero WCAG2A/2AA/2.1AA violations with no rules disabled. Six screenshots (selected/narrow/vertical
+  × light/dark) were inspected and preserved in .cache/carousel-proof/.
+- **Findings:** initial alignment assertions incorrectly included upstream's 16px slide gutter;
+  corrected tests compare visible card edges, including RTL. Narrow axe exposed over-wide API
+  labels; shortened the first column without changing the API. Existing item img lint and occasional
+  Slider act warnings remain. The only shared runtime edit adds an inert clock token, so the full
+  browser suite was not repeated. Next-generated tsconfig additions/formatting were inspected/restored.
+- **Scroll Area handoff:** B6 is 5/6 shipped. This session stops after Carousel; coordinator confirms
+  completed/idle and clean commits before starting Scroll Area. Scroll Area must read actual pinned
+  sources and choose motion from their behaviour. Its completion must review B6's batch gate;
+  do not infer that Carousel evidence closes sibling or historical visual gates. Historical B1–B5
+  gates (including earlier B5 select/menu evidence), B7/B8/B9 and §8 carried work all remain open.
+  This does not establish overall parity completion.
 
 ## 8. Backlog
 
