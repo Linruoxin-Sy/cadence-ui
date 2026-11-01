@@ -239,8 +239,13 @@ const cm = useCadenceMotion();
 Accordion and Collapsible panels use the CSS form of this recipe so Base UI can observe native
 transitions and finish its own mount, hidden-until-found, and close lifecycle. Measure the natural
 inner content in a layout effect and ResizeObserver (never the animated panel or during render),
-write its border-box height to a custom property, and transition the panel's height between zero
-and `max(0px, measured-height)`. The closed size is zero; content is clipped only while necessary.
+write a non-negative height target to a custom property, and transition the panel's height between
+zero and that target. Match the panel's box sizing: for border-box add its computed vertical padding
+and borders to the natural inner border-box height; for content-box use the inner height directly.
+Read those styles after commit, and remeasure when caller classes/styles or viewport sizing change.
+Do not observe the animated panel's size or animate padding/borders. CSS height zero still has the
+native padding/border minimum while closing; Base UI hides/unmounts the panel after completion.
+Callers needing a visually zero-height closing endpoint can put decoration on a content child.
 Initially open panels render at natural height before hydration, without an entrance animation.
 
 This form uses `duration.slow` / `ease.out` via `--motion-duration-slow` / `ease-cadence-out`.

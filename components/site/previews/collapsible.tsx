@@ -15,8 +15,8 @@ export function CollapsiblePreview() {
           {open ? "Hide details" : "Show details"}
         </CollapsibleTrigger>
       </div>
-      <CollapsibleContent>
-        <div className="mt-4 rounded-lg border p-4 text-sm">
+      <CollapsibleContent className="mt-4 rounded-lg border p-4 text-sm">
+        <div>
           <p className="mb-4">Components are copied into your project so you can make them your own.</p>
           <Button variant="outline" size="sm" onClick={() => setDetails(!details)}>
             Toggle extra detail

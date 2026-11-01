@@ -57,6 +57,32 @@ describe("Collapsible", () => {
     expect(screen.getByRole("button", { name: "Details" })).toHaveAttribute("data-custom", "yes");
   });
 
+  it("keeps state-dependent decoration on a persistent outer panel", async () => {
+    const { container } = render(
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger>Persistent decoration</CollapsibleTrigger>
+        <CollapsibleContent
+          keepMounted
+          className={(state) => (state.open ? "p-4 border" : "p-2 border")}
+          style={(state) => ({ paddingBottom: state.open ? 31 : 12, boxSizing: "content-box" })}
+        >
+          Retained detail
+        </CollapsibleContent>
+      </Collapsible>,
+    );
+    const panel = container.querySelector('[data-slot="collapsible-content"]');
+    expect(panel).toHaveClass("p-4", "border");
+    expect(panel).toHaveStyle({ paddingBottom: "31px", boxSizing: "content-box" });
+    await userEvent.click(screen.getByRole("button", { name: "Persistent decoration" }));
+    await waitFor(() => expect(panel).toHaveAttribute("hidden"));
+    expect(panel).toHaveClass("p-2", "border");
+    expect(panel).toHaveStyle({ paddingBottom: "12px" });
+    expect(panel?.firstElementChild).not.toHaveAttribute("style");
+    await userEvent.click(screen.getByRole("button", { name: "Persistent decoration" }));
+    expect(panel).not.toHaveAttribute("hidden");
+    expect(panel).toHaveStyle({ paddingBottom: "31px" });
+  });
+
   it("toggles with Enter/Space and keeps trigger focus", async () => {
     const user = userEvent.setup();
     render(<Example />);

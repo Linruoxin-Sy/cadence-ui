@@ -103,7 +103,10 @@ state-based classes/styles. Use `render`, not `asChild`, for a custom element. S
 
 All primitive props remain available. A custom render must preserve supplied children and props,
 including the natural measurement wrapper. The added `collapsible-content-inner` slot is structural.
-Put padding and borders inside Content so the closed outer panel can reach zero height.
+Outer padding and borders are supported in both `border-box` and `content-box`; expanded content
+retains its natural height. During closing, CSS keeps the outer padding/border minimum until Base UI
+hides or unmounts the panel. To reach a visually zero-height endpoint before hiding, put that decoration
+on a content child. Caller styles are preserved; padding and borders are never animated.
 
 ## Motion contract
 
@@ -115,8 +118,9 @@ Put padding and borders inside Content so the closed outer panel can reach zero 
 | None | Instant height, no transform or transition | Zero duration | Yes |
 
 An inner ResizeObserver watches natural content, never the animated panel. Measurements happen after
-commit and on resize. Native CSS reversal preserves position rather than spring velocity. Base UI
-owns mounting, hidden state and transition completion. No icon animation or extra recipe is added.
+commit, on resize and when outer classes/styles change. Border-box targets include outer vertical
+padding and borders; content-box targets use the natural inner height. Native CSS reversal preserves
+position rather than spring velocity. Base UI owns mounting, hidden state and transition completion. No icon animation or extra recipe is added.
 
 ## Accessibility
 

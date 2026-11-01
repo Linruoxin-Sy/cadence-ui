@@ -935,8 +935,9 @@ the batch row now says `gate open` because the earlier components still lack vis
   no transform. Every animated panel reads the reduced branch and emits `data-motion`.
 - **API:** Root and Trigger pass through primitive props; Content classes (including state callbacks),
   styles, custom render and ref stay on the outer panel. Base UI owns lifecycle, cancellation,
-  disabled state, keepMounted and hiddenUntilFound. Content padding belongs inside the measured
-  wrapper so the outer panel can close to zero. No renamed props, defaults or validation ownership.
+  disabled state, keepMounted and hiddenUntilFound. Outer padding/borders are supported, with the
+  native CSS minimum during closing until the panel hides/unmounts. No renamed props, defaults or
+  validation ownership.
 - **Verification:** `pnpm check` passes (338 tests in 55 files), including seven collapsible unit tests,
   typecheck, lint (only existing item image warning), registry/parity, budgets and P11. Production
   build passes with 56 pages in `.next-collapsible`; generated tsconfig changes are reverted.
@@ -946,6 +947,19 @@ the batch row now says `gate open` because the earlier components still lack vis
   The first browser run caught a label-dependent test locator; the stable slot locator passes.
   Both final theme screenshots were inspected and preserved in `.cache/collapsible-proof/`.
   No shared code changed, so the full browser suite was not repeated for this component.
+- **Box-model follow-up (2026-11-01):** isolated Edge reproduced 34px of clipped natural content
+  with outer `p-4 border` under Preflight border-box (138px target omitted 32px padding + 2px borders).
+  Content-box was unaffected. Corrected border-box targets include computed outer vertical edges;
+  content-box targets retain inner natural height. Inner border-box ResizeObserver plus outer attribute
+  and viewport listeners remeasure without observing animated size or animating decoration. Scheme
+  and consumer docs now record the native closing floor; an asymmetric 62px padding/border case
+  reaches that floor, then Base UI unmounts normally. Preview exercises real outer `className`.
+  Eleven Edge tests pass on isolated `.next-collapsible-box`, port 3116, two workers: all previous
+  mode/preference, interruption, accessibility/theme checks plus natural auto-height comparisons,
+  both box models, vertical-only inline changes, dynamic content, wrapping and close/reopen lifecycle.
+  Final `pnpm check` passes 339 tests in 55 files (eight collapsible tests); the added test preserves
+  state-callback classes/styles on a persistent outer panel. Dual-theme screenshots were inspected
+  and preserved in `.cache/collapsible-box-proof/`. No shared runtime changes or upstream pin movement.
 - **Remaining:** B6 is 2/6 shipped; tabs, table, carousel and scroll-area remain in order.
   Historical B1–B5 visual gates, B7–B9, and §8 carried work stay open. This completes only collapsible.
 

@@ -19,16 +19,34 @@ function CollapsibleBody({ children }: Pick<CollapsiblePrimitive.Panel.Props, "c
   useLayoutEffect(() => {
     const content = ref.current;
     if (!content) return;
+    const panel = content.parentElement;
+    const view = content.ownerDocument.defaultView;
+    if (!panel || !view) return;
     const measure = () => {
-      content.parentElement?.style.setProperty(
-        "--cadence-disclosure-height",
-        `${Math.max(0, content.getBoundingClientRect().height)}px`,
-      );
+      const style = view.getComputedStyle(panel);
+      const edges =
+        style.boxSizing === "border-box"
+          ? [style.paddingTop, style.paddingBottom, style.borderTopWidth, style.borderBottomWidth].reduce(
+              (sum, value) => sum + (Number.parseFloat(value) || 0),
+              0,
+            )
+          : 0;
+      const height = `${Math.max(0, content.getBoundingClientRect().height + edges)}px`;
+      // Attribute observation includes our own write; avoid another mutation when unchanged.
+      if (panel.style.getPropertyValue("--cadence-disclosure-height") !== height)
+        panel.style.setProperty("--cadence-disclosure-height", height);
     };
     measure();
     const observer = new ResizeObserver(measure);
-    observer.observe(content);
-    return () => observer.disconnect();
+    observer.observe(content, { box: "border-box" });
+    const attributes = new MutationObserver(measure);
+    attributes.observe(panel, { attributes: true, attributeFilter: ["class", "style"] });
+    view.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      attributes.disconnect();
+      view.removeEventListener("resize", measure);
+    };
   }, []);
   return (
     <div ref={ref} data-slot="collapsible-content-inner" className="flow-root">
