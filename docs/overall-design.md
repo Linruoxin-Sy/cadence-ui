@@ -556,3 +556,11 @@ Before a component can be merged it must satisfy:
 | Build              | in-house scripts + prebuild                         | `shadcn build` + finalize                        |
 | Versions           | none                                                | tag + `meta.since` + `sourceSha`                 |
 | Tests              | none (visual acceptance on the site)                | Vitest + Playwright + axe + size budget          |
+
+### Sidebar semantic colors
+
+Sidebar uses shadcn's `sidebar`, `sidebar-foreground`, `sidebar-primary`, `sidebar-primary-foreground`,
+`sidebar-accent`, `sidebar-accent-foreground`, `sidebar-border`, and `sidebar-ring` color utilities.
+The site and cadence-theme expose them with `--sidebar-*` overrides and existing card/primary/accent/
+border/ring semantic fallbacks. A consumer without a dedicated sidebar palette therefore still gets
+an opaque, legible mobile panel; consumers can override each sidebar token independently.

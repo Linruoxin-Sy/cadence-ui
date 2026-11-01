@@ -2089,6 +2089,159 @@
           "className": null
         }
       }
+    },
+    "sidebar": {
+      "path": "apps/v4/registry/bases/base/ui/sidebar.tsx",
+      "exports": [
+        "Sidebar",
+        "SidebarContent",
+        "SidebarFooter",
+        "SidebarGroup",
+        "SidebarGroupAction",
+        "SidebarGroupContent",
+        "SidebarGroupLabel",
+        "SidebarHeader",
+        "SidebarInput",
+        "SidebarInset",
+        "SidebarMenu",
+        "SidebarMenuAction",
+        "SidebarMenuBadge",
+        "SidebarMenuButton",
+        "SidebarMenuItem",
+        "SidebarMenuSkeleton",
+        "SidebarMenuSub",
+        "SidebarMenuSubButton",
+        "SidebarMenuSubItem",
+        "SidebarProvider",
+        "SidebarRail",
+        "SidebarSeparator",
+        "SidebarTrigger",
+        "useSidebar"
+      ],
+      "slots": [
+        "sidebar",
+        "sidebar-container",
+        "sidebar-content",
+        "sidebar-footer",
+        "sidebar-gap",
+        "sidebar-group",
+        "sidebar-group-action",
+        "sidebar-group-content",
+        "sidebar-group-label",
+        "sidebar-header",
+        "sidebar-inner",
+        "sidebar-input",
+        "sidebar-inset",
+        "sidebar-menu",
+        "sidebar-menu-action",
+        "sidebar-menu-badge",
+        "sidebar-menu-button",
+        "sidebar-menu-item",
+        "sidebar-menu-skeleton",
+        "sidebar-menu-sub",
+        "sidebar-menu-sub-button",
+        "sidebar-menu-sub-item",
+        "sidebar-rail",
+        "sidebar-separator",
+        "sidebar-trigger",
+        "sidebar-wrapper"
+      ],
+      "props": {
+        "useSidebar": {},
+        "SidebarProvider": {
+          "defaultOpen": "true",
+          "open": null,
+          "onOpenChange": null,
+          "className": null,
+          "style": null,
+          "children": null
+        },
+        "Sidebar": {
+          "side": "\"left\"",
+          "variant": "\"sidebar\"",
+          "collapsible": "\"offcanvas\"",
+          "className": null,
+          "children": null,
+          "dir": null
+        },
+        "SidebarTrigger": {
+          "className": null,
+          "onClick": null
+        },
+        "SidebarRail": {
+          "className": null
+        },
+        "SidebarInset": {
+          "className": null
+        },
+        "SidebarInput": {
+          "className": null
+        },
+        "SidebarHeader": {
+          "className": null
+        },
+        "SidebarFooter": {
+          "className": null
+        },
+        "SidebarSeparator": {
+          "className": null
+        },
+        "SidebarContent": {
+          "className": null
+        },
+        "SidebarGroup": {
+          "className": null
+        },
+        "SidebarGroupLabel": {
+          "className": null,
+          "render": null
+        },
+        "SidebarGroupAction": {
+          "className": null,
+          "render": null
+        },
+        "SidebarGroupContent": {
+          "className": null
+        },
+        "SidebarMenu": {
+          "className": null
+        },
+        "SidebarMenuItem": {
+          "className": null
+        },
+        "SidebarMenuButton": {
+          "render": null,
+          "isActive": "false",
+          "variant": "\"default\"",
+          "size": "\"default\"",
+          "tooltip": null,
+          "className": null
+        },
+        "SidebarMenuAction": {
+          "className": null,
+          "render": null,
+          "showOnHover": "false"
+        },
+        "SidebarMenuBadge": {
+          "className": null
+        },
+        "SidebarMenuSkeleton": {
+          "className": null,
+          "showIcon": "false"
+        },
+        "SidebarMenuSub": {
+          "className": null
+        },
+        "SidebarMenuSubItem": {
+          "className": null
+        },
+        "SidebarMenuSubButton": {
+          "render": null,
+          "size": "\"md\"",
+          "isActive": "false",
+          "className": null
+        }
+      }
     }
   }
 }

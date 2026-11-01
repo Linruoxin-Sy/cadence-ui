@@ -5,7 +5,19 @@ import { X } from "lucide-react";
 import type * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
-import { useCadenceMotion } from "../lib/provider";
+import { duration, reducedDurationScale } from "../lib/motion";
+import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
+
+function clock(cm: CadenceMotion): React.CSSProperties {
+  const factor = cm.disabled ? 0 : (cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
+  return {
+    "--motion-duration-fast": `${duration.fast * factor}s`,
+    "--motion-duration-base": `${duration.base * factor}s`,
+  } as React.CSSProperties;
+}
+function classes<S>(base: string, value: string | ((state: S) => string | undefined) | undefined) {
+  return typeof value === "function" ? (state: S) => cn(base, value(state)) : cn(base, value);
+}
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -23,15 +35,19 @@ function SheetPortal({ ...props }: SheetPrimitive.Portal.Props) {
   return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
-function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
+function SheetOverlay({ className, style, ...props }: SheetPrimitive.Backdrop.Props) {
   const cm = useCadenceMotion();
 
   return (
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
       data-motion={cm.mode}
-      className={cn(
-        "fixed inset-0 z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      style={typeof style === "function" ? (state) => ({ ...clock(cm), ...style(state) }) : { ...clock(cm), ...style }}
+      className={classes(
+        cn(
+          "fixed inset-0 z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast)",
+          !cm.disabled && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -55,6 +71,7 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
 function SheetContent({
   className,
   children,
+  style,
   side = "right",
   showCloseButton = true,
   ...props
@@ -89,10 +106,16 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         data-motion={cm.mode}
-        className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background shadow-lg outline-none transition-[opacity,translate] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-          placement,
-          !cm.reduced && slide,
+        style={
+          typeof style === "function" ? (state) => ({ ...clock(cm), ...style(state) }) : { ...clock(cm), ...style }
+        }
+        className={classes(
+          cn(
+            "fixed z-50 flex flex-col gap-4 bg-background shadow-lg outline-none transition-[opacity,translate] ease-cadence-out duration-(--motion-duration-base)",
+            placement,
+            !cm.disabled && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+            !cm.reduced && slide,
+          ),
           className,
         )}
         {...props}

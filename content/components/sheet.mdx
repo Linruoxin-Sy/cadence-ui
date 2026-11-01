@@ -144,6 +144,10 @@ write the property individually — the same reason the dialogs transition `scal
 | Escape | Closes the sheet and returns focus to the trigger. |
 | Enter / Space | Activates the focused control. |
 
+The panel and backdrop resolve local token clocks from the effective mode and time scale, including
+full inside a parent none scope. None also removes starting/ending opacity classes, so no hidden
+starting frame remains. Caller state callback classes/styles still merge last.
+
 ## Accessibility
 
 - Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`, focus

@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B6 implementations shipped (2026-11-01); B6 batch gate complete.
-> Historical B1–B5 visual gates remain open. B7 chart, calendar, navigation-menu and resizable shipped; sidebar is next. B7–B9 and §8 remain open.**
+> Status: **B0–B7 implementations shipped (2026-11-01); B6 and B7 batch gates complete.
+> Historical B1–B5 visual gates remain open. B8 data-table is next; B8/B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -257,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status      |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ----------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done     |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done     |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done     |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 4/5 shipped |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
-|       | **Total**                  | **57** |            | **102**     |         |             |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned   |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
+|       | **Total**                  | **57** |            | **102**     |         |           |
 
 ### 7.0 Status discipline
 
@@ -325,7 +325,8 @@ All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scrol
 
 ### B7 — heavy data and navigation (5)
 
-Chart, Calendar, Navigation Menu and Resizable shipped (§7.15–7.18). Next: `sidebar`.
+Chart, Calendar, Navigation Menu, Resizable and Sidebar shipped (§7.15–7.19).
+Batch gate complete (§7.20); B8 `data-table` is next.
 
 ### B8 — compositions (2, `registry:block`)
 
@@ -1232,6 +1233,53 @@ the batch row now says `gate open` because the earlier components still lack vis
   Source and payloads are committed separately, rebuilt from final source before the final check.
 - **Remaining:** B7 is 4/5; Sidebar follows. B1–B5 historical visual gates, B8/B9 and all open §8 work
   remain open. B6 stays closed. Nested CSS popup clocks remain part of the historical conformance work.
+
+### 7.19 B7 Sidebar — completed (2026-11-01)
+
+- **Surface:** pinned Base API (24 exports and all slots/defaults) with new-york-v4 classes. All
+  left/right, sidebar/floating/inset and offcanvas/icon/none modes retained; controlled/uncontrolled
+  desktop state, separate mobile Sheet state, seven-day write-only cookie and Ctrl/Cmd+B preserved.
+  Native events, render callbacks, refs including React 19 cleanup and caller classes/styles survive.
+  Shared `use-mobile` hook ships as a namespaced registry:hook under lib/hooks; no npm dependency added.
+- **Motion:** T3 `layout.move`, desktop offcanvas own-width transform on a persistent native div.
+  A persistent MotionValue retains retarget velocity; cleanup stops the spring. Reduced/none use
+  immediate static edge positioning and no transform animation. Gap/icon widths and label layout
+  update immediately in every mode; no measured geometry, height/width/left/right tween or timer.
+  SSR collapsed placement is explicit. Caller transform owns that property and suppresses the spring.
+  Offcanvas content is inert while closed. Breakpoint changes retain upstream's separate trees.
+- **Dependency repairs:** Sheet popup/backdrop resolve local token clocks (including nested full
+  inside none), preserve callback class/style merging and remove hidden start/end opacity in none.
+  Sidebar tooltip roots are disabled whenever the final tooltip hidden prop is true: otherwise a
+  visually hidden tooltip consumed Escape before the mobile Sheet. Explicit hidden=false overrides
+  still work. Stable skeleton width avoids SSR random mismatch. Sidebar semantic colors now have
+  card/primary/accent/border/ring fallbacks in site and cadence-theme; screenshot review found that
+  missing aliases made the mobile panel transparent. No shared motion/provider runtime changed.
+- **Proof:** 8 Sidebar unit tests and 9 Sheet tests cover modes, cancellation, controlled state,
+  cookie/shortcut, native events, render refs/cleanup, variants, input identity and nested clocks.
+  Full check: 412 tests / 64 files; 54 pinned parity items, registry freshness/budgets/P11, typecheck
+  and lint pass. Isolated `.next-sidebar` production build: 65 static pages. Final Sidebar browser
+  suite plus the preserved docs-sidebar continuity regression: 9/9. Three modes × two system
+  preferences sample actual desktop transform and mobile translate/opacity; both sides, icon,
+  offcanvas, static, all surface variants, controlled external toggles, rapid reversal, live downgrade,
+  resize, keyboard/Tab/Escape/outside and focus return pass. Full-page axe WCAG2A/2AA/2.1AA zero
+  violations, no document overflow at 1280/390. Four final screenshots individually reviewed in
+  `.cache/sidebar-proof/`. Source and rebuilt payloads are committed separately.
+
+### 7.20 B7 — ✅ complete (2026-11-01)
+
+All five implementations and their batch gate are complete. The joint Edge production matrix for
+Chart, Calendar, Navigation Menu, Resizable and Sidebar passes 40/40, including each component's
+full/reduced/none × system preferences, full-page axe with no disabled rules, responsive overflow
+checks and light/dark screenshots. Earlier B7 source-specific screenshots were reviewed in their
+own steps; Sidebar's final four images were also reviewed. The final preview-only refinement and
+extra variant/static checks pass Sidebar plus the existing site-sidebar regression again (9/9).
+Full repository check proves all tier size budgets and pinned parity. Logs live under
+`.cache/sidebar-{build,b7-e2e,e2e-final,final-check}.log`; screenshot folders remain local evidence.
+
+This closes B7 only. B1–B5 historical visual gates (especially older select/menu), B8 blocks,
+B9 attachment/bubble and all open §8 carried work remain open. B6 remains closed. Sheet's local clock
+repair does not close the historical nested CSS-popup conformance gate for other components.
+Next: B8 `data-table`, followed by `date-picker`, then B9 and the historical/§8 audits in dependency order.
 
 ## 8. Backlog
 

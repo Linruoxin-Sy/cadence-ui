@@ -72,7 +72,15 @@
       "cssVars": {
         "theme": {
           "--ease-cadence-out": "cubic-bezier(0.22, 1, 0.36, 1)",
-          "--ease-cadence-in-out": "cubic-bezier(0.65, 0, 0.35, 1)"
+          "--ease-cadence-in-out": "cubic-bezier(0.65, 0, 0.35, 1)",
+          "--color-sidebar": "var(--sidebar, var(--card))",
+          "--color-sidebar-foreground": "var(--sidebar-foreground, var(--card-foreground))",
+          "--color-sidebar-primary": "var(--sidebar-primary, var(--primary))",
+          "--color-sidebar-primary-foreground": "var(--sidebar-primary-foreground, var(--primary-foreground))",
+          "--color-sidebar-accent": "var(--sidebar-accent, var(--accent))",
+          "--color-sidebar-accent-foreground": "var(--sidebar-accent-foreground, var(--accent-foreground))",
+          "--color-sidebar-border": "var(--sidebar-border, var(--border))",
+          "--color-sidebar-ring": "var(--sidebar-ring, var(--ring))"
         },
         "light": {
           "--motion-duration-instant": "100ms",
@@ -1771,6 +1779,59 @@
         "motion": [],
         "intensity": "subtle",
         "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
+    },
+    {
+      "name": "use-mobile",
+      "type": "registry:hook",
+      "title": "Mobile breakpoint",
+      "description": "Responsive viewport detection for sidebar layouts.",
+      "files": [
+        {
+          "path": "registry/cadence/lib/hooks/use-mobile.ts",
+          "type": "registry:hook",
+          "target": "@components/cadence/lib/hooks/use-mobile.ts"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "Workspace navigation for dashboards and application shells.",
+      "categories": ["navigation"],
+      "dependencies": ["@base-ui/react", "motion", "class-variance-authority", "lucide-react"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/use-mobile",
+        "@cadence/button",
+        "@cadence/input",
+        "@cadence/separator",
+        "@cadence/sheet",
+        "@cadence/skeleton",
+        "@cadence/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/sidebar/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/sidebar/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T3",
+        "batch": "B7",
+        "motion": ["layout.move"],
+        "intensity": "medium",
+        "complexity": "L",
         "upstream": {
           "registry": "shadcn",
           "style": "base-ui",

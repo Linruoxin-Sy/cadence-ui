@@ -108,4 +108,34 @@ describe("Sheet", () => {
     expect(overlay).toHaveAttribute("data-motion", mode);
     expect(overlay?.className).toContain("duration-(--motion-duration-fast)");
   });
+  it("restores local full clocks inside none and keeps callback styles/classes", async () => {
+    const { rerender } = render(
+      <CadenceProvider mode="none">
+        <CadenceProvider mode="full" timeScale={2}>
+          <Sheet open>
+            <SheetContent className={() => "caller"} style={() => ({ color: "red" })}>
+              <SheetTitle>Clock</SheetTitle>
+              <SheetDescription>Local</SheetDescription>
+            </SheetContent>
+          </Sheet>
+        </CadenceProvider>
+      </CadenceProvider>,
+    );
+    const panel = screen.getByRole("dialog");
+    expect(panel).toHaveClass("caller");
+    expect(panel.style.getPropertyValue("--motion-duration-base")).toBe("0.44s");
+    expect(panel.style.color).toBe("red");
+    rerender(
+      <CadenceProvider mode="none">
+        <Sheet open>
+          <SheetContent>
+            <SheetTitle>Clock</SheetTitle>
+            <SheetDescription>Local</SheetDescription>
+          </SheetContent>
+        </Sheet>
+      </CadenceProvider>,
+    );
+    expect(screen.getByRole("dialog").style.getPropertyValue("--motion-duration-base")).toBe("0s");
+    expect(screen.getByRole("dialog").className).not.toContain("starting-style");
+  });
 });

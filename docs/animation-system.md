@@ -202,6 +202,15 @@ animation Cadence authors: swapping them for `gesture.drag` would mean re-implem
 `drawer` declares `popup.anchored` + `exit.fade` and documents the swipe in its Motion contract table.
 `gesture.drag` stays in the catalogue for a component that drives Motion directly.
 
+### 3.0 Sidebar composition
+
+Sidebar uses `layout.move` for the desktop offcanvas panel's own-width transform. The reserved
+gap and icon-mode widths update immediately; they are functional layout, with no width, left/right,
+margin, padding or height interpolation. Reduced/none use the static off-edge position, with zero
+transform duration. The same panel and its children survive desktop toggles and rapid reversals.
+Mobile delegates enter/exit to Sheet; button, tooltip and skeleton children retain their own recipes.
+No new geometry engine or measured resize recipe is introduced.
+
 ### 3.1 Code for the key recipes
 
 #### `popup.anchored` (anchored panels, CSS-only)
