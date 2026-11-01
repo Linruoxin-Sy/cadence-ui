@@ -4,13 +4,18 @@ import { Button } from "@/registry/cadence/button";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 import { createToastManager, Toaster } from "@/registry/cadence/toast";
 import { PopupMotionScope } from "./popup-motion-scope";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const types = ["success", "info", "warning", "error", "loading"] as const;
 
 export function ToastPreview() {
+  const { control, choose } = usePreviewVariant("Toast", types);
   const [manager] = useState(createToastManager);
   const [message, setMessage] = useState("No action yet");
   const cm = useCadenceMotion();
   return (
     <PopupMotionScope>
+      {control}
       <Toaster toastManager={manager} timeout={0}>
         <div data-slot="toast-demo" data-motion={cm.mode} className="flex flex-col items-center gap-4">
           <div className="flex flex-wrap justify-center gap-2">
@@ -19,7 +24,7 @@ export function ToastPreview() {
                 manager.add({
                   title: "Changes saved",
                   description: "Your workspace is up to date.",
-                  type: "success",
+                  type: choose("success"),
                   actionProps: { children: "Undo", onClick: () => setMessage("Changes undone") },
                 })
               }
@@ -32,7 +37,7 @@ export function ToastPreview() {
                 manager.add({
                   title: "Connection unavailable",
                   description: "Try again when you are online.",
-                  type: "error",
+                  type: choose("error"),
                   priority: "high",
                 })
               }

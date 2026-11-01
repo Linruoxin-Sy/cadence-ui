@@ -15,6 +15,9 @@ import {
   CodeBlockTitle,
 } from "@/registry/cadence/code-block";
 import { PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["default", "destructive"] as const;
 
 const SOURCE = `export async function stream({ prompt, signal }: StreamOptions) {
   const response = await fetch("/api/chat", {
@@ -45,41 +48,45 @@ const INSTALL = {
  * one shared element and the copy button follows the selected tab.
  */
 export function CodeBlockPreview() {
+  const { control, choose } = usePreviewVariant("CodeBlock", previewVariantOptions);
   return (
-    <PreviewStack>
-      <div className="grid w-full max-w-xl gap-4">
-        <CodeBlock maxLines={6} language="tsx">
-          <CodeBlockHeader>
-            <CodeBlockTitle>
-              <FileCode2Icon />
-              app/api/chat/route.ts
-            </CodeBlockTitle>
-            <CodeBlockActions>
-              <CodeBlockCopyButton value={SOURCE} />
-            </CodeBlockActions>
-          </CodeBlockHeader>
-          <CodeBlockContent lineNumbers>{SOURCE}</CodeBlockContent>
-          <CodeBlockFooter className="justify-center">
-            <CodeBlockExpandButton />
-          </CodeBlockFooter>
-        </CodeBlock>
+    <>
+      {control}
+      <PreviewStack>
+        <div className="grid w-full max-w-xl gap-4">
+          <CodeBlock maxLines={6} language="tsx" variant={choose("default")}>
+            <CodeBlockHeader>
+              <CodeBlockTitle>
+                <FileCode2Icon />
+                app/api/chat/route.ts
+              </CodeBlockTitle>
+              <CodeBlockActions>
+                <CodeBlockCopyButton value={SOURCE} />
+              </CodeBlockActions>
+            </CodeBlockHeader>
+            <CodeBlockContent lineNumbers>{SOURCE}</CodeBlockContent>
+            <CodeBlockFooter className="justify-center">
+              <CodeBlockExpandButton />
+            </CodeBlockFooter>
+          </CodeBlock>
 
-        <CodeBlock defaultTab="pnpm" language="bash">
-          <CodeBlockHeader>
-            <CodeBlockTabs label="Package manager">
-              <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
-              <CodeBlockTab value="npm">npm</CodeBlockTab>
-              <CodeBlockTab value="yarn">yarn</CodeBlockTab>
-            </CodeBlockTabs>
-            <CodeBlockActions>
-              <CodeBlockCopyButton values={INSTALL} />
-            </CodeBlockActions>
-          </CodeBlockHeader>
-          <CodeBlockPanel value="pnpm">{INSTALL.pnpm}</CodeBlockPanel>
-          <CodeBlockPanel value="npm">{INSTALL.npm}</CodeBlockPanel>
-          <CodeBlockPanel value="yarn">{INSTALL.yarn}</CodeBlockPanel>
-        </CodeBlock>
-      </div>
-    </PreviewStack>
+          <CodeBlock defaultTab="pnpm" language="bash" variant={choose("default")}>
+            <CodeBlockHeader>
+              <CodeBlockTabs label="Package manager">
+                <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+                <CodeBlockTab value="npm">npm</CodeBlockTab>
+                <CodeBlockTab value="yarn">yarn</CodeBlockTab>
+              </CodeBlockTabs>
+              <CodeBlockActions>
+                <CodeBlockCopyButton values={INSTALL} />
+              </CodeBlockActions>
+            </CodeBlockHeader>
+            <CodeBlockPanel value="pnpm">{INSTALL.pnpm}</CodeBlockPanel>
+            <CodeBlockPanel value="npm">{INSTALL.npm}</CodeBlockPanel>
+            <CodeBlockPanel value="yarn">{INSTALL.yarn}</CodeBlockPanel>
+          </CodeBlock>
+        </div>
+      </PreviewStack>
+    </>
   );
 }

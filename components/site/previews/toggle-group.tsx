@@ -4,6 +4,9 @@ import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ItalicIcon, U
 import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
 import { ControlMotionScope } from "./control-motion-scope";
 import { PreviewRow } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["default", "outline"] as const;
 
 /**
  * The group's characteristics are `variant`, `spacing`, `multiple`, `size`, and
@@ -12,79 +15,94 @@ import { PreviewRow } from "./shell";
  * the shared surface is visible without a click.
  */
 export function ToggleGroupPreview() {
+  const { control, choose } = usePreviewVariant("ToggleGroup", previewVariantOptions);
   return (
-    <ControlMotionScope
-      staticControl={
-        <ToggleGroup value={["static"]} aria-label="Static group">
-          <ToggleGroupItem value="static">On</ToggleGroupItem>
-        </ToggleGroup>
-      }
-    >
-      <PreviewRow>
-        <ToggleGroup variant="outline" defaultValue={["left"]} aria-label="Text alignment">
-          <ToggleGroupItem value="left" aria-label="Align left">
-            <AlignLeftIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="center" aria-label="Align center">
-            <AlignCenterIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="right" aria-label="Align right">
-            <AlignRightIcon />
-          </ToggleGroupItem>
-        </ToggleGroup>
+    <>
+      {control}
+      <ControlMotionScope
+        staticControl={
+          <ToggleGroup value={["static"]} aria-label="Static group" variant={choose("default")}>
+            <ToggleGroupItem value="static">On</ToggleGroupItem>
+          </ToggleGroup>
+        }
+      >
+        <PreviewRow>
+          <ToggleGroup variant={choose("outline")} defaultValue={["left"]} aria-label="Text alignment">
+            <ToggleGroupItem value="left" aria-label="Align left">
+              <AlignLeftIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="center" aria-label="Align center">
+              <AlignCenterIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="right" aria-label="Align right">
+              <AlignRightIcon />
+            </ToggleGroupItem>
+          </ToggleGroup>
 
-        <ToggleGroup variant="outline" spacing={1} defaultValue={["day"]} aria-label="Range">
-          <ToggleGroupItem value="day">Day</ToggleGroupItem>
-          <ToggleGroupItem value="week">Week</ToggleGroupItem>
-          <ToggleGroupItem value="month">Month</ToggleGroupItem>
-        </ToggleGroup>
-      </PreviewRow>
+          <ToggleGroup variant={choose("outline")} spacing={1} defaultValue={["day"]} aria-label="Range">
+            <ToggleGroupItem value="day">Day</ToggleGroupItem>
+            <ToggleGroupItem value="week">Week</ToggleGroupItem>
+            <ToggleGroupItem value="month">Month</ToggleGroupItem>
+          </ToggleGroup>
+        </PreviewRow>
 
-      <PreviewRow>
-        <ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style">
-          <ToggleGroupItem value="bold" aria-label="Bold">
-            <BoldIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="italic" aria-label="Italic">
-            <ItalicIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="underline" aria-label="Underline">
-            <UnderlineIcon />
-          </ToggleGroupItem>
-        </ToggleGroup>
+        <PreviewRow>
+          <ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style" variant={choose("default")}>
+            <ToggleGroupItem value="bold" aria-label="Bold">
+              <BoldIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="Italic">
+              <ItalicIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="Underline">
+              <UnderlineIcon />
+            </ToggleGroupItem>
+          </ToggleGroup>
 
-        <ToggleGroup variant="outline" size="sm" defaultValue={["week"]} aria-label="Range, small">
-          <ToggleGroupItem value="day">Day</ToggleGroupItem>
-          <ToggleGroupItem value="week">Week</ToggleGroupItem>
-          <ToggleGroupItem value="month">Month</ToggleGroupItem>
-        </ToggleGroup>
-      </PreviewRow>
+          <ToggleGroup variant={choose("outline")} size="sm" defaultValue={["week"]} aria-label="Range, small">
+            <ToggleGroupItem value="day">Day</ToggleGroupItem>
+            <ToggleGroupItem value="week">Week</ToggleGroupItem>
+            <ToggleGroupItem value="month">Month</ToggleGroupItem>
+          </ToggleGroup>
+        </PreviewRow>
 
-      <PreviewRow className="items-start gap-6">
-        <ToggleGroup orientation="vertical" variant="outline" defaultValue={["left"]} aria-label="Vertical alignment">
-          <ToggleGroupItem value="left" aria-label="Align left">
-            <AlignLeftIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="center" aria-label="Align center">
-            <AlignCenterIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="right" aria-label="Align right">
-            <AlignRightIcon />
-          </ToggleGroupItem>
-        </ToggleGroup>
+        <PreviewRow className="items-start gap-6">
+          <ToggleGroup
+            orientation="vertical"
+            variant={choose("outline")}
+            defaultValue={["left"]}
+            aria-label="Vertical alignment"
+          >
+            <ToggleGroupItem value="left" aria-label="Align left">
+              <AlignLeftIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="center" aria-label="Align center">
+              <AlignCenterIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="right" aria-label="Align right">
+              <AlignRightIcon />
+            </ToggleGroupItem>
+          </ToggleGroup>
 
-        <ToggleGroup orientation="vertical" size="sm" defaultValue={["bold"]} aria-label="Vertical text style">
-          <ToggleGroupItem value="bold" aria-label="Bold">
-            <BoldIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="italic" aria-label="Italic">
-            <ItalicIcon />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="underline" aria-label="Underline">
-            <UnderlineIcon />
-          </ToggleGroupItem>
-        </ToggleGroup>
-      </PreviewRow>
-    </ControlMotionScope>
+          <ToggleGroup
+            orientation="vertical"
+            size="sm"
+            defaultValue={["bold"]}
+            aria-label="Vertical text style"
+            variant={choose("default")}
+          >
+            <ToggleGroupItem value="bold" aria-label="Bold">
+              <BoldIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="italic" aria-label="Italic">
+              <ItalicIcon />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="underline" aria-label="Underline">
+              <UnderlineIcon />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </PreviewRow>
+      </ControlMotionScope>
+    </>
   );
 }

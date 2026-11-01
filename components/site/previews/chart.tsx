@@ -12,6 +12,9 @@ import {
 } from "@/registry/cadence/chart";
 import type { CadenceMode } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const variants = ["bar", "line", "area", "pie"] as const;
 
 const config = {
   desktop: { label: "Desktop", color: "var(--foreground)" },
@@ -25,7 +28,9 @@ const baseline = [
 ];
 
 export function ChartPreview() {
-  const [type, setType] = useState("bar");
+  const [authoredType, setType] = useState<(typeof variants)[number]>("bar");
+  const { control, choose, select } = usePreviewVariant("Chart", variants);
+  const type = choose(authoredType);
   const [updated, setUpdated] = useState(false);
   const [mode, setMode] = useState<CadenceMode | undefined>();
   const data = updated
@@ -33,6 +38,7 @@ export function ChartPreview() {
     : baseline;
   return (
     <div className="grid w-full min-w-0 grid-cols-1 gap-4">
+      {control}
       <div className="flex flex-wrap items-center gap-3">
         <Button variant="outline" onClick={() => setUpdated((value) => !value)}>
           Update data
@@ -60,7 +66,10 @@ export function ChartPreview() {
           aria-label="Chart type"
           className="rounded border bg-background p-1"
           value={type}
-          onChange={(event) => setType(event.target.value)}
+          onChange={(event) => {
+            select("all");
+            setType(event.target.value as typeof authoredType);
+          }}
         >
           <option value="bar">Bar</option>
           <option value="line">Line</option>

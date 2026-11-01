@@ -1629,10 +1629,11 @@ No product/component/config/dependency changes adopted. ADR-016 remains investig
 **Documentation site** — bounded flow work (2026-11-02), see
 [evidence matrix and 58-preview inventory](evidence/component-page-flow.md).
 Registry source view, install copy feedback, compiled-heading TOC, registry-order prev/next,
-real MDX edit link and readable keyboard-scrollable mobile tables are implemented. Button's
-six visual variants now support URL/client-state switching and history without remounting.
-Other previews retain real native controls and simultaneous specimens; URL variant support
-beyond Button remains OPEN, so this is not closure of the whole preview promise.
+real MDX edit link and readable keyboard-scrollable mobile tables are implemented. URL preview
+shapes are now covered by the complete 58-page [applicability matrix](evidence/preview-variants-matrix.json):
+37 applicable axes / 118 real options, 21 explicit exclusions. Original all specimens, controls,
+DOM/state, SSR/no-JS output and URL/history are preserved; see [proof and limits](evidence/preview-variants.md).
+This closes URL variants only, not the whole site or §8.
 The old unused copy-command claim was stale: installation already uses PackageManagerBlock.
 Index search/category/intensity/complexity filters, sidebar landmark/controls/height audit,
 immutable distribution caching/route and missing guides remain OPEN and are outside this group.
@@ -1859,3 +1860,13 @@ primitive-owned swipe rather than declaring a spurious gesture.drag recipe.
   from the final source commit, verify, then commit public artifacts and the complete handoff separately.
   B1–B4/B6–B9 remain closed. This closes only B5: §8 tooling/site/metadata, full-library
   callback/render/ref/native-event, CSS-popup and Motion running-mode audits remain open.
+
+### URL preview shapes follow-up (2026-11-02)
+
+All 58 preview/API pairs have an explicit applicability matrix in
+`docs/evidence/preview-variants-matrix.json`: 37 applicable primary shape axes, 21 concrete exclusions.
+Site-only URL controls apply real props/compositions, retain original all/SSR specimens and demo state,
+and preserve unrelated URL/history state. Validation and remaining limits are recorded in
+`docs/evidence/preview-variants.md` and the serial handoff. This closes only URL variants under its
+recorded gates; index/sidebar, distribution/guides, metadata, initial JS and cross-library audits
+remain OPEN. Older Button-only flow notes above are historical evidence.

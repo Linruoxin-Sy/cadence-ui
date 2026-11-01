@@ -1,0 +1,519 @@
+[
+  {
+    "id": "button",
+    "applicable": true,
+    "part": "Button",
+    "prop": "variant",
+    "options": ["default", "secondary", "destructive", "outline", "ghost", "link"],
+    "default": "all",
+    "source": "components/site/previews/button.tsx",
+    "api": "registry/cadence/button/index.tsx"
+  },
+  {
+    "id": "badge",
+    "applicable": true,
+    "part": "Badge",
+    "prop": "variant",
+    "options": ["default", "secondary", "destructive", "outline", "ghost", "link"],
+    "default": "all",
+    "source": "components/site/previews/badge.tsx",
+    "api": "registry/cadence/badge/index.tsx"
+  },
+  {
+    "id": "kbd",
+    "applicable": false,
+    "reason": "Kbd/KbdGroup expose native content and composition, no named size/style API.",
+    "source": "components/site/previews/kbd.tsx",
+    "api": "registry/cadence/kbd/index.tsx"
+  },
+  {
+    "id": "separator",
+    "applicable": true,
+    "part": "Separator",
+    "prop": "orientation",
+    "options": ["horizontal", "vertical"],
+    "default": "all",
+    "source": "components/site/previews/separator.tsx",
+    "api": "registry/cadence/separator/index.tsx"
+  },
+  {
+    "id": "label",
+    "applicable": false,
+    "reason": "Label has associations and inherited disabled state; no named visual API.",
+    "source": "components/site/previews/label.tsx",
+    "api": "registry/cadence/label/index.tsx"
+  },
+  {
+    "id": "input",
+    "applicable": false,
+    "reason": "Native input types and validity are semantics/state, not a visual variant API.",
+    "source": "components/site/previews/input.tsx",
+    "api": "registry/cadence/input/index.tsx"
+  },
+  {
+    "id": "textarea",
+    "applicable": false,
+    "reason": "Rows, content and validity are native geometry/state; no named visual API.",
+    "source": "components/site/previews/textarea.tsx",
+    "api": "registry/cadence/textarea/index.tsx"
+  },
+  {
+    "id": "card",
+    "applicable": true,
+    "part": "Card",
+    "prop": "size",
+    "options": ["default", "sm"],
+    "default": "all",
+    "source": "components/site/previews/card.tsx",
+    "api": "registry/cadence/card/index.tsx"
+  },
+  {
+    "id": "aspect-ratio",
+    "applicable": false,
+    "reason": "ratio is an arbitrary numeric geometry value, not a named visual shape.",
+    "source": "components/site/previews/aspect-ratio.tsx",
+    "api": "registry/cadence/aspect-ratio/index.tsx"
+  },
+  {
+    "id": "avatar",
+    "applicable": true,
+    "part": "Avatar",
+    "prop": "size",
+    "options": ["default", "sm", "lg"],
+    "default": "all",
+    "source": "components/site/previews/avatar.tsx",
+    "api": "registry/cadence/avatar/index.tsx"
+  },
+  {
+    "id": "skeleton",
+    "applicable": false,
+    "reason": "Arbitrary class-based geometry; only existing motion mode is named, excluded from variant.",
+    "source": "components/site/previews/skeleton.tsx",
+    "api": "registry/cadence/skeleton/index.tsx"
+  },
+  {
+    "id": "alert",
+    "applicable": true,
+    "part": "Alert",
+    "prop": "variant",
+    "options": ["default", "destructive"],
+    "default": "all",
+    "source": "components/site/previews/alert.tsx",
+    "api": "registry/cadence/alert/index.tsx"
+  },
+  {
+    "id": "empty",
+    "applicable": true,
+    "part": "EmptyMedia",
+    "prop": "variant",
+    "options": ["default", "icon"],
+    "default": "all",
+    "source": "components/site/previews/empty.tsx",
+    "api": "registry/cadence/empty/index.tsx"
+  },
+  {
+    "id": "item",
+    "applicable": true,
+    "part": "Item",
+    "prop": "variant",
+    "options": ["default", "muted", "outline"],
+    "default": "all",
+    "source": "components/site/previews/item.tsx",
+    "api": "registry/cadence/item/index.tsx"
+  },
+  {
+    "id": "field",
+    "applicable": true,
+    "part": "Field",
+    "prop": "orientation",
+    "options": ["vertical", "horizontal", "responsive"],
+    "default": "all",
+    "source": "components/site/previews/field.tsx",
+    "api": "registry/cadence/field/index.tsx"
+  },
+  {
+    "id": "button-group",
+    "applicable": true,
+    "part": "ButtonGroup",
+    "prop": "orientation",
+    "options": ["horizontal", "vertical"],
+    "default": "all",
+    "source": "components/site/previews/button-group.tsx",
+    "api": "registry/cadence/button-group/index.tsx"
+  },
+  {
+    "id": "input-group",
+    "applicable": true,
+    "part": "InputGroupAddon",
+    "prop": "align",
+    "options": ["inline-start", "inline-end", "block-start", "block-end"],
+    "default": "all",
+    "source": "components/site/previews/input-group.tsx",
+    "api": "registry/cadence/input-group/index.tsx"
+  },
+  {
+    "id": "breadcrumb",
+    "applicable": false,
+    "reason": "Navigation composition and separators; no named visual API.",
+    "source": "components/site/previews/breadcrumb.tsx",
+    "api": "registry/cadence/breadcrumb/index.tsx"
+  },
+  {
+    "id": "pagination",
+    "applicable": true,
+    "part": "PaginationLink/Previous/Next",
+    "prop": "size",
+    "options": ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"],
+    "default": "all",
+    "source": "components/site/previews/pagination.tsx",
+    "api": "registry/cadence/pagination/index.tsx"
+  },
+  {
+    "id": "spinner",
+    "applicable": false,
+    "reason": "Size comes from arbitrary classes, not a named size API; motion is kept separate.",
+    "source": "components/site/previews/spinner.tsx",
+    "api": "registry/cadence/spinner/index.tsx"
+  },
+  {
+    "id": "dialog",
+    "applicable": false,
+    "reason": "Rename and changelog are content compositions; Button variants belong to triggers, not Dialog.",
+    "source": "components/site/previews/dialog.tsx",
+    "api": "registry/cadence/dialog/index.tsx"
+  },
+  {
+    "id": "checkbox",
+    "applicable": false,
+    "reason": "checked/indeterminate/disabled/invalid are interaction state; no visual variant API.",
+    "source": "components/site/previews/checkbox.tsx",
+    "api": "registry/cadence/checkbox/index.tsx"
+  },
+  {
+    "id": "radio-group",
+    "applicable": false,
+    "reason": "Choice values and disabled state are data; no authored named visual layout API.",
+    "source": "components/site/previews/radio-group.tsx",
+    "api": "registry/cadence/radio-group/index.tsx"
+  },
+  {
+    "id": "switch",
+    "applicable": true,
+    "part": "Switch",
+    "prop": "size",
+    "options": ["default", "sm"],
+    "default": "all",
+    "source": "components/site/previews/switch.tsx",
+    "api": "registry/cadence/switch/index.tsx"
+  },
+  {
+    "id": "slider",
+    "applicable": true,
+    "part": "Slider",
+    "prop": "orientation",
+    "options": ["horizontal", "vertical"],
+    "default": "all",
+    "source": "components/site/previews/slider.tsx",
+    "api": "registry/cadence/slider/index.tsx"
+  },
+  {
+    "id": "toggle",
+    "applicable": true,
+    "part": "Toggle",
+    "prop": "variant",
+    "options": ["default", "outline"],
+    "default": "all",
+    "source": "components/site/previews/toggle.tsx",
+    "api": "registry/cadence/toggle/index.tsx"
+  },
+  {
+    "id": "toggle-group",
+    "applicable": true,
+    "part": "ToggleGroup",
+    "prop": "variant",
+    "options": ["default", "outline"],
+    "default": "all",
+    "source": "components/site/previews/toggle-group.tsx",
+    "api": "registry/cadence/toggle-group/index.tsx"
+  },
+  {
+    "id": "input-otp",
+    "applicable": false,
+    "reason": "Length, values and invalid state are data/validation state, not visual variants.",
+    "source": "components/site/previews/input-otp.tsx",
+    "api": "registry/cadence/input-otp/index.tsx"
+  },
+  {
+    "id": "progress",
+    "applicable": false,
+    "reason": "Numeric/null value and completion are progress state, not visual variants.",
+    "source": "components/site/previews/progress.tsx",
+    "api": "registry/cadence/progress/index.tsx"
+  },
+  {
+    "id": "alert-dialog",
+    "applicable": true,
+    "part": "AlertDialogContent",
+    "prop": "size",
+    "options": ["default", "sm"],
+    "default": "all",
+    "source": "components/site/previews/alert-dialog.tsx",
+    "api": "registry/cadence/alert-dialog/index.tsx"
+  },
+  {
+    "id": "popover",
+    "applicable": true,
+    "part": "PopoverContent",
+    "prop": "align",
+    "options": ["start", "center", "end"],
+    "default": "all",
+    "source": "components/site/previews/popover.tsx",
+    "api": "registry/cadence/popover/index.tsx"
+  },
+  {
+    "id": "tooltip",
+    "applicable": true,
+    "part": "TooltipContent",
+    "prop": "side",
+    "options": ["top", "right", "bottom", "left"],
+    "default": "all",
+    "source": "components/site/previews/tooltip.tsx",
+    "api": "registry/cadence/tooltip/index.tsx"
+  },
+  {
+    "id": "hover-card",
+    "applicable": true,
+    "part": "HoverCardContent",
+    "prop": "side",
+    "options": ["top", "right", "bottom", "left"],
+    "default": "all",
+    "source": "components/site/previews/hover-card.tsx",
+    "api": "registry/cadence/hover-card/index.tsx"
+  },
+  {
+    "id": "sheet",
+    "applicable": true,
+    "part": "SheetContent",
+    "prop": "side",
+    "options": ["top", "right", "bottom", "left"],
+    "default": "all",
+    "source": "components/site/previews/sheet.tsx",
+    "api": "registry/cadence/sheet/index.tsx"
+  },
+  {
+    "id": "drawer",
+    "applicable": true,
+    "part": "Drawer",
+    "prop": "swipeDirection",
+    "options": ["down", "up", "left", "right"],
+    "default": "all",
+    "source": "components/site/previews/drawer.tsx",
+    "api": "registry/cadence/drawer/index.tsx"
+  },
+  {
+    "id": "select",
+    "applicable": true,
+    "part": "SelectTrigger",
+    "prop": "size",
+    "options": ["default", "sm"],
+    "default": "all",
+    "source": "components/site/previews/select.tsx",
+    "api": "registry/cadence/select/index.tsx"
+  },
+  {
+    "id": "combobox",
+    "applicable": false,
+    "reason": "Picker/chips are separate part compositions and single/multiple selection ownership; no named visual API.",
+    "source": "components/site/previews/combobox.tsx",
+    "api": "registry/cadence/combobox/index.tsx"
+  },
+  {
+    "id": "dropdown-menu",
+    "applicable": true,
+    "part": "DropdownMenuItem",
+    "prop": "variant",
+    "options": ["default", "destructive"],
+    "default": "all",
+    "source": "components/site/previews/dropdown-menu.tsx",
+    "api": "registry/cadence/dropdown-menu/index.tsx"
+  },
+  {
+    "id": "context-menu",
+    "applicable": true,
+    "part": "ContextMenuItem",
+    "prop": "variant",
+    "options": ["default", "destructive"],
+    "default": "all",
+    "source": "components/site/previews/context-menu.tsx",
+    "api": "registry/cadence/context-menu/index.tsx"
+  },
+  {
+    "id": "menubar",
+    "applicable": true,
+    "part": "MenubarItem",
+    "prop": "variant",
+    "options": ["default", "destructive"],
+    "default": "all",
+    "source": "components/site/previews/menubar.tsx",
+    "api": "registry/cadence/menubar/index.tsx"
+  },
+  {
+    "id": "code-block",
+    "applicable": true,
+    "part": "CodeBlock",
+    "prop": "variant",
+    "options": ["default", "destructive"],
+    "default": "all",
+    "source": "components/site/previews/code-block.tsx",
+    "api": "registry/cadence/code-block/index.tsx"
+  },
+  {
+    "id": "command",
+    "applicable": false,
+    "reason": "Inline/CommandDialog are different component compositions; trigger Button variant is not a Command variant.",
+    "source": "components/site/previews/command.tsx",
+    "api": "registry/cadence/command/index.tsx"
+  },
+  {
+    "id": "toast",
+    "applicable": true,
+    "part": "ToastIcon",
+    "prop": "type",
+    "options": ["success", "info", "warning", "error", "loading"],
+    "default": "all",
+    "source": "components/site/previews/toast.tsx",
+    "api": "registry/cadence/toast/index.tsx"
+  },
+  {
+    "id": "accordion",
+    "applicable": false,
+    "reason": "Expanded values are disclosure state; nested Button variant is not an Accordion API.",
+    "source": "components/site/previews/accordion.tsx",
+    "api": "registry/cadence/accordion/index.tsx"
+  },
+  {
+    "id": "collapsible",
+    "applicable": false,
+    "reason": "open/details are disclosure state; Button variant belongs to the trigger.",
+    "source": "components/site/previews/collapsible.tsx",
+    "api": "registry/cadence/collapsible/index.tsx"
+  },
+  {
+    "id": "tabs",
+    "applicable": true,
+    "part": "TabsList",
+    "prop": "variant",
+    "options": ["default", "line"],
+    "default": "all",
+    "source": "components/site/previews/tabs.tsx",
+    "api": "registry/cadence/tabs/index.tsx"
+  },
+  {
+    "id": "table",
+    "applicable": false,
+    "reason": "Semantic table parts and data; no named visual variant/size API.",
+    "source": "components/site/previews/table.tsx",
+    "api": "registry/cadence/table/index.tsx"
+  },
+  {
+    "id": "carousel",
+    "applicable": true,
+    "part": "Carousel",
+    "prop": "orientation",
+    "options": ["horizontal", "vertical"],
+    "default": "all",
+    "source": "components/site/previews/carousel.tsx",
+    "api": "registry/cadence/carousel/index.tsx"
+  },
+  {
+    "id": "scroll-area",
+    "applicable": true,
+    "part": "ScrollBar",
+    "prop": "orientation",
+    "options": ["vertical", "horizontal"],
+    "default": "all",
+    "source": "components/site/previews/scroll-area.tsx",
+    "api": "registry/cadence/scroll-area/index.tsx"
+  },
+  {
+    "id": "chart",
+    "applicable": true,
+    "part": "BarChart/LineChart/AreaChart/PieChart",
+    "prop": "composition",
+    "options": ["bar", "line", "area", "pie"],
+    "default": "all",
+    "source": "components/site/previews/chart.tsx",
+    "api": "registry/cadence/chart/index.tsx"
+  },
+  {
+    "id": "calendar",
+    "applicable": true,
+    "part": "Calendar",
+    "prop": "buttonVariant",
+    "options": ["default", "secondary", "destructive", "outline", "ghost", "link"],
+    "default": "all",
+    "source": "components/site/previews/calendar.tsx",
+    "api": "registry/cadence/calendar/index.tsx"
+  },
+  {
+    "id": "navigation-menu",
+    "applicable": false,
+    "reason": "Panel value and extra-link content are navigation state; no named visual API.",
+    "source": "components/site/previews/navigation-menu.tsx",
+    "api": "registry/cadence/navigation-menu/index.tsx"
+  },
+  {
+    "id": "resizable",
+    "applicable": true,
+    "part": "ResizablePanelGroup",
+    "prop": "orientation",
+    "options": ["horizontal", "vertical"],
+    "default": "all",
+    "source": "components/site/previews/resizable.tsx",
+    "api": "registry/cadence/resizable/index.tsx"
+  },
+  {
+    "id": "sidebar",
+    "applicable": true,
+    "part": "Sidebar",
+    "prop": "variant",
+    "options": ["sidebar", "floating", "inset"],
+    "default": "all",
+    "source": "components/site/previews/sidebar.tsx",
+    "api": "registry/cadence/sidebar/index.tsx"
+  },
+  {
+    "id": "data-table",
+    "applicable": false,
+    "reason": "Filtering/sorting/page sizes are dataset state, not a named visual variant API.",
+    "source": "components/site/previews/data-table.tsx",
+    "api": "registry/cadence/data-table/index.tsx"
+  },
+  {
+    "id": "date-picker",
+    "applicable": false,
+    "reason": "single/range selects a value ownership contract; Button variants are implementation composition, not a DatePickerDemo visual API.",
+    "source": "components/site/previews/date-picker.tsx",
+    "api": "registry/cadence/date-picker/index.tsx"
+  },
+  {
+    "id": "attachment",
+    "applicable": true,
+    "part": "Attachment",
+    "prop": "size",
+    "options": ["default", "sm", "xs"],
+    "default": "all",
+    "source": "components/site/previews/attachment.tsx",
+    "api": "registry/cadence/attachment/index.tsx"
+  },
+  {
+    "id": "bubble",
+    "applicable": true,
+    "part": "Bubble",
+    "prop": "variant",
+    "options": ["default", "secondary", "muted", "tinted", "outline", "ghost", "destructive"],
+    "default": "all",
+    "source": "components/site/previews/bubble.tsx",
+    "api": "registry/cadence/bubble/index.tsx"
+  }
+]

@@ -13,6 +13,9 @@ import {
 } from "@/registry/cadence/popover";
 import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["start", "center", "end"] as const;
 
 const COLUMNS = [
   { id: "column-name", label: "Name", checked: true },
@@ -27,38 +30,42 @@ const COLUMNS = [
  * the trigger's left or right edge.
  */
 export function PopoverPreview() {
+  const { control, choose } = usePreviewVariant("Popover", previewVariantOptions);
   return (
-    <PopupMotionScope>
-      <PreviewStack>
-        <PreviewRow className="gap-3">
-          <Popover>
-            <PopoverTrigger render={<Button variant="outline" />}>Visible columns</PopoverTrigger>
-            <PopoverContent align="start">
-              <PopoverHeader>
-                <PopoverTitle>Visible columns</PopoverTitle>
-                <PopoverDescription>Three of four columns are shown.</PopoverDescription>
-              </PopoverHeader>
-              <div className="flex flex-col gap-2">
-                {COLUMNS.map((column) => (
-                  <div key={column.id} className="flex items-center gap-2">
-                    <Checkbox id={column.id} defaultChecked={column.checked} />
-                    <Label htmlFor={column.id} className="font-normal">
-                      {column.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+    <>
+      {control}
+      <PopupMotionScope>
+        <PreviewStack>
+          <PreviewRow className="gap-3">
+            <Popover>
+              <PopoverTrigger render={<Button variant="outline" />}>Visible columns</PopoverTrigger>
+              <PopoverContent align={choose("start")}>
+                <PopoverHeader>
+                  <PopoverTitle>Visible columns</PopoverTitle>
+                  <PopoverDescription>Three of four columns are shown.</PopoverDescription>
+                </PopoverHeader>
+                <div className="flex flex-col gap-2">
+                  {COLUMNS.map((column) => (
+                    <div key={column.id} className="flex items-center gap-2">
+                      <Checkbox id={column.id} defaultChecked={column.checked} />
+                      <Label htmlFor={column.id} className="font-normal">
+                        {column.label}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
 
-          <Popover>
-            <PopoverTrigger render={<Button variant="ghost" />}>Plain content</PopoverTrigger>
-            <PopoverContent align="end" className="w-64 text-sm">
-              A popover is not a dialog: it does not trap focus and clicking outside closes it.
-            </PopoverContent>
-          </Popover>
-        </PreviewRow>
-      </PreviewStack>
-    </PopupMotionScope>
+            <Popover>
+              <PopoverTrigger render={<Button variant="ghost" />}>Plain content</PopoverTrigger>
+              <PopoverContent align={choose("end")} className="w-64 text-sm">
+                A popover is not a dialog: it does not trap focus and clicking outside closes it.
+              </PopoverContent>
+            </Popover>
+          </PreviewRow>
+        </PreviewStack>
+      </PopupMotionScope>
+    </>
   );
 }

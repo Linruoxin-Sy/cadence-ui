@@ -9,6 +9,9 @@ import {
   AvatarImage,
 } from "@/registry/cadence/avatar";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["default", "sm", "lg"] as const;
 
 /**
  * Three sizes, then the three things an avatar can be showing — an image with a
@@ -17,49 +20,53 @@ import { PreviewRow, PreviewStack } from "./shell";
  * count.
  */
 export function AvatarPreview() {
+  const { control, choose } = usePreviewVariant("Avatar", previewVariantOptions);
   return (
-    <PreviewStack>
-      <PreviewRow>
-        <Avatar size="sm">
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-        <Avatar>
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-        <Avatar size="lg">
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-      </PreviewRow>
-
-      <PreviewRow>
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
-          <AvatarFallback>SC</AvatarFallback>
-          <AvatarBadge className="bg-emerald-600" />
-        </Avatar>
-        <Avatar>
-          <AvatarImage src="/missing-avatar.png" alt="Broken image" />
-          <AvatarFallback>GH</AvatarFallback>
-        </Avatar>
-        <Avatar>
-          <AvatarFallback>AL</AvatarFallback>
-        </Avatar>
-      </PreviewRow>
-
-      <PreviewRow>
-        <AvatarGroup>
-          <Avatar>
+    <>
+      {control}
+      <PreviewStack>
+        <PreviewRow>
+          <Avatar size={choose("sm")}>
             <AvatarFallback>AL</AvatarFallback>
           </Avatar>
-          <Avatar>
+          <Avatar size={choose("default")}>
+            <AvatarFallback>AL</AvatarFallback>
+          </Avatar>
+          <Avatar size={choose("lg")}>
+            <AvatarFallback>AL</AvatarFallback>
+          </Avatar>
+        </PreviewRow>
+
+        <PreviewRow>
+          <Avatar size={choose("default")}>
+            <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
+            <AvatarFallback>SC</AvatarFallback>
+            <AvatarBadge className="bg-emerald-600" />
+          </Avatar>
+          <Avatar size={choose("default")}>
+            <AvatarImage src="/missing-avatar.png" alt="Broken image" />
             <AvatarFallback>GH</AvatarFallback>
           </Avatar>
-          <Avatar>
-            <AvatarFallback>SC</AvatarFallback>
+          <Avatar size={choose("default")}>
+            <AvatarFallback>AL</AvatarFallback>
           </Avatar>
-          <AvatarGroupCount>+3</AvatarGroupCount>
-        </AvatarGroup>
-      </PreviewRow>
-    </PreviewStack>
+        </PreviewRow>
+
+        <PreviewRow>
+          <AvatarGroup>
+            <Avatar size={choose("default")}>
+              <AvatarFallback>AL</AvatarFallback>
+            </Avatar>
+            <Avatar size={choose("default")}>
+              <AvatarFallback>GH</AvatarFallback>
+            </Avatar>
+            <Avatar size={choose("default")}>
+              <AvatarFallback>SC</AvatarFallback>
+            </Avatar>
+            <AvatarGroupCount>+3</AvatarGroupCount>
+          </AvatarGroup>
+        </PreviewRow>
+      </PreviewStack>
+    </>
   );
 }

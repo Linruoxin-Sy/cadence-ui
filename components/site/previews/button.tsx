@@ -1,11 +1,12 @@
 "use client";
 
 import { PlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/registry/cadence/button";
 import type { CadenceMode } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
 
 /**
  * Six variants, then the eight sizes (four labelled, four square), then the two
@@ -15,41 +16,11 @@ import { PreviewRow, PreviewStack } from "./shell";
 const variants = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
 
 export function ButtonPreview() {
-  const [variant, setVariant] = useState("all");
-  useEffect(() => {
-    const read = () => {
-      const value = new URLSearchParams(window.location.search).get("variant");
-      setVariant(value && variants.some((variant) => variant === value) ? value : "all");
-    };
-    read();
-    window.addEventListener("popstate", read);
-    return () => window.removeEventListener("popstate", read);
-  }, []);
+  const { variant, control } = usePreviewVariant("Button", variants);
   const [mode, setMode] = useState<CadenceMode | undefined>();
   return (
     <PreviewStack>
-      <label className="flex items-center gap-2 text-sm">
-        Button variant
-        <select
-          aria-label="Button variant"
-          value={variant}
-          onChange={(event) => {
-            const value = event.target.value;
-            setVariant(value);
-            const url = new URL(window.location.href);
-            if (value === "all") url.searchParams.delete("variant");
-            else url.searchParams.set("variant", value);
-            window.history.pushState(null, "", url);
-          }}
-        >
-          <option value="all">All variants</option>
-          {variants.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
+      {control}
       <label className="flex items-center gap-2 text-sm">
         Button motion
         <select

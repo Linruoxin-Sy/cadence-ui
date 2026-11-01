@@ -4,6 +4,9 @@ import { BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
 import { Button } from "@/registry/cadence/button";
 import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["horizontal", "vertical"] as const;
 
 /**
  * Two orientations, and the two ways a group holds non-buttons: `ButtonGroupText` for
@@ -11,44 +14,48 @@ import { PreviewRow, PreviewStack } from "./shell";
  * removes the inner radii — everything else is still a `Button`.
  */
 export function ButtonGroupPreview() {
+  const { control, choose } = usePreviewVariant("ButtonGroup", previewVariantOptions);
   return (
-    <PreviewStack>
-      <PreviewRow className="gap-4">
-        <ButtonGroup aria-label="Text style">
-          <Button variant="outline" size="icon-sm" aria-label="Bold">
-            <BoldIcon />
-          </Button>
-          <Button variant="outline" size="icon-sm" aria-label="Italic">
-            <ItalicIcon />
-          </Button>
-          <Button variant="outline" size="icon-sm" aria-label="Underline">
-            <UnderlineIcon />
-          </Button>
-        </ButtonGroup>
+    <>
+      {control}
+      <PreviewStack>
+        <PreviewRow className="gap-4">
+          <ButtonGroup aria-label="Text style" orientation={choose("horizontal")}>
+            <Button variant="outline" size="icon-sm" aria-label="Bold">
+              <BoldIcon />
+            </Button>
+            <Button variant="outline" size="icon-sm" aria-label="Italic">
+              <ItalicIcon />
+            </Button>
+            <Button variant="outline" size="icon-sm" aria-label="Underline">
+              <UnderlineIcon />
+            </Button>
+          </ButtonGroup>
 
-        <ButtonGroup aria-label="Zoom">
-          <ButtonGroupText>-</ButtonGroupText>
-          <Button variant="outline" size="sm">
-            100%
-          </Button>
-          <ButtonGroupSeparator />
-          <ButtonGroupText>+</ButtonGroupText>
-        </ButtonGroup>
-      </PreviewRow>
+          <ButtonGroup aria-label="Zoom" orientation={choose("horizontal")}>
+            <ButtonGroupText>-</ButtonGroupText>
+            <Button variant="outline" size="sm">
+              100%
+            </Button>
+            <ButtonGroupSeparator />
+            <ButtonGroupText>+</ButtonGroupText>
+          </ButtonGroup>
+        </PreviewRow>
 
-      <PreviewRow>
-        <ButtonGroup orientation="vertical" aria-label="Order">
-          <Button variant="outline" size="sm">
-            Move up
-          </Button>
-          <Button variant="outline" size="sm">
-            Move down
-          </Button>
-          <Button variant="outline" size="sm">
-            Duplicate
-          </Button>
-        </ButtonGroup>
-      </PreviewRow>
-    </PreviewStack>
+        <PreviewRow>
+          <ButtonGroup orientation={choose("vertical")} aria-label="Order">
+            <Button variant="outline" size="sm">
+              Move up
+            </Button>
+            <Button variant="outline" size="sm">
+              Move down
+            </Button>
+            <Button variant="outline" size="sm">
+              Duplicate
+            </Button>
+          </ButtonGroup>
+        </PreviewRow>
+      </PreviewStack>
+    </>
   );
 }

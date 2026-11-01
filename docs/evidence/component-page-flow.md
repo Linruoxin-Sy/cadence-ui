@@ -1,5 +1,8 @@
 # Component page flow audit (2026-11-02)
 
+Historical snapshot at `a9fd620`. The subsequent [URL shape audit](preview-variants.md) and
+[58-page applicability matrix](preview-variants-matrix.json) supersede the Button-only URL status below.
+
 Baseline: `0c35508`. Product budget remains OPEN. This is a bounded site-flow audit, not a full-library motion/callback proof.
 
 | Promise                    | Baseline evidence                                                                   | Current state                                                                                                |

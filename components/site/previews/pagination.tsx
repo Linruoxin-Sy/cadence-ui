@@ -10,6 +10,9 @@ import {
   PaginationPrevious,
 } from "@/registry/cadence/pagination";
 import { PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const sizes = ["default", "xs", "sm", "lg", "icon", "icon-xs", "icon-sm", "icon-lg"] as const;
 
 /**
  * The full trail with an ellipsis and a last page, then the compact one that only
@@ -17,32 +20,40 @@ import { PreviewStack } from "./shell";
  * and right-click survive; the shape comes from the button variants.
  */
 export function PaginationPreview() {
+  const { control, choose } = usePreviewVariant("Pagination", sizes);
   return (
     <PreviewStack>
+      {control}
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious href="#pagination" />
+            <PaginationPrevious size={choose("default")} href="#pagination" />
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#pagination">1</PaginationLink>
+            <PaginationLink size={choose("icon")} href="#pagination">
+              1
+            </PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#pagination" isActive>
+            <PaginationLink size={choose("icon")} href="#pagination" isActive>
               2
             </PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#pagination">3</PaginationLink>
+            <PaginationLink size={choose("icon")} href="#pagination">
+              3
+            </PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#pagination">12</PaginationLink>
+            <PaginationLink size={choose("icon")} href="#pagination">
+              12
+            </PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext href="#pagination" />
+            <PaginationNext size={choose("default")} href="#pagination" />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
@@ -50,15 +61,15 @@ export function PaginationPreview() {
       <Pagination>
         <PaginationContent>
           <PaginationItem>
-            <PaginationPrevious href="#pagination" text="Back" />
+            <PaginationPrevious size={choose("default")} href="#pagination" text="Back" />
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href="#pagination" isActive>
+            <PaginationLink size={choose("icon")} href="#pagination" isActive>
               1
             </PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext href="#pagination" text="Forward" />
+            <PaginationNext size={choose("default")} href="#pagination" text="Forward" />
           </PaginationItem>
         </PaginationContent>
       </Pagination>

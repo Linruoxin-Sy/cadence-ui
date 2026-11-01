@@ -13,6 +13,9 @@ import {
 } from "@/registry/cadence/drawer";
 import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["down", "up", "left", "right"] as const;
 
 const DESTINATIONS = ["Inbox", "Archive", "Read later"] as const;
 
@@ -22,6 +25,7 @@ const DESTINATIONS = ["Inbox", "Archive", "Read later"] as const;
  * the drag through `--drawer-swipe-*`, so the backdrop returns as you pull.
  */
 export function DrawerPreview() {
+  const { control, choose } = usePreviewVariant("Drawer", previewVariantOptions);
   const content = (
     <>
       <DrawerHeader>
@@ -42,25 +46,28 @@ export function DrawerPreview() {
   );
 
   return (
-    <PopupMotionScope>
-      <PreviewStack>
-        <PreviewRow className="gap-2">
-          <Drawer showSwipeHandle>
-            <DrawerTrigger render={<Button variant="outline" />}>Down</DrawerTrigger>
-            <DrawerContent>{content}</DrawerContent>
-          </Drawer>
+    <>
+      {control}
+      <PopupMotionScope>
+        <PreviewStack>
+          <PreviewRow className="gap-2">
+            <Drawer showSwipeHandle swipeDirection={choose("down")}>
+              <DrawerTrigger render={<Button variant="outline" />}>Down</DrawerTrigger>
+              <DrawerContent>{content}</DrawerContent>
+            </Drawer>
 
-          <Drawer swipeDirection="up">
-            <DrawerTrigger render={<Button variant="ghost" />}>Up</DrawerTrigger>
-            <DrawerContent>{content}</DrawerContent>
-          </Drawer>
+            <Drawer swipeDirection={choose("up")}>
+              <DrawerTrigger render={<Button variant="ghost" />}>Up</DrawerTrigger>
+              <DrawerContent>{content}</DrawerContent>
+            </Drawer>
 
-          <Drawer swipeDirection="right">
-            <DrawerTrigger render={<Button variant="ghost" />}>From the right</DrawerTrigger>
-            <DrawerContent>{content}</DrawerContent>
-          </Drawer>
-        </PreviewRow>
-      </PreviewStack>
-    </PopupMotionScope>
+            <Drawer swipeDirection={choose("right")}>
+              <DrawerTrigger render={<Button variant="ghost" />}>From the right</DrawerTrigger>
+              <DrawerContent>{content}</DrawerContent>
+            </Drawer>
+          </PreviewRow>
+        </PreviewStack>
+      </PopupMotionScope>
+    </>
   );
 }

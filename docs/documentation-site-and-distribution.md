@@ -95,12 +95,33 @@ complements the implementation checks and three-mode tests; it does not prove li
 | Install copy           | `npx shadcn add @cadence/<id>`                                                                                                                                                             | Lowers the conversion barrier                                                             |
 | Loading transition     | `components/site/measured-height.tsx` applies the measured height in the frame it changed (ADR-015); the specimen itself lands with a CSS `@starting-style` reveal in `previews/shell.tsx` | The card is always the size of its example, and the content arrives without moving layout |
 
-Variant switching follows each component's real API. Button's named visual variants have a
-`?variant=outline` selector, with `all` as the default catalogue matrix; switching hides existing
-specimens rather than remounting them, and history restores the selection. Other previews keep
-their native state, placement, orientation, tab or composition controls and parallel specimens.
-A component without a named variant API does not get a decorative selector. URL variant support
-beyond Button is not yet implemented; do not infer it from the simultaneous matrix.
+Variant switching uses each preview's real named shapes, recorded for all 58 pages in
+[the applicability matrix](evidence/preview-variants-matrix.json). The URL has one primary
+shape axis per page: visual variant first; otherwise its named size, orientation, placement,
+or documented named composition. Own parts count (such as EmptyMedia and TabsList); a nested
+Button does not give its parent a variant API. Chart's four authored Recharts compositions and
+Toast's five explicitly rendered icon types are named shapes. Arbitrary numeric geometry,
+selection values, open/invalid/disabled state, and motion modes are not variants.
+
+There are 37 applicable pages and 21 explicit non-applicable pages. The matrix records each
+primary axis, complete option set, owning part/prop and source/API paths. Other axes keep their
+existing examples and controls; this single URL parameter is not a serialization of all demo state.
+Missing or explicit `all` preserves the original authored specimens and settings. SSR/no-JS always
+renders that complete original catalogue; hydration applies a valid cold URL to the same nodes.
+The route awaits its lazy preview instead of streaming a local Skeleton fallback: the old local
+Suspense left the specimen in a hidden server segment without JavaScript. Per-page dynamic imports,
+measured frame sizing and specimen entrance styling remain; navigation waits for the ready route.
+Unknown values resolve to all and announce the fallback in a status region without rewriting the URL.
+Changing the selector pushes history while preserving unrelated query parameters, history state
+and hash; back/forward restores the selection. Selecting all removes only `variant`.
+
+Most pages override only their owning real prop on the existing specimens. Button and ScrollArea
+filter the existing specimens with hidden, retaining their nodes; history that hides the focused
+specimen moves focus to the variant selector. Other changes keep focus where it is. Chart's inner
+graph composition changes as its original Chart type control did, with the same ChartContainer and
+preview state. No preview is keyed by variant. Existing controls in the selected dimension return
+to all before applying their native local setting, so they remain operational; mode, size and other
+independent controls are unchanged. No registry component acquires a generic variant prop.
 
 The source view is a native disclosure next to the live preview, so opening code does not replace
 or reset an example. Every file is read on the server from the built registry payload and rendered

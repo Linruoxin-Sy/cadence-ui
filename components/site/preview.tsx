@@ -1,8 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
-import { Skeleton } from "@/registry/cadence/skeleton";
 import { MeasuredHeight } from "./measured-height";
 import { previews } from "./previews";
 
@@ -50,9 +48,9 @@ export function PreviewFrame({ id }: { id: string }) {
           centres the specimen on both axes — the previews themselves are laid out to
           sit in the middle rather than to fill the card. */}
       <MeasuredHeight className="grid min-h-80 place-items-center p-6">
-        <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-          <Preview id={id} />
-        </Suspense>
+        {/* Let the route await the SSR preview. A local streaming fallback leaves
+            the actual specimen in a hidden segment when JavaScript is disabled. */}
+        <Preview id={id} />
       </MeasuredHeight>
     </div>
   );

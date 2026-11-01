@@ -15,6 +15,9 @@ import {
 } from "@/registry/cadence/sheet";
 import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["top", "right", "bottom", "left"] as const;
 
 const SIDES = [
   { side: "right", label: "Right" },
@@ -29,41 +32,47 @@ const SIDES = [
  * right-hand panel carries the full composition — header, body, footer.
  */
 export function SheetPreview() {
+  const { control, choose } = usePreviewVariant("Sheet", previewVariantOptions);
   return (
-    <PopupMotionScope>
-      <PreviewStack>
-        <PreviewRow className="gap-2">
-          {SIDES.map(({ side, label }) => (
-            <Sheet key={side}>
-              <SheetTrigger render={<Button variant={side === "right" ? "outline" : "ghost"} />}>{label}</SheetTrigger>
-              <SheetContent side={side}>
-                <SheetHeader>
-                  <SheetTitle>Filters</SheetTitle>
-                  <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
-                </SheetHeader>
-                <div className="flex flex-col gap-3 px-4">
-                  <div className="flex items-center gap-2">
-                    <Checkbox id={`sheet-open-${side}`} defaultChecked />
-                    <Label htmlFor={`sheet-open-${side}`} className="font-normal">
-                      Open only
-                    </Label>
+    <>
+      {control}
+      <PopupMotionScope>
+        <PreviewStack>
+          <PreviewRow className="gap-2">
+            {SIDES.map(({ side, label }) => (
+              <Sheet key={side}>
+                <SheetTrigger render={<Button variant={side === "right" ? "outline" : "ghost"} />}>
+                  {label}
+                </SheetTrigger>
+                <SheetContent side={choose(side)}>
+                  <SheetHeader>
+                    <SheetTitle>Filters</SheetTitle>
+                    <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
+                  </SheetHeader>
+                  <div className="flex flex-col gap-3 px-4">
+                    <div className="flex items-center gap-2">
+                      <Checkbox id={`sheet-open-${side}`} defaultChecked />
+                      <Label htmlFor={`sheet-open-${side}`} className="font-normal">
+                        Open only
+                      </Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox id={`sheet-mine-${side}`} />
+                      <Label htmlFor={`sheet-mine-${side}`} className="font-normal">
+                        Assigned to me
+                      </Label>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox id={`sheet-mine-${side}`} />
-                    <Label htmlFor={`sheet-mine-${side}`} className="font-normal">
-                      Assigned to me
-                    </Label>
-                  </div>
-                </div>
-                <SheetFooter>
-                  <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
-                  <SheetClose render={<Button />}>Apply filters</SheetClose>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
-          ))}
-        </PreviewRow>
-      </PreviewStack>
-    </PopupMotionScope>
+                  <SheetFooter>
+                    <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
+                    <SheetClose render={<Button />}>Apply filters</SheetClose>
+                  </SheetFooter>
+                </SheetContent>
+              </Sheet>
+            ))}
+          </PreviewRow>
+        </PreviewStack>
+      </PopupMotionScope>
+    </>
   );
 }

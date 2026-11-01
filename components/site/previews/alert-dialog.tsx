@@ -16,6 +16,9 @@ import {
 import { Button } from "@/registry/cadence/button";
 import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
+import { usePreviewVariant } from "./use-preview-variant";
+
+const previewVariantOptions = ["default", "sm"] as const;
 
 /**
  * Two sizes, and the two intensities a destructive confirmation has: the full panel
@@ -23,44 +26,48 @@ import { PreviewRow, PreviewStack } from "./shell";
  * can be undone. Neither dismisses on an outside click.
  */
 export function AlertDialogPreview() {
+  const { control, choose } = usePreviewVariant("AlertDialog", previewVariantOptions);
   return (
-    <PopupMotionScope>
-      <PreviewStack>
-        <PreviewRow className="gap-3">
-          <AlertDialog>
-            <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogMedia>
-                  <Trash2Icon aria-hidden="true" />
-                </AlertDialogMedia>
-                <AlertDialogTitle>Delete this project?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Every deployment and its logs go with it. This cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Keep project</AlertDialogCancel>
-                <AlertDialogAction variant="destructive">Delete project</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+    <>
+      {control}
+      <PopupMotionScope>
+        <PreviewStack>
+          <PreviewRow className="gap-3">
+            <AlertDialog>
+              <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
+              <AlertDialogContent size={choose("default")}>
+                <AlertDialogHeader>
+                  <AlertDialogMedia>
+                    <Trash2Icon aria-hidden="true" />
+                  </AlertDialogMedia>
+                  <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Every deployment and its logs go with it. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep project</AlertDialogCancel>
+                  <AlertDialogAction variant="destructive">Delete project</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
-          <AlertDialog>
-            <AlertDialogTrigger render={<Button variant="ghost" />}>Archive</AlertDialogTrigger>
-            <AlertDialogContent size="sm">
-              <AlertDialogHeader>
-                <AlertDialogTitle>Archive this project?</AlertDialogTitle>
-                <AlertDialogDescription>It stops deploying, and you can unarchive it later.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction>Archive</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </PreviewRow>
-      </PreviewStack>
-    </PopupMotionScope>
+            <AlertDialog>
+              <AlertDialogTrigger render={<Button variant="ghost" />}>Archive</AlertDialogTrigger>
+              <AlertDialogContent size={choose("sm")}>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Archive this project?</AlertDialogTitle>
+                  <AlertDialogDescription>It stops deploying, and you can unarchive it later.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Archive</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </PreviewRow>
+        </PreviewStack>
+      </PopupMotionScope>
+    </>
   );
 }
