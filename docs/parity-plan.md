@@ -1990,3 +1990,10 @@ and compatibility-combobox-focus.json. No global motion closure: new production 
 Checkbox/RadioGroup none-first-insertion failures under both OS settings at
 b3.spec.ts:148 are explicit OPEN counterexamples for follow-up. First build budget
 292327/120000 remains FAIL; final runtime rebuild/measurement follows in handoff.
+
+Provider final scope correction: keep original MotionConfig fallback semantics using
+base/out tokens and inherited clock; every shipped Motion writer supplies explicit
+recipe timing via transition/controls.start/animate. The first change to effective
+fallback timing exceeded the proven token-only scope; restored it without claiming
+causality for first-frame failures. Recipe none stays zero; caller-authored Motion
+programs are not globally controlled. Context tests distinguish these surfaces.

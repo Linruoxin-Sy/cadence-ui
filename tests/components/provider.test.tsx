@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { MotionConfigContext } from "motion/react";
 import { useContext } from "react";
 import { describe, expect, it } from "vitest";
-import { duration, ease, reducedDurationScale } from "@/registry/cadence/lib/motion";
+import { duration, ease } from "@/registry/cadence/lib/motion";
 import { CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
 
 /**
@@ -29,7 +29,7 @@ function FallbackProbe() {
   return <output data-testid="fallback">{JSON.stringify(transition)}</output>;
 }
 
-it("updates the actual MotionConfig fallback across modes and nested clocks", () => {
+it("keeps the token fallback distinct from recipe modes across nested clocks", () => {
   const tree = (mode: "full" | "reduced" | "none") => (
     <CadenceProvider mode={mode} timeScale={4}>
       <CadenceProvider>
@@ -42,10 +42,10 @@ it("updates the actual MotionConfig fallback across modes and nested clocks", ()
   expect(JSON.parse(node.textContent ?? "")).toEqual({ duration: duration.base * 4, ease: ease.out });
   view.rerender(tree("none"));
   expect(screen.getByTestId("fallback")).toBe(node);
-  expect(JSON.parse(node.textContent ?? "")).toEqual({ duration: 0, ease: ease.out });
+  expect(JSON.parse(node.textContent ?? "")).toEqual({ duration: duration.base * 4, ease: ease.out });
   view.rerender(tree("reduced"));
   expect(JSON.parse(node.textContent ?? "")).toEqual({
-    duration: duration.base * 4 * reducedDurationScale,
+    duration: duration.base * 4,
     ease: ease.out,
   });
 });

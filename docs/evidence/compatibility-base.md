@@ -23,7 +23,7 @@ B3 compatibility tests cover all Base state class/style callbacks and caller-las
 
 ## Provider fallback
 
-Source b8402a3 removes literal timing/easing and corrects obsolete reduced travel comment. MotionConfig fallback now uses base/out and effective mode/clock; actual context test passes same-node full→none→reduced inside inherited 4× clock. Explicit component transitions and targets unchanged. No new recipe; no claim this cancels running effects or controls caller-authored Motion programs. Global live-cancel/first-frame/nested-clock matrix remains OPEN.
+Source b8402a3 removes literal timing/easing and corrects obsolete reduced travel comment. Initial b8402a3 also changed the fallback mode clock. Final scope correction retains the original fallback semantics with base/out tokens and inherited 4× clock; actual context test distinguishes fallback from explicit recipe mode transitions. Shipped Motion parts explicitly supply recipe transitions through props, controls.start or imperative animate. Arbitrary caller-authored Motion targets are not library-controlled. Explicit component transitions and targets unchanged. No new recipe; no claim this cancels running effects or controls caller-authored Motion programs. Global live-cancel/first-frame/nested-clock matrix remains OPEN.
 
 ## B4: all 56 actual exports
 

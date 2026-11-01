@@ -11,7 +11,6 @@ import {
   ease,
   type MotionOptions,
   type Recipe,
-  reducedDurationScale,
   spring,
   transitionFor,
 } from "./motion";
@@ -122,8 +121,7 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
       <MotionConfig
         reducedMotion="user"
         transition={{
-          duration:
-            effective === "none" ? 0 : duration.base * scale * (effective === "reduced" ? reducedDurationScale : 1),
+          duration: duration.base * scale,
           ease: ease.out,
         }}
       >
