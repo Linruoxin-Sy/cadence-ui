@@ -302,33 +302,23 @@ item.meta.sourceSha = commitSha;
 
 ## 4. Registry endpoints
 
-| Endpoint                     | Content                                                       | Caching           |
-| ---------------------------- | ------------------------------------------------------------- | ----------------- |
-| `/r/registry.json`           | Full index (name/type/title/description/categories/meta)      | 1h, with ETag     |
-| `/r/<id>.json`               | A single item (content + target + deps + docs + meta)         | 1 year, immutable |
-| `/r/<id>.md`                 | Per-component markdown (for AI/curl)                          | 1 year            |
-| `/r/catalog.json`            | Machine-readable catalog (category, motion, intensity, since) | 1h                |
-| `/r/registry-<version>.json` | Version snapshot per tag                                      | permanent         |
+| Endpoint                       | Content                              | Caching                            |
+| ------------------------------ | ------------------------------------ | ---------------------------------- |
+| `/r/registry.json`             | Current install index                | Revalidate every use, SHA-256 ETag |
+| `/r/<id>.json`                 | Current installable item             | Revalidate every use, SHA-256 ETag |
+| `/r/<id>.md`                   | Current component markdown           | Revalidate every use, SHA-256 ETag |
+| `/r/catalog.json`              | Current machine catalog              | Revalidate every use, SHA-256 ETag |
+| `/r/snapshots/<sha256>/<file>` | Explicitly frozen distribution files | One year, immutable, SHA-256 ETag  |
 
-Implementation (Next Route Handler):
-
-```ts
-// app/r/[...path]/route.ts
-export async function GET(_: Request, { params }: { params: Promise<{ path: string[] }> }) {
-  const file = path.join(process.cwd(), "public/r", ...(await params).path);
-  if (!file.startsWith(path.join(process.cwd(), "public/r"))) return new Response("Not found", { status: 404 });
-  const body = await readFile(file);
-  return new Response(body, {
-    headers: {
-      "content-type": file.endsWith(".md") ? "text/markdown; charset=utf-8" : "application/json",
-      "cache-control": "public, max-age=31536000, immutable",
-      "access-control-allow-origin": "*",
-    },
-  });
-}
-```
-
-> Security: only files under `public/r` can be read, which blocks directory traversal.
+ADR-017 supersedes the former immutable latest example and tag-index-only snapshot promise.
+`beforeFiles` rewrites `/r` to `app/registry-files/[...path]/route.ts` before public static files.
+GET and HEAD share exact bytes/ETag and weak/list/wildcard If-None-Match handling (304).
+Missing or invalid resource paths return 404/no-store. Only a single lowercase JSON/MD filename,
+or snapshots + a 64-hex identity + that filename, is accepted; no filesystem path prefix guessing.
+Normal builds preserve and verify every tracked snapshot. `node scripts/freeze-registry.mjs`
+explicitly freezes the current built output. Commit its entire directory; deployment needs public/r,
+not git history or a local cache. Never edit/delete previously distributed snapshot directories.
+See the registry guide for namespace pinning and self-hosting; a frozen index alone cannot pin deps.
 
 ---
 
@@ -363,14 +353,14 @@ export async function GET(_: Request, { params }: { params: Promise<{ path: stri
 
 ### 5.2 Other endpoints
 
-| Endpoint          | Purpose                                                                                             |
-| ----------------- | --------------------------------------------------------------------------------------------------- |
-| `/llms-full.txt`  | All component markdown inlined (~200–400 KB)                                                        |
-| `/llms-small.txt` | Overview + one line per component (< 20 KB)                                                         |
-| `/r/catalog.json` | Structured catalog (name, category, deps, motion, since)                                            |
-| `/api/mcp`        | MCP: `list_components` / `search` / `get_component` / `get_install_command` / `get_motion_contract` |
+| Endpoint                     | Purpose                                                                                             |
+| ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| `/llms-full.txt`             | All component markdown inlined (~200–400 KB)                                                        |
+| `/llms-small.txt` (planned)  | Overview + one line per component (< 20 KB)                                                         |
+| `/r/catalog.json`            | Structured catalog (name, category, deps, motion, since)                                            |
+| `/api/mcp` (planned, absent) | MCP: `list_components` / `search` / `get_component` / `get_install_command` / `get_motion_contract` |
 
-### 5.3 MCP tool definitions (v0.2)
+### 5.3 Planned MCP tool definitions (not implemented)
 
 | Tool                  | Input                     | Output                        |
 | --------------------- | ------------------------- | ----------------------------- |
@@ -382,7 +372,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ path: stri
 
 > Compared with Arc's MCP, there is one extra tool, `get_motion_contract`: when an agent edits animation code it gets the allowed properties and durations directly.
 
-### 5.4 Agent Skill (v0.3)
+### 5.4 Planned Agent Skill (not distributed)
 
 Package "how to choose a component, how to change motion, how to keep a11y" as `SKILL.md` + 3 rule files, distributed to `~/.claude/skills/cadence/` through a `registry:file` item.
 
@@ -390,14 +380,14 @@ Package "how to choose a component, how to change motion, how to keep a11y" as `
 
 ## 6. Versions, changes, and deprecation
 
-| Item                | Rule                                                                                        |
-| ------------------- | ------------------------------------------------------------------------------------------- |
-| Version numbers     | `v0.x.y`, semver (0.x may break, but it must be flagged in the CHANGELOG)                   |
-| Tags                | Tag every release; `/r/registry-<version>.json` snapshot                                    |
-| Item-level versions | `meta.since` (first appearance); breaking changes add `meta.changedIn`                      |
-| CHANGELOG           | Generated from conventional commits, grouped Added/Changed/Fixed/Removed                    |
-| Deprecation         | Mark `meta.deprecated: "0.4.0"` + a note at the top of the docs, keep for at least 2 minors |
-| Migration           | Every breaking change ships a codemod or a "replacement snippet" doc                        |
+| Item                | Rule                                                                                          |
+| ------------------- | --------------------------------------------------------------------------------------------- |
+| Version numbers     | `v0.x.y`, semver (0.x may break, but it must be flagged in the CHANGELOG)                     |
+| Tags                | Future releases may map tags to retained content snapshots; no release tags are claimed today |
+| Item-level versions | `meta.since` (first appearance); breaking changes add `meta.changedIn`                        |
+| CHANGELOG           | Generated from conventional commits, grouped Added/Changed/Fixed/Removed                      |
+| Deprecation         | Mark `meta.deprecated: "0.4.0"` + a note at the top of the docs, keep for at least 2 minors   |
+| Migration           | Every breaking change ships a codemod or a "replacement snippet" doc                          |
 
 **Why no npm package**: under the copy-the-source model, versions only answer "which version did I install"; no dependency resolution is needed. If a pure utility package such as `@cadence/motion` appears later, publish it to npm separately.
 
@@ -425,7 +415,7 @@ Package "how to choose a component, how to change motion, how to keep a11y" as `
 1. Automated: CI + Vercel Preview (one deployment per PR, directly clickable).
 2. Human: motion review (per §11 of the Animation system document) + API review (naming/control/passthrough).
 3. Merge: squash merge, commit messages following conventional commits.
-4. Release: maintainer runs `pnpm release` locally (bump + changelog + tag + push); Vercel deploys automatically.
+4. Release automation and hosting remain future work; there is no `pnpm release` command today. A maintainer must separately authorize publication/tagging and retain frozen snapshots.
 
 ---
 
@@ -470,7 +460,7 @@ Any step that requires "reading the source to figure it out" counts as a documen
 | Component body    | On the site, payload only carries a URL              | Payload embeds `docs`                                    |
 | Markdown endpoint | Yes                                                  | Yes (`/r/<id>.md`)                                       |
 | llms              | Three files (txt/full/small)                         | Three files + catalog                                    |
-| MCP               | Yes (list/search/get/install/skill)                  | Yes + `get_motion_contract`                              |
+| MCP               | Yes (list/search/get/install/skill)                  | Planned; no Cadence MCP server ships today               |
 | Versions          | None                                                 | tag + `meta.since` + snapshot                            |
 | Tests             | None                                                 | unit + E2E + axe + visual                                |
 | Preview           | Private to the site                                  | Public, with mode and speed controls in the header       |

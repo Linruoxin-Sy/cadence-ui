@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   // The compiler owns render memoization for the site. Do not add `useMemo`,
   // `useCallback`, or `React.memo` to site or registry source to compensate.
   reactCompiler: true,
+  async rewrites() {
+    return {
+      beforeFiles: [{ source: "/r/:path*", destination: "/registry-files/:path*" }],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   experimental: {
     optimizePackageImports: ["lucide-react", "motion"],
   },

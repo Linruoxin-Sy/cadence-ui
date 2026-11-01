@@ -448,3 +448,38 @@ before chrome. See the [bounded experiment](site-js-budget.md#code-fence-feature
 and `docs/evidence/site-code-fence-boundaries.json`. No product adoption: even the ordinary subset
 fails, and a required install control removes the apparent headroom. Keep the complete-route gate;
 investigate the install layout/fold engine boundary through public APIs before another candidate.
+
+---
+
+## ADR-017 · Revalidated aliases and retained content snapshots
+
+**Status**: accepted, 2026-11-02. Supersedes distribution §4's immutable unversioned URL
+and §6's tag-index-only snapshot example; ADR-001/007/009 stay in force.
+
+**Context**: public/r is rebuilt in place. A year of immutable caching there would strand
+installers on old source. An immutable index with mutable dependency URLs cannot pin an install.
+A dynamic catch-all alone also loses to Next public files.
+
+**Decision**: retain the build output and all existing URLs. A beforeFiles rewrite sends /r to
+a Node route with a strict filename/segment grammar. Latest resources revalidate every use;
+SHA-256 ETags identify exact response bytes. GET/HEAD support conditional 304. Errors are no-store.
+Explicit `node scripts/freeze-registry.mjs` copies every current root JSON/MD byte into
+`public/r/snapshots/<tree-sha256>/`, with a manifest of file SHA-256 hashes. Identity is SHA-256
+of sorted JSON [filename, digest] pairs, using localeCompare ordering. Snapshots include sourceSha
+as provenance, but do not depend on git at runtime. They are tracked distribution artifacts.
+The tracked registry-snapshots.json retention inventory detects missing directories.
+Normal builds verify all manifest hashes and identities before writing aliases, and never freeze,
+rewrite or delete snapshots. registry:check repeats integrity validation. Re-running freeze with
+identical bytes is idempotent. Deploy the retained directories on every future deployment.
+Pin the consumer's **@cadence namespace** to the snapshot template so transitive @cadence deps
+resolve there too. Pinning a single direct URL without namespace configuration is insufficient.
+Frozen docs/catalog links and install prose retain their captured latest references; the namespace
+template, not those prose links, controls a pinned install. Package dependencies keep their captured
+ranges; use the consumer lockfile for package-level reproducibility.
+
+**Consequences**: latest cannot be cached indefinitely; frozen artifacts cost repository/storage
+space and are permanent once distributed. Freezing is explicit reviewable work, independent of
+ordinary handoffs and advisory meta.since/package versions. No synthetic release/tag or external
+hosting is implied. Production HTTP tests must verify the rewrite really precedes static files.
+A plain static host needs equivalent cache/conditional/security rules; Next start is the supported
+local reference, not proof about an unconfigured CDN.

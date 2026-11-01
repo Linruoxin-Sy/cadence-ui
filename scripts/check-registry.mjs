@@ -29,8 +29,10 @@ import {
   recipeCatalogue,
 } from "./motion-manifest.mjs";
 import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
+import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
+await verifySnapshots(root);
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
 const problems = checkCatalogIntensity(registry);
 

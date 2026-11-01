@@ -15,8 +15,10 @@ import os from "node:os";
 import path from "node:path";
 import matter from "gray-matter";
 import { motionRecipes } from "./motion-manifest.mjs";
+import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
+await verifySnapshots(root);
 const publicDir = path.join(root, "public");
 const outDir = path.join(publicDir, "r");
 const docsDir = path.join(root, "content", "components");
