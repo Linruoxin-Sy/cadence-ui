@@ -76,6 +76,7 @@ npx shadcn@latest add @cadence/button
 - [Calendar](https://cadence.dev/r/calendar.md): Select dates, multiple days, and ranges with accessible month navigation. (collection)
 - [Navigation Menu](https://cadence.dev/r/navigation-menu.md): Site navigation with shared popup content and interruptible sizing. (navigation)
 - [Resizable](https://cadence.dev/r/resizable.md): Adjustable split panels with pointer and keyboard resizing. (layout)
+- [Sidebar](https://cadence.dev/r/sidebar.md): Workspace navigation for dashboards and application shells. (navigation)
 
 ## Docs
 
