@@ -1967,3 +1967,9 @@ fallback. Corrected the obsolete reduced-travel comment. Actual MotionConfig con
 test covers same-node full→none→reduced with inherited 4× clock; this is config evidence,
 not running-animation cancellation proof. Component recipes/targets stay unchanged.
 Validation and current production JS measurement follow in compatibility-base handoff.
+
+B3 finite review (2026-11-02): all eight items/35 exports now reviewed, including
+unchanged Progress evidence reuse. Ledger223/466 classified,243 open; historical
+Toggle/Group3 DOM paths now finite-reviewed using native/ref/cancel evidence plus
+nested-group isolation. See compatibility-base.md. Independent live Motion/CSS
+matrices, B4/B5 and Combobox outside-focus matrix, per-page JS and final audit stay OPEN.

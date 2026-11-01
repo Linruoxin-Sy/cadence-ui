@@ -233,3 +233,67 @@ it("shows the mixed checkbox indicator without a checked value", () => {
   expect(container.querySelector('[data-slot="checkbox-indicator"]')).toHaveStyle({ opacity: "1" });
   expect(container.querySelector(".lucide-minus")).not.toBeNull();
 });
+
+it("keeps OTP's native input event and ref ownership through controlled updates", () => {
+  const firstCleanup = vi.fn();
+  const secondCleanup = vi.fn();
+  const first = vi.fn(() => firstCleanup);
+  const second = vi.fn(() => secondCleanup);
+  const listener = vi.fn((event) => {
+    expect(event.currentTarget).toBe(input);
+    expect(event.nativeEvent).toBe(native);
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  const parent = vi.fn();
+  const tree = (updated: boolean) => (
+    // biome-ignore lint/a11y/noStaticElementInteractions: test-only ancestor observes native drag propagation.
+    <section onDrag={parent}>
+      <InputOTP
+        ref={updated ? second : first}
+        value={updated ? "34" : "12"}
+        maxLength={2}
+        aria-label="Native OTP"
+        onDrag={listener}
+        style={{ color: "red" }}
+        render={({ slots }) => <output>{slots.map((slot) => slot.char).join("")}</output>}
+      />
+    </section>
+  );
+  const view = render(tree(false));
+  const input = screen.getByLabelText("Native OTP") as HTMLInputElement;
+  input.focus();
+  const native = new Event("drag", { bubbles: true, cancelable: true });
+  fireEvent(input, native);
+  expect(listener).toHaveBeenCalledTimes(1);
+  expect(native.defaultPrevented).toBe(true);
+  expect(parent).not.toHaveBeenCalled();
+  view.rerender(tree(true));
+  expect(screen.getByLabelText("Native OTP")).toBe(input);
+  expect(input).toHaveFocus();
+  // input-otp owns transparent input styling; visible characters belong to slots.
+  expect(input.style.color).toBe("transparent");
+  expect(firstCleanup).toHaveBeenCalledTimes(1);
+  expect(second).toHaveBeenCalledWith(input);
+  expect(screen.getByText("34")).toBeInTheDocument();
+  view.unmount();
+  expect(secondCleanup).toHaveBeenCalledTimes(1);
+});
+
+it("isolates nested ToggleGroup value and visual contexts", async () => {
+  const outerChange = vi.fn();
+  const innerChange = vi.fn();
+  render(
+    <ToggleGroup variant="outline" size="lg" onValueChange={outerChange}>
+      <ToggleGroupItem value="outer">Outer</ToggleGroupItem>
+      <ToggleGroup variant="default" size="sm" onValueChange={innerChange}>
+        <ToggleGroupItem value="inner">Inner</ToggleGroupItem>
+      </ToggleGroup>
+    </ToggleGroup>,
+  );
+  await userEvent.click(screen.getByRole("button", { name: "Inner" }));
+  expect(innerChange).toHaveBeenCalledWith(["inner"], expect.anything());
+  expect(outerChange).not.toHaveBeenCalled();
+  expect(screen.getByRole("button", { name: "Inner" })).toHaveAttribute("data-size", "sm");
+  expect(screen.getByRole("button", { name: "Outer" })).toHaveAttribute("data-size", "lg");
+});

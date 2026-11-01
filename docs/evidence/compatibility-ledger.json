@@ -1071,123 +1071,166 @@
     },
     "checkbox": {
       "CheckboxProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base Checkbox.Root forwards caller props/ref/render; evaluated state class caller-last, style in rest. Private Indicator/ControlSpan never receives caller root props. Mixed state/controlled/disabled/render/cleanup exercised by B3 suites.",
+        "evidence": "compatibility-base.md"
       },
       "Checkbox": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base Checkbox.Root forwards caller props/ref/render; evaluated state class caller-last, style in rest. Private Indicator/ControlSpan never receives caller root props. Mixed state/controlled/disabled/render/cleanup exercised by B3 suites.",
+        "evidence": "compatibility-base.md"
       }
     },
     "radio-group": {
       "RadioGroupProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base RadioGroup/Radio.Root forwarders retain native events/render/style/ref; group context owns roving value, items own checked state. Private Indicator is not a public event surface. B3 callback/render/ref/controlled tests and RadioGroup keyboard suite apply.",
+        "evidence": "compatibility-base.md"
       },
       "RadioGroupItemProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base RadioGroup/Radio.Root forwarders retain native events/render/style/ref; group context owns roving value, items own checked state. Private Indicator is not a public event surface. B3 callback/render/ref/controlled tests and RadioGroup keyboard suite apply.",
+        "evidence": "compatibility-base.md"
       },
       "RadioGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base RadioGroup/Radio.Root forwarders retain native events/render/style/ref; group context owns roving value, items own checked state. Private Indicator is not a public event surface. B3 callback/render/ref/controlled tests and RadioGroup keyboard suite apply.",
+        "evidence": "compatibility-base.md"
       },
       "RadioGroupItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base RadioGroup/Radio.Root forwarders retain native events/render/style/ref; group context owns roving value, items own checked state. Private Indicator is not a public event surface. B3 callback/render/ref/controlled tests and RadioGroup keyboard suite apply.",
+        "evidence": "compatibility-base.md"
       }
     },
     "switch": {
       "SwitchProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base Switch.Root caller-last state classes/rest style/ref/render; private measured Thumb is not caller root DOM. B3 controlled/disabled/render/cleanup paths and original keyboard suite apply.",
+        "evidence": "compatibility-base.md"
       },
       "Switch": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base Switch.Root caller-last state classes/rest style/ref/render; private measured Thumb is not caller root DOM. B3 controlled/disabled/render/cleanup paths and original keyboard suite apply.",
+        "evidence": "compatibility-base.md"
       }
     },
     "slider": {
       "SliderProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Generic Base Slider.Root caller-last state classes and rest style/ref/render; min/max/value/default/orientation/edge alignment preserved. Label props routed to generated thumbs, private thumbProps are engine-owned, not arbitrary root events. Real keyboard native range and external value updates covered.",
+        "evidence": "compatibility-base.md"
       },
       "Slider": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Generic Base Slider.Root caller-last state classes and rest style/ref/render; min/max/value/default/orientation/edge alignment preserved. Label props routed to generated thumbs, private thumbProps are engine-owned, not arbitrary root events. Real keyboard native range and external value updates covered.",
+        "evidence": "compatibility-base.md"
       }
     },
     "toggle": {
       "ToggleProps": {
         "kind": "type",
         "status": "reviewed-static",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base Toggle default PressButton path and caller render override reviewed with four native events, exact identity/cancel, dynamic React19 ref cleanup, controlled callbacks and disabled/keyboard paths. Independent running press visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       },
       "Toggle": {
-        "kind": "DOM",
-        "status": "bounded-runtime",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base Toggle default PressButton path and caller render override reviewed with four native events, exact identity/cancel, dynamic React19 ref cleanup, controlled callbacks and disabled/keyboard paths. Independent running press visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       },
       "toggleVariants": {
         "kind": "variant-helper",
         "status": "reviewed-static",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base Toggle default PressButton path and caller render override reviewed with four native events, exact identity/cancel, dynamic React19 ref cleanup, controlled callbacks and disabled/keyboard paths. Independent running press visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       }
     },
     "toggle-group": {
       "ToggleGroupProps": {
         "kind": "type",
         "status": "reviewed-static",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base group plus private nearest visual context; Item is Base Toggle with PressButton and caller renderer override. Context variant/size precede item, spacing/orientation joins preserved. Native/ref/controlled/cancel tests plus nested-group isolation prove finite paths; running visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       },
       "ToggleGroupItemProps": {
         "kind": "type",
         "status": "reviewed-static",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Base group plus private nearest visual context; Item is Base Toggle with PressButton and caller renderer override. Context variant/size precede item, spacing/orientation joins preserved. Native/ref/controlled/cancel tests plus nested-group isolation prove finite paths; running visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       },
       "ToggleGroup": {
-        "kind": "DOM-and-context",
-        "status": "bounded-runtime",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base group plus private nearest visual context; Item is Base Toggle with PressButton and caller renderer override. Context variant/size precede item, spacing/orientation joins preserved. Native/ref/controlled/cancel tests plus nested-group isolation prove finite paths; running visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       },
       "ToggleGroupItem": {
-        "kind": "DOM",
-        "status": "bounded-runtime",
-        "boundary": "See export table and unresolved paths in compatibility-toggle.md; not whole-component closure."
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Base group plus private nearest visual context; Item is Base Toggle with PressButton and caller renderer override. Context variant/size precede item, spacing/orientation joins preserved. Native/ref/controlled/cancel tests plus nested-group isolation prove finite paths; running visual cancellation OPEN.",
+        "evidence": "compatibility-base.md"
       }
     },
     "input-otp": {
       "InputOTPProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTPGroupProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTPSlotProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTPSeparatorProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual exported inheritance/variant helper checked; no runtime DOM of its own; associated public context and runtime obligations: Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTP": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTPGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTPSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       },
       "InputOTPSlot": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native input-otp1.5 Input plus native div Group/Slot/Separator. Input render is data slots renderer, not Base DOM render; dependency owns transparent input style/selection. Native event cancellation/ref replacement/same focused input tested. Private motion.span receives no caller div props.",
+        "evidence": "compatibility-base.md"
       }
     },
     "progress": {
