@@ -102,6 +102,8 @@ orientations.
 The joining rules are `[&>*]` selectors, so any child that renders a `data-slot` — a
 button, an input, a select trigger — participates without a prop.
 
+`ButtonGroupSeparator` accepts Base state callbacks for `className` and `style`, merged after defaults. `ButtonGroupText` uses native string classes and style objects.
+
 ## Motion contract
 
 No motion (T0). The group does not animate. Adjacent buttons share a border, and the

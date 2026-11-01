@@ -136,6 +136,8 @@ write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 `item-description`, `item-actions`, `item-header`, `item-footer`,
 `item-separator`).
 
+`ItemSeparator` accepts Base state callbacks for `className` and `style`; caller classes are merged last. `Item` render props use native string classes and style objects.
+
 ## Motion contract
 
 No motion (T0). A row does not lift on hover or slide on mount. The only transition

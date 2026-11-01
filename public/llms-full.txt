@@ -1551,11 +1551,13 @@ block is harder to read and competes with the page it sits on.
 | `Alert`            | `variant`, native props  | `variant`: `"default" \| "destructive"`. Always `role="alert"`. |
 | `AlertTitle`       | native div props         | One line, medium weight, second grid column.                    |
 | `AlertDescription` | native div props         | Muted text; paragraphs inside keep relaxed leading.             |
-| `AlertAction`      | native div props         | Right-aligned slot, spans both rows.                            |
+| `AlertAction`      | native div props         | Third grid column, spans both rows.                            |
 
 Every part sets `data-slot` (`alert`, `alert-title`, `alert-description`,
 `alert-action`), so a consumer can restyle without new props:
 `[&>[data-slot=alert-title]]:text-base`.
+
+Destructive descriptions use the full destructive text token for readable contrast in both themes. An action has its own grid column so it cannot cover the title or description.
 
 ## Motion contract
 
@@ -1862,6 +1864,8 @@ title or a progress line below the content.
 write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 `item-description`, `item-actions`, `item-header`, `item-footer`,
 `item-separator`).
+
+`ItemSeparator` accepts Base state callbacks for `className` and `style`; caller classes are merged last. `Item` render props use native string classes and style objects.
 
 ## Motion contract
 
@@ -2172,6 +2176,8 @@ orientations.
 The joining rules are `[&>*]` selectors, so any child that renders a `data-slot` — a
 button, an input, a select trigger — participates without a prop.
 
+`ButtonGroupSeparator` accepts Base state callbacks for `className` and `style`, merged after defaults. `ButtonGroupText` uses native string classes and style objects.
+
 ## Motion contract
 
 No motion (T0). The group does not animate. Adjacent buttons share a border, and the
@@ -2308,6 +2314,8 @@ steal focus from the input — the addon's focus handler steps aside.
 The frame watches `[data-slot=input-group-control]` for `:focus-visible` and
 `[aria-invalid=true]`, which is why the control can be borderless and the group still
 shows the ring.
+
+`InputGroupButton` preserves Button state callbacks for `className` and `style`, with caller classes last. The input and textarea wrappers keep their native props.
 
 ## Motion contract
 
