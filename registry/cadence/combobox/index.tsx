@@ -19,38 +19,59 @@ import { useCadenceMotion } from "../lib/provider";
 
 const Combobox = ComboboxPrimitive.Root;
 
-/** Base UI 1.9 hides the outside of a typeable popup from AT without removing
- * its tab stops. Add native inert only to nodes it newly hides. Tab releases the
- * guard before the browser moves focus, preserving Base UI's tab-out dismissal.
- * Existing hidden/inert nodes (including a parent dialog) retain their owner.
+/** Base UI hides the outside from AT but leaves its tab stops. Suppress those
+ * stops without inert, which also swallows outside pointer activation. Tab
+ * releases the guard before native focus navigation. Pre-existing hidden/inert
+ * nodes retain their owner; caller tabindex changes are never overwritten on cleanup.
  */
 function ComboboxFocusSafety() {
   React.useLayoutEffect(() => {
     const existing = new Set(document.querySelectorAll('[aria-hidden="true"]'));
     const owned = new Set<HTMLElement>();
+    const stops = new Map<HTMLElement, string | null>();
+    const selector =
+      'a[href],area[href],button,input,select,textarea,iframe,summary,[tabindex],[contenteditable="true"],audio[controls],video[controls]';
     let released = false;
+    const restoreStop = (node: HTMLElement, previous: string | null) => {
+      if (node.getAttribute("tabindex") !== "-1") return;
+      if (previous === null) node.removeAttribute("tabindex");
+      else node.setAttribute("tabindex", previous);
+    };
     const restore = () => {
-      for (const node of owned) node.inert = false;
+      for (const [node, previous] of stops) restoreStop(node, previous);
+      stops.clear();
       owned.clear();
     };
     const sync = () => {
       for (const node of owned) {
         if (node.getAttribute("aria-hidden") !== "true") {
-          node.inert = false;
           owned.delete(node);
         }
       }
       if (released) return;
       for (const node of document.querySelectorAll<HTMLElement>('[aria-hidden="true"]')) {
-        if (!existing.has(node) && !node.inert) {
-          node.inert = true;
+        if (!existing.has(node) && !node.closest("[inert]")) {
           owned.add(node);
+        }
+      }
+      for (const [node, previous] of stops) {
+        if (![...owned].some((root) => root.contains(node))) {
+          restoreStop(node, previous);
+          stops.delete(node);
+        }
+      }
+      for (const root of owned) {
+        for (const node of [root, ...root.querySelectorAll<HTMLElement>(selector)]) {
+          if (!node.matches(selector) || node.closest("[inert]") || node.tabIndex < 0 || stops.has(node)) continue;
+          stops.set(node, node.getAttribute("tabindex"));
+          node.tabIndex = -1;
         }
       }
     };
     const observer = new MutationObserver(sync);
     observer.observe(document.body, {
       subtree: true,
+      childList: true,
       attributes: true,
       attributeFilter: ["aria-hidden", "data-base-ui-inert"],
     });

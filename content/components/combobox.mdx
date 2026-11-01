@@ -218,8 +218,8 @@ same component tree. Base UI `className(state)` and `style(state)` callbacks are
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
 remain owned by the primitive. Base UI 1.9's typeable focus manager hides background
 nodes from assistive technology while leaving their tab stops enabled. Cadence adds native
-`inert` only to newly hidden nodes; Tab releases it before normal focus navigation and
-Base UI's blur dismissal. Existing hidden/inert nodes and parent dialogs keep their owners. `ComboboxInput` string classes style the field frame;
+temporary negative tab indices only to newly hidden focus stops, preserving outside pointer activation; Tab releases them before normal focus navigation and
+Base UI's blur dismissal. Existing hidden/inert nodes and parent dialogs keep their owners; cleanup preserves caller tabindex changes. `ComboboxInput` string classes style the field frame;
 state callback classes style the native input with its real Base UI input state.
 
 ## Keyboard interactions

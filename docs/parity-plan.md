@@ -1980,3 +1980,13 @@ production source changes. Ledger279/466 classified (162 compatibility/117 stati
 187 open. See compatibility-base.md. B5 remains the next finite group; actual
 Combobox baseline now reproduces swallowed outside-button activation for mouse/touch
 under Cadence inert guard (Base1.9 default activates); repair/matrix remains OPEN.
+
+B5 finite review (2026-11-02): all seven items/94 actual exports reviewed against
+actual forwarding/context/manager paths, fixed pin and installed types. Ledger373/466
+classified (256 compatibility/117 static),93 open (remaining B6–B9). Combobox outside
+activation defect reproduced against Base with mouse/touch, repaired via tab-stop
+guard and finite Tab/parent/sibling/reopen/ownership matrix; see compatibility-base.md
+and compatibility-combobox-focus.json. No global motion closure: new production B3
+Checkbox/RadioGroup none-first-insertion failures under both OS settings at
+b3.spec.ts:148 are explicit OPEN counterexamples for follow-up. First build budget
+292327/120000 remains FAIL; final runtime rebuild/measurement follows in handoff.

@@ -1,0 +1,153 @@
+{
+  "scope": "Production Vite7.3.7 bundle of actual Base1.9.0/Cadence Combobox. Edge3156. No site shell/CSS or per-page JS budget claim.",
+  "before": {
+    "mouse": {
+      "base": {
+        "dismissed": true,
+        "clicks": 1
+      },
+      "cadence": {
+        "dismissed": true,
+        "clicks": 0,
+        "inert": true
+      }
+    },
+    "touch": {
+      "base": {
+        "dismissed": true,
+        "clicks": 1
+      },
+      "cadence": {
+        "dismissed": true,
+        "clicks": 0,
+        "inert": true
+      }
+    }
+  },
+  "after": [
+    {
+      "baseline": true,
+      "touch": false,
+      "before": {
+        "hidden": "true"
+      },
+      "proof": {
+        "changes": [true, false],
+        "clicks": 1
+      },
+      "open": 0
+    },
+    {
+      "baseline": true,
+      "touch": true,
+      "before": {
+        "hidden": "true"
+      },
+      "proof": {
+        "changes": [true, false],
+        "clicks": 1
+      },
+      "open": 0
+    },
+    {
+      "baseline": false,
+      "touch": false,
+      "before": {
+        "hidden": "true"
+      },
+      "proof": {
+        "changes": [true, false],
+        "clicks": 1
+      },
+      "open": 0
+    },
+    {
+      "baseline": false,
+      "touch": true,
+      "before": {
+        "hidden": "true"
+      },
+      "proof": {
+        "changes": [true, false],
+        "clicks": 1
+      },
+      "open": 0
+    }
+  ],
+  "keyboardAndCleanup": [
+    {
+      "case": "tab",
+      "baseline": true,
+      "shift": false,
+      "focus": "outside"
+    },
+    {
+      "case": "tab",
+      "baseline": true,
+      "shift": true,
+      "focus": "before"
+    },
+    {
+      "case": "tab",
+      "baseline": false,
+      "shift": false,
+      "focus": "input-group-button"
+    },
+    {
+      "case": "tab",
+      "baseline": false,
+      "shift": true,
+      "focus": "before"
+    },
+    {
+      "case": "reopen/unmount/caller-ownership",
+      "nested": false,
+      "outside": {
+        "inert": false,
+        "hidden": null,
+        "tabindex": "2"
+      }
+    },
+    {
+      "case": "reopen/unmount/caller-ownership",
+      "nested": true,
+      "outside": {
+        "inert": false,
+        "hidden": null,
+        "tabindex": null
+      }
+    }
+  ],
+  "ownership": [
+    {
+      "case": "nested-parent-ownership",
+      "touch": false,
+      "pre": {
+        "inert": false,
+        "hidden": null,
+        "tabindex": null
+      }
+    },
+    {
+      "case": "nested-parent-ownership",
+      "touch": true,
+      "pre": {
+        "inert": false,
+        "hidden": null,
+        "tabindex": null
+      }
+    },
+    {
+      "case": "sibling-popup-close-order",
+      "passed": true
+    }
+  ],
+  "sources": {
+    ".cache/compat-combobox-fixture/main.tsx": "import React from 'react';\nimport {createRoot} from 'react-dom/client';\nimport {Combobox as B} from '@base-ui/react/combobox';\nimport {Combobox,ComboboxInput,ComboboxContent,ComboboxList,ComboboxItem} from '../../registry/cadence/combobox';\nimport {Dialog,DialogTrigger,DialogContent,DialogTitle,DialogClose} from '../../registry/cadence/dialog';\nimport {CadenceProvider} from '../../registry/cadence/lib/provider';\nconst baseline=new URLSearchParams(location.search).has('base');\nwindow.proof={changes:[],clicks:0};\nfunction Combo(){return <div style={{margin:40,display:\"inline-block\",width:300,verticalAlign:\"top\"}}>{baseline?<B.Root items={['Alpha','Beta']} onOpenChange={v=>window.proof.changes.push(v)}><B.Input aria-label=\"Choice\"/><B.Portal><B.Positioner><B.Popup style={{background:'white',padding:20,border:'1px solid'}}><B.List>{v=><B.Item key={v} value={v}>{v}</B.Item>}</B.List></B.Popup></B.Positioner></B.Portal></B.Root>:<Combobox items={['Alpha','Beta']} onOpenChange={v=>window.proof.changes.push(v)}><ComboboxInput aria-label=\"Choice\"/><ComboboxContent style={{background:'white',padding:20,border:'1px solid'}}><ComboboxList>{v=><ComboboxItem key={v} value={v}>{v}</ComboboxItem>}</ComboboxList></ComboboxContent></Combobox>}</div>}\nfunction App(){const [mounted,setMounted]=React.useState(true);window.setMounted=setMounted;return <CadenceProvider mode=\"none\"><button id=\"before\">Before</button><button id=\"prehidden\" aria-hidden=\"true\" tabIndex={3}>Hidden</button><button id=\"preinert\" inert tabIndex={4}>Inert</button>{mounted&&(new URLSearchParams(location.search).has(\"dialog\")?<Dialog><DialogTrigger>Open dialog</DialogTrigger><DialogContent style={{position:\"fixed\",left:80,top:80,zIndex:100,background:\"white\"}}><DialogTitle>Nested</DialogTitle><Combo/><button id=\"inside\" onClick={()=>window.proof.clicks++}>Inside dialog</button><DialogClose>Close dialog</DialogClose></DialogContent></Dialog>:<><Combo/>{new URLSearchParams(location.search).has(\"siblings\")&&<Combo/>}</>)}<button id=\"outside\" style={{position:'fixed',left:500,top:300}} onClick={()=>window.proof.clicks++}>Outside</button></CadenceProvider>}\ncreateRoot(document.getElementById('root')).render(<App/>);\r\n",
+    ".cache/compat-combobox-fixture/index.html": "<!doctype html><html><body><div id=\"root\"></div><script type=\"module\" src=\"/main.tsx\"></script></body></html>\r\n",
+    ".cache/native-div-vite.mjs": "export default {esbuild:{jsx:\"automatic\"},build:{outDir:\"dist\",emptyOutDir:true}}",
+    ".cache/compat-combobox-baseline.mjs": "import {chromium,expect} from '@playwright/test';\nimport fs from 'node:fs';\nconst b=await chromium.launch({channel:'msedge',headless:true});const results=[];\nfor(const baseline of [true,false])for(const touch of [false,true]){\n const p=await b.newPage({hasTouch:touch});await p.goto('http://127.0.0.1:3156/'+(baseline?'?base':''));\n await p.getByRole('combobox').click();await p.getByRole('option').first().waitFor();\n const before=await p.evaluate(()=>({inert:document.querySelector('#outside').closest('[inert]')?.outerHTML.slice(0,160),hidden:document.querySelector('#outside').closest('[aria-hidden]')?.getAttribute('aria-hidden')}));\n if(touch)await p.touchscreen.tap(530,315);else await p.mouse.click(530,315);\n await p.waitForTimeout(100);results.push({baseline,touch,before,proof:await p.evaluate(()=>window.proof),open:await p.getByRole('option').count()});await p.close();\n}\nawait b.close();fs.writeFileSync('.cache/compat-combobox-baseline.json',JSON.stringify(results,null,2));console.log(results);\r\n",
+    ".cache/compat-combobox-matrix.mjs": "import {chromium,expect} from '@playwright/test';import fs from 'node:fs';\nconst b=await chromium.launch({channel:'msedge',headless:true});const reports=[];\nfor(const baseline of [true,false])for(const shift of [false,true]){\n const p=await b.newPage();await p.goto('http://127.0.0.1:3156/'+(baseline?'?base':''));await p.getByRole('combobox').click();await p.getByRole('option').first().waitFor();\n await p.keyboard.press(shift?'Shift+Tab':'Tab');await expect(p.getByRole('option')).toHaveCount(0);\n reports.push({case:'tab',baseline,shift,focus:await p.evaluate(()=>document.activeElement.id||document.activeElement.getAttribute('data-slot')||document.activeElement.tagName)});\n await expect(p.locator('#prehidden')).toHaveAttribute('aria-hidden','true');await expect(p.locator('#prehidden')).toHaveAttribute('tabindex','3');await expect(p.locator('#preinert')).toHaveAttribute('inert','');await p.close();\n}\nfor(const nested of [false,true]){\n const p=await b.newPage();await p.goto('http://127.0.0.1:3156/'+(nested?'?dialog':''));if(nested)await p.getByText('Open dialog',{exact:true}).click();\n for(let i=0;i<2;i++) {await p.getByRole('combobox').click();await p.getByRole('option').first().waitFor();await p.keyboard.press('Escape');await expect(p.getByRole('option')).toHaveCount(0);}\n await p.getByRole('combobox').click();await p.getByRole('option').first().waitFor();\n if(!nested){await expect(p.locator('#outside')).toHaveAttribute('tabindex','-1');await p.locator('#outside').evaluate(e=>e.setAttribute('tabindex','2'));}\n await p.evaluate(()=>window.setMounted(false));await expect(p.getByRole('option')).toHaveCount(0);\n if(!nested)await expect(p.locator('#outside')).toHaveAttribute('tabindex','2');else {await expect(p.locator('#outside')).not.toHaveAttribute('tabindex');await expect(p.locator('#outside')).not.toHaveAttribute('aria-hidden');expect(await p.locator('#outside').evaluate(e=>e.inert)).toBe(false);}\n await expect(p.locator('#prehidden')).toHaveAttribute('aria-hidden','true');await expect(p.locator('#prehidden')).toHaveAttribute('tabindex','3');await expect(p.locator('#preinert')).toHaveAttribute('inert','');await expect(p.locator('#preinert')).toHaveAttribute('tabindex','4');\n reports.push({case:'reopen/unmount/caller-ownership',nested,outside:await p.locator('#outside').evaluate(e=>({inert:e.inert,hidden:e.getAttribute('aria-hidden'),tabindex:e.getAttribute('tabindex')}))});await p.close();\n}\nawait b.close();fs.writeFileSync('.cache/compat-combobox-matrix.json',JSON.stringify(reports,null,2));console.log(reports);\r\n",
+    ".cache/compat-combobox-ownership.mjs": "import {chromium,expect} from '@playwright/test';import fs from 'node:fs';const b=await chromium.launch({channel:'msedge',headless:true});const reports=[];\nfor(const touch of [false,true]){\n const p=await b.newPage({hasTouch:touch});await p.goto('http://127.0.0.1:3156/?dialog');await p.getByText('Open dialog',{exact:true}).click();await p.getByRole('combobox').click();await p.getByRole('option').first().waitFor();\n const pre=await p.locator('#outside').evaluate(e=>({inert:e.inert,hidden:e.getAttribute('aria-hidden'),tabindex:e.getAttribute('tabindex')}));\n const target=p.locator('#inside');if(touch)await target.tap();else await target.click();await expect(p.getByRole('option')).toHaveCount(0);await expect(p.getByRole('dialog')).toHaveCount(1);expect(await p.evaluate(()=>window.proof.clicks)).toBe(1);\n expect(await p.locator('#outside').evaluate(e=>({inert:e.inert,hidden:e.getAttribute('aria-hidden'),tabindex:e.getAttribute('tabindex')}))).toEqual(pre);\n await p.getByText('Close dialog',{exact:true}).click();await expect(p.getByRole('dialog')).toHaveCount(0);await expect(p.locator('#outside')).not.toHaveAttribute('aria-hidden');await expect(p.locator('#outside')).not.toHaveAttribute('tabindex');reports.push({case:'nested-parent-ownership',touch,pre});await p.close();\n}\nconst p=await b.newPage();await p.goto('http://127.0.0.1:3156/?siblings');const inputs=p.locator('input[role=combobox]');await inputs.nth(0).click();await p.getByRole('option').first().waitFor();await inputs.nth(1).click();await expect(inputs.nth(0)).toHaveAttribute('aria-expanded','false');await expect(inputs.nth(1)).toHaveAttribute('aria-expanded','true');await expect(p.getByRole('option')).toHaveCount(2);await p.keyboard.press('Escape');await expect(p.getByRole('option')).toHaveCount(0);await expect(p.locator('#outside')).not.toHaveAttribute('tabindex');reports.push({case:'sibling-popup-close-order',passed:true});await b.close();fs.writeFileSync('.cache/compat-combobox-ownership.json',JSON.stringify(reports,null,2));console.log(reports);\r\n"
+  }
+}

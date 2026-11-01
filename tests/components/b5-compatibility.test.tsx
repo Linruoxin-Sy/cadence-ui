@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
 import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "@/registry/cadence/combobox";
@@ -21,6 +21,79 @@ import {
   ToastViewport,
   useToastManager,
 } from "@/registry/cadence/toast";
+
+it("Combobox guards hidden tab stops without inert and restores caller ownership", async () => {
+  const view = render(
+    <CadenceProvider mode="none">
+      <button type="button" data-testid="outside">
+        Outside
+      </button>
+      {/* biome-ignore lint/a11y/noAriaHiddenOnFocusable: deliberately pre-existing caller state must remain caller-owned. */}
+      {/* biome-ignore lint/a11y/noPositiveTabindex: non-default caller value makes restoration observable. */}
+      <button type="button" aria-hidden="true" tabIndex={3} data-testid="hidden">
+        Hidden
+      </button>
+      {/* biome-ignore lint/a11y/noPositiveTabindex: deliberately preserved caller value on an inert node. */}
+      <button type="button" inert tabIndex={4} data-testid="inert">
+        Inert
+      </button>
+      <Combobox items={["Alpha"]}>
+        <ComboboxInput aria-label="Guard" />
+        <ComboboxContent>
+          <ComboboxList>
+            {(value: string) => (
+              <ComboboxItem key={value} value={value}>
+                {value}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+    </CadenceProvider>,
+  );
+  await userEvent.click(screen.getByRole("combobox"));
+  const outside = screen.getByTestId("outside");
+  await waitFor(() => expect(outside).toHaveAttribute("tabindex", "-1"));
+  expect(outside).not.toHaveAttribute("inert");
+  expect(screen.getByTestId("hidden")).toHaveAttribute("tabindex", "3");
+  expect(screen.getByTestId("inert")).toHaveAttribute("tabindex", "4");
+  outside.setAttribute("tabindex", "2");
+  fireEvent.keyDown(screen.getByRole("combobox"), { key: "Tab" });
+  expect(outside).toHaveAttribute("tabindex", "2");
+  view.unmount();
+  expect(outside).toHaveAttribute("tabindex", "2");
+});
+
+it("SelectTrigger retains its internal DOM ref while React19 caller refs change", async () => {
+  const firstCleanup = vi.fn();
+  const secondCleanup = vi.fn();
+  const first = vi.fn(() => firstCleanup);
+  const second = vi.fn(() => secondCleanup);
+  const tree = (updated: boolean) => (
+    <CadenceProvider mode="none">
+      <Select value="a">
+        <SelectTrigger ref={updated ? second : first}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="a">Alpha</SelectItem>
+        </SelectContent>
+      </Select>
+    </CadenceProvider>
+  );
+  const view = render(tree(false));
+  const trigger = screen.getByRole("combobox");
+  trigger.focus();
+  view.rerender(tree(true));
+  expect(screen.getByRole("combobox")).toBe(trigger);
+  expect(trigger).toHaveFocus();
+  expect(firstCleanup).toHaveBeenCalledTimes(1);
+  expect(second).toHaveBeenCalledWith(trigger);
+  await userEvent.keyboard("{ArrowDown}");
+  expect(await screen.findByRole("option")).toHaveTextContent("Alpha");
+  view.unmount();
+  expect(secondCleanup).toHaveBeenCalledTimes(1);
+});
 
 it("dropdown-menu preserves typed callbacks, render, refs, events, controlled updates and local clock", () => {
   const cleanup = vi.fn();

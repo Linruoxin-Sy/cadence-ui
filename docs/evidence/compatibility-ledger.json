@@ -1595,300 +1595,444 @@
     },
     "select": {
       "Select": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectScrollDownButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectScrollUpButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "SelectValue": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual select implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "combobox": {
       "Combobox": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxChip": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxChips": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxChipsInput": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxCollection": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-consumer",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxEmpty": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxInput": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxList": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ComboboxValue": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-consumer",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "useComboboxAnchor": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "ref-hook",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual combobox implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "dropdown-menu": {
       "DropdownMenu": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuCheckboxItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuRadioGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuRadioItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuShortcut": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuSub": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuSubContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuSubTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "DropdownMenuTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual dropdown-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "context-menu": {
       "ContextMenu": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuCheckboxItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuRadioGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuRadioItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuShortcut": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuSub": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuSubContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuSubTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ContextMenuTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual context-menu implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "menubar": {
       "Menubar": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarCheckboxItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarMenu": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarRadioGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarRadioItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarShortcut": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarSub": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarSubContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarSubTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "MenubarTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual menubar implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "code-block": {
@@ -2015,94 +2159,138 @@
     },
     "command": {
       "Command": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandDialog": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandEmpty": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandInput": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandList": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "cmdk-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "CommandShortcut": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual command implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. String class/object style, native rest/ref/event forwarding; no invented Base state callback. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "toast": {
       "createToastManager": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "toast-manager",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "Toast": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastAction": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastClose": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "Toaster": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastProvider": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "ToastViewport": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Base state class/style resolved caller-last, actual render/ref/native event path retained; private animated indicator never receives arbitrary public item props. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "toast": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "toast-manager",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       },
       "useToastManager": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "toast-manager",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual toast implementation, fixed pin and installed public types read; per-export names and concrete shared forwarding/context/ownership paths in compatibility-base.md. Non-DOM surface has real context/manager/ref obligations, not automatic N/A. Finite compatibility reviewed, independent global live-mode/clock/first-frame audits remain OPEN."
       }
     },
     "accordion": {
