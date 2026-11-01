@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B9 implementations shipped (2026-11-01); B1–B2 and B6–B9 batch gates complete.
-> Historical B3–B5 visual gates and §8 remain open; B3 is next.**
+> Status: **B0–B9 implementations shipped (2026-11-01); B1–B3 and B6–B9 batch gates complete.
+> Historical B4–B5 visual gates and §8 remain open; B4 is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -267,7 +267,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                        |
 | B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | complete (§7.27)               |
 | B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ gate complete (§7.28)       |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | implementation done; gate open |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ gate complete (§7.29)       |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | implementation done; gate open |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open                      |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete                       |
@@ -418,7 +418,7 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Not yet done:** dual-theme screenshots, same environment limitation as B1. The visual half of the
   batch gate stays open for both batches; everything else is verified.
 
-### 7.3 B3 — implementation complete (2026-10-30); historical gate open
+### 7.3 B3 — implementation complete (2026-10-30); gate closed in §7.29
 
 - **Scope shipped:** `checkbox`, `radio-group`, `switch`, `slider`, `toggle`, `toggle-group`,
   `input-otp`, `progress`. 29 components, 34 registry items, 29 docs, 29 previews.
@@ -1648,3 +1648,36 @@ With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
   `.cache/b2-proof/<id>-<light|dark>-<1280|390>[-preview].png` (untracked).
 - B3–B5 gates, all §8 tooling/site/metadata, and the cross-library callback/popup audit remain open.
   Next is only B3; B1/B2/B6–B9 stay closed unless new concrete evidence warrants a bounded repair.
+
+### 7.29 Historical B3 gate — complete (2026-11-02)
+
+- Reviewed all eight pinned Base sources and installed APIs. Base className callbacks now evaluate
+  against real state before caller-last cn; ProgressIndicator style callbacks and ToggleGroup style
+  callbacks/objects preserve internal defaults and caller overrides. ToggleGroup passes orientation
+  to Base for vertical keyboard navigation. Mixed Checkbox shows its indicator; numeric Slider values
+  render one thumb; InputOTP restores the pinned spellCheck=false default.
+- Browser sampling exposed continuing opacity/translate under a live none downgrade. The documented
+  control adapter stops and retargets existing animation controls on value/clock changes, including an
+  unchanged target; zero-duration targets commit immediately. Its shared source ships with the existing
+  cadence-provider item. Checkbox/Radio/Switch/Slider/Progress retain the same DOM nodes and recipes.
+  OTP also retains its character span, animates only changed characters, and cancels mode changes.
+  No new dependencies, public props, recipe, or parity deviation. Caller owns values and validation.
+- Added four compatibility tests covering all Base callback surfaces, render forms, native events,
+  React19 cleanup, external controlled updates and OTP identity/focus. All old tests remain.
+  Full check: 457 tests /71 files, all tier budgets, P11, registry freshness, parity58 surfaces.
+  An intermediate CodeBlock asynchronous highlight timeout was retried without changing source,
+  test timeout or configuration; final verification is recorded in the handoff.
+- Production `.next-b3-gate` built69pages. Edge workers2, port3136: final B3 suite64/64 (2.1m),
+  `.cache/b3-final-review-e2e.log`. Eight recipes/components ×three modes ×two OS settings prove actual
+  per-frame scale/translate/opacity, initial none, running cancellation even during held pointer,
+  nested full recovery, stable nodes, keyboard/focus, drag, native clipboard paste/selection,
+  rapid changes and mobile resize. Tests wait for the mode commit before sampling none.
+- Sixteen visual cases cover eight pages in both themes at1280/390: full-page axe zero violations
+  without disabled rules, no document overflow or pageerror. All32 full-page and32 preview images
+  reviewed individually; code/tables scroll internally. `.cache/b3-proof/` contains the PNGs and
+  four-image review sheets. Docs match callback and scalar-value APIs; Progress composition explicitly
+  retains its upstream default track. No screenshot/cache/build artifacts are committed.
+- Source, final-source payload and handoff are separate commits. Evidence/logs and the complete next
+  B4 onward work are in `docs/handoffs/b3-gate.md`. Fixed pin remains96da9cc7f1aa10580a3741664e2a77c721206c00.
+  B4/B5 gates, every open §8 item, and global callback/popup/running-mode audits remain open.
+  B1/B2/B6–B9 stay closed; this closes only B3, not the overall goal.

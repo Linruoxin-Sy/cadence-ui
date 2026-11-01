@@ -2,9 +2,9 @@
 
 import { OTPInput, OTPInputContext } from "input-otp";
 import { MinusIcon } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, useAnimationControls } from "motion/react";
 import type * as React from "react";
-import { useContext } from "react";
+import { useContext, useEffect, useEffectEvent, useRef } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
@@ -47,6 +47,7 @@ function InputOTP({ className, containerClassName, ...props }: InputOTPProps) {
 
   return (
     <OTPInput
+      spellCheck={false}
       data-slot="input-otp"
       data-motion={cm.mode}
       containerClassName={cn("flex items-center gap-2 has-disabled:opacity-50", containerClassName)}
@@ -65,6 +66,23 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
   const inputOTPContext = useContext(OTPInputContext);
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {};
 
+  const controls = useAnimationControls();
+  const previousCharacter = useRef(char);
+  const animateCharacter = useEffectEvent(() => {
+    controls.stop();
+    const changed = previousCharacter.current !== char;
+    previousCharacter.current = char;
+    if (changed && char && cm.mode !== "none") {
+      controls.set(cm.reduced ? { opacity: 0, scale: 1 } : { opacity: 0, scale: scale.in });
+      void controls.start({ opacity: 1, scale: 1 }, cm.transition("state.morph"));
+    } else controls.set({ opacity: 1, scale: 1 });
+  });
+  // biome-ignore lint/correctness/useExhaustiveDependencies: character/mode/clock changes trigger the effect; the event reads their latest values without re-running for unrelated slot focus updates.
+  useEffect(() => {
+    animateCharacter();
+    return () => controls.stop();
+  }, [char, cm.mode, cm.timeScale, controls]);
+
   return (
     <div
       data-slot="input-otp-slot"
@@ -78,12 +96,7 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       )}
       {...props}
     >
-      <motion.span
-        key={char || "empty"}
-        initial={cm.reduced ? { opacity: 0 } : { opacity: 0, scale: scale.in }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={cm.transition("state.morph")}
-      >
+      <motion.span data-motion={cm.mode} initial={false} animate={controls} transition={cm.transition("state.morph")}>
         {char}
       </motion.span>
       {hasFakeCaret && (

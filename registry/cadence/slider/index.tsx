@@ -1,9 +1,10 @@
 "use client";
 
 import { Slider as SliderPrimitive } from "@base-ui/react/slider";
-import { type HTMLMotionProps, motion } from "motion/react";
+import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
 import { cn } from "../lib/cn";
+import { ControlDiv } from "../lib/control-animation";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
@@ -42,7 +43,12 @@ function Slider<Value extends number | readonly number[] = number | readonly num
   ...props
 }: SliderProps<Value>) {
   const cm = useCadenceMotion();
-  const _values = Array.isArray(value) ? value : Array.isArray(defaultValue) ? defaultValue : [min, max];
+  const resolvedValue = value ?? defaultValue;
+  const _values = Array.isArray(resolvedValue)
+    ? resolvedValue
+    : typeof resolvedValue === "number"
+      ? [resolvedValue]
+      : [min, max];
   const thumbCount = _values.length;
   // Orientation is a JS branch, not a `data-horizontal:` / `data-vertical:` variant:
   // Base UI writes `data-orientation`, and the shorthand utility compiles to
@@ -65,7 +71,9 @@ function Slider<Value extends number | readonly number[] = number | readonly num
       max={max}
       thumbAlignment="edge"
       orientation={orientation}
-      className={cn(vertical ? "h-full" : "w-full", className)}
+      className={(state) =>
+        cn(vertical ? "h-full" : "w-full", typeof className === "function" ? className(state) : className)
+      }
       {...props}
     >
       <SliderPrimitive.Control
@@ -89,6 +97,7 @@ function Slider<Value extends number | readonly number[] = number | readonly num
         {Array.from({ length: _values.length }, (_, index) => (
           <SliderPrimitive.Thumb
             data-slot="slider-thumb"
+            data-motion={cm.mode}
             // biome-ignore lint/suspicious/noArrayIndexKey: a thumb has no identity beyond its position in the value array — Base UI's own `index` prop is the same number.
             key={index}
             index={index}
@@ -98,15 +107,14 @@ function Slider<Value extends number | readonly number[] = number | readonly num
               const { className: thumbClassName, ...rest } = thumbProps as React.HTMLProps<HTMLDivElement>;
 
               return (
-                <motion.div
+                <ControlDiv
                   {...(rest as HTMLMotionProps<"div">)}
                   className={cn(
                     "block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 outline-none transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4",
                     "data-disabled:pointer-events-none data-disabled:opacity-50",
                     thumbClassName,
                   )}
-                  initial={false}
-                  animate={{ scale: state.dragging && !cm.reduced ? scale.press : 1 }}
+                  target={{ scale: state.dragging && !cm.reduced ? scale.press : 1 }}
                   transition={cm.transition("feedback.press")}
                 />
               );

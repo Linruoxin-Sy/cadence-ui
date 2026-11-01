@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Slider } from "@/registry/cadence/slider";
-import { PreviewStack } from "./shell";
+import { ControlMotionScope } from "./control-motion-scope";
 
 /**
  * One thumb, two thumbs, no thumb: the single value, the range, and the disabled
@@ -15,9 +15,9 @@ export function SliderPreview() {
   const [price, setPrice] = useState([120, 480]);
 
   return (
-    <PreviewStack>
-      <div className="flex items-start gap-10">
-        <div className="grid w-72 gap-6">
+    <ControlMotionScope staticControl={<Slider aria-label="Static slider" value={50} className="max-w-20" />}>
+      <div className="flex w-full flex-col items-start gap-6 sm:flex-row sm:gap-10">
+        <div className="grid w-full max-w-72 gap-6">
           <div className="grid gap-2">
             <div className="flex items-center justify-between text-sm">
               <span>Volume</span>
@@ -57,6 +57,6 @@ export function SliderPreview() {
           <span className="text-xs text-muted-foreground">Vertical</span>
         </div>
       </div>
-    </PreviewStack>
+    </ControlMotionScope>
   );
 }

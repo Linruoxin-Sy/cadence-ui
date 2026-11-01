@@ -1,10 +1,11 @@
 "use client";
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
-import { type HTMLMotionProps, motion } from "motion/react";
+import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
 import { createContext, useContext } from "react";
 import { cn } from "../lib/cn";
+import { ControlDiv } from "../lib/control-animation";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
@@ -58,7 +59,9 @@ function Progress({ className, children, value, min = 0, max = 100, ...props }: 
         value={value}
         min={min}
         max={max}
-        className={cn("flex w-full flex-wrap gap-3", className)}
+        className={(state) =>
+          cn("flex w-full flex-wrap gap-3", typeof className === "function" ? className(state) : className)
+        }
         {...props}
       >
         {children}
@@ -74,7 +77,12 @@ function ProgressTrack({ className, ...props }: ProgressTrackProps) {
   return (
     <ProgressPrimitive.Track
       data-slot="progress-track"
-      className={cn("relative flex h-2 w-full items-center overflow-x-hidden rounded-full bg-primary/20", className)}
+      className={(state) =>
+        cn(
+          "relative flex h-2 w-full items-center overflow-x-hidden rounded-full bg-primary/20",
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       {...props}
     />
   );
@@ -92,17 +100,16 @@ function ProgressIndicator({ className, style, ...props }: ProgressIndicatorProp
       data-motion={cm.mode}
       // Base UI writes `width: <value>%`; the fill is driven by a transform instead,
       // so the element keeps the full track width and only its scale changes.
-      style={{ width: "100%", ...style }}
+      style={(state) => ({ width: "100%", ...(typeof style === "function" ? style(state) : style) })}
       className={className}
       render={(indicatorProps) => {
         const { className: indicatorClassName, ...rest } = indicatorProps as React.HTMLProps<HTMLDivElement>;
 
         return (
-          <motion.div
+          <ControlDiv
             {...(rest as HTMLMotionProps<"div">)}
             className={cn("h-full w-full origin-left bg-primary", pulse, indicatorClassName)}
-            initial={false}
-            animate={{ scaleX: fraction ?? 1 }}
+            target={{ scaleX: fraction ?? 1 }}
             transition={cm.reduced ? { duration: 0 } : cm.transition("data.transition")}
           />
         );
@@ -114,7 +121,11 @@ function ProgressIndicator({ className, style, ...props }: ProgressIndicatorProp
 
 function ProgressLabel({ className, ...props }: ProgressLabelProps) {
   return (
-    <ProgressPrimitive.Label data-slot="progress-label" className={cn("text-sm font-medium", className)} {...props} />
+    <ProgressPrimitive.Label
+      data-slot="progress-label"
+      className={(state) => cn("text-sm font-medium", typeof className === "function" ? className(state) : className)}
+      {...props}
+    />
   );
 }
 
@@ -122,7 +133,9 @@ function ProgressValue({ className, ...props }: ProgressValueProps) {
   return (
     <ProgressPrimitive.Value
       data-slot="progress-value"
-      className={cn("text-sm text-muted-foreground tabular-nums", className)}
+      className={(state) =>
+        cn("text-sm text-muted-foreground tabular-nums", typeof className === "function" ? className(state) : className)
+      }
       {...props}
     />
   );

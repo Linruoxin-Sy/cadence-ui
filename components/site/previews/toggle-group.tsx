@@ -2,7 +2,8 @@
 
 import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
-import { PreviewRow, PreviewStack } from "./shell";
+import { ControlMotionScope } from "./control-motion-scope";
+import { PreviewRow } from "./shell";
 
 /**
  * The group's characteristics are `variant`, `spacing`, `multiple`, `size`, and
@@ -12,7 +13,13 @@ import { PreviewRow, PreviewStack } from "./shell";
  */
 export function ToggleGroupPreview() {
   return (
-    <PreviewStack>
+    <ControlMotionScope
+      staticControl={
+        <ToggleGroup value={["static"]} aria-label="Static group">
+          <ToggleGroupItem value="static">On</ToggleGroupItem>
+        </ToggleGroup>
+      }
+    >
       <PreviewRow>
         <ToggleGroup variant="outline" defaultValue={["left"]} aria-label="Text alignment">
           <ToggleGroupItem value="left" aria-label="Align left">
@@ -78,6 +85,6 @@ export function ToggleGroupPreview() {
           </ToggleGroupItem>
         </ToggleGroup>
       </PreviewRow>
-    </PreviewStack>
+    </ControlMotionScope>
   );
 }

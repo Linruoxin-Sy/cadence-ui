@@ -334,6 +334,12 @@ useLayoutEffect(() => {
 
 #### `state.morph` (control indicators: tick, dot, thumb)
 
+State indicators must cancel an active animation when the effective mode or clock changes,
+even when the target value is unchanged. Updating a Motion `transition` prop alone does not
+retarget that animation. The control adapter stops its controls and applies the current target
+immediately for zero-duration transitions; other updates restart the declared recipe on the
+same node. Initial state is rendered at its target without an entrance.
+
 Form controls own the state, so the animation is driven by the primitive's render
 state rather than by props the consumer passes. Base UI hands the current state to
 a `render` callback; Motion takes over the element from there. The indicator must

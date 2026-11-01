@@ -2,7 +2,8 @@
 
 import { BoldIcon, ItalicIcon } from "lucide-react";
 import { Toggle } from "@/registry/cadence/toggle";
-import { PreviewRow, PreviewStack } from "./shell";
+import { ControlMotionScope } from "./control-motion-scope";
+import { PreviewRow } from "./shell";
 
 /**
  * Both variants in both states, side by side: the pressed fill is the whole point of
@@ -11,7 +12,13 @@ import { PreviewRow, PreviewStack } from "./shell";
  */
 export function TogglePreview() {
   return (
-    <PreviewStack>
+    <ControlMotionScope
+      staticControl={
+        <Toggle aria-label="Static toggle" defaultPressed>
+          On
+        </Toggle>
+      }
+    >
       <PreviewRow>
         <Toggle aria-label="Bold">
           <BoldIcon />
@@ -39,6 +46,6 @@ export function TogglePreview() {
           Disabled
         </Toggle>
       </PreviewRow>
-    </PreviewStack>
+    </ControlMotionScope>
   );
 }

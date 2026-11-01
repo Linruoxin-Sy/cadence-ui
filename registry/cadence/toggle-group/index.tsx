@@ -51,6 +51,7 @@ function ToggleGroup({
   className,
   variant,
   size,
+  style,
   spacing = 0,
   orientation = "horizontal",
   children,
@@ -62,18 +63,23 @@ function ToggleGroup({
       data-variant={variant}
       data-size={size}
       data-spacing={spacing}
+      orientation={orientation}
       data-orientation={orientation}
-      style={{ "--gap": spacing } as CSSProperties}
-      className={cn(
-        // Orientation is a JS branch, not a `data-vertical:` variant: Base UI writes
-        // `data-orientation="vertical"`, while the shorthand utility compiles to
-        // `[data-vertical]`, which nothing ever sets — a vertical group would lay out
-        // as a row.
-        "group/toggle-group flex w-fit gap-[calc(var(--spacing)*var(--gap))] rounded-md",
-        orientation === "vertical" ? "flex-col items-stretch" : "items-center",
-        "data-[spacing=0]:data-[variant=outline]:shadow-xs",
-        className,
-      )}
+      style={(state) =>
+        ({ "--gap": spacing, ...(typeof style === "function" ? style(state) : style) }) as CSSProperties
+      }
+      className={(state) =>
+        cn(
+          // Orientation is a JS branch, not a `data-vertical:` variant: Base UI writes
+          // `data-orientation="vertical"`, while the shorthand utility compiles to
+          // `[data-vertical]`, which nothing ever sets — a vertical group would lay out
+          // as a row.
+          "group/toggle-group flex w-fit gap-[calc(var(--spacing)*var(--gap))] rounded-md",
+          orientation === "vertical" ? "flex-col items-stretch" : "items-center",
+          "data-[spacing=0]:data-[variant=outline]:shadow-xs",
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       {...props}
     >
       <ToggleGroupContext.Provider value={{ variant, size, spacing, orientation }}>
@@ -100,16 +106,18 @@ function ToggleGroupItem({ className, children, variant, size, ...props }: Toggl
       data-size={resolvedSize}
       data-spacing={context.spacing}
       data-motion={cm.mode}
-      className={cn(
-        toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
-        "w-auto min-w-0 shrink-0 px-3 focus:z-10 focus-visible:z-10",
-        joined && "rounded-none shadow-none",
-        joined && (vertical ? "first:rounded-t-md last:rounded-b-md" : "first:rounded-l-md last:rounded-r-md"),
-        joined &&
-          resolvedVariant === "outline" &&
-          (vertical ? "border-t-0 first:border-t" : "border-l-0 first:border-l"),
-        className,
-      )}
+      className={(state) =>
+        cn(
+          toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
+          "w-auto min-w-0 shrink-0 px-3 focus:z-10 focus-visible:z-10",
+          joined && "rounded-none shadow-none",
+          joined && (vertical ? "first:rounded-t-md last:rounded-b-md" : "first:rounded-l-md last:rounded-r-md"),
+          joined &&
+            resolvedVariant === "outline" &&
+            (vertical ? "border-t-0 first:border-t" : "border-l-0 first:border-l"),
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       render={
         <motion.button
           whileTap={cm.reduced ? undefined : { scale: scale.press }}

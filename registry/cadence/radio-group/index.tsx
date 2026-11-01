@@ -2,9 +2,10 @@
 
 import { Radio as RadioPrimitive } from "@base-ui/react/radio";
 import { RadioGroup as RadioGroupPrimitive } from "@base-ui/react/radio-group";
-import { type HTMLMotionProps, motion } from "motion/react";
+import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
 import { cn } from "../lib/cn";
+import { ControlSpan } from "../lib/control-animation";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
@@ -29,7 +30,13 @@ export interface RadioGroupItemProps extends RadioPrimitive.Root.Props<unknown> 
  * (P11).
  */
 function RadioGroup({ className, ...props }: RadioGroupProps) {
-  return <RadioGroupPrimitive data-slot="radio-group" className={cn("grid gap-3", className)} {...props} />;
+  return (
+    <RadioGroupPrimitive
+      data-slot="radio-group"
+      className={(state) => cn("grid gap-3", typeof className === "function" ? className(state) : className)}
+      {...props}
+    />
+  );
 }
 
 function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
@@ -39,32 +46,34 @@ function RadioGroupItem({ className, ...props }: RadioGroupItemProps) {
     <RadioPrimitive.Root
       data-slot="radio-group-item"
       data-motion={cm.mode}
-      className={cn(
-        "group/radio-group-item peer relative aspect-square size-4 shrink-0 rounded-full border border-input text-primary shadow-xs outline-none transition-[color,box-shadow]",
-        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        "data-disabled:cursor-not-allowed data-disabled:opacity-50",
-        "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
-        "dark:bg-input/30",
-        className,
-      )}
+      className={(state) =>
+        cn(
+          "group/radio-group-item peer relative aspect-square size-4 shrink-0 rounded-full border border-input text-primary shadow-xs outline-none transition-[color,box-shadow]",
+          "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+          "data-disabled:cursor-not-allowed data-disabled:opacity-50",
+          "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+          "dark:bg-input/30",
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       {...props}
     >
       <RadioPrimitive.Indicator
         data-slot="radio-group-indicator"
+        data-motion={cm.mode}
         keepMounted
         render={(indicatorProps, state) => {
           const { className: indicatorClassName, ...rest } = indicatorProps as React.HTMLProps<HTMLSpanElement>;
 
           return (
-            <motion.span
+            <ControlSpan
               {...(rest as HTMLMotionProps<"span">)}
               className={cn("flex size-full items-center justify-center", indicatorClassName)}
-              initial={false}
-              animate={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
+              target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
               transition={cm.transition("state.morph")}
             >
               <span className="size-2 rounded-full bg-primary" />
-            </motion.span>
+            </ControlSpan>
           );
         }}
       />

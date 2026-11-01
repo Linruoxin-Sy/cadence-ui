@@ -2,7 +2,8 @@
 
 import { Label } from "@/registry/cadence/label";
 import { Switch } from "@/registry/cadence/switch";
-import { PreviewRow, PreviewStack } from "./shell";
+import { ControlMotionScope } from "./control-motion-scope";
+import { PreviewRow } from "./shell";
 
 /**
  * The switch's range is small on purpose: on and off, the `sm` size, and disabled.
@@ -11,7 +12,7 @@ import { PreviewRow, PreviewStack } from "./shell";
  */
 export function SwitchPreview() {
   return (
-    <PreviewStack>
+    <ControlMotionScope staticControl={<Switch aria-label="Static switch" defaultChecked />}>
       <PreviewRow className="gap-6">
         <div className="flex items-center gap-2">
           <Switch id="switch-off" />
@@ -37,6 +38,6 @@ export function SwitchPreview() {
           <Label htmlFor="switch-disabled">Disabled</Label>
         </div>
       </PreviewRow>
-    </PreviewStack>
+    </ControlMotionScope>
   );
 }

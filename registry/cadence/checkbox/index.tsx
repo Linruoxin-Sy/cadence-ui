@@ -1,10 +1,11 @@
 "use client";
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
-import { Check } from "lucide-react";
-import { type HTMLMotionProps, motion } from "motion/react";
+import { Check, Minus } from "lucide-react";
+import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
 import { cn } from "../lib/cn";
+import { ControlSpan } from "../lib/control-animation";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
@@ -36,33 +37,39 @@ function Checkbox({ className, ...props }: CheckboxProps) {
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       data-motion={cm.mode}
-      className={cn(
-        "peer relative size-4 shrink-0 rounded-[4px] border border-input shadow-xs outline-none transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2",
-        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        "data-disabled:cursor-not-allowed data-disabled:opacity-50",
-        "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
-        "data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground",
-        "dark:bg-input/30",
-        className,
-      )}
+      className={(state) =>
+        cn(
+          "peer relative size-4 shrink-0 rounded-[4px] border border-input shadow-xs outline-none transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2",
+          "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+          "data-disabled:cursor-not-allowed data-disabled:opacity-50",
+          "aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40",
+          "data-checked:border-primary data-checked:bg-primary data-checked:text-primary-foreground",
+          "dark:bg-input/30",
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       {...props}
     >
       <CheckboxPrimitive.Indicator
         data-slot="checkbox-indicator"
+        data-motion={cm.mode}
         keepMounted
         render={(indicatorProps, state) => {
           const { className: indicatorClassName, ...rest } = indicatorProps as React.HTMLProps<HTMLSpanElement>;
 
           return (
-            <motion.span
+            <ControlSpan
               {...(rest as HTMLMotionProps<"span">)}
               className={cn("grid size-full place-content-center text-current", indicatorClassName)}
-              initial={false}
-              animate={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
+              target={
+                state.checked || state.indeterminate
+                  ? { opacity: 1, scale: 1 }
+                  : { opacity: 0, scale: cm.reduced ? 1 : scale.in }
+              }
               transition={cm.transition("state.morph")}
             >
-              <Check className="size-3.5" />
-            </motion.span>
+              {state.indeterminate ? <Minus className="size-3.5" /> : <Check className="size-3.5" />}
+            </ControlSpan>
           );
         }}
       />

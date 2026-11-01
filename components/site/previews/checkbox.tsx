@@ -2,7 +2,7 @@
 
 import { Checkbox } from "@/registry/cadence/checkbox";
 import { Label } from "@/registry/cadence/label";
-import { PreviewStack } from "./shell";
+import { ControlMotionScope } from "./control-motion-scope";
 
 /**
  * Five states, because a checkbox has no variant: unchecked, checked, indeterminate,
@@ -11,7 +11,7 @@ import { PreviewStack } from "./shell";
  */
 export function CheckboxPreview() {
   return (
-    <PreviewStack>
+    <ControlMotionScope staticControl={<Checkbox aria-label="Static checkbox" defaultChecked />}>
       <div className="grid w-full max-w-md grid-cols-2 gap-x-8 gap-y-4">
         <div className="flex items-center gap-2">
           <Checkbox id="checkbox-unchecked" />
@@ -38,6 +38,6 @@ export function CheckboxPreview() {
           <Label htmlFor="checkbox-invalid">Invalid</Label>
         </div>
       </div>
-    </PreviewStack>
+    </ControlMotionScope>
   );
 }

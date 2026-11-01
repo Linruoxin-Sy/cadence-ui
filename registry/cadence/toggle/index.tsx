@@ -53,7 +53,9 @@ function Toggle({ className, variant = "default", size = "default", ...props }: 
     <TogglePrimitive
       data-slot="toggle"
       data-motion={cm.mode}
-      className={cn(toggleVariants({ variant, size }), className)}
+      className={(state) =>
+        cn(toggleVariants({ variant, size }), typeof className === "function" ? className(state) : className)
+      }
       render={
         <motion.button
           whileTap={cm.reduced ? undefined : { scale: scale.press }}

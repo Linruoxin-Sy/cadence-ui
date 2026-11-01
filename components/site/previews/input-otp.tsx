@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/registry/cadence/input-otp";
 import { Label } from "@/registry/cadence/label";
-import { PreviewStack } from "./shell";
+import { ControlMotionScope } from "./control-motion-scope";
 
 /**
  * The six-box code with a separator between the groups, and the invalid variant.
@@ -15,7 +15,15 @@ export function InputOtpPreview() {
   const [invalid, setInvalid] = useState("0000");
 
   return (
-    <PreviewStack>
+    <ControlMotionScope
+      staticControl={
+        <InputOTP maxLength={1} value="1" aria-label="Static code">
+          <InputOTPGroup>
+            <InputOTPSlot index={0} />
+          </InputOTPGroup>
+        </InputOTP>
+      }
+    >
       <div className="grid gap-3">
         <Label htmlFor="otp">Verification code</Label>
         <InputOTP id="otp" maxLength={6} value={code} onChange={setCode} containerClassName="justify-center">
@@ -38,6 +46,7 @@ export function InputOtpPreview() {
         <InputOTP
           id="otp-invalid"
           maxLength={4}
+          aria-invalid="true"
           value={invalid}
           onChange={setInvalid}
           containerClassName="justify-center"
@@ -50,6 +59,6 @@ export function InputOtpPreview() {
           </InputOTPGroup>
         </InputOTP>
       </div>
-    </PreviewStack>
+    </ControlMotionScope>
   );
 }

@@ -60,6 +60,11 @@
           "path": "registry/cadence/lib/provider.tsx",
           "type": "registry:lib",
           "target": "@components/cadence/lib/provider.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/control-animation.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/control-animation.tsx"
         }
       ]
     },

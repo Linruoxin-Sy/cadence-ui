@@ -1,9 +1,10 @@
 "use client";
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
-import { type HTMLMotionProps, motion } from "motion/react";
+import type { HTMLMotionProps } from "motion/react";
 import { type Ref, type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "../lib/cn";
+import { ControlSpan } from "../lib/control-animation";
 import { useCadenceMotion } from "../lib/provider";
 
 export interface SwitchProps extends SwitchPrimitive.Root.Props {
@@ -73,27 +74,30 @@ function Switch({ className, size = "default", ...props }: SwitchProps) {
       data-slot="switch"
       data-size={size}
       data-motion={cm.mode}
-      className={cn(
-        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs outline-none transition-[color,box-shadow] after:absolute after:-inset-x-3 after:-inset-y-2",
-        "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-        "data-disabled:cursor-not-allowed data-disabled:opacity-50",
-        "data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=sm]:h-3.5 data-[size=sm]:w-6",
-        "data-checked:bg-primary data-unchecked:bg-input dark:data-unchecked:bg-input/80",
-        className,
-      )}
+      className={(state) =>
+        cn(
+          "peer group/switch relative inline-flex shrink-0 items-center rounded-full border border-transparent shadow-xs outline-none transition-[color,box-shadow] after:absolute after:-inset-x-3 after:-inset-y-2",
+          "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+          "data-disabled:cursor-not-allowed data-disabled:opacity-50",
+          "data-[size=default]:h-[1.15rem] data-[size=default]:w-8 data-[size=sm]:h-3.5 data-[size=sm]:w-6",
+          "data-checked:bg-primary data-unchecked:bg-input dark:data-unchecked:bg-input/80",
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       {...props}
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
+        data-motion={cm.mode}
         render={(thumbProps, state) => {
           const { className: thumbClassName, ref: forwardedRef, ...rest } = thumbProps as ThumbRenderProps;
 
           return (
-            <motion.span
+            <ControlSpan
               {...(rest as HTMLMotionProps<"span">)}
               ref={(node: HTMLSpanElement | null) => {
                 thumbRef.current = node;
-                if (typeof forwardedRef === "function") forwardedRef(node);
+                if (typeof forwardedRef === "function") return forwardedRef(node);
                 else if (forwardedRef) (forwardedRef as RefObject<HTMLSpanElement | null>).current = node;
               }}
               className={cn(
@@ -102,8 +106,7 @@ function Switch({ className, size = "default", ...props }: SwitchProps) {
                 "dark:data-checked:bg-primary-foreground dark:data-unchecked:bg-foreground",
                 thumbClassName,
               )}
-              initial={false}
-              animate={{ x: state.checked ? (travel ?? 0) : 0 }}
+              target={{ x: state.checked ? (travel ?? 0) : 0 }}
               // Until the measured distance has been painted, there is nothing to
               // animate *between*: jump into place, then spring on user input.
               transition={!settled || cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
