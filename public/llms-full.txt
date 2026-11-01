@@ -2893,11 +2893,13 @@ const [open, setOpen] = useState(false);
 
 ## Motion contract
 
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 
 The panel stays mounted while its exit transition runs; Base UI delays unmount until the
@@ -4410,19 +4412,22 @@ button a button:
 | `AlertDialogMedia` | `className` | Icon slot; changes the header layout. |
 | `AlertDialogTitle` | `className` | Required accessible name. |
 | `AlertDialogDescription` | `className` | Supporting text; wire it to the decision, not the product. |
-| `AlertDialogAction` | `variant`, `size`, `onClick`, `render` | Confirming button. Closes the dialog after `onClick` runs. |
+| `AlertDialogAction` | `variant`, `size`, `onClick`, `render` | Confirming Button. The caller owns closing via the root’s controlled `open` value. |
 | `AlertDialogCancel` | `variant` (`outline`), `size`, `onClick`, `render` | Dismissing button. Also closes the dialog. |
 
-Both buttons render Base UI's `Close`, so a confirmation ends the dialog instead of leaving it open —
-upstream's Base UI port binds neither button, which would make the default usage a no-op.
+`AlertDialogCancel` renders Base UI’s Close. `AlertDialogAction` matches the pinned upstream
+Button: clicking it invokes the caller’s handler and leaves the popup open. Use controlled
+`open` / `onOpenChange` to close when the caller decides the action is complete.
 
 ## Motion contract
+
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 
 The entrance is the dialog's, because this is the same popup: a fade under a 0.96-scale settle. The
@@ -4442,6 +4447,8 @@ The outside press is the one path that is deliberately missing: clicking the ove
 which is the difference between this component and `dialog`.
 
 ## Accessibility
+
+The destructive action uses foreground text on a tinted destructive background. This preserves the warning colour while meeting text contrast in both themes.
 
 - Base UI provides `role="alertdialog"`, `aria-modal`, `aria-labelledby`, `aria-describedby`, focus
   trapping, focus return, scroll lock, and the Escape path.
@@ -4478,8 +4485,7 @@ buttons split the width instead of stacking, so the two answers stay side by sid
 - Always render `AlertDialogTitle`; it is the accessible name. Use `AlertDialogDescription` for the
   consequence of the action, in one sentence.
 - Name the confirming button after its effect ("Delete project", "Leave without saving"), never "OK".
-- Both buttons close the dialog, so never hide the dialog manually in `onClick`; pass the work to the
-  caller instead.
+- Cancel closes automatically. The confirming Action stays open; use the root’s controlled `open` value when the caller decides to close.
 - Use `AlertDialogMedia` for an icon, not for an illustration: the slot is a 4rem square that changes
   the header layout.
 
@@ -4601,6 +4607,8 @@ a dialog:
 trigger and upstream's Base UI surface has no anchor part.
 
 ## Motion contract
+
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -4753,6 +4761,8 @@ A disabled button does not emit pointer events, so wrap it and put the hint on t
 
 ## Motion contract
 
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
@@ -4860,13 +4870,15 @@ reads better below the link. `alignOffset` defaults to `4` for the same reason.
 </HoverCardContent>
 ```
 
-## A delay for the whole app
+## Trigger delay
 
-`HoverCard` takes the same delay props as the Base UI root. A longer `delay` keeps a page of links from
-flashing cards at every pointer movement.
+`HoverCardTrigger` owns `delay` and `closeDelay`, defaulting to 600ms and 300ms in the installed Base UI. The root owns open state.
 
 ```tsx
-<HoverCard delay={400}>…</HoverCard>
+<HoverCard>
+  <HoverCardTrigger delay={400} closeDelay={300} render={<a href="/profile" />}>Profile</HoverCardTrigger>
+  <HoverCardContent>Profile preview</HoverCardContent>
+</HoverCard>
 ```
 
 ## When to use
@@ -4888,8 +4900,8 @@ flashing cards at every pointer movement.
 
 | Part | Props | Notes |
 | --- | --- | --- |
-| `HoverCard` | `open`, `defaultOpen`, `onOpenChange`, `delay`, `closeDelay` | Base UI root; `delay` is per card. |
-| `HoverCardTrigger` | native props, `render` | The link or button the card describes. |
+| `HoverCard` | `open`, `defaultOpen`, `onOpenChange` | Base UI root; owns open state. |
+| `HoverCardTrigger` | native anchor props, `render`, `delay`, `closeDelay` | The link or button the card describes. |
 | `HoverCardContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, and popup. `side` defaults to `bottom`, `sideOffset` to `4`, `alignOffset` to `4`. |
 
 The portal renders `data-slot="hover-card-portal"`; the popup is `data-slot="hover-card-content"`. There
@@ -4897,6 +4909,8 @@ is no `HoverCardArrow`: upstream's Base UI surface has none, and the card is a s
 pointer.
 
 ## Motion contract
+
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -5070,6 +5084,8 @@ const [open, setOpen] = useState(false);
 
 ## Motion contract
 
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.base` / `duration.fast` | yes |
@@ -5238,10 +5254,12 @@ stays interactive.
 
 ## Motion contract
 
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.slow` / `duration.fast` | yes |
-| drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | `gesture.drag` | yes (it is the gesture) |
+| drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | Base UI gesture (no authored recipe) | yes (it is the gesture) |
 | exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade` · `duration.slow` / `duration.fast` | yes |
 | reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the sheet is in place on the first frame | – | – |

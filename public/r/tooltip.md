@@ -95,6 +95,8 @@ A disabled button does not emit pointer events, so wrap it and put the hint on t
 
 ## Motion contract
 
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
