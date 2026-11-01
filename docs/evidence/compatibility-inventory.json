@@ -41,10 +41,9 @@
       "imports": [
         "@base-ui/react/button",
         "class-variance-authority",
-        "motion/react",
-        "react",
         "../lib/cn",
         "../lib/motion",
+        "../lib/press-button",
         "../lib/provider"
       ],
       "priorSuite": "tests/components/button.test.tsx",
@@ -6085,9 +6084,9 @@
       "imports": [
         "@base-ui/react/toggle",
         "class-variance-authority",
-        "motion/react",
         "../lib/cn",
         "../lib/motion",
+        "../lib/press-button",
         "../lib/provider"
       ],
       "priorSuite": "tests/components/toggle.test.tsx",
@@ -6190,10 +6189,10 @@
         "@base-ui/react/toggle",
         "@base-ui/react/toggle-group",
         "class-variance-authority",
-        "motion/react",
         "react",
         "../lib/cn",
         "../lib/motion",
+        "../lib/press-button",
         "../lib/provider",
         "../toggle"
       ],

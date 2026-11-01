@@ -1686,6 +1686,19 @@ and remaining Button paths. All other items still require per-part source/contex
 review and risk-based runtime proof; B1–B9 historical evidence is not whole-library
 certification. Same-target live-mode and CSS popup audits remain separate and open.
 
+The next bounded group reproduces and repairs the same four native-event collisions
+in Toggle/ToggleGroupItem. These three controls share a shipped private press-button
+adapter. Dynamic ref identity tests additionally exposed Motion 13.5.1 retaining
+its external ref without cleanup/reassignment; the adapter now commits Base/caller
+refs independently on the same DOM node. Actual native capture/cancel, render
+ownership, controlled pressed/group values, keyboard context and disabled-during-
+press activation are covered. `compatibility-ledger.json` is a separate hand-maintained
+58-item/466-export ledger: only ten exports classified so far; pending rows stay open.
+See `compatibility-toggle.md` for proof, remaining Motion-root risks and limitations.
+Production Button12/12 and Toggle/Group16/16 regressions pass; initial JS remains
+FAIL at291749 gzip bytes/23 scripts against120000. All global compatibility/live-
+motion/Combobox audits remain OPEN.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |

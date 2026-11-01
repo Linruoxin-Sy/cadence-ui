@@ -185,12 +185,19 @@ it.each(["default", "element", "function"] as const)(
           type="submit"
           onClick={(event) => {
             order.push("caller");
+            expect(event.defaultPrevented).toBe(kind !== "default");
             event.preventDefault();
             event.stopPropagation();
           }}
           render={
             kind === "default" ? undefined : kind === "element" ? (
-              <button type="submit" onClick={() => order.push("element")} />
+              <button
+                type="submit"
+                onClick={(event) => {
+                  order.push("element");
+                  event.preventDefault();
+                }}
+              />
             ) : (
               (props) => (
                 <button
@@ -198,6 +205,7 @@ it.each(["default", "element", "function"] as const)(
                   type="submit"
                   onClick={(event) => {
                     order.push("function");
+                    event.preventDefault();
                     props.onClick?.(event);
                   }}
                 />
