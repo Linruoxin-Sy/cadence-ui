@@ -1,0 +1,184 @@
+# Attachment
+
+> Displays file media, metadata, caller-owned upload state, and actions.
+
+- Registry item: https://cadence.dev/r/attachment.json
+- Install: `npx shadcn@latest add @cadence/attachment`
+- Type: registry:ui
+- Since: 0.5.0
+- Motion recipes: data.transition, feedback.press
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/attachment
+```
+
+## Usage
+
+```tsx
+import {
+  Attachment, AttachmentMedia, AttachmentContent, AttachmentTitle,
+  AttachmentDescription, AttachmentActions, AttachmentAction,
+} from "@/components/cadence/attachment";
+
+export function FileCard({ onRemove }: { onRemove: () => void }) {
+  return (
+    <Attachment>
+      <AttachmentMedia aria-hidden="true">PDF</AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle>report.pdf</AttachmentTitle>
+        <AttachmentDescription>PDF · 2.4 MB</AttachmentDescription>
+      </AttachmentContent>
+      <AttachmentActions>
+        <AttachmentAction aria-label="Remove report.pdf" onClick={onRemove}>×</AttachmentAction>
+      </AttachmentActions>
+    </Attachment>
+  );
+}
+```
+
+## Upload state
+
+Pass `state="idle"`, `"uploading"`, `"processing"`, `"error"` or `"done"` from your
+application. Uploading and processing pulse the title; the description carries
+readable status even with animation disabled. An error needs text explaining the
+failure. Set `aria-busy` on the appropriate region and use a separate polite status
+for meaningful milestones, rather than announcing every progress update.
+
+```tsx
+<Attachment state="uploading" aria-busy="true">
+  <AttachmentContent>
+    <AttachmentTitle>report.pdf</AttachmentTitle>
+    <AttachmentDescription>Uploading · 64%</AttachmentDescription>
+  </AttachmentContent>
+</Attachment>
+```
+
+## Images and sizes
+
+Use `AttachmentMedia variant="image"` with a native image and meaningful alt text.
+`orientation="vertical"` stacks it above the metadata; horizontal is the default.
+Sizes are `default`, `sm` and `xs`. The media is dimmed while work is in progress.
+Supply image URLs yourself; the component never creates or revokes object URLs.
+
+## Trigger and independent actions
+
+`AttachmentTrigger` fills the card behind `AttachmentActions`. Give the empty
+trigger an accessible name. It defaults to a non-submitting button; `render`
+accepts an element or render function, preserving Base UI event/ref merging.
+Actions default to ghost Button with icon-xs size and accept Button's callbacks,
+native props and `render`. Keep actions in AttachmentActions so their stacking
+order leaves them independently reachable.
+
+```tsx
+<AttachmentTrigger render={<a href="/files/report.pdf" download aria-label="Download report.pdf" />} />
+```
+
+## Scrollable groups
+
+Wrap cards in `AttachmentGroup` for a snapping horizontal row. Native scrolling
+is immediate and never smoothed by this component. For presentational cards give
+the group `tabIndex={0}`, `role="group"` and an accessible name; interactive cards
+can be reached with Tab. Allow the group to shrink within its parent.
+
+```tsx
+<AttachmentGroup tabIndex={0} role="group" aria-label="Selected files">
+  <Attachment orientation="vertical" size="sm">
+    <AttachmentMedia variant="image"><img src={previewUrl} alt="Selected workspace" /></AttachmentMedia>
+    <AttachmentContent><AttachmentTitle>workspace.png</AttachmentTitle></AttachmentContent>
+  </Attachment>
+</AttachmentGroup>
+```
+
+## When to use
+
+File previews in composers, upload lists, or message attachments with caller-owned
+metadata and optional open/remove/retry actions.
+
+## When not to use
+
+Use Input for native file selection, Progress for a standalone percentage, and
+Item for generic content that does not represent a file. Attachment does not
+implement an uploader, drop zone, file parser or streaming message runtime.
+
+## API
+
+| Part | Props and defaults |
+| --- | --- |
+| `Attachment` | Native div props; state `done`, size `default`, orientation `horizontal` |
+| `AttachmentMedia` | Native div props; variant `icon` or `image`, default `icon` |
+| `AttachmentContent` | Native div props; wraps metadata |
+| `AttachmentTitle` | Native span props; filename, busy opacity loop |
+| `AttachmentDescription` | Native span props; metadata/status text |
+| `AttachmentActions` | Native div props; independent action layer |
+| `AttachmentAction` | All Button props; size `icon-xs`, variant falls back to `ghost` |
+| `AttachmentTrigger` | Base UI useRender button props; type `button` without render; render element/function |
+| `AttachmentGroup` | Native div props; horizontal scroll and snap |
+
+Every part preserves its upstream `attachment-*` data-slot (root: `attachment`).
+Native refs, styles and events pass through; classes merge last. Root also exposes
+`data-state`, `data-size`, `data-orientation`; media exposes `data-variant`.
+No File or request state is stored internally. There is no default upload action.
+
+## Motion contract
+
+| Cause | Recipe | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| Uploading/processing title | `data.transition` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
+| Default action pressed | `feedback.press` | Button token spring/press scale | No scale | Instant, no scale |
+
+Continuous timing comes from the project's `--animate-pulse` theme token. This
+replaces upstream's travelling shimmer with opacity to stay in the motion budget.
+Root/title and default actions expose `data-motion`; live none cancels the loop
+without replacing nodes. State, removal, size, orientation and media updates are
+immediate. No entry, exit, layout or geometry recipe is implied. Custom render
+controls can own their own feedback as with Button.
+
+## Keyboard interactions
+
+Tab reaches triggers and actions separately. Enter/Space activate default buttons;
+a rendered link uses native link behaviour. Disabled actions retain Button's native
+semantics. A focusable group scrolls with arrow keys; Tab also reveals off-screen
+interactive cards. Removal focus policy belongs to the caller.
+
+## Accessibility
+
+Name every icon-only action and overlay trigger, retain meaningful image alt text,
+and describe failures in text. The trigger has a visible focus ring. Avoid nested
+interactive elements inside triggers. Provide a polite live region for upload
+milestones outside a busy region. Truncated filenames remain in the DOM; a title
+attribute or your own details view can expose their full visual text.
+
+## Validation and data ownership
+
+The application owns native file input `name`, `accept`, `multiple`, `required`,
+File objects, form submission, validation, upload progress, requests, cancel/retry,
+URLs and URL cleanup. Attachment forwards `aria-invalid`/`data-invalid` when given;
+`state="error"` only styles a supplied failure. It never decides which file is valid.
+The preview's file input reports the selected filename locally and makes no request.
+
+## Responsiveness and performance
+
+Cards cap at their parent's width; long names truncate. Groups scroll horizontally
+with no document overflow when their parent can shrink. Large lists should be
+paginated or virtualized by the application. The busy opacity loop uses CSS with
+no per-frame JavaScript or layout reads; none stops it on the next style update.
+No @shadcn/react dependency or streaming runtime is needed for this pinned API.
+
+## AI usage notes
+
+Compose these nine parts; keep upload state and file lifecycle in your application.
+Do not infer a network operation from the visual `state` value. Prefer stable file
+IDs as keys so a progress update preserves focus and the native input. There is no
+message streaming dependency and no reason to remount a composer when a file changes.
+
+## Related components
+
+[Button](/components/button) supplies actions, [Input](/components/input) supplies
+native file selection, [Progress](/components/progress) displays known progress,
+and [Code Block](/components/code-block) displays textual file contents.
+
+---
+
+Full index: https://cadence.dev/llms.txt
