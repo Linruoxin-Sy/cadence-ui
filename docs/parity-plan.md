@@ -1607,6 +1607,17 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
   [request/manifest evidence](evidence/site-js-budget.json). Resolving the framework/dependency
   constraint remains required before closing this item; the rest of §8 stays open.
 
+Runtime follow-up (2026-11-02): isolated Pages counter **113,032 bytes**, Pages + unchanged ButtonPreview
+**168,699**; direct React SSR + unchanged preview **126,429**; local synchronous `m`/`domAnimation`
+Button fork **112,220**, but adding the existing CodeBlock docs fence reaches **135,334** before chrome.
+Actual browser scripts, hashes and loaded-module attribution are in `evidence/site-runtime-boundaries.json`;
+runnable scripts and limitations are in `site-js-budget.md`. Next App Router actually loads its vendored
+React **19.3.0-canary-278794d7-20261002**, distinct from installed 19.3.1; loaded scripts show no second
+renderer marker. No product/config/dependency changes adopted, no universal framework floor claimed.
+ADR-016 keeps architecture research explicit. First narrow the real code-fence dependency boundary,
+then prove a complete SSR route and all controls before migration. **Budget remains OPEN**; all other
+§8 and cross-library work stays open.
+
 **Documentation site** — see
 [documentation-site-and-distribution.md](documentation-site-and-distribution.md) §2.2 for the promise these
 items close: preview variant switching and code view, install-command copy (the component exists at

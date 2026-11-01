@@ -1,0 +1,918 @@
+{
+  "date": "2026-11-02",
+  "scope": "Diagnostic subsets only; production remains 290171 bytes; budget OPEN",
+  "variants": {
+    "js-pages-counter": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "preview": false,
+      "next": "16.4.3",
+      "react": "19.3.1",
+      "buildId": "9cTZTpJYNifO_vc5HNmht",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 113032,
+        "files": [
+          {
+            "path": "/_next/static/9cTZTpJYNifO_vc5HNmht/_buildManifest.js",
+            "bytes": 725,
+            "gzip": 382,
+            "sha256": "292a1b96ecd5fe285d1c79ba415ab7edf32064e593e6a70f425cc415ad5726ea",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/9cTZTpJYNifO_vc5HNmht/_clientMiddlewareManifest.js",
+            "bytes": 96,
+            "gzip": 66,
+            "sha256": "5483e3295dc35dfe29ea932efc85341c916f10ff78ff5b0e965e003710893a4a",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/9cTZTpJYNifO_vc5HNmht/_ssgManifest.js",
+            "bytes": 76,
+            "gzip": 60,
+            "sha256": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/26wm7kk-baika.js",
+            "bytes": 336674,
+            "gzip": 102588,
+            "sha256": "5b36668955691e680bc9c5009479b836bc2ce1c4d8a782291c83379d516e88d3",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/2a-bx-ot_v95v.js",
+            "bytes": 782,
+            "gzip": 522,
+            "sha256": "ed7edee77637eda0372f4c02a949cae7d65b051a117236dd160305f36f20a422",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/3o88wq9k1k42h.js",
+            "bytes": 14612,
+            "gzip": 5474,
+            "sha256": "d87bddf38fdec0e45dd16bad7f75fe73e8b040c848a925ec884449258b2cbd26",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+            "bytes": 10030,
+            "gzip": 3940,
+            "sha256": "8bbb58cbfd4633c1d828c6bc37bc32abc768a149c01b1dfc4f5131fd81274551",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/_next/static/chunks/3o88wq9k1k42h.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/chunks/26wm7kk-baika.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/chunks/turbopack-3-ry682tkyiqk.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/chunks/2a-bx-ot_v95v.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/9cTZTpJYNifO_vc5HNmht/_buildManifest.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/9cTZTpJYNifO_vc5HNmht/_ssgManifest.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/9cTZTpJYNifO_vc5HNmht/_clientMiddlewareManifest.js",
+            "type": "parser"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      }
+    },
+    "js-pages-preview": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "preview": true,
+      "next": "16.4.3",
+      "react": "19.3.1",
+      "buildId": "8-V8UUTUxSqzDw5swG1Gx",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 168699,
+        "files": [
+          {
+            "path": "/_next/static/8-V8UUTUxSqzDw5swG1Gx/_buildManifest.js",
+            "bytes": 731,
+            "gzip": 383,
+            "sha256": "ec06f9e9fb5515b7f2e2dcbccf582457e21faf020f944a992f0dea09ba912451",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/8-V8UUTUxSqzDw5swG1Gx/_clientMiddlewareManifest.js",
+            "bytes": 96,
+            "gzip": 66,
+            "sha256": "5483e3295dc35dfe29ea932efc85341c916f10ff78ff5b0e965e003710893a4a",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/8-V8UUTUxSqzDw5swG1Gx/_ssgManifest.js",
+            "bytes": 76,
+            "gzip": 60,
+            "sha256": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/012tho4v4blue.js",
+            "bytes": 337042,
+            "gzip": 102768,
+            "sha256": "315c2609394a870b75c41161dfcc69fb9a14eef740bd5b1e7bbf1cff67b68bb9",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/0a71pjjdsqr-a.js",
+            "bytes": 14650,
+            "gzip": 5495,
+            "sha256": "c605bfa5648f6816aae3d4e3376d314cb909d5d63c790c96eb8ce58964d4abd7",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/1r8pjse3q-lz-.js",
+            "bytes": 169086,
+            "gzip": 55537,
+            "sha256": "67712b3741e8fae0e2df081f5658ed75b4055c297945d5c6d565a7dc84b55dcf",
+            "status": 200
+          },
+          {
+            "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+            "bytes": 11255,
+            "gzip": 4390,
+            "sha256": "b5f9b5199b99ab6c141f4540f0b7d0fe803c4ecf6956849ecb6e59d3d439272e",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/_next/static/chunks/0a71pjjdsqr-a.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/chunks/012tho4v4blue.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/chunks/1r8pjse3q-lz-.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/8-V8UUTUxSqzDw5swG1Gx/_buildManifest.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/8-V8UUTUxSqzDw5swG1Gx/_ssgManifest.js",
+            "type": "parser"
+          },
+          {
+            "path": "/_next/static/8-V8UUTUxSqzDw5swG1Gx/_clientMiddlewareManifest.js",
+            "type": "parser"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      }
+    },
+    "react-ssr-budget": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "lean": false,
+      "fence": false,
+      "esbuildVersion": "0.28.2",
+      "react": "19.3.1",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 126429,
+        "files": [
+          {
+            "path": "/client.js",
+            "bytes": 397268,
+            "gzip": 126429,
+            "sha256": "e074493360d05277ce2a2ed1bd706aad7bb415bf058ee5077bfc0fe21aa2113a",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/client.js",
+            "type": "parser"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      },
+      "modes": [
+        {
+          "mode": "full",
+          "heldTransform": "matrix(0.97, 0, 0, 0.97, 0, 0)"
+        },
+        {
+          "mode": "reduced",
+          "heldTransform": "none"
+        },
+        {
+          "mode": "none",
+          "heldTransform": "none"
+        }
+      ],
+      "ssrButtons": 16,
+      "modules": [
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js",
+          "bytesInOutput": 205201
+        },
+        {
+          "module": "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytesInOutput": 27561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/node/create-projection-node.mjs",
+          "bytesInOutput": 23144
+        },
+        {
+          "module": "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js",
+          "bytesInOutput": 7969
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/drag/VisualElementDragControls.mjs",
+          "bytesInOutput": 7452
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/VisualElement.mjs",
+          "bytesInOutput": 6582
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/JSAnimation.mjs",
+          "bytesInOutput": 4376
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/pan/PanSession.mjs",
+          "bytesInOutput": 3938
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/generators/spring.mjs",
+          "bytesInOutput": 3802
+        },
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js",
+          "bytesInOutput": 3665
+        },
+        {
+          "module": "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js",
+          "bytesInOutput": 3662
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/index.mjs",
+          "bytesInOutput": 2951
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/utils/animation-state.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/NativeAnimation.mjs",
+          "bytesInOutput": 2241
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs",
+          "bytesInOutput": 2187
+        },
+        {
+          "module": "registry/cadence/lib/motion.ts",
+          "bytesInOutput": 2120
+        },
+        {
+          "module": "registry/cadence/button/index.tsx",
+          "bytesInOutput": 1943
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs",
+          "bytesInOutput": 1819
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/KeyframesResolver.mjs",
+          "bytesInOutput": 1773
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/use-button/useButton.mjs",
+          "bytesInOutput": 1647
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs",
+          "bytesInOutput": 1596
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/features/layout/MeasureLayout.mjs",
+          "bytesInOutput": 1571
+        },
+        {
+          "module": "components/site/previews/button.tsx",
+          "bytesInOutput": 1561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/types/complex/index.mjs",
+          "bytesInOutput": 1342
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/shared/stack.mjs",
+          "bytesInOutput": 1298
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/merge-props/mergeProps.mjs",
+          "bytesInOutput": 1292
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/utils/mix/complex.mjs",
+          "bytesInOutput": 1186
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/dom/parse-transform.mjs",
+          "bytesInOutput": 1149
+        },
+        {
+          "module": "node_modules/.pnpm/lucide-react@1.62.0_@types+react@19.3.0_react@19.3.1/node_modules/lucide-react/dist/esm/shared/src/build/buildLucideIconNode.mjs",
+          "bytesInOutput": 1141
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/useRenderElement.mjs",
+          "bytesInOutput": 1109
+        }
+      ],
+      "loadedModuleCount": 324
+    },
+    "react-ssr-budget-lean": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "lean": true,
+      "fence": false,
+      "esbuildVersion": "0.28.2",
+      "react": "19.3.1",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 112220,
+        "files": [
+          {
+            "path": "/client.js",
+            "bytes": 348894,
+            "gzip": 112220,
+            "sha256": "217ea93c6a7ab0141f704832a27bf2441aaea1f7200b48d04e9f6b1460ab47ef",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/client.js",
+            "type": "parser"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      },
+      "modes": [
+        {
+          "mode": "full",
+          "heldTransform": "matrix(0.97, 0, 0, 0.97, 0, 0)"
+        },
+        {
+          "mode": "reduced",
+          "heldTransform": "none"
+        },
+        {
+          "mode": "none",
+          "heldTransform": "none"
+        }
+      ],
+      "ssrButtons": 16,
+      "modules": [
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js",
+          "bytesInOutput": 205145
+        },
+        {
+          "module": "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytesInOutput": 27561
+        },
+        {
+          "module": "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js",
+          "bytesInOutput": 7969
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/VisualElement.mjs",
+          "bytesInOutput": 6584
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/JSAnimation.mjs",
+          "bytesInOutput": 4376
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/generators/spring.mjs",
+          "bytesInOutput": 3802
+        },
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js",
+          "bytesInOutput": 3665
+        },
+        {
+          "module": "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js",
+          "bytesInOutput": 3662
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/index.mjs",
+          "bytesInOutput": 2952
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/utils/animation-state.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/NativeAnimation.mjs",
+          "bytesInOutput": 2241
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs",
+          "bytesInOutput": 2187
+        },
+        {
+          "module": "registry/cadence/lib/motion.ts",
+          "bytesInOutput": 2120
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean/button.tsx",
+          "bytesInOutput": 1972
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs",
+          "bytesInOutput": 1819
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/KeyframesResolver.mjs",
+          "bytesInOutput": 1775
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/use-button/useButton.mjs",
+          "bytesInOutput": 1647
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs",
+          "bytesInOutput": 1596
+        },
+        {
+          "module": "components/site/previews/button.tsx",
+          "bytesInOutput": 1561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/types/complex/index.mjs",
+          "bytesInOutput": 1342
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/merge-props/mergeProps.mjs",
+          "bytesInOutput": 1292
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/utils/mix/complex.mjs",
+          "bytesInOutput": 1187
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/dom/parse-transform.mjs",
+          "bytesInOutput": 1149
+        },
+        {
+          "module": "node_modules/.pnpm/lucide-react@1.62.0_@types+react@19.3.0_react@19.3.1/node_modules/lucide-react/dist/esm/shared/src/build/buildLucideIconNode.mjs",
+          "bytesInOutput": 1141
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/useRenderElement.mjs",
+          "bytesInOutput": 1109
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/interfaces/visual-element-target.mjs",
+          "bytesInOutput": 1022
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/index.mjs",
+          "bytesInOutput": 991
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/features/viewport/index.mjs",
+          "bytesInOutput": 970
+        },
+        {
+          "module": "registry/cadence/lib/provider.tsx",
+          "bytesInOutput": 948
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+utils@0.5.0_@types_6b1c5c30254f04ccfc8f12b63d1f3b80/node_modules/@base-ui/utils/useMergedRefs.mjs",
+          "bytesInOutput": 932
+        }
+      ],
+      "loadedModuleCount": 283
+    },
+    "react-ssr-budget-lean-fence": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "lean": true,
+      "fence": true,
+      "esbuildVersion": "0.28.2",
+      "react": "19.3.1",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 135334,
+        "files": [
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "bytes": 797,
+            "gzip": 499,
+            "sha256": "0963f93e9fea80ad6ccdd34158529cf8f0702abae7b998ed2fdcaa31badd9524",
+            "status": 200
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "bytes": 638,
+            "gzip": 388,
+            "sha256": "9dbaaa1b267ebd74b96fc498735a78d76804f1e96e532871291c937cf83694e7",
+            "status": 200
+          },
+          {
+            "path": "/client.js",
+            "bytes": 421253,
+            "gzip": 134447,
+            "sha256": "81fc925bc76ad4718aab66e4cea5c0b2e83d88d7dd16d0162ed64f76dc0e41e1",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/client.js",
+            "type": "parser"
+          },
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "type": "script"
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "type": "script"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      },
+      "modes": [
+        {
+          "mode": "full",
+          "heldTransform": "matrix(0.97, 0, 0, 0.97, 0, 0)"
+        },
+        {
+          "mode": "reduced",
+          "heldTransform": "none"
+        },
+        {
+          "mode": "none",
+          "heldTransform": "none"
+        }
+      ],
+      "ssrButtons": 16,
+      "modules": [
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js",
+          "bytesInOutput": 205372
+        },
+        {
+          "module": "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytesInOutput": 27542
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/node/create-projection-node.mjs",
+          "bytesInOutput": 23144
+        },
+        {
+          "module": "registry/cadence/code-block/index.tsx",
+          "bytesInOutput": 9537
+        },
+        {
+          "module": "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js",
+          "bytesInOutput": 7969
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/drag/VisualElementDragControls.mjs",
+          "bytesInOutput": 7452
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/VisualElement.mjs",
+          "bytesInOutput": 6582
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/JSAnimation.mjs",
+          "bytesInOutput": 4376
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/pan/PanSession.mjs",
+          "bytesInOutput": 3938
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/generators/spring.mjs",
+          "bytesInOutput": 3778
+        },
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js",
+          "bytesInOutput": 3665
+        },
+        {
+          "module": "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js",
+          "bytesInOutput": 3662
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/index.mjs",
+          "bytesInOutput": 2951
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/utils/animation-state.mjs",
+          "bytesInOutput": 2496
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/NativeAnimation.mjs",
+          "bytesInOutput": 2241
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs",
+          "bytesInOutput": 2187
+        },
+        {
+          "module": "registry/cadence/lib/motion.ts",
+          "bytesInOutput": 2120
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence/button.tsx",
+          "bytesInOutput": 1972
+        },
+        {
+          "module": "registry/cadence/button/index.tsx",
+          "bytesInOutput": 1943
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs",
+          "bytesInOutput": 1819
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/KeyframesResolver.mjs",
+          "bytesInOutput": 1773
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/use-button/useButton.mjs",
+          "bytesInOutput": 1637
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs",
+          "bytesInOutput": 1596
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/features/layout/MeasureLayout.mjs",
+          "bytesInOutput": 1571
+        },
+        {
+          "module": "components/site/previews/button.tsx",
+          "bytesInOutput": 1561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/types/complex/index.mjs",
+          "bytesInOutput": 1342
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/shared/stack.mjs",
+          "bytesInOutput": 1298
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/merge-props/mergeProps.mjs",
+          "bytesInOutput": 1292
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/utils/mix/complex.mjs",
+          "bytesInOutput": 1186
+        }
+      ],
+      "loadedModuleCount": 359
+    }
+  },
+  "productionInspection": {
+    "buildId": "FY8YdajUVwGZd7ucvlpS5",
+    "note": "Retained production artifact; every entity verified against committed baseline SHA; not a new production rebuild",
+    "loaded": [
+      {
+        "path": "/_next/static/chunks/0ywrj6uoh6hzn.js",
+        "sha256": "c3b2229c0111ffa1ec23943e526b8e151911f4189d675df6fce212124e986c25",
+        "gzip": 1979,
+        "root": true,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/2mduzyscstvmx.js",
+        "sha256": "3f152127a667b792818f6eb892eacf7182c6b4c4238733c24417c0d857d04d82",
+        "gzip": 8756,
+        "root": true,
+        "reactVersions": ["19.3.0-canary-278794d7-20261002"],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "sha256": "b5f9b5199b99ab6c141f4540f0b7d0fe803c4ecf6956849ecb6e59d3d439272e",
+        "gzip": 4390,
+        "root": true,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/3pu8aclvs_iw5.js",
+        "sha256": "56a9c5be6e0f12bafbfecfe9c9d657f18e81825415cfef4e93b809a17eddc4f4",
+        "gzip": 5576,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/0opyqbxhjlzbs.js",
+        "sha256": "0f47b58c70ff6737d04934e2f6408b0dabc7b903e352e88f3b2287eabd51fa2e",
+        "gzip": 8554,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/144bwxzfaca4z.js",
+        "sha256": "c374e673563631e194aae0c03efceabc709b0c0c0740c95821d434ffcffc97e1",
+        "gzip": 8072,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/3agwwx34v3msc.js",
+        "sha256": "03523f8cb155405667527111ded7790f185c2e96038ad388f650055c1eeaa121",
+        "gzip": 45595,
+        "root": true,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": true
+      },
+      {
+        "path": "/_next/static/chunks/0sx41h7dma96r.js",
+        "sha256": "3ebd8295c5f0de30807fb392595b162f8bdb6335a925c381e0ebfa1cddb87769",
+        "gzip": 8835,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/2ku0af_rt28tp.js",
+        "sha256": "e63b21af91c2992e6449426249ba1949dfe6ca44d41d1e4a5627dca88b6a0132",
+        "gzip": 6836,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/0070c15yth5p6.js",
+        "sha256": "af05187be4f15d2bb49e0d6911a9366aaa5886b40fb63bb940640375e6ba3e46",
+        "gzip": 7767,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/3amhs1u_q98wk.js",
+        "sha256": "1422cdcc34d169dbcead6ec34a436534a7a2b4f5777ee0e9136396758768bd9e",
+        "gzip": 14034,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/1pw3gdfr6x-ge.js",
+        "sha256": "0cdbfbb6f1c48b24db74a8ac1d8254e3491d9db7e89a3bb3ad2d050ad3325a48",
+        "gzip": 8842,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/2h42467wjznxd.js",
+        "sha256": "355c9715eb1bf00592b474cc123faff48a97749a353d1dc4cf9f4f7619335d0d",
+        "gzip": 72047,
+        "root": true,
+        "reactVersions": ["19.3.0-canary-278794d7-20261002"],
+        "rendererMarkers": 1,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/2m7l8rqycuinx.js",
+        "sha256": "8647eda7ea375097537302504a5f9c76c34c61775a214c5adac4901bcb52b744",
+        "gzip": 9240,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/1_0en6_2wlpmx.js",
+        "sha256": "ea564431c91f357754a586c007a4f71e2939593b7ad6a9e20657a10ecc21ce07",
+        "gzip": 11028,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/3ma0k8h6xilbg.js",
+        "sha256": "62e75977c8c24f666b59b1cc72288c55752c7cd624c40a21c1b8ba27b0492890",
+        "gzip": 44870,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/2qxdfbuzlg-k7.js",
+        "sha256": "2ab478b2e5ef152cb7dd47e4f8d58f23b896fbc3e65c1fdd945ff6869b2b9639",
+        "gzip": 5831,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/01mvo0_doq5xw.js",
+        "sha256": "180dee0d90210fae0c85b808ad5150412a0a3a365bf02446808e15f8a502916f",
+        "gzip": 6531,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/1a-g05opns22j.js",
+        "sha256": "9a3fea58d6ca93761bd2e9146d43612bba8cb37b89772d4372dea733274b46b6",
+        "gzip": 1346,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/2kq8gru5o07e6.js",
+        "sha256": "b1153f447c864c1ae2f6c679f9510aa6911ca21a16b08a56f956026b2f1baeb5",
+        "gzip": 8587,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/3cajmh9d5p2k1.js",
+        "sha256": "6febea1db2256a003fb7869f6a498e4539c6ec724fca86371e0cc54684d4104a",
+        "gzip": 214,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      },
+      {
+        "path": "/_next/static/chunks/31b_u2-p_wmi4.js",
+        "sha256": "c0ed4ec728af49d5237f74bde83b9e51d23106d13a8a26a502de0d6c917357ed",
+        "gzip": 1241,
+        "root": false,
+        "reactVersions": [],
+        "rendererMarkers": 0,
+        "containsNavigateReducer": false
+      }
+    ]
+  }
+}

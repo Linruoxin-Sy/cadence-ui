@@ -409,3 +409,34 @@ measured animation only on T3+) and a reduced-motion branch for motion that does
 
 **Rejected**: `geometry.resize` on `card` (spring lag on a passive surface, plus a T3-only mechanism on a
 T0 atom); a `rAF` lerp with a hand-written constant (a motion token in disguise, outside the catalogue).
+
+---
+
+## ADR-016 · Measure alternative hydration boundaries before changing the docs framework
+
+**Status**: investigation; no production architecture change accepted. ADR-009 remains in force.
+
+**Context**: the production initial-JS gate fails at 290,171 bytes against 120,000. The measured App
+Router bootstrap alone exceeds the budget. That is evidence about this build, not all configurations.
+Isolated Pages Router and direct React SSR prototypes now provide additional runnable comparisons;
+the [audit](site-js-budget.md#runtime-boundary-experiments-2026-11-02-follow-up) and
+`docs/evidence/site-runtime-boundaries.json` record exact scopes and results.
+
+**Research decision**: preserve the budget, React 19 semantics, registry API and the production app.
+Pages Router plus unchanged ButtonPreview is 168,699 bytes. Direct React SSR with a synchronous,
+locally feature-scoped Button fork is 112,220 bytes, but adding the existing documentation CodeBlock
+fence raises it to 135,334 before chrome. Neither candidate is an accepted solution. No component
+source, dependency, Next config, install path or distribution route changes as part of this research.
+
+**Next decision gate**: prototype a server-rendered document shell with route-specific hydration;
+first narrow the actual code-fence dependency graph without replacing its registry renderer or losing
+features. A complete Button route must retain all site controls, source/install copy, navigation,
+search, SSR and preview behavior. Measure every automatic script and prove interactions, modes,
+focus and accessibility before revisiting ADR-009 or adopting component engine changes. No global
+`domAnimation` substitution: other components require layout/drag. Do not replace React with a
+compatibility layer or defer initial functionality to satisfy an observation window.
+
+**Consequences**: experiments remain separate from product code; passing a reduced fixture never
+closes the route gate. Framework migration entails routing/MDX/metadata/asset/immutable-registry
+hosting work and needs a full-route proof, not just removal of App Router bytes. Other open site and
+cross-library audits can proceed independently; this investigation does not close them.

@@ -112,3 +112,70 @@ not a universal mathematical minimum for every future version/configuration.
 A solution therefore requires further framework/runtime architecture investigation in addition to
 route dependency work. Raising the limit, removing SSR/hydration/controls or deferring first-screen
 functionality is not an accepted solution. This audit deliberately leaves the budget **open**.
+
+## Runtime boundary experiments (2026-11-02 follow-up)
+
+Product source remains unchanged at 290,171 bytes. These runnable diagnostic subsets are not
+replacement pages or budget closure. Run sequentially from the repository root:
+
+```powershell
+node scripts/experiment-pages-budget.mjs
+node scripts/experiment-pages-budget.mjs --preview
+node scripts/experiment-react-ssr-budget.mjs
+node scripts/experiment-react-ssr-budget.mjs --dom-animation
+node scripts/experiment-react-ssr-budget.mjs --dom-animation --fence
+```
+
+Scripts generate fixtures only under `.cache`, build production bundles, bind an OS-selected unused
+port, use fresh Edge contexts and the unchanged `measureInitialScripts` collector, then close the
+browser/server. Reports retain every loaded script, hash, gzip size, CDP initiator and error. React
+SSR reports attribute minified **uncompressed** bytes to modules in loaded outputs using esbuild's
+metafile; these contributions are not additive gzip sizes. esbuild 0.28.2 is resolved from the installed
+Vitest/Vite toolchain, with no dependency added. Compact evidence: `evidence/site-runtime-boundaries.json`.
+
+| Diagnostic subset                                             | Gzip bytes | Scripts | Interpretation                                       |
+| ------------------------------------------------------------- | ---------: | ------: | ---------------------------------------------------- |
+| Next Pages Router, hydrated counter                           |    113,032 |       7 | Different router fits without components             |
+| Next Pages Router, unchanged ButtonPreview                    |    168,699 |       7 | Router replacement alone fails before site chrome    |
+| React SSR, unchanged ButtonPreview + counted Button           |    126,429 |       1 | Removing Next alone still fails this subset          |
+| React SSR, local Button `m` + synchronous `domAnimation` fork |    112,220 |       1 | 7,780 bytes left before site chrome/docs             |
+| Same fork + existing CodeBlock fence and copy control         |    135,334 |       3 | Documentation dependency graph defeats that headroom |
+
+Pages counter proves Enter activation after hydration; Pages preview proves all 16 original buttons
+and a live none selection. React SSR uses the real preview and a separate counted Button to prove
+hydration/Enter activation. It verifies 16 preview buttons with JavaScript disabled, no recoverable
+hydration errors, mode attributes and held press transforms: full 0.97, reduced/none identity.
+The first press probe returned identity after keyboard input; the final probe explicitly establishes
+pointer modality with a click before sampling. This is limited interaction evidence, not a full
+accessibility or same-target cancellation audit. Fixtures omit the production stylesheet/site chrome.
+
+`--dom-animation` writes an explicit local Button fork: `motion/react-m` plus a DOM-free
+`LazyMotion features={domAnimation}` boundary around its existing primitive. Tokens, props and reduced
+branch remain. Features load synchronously; nothing moves past the observation window. Registry source
+is untouched and the fork is not adopted. The fence uses real CodeBlock root/header/title/actions/
+copy/content exports and server-rendered text, matching pre-highlighted docs' no-client-tokenization
+path. ESM splitting is enabled; all three automatic scripts are counted. An initial unsplit diagnostic
+bundled deferred grammars into a 315,017-byte entity; it was corrected, not reported as a runtime floor.
+The fixture renders the copy control but does not assert clipboard or highlight behavior.
+
+Inspecting the retained final production root chunks corrects a version distinction: installed React/
+React DOM are 19.3.1, while App Router's loaded React/renderer strings are
+**19.3.0-canary-278794d7-20261002**. The 72,047-byte chunk contains the renderer; the 45,595-byte chunk
+contains router/reducer code. These entity sizes can include other modules, not isolated package costs.
+Across all 22 loaded scripts there is one renderer marker and no stable 19.3.1 renderer marker;
+this inspection provides no evidence of duplicate loaded React DOM renderers. Next internal React
+aliases were not replaced. These are concrete builds, not universal configuration lower bounds.
+
+Primary references: Next's [package bundling guide](https://nextjs.org/docs/app/guides/package-bundling),
+React's [SSR and hydration](https://react.dev/reference/react-dom/server/renderToString), and Motion's
+[bundle-size guide](https://motion.dev/docs/react-reduce-bundle-size). Motion distinguishes
+`domAnimation` (animation/exit/tap/hover/focus) from `domMax` (also layout/drag); substituting globally
+would break existing layout/drag contracts.
+
+Next candidate: a server-rendered document shell with route-specific hydrated islands and explicit
+feature selection for actual docs controls, including CodeBlock. First isolate a narrower code-fence
+dependency boundary while retaining the registry renderer and its real features. Then build a full
+`/components/button` prototype with all existing header/sidebar/package-manager/code-copy/preview
+functions, links and SSR; prove cold navigation, clipboard/search, modes and accessibility, and count
+all automatic scripts. The 135,334-byte fence subset is already over budget, so current evidence does
+not justify migration. ADR-016 records research only; the budget remains open.
