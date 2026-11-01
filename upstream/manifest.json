@@ -2329,6 +2329,40 @@
           "className": null
         }
       }
+    },
+    "bubble": {
+      "path": "apps/v4/registry/bases/base/ui/bubble.tsx",
+      "exports": [
+        "Bubble",
+        "BubbleContent",
+        "BubbleGroup",
+        "BubbleReactions"
+      ],
+      "slots": [
+        "bubble",
+        "bubble-content",
+        "bubble-group",
+        "bubble-reactions"
+      ],
+      "props": {
+        "BubbleGroup": {
+          "className": null
+        },
+        "Bubble": {
+          "variant": "\"default\"",
+          "align": "\"start\"",
+          "className": null
+        },
+        "BubbleContent": {
+          "className": null,
+          "render": null
+        },
+        "BubbleReactions": {
+          "side": "\"bottom\"",
+          "align": "\"end\"",
+          "className": null
+        }
+      }
     }
   }
 }

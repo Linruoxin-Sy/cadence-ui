@@ -211,6 +211,15 @@ transform duration. The same panel and its children survive desktop toggles and 
 Mobile delegates enter/exit to Sheet; button, tooltip and skeleton children retain their own recipes.
 No new geometry engine or measured resize recipe is introduced.
 
+### 3.0.1 Bubble surface entry
+
+Bubble uses the one-shot `data.transition` recipe for opacity-only entry through
+CSS `@starting-style`. It resolves duration locally via `cm.transition()` so nested
+providers restore their clock. Full/reduced both fade; none removes starting opacity
+and sets zero duration, including live cancellation. Text chunks, variants, alignment,
+reactions and resize remain immediate on stable nodes. Static reaction offsets are
+positioning, not motion. Bubble has no streaming runtime or measured geometry.
+
 ### 3.1 Code for the key recipes
 
 #### `popup.anchored` (anchored panels, CSS-only)

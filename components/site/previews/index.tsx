@@ -69,4 +69,5 @@ export const previews: Record<string, ComponentType> = {
   sidebar: dynamic(() => import("./sidebar").then((mod) => ({ default: mod.SidebarPreview }))),
   "date-picker": dynamic(() => import("./date-picker").then((mod) => ({ default: mod.DatePickerPreview }))),
   attachment: dynamic(() => import("./attachment").then((mod) => ({ default: mod.AttachmentPreview }))),
+  bubble: dynamic(() => import("./bubble").then((mod) => ({ default: mod.BubblePreview }))),
 };

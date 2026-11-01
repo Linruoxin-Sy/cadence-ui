@@ -1954,6 +1954,35 @@
           "guide": "apps/v4/content/docs/components/base/attachment.mdx"
         }
       }
+    },
+    {
+      "name": "bubble",
+      "type": "registry:ui",
+      "title": "Bubble",
+      "description": "Displays conversational content with variants, grouping, reactions, and polymorphic surfaces.",
+      "categories": ["ai"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/bubble/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/bubble/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T5",
+        "batch": "B9",
+        "motion": ["data.transition"],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B8 implementations shipped (2026-11-01); B6, B7 and B8 batch gates complete.
-> Historical B1–B5 visual gates remain open. B9 Attachment shipped; Bubble and the B9 joint gate remain open; §8 remains open.**
+> Status: **B0–B9 implementations shipped (2026-11-01); B6–B9 batch gates complete.
+> Historical B1–B5 visual gates and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -30,12 +30,17 @@ reduced-motion branch.
 
 | Bucket                        | Count  | Notes                                                               |
 | ----------------------------- | ------ | ------------------------------------------------------------------- |
-| `registry:ui` components      | 55     | Batch B1–B7, B9                                                     |
+| `registry:ui` components      | 56     | Batch B1–B7, B9                                                     |
 | `registry:block` compositions | 2      | Data Table, Date Picker (docs treat them as guides, not primitives) |
-| **Total in scope**            | **57** | Ships by `0.5.0`                                                    |
-| Backlog: AI components        | 26     | Not scheduled; prerequisites in §7                                  |
+| **Total in scope**            | **58** | Ships by `0.5.0`                                                    |
+| Backlog: AI components        | 25     | Not scheduled; prerequisites in §7                                  |
 | Backlog: `direction`          | 1      | Explicitly deferred                                                 |
 | Explicitly not shipping       | 3      | `form`, `native-select`, `sonner`                                   |
+
+The inventory is 58 documented components (56 UI + 2 blocks). The former 57-item
+headline omitted `code-block` when it moved out of the AI backlog into B9 (§7.5).
+B9 therefore counts all three shipped items; the historical effort estimate stays
+102 person-days rather than inventing a new estimate for work already delivered.
 
 `form` and `native-select` are excluded because the library does not own validation or form state
 (§4). `sonner` is excluded because notifications ship through `toast`.
@@ -126,7 +131,7 @@ the two pilot components.
 - The probe confirmed why dependencies must be namespaced: a bare `button` resolves against the
   default shadcn registry. `registry:check` now rejects un-namespaced dependencies.
 
-## 6. Architecture for 57 components
+## 6. Architecture for 58 components
 
 ### 6.1 Layout
 
@@ -257,19 +262,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                 |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ---------------------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done                |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open              |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete               |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done                |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done                |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | 1/2 shipped; gate open |
-|       | **Total**                  | **57** |            | **102**     |         |                        |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done   |
+| B9    | AI first                   | 3      | B1         | 3.5         | 0.5.0   | ✅ done   |
+|       | **Total**                  | **58** |            | **102**     |         |           |
 
 ### 7.0 Status discipline
 
@@ -293,8 +298,8 @@ green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**,
 §7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
 here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus and
 `combobox` and `command` that followed. `toast` completes the implementation in §7.8; the earlier
-components’ visual gate remains open. **B9 is open**: `code-block` landed ahead of the
-batch (see §7.5), `attachment` is shipped (§7.24), and `bubble` remains.
+components’ visual gate remains open. **B9 is complete** (§7.26): `code-block` landed ahead of the
+batch (§7.5), followed by `attachment` (§7.24) and `bubble` (§7.25).
 
 ### B1 — atoms (11)
 
@@ -334,7 +339,7 @@ Batch gate complete (§7.20); B8 blocks and their joint gate are complete (§7.2
 
 ### B9 — AI first (2 + 1 early)
 
-`attachment` ✅ shipped (§7.24); `bubble` next. `marker` and `message` moved to the backlog. `code-block` shipped ahead of the
+`attachment` ✅ shipped (§7.24); `bubble` ✅ shipped (§7.25); joint gate closed (§7.26). `marker` and `message` moved to the backlog. `code-block` shipped ahead of the
 batch (§7.5): it is the one AI component whose upstream source is already pinned, so it needed no new
 prerequisite to clear.
 
@@ -1417,6 +1422,70 @@ public payloads are committed separately. Bubble, code-block joint regression an
 the B9 batch gate remain open, as do historical B1–B5 gates and all carried §8 work.
 B6/B7/B8 remain closed; no global popup/wrapper compatibility conclusion is implied.
 
+
+### 7.25 Bubble — ✅ shipped (2026-11-01)
+
+Pinned source: `apps/v4/registry/bases/base/ui/bubble.tsx`, guide
+`apps/v4/content/docs/components/base/bubble.mdx`, demo
+`apps/v4/examples/base/bubble-demo.tsx`, visual
+`apps/v4/registry/new-york-v4/ui/bubble.tsx`, all at
+`96da9cc7f1aa10580a3741664e2a77c721206c00`. CLI docs returned no links;
+real fixed resources and installed Base UI useRender/mergeProps types were read.
+The four-part API needs no new package and no @shadcn/react or streaming runtime.
+The remaining unscheduled AI prerequisites stay open.
+
+Preserves Bubble/Group/Content/Reactions exports and slots, seven variants, start/end,
+reaction top/bottom + start/end, all defaults, native props/styles/events/refs and
+Base UI render element/function merging with React 19 ref cleanup. Interactive content
+has native button/link keyboard semantics and visible focus. Destructive foreground
+text plus destructive border/background replaces the pinned red text: real axe caught
+insufficient contrast in both themes (dark 4.37:1); no API/default deviation.
+
+T5 one-shot `data.transition` uses CSS @starting-style opacity and the local
+cm.transition clock, including timeScale. Full/reduced fade only; none first frame
+is opaque with zero duration, and live none cancels on the same node. Nested full
+restores the clock inside outer none (preview 0.88s; OS/reduced 0.528s). No streaming,
+layout, entry translation, exit delay, timer or forced node remount. Text chunks,
+variant/alignment/reaction updates and resize are immediate; stable message IDs in
+preview preserve nodes. The app owns messages, network, cancellation, retry and scroll.
+The existing recipe is clarified in animation-system §3.0.1; no runtime/token changes.
+
+Seven unit tests plus real Edge evidence cover defaults, slots, merged events/styles/
+classes/ref cleanup, render state, links/buttons, all modes and stable updates.
+The inventory is now 65 registry items, 58 components (56 UI + 2 blocks), 58 docs,
+59 previews, 58 pinned surfaces. The old 57 total omitted the early Code Block;
+counts in the scope/batch/schedule/risk tables are corrected without dropping work.
+
+### 7.26 B9 — ✅ complete (2026-11-01)
+
+Attachment + Bubble + the early Code Block jointly verified. Complete repository
+check passes 446 tests / 68 files, typecheck, Biome, registry freshness, parity,
+all gzip tier budgets and P11. Only the existing Item img lint warning remains.
+Isolated `.next-b9` production build passes with 69 static pages. No package,
+shared runtime, build/test configuration or upstream pin changes.
+
+Edge, port3133, workers2:
+`node node_modules/@playwright/test/cli.js test tests/e2e/bubble.spec.ts tests/e2e/attachment.spec.ts tests/e2e/motion-matrix.spec.ts --grep 'bubble|attachment|code-block' --workers=2`
+passes **31/31 (1.0m)**, `.cache/bubble-b9-e2e.log`. Bubble and Attachment run
+full/reduced/none × both OS preferences, native pointer/keyboard actions, live none,
+state/text updates and node continuity; Code Block retains its six-mode fold/tab and
+mid-flight pill layering regressions. Bubble tests observe actual first-frame opacity,
+duration and animation count, not only attributes. No console errors in new mode tests.
+
+All three pages: light/dark ×1280/390, complete-page axe WCAG2A/2AA/2.1AA zero violations,
+no disabled rules, no document overflow. Bubble covers seven variants and every reaction
+side/alignment. Full-page + preview images in `.cache/bubble-proof/` and
+`.cache/attachment-proof/` individually reviewed. Edge's >20k-pixel mobile Code Block
+full capture repeated pixels, so overlapping 5000px viewport tiles cover the complete
+page; all twelve tiles reviewed through the footer. Additional visual-only Code Block
+run **2/2 (10.0s)**, `.cache/bubble-code-tiles.log`, re-runs two existing visual tests,
+not two extra unique tests. Cached screenshots/logs are not committed.
+
+This closes B9 only. Historical B1–B5 visual gates and every unclosed §8 item remain
+open; B6/B7/B8 remain closed. Next is a bounded historical-gate audit, then §8, with
+full handoff and coordinator verification before another implementation session.
+
+
 ## 8. Backlog
 
 ### AI components (25, unscheduled)
@@ -1503,7 +1572,7 @@ the missing guide entries, and the sidebar's landmark / `aria-controls` / height
 | 0.2.0   | B0–B2 (20) | 21.5        | 4.5 weeks     | 2.5 weeks      |
 | 0.3.0   | B3–B4 (15) | 48          | 9.5 weeks     | 5.5 weeks      |
 | 0.4.0   | B5–B6 (13) | 77          | 15.5 weeks    | 8.5 weeks      |
-| 0.5.0   | B7–B9 (9)  | 102         | 20.5 weeks    | 12 weeks       |
+| 0.5.0   | B7–B9 (10) | 102         | 20.5 weeks    | 12 weeks       |
 
 With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
 
@@ -1511,10 +1580,10 @@ With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
 
 | Risk                                                 | Mitigation                                                     |
 | ---------------------------------------------------- | -------------------------------------------------------------- |
-| Upstream API drift across 57 hand-maintained files   | Pinned manifest, parity check, quarterly sync, `meta.upstream` |
+| Upstream API drift across 58 hand-maintained files   | Pinned manifest, parity check, quarterly sync, `meta.upstream` |
 | Size budget unrealistic for upstream source          | Tier budgets plus `meta.budget` exceptions with reasons        |
 | Every component animating                            | T0 is a real tier; "one cause" review rejects decoration       |
 | Data Table / Date Picker written as primitives       | They are `registry:block` with a guide template                |
 | AI upstream instability                              | Backlog until prerequisites are met                            |
-| Documentation load (57 pages, 12 section slots each) | `new-item.mjs` scaffolding plus the §2 template                |
+| Documentation load (58 pages, 12 section slots each) | `new-item.mjs` scaffolding plus the §2 template                |
 | Existing users of the eight components               | Tagged release, migration note (import path only)              |
