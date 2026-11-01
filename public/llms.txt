@@ -65,6 +65,7 @@ npx shadcn@latest add @cadence/button
 - [Menubar](https://cadence.dev/r/menubar.md): Application menus along the top of a window. (overlay)
 - [Code block](https://cadence.dev/r/code-block.md): Install commands, source snippets, and tool output. (ai)
 - [Command](https://cadence.dev/r/command.md): Search and run actions from a keyboard-driven command palette. (navigation)
+- [Toast](https://cadence.dev/r/toast.md): Transient notifications with accessible actions and dismissal. (feedback)
 
 ## Docs
 
