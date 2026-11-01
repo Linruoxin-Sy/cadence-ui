@@ -20,6 +20,7 @@ beforeAll(() => {
   cpSync("content", path.join(fixture, "content"), { recursive: true });
   cpSync("tests", path.join(fixture, "tests"), { recursive: true });
   cpSync("registry.json", path.join(fixture, "registry.json"));
+  cpSync("registry-snapshots.json", path.join(fixture, "registry-snapshots.json"));
   for (const dir of ["registry", "public", "docs", "app", "components"]) {
     symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
   }
