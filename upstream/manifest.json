@@ -1765,6 +1765,24 @@
           "children": null
         }
       }
+    },
+    "collapsible": {
+      "path": "apps/v4/registry/bases/base/ui/collapsible.tsx",
+      "exports": [
+        "Collapsible",
+        "CollapsibleContent",
+        "CollapsibleTrigger"
+      ],
+      "slots": [
+        "collapsible",
+        "collapsible-content",
+        "collapsible-trigger"
+      ],
+      "props": {
+        "Collapsible": {},
+        "CollapsibleTrigger": {},
+        "CollapsibleContent": {}
+      }
     }
   }
 }

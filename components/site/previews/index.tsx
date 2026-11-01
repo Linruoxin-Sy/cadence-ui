@@ -56,4 +56,5 @@ export const previews: Record<string, ComponentType> = {
   command: dynamic(() => import("./command").then((mod) => ({ default: mod.CommandPreview }))),
   toast: dynamic(() => import("./toast").then((mod) => ({ default: mod.ToastPreview }))),
   accordion: dynamic(() => import("./accordion").then((mod) => ({ default: mod.AccordionPreview }))),
+  collapsible: dynamic(() => import("./collapsible").then((mod) => ({ default: mod.CollapsiblePreview }))),
 };

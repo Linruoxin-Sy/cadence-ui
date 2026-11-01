@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
-> open for earlier components; B6 accordion shipped, collapsible is next.**
+> open for earlier components; B6 accordion and collapsible shipped, tabs is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -265,7 +265,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 1/6 shipped |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 2/6 shipped |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned     |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
@@ -320,7 +320,7 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B6 — disclosure and collections (6)
 
-`accordion` shipped (§7.9). Next: `collapsible`, then `tabs`, `table`, `carousel`, `scroll-area`.
+`accordion` and `collapsible` shipped (§7.9–7.10). Next: `tabs`, then `table`, `carousel`, `scroll-area`.
 
 ### B7 — heavy data and navigation (5)
 
@@ -921,6 +921,33 @@ the batch row now says `gate open` because the earlier components still lack vis
 - **Remaining:** B6 is 1/6 shipped; `collapsible` is next, followed by tabs, table, carousel, scroll-area.
   Historical B1–B5 visual gates remain open as already recorded. B7–B9 and §8 carried work remain
   scheduled; this is not overall parity completion.
+
+### 7.10 B6 collapsible shipped (2026-11-01)
+
+- **Scope:** all three pinned exports and three slots, plus a structural content-inner slot.
+  45 components, 51 registry items, 45 docs, 46 previews. Only collapsible's surface is added to
+  the fixed manifest; upstream pin remains `96da9cc7f1aa`. No new dependency or shared runtime change.
+  Both upstream layers are unstyled; the preview composes Button and caller-owned boolean state.
+- **Motion conformance:** declared, implemented and documented `geometry.resize` CSS form from §3.1.
+  Natural inner height is measured after commit and through ResizeObserver, clamped at zero; full
+  transitions height with `duration.slow` / `ease.out`. Both reversal directions retain current
+  position, without claiming spring velocity. Reduced and none remove height transitions and have
+  no transform. Every animated panel reads the reduced branch and emits `data-motion`.
+- **API:** Root and Trigger pass through primitive props; Content classes (including state callbacks),
+  styles, custom render and ref stay on the outer panel. Base UI owns lifecycle, cancellation,
+  disabled state, keepMounted and hiddenUntilFound. Content padding belongs inside the measured
+  wrapper so the outer panel can close to zero. No renamed props, defaults or validation ownership.
+- **Verification:** `pnpm check` passes (338 tests in 55 files), including seven collapsible unit tests,
+  typecheck, lint (only existing item image warning), registry/parity, budgets and P11. Production
+  build passes with 56 pages in `.next-collapsible`; generated tsconfig changes are reverted.
+  Targeted Edge browser tests pass 8/8 on port 3114 with two workers: three modes × two system
+  preferences, computed duration/transform, measured growth, close/open/close reversal and continuous
+  position, unmount, keyboard/focus, responsive width, and axe in both themes without disabled rules.
+  The first browser run caught a label-dependent test locator; the stable slot locator passes.
+  Both final theme screenshots were inspected and preserved in `.cache/collapsible-proof/`.
+  No shared code changed, so the full browser suite was not repeated for this component.
+- **Remaining:** B6 is 2/6 shipped; tabs, table, carousel and scroll-area remain in order.
+  Historical B1–B5 visual gates, B7–B9, and §8 carried work stay open. This completes only collapsible.
 
 ## 8. Backlog
 
