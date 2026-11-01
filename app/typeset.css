@@ -504,3 +504,16 @@
     margin-block-start: 0;
   }
 }
+
+/* Preserve readable cells on phones; the keyboard target owns scrolling. */
+.typeset table.docs-table {
+  min-width: 44rem;
+  width: 100%;
+}
+.typeset table.docs-table :is(th, td) {
+  min-width: 7rem;
+  overflow-wrap: normal;
+}
+.typeset table.docs-table td:last-child {
+  min-width: 16rem;
+}

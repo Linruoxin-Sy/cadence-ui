@@ -594,7 +594,7 @@ function CodeBlockCopyButton({
   const block = React.useContext(CodeBlockContext);
   // The text that was copied, not a flag: a tick that survived a tab switch would
   // claim the variant the reader is now looking at was the one copied.
-  const [copiedText, setCopiedText] = React.useState<string | null>(null);
+  const [copiedText, setCopiedText] = React.useState<string | null | false>(null);
 
   const text = values ? (block?.tab ? (values[block.tab] ?? "") : (Object.values(values)[0] ?? "")) : (value ?? "");
   const copied = copiedText !== null && copiedText === text;
@@ -621,12 +621,16 @@ function CodeBlockCopyButton({
         {...props}
         onClick={(event) => {
           onClick?.(event);
-          // A clipboard write can be refused (permission, an insecure origin); the
-          // glyph then stays on "copy" instead of claiming a success.
+          if (event.defaultPrevented) return;
+          setCopiedText(null);
+          if (!navigator.clipboard) {
+            setCopiedText(false);
+            return;
+          }
           void navigator.clipboard
-            ?.writeText(text)
+            .writeText(text)
             .then(() => setCopiedText(text))
-            .catch(() => {});
+            .catch(() => setCopiedText(false));
         }}
       >
         {children ?? (
@@ -653,7 +657,7 @@ function CodeBlockCopyButton({
         )}
       </Button>
       <span aria-live="polite" className="sr-only">
-        {copied ? "Copied" : ""}
+        {copiedText === false ? "Copy failed. Select and copy manually." : copied ? "Copied" : ""}
       </span>
     </>
   );

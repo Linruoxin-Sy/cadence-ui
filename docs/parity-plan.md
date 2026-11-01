@@ -1626,12 +1626,17 @@ CodeBlock conformance or complete-route acceptance. Runnable probes, limits and 
 in `site-js-budget.md`, with requests/module evidence in `evidence/site-code-fence-boundaries.json`.
 No product/component/config/dependency changes adopted. ADR-016 remains investigation; budget **OPEN**.
 
-**Documentation site** — see
-[documentation-site-and-distribution.md](documentation-site-and-distribution.md) §2.2 for the promise these
-items close: preview variant switching and code view, install-command copy (the component exists at
-`components/site/copy-command.tsx` and is imported nowhere), search and category/intensity/complexity filters
-on the index, TOC / prev-next / "Edit this page" on component pages, `/r/[...path]` with immutable caching,
-the missing guide entries, and the sidebar's landmark / `aria-controls` / height-animation problems.
+**Documentation site** — bounded flow work (2026-11-02), see
+[evidence matrix and 58-preview inventory](evidence/component-page-flow.md).
+Registry source view, install copy feedback, compiled-heading TOC, registry-order prev/next,
+real MDX edit link and readable keyboard-scrollable mobile tables are implemented. Button's
+six visual variants now support URL/client-state switching and history without remounting.
+Other previews retain real native controls and simultaneous specimens; URL variant support
+beyond Button remains OPEN, so this is not closure of the whole preview promise.
+The old unused copy-command claim was stale: installation already uses PackageManagerBlock.
+Index search/category/intensity/complexity filters, sidebar landmark/controls/height audit,
+immutable distribution caching/route and missing guides remain OPEN and are outside this group.
+Initial JS remains OPEN independently of passing flow checks; no budget/config/metering change.
 
 **Metadata**
 

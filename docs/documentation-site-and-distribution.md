@@ -95,6 +95,20 @@ complements the implementation checks and three-mode tests; it does not prove li
 | Install copy           | `npx shadcn add @cadence/<id>`                                                                                                                                                             | Lowers the conversion barrier                                                             |
 | Loading transition     | `components/site/measured-height.tsx` applies the measured height in the frame it changed (ADR-015); the specimen itself lands with a CSS `@starting-style` reveal in `previews/shell.tsx` | The card is always the size of its example, and the content arrives without moving layout |
 
+Variant switching follows each component's real API. Button's named visual variants have a
+`?variant=outline` selector, with `all` as the default catalogue matrix; switching hides existing
+specimens rather than remounting them, and history restores the selection. Other previews keep
+their native state, placement, orientation, tab or composition controls and parallel specimens.
+A component without a named variant API does not get a decorative selector. URL variant support
+beyond Button is not yet implemented; do not infer it from the simultaneous matrix.
+
+The source view is a native disclosure next to the live preview, so opening code does not replace
+or reset an example. Every file is read on the server from the built registry payload and rendered
+through `CodeFence` with build-time highlighting and the registry copy control. The MDX Usage
+section remains the runnable example. TOC anchors are assigned from the compiled heading tree;
+prev/next follows `listComponents()` registry order, and editing targets the component MDX on main.
+Tables retain readable minimum column widths and native keyboard horizontal scrolling on phones.
+
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 
 The preview body is the one place the _site_ owns geometry: the frame mounts a `Skeleton` while a page's

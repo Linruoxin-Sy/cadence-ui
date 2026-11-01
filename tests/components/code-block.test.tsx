@@ -433,6 +433,22 @@ describe("CodeBlock", () => {
     });
   });
 
+  it("announces clipboard rejection and supports retry", async () => {
+    const writeText = vi.fn().mockRejectedValueOnce(new Error("denied")).mockResolvedValueOnce(undefined);
+    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
+    render(
+      <CadenceProvider mode="none">
+        <CodeBlockCopyButton value={SOURCE} />
+      </CadenceProvider>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+    expect(await screen.findByText("Copy failed. Select and copy manually.")).toHaveAttribute("aria-live", "polite");
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Copied" })).toBeInTheDocument());
+    expect(writeText).toHaveBeenLastCalledWith(SOURCE);
+    vi.unstubAllGlobals();
+  });
+
   it("keeps the copy state without the scale under reduced motion", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
