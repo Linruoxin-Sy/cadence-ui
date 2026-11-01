@@ -1,11 +1,10 @@
 "use client";
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress";
-import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
 import { createContext, useContext } from "react";
 import { cn } from "../lib/cn";
-import { ControlDiv } from "../lib/control-animation";
+import { NativeControlDiv } from "../lib/control-animation";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
@@ -106,8 +105,8 @@ function ProgressIndicator({ className, style, ...props }: ProgressIndicatorProp
         const { className: indicatorClassName, ...rest } = indicatorProps as React.HTMLProps<HTMLDivElement>;
 
         return (
-          <ControlDiv
-            {...(rest as HTMLMotionProps<"div">)}
+          <NativeControlDiv
+            {...rest}
             className={cn("h-full w-full origin-left bg-primary", pulse, indicatorClassName)}
             target={{ scaleX: fraction ?? 1 }}
             transition={cm.reduced ? { duration: 0 } : cm.transition("data.transition")}

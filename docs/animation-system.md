@@ -644,6 +644,16 @@ Caller `render` still replaces the default renderer through Base UI. This bounda
 does not establish compatibility for other Motion-rendered parts or prove live-mode
 cancellation of an already running gesture.
 
+### Native event boundary for public div parts
+
+ProgressIndicator's default renderer and floating CodeBlockActions use `lib/native-div.tsx`.
+Its `motion.create()` native div adapter carries the four reserved React handlers and
+caller ref in private props, restoring them to the same DOM node and committing ref
+identity changes with React 19 cleanup, as for press controls above. Progress keeps
+its existing imperative control animation; Actions keeps its declarative opacity
+animation. No recipe, token, DOM wrapper, or caller render ownership changes. Internal
+ControlDiv/ControlSpan consumers are not implicitly migrated or certified.
+
 A Base UI popup enters a "closing" phase before it unmounts, waiting for the animation to finish. Understanding these four patterns is what makes "rich animation" land in practice (official docs: [Base UI Animation](https://base-ui.com/react/handbook/animation.md)).
 
 ### Pattern A: pure CSS transition (recommended for simple popups)

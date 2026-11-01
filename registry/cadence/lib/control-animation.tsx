@@ -1,7 +1,9 @@
 "use client";
 
 import { type HTMLMotionProps, motion, type Transition, useAnimationControls } from "motion/react";
-import { useEffect, useEffectEvent, useLayoutEffect } from "react";
+import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect } from "react";
+
+import { NativeMotionDiv } from "./native-div";
 
 const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 type Target = Record<string, number>;
@@ -38,4 +40,16 @@ export function ControlSpan({ target, transition, ...props }: ControlSpanProps) 
 export function ControlDiv({ target, transition, ...props }: ControlDivProps) {
   const controls = useControlAnimation(target, transition);
   return <motion.div {...props} initial={target} animate={controls} />;
+}
+
+export function NativeControlDiv({
+  target,
+  transition,
+  ...props
+}: Omit<ComponentProps<typeof NativeMotionDiv>, "animate" | "initial" | "transition"> & {
+  target: Target;
+  transition: Transition;
+}) {
+  const controls = useControlAnimation(target, transition);
+  return <NativeMotionDiv {...props} initial={target} animate={controls} />;
 }

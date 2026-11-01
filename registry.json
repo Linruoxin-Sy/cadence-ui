@@ -72,6 +72,11 @@
           "target": "@components/cadence/lib/control-animation.tsx"
         },
         {
+          "path": "registry/cadence/lib/native-div.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/native-div.tsx"
+        },
+        {
           "path": "registry/cadence/lib/press-button.tsx",
           "type": "registry:lib",
           "target": "@components/cadence/lib/press-button.tsx"

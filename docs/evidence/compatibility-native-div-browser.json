@@ -1,0 +1,85 @@
+{
+  "scope": "Production Vite7.3.7 bundle of actual repository CodeBlock floating Actions and CadenceProvider; no site shell/CSS, no route-budget claim. Edge3154.",
+  "reports": [
+    {
+      "mode": "full",
+      "events": [
+        {
+          "type": "animationstart",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "drag",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "dragstart",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "dragend",
+          "native": true,
+          "current": "code-block-actions"
+        }
+      ]
+    },
+    {
+      "mode": "reduced",
+      "events": [
+        {
+          "type": "animationstart",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "drag",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "dragstart",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "dragend",
+          "native": true,
+          "current": "code-block-actions"
+        }
+      ]
+    },
+    {
+      "mode": "none",
+      "events": [
+        {
+          "type": "animationstart",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "drag",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "dragstart",
+          "native": true,
+          "current": "code-block-actions"
+        },
+        {
+          "type": "dragend",
+          "native": true,
+          "current": "code-block-actions"
+        }
+      ]
+    }
+  ],
+  "fixtureSource": "import React, {useState, useCallback} from 'react';\nimport {createRoot} from 'react-dom/client';\nimport {CodeBlock,CodeBlockActions,CodeBlockCopyButton,CodeBlockContent} from '../../registry/cadence/code-block';\nimport {CadenceProvider} from '../../registry/cadence/lib/provider';\nwindow.proof={events:[],refs:[],cleanups:[]};\nfunction Fixture(){\n const [version,setVersion]=useState(0); const [mode,setMode]=useState('full');\n window.changeRef=()=>setVersion(v=>v+1); window.changeMode=setMode;\n const ref=useCallback(node=>{if(node)window.proof.refs.push(version);return ()=>window.proof.cleanups.push(version)},[version]);\n const handler=e=>{window.proof.events.push({type:e.type,native:e.nativeEvent===window.sentEvent,current:e.currentTarget.dataset.slot});e.preventDefault();e.stopPropagation()};\n return <CadenceProvider mode={mode}><CodeBlock><CodeBlockActions ref={ref} tabIndex={0} onAnimationStart={handler} onDrag={handler} onDragStart={handler} onDragEnd={handler}><CodeBlockCopyButton value=\"source\" /></CodeBlockActions><CodeBlockContent>source</CodeBlockContent></CodeBlock></CadenceProvider>\n}\ncreateRoot(document.getElementById('root')).render(<Fixture/>);\n",
+  "runner": "import {chromium,expect} from '@playwright/test';\nimport {writeFileSync} from 'node:fs';\nconst browser=await chromium.launch({channel:'msedge',headless:true});\nconst page=await browser.newPage();\nawait page.goto('http://127.0.0.1:3154');\nconst actions=page.locator('[data-slot=\"code-block-actions\"]');\nawait actions.waitFor();\nconst reports=[];\nfor(const mode of ['full','reduced','none']){\n await page.evaluate(mode=>window.changeMode(mode),mode);\n await expect(actions).toHaveAttribute('data-motion',mode);\n await actions.focus();\n await expect.poll(()=>actions.evaluate(e=>Number(getComputedStyle(e).opacity))).toBe(1);\n reports.push(await page.evaluate(()=>{\n const node=document.querySelector('[data-slot=\"code-block-actions\"]');\n for(const type of ['animationstart','drag','dragstart','dragend']){window.sentEvent=new Event(type,{bubbles:true,cancelable:true});node.dispatchEvent(window.sentEvent);if(!window.sentEvent.defaultPrevented)throw Error('cancellation lost')}\n return {mode:node.dataset.motion,events:window.proof.events.slice(-4)};\n }));\n}\nawait page.evaluate(()=>window.changeRef());\nawait expect.poll(()=>page.evaluate(()=>window.proof.cleanups.length)).toBe(1);\nawait expect(actions).toBeFocused();\nexpect(await page.evaluate(()=>window.proof.refs)).toEqual([0,1]);\nexpect(reports.every(r=>r.events.length===4&&r.events.every(e=>e.native&&e.current==='code-block-actions'))).toBe(true);\nawait page.screenshot({path:'.cache/native-div-floating-production.png'});\nwriteFileSync('.cache/native-div-floating-production.json',JSON.stringify(reports,null,2));\nawait browser.close();\nconsole.log('Floating Actions production Vite/Edge: 3 modes, 12 exact native events, focused ref handoff passed');\n",
+  "config": "export default {esbuild:{jsx:\"automatic\"},build:{outDir:\"dist\",emptyOutDir:true}}",
+  "result": "3 modes / 12 exact native callbacks / focused callback-ref cleanup and handoff passed; no wrappers or remounts.",
+  "harnessFailure": "Windows Python mapped JS to text/plain; fixed only local HTTP Content-Type, reran unchanged assertions."
+}

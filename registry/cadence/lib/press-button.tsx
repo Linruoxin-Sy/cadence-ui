@@ -9,18 +9,13 @@ type NativeEvents = Pick<ComponentProps<"button">, "onAnimationStart" | "onDrag"
 // then restore them on the same button after Motion has resolved style and refs.
 const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-function NativeButton({
-  nativeEvents,
-  nativeRef,
-  ref,
-  ...props
-}: ComponentProps<"button"> & {
-  nativeEvents: NativeEvents;
-  nativeRef: ComponentProps<"button">["ref"];
-}) {
-  const node = useRef<HTMLButtonElement | null>(null);
+export function useNativeMotionRef<T extends HTMLElement>(
+  ref: import("react").Ref<T> | undefined,
+  nativeRef: import("react").Ref<T> | undefined,
+) {
+  const node = useRef<T | null>(null);
   const motionRef = useCallback(
-    (instance: HTMLButtonElement | null) => {
+    (instance: T | null) => {
       node.current = instance;
       if (typeof ref === "function") return ref(instance);
       if (ref) ref.current = instance;
@@ -44,6 +39,19 @@ function NativeButton({
       nativeRef.current = null;
     };
   }, [nativeRef]);
+  return motionRef;
+}
+
+function NativeButton({
+  nativeEvents,
+  nativeRef,
+  ref,
+  ...props
+}: ComponentProps<"button"> & {
+  nativeEvents: NativeEvents;
+  nativeRef: ComponentProps<"button">["ref"];
+}) {
+  const motionRef = useNativeMotionRef(ref, nativeRef);
   return <button {...props} {...nativeEvents} ref={motionRef} />;
 }
 const MotionNativeButton = motion.create(NativeButton);

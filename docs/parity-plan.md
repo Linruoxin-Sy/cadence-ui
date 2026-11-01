@@ -1699,6 +1699,15 @@ Production Button12/12 and Toggle/Group16/16 regressions pass; initial JS remain
 FAIL at291749 gzip bytes/23 scripts against120000. All global compatibility/live-
 motion/Combobox audits remain OPEN.
 
+Progress/CodeBlock follow-up audits all 34 actual exports and repairs default
+ProgressIndicator/floating Actions native-event + dynamic-ref loss, and caller refs
+breaking CodeBlockTabs navigation/Content measurement. The hand-maintained ledger now
+classifies 44/466 exports; 422 remain unreviewed. See `docs/evidence/compatibility-native-div.md`
+and `docs/handoffs/compatibility-native-div.md`. Full check 645/84 passes, production
+Edge matrix 27/27 passes; cold initial JS remains FAIL at292344 gzip bytes/23 scripts
+against120000. This closes these finite compatibility surfaces only; the independent
+running Motion/CSS popup matrices, Combobox focus safety, budget and final audit stay OPEN.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |

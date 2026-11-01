@@ -867,44 +867,54 @@
     },
     "progress": {
       "ProgressProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: ProgressProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressTrackProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: ProgressTrackProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressIndicatorProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: ProgressIndicatorProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressLabelProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: ProgressLabelProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressValueProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: ProgressValueProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "Progress": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: Progress. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressIndicator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: ProgressIndicator. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: ProgressLabel. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressTrack": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: ProgressTrack. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "ProgressValue": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: ProgressValue. Finite native/Base surface reviewed; independent running motion matrix remains open."
       }
     },
     "alert-dialog": {
@@ -1403,100 +1413,124 @@
     },
     "code-block": {
       "CodeBlockProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockHeaderProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockHeaderProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockTitleProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockTitleProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockTabsProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockTabsProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockTabProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockTabProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockActionsProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockActionsProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockCopyButtonProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockCopyButtonProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockContentProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockContentProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockPanelProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockPanelProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockLineProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockLineProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockFooterProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockFooterProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockExpandButtonProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockExpandButtonProps. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlock": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlock. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockActions": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockActions. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockContent. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockCopyButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockCopyButton. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockExpandButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockExpandButton. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockFooter. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockHeader. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockLine": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockLine. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockPanel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockPanel. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockTab": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockTab. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockTabs": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockTabs. Finite native/Base surface reviewed; independent running motion matrix remains open."
       },
       "CodeBlockTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "compatibility-native-div.md export audit: CodeBlockTitle. Finite native/Base surface reviewed; independent running motion matrix remains open."
       }
     },
     "command": {

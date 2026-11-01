@@ -6615,7 +6615,6 @@
       },
       "imports": [
         "@base-ui/react/progress",
-        "motion/react",
         "react",
         "react",
         "../lib/cn",
@@ -13379,6 +13378,7 @@
         "../code-highlight/use-highlighted-code",
         "../lib/cn",
         "../lib/motion",
+        "../lib/native-div",
         "../lib/provider"
       ],
       "priorSuite": "tests/components/code-block.test.tsx",

@@ -4,12 +4,13 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
-import { animate, type HTMLMotionProps, motion, useMotionValue } from "motion/react";
+import { animate, motion, useMotionValue } from "motion/react";
 import * as React from "react";
 import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
+import { NativeMotionDiv } from "../lib/native-div";
 import { useCadenceMotion } from "../lib/provider";
 
 /** How long the copy button shows its tick before returning to the copy glyph. */
@@ -402,9 +403,10 @@ export interface CodeBlockTabsProps extends React.ComponentProps<"div"> {
  * selected tab is a tab stop, and Arrow keys / Home / End move between them, which
  * is the pattern a screen reader announces as tabs rather than as a radio group.
  */
-function CodeBlockTabs({ className, label = "Language", children, onKeyDown, ...props }: CodeBlockTabsProps) {
+function CodeBlockTabs({ ref, className, label = "Language", children, onKeyDown, ...props }: CodeBlockTabsProps) {
   const block = useCodeBlockPart("CodeBlockTabs");
   const listRef = React.useRef<HTMLDivElement>(null);
+  React.useImperativeHandle(ref, () => listRef.current as HTMLDivElement, []);
 
   const move = (step: number | "first" | "last") => {
     const tabs = [...(listRef.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])];
@@ -534,7 +536,7 @@ function CodeBlockActions({ className, children, ...props }: CodeBlockActionsPro
   }
 
   return (
-    <motion.div
+    <NativeMotionDiv
       data-slot="code-block-actions"
       data-motion={cm.mode}
       data-revealed={revealed || undefined}
@@ -549,10 +551,10 @@ function CodeBlockActions({ className, children, ...props }: CodeBlockActionsPro
         !revealed && "pointer-events-none",
         className,
       )}
-      {...(props as HTMLMotionProps<"div">)}
+      {...props}
     >
       {children}
-    </motion.div>
+    </NativeMotionDiv>
   );
 }
 
@@ -691,6 +693,7 @@ export interface CodeBlockContentProps extends React.ComponentProps<"pre"> {
  * layout read in render would be a synchronous reflow on every chunk of a stream.
  */
 function CodeBlockContent({
+  ref,
   className,
   children,
   style,
@@ -704,6 +707,7 @@ function CodeBlockContent({
   const cm = useCadenceMotion();
   const block = React.useContext(CodeBlockContext);
   const preRef = React.useRef<HTMLPreElement>(null);
+  React.useImperativeHandle(ref, () => preRef.current as HTMLPreElement, []);
   const viewportRef = React.useRef<HTMLDivElement>(null);
   const height = useMotionValue(0);
   const [measured, setMeasured] = React.useState(false);
