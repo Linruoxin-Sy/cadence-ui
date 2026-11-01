@@ -1620,6 +1620,35 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll Area",
+      "description": "Constrained lists and wide content with native scrolling and custom scrollbars.",
+      "categories": ["scroll"],
+      "dependencies": ["@base-ui/react"],
+      "registryDependencies": ["@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/scroll-area/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/scroll-area/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.4.0",
+        "tier": "T0",
+        "batch": "B6",
+        "motion": [],
+        "intensity": "subtle",
+        "complexity": "S",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

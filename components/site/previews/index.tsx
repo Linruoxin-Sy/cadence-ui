@@ -60,4 +60,5 @@ export const previews: Record<string, ComponentType> = {
   tabs: dynamic(() => import("./tabs").then((mod) => ({ default: mod.TabsPreview }))),
   table: dynamic(() => import("./table").then((mod) => ({ default: mod.TablePreview }))),
   carousel: dynamic(() => import("./carousel").then((mod) => ({ default: mod.CarouselPreview }))),
+  "scroll-area": dynamic(() => import("./scroll-area").then((mod) => ({ default: mod.ScrollAreaPreview }))),
 };

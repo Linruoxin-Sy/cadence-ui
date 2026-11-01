@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
-> open for earlier components; B6 accordion, collapsible, tabs, table and carousel shipped, scroll-area is next.**
+> Status: **B0–B6 implementations shipped (2026-11-01); B6 batch gate complete.
+> Historical B1–B5 visual gates remain open. B7 chart is next; B7–B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -257,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status      |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ----------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done     |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done     |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done     |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 5/6 shipped |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned     |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
-|       | **Total**                  | **57** |            | **102**     |         |             |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned   |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned   |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
+|       | **Total**                  | **57** |            | **102**     |         |           |
 
 ### 7.0 Status discipline
 
@@ -320,7 +320,8 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B6 — disclosure and collections (6)
 
-`accordion`, `collapsible`, `tabs`, `table` and `carousel` shipped (§7.9–7.13). Next: `scroll-area`.
+All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scroll-area`
+(§7.9–7.14). Batch gate reviewed and complete (§7.14); B7 `chart` is next.
 
 ### B7 — heavy data and navigation (5)
 
@@ -1064,6 +1065,45 @@ the batch row now says `gate open` because the earlier components still lack vis
   do not infer that Carousel evidence closes sibling or historical visual gates. Historical B1–B5
   gates (including earlier B5 select/menu evidence), B7/B8/B9 and §8 carried work all remain open.
   This does not establish overall parity completion.
+
+### 7.14 B6 scroll-area shipped; batch gate complete (2026-11-01)
+
+- **Surface:** both fixed exports and all four slots from Base UI at unchanged pin `96da9cc7f1aa`.
+  new-york-v4 scrollbar sizes, borders and rounded thumb retained. Default orientation is vertical;
+  root ref/classes/styles/render/native events stay on the root, viewport is internal. ScrollBar
+  forwards its ref/render/styles/events/keepMounted to the track. State callback classes merge last.
+  Only scroll-area was appended to the pinned manifest using shared extractors.
+  49 components, 55 registry items, 49 docs, 50 previews.
+- **Motion audit:** T0, declared = implemented = documented empty recipe set. Native scrolling and
+  primitive thumb sizing/translation represent position, not authored animation. All modes retain
+  wheel, keyboard and pointer scrolling with no interpolation added. No motion/provider dependency,
+  hook, mode attribute, timing literal or shared runtime change. Colour/focus feedback stays upstream.
+- **Proof:** full `pnpm check` passes 369 tests in 59 files (six new tests), typecheck, Biome,
+  registry freshness/budgets/P11 and pinned parity. Isolated `.next-scroll-area` production build
+  passes with 60 pages; Next-generated tsconfig additions/formatting inspected and restored.
+  Edge port 3120, two workers, eight targeted browser tests pass: three modes × two system
+  preferences, computed no authored motion, keyboard on both axes, wheel and actual thumb dragging,
+  content growth followed by native scroll remeasurement, parent-only height resize, no page errors.
+  Full-page desktop/390px axe has zero WCAG2A/2AA/2.1AA violations with no disabled rules.
+  Four dual-theme screenshots inspected and saved in `.cache/scroll-area-proof/`.
+- **Findings:** Base UI removes non-overflowing viewport from the Tab order; unit assertions now
+  preserve that behaviour. jsdom lacks getAnimations; this file supplies an empty API shim, while
+  actual computed animation is checked in Edge. Installed Base UI resolves to 1.9.0 under the existing
+  ^1.6.0 range, without a dependency change. Its viewport observes its own size, not content-only
+  growth: thumb updates on subsequent native scrolling or viewport resize. Docs explicitly record
+  this limitation rather than adding an unpinned Content wrapper or an extra observer.
+  A final browser rerun exposed a wheel-test focus/dispatch race after horizontal keyboard scrolling;
+  the test now refocuses the vertical viewport and polls real wheel input. Final eight tests pass.
+- **B6 gate review:** the six per-component proofs cover modes, keyboard, zero axe violations,
+  size budget and inspected dual-theme screenshots. Existing evidence is still present locally:
+  accordion 8 Edge tests / `.cache/accordion-proof/` (2 images); collapsible final box-model proof
+  11 / `.cache/collapsible-box-proof/` (2); tabs 8 / `.cache/tabs-proof/` (6); table 8 /
+  `.cache/table-proof/` (6); carousel 9 / `.cache/carousel-proof/` (6); scroll-area 8 /
+  `.cache/scroll-area-proof/` (4). Earlier findings and final reruns are detailed in §7.9–7.13.
+  Current aggregate check covers all siblings; no shared runtime changed, so their browser runs
+  were not repeated. This closes B6 only. Historical B1–B5 visual gates remain open.
+- **Next:** B7 `chart`, then calendar, navigation-menu, resizable, sidebar. B8 data-table/date-picker,
+  B9 attachment/bubble, and §8 carried work remain scheduled/open. No overall parity completion claim.
 
 ## 8. Backlog
 

@@ -1911,6 +1911,29 @@
           "size": "\"icon-sm\""
         }
       }
+    },
+    "scroll-area": {
+      "path": "apps/v4/registry/bases/base/ui/scroll-area.tsx",
+      "exports": [
+        "ScrollArea",
+        "ScrollBar"
+      ],
+      "slots": [
+        "scroll-area",
+        "scroll-area-scrollbar",
+        "scroll-area-thumb",
+        "scroll-area-viewport"
+      ],
+      "props": {
+        "ScrollArea": {
+          "className": null,
+          "children": null
+        },
+        "ScrollBar": {
+          "className": null,
+          "orientation": "\"vertical\""
+        }
+      }
     }
   }
 }
