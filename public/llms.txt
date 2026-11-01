@@ -77,6 +77,7 @@ npx shadcn@latest add @cadence/button
 - [Navigation Menu](https://cadence.dev/r/navigation-menu.md): Site navigation with shared popup content and interruptible sizing. (navigation)
 - [Resizable](https://cadence.dev/r/resizable.md): Adjustable split panels with pointer and keyboard resizing. (layout)
 - [Sidebar](https://cadence.dev/r/sidebar.md): Workspace navigation for dashboards and application shells. (navigation)
+- [Data Table](https://cadence.dev/r/data-table.md): An editable payments table with sorting, filtering, selection, visibility, and pagination. ()
 
 ## Docs
 

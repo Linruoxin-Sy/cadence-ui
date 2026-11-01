@@ -250,6 +250,12 @@ is as wide as its widest item.
 - Do not put a form with validation inside a menu. A menu is a list of commands; `popover`
   is the surface for controls.
 
+The popup owns its `duration.fast` clock, including provider timeScale and the
+reduced duration multiplier. An explicit full provider restores the clock inside
+an outer none scope. In none mode the popup removes starting/ending opacity and
+uses zero duration on the first frame. Function-valued popup `className` and
+`style` receive Base UI state and merge after the component defaults.
+
 ---
 
 Full index: https://cadence.dev/llms.txt
