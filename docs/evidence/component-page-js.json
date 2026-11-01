@@ -1,0 +1,191 @@
+{
+  "date": "2026-11-02",
+  "sourceCommit": "a9fd620",
+  "payloadCommit": "7008da2",
+  "scope": "Full production Button route after component page flow changes; budget remains OPEN",
+  "baselineGzipBytes": 290171,
+  "gzipBytes": 290675,
+  "deltaBytes": 504,
+  "limit": 120000,
+  "buildId": "z6qSzsZJu8NC6htak86_h",
+  "observation": "load + networkidle + 10s + networkidle, no interaction",
+  "errors": [],
+  "roots": [
+    {
+      "file": "static/chunks/0ywrj6uoh6hzn.js",
+      "gzip": 1979
+    },
+    {
+      "file": "static/chunks/2mduzyscstvmx.js",
+      "gzip": 8756
+    },
+    {
+      "file": "static/chunks/2h42467wjznxd.js",
+      "gzip": 72047
+    },
+    {
+      "file": "static/chunks/3agwwx34v3msc.js",
+      "gzip": 45595
+    },
+    {
+      "file": "static/chunks/turbopack-2c3mg3r-05n1w.js",
+      "gzip": 4390
+    }
+  ],
+  "files": [
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/0070c15yth5p6.js",
+      "bytes": 21751,
+      "gzip": 7767,
+      "sha256": "af05187be4f15d2bb49e0d6911a9366aaa5886b40fb63bb940640375e6ba3e46",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/0opyqbxhjlzbs.js",
+      "bytes": 21621,
+      "gzip": 8554,
+      "sha256": "0f47b58c70ff6737d04934e2f6408b0dabc7b903e352e88f3b2287eabd51fa2e",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/0sx41h7dma96r.js",
+      "bytes": 21137,
+      "gzip": 8835,
+      "sha256": "3ebd8295c5f0de30807fb392595b162f8bdb6335a925c381e0ebfa1cddb87769",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/0ywrj6uoh6hzn.js",
+      "bytes": 5371,
+      "gzip": 1979,
+      "sha256": "c3b2229c0111ffa1ec23943e526b8e151911f4189d675df6fce212124e986c25",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/1_0en6_2wlpmx.js",
+      "bytes": 29550,
+      "gzip": 11028,
+      "sha256": "ea564431c91f357754a586c007a4f71e2939593b7ad6a9e20657a10ecc21ce07",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/144bwxzfaca4z.js",
+      "bytes": 20955,
+      "gzip": 8072,
+      "sha256": "c374e673563631e194aae0c03efceabc709b0c0c0740c95821d434ffcffc97e1",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/17e45le0t66mp.js",
+      "bytes": 4561,
+      "gzip": 1802,
+      "sha256": "c4e42b909efb69b5d7da6a191ece2c6496e42a1590b9d1b5024af0fdfbae8ad3",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/1ffbo8hhxu2um.js",
+      "bytes": 21468,
+      "gzip": 8636,
+      "sha256": "958d936e9acf73e505fa69db849ae9be1e175dd4b0cd9ff7c783ad23fe202215",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/1pw3gdfr6x-ge.js",
+      "bytes": 28003,
+      "gzip": 8842,
+      "sha256": "0cdbfbb6f1c48b24db74a8ac1d8254e3491d9db7e89a3bb3ad2d050ad3325a48",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/2h42467wjznxd.js",
+      "bytes": 229945,
+      "gzip": 72047,
+      "sha256": "355c9715eb1bf00592b474cc123faff48a97749a353d1dc4cf9f4f7619335d0d",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/2ku0af_rt28tp.js",
+      "bytes": 18756,
+      "gzip": 6836,
+      "sha256": "e63b21af91c2992e6449426249ba1949dfe6ca44d41d1e4a5627dca88b6a0132",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/2m7l8rqycuinx.js",
+      "bytes": 24060,
+      "gzip": 9240,
+      "sha256": "8647eda7ea375097537302504a5f9c76c34c61775a214c5adac4901bcb52b744",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/2mduzyscstvmx.js",
+      "bytes": 32754,
+      "gzip": 8756,
+      "sha256": "3f152127a667b792818f6eb892eacf7182c6b4c4238733c24417c0d857d04d82",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/2qxdfbuzlg-k7.js",
+      "bytes": 13987,
+      "gzip": 5831,
+      "sha256": "2ab478b2e5ef152cb7dd47e4f8d58f23b896fbc3e65c1fdd945ff6869b2b9639",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/2t0amji0afc6y.js",
+      "bytes": 22589,
+      "gzip": 6530,
+      "sha256": "d405415d9d196f2af1a642a6362eab1737c8986cc724d728cf6c05840119f97e",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/31b_u2-p_wmi4.js",
+      "bytes": 2400,
+      "gzip": 1241,
+      "sha256": "c0ed4ec728af49d5237f74bde83b9e51d23106d13a8a26a502de0d6c917357ed",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/3agwwx34v3msc.js",
+      "bytes": 164865,
+      "gzip": 45595,
+      "sha256": "03523f8cb155405667527111ded7790f185c2e96038ad388f650055c1eeaa121",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/3amhs1u_q98wk.js",
+      "bytes": 38457,
+      "gzip": 14034,
+      "sha256": "1422cdcc34d169dbcead6ec34a436534a7a2b4f5777ee0e9136396758768bd9e",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/3cajmh9d5p2k1.js",
+      "bytes": 250,
+      "gzip": 214,
+      "sha256": "6febea1db2256a003fb7869f6a498e4539c6ec724fca86371e0cc54684d4104a",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/3ma0k8h6xilbg.js",
+      "bytes": 133698,
+      "gzip": 44870,
+      "sha256": "62e75977c8c24f666b59b1cc72288c55752c7cd624c40a21c1b8ba27b0492890",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/3pu8aclvs_iw5.js",
+      "bytes": 18767,
+      "gzip": 5576,
+      "sha256": "56a9c5be6e0f12bafbfecfe9c9d657f18e81825415cfef4e93b809a17eddc4f4",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:3142/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+      "bytes": 11255,
+      "gzip": 4390,
+      "sha256": "b5f9b5199b99ab6c141f4540f0b7d0fe803c4ecf6956849ecb6e59d3d439272e",
+      "status": 200
+    }
+  ]
+}
