@@ -1,0 +1,156 @@
+import { spawnSync } from "node:child_process";
+import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { checkMotionDocs } from "../../scripts/motion-docs.mjs";
+import { recipeCatalogue } from "../../scripts/motion-manifest.mjs";
+
+const root = process.cwd();
+const registry = JSON.parse(readFileSync("registry.json", "utf8"));
+const catalogue = recipeCatalogue(readFileSync("registry/cadence/lib/motion.ts", "utf8"));
+let fixture: string;
+const buttonPath = "content/components/button.mdx";
+const guidePath = "content/docs/motion.mdx";
+const button = readFileSync(buttonPath, "utf8");
+const guide = readFileSync(guidePath, "utf8");
+
+beforeAll(() => {
+  fixture = mkdtempSync(path.join(os.tmpdir(), "cadence-motion-docs-"));
+  cpSync("content", path.join(fixture, "content"), { recursive: true });
+  cpSync("registry.json", path.join(fixture, "registry.json"));
+  for (const dir of ["registry", "public", "docs", "app", "components"]) {
+    symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
+  }
+});
+afterAll(() => rmSync(fixture, { recursive: true, force: true }));
+
+function entry(file: string, source: string) {
+  writeFileSync(path.join(fixture, file), source);
+  try {
+    const result = spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
+      cwd: fixture,
+      encoding: "utf8",
+    });
+    return { status: result.status, output: result.stdout + result.stderr };
+  } finally {
+    writeFileSync(path.join(fixture, file), readFileSync(path.join(root, file), "utf8"));
+  }
+}
+
+describe("registry:check motion docs entry", () => {
+  it("accepts all 58 real contracts, including T0, composed, continuous, CSS and engine forms", async () => {
+    expect(
+      registry.items.filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type)),
+    ).toHaveLength(58);
+    expect(await checkMotionDocs(root, registry, catalogue)).toEqual([]);
+    expect(entry(buttonPath, button).status).toBe(0);
+  });
+
+  it.each([
+    [
+      "missing recipe",
+      button.replaceAll("`feedback.press` / `spring.press`", "`spring.press`"),
+      'missing recipe "feedback.press"',
+    ],
+    ["extra recipe", button.replace("`spring.press`", "`reveal` / `spring.press`"), 'extra recipe "reveal"'],
+    ["unknown recipe", button.replace("`spring.press`", "`theme.reveal`"), 'unknown recipe "theme.reveal"'],
+    [
+      "duplicate cell",
+      button.replace("`spring.press`", "`feedback.press` / `spring.press`"),
+      'duplicate recipe "feedback.press"',
+    ],
+    ["missing section", button.replace("## Motion contract", "## Other"), "expected one ## Motion contract section"],
+    ["duplicate section", `${button}\n## Motion contract\n`, "found 2"],
+    ["missing table", button.replaceAll("| Phase", "Phase"), "expected one Motion contract recipe table"],
+    [
+      "frontmatter drift",
+      button.replace("motion: [feedback.press]", "motion: [reveal]"),
+      "frontmatter motion: missing recipe",
+    ],
+    [
+      "duplicate frontmatter",
+      button.replace("motion: [feedback.press]", "motion: [feedback.press, feedback.press]"),
+      "frontmatter motion: duplicate recipe",
+    ],
+    [
+      "invalid frontmatter",
+      button.replace("motion: [feedback.press]", "motion: feedback.press"),
+      "frontmatter motion must be an array",
+    ],
+  ])("rejects %s through the actual check script", (_, source, diagnostic) => {
+    const result = entry(buttonPath, source);
+    expect(result.status).toBe(1);
+    expect(result.output).toContain(`${buttonPath}:`);
+    expect(result.output).toContain(diagnostic);
+  });
+
+  it.each([
+    ["missing", guide.replace(/^\| `reveal`.*\n/m, ""), 'missing recipe "reveal"'],
+    ["unknown", guide.replace("| `reveal`", "| `theme.reveal`"), 'unknown recipe "theme.reveal"'],
+    ["duplicate", guide.replace("| `enter.pop`", "| `reveal`"), 'duplicate recipe "reveal"'],
+    ["missing table", guide.replace("| Recipe |", "| Other |"), "expected one Recipes recipe table"],
+  ])("rejects guide catalogue %s through the check script", (_, source, diagnostic) => {
+    const result = entry(guidePath, source);
+    expect(result.status).toBe(1);
+    expect(result.output).toContain(diagnostic);
+  });
+
+  it("does not mistake prose, API tables, comments or fenced examples for declarations", () => {
+    const extra =
+      "\nProse can discuss `theme.reveal`.\n<!-- ## Motion contract -->\n\n```md\n## Motion contract\n| Token |\n| --- |\n| `theme.reveal` |\n```\n\n~~~md\n## Motion contract\n~~~\n";
+    const result = entry(
+      buttonPath,
+      button.replace(
+        "## Motion contract",
+        `| Prop | Type |\n| --- | --- |\n| recipe | \`theme.reveal\` |\n${extra}\n## Motion contract`,
+      ),
+    );
+    expect(result.status).toBe(0);
+  });
+
+  it("rejects duplicate meta.motion even when frontmatter and table sets agree", async () => {
+    const copy = structuredClone(registry);
+    copy.items.find((item: { name: string }) => item.name === "button").meta.motion.push("feedback.press");
+    expect(await checkMotionDocs(root, copy, catalogue)).toContain(
+      'button: meta.motion: duplicate recipe "feedback.press"',
+    );
+  });
+});
+
+describe("new-item motion docs scaffold", () => {
+  it.each([{ motion: [] }, { motion: ["reveal", "exit.fade"] }])(
+    "emits the complete declared set %j",
+    async ({ motion }) => {
+      const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-scaffold-"));
+      try {
+        cpSync("content", path.join(temp, "content"), { recursive: true });
+        cpSync("components", path.join(temp, "components"), { recursive: true });
+        writeFileSync(path.join(temp, "registry.json"), '{"items":[]}');
+        const result = spawnSync(
+          process.execPath,
+          [
+            path.join(root, "scripts/new-item.mjs"),
+            "--name",
+            "fixture",
+            "--description",
+            "Fixture.",
+            "--batch",
+            "B1",
+            "--tier",
+            motion.length ? "T2" : "T0",
+            "--motion",
+            motion.join(","),
+          ],
+          { cwd: temp, encoding: "utf8" },
+        );
+        expect(result.status, result.stderr).toBe(0);
+        expect(
+          await checkMotionDocs(temp, JSON.parse(readFileSync(path.join(temp, "registry.json"), "utf8")), catalogue),
+        ).toEqual([]);
+      } finally {
+        rmSync(temp, { recursive: true, force: true });
+      }
+    },
+  );
+});

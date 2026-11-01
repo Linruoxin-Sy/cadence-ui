@@ -17,13 +17,13 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import matter from "gray-matter";
+import { checkMotionDocs } from "./motion-docs.mjs";
 import {
   calledRecipes,
   cataloguedRecipes,
   documentedRecipes,
   implementedForm,
   MOTION_FORMS,
-  motionRecipes,
   normaliseMotion,
   recipeCatalogue,
 } from "./motion-manifest.mjs";
@@ -34,6 +34,7 @@ const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "ut
 const problems = [];
 
 const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
+problems.push(...(await checkMotionDocs(root, registry, RECIPES)));
 const docsDir = path.join(root, "content", "components");
 
 /** Frontmatter is the human-facing copy of `meta`; the two must not drift. */
@@ -230,11 +231,7 @@ for (const item of registry.items) {
           problems.push(`${item.name}: docs frontmatter ${key} is "${frontmatter[key]}", registry says "${expected}"`);
         }
       }
-      const docRecipes = [...(frontmatter.motion ?? [])].sort().join("|");
-      const metaRecipes = motionRecipes(item.meta?.motion).sort().join("|");
-      if (docRecipes !== metaRecipes) {
-        problems.push(`${item.name}: docs motion [${docRecipes}] != registry motion [${metaRecipes}]`);
-      }
+      // Motion frontmatter and actual tables are checked together by checkMotionDocs.
     }
   }
 }

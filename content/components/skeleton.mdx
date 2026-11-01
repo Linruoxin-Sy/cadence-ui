@@ -100,7 +100,7 @@ placeholders and each Motion loop costs a frame callback; the pulse only touches
 
 | Phase   | Properties                | Token                          | Interruptible |
 | ------- | ------------------------- | ------------------------------ | ------------- |
-| pulse   | `opacity 1 → 0.5 → 1`     | `animate-pulse` (theme timing) | yes (CSS)     |
+| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition` / `animate-pulse` (theme timing) | yes (CSS)     |
 | reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
 | none    | no animation; full opacity | `animate-none`                 | –             |
 

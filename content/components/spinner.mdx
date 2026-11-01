@@ -109,7 +109,7 @@ the user is waiting on, and it must not add a frame callback to it. Only `transf
 
 | Phase   | Properties          | Token                         | Interruptible |
 | ------- | ------------------- | ----------------------------- | ------------- |
-| spin    | `rotate 0 → 360deg` | `animate-spin` (theme timing) | yes (CSS)     |
+| spin    | `rotate 0 → 360deg` | `data.transition` / `animate-spin` (theme timing) | yes (CSS)     |
 | reduced | same rotation       | `animate-spin`                | yes (CSS)     |
 | none    | none; icon static   | `animate-none`                | –             |
 

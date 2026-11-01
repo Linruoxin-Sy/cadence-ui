@@ -60,18 +60,28 @@ levels appear only inside `## API`, where a component with distinct parts groups
 
 ### 2.1 The Motion contract section (this project's signature content)
 
-```md
-### Motion contract
+Every component has one flat `## Motion contract` section and a Markdown table. Recipe names
+are inline code in the table's `Token`, `Recipe`, or `Recipe / cause`, or `Recipe / tokens` column. Token cells may
+also explain timing with `duration.*`, `ease.*`, `spring.*`, and `distance.*`; these are tokens,
+not recipes. Multiple phases may repeat a recipe, but a cell must not repeat it. Prose, examples,
+and API tables are not declarations. A static component may use an empty Token column or a
+`Mode | Authored motion` (or `Mode | Animated properties`) table with no recipes. Composition tables name the recipes explicitly
+reused from installed dependencies; they do not invent transition calls in the wrapper.
 
-| Phase       | Properties                | Token                    | Interruptible |
-| ----------- | ------------------------- | ------------------------ | ------------- |
-| enter       | opacity 0→1, y 8→0        | duration.base / ease.out | yes           |
-| exit        | opacity 1→0, scale 1→0.98 | duration.fast / ease.in  | yes           |
-| interaction | whileTap scale 0.97       | spring.press             | —             |
-| reduced     | opacity only, 100ms       | duration.instant         | —             |
+```md
+## Motion contract
+
+| Phase          | Properties               | Token                             | Interruptible |
+| -------------- | ------------------------ | --------------------------------- | ------------- |
+| press          | scale while pressed      | `feedback.press` / `spring.press` | yes           |
+| reduced / none | immediate state feedback | —                                 | —             |
 ```
 
-Tests read this section too (see the Animation system document, §9.3), so it must stay in sync with the code.
+`registry:check` compares the table's recipe set with `meta.motion` and frontmatter `motion`,
+and checks the `## Recipes` table in `content/docs/motion.mdx` against the runtime catalogue.
+Missing sections/tables, unknown or extra recipes, missing recipes and duplicate declarations
+fail the check. Free prose and phase descriptions remain editorial content. This static gate
+complements the implementation checks and three-mode tests; it does not prove live animation.
 
 ### 2.2 Preview capabilities
 

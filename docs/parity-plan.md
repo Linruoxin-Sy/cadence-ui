@@ -1522,11 +1522,25 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
   difference the visual style forces. What it still cannot see: the class lists themselves (a dropped
   utility is invisible to every check — the B4 review found two by hand), and type-level requiredness,
   because most props come from a Base UI type no regex can resolve.
-- **Docs-side recipe validation (half done).** `registry:check` now compares the §3 catalogue table and
-  the §5 `Recipe` union against `lib/motion.ts`, and fails on a recipe that exists in only one of them —
-  the drift that let `theme.reveal` survive. Still open: the per-component motion tables in
-  `content/components/<id>.mdx` and the recipe table in `content/docs/motion.mdx`, which are prose and
-  remain unchecked.
+- **Docs-side recipe validation — done 2026-11-02.** `registry:check` retains the §3 catalogue / §5
+  `Recipe` union comparisons and now calls `scripts/motion-docs.mjs` for all 58 component Motion
+  contract tables plus `content/docs/motion.mdx`'s Recipes table. Registry declarations, frontmatter
+  and actual table recipe sets agree with the runtime catalogue. Parsing is scoped to the named
+  section and designated columns, excluding prose, API tables, comments and fences. Repeated phases
+  may use the same recipe; duplicate declarations/cell entries/catalogue rows fail, as do missing,
+  extra and unknown recipes or missing tables/sections. T0 empty sets, explicit composition reuse,
+  continuous CSS, popup CSS and engine forms retain their existing implementation checks.
+  The design convention is in documentation-site-and-distribution §2.1; the scaffold emits every
+  requested recipe and a T0 static table. Button/Skeleton/Spinner tables now name the recipes that
+  previously appeared only in prose; Carousel has an explicit Recipe column. Source/scheme were
+  inspected; no runtime, metadata or motion form was changed to hide a mismatch.
+  Evidence: `tests/lib/motion-docs.test.tsx` **19 tests**, including isolated mutations through the
+  actual `check-registry.mjs` entry and T0/multiple-recipe scaffolds. Full `pnpm check` **493/493,
+  74/74 files**, `.cache/motion-docs-check.log`; registry build `.cache/motion-docs-build.log`.
+  Four modified contracts compiled with the site's MDX compiler + remarkGfm and rendered in Edge;
+  `.cache/motion-docs-render.html` / `.png` preserve the reviewed, intact tables. This gate proves
+  static recipe declarations; the helper, highlight reliability, JS budget and cross-library live
+  behavior audits below remain open.
 - **`expectMotionContract()` helper.** The three-mode assertion is hand-written per component, and the two
   components missing it were the two that were broken. One shared helper that a new component must call.
 - **Async highlight test reliability.** Investigate the repeated CodeBlock 1s highlight wait timeouts

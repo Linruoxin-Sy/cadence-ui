@@ -101,8 +101,14 @@ const apiRow = `| \`className\` | \`string\` | – | Merged last. |`;
 const motionSection = motion.length
   ? `| Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| TODO | TODO | \`${motion[0]}\` | TODO |`
-  : "No motion. The component is structural: it keeps the focus ring and colour transitions only.";
+${motion.map((recipe) => `| TODO | TODO | \`${recipe}\` | TODO |`).join("\n")}`
+  : `No motion. The component is structural: it keeps the focus ring and colour transitions only.
+
+| Mode | Authored motion |
+| --- | --- |
+| full | none |
+| reduced | none |
+| none | none |`;
 
 const docs = `---
 title: ${title}
