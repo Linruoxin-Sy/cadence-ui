@@ -25,7 +25,7 @@ import { PreviewStack } from "./shell";
 export function ItemPreview() {
   return (
     <PreviewStack>
-      <div className="grid w-full max-w-2xl grid-cols-2 items-start gap-4">
+      <div className="grid w-full max-w-2xl grid-cols-1 items-start sm:grid-cols-2 gap-4">
         <ItemGroup>
           <Item>
             <ItemMedia variant="icon">
@@ -48,7 +48,7 @@ export function ItemPreview() {
             </ItemMedia>
             <ItemContent>
               <ItemTitle>registry</ItemTitle>
-              <ItemDescription>19 items, 12 components</ItemDescription>
+              <ItemDescription>65 items, 58 components</ItemDescription>
             </ItemContent>
             <ItemActions>
               <Badge variant="secondary">v0.2.0</Badge>

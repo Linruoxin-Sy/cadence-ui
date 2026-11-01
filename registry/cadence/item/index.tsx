@@ -32,7 +32,14 @@ function ItemGroup({ className, ...props }: ItemGroupProps) {
 export interface ItemSeparatorProps extends React.ComponentProps<typeof Separator> {}
 
 function ItemSeparator({ className, ...props }: ItemSeparatorProps) {
-  return <Separator data-slot="item-separator" orientation="horizontal" className={cn("my-0", className)} {...props} />;
+  return (
+    <Separator
+      data-slot="item-separator"
+      orientation="horizontal"
+      className={(state) => cn("my-0", typeof className === "function" ? className(state) : className)}
+      {...props}
+    />
+  );
 }
 
 /**

@@ -16,8 +16,8 @@ export function AlertPreview() {
       <div className="grid w-full max-w-lg gap-3">
         <Alert>
           <CircleAlertIcon />
-          <AlertTitle>33 components left to ship</AlertTitle>
-          <AlertDescription>Batch B2 covers structure and feedback.</AlertDescription>
+          <AlertTitle>Registry ready</AlertTitle>
+          <AlertDescription>58 components are available to install.</AlertDescription>
         </Alert>
 
         <Alert variant="destructive">

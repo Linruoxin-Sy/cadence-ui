@@ -69,7 +69,7 @@ function PaginationLink({ className, isActive, size = "icon", ...props }: Pagina
   );
 }
 
-export interface PaginationPreviousProps extends Omit<React.ComponentProps<typeof PaginationLink>, "size"> {
+export interface PaginationPreviousProps extends React.ComponentProps<typeof PaginationLink> {
   /** Label text; hidden below `sm`, where the chevron carries the meaning. */
   text?: string;
 }
@@ -88,7 +88,7 @@ function PaginationPrevious({ className, text = "Previous", ...props }: Paginati
   );
 }
 
-export interface PaginationNextProps extends Omit<React.ComponentProps<typeof PaginationLink>, "size"> {
+export interface PaginationNextProps extends React.ComponentProps<typeof PaginationLink> {
   text?: string;
 }
 

@@ -96,11 +96,13 @@ block is harder to read and competes with the page it sits on.
 | `Alert`            | `variant`, native props  | `variant`: `"default" \| "destructive"`. Always `role="alert"`. |
 | `AlertTitle`       | native div props         | One line, medium weight, second grid column.                    |
 | `AlertDescription` | native div props         | Muted text; paragraphs inside keep relaxed leading.             |
-| `AlertAction`      | native div props         | Right-aligned slot, spans both rows.                            |
+| `AlertAction`      | native div props         | Third grid column, spans both rows.                            |
 
 Every part sets `data-slot` (`alert`, `alert-title`, `alert-description`,
 `alert-action`), so a consumer can restyle without new props:
 `[&>[data-slot=alert-title]]:text-base`.
+
+Destructive descriptions use the full destructive text token for readable contrast in both themes. An action has its own grid column so it cannot cover the title or description.
 
 ## Motion contract
 

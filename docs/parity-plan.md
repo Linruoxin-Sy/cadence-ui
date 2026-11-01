@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B9 implementations shipped (2026-11-01); B1 and B6–B9 batch gates complete.
-> Historical B2–B5 visual gates and §8 remain open; B2 is next.**
+> Status: **B0–B9 implementations shipped (2026-11-01); B1–B2 and B6–B9 batch gates complete.
+> Historical B3–B5 visual gates and §8 remain open; B3 is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -266,7 +266,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------------------------------ |
 | B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                        |
 | B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | complete (§7.27)               |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | implementation done; gate open |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ gate complete (§7.28)       |
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | implementation done; gate open |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | implementation done; gate open |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open                      |
@@ -1618,3 +1618,33 @@ With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
   Pulse sampling uses the computed CSS duration, not a fixed frame count tied to display Hz.
 - No recipes, motion tokens, runtime, dependencies, upstream pin or checking configuration changed.
   B2–B5 and every §8 carried item, including global callback/popup audits, remain open.
+
+
+### 7.28 Historical B2 gate — complete (2026-11-02)
+
+- Nine items: alert, empty, item, field, button-group, input-group, breadcrumb,
+  pagination, spinner. Eight static T0 wrappers keep their existing provider-free contract.
+- Compared all nine pinned Base source files and installed Base/useRender types. Fix inherited
+  state class callbacks in ItemSeparator, ButtonGroupSeparator and InputGroupButton; state styles,
+  caller-last classes, render, events and React 19 cleanup refs remain supported. Native useRender
+  parts retain string/object props. PaginationPrevious/Next again accept upstream's size prop.
+- Alert destructive description now uses the full destructive token: the former /90 failed axe
+  contrast at 4.23 light / 4.41 dark. Action occupies a third column, without covering message text.
+- Empty/Item previews stack on mobile; Field demonstrates responsive direction and caller-supplied
+  invalid changes with stable input values. Counts in Alert/Item previews reflect 58 components.
+- Spinner retains the documented single-glyph rotation exception: CSS data.transition in full/reduced,
+  static in none. Real rAF samples prove rotation, initial-none stillness, live cancellation, nested
+  full restoration and OS preference change; no new recipes, timings, runtime or dependencies.
+- Edge production gate `.next-b2-gate`, workers=2: B2 suite 30/30 (1.9m). Six mode/OS animation
+  cases and six mode/OS native interaction cases, plus nine pages in two themes. Full-page axe
+  WCAG2A/2AA/2.1AA zero violations at 1280/390, no disabled rules, document overflow or page errors.
+  All 36 full-page and 36 preview captures reviewed. Additional four existing visual cases passed
+  (15.9s) with real Alert no-overlap and ButtonGroupSeparator positive-height geometry assertions;
+  these are reruns, not 34 distinct cases. Initial run 28/30 failed Alert contrast, fixed in source.
+- Production build succeeds (69 pages). Initial full check passes 453 tests / 70 files, including
+  three new compatibility tests; final-source registry rebuild/check and commits recorded in
+  `docs/handoffs/b2-gate.md`. Pin remains 96da9cc7f1aa10580a3741664e2a77c721206c00.
+- Evidence: `.cache/b2-review-e2e.log`, `.cache/b2-geometry-e2e.log`, `.cache/b2-review-build.log`,
+  `.cache/b2-proof/<id>-<light|dark>-<1280|390>[-preview].png` (untracked).
+- B3–B5 gates, all §8 tooling/site/metadata, and the cross-library callback/popup audit remain open.
+  Next is only B3; B1/B2/B6–B9 stay closed unless new concrete evidence warrants a bounded repair.

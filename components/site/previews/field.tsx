@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/registry/cadence/button";
 import {
   Field,
@@ -23,13 +24,15 @@ import { PreviewStack } from "./shell";
  * between groups.
  */
 export function FieldPreview() {
+  // The application supplies invalid state; Field performs no validation.
+  const [invalid, setInvalid] = useState(true);
   return (
     <PreviewStack>
-      <FieldSet className="w-full max-w-sm gap-3">
+      <FieldSet className="w-full max-w-lg gap-3">
         <FieldLegend>Billing details</FieldLegend>
 
         <FieldGroup className="gap-3">
-          <Field>
+          <Field orientation="responsive">
             <FieldLabel htmlFor="field-name">Company</FieldLabel>
             <FieldContent>
               <Input id="field-name" placeholder="Cadence Labs" />
@@ -37,11 +40,18 @@ export function FieldPreview() {
             </FieldContent>
           </Field>
 
-          <Field data-invalid="true">
+          <Field data-invalid={invalid}>
             <FieldLabel htmlFor="field-vat">VAT number</FieldLabel>
             <FieldContent>
-              <Input id="field-vat" aria-invalid defaultValue="NL0000" aria-describedby="field-vat-error" />
-              <FieldError id="field-vat-error">That VAT number has the wrong number of digits.</FieldError>
+              <Input
+                id="field-vat"
+                aria-invalid={invalid}
+                defaultValue="NL0000"
+                aria-describedby={invalid ? "field-vat-error" : undefined}
+              />
+              <FieldError id="field-vat-error">
+                {invalid ? "That VAT number has the wrong number of digits." : null}
+              </FieldError>
             </FieldContent>
           </Field>
 
@@ -55,7 +65,10 @@ export function FieldPreview() {
 
           <FieldSeparator>or</FieldSeparator>
 
-          <Field orientation="horizontal">
+          <Field orientation="horizontal" className="flex-wrap">
+            <Button size="sm" variant="outline" onClick={() => setInvalid((value) => !value)}>
+              Toggle supplied error
+            </Button>
             <Button size="sm">Save</Button>
             <Button size="sm" variant="ghost">
               Cancel

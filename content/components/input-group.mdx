@@ -110,6 +110,8 @@ The frame watches `[data-slot=input-group-control]` for `:focus-visible` and
 `[aria-invalid=true]`, which is why the control can be borderless and the group still
 shows the ring.
 
+`InputGroupButton` preserves Button state callbacks for `className` and `style`, with caller classes last. The input and textarea wrappers keep their native props.
+
 ## Motion contract
 
 No motion (T0). The frame never animates. `transition-[color,box-shadow]` covers the

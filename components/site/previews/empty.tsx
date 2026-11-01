@@ -13,7 +13,7 @@ import { PreviewStack } from "./shell";
 export function EmptyPreview() {
   return (
     <PreviewStack>
-      <div className="grid w-full max-w-xl grid-cols-2 items-start gap-4">
+      <div className="grid w-full max-w-xl grid-cols-1 items-start sm:grid-cols-2 gap-4">
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">

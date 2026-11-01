@@ -136,7 +136,9 @@ function InputGroupButton({
       type={type}
       variant={variant}
       size={size}
-      className={cn(inputGroupButtonVariants({ size }), className)}
+      className={(state) =>
+        cn(inputGroupButtonVariants({ size }), typeof className === "function" ? className(state) : className)
+      }
       {...props}
     />
   );
