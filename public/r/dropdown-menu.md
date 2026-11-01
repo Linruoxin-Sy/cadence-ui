@@ -158,7 +158,7 @@ the element the user presses.
 | `align`       | `"start" \| "center" \| "end"`                 | `"start"`  | Alignment along the trigger's edge.            |
 | `sideOffset`  | `number`                                      | `4`        | Gap between trigger and panel, in pixels.       |
 | `alignOffset` | `number`                                      | `0`        | Shift along the alignment axis.                 |
-| `className`   | `string`                                      | –          | Merged last.                                    |
+| `className`   | string or Base UI state callback                                      | –          | Merged last.                                    |
 
 ### Items
 
@@ -195,6 +195,14 @@ a submenu grows out of its item the same way, because both levels render the sam
 The highlighted row is a colour change, not motion: `data-highlighted` switches the item's
 background. A travelling highlight would be a shared element across items — `layout.move`,
 which belongs to `tabs` and `toggle-group`, not to a menu that can be entered at any row.
+
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
 
 ## Keyboard interactions
 

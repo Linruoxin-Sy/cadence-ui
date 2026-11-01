@@ -132,6 +132,14 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 Notifications remain expanded in a vertical stack; there is no collapsed height or stack-scale animation.
 Base UI owns timeout pausing, lifecycle, swipe recognition and removal. No extra animation scheduler is added.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
+
 ## Keyboard interactions
 
 | Keys | Action |

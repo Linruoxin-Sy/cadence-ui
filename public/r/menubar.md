@@ -142,6 +142,14 @@ The bar itself does not animate. Switching from one open menu to the next replac
 with another; there is no shared element between them, and a highlight sliding along the bar
 would suggest a continuity the markup does not have.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
+
 ## Keyboard interactions
 
 | Keys                        | Action                                                        |

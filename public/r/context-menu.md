@@ -27,7 +27,7 @@ import {
 export function FileContextMenu({ file }: { file: File }) {
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="flex h-32 items-center justify-center rounded-lg border border-dashed text-sm">
+      <ContextMenuTrigger tabIndex={0} className="flex h-32 items-center justify-center rounded-lg border border-dashed text-sm">
         {file.name}
       </ContextMenuTrigger>
       <ContextMenuContent>
@@ -132,7 +132,7 @@ long-press; it renders a `div` by default, so give it the box you want to be rig
 | `align`       | `"start" \| "center" \| "end"`            | `"start"`   | Alignment along that side.                    |
 | `sideOffset`  | `number`                                 | `0`         | Gap from the pointer.                         |
 | `alignOffset` | `number`                                 | `4`         | Shift along the alignment axis.               |
-| `className`   | `string`                                 | –           | Merged last.                                  |
+| `className`   | string or Base UI state callback                                 | –           | Merged last.                                  |
 
 ### Items
 
@@ -159,6 +159,14 @@ slots.
 The panel grows out of the point that was pressed. That is the whole reason the recipe is
 anchored rather than centred: a context menu belongs to the place it was summoned, and a
 scale from the pointer says so without moving the panel.
+
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
 
 ## Keyboard interactions
 

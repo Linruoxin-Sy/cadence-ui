@@ -5439,6 +5439,16 @@ folds the surface without re-wrapping the label, and the handoff's destination d
 the width settles. Keyboard selection has no origin, so it changes the width and lets the label swap
 without a flight; the pointer keeps the spatial handoff.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive. A cancelled selection
+does not fly the pointer label over the current value. Natural text width is observed
+separately from the animated outer slot, including content and viewport changes.
+
 ## Keyboard interactions
 
 - `Enter` / `Space` / `ArrowDown` opens the list and focuses the selected item.
@@ -5684,6 +5694,18 @@ from the field rather than from its own centre. The list itself never animates: 
 keystroke, and a row that is still travelling when the next character arrives is a list the reader has to
 chase.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive. Base UI 1.9's typeable focus manager hides background
+nodes from assistive technology while leaving their tab stops enabled. Cadence adds native
+`inert` only to newly hidden nodes; Tab releases it before normal focus navigation and
+Base UI's blur dismissal. Existing hidden/inert nodes and parent dialogs keep their owners. `ComboboxInput` string classes style the field frame;
+state callback classes style the native input with its real Base UI input state.
+
 ## Keyboard interactions
 
 - `ArrowDown` or `Alt+ArrowDown` opens the popup; with it open, `ArrowDown`/`ArrowUp` move the highlight.
@@ -5887,7 +5909,7 @@ the element the user presses.
 | `align`       | `"start" \| "center" \| "end"`                 | `"start"`  | Alignment along the trigger's edge.            |
 | `sideOffset`  | `number`                                      | `4`        | Gap between trigger and panel, in pixels.       |
 | `alignOffset` | `number`                                      | `0`        | Shift along the alignment axis.                 |
-| `className`   | `string`                                      | –          | Merged last.                                    |
+| `className`   | string or Base UI state callback                                      | –          | Merged last.                                    |
 
 ### Items
 
@@ -5924,6 +5946,14 @@ a submenu grows out of its item the same way, because both levels render the sam
 The highlighted row is a colour change, not motion: `data-highlighted` switches the item's
 background. A travelling highlight would be a shared element across items — `layout.move`,
 which belongs to `tabs` and `toggle-group`, not to a menu that can be entered at any row.
+
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
 
 ## Keyboard interactions
 
@@ -6008,7 +6038,7 @@ import {
 export function FileContextMenu({ file }: { file: File }) {
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="flex h-32 items-center justify-center rounded-lg border border-dashed text-sm">
+      <ContextMenuTrigger tabIndex={0} className="flex h-32 items-center justify-center rounded-lg border border-dashed text-sm">
         {file.name}
       </ContextMenuTrigger>
       <ContextMenuContent>
@@ -6113,7 +6143,7 @@ long-press; it renders a `div` by default, so give it the box you want to be rig
 | `align`       | `"start" \| "center" \| "end"`            | `"start"`   | Alignment along that side.                    |
 | `sideOffset`  | `number`                                 | `0`         | Gap from the pointer.                         |
 | `alignOffset` | `number`                                 | `4`         | Shift along the alignment axis.               |
-| `className`   | `string`                                 | –           | Merged last.                                  |
+| `className`   | string or Base UI state callback                                 | –           | Merged last.                                  |
 
 ### Items
 
@@ -6140,6 +6170,14 @@ slots.
 The panel grows out of the point that was pressed. That is the whole reason the recipe is
 anchored rather than centred: a context menu belongs to the place it was summoned, and a
 scale from the pointer says so without moving the panel.
+
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
 
 ## Keyboard interactions
 
@@ -6320,6 +6358,14 @@ changes, and a submenu opens to the right of the item it belongs to.
 The bar itself does not animate. Switching from one open menu to the next replaces one panel
 with another; there is no shared element between them, and a highlight sliding along the bar
 would suggest a continuity the markup does not have.
+
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
 
 ## Keyboard interactions
 
@@ -6883,6 +6929,13 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 The inline command has no animation. `CommandDialog` inherits Dialog's recipes and mode branches;
 it adds no transition of its own. Fixed centering translation is layout, not motion.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. The Dialog surface retains Base UI callback/render/ref semantics. Command parts use
+cmdk’s native string class and object style props; cmdk owns filtering and keyboard selection.
+
 ## Keyboard interactions
 
 | Keys | Action |
@@ -7044,6 +7097,14 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 Notifications remain expanded in a vertical stack; there is no collapsed height or stack-scale animation.
 Base UI owns timeout pausing, lifecycle, swipe recognition and removal. No extra animation scheduler is added.
+
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive.
 
 ## Keyboard interactions
 
