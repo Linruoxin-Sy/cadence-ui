@@ -1913,6 +1913,47 @@
           "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
         }
       }
+    },
+    {
+      "name": "attachment",
+      "type": "registry:ui",
+      "title": "Attachment",
+      "description": "Displays file media, metadata, caller-owned upload state, and actions.",
+      "categories": ["ai"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/button"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/attachment/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/attachment/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T5",
+        "batch": "B9",
+        "motion": [
+          {
+            "recipe": "data.transition",
+            "form": "continuous"
+          },
+          "feedback.press"
+        ],
+        "intensity": "subtle",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10",
+          "guide": "apps/v4/content/docs/components/base/attachment.mdx"
+        }
+      }
     }
   ]
 }

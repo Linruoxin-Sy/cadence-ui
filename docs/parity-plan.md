@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B8 implementations shipped (2026-11-01); B6, B7 and B8 batch gates complete.
-> Historical B1–B5 visual gates remain open. B9 attachment/bubble is next; §8 remains open.**
+> Historical B1–B5 visual gates remain open. B9 Attachment shipped; Bubble and the B9 joint gate remain open; §8 remains open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -268,7 +268,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done   |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | 1/2 shipped; gate open |
 |       | **Total**                  | **57** |            | **102**     |         |           |
 
 ### 7.0 Status discipline
@@ -294,7 +294,7 @@ green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**,
 here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus and
 `combobox` and `command` that followed. `toast` completes the implementation in §7.8; the earlier
 components’ visual gate remains open. **B9 is open**: `code-block` landed ahead of the
-batch (see §7.5), and `attachment` + `bubble` are still to come.
+batch (see §7.5), `attachment` is shipped (§7.24), and `bubble` remains.
 
 ### B1 — atoms (11)
 
@@ -334,7 +334,7 @@ Batch gate complete (§7.20); B8 blocks and their joint gate are complete (§7.2
 
 ### B9 — AI first (2 + 1 early)
 
-`attachment`, `bubble`. `marker` and `message` moved to the backlog. `code-block` shipped ahead of the
+`attachment` ✅ shipped (§7.24); `bubble` next. `marker` and `message` moved to the backlog. `code-block` shipped ahead of the
 batch (§7.5): it is the one AI component whose upstream source is already pinned, so it needed no new
 prerequisite to clear.
 
@@ -1366,6 +1366,56 @@ B1–B5 historical visual gates and every unclosed §8 item remain open; B6/B7 s
 Popover's local clock repair does not prove other historical popups. Base UI
 className state callbacks need a final compatibility audit across older wrappers;
 Button/Popover/Sheet/Dropdown local fixes do not prove full-library compatibility.
+
+### 7.24 Attachment — ✅ shipped (2026-11-01)
+
+The fixed pin has `apps/v4/registry/bases/base/ui/attachment.tsx`, the Base guide
+`apps/v4/content/docs/components/base/attachment.mdx` and Base example
+`apps/v4/examples/base/attachment-demo.tsx`. Visual classes come from
+`apps/v4/registry/new-york-v4/ui/attachment.tsx`. The nine-export source imports
+Base UI mergeProps/useRender and Button; it does **not** import `@shadcn/react`.
+Existing installed dependencies suffice; no package or pin change is needed.
+The unscheduled AI prerequisites below remain applicable to future components
+that actually need that runtime or streaming ownership; they do not require
+adding an unused runtime to this presentational file component.
+
+Attachment's caller owns File objects, object URLs and their revocation, file input
+accept/multiple/name/required semantics, upload requests, progress, cancellation,
+retry and validation. Its state prop only renders idle/uploading/processing/error/done.
+No streaming model is needed here. T5 composes existing data.transition (busy title:
+opacity pulse, replacing upstream shimmer's background travel) and feedback.press
+(Button actions). Layout, media state and removal update immediately. No reveal,
+layout/geometry animation or presence delay is added. Full/reduced retain the
+opacity-only busy loop; none disables it. Bubble and the joint B9 gate remain open.
+
+**Implementation and proof:** all nine pinned Base exports/slots/defaults are retained,
+with new-york-v4 visual classes. Native div/span props, useRender element/function,
+event merging and React 19 ref cleanup survive. AttachmentAction preserves Button
+className/style state callbacks and caller-last merging; trigger/actions stay on
+separate layers, with an explicit overlay focus ring. Native image composition,
+long names, three sizes, both orientations and keyboard-scrollable groups are shown.
+The preview's native file input updates only the displayed name; no request is sent.
+No new npm dependency, shared runtime, build/test config or upstream pin change.
+
+Full repository check: 439 tests / 67 files, 57 pinned surfaces, registry freshness,
+all gzip tier budgets, P11, types and Biome pass. Isolated `.next-b9` production build:
+68 static pages. Edge workers=2, port3133: full/reduced/none × both system preferences,
+per-frame title opacity/no-transform, actual action press scale, live none cancellation,
+restored nested full under outer none, system reduce, stable title across state/size/
+orientation/resize, file selection, Enter/Space/Tab, independent pointer actions,
+link activation and keyboard group scroll. Full-page WCAG2A/2AA/2.1AA axe has zero
+violations without disabled rules in light/dark at 1280/390, both orientations;
+no document overflow at any size. Eight browser cases pass. Four full-page and
+four preview screenshots are individually reviewed in `.cache/attachment-proof/`.
+Logs: `.cache/attachment-{build,e2e,final-registry,final-check}.log`.
+
+Initial unconstrained concurrent verification exhausted host memory; final checks
+run sequentially, Vitest through VITEST_MAX_FORKS=2/VITEST_MIN_FORKS=1, build with
+RAYON_NUM_THREADS=2 and NODE_OPTIONS=--max-old-space-size=768. No checks disabled.
+Next's generated tsconfig additions were restored. Source and final-source-stamped
+public payloads are committed separately. Bubble, code-block joint regression and
+the B9 batch gate remain open, as do historical B1–B5 gates and all carried §8 work.
+B6/B7/B8 remain closed; no global popup/wrapper compatibility conclusion is implied.
 
 ## 8. Backlog
 

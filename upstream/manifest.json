@@ -2266,6 +2266,69 @@
       "props": {
         "DatePickerDemo": {}
       }
+    },
+    "attachment": {
+      "path": "apps/v4/registry/bases/base/ui/attachment.tsx",
+      "guide": "apps/v4/content/docs/components/base/attachment.mdx",
+      "exports": [
+        "Attachment",
+        "AttachmentAction",
+        "AttachmentActions",
+        "AttachmentContent",
+        "AttachmentDescription",
+        "AttachmentGroup",
+        "AttachmentMedia",
+        "AttachmentTitle",
+        "AttachmentTrigger"
+      ],
+      "slots": [
+        "attachment",
+        "attachment-action",
+        "attachment-actions",
+        "attachment-content",
+        "attachment-description",
+        "attachment-group",
+        "attachment-media",
+        "attachment-title",
+        "attachment-trigger"
+      ],
+      "props": {
+        "Attachment": {
+          "className": null,
+          "state": "\"done\"",
+          "size": "\"default\"",
+          "orientation": "\"horizontal\""
+        },
+        "AttachmentMedia": {
+          "className": null,
+          "variant": "\"icon\""
+        },
+        "AttachmentContent": {
+          "className": null
+        },
+        "AttachmentTitle": {
+          "className": null
+        },
+        "AttachmentDescription": {
+          "className": null
+        },
+        "AttachmentActions": {
+          "className": null
+        },
+        "AttachmentAction": {
+          "className": null,
+          "variant": null,
+          "size": "\"icon-xs\""
+        },
+        "AttachmentTrigger": {
+          "className": null,
+          "render": null,
+          "type": null
+        },
+        "AttachmentGroup": {
+          "className": null
+        }
+      }
     }
   }
 }
