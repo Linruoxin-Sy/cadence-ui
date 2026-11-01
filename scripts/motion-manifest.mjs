@@ -83,6 +83,20 @@ export function implementedForm(source, recipe, form = "one-shot") {
   if (called) return "one-shot";
 
   if (recipe === "geometry.resize" && form === "css-transition") {
+    // Navigation Menu delegates measurement/retargeting to Base UI's shared popup engine.
+    const sharedPopup =
+      source.includes("NavigationMenuPrimitive.Popup") &&
+      source.includes("NavigationMenuPrimitive.Viewport") &&
+      source.includes("--popup-width") &&
+      source.includes("--popup-height") &&
+      source.includes("min-h-0 min-w-0 max-h-(--available-height) max-w-(--available-width)") &&
+      source.includes("transition-[opacity,scale,width,height]") &&
+      source.includes("--motion-duration-slow") &&
+      source.includes("ease-cadence-out") &&
+      /cm\.reduced\s*\?\s*"transition-opacity"/.test(source) &&
+      source.includes("data-motion={cm.mode}");
+    if (sharedPopup) return "css-transition";
+
     const states = source.includes("data-[starting-style]:h-0") && source.includes("data-[ending-style]:h-0");
     const measured =
       source.includes("ResizeObserver") && source.includes("getBoundingClientRect") && source.includes("Math.max(0,");

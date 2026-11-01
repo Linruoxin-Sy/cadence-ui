@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B6 implementations shipped (2026-11-01); B6 batch gate complete.
-> Historical B1–B5 visual gates remain open. B7 chart and calendar shipped; navigation-menu is next. B7–B9 and §8 remain open.**
+> Historical B1–B5 visual gates remain open. B7 chart, calendar and navigation-menu shipped; resizable is next. B7–B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -266,7 +266,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 2/5 shipped |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 3/5 shipped |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
 |       | **Total**                  | **57** |            | **102**     |         |             |
@@ -325,7 +325,7 @@ All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scrol
 
 ### B7 — heavy data and navigation (5)
 
-Chart and Calendar shipped (§7.15–7.16). Next: `navigation-menu`, `resizable`, `sidebar`.
+Chart, Calendar and Navigation Menu shipped (§7.15–7.17). Next: `resizable`, `sidebar`.
 
 ### B8 — compositions (2, `registry:block`)
 
@@ -1169,6 +1169,43 @@ the batch row now says `gate open` because the earlier components still lack vis
   `pnpm registry:build` precedes `pnpm check`; source and generated payloads are separate commits.
 - **Remaining:** closes Calendar only. B7 is 2/5; navigation-menu, resizable and sidebar follow.
   Historical B1–B5 visual gates, B8/B9 and all unclosed §8 carried work remain open; B6 stays closed.
+
+### 7.17 B7 navigation-menu shipped (2026-11-01)
+
+- **Pinned surface:** read Base and new-york-v4 sources at 96da9cc7f1aa. All nine Base
+  exports, slots, declared props/defaults and native Base UI Root/List/Item/Trigger/Content/Link/Icon/
+  Positioner props remain available, including render, refs, state callback classes/styles,
+  controlled changes, actions, keepMounted and collision positioning. No new dependency or pin move.
+- **Motion:** T3 popup.anchored + exit.fade + geometry.resize (explicit CSS form). Base UI retains
+  its shared popup/viewport, measured targets, cancellation and auto-size reset. Native CSS full
+  scales/fades the anchored popup, cross-fades content, and transitions bounded width/height on
+  the slow token clock. Reduced drops scale and geometry transitions; none also omits starting/
+  ending opacity states. Positioning coordinates update instantly. Popup/content own token clocks
+  for nested modes and timeScale. Caller classes/styles remain last; no second geometry engine.
+- **Findings:** Base UI ArrowDown opens but keeps trigger focus; Tab enters content. Horizontal
+  arrows move top-level focus and ArrowDown opens the next item. Content keepMounted preserves
+  state while the portal remains mounted; the default portal unmounts on a complete close.
+  Controlled value-only changes can adopt natural geometry immediately; trigger activation and
+  in-panel content mutations drive Base UI's measured resize clock. External controls may dismiss
+  the popup by normal outside/focus-out semantics. Tests distinguish these paths.
+- **Accessibility repair:** Base UI 1.6's tabbable focus guards carried aria-hidden=true, causing
+  full-page axe aria-hidden-focus failures. Two menu-scoped child-list observers remove that
+  attribute from these empty generic spans only, preserving tabindex, focus handlers and refs
+  (including callback cleanup). No dependency patch, global mutation or disabled axe rule.
+- **Proof:** production `.next-navigation-menu` build, Edge 8/8 matrix (three modes × two system
+  preferences plus light/dark visual cases), actual sampled popup scale/opacity, pointer cross-item
+  switching, keyboard arrows/Tab/Escape, outside dismissal, controlled rapid reverse, same popup
+  identity, in-panel content update, active resize → none with a positive running count → zero,
+  system downgrade and 390px resize. Whole-page axe WCAG2A/2AA/2.1AA zero violations in both themes,
+  no horizontal overflow at 1280/390. Four screenshots reviewed in `.cache/navigation-menu-proof/`.
+  Unit coverage includes modes, disabled semantics, render/refs/callback styles/classes, cancellation,
+  retained content and ref cleanup; registry verifier also checks the explicit shared-popup CSS form.
+- **Conformance:** declared = implemented = documented; transform/opacity plus bounded T3 measured
+  geometry only, no top/left tween or animation timer. Full/reduced/none differ in computed browser
+  behavior; mode changes keep the same popup. Payloads rebuilt before check and from final source
+  commit, with source and generated artifacts in separate commits.
+- **Remaining:** closes Navigation Menu only. B7 is 3/5; resizable then sidebar. Historical B1–B5
+  visual gates, B8/B9 and all unclosed §8 carried work remain open. B6 stays closed.
 
 ## 8. Backlog
 

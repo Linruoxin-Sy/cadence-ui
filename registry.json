@@ -1712,6 +1712,42 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:ui",
+      "title": "Navigation Menu",
+      "description": "Site navigation with shared popup content and interruptible sizing.",
+      "categories": ["navigation"],
+      "dependencies": ["@base-ui/react", "motion", "class-variance-authority", "lucide-react"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/navigation-menu/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/navigation-menu/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T3",
+        "batch": "B7",
+        "motion": [
+          "popup.anchored",
+          "exit.fade",
+          {
+            "recipe": "geometry.resize",
+            "form": "css-transition"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

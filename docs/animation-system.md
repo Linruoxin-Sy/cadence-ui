@@ -257,6 +257,24 @@ ResizeObserver retargets when open content changes, without observing the animat
 Under reduced and none, remove the height transition with `duration-0`; geometry is instant in both.
 A static expanded/collapsed icon swap needs no additional recipe. Every panel carries `data-motion`.
 
+#### `geometry.resize` for Base UI Navigation Menu (CSS form)
+
+Navigation Menu's shared Popup uses Base UI's `--popup-width` / `--popup-height` targets.
+Its Trigger measures after commit and on content mutation / viewport resize, snapshots the current
+interrupted size, and schedules the next target through animation frames. Keep that engine and its
+native transition completion / auto-size reset; do not add a second geometry observer or remount the viewport.
+Clamp the popup with non-negative minimum dimensions and the positioner's available width/height.
+Transition width/height with `duration.slow` / `ease.out` only in full mode; reduced and none remove
+both properties from the transition list, including during an active resize. Native CSS reversal
+keeps current position (not spring velocity). Initial open uses natural size without a resize reveal.
+The positioner's coordinates update instantly: transitioning top/left is outside the motion budget.
+Popup entrance uses `popup.anchored`, closing uses `exit.fade`; content switches cross-fade on the
+same fast clock without an extra scale or directional travel. Base UI retains exiting content inert,
+then unmounts it after native transitions. All animated parts carry their own effective `data-motion`. Popup and Content set token-derived local CSS clocks from that mode and timeScale so an explicit full subtree cannot inherit zero timings from a none ancestor.
+Caller state callback classes/styles and render/refs remain intact. Caller-authored animation must
+follow this same contract. This T3 form requires browser proof of switch/reverse/content resize and
+running mode downgrade, alongside the popup's keyboard/pointer lifecycle.
+
 #### `geometry.resize` (label/width morphing)
 
 ```tsx

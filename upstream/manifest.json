@@ -2010,6 +2010,62 @@
           "locale": null
         }
       }
+    },
+    "navigation-menu": {
+      "path": "apps/v4/registry/bases/base/ui/navigation-menu.tsx",
+      "exports": [
+        "NavigationMenu",
+        "NavigationMenuContent",
+        "NavigationMenuIndicator",
+        "NavigationMenuItem",
+        "NavigationMenuLink",
+        "NavigationMenuList",
+        "NavigationMenuPositioner",
+        "NavigationMenuTrigger",
+        "navigationMenuTriggerStyle"
+      ],
+      "slots": [
+        "navigation-menu",
+        "navigation-menu-content",
+        "navigation-menu-indicator",
+        "navigation-menu-item",
+        "navigation-menu-link",
+        "navigation-menu-list",
+        "navigation-menu-trigger"
+      ],
+      "props": {
+        "NavigationMenu": {
+          "align": "\"start\"",
+          "className": null,
+          "children": null
+        },
+        "NavigationMenuList": {
+          "className": null
+        },
+        "NavigationMenuItem": {
+          "className": null
+        },
+        "NavigationMenuTrigger": {
+          "className": null,
+          "children": null
+        },
+        "NavigationMenuContent": {
+          "className": null
+        },
+        "NavigationMenuPositioner": {
+          "className": null,
+          "side": "\"bottom\"",
+          "sideOffset": "8",
+          "align": "\"start\"",
+          "alignOffset": "0"
+        },
+        "NavigationMenuLink": {
+          "className": null
+        },
+        "NavigationMenuIndicator": {
+          "className": null
+        }
+      }
     }
   }
 }
