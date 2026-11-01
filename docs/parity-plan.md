@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0, B1, B2, B3 and B4 complete (2026-10-30); B5 in progress — `select`, `dropdown-menu`,
-> `context-menu`, `menubar`, `combobox` and `command` shipped, `toast` to come (2026-11-01).**
+> Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
+> open for earlier components; B6 implementation is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -256,19 +256,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status  |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | next    |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned |
-|       | **Total**                  | **57** |            | **102**     |         |         |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned   |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned   |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned   |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
+|       | **Total**                  | **57** |            | **102**     |         |           |
 
 ### 7.0 Status discipline
 
@@ -291,7 +291,8 @@ validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` 
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
 §7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
 here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus and
-`combobox` and `command` that followed, and `toast` remains. **B9 is open**: `code-block` landed ahead of the
+`combobox` and `command` that followed. `toast` completes the implementation in §7.8; the earlier
+components’ visual gate remains open. **B9 is open**: `code-block` landed ahead of the
 batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B1 — atoms (11)
@@ -722,7 +723,8 @@ whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/cod
 
 ### 7.6 B5 — in progress (2026-10-31, updated 2026-11-01)
 
-Six of the seven items are shipped; the batch row says `next` because `toast` remains.
+Historical checkpoint before toast: six of seven items shipped. §7.8 supersedes this checkpoint;
+the batch row now says `gate open` because the earlier components still lack visual evidence.
 
 - **Scope shipped:** `select` (2026-10-30), `dropdown-menu`, `context-menu`, `menubar` (2026-10-31),
   `combobox` (2026-11-01). 41 components, 47 registry items, 41 docs, 42 previews, 290 unit tests,
@@ -824,8 +826,9 @@ Six of the seven items are shipped; the batch row says `next` because `toast` re
     size: a 24px X in a 24px box. Both icon controls now declare the glyph size themselves, which is also
     what makes a hand-placed `ComboboxTrigger` render correctly without a `Button` behind it. jsdom and axe
     both pass either way — this is the class the browser pass exists to catch, and it did.
-- **Still open:** `toast` — the rest of B5 (`command` completed in §7.7). Dual-theme screenshots for B1–B5 are
-  still not generated: the browser pass now runs here, but nothing writes the images, so the visual half
+- **At this checkpoint:** `toast` remained (`command` completed in §7.7; toast now completes in §7.8).
+  Comprehensive dual-theme screenshots for B1–B5 were still not generated: the browser pass now runs here,
+  but nothing writes the images, so the visual half
   of the batch gate remains a script that does not exist. `combobox` was checked by hand in both themes
   while it was written (closed and open, light and dark), which is how the clear glyph above was found;
   those images live in `.cache`, not in the repo.
@@ -856,8 +859,40 @@ Six of the seven items are shipped; the batch row says `next` because `toast` re
   real computed panel/backdrop durations and sampled scale, input focus, empty filtering, Escape
   focus restoration, keyboard selection, and axe in light/dark. Four screenshots (inline/dialog ×
   light/dark) are generated under `test-results/command-command-*/` and visually inspected.
-- **Still open:** `toast`, then B6 onward in the batch table. Older batches' missing screenshots
-  remain open; this component's screenshot test does not close that historical gate.
+- **Next at this checkpoint:** `toast` (now §7.8), then B6 onward in the batch table.
+  Older batches' missing screenshots remain open; this component's screenshot test does not close that historical gate.
+
+### 7.8 `toast` — B5 implementation complete, visual gate open (2026-11-01)
+
+- **Shipped:** all 13 pinned upstream exports and nine slots, including compound parts, `Toaster`,
+  shared `toast`, `createToastManager`, and `useToastManager`. No upstream pin change or new dependency.
+  43 components, 49 registry items, 43 docs, 44 previews. Pinned Base UI source exists;
+  `new-york-v4/toast.tsx` is a cached 404, so semantic popover tokens and Button chrome are used.
+- **Motion conformance:** `popup.anchored` + `exit.fade`, CSS transition form. Full fades and scales
+  from the shared scale token, reduced keeps opacity and removes scale/swipe transforms, none resolves
+  to zero duration. Base UI owns the swipe variables and lifecycle, as with Drawer. No new recipe.
+  Stack bottom offsets and natural content heights update instantly: T2 never animates geometry.
+  Notifications stay expanded rather than reproducing upstream's collapsed height/scale animation.
+  The loading glyph stays static; no rotation or continuous recipe is introduced.
+- **Ownership and API:** manager exports remain Base UI aliases for parity. Cadence adds no promise
+  orchestration, request handling, or validation; docs and preview use caller-owned add/update/close.
+  Provider defaults and Button render defaults remain pinned. Action activation preserves the toast
+  unless the caller closes it; title/description announce via Base UI's notification region.
+- **Verification:** `pnpm registry:build` and `pnpm check` pass (318 tests in 52 files), including
+  registry/parity checks, mode branches, slot coverage, updates, manager isolation, action keyboard
+  activation, explicit close, and removal callbacks. Production build passes with 54 static pages
+  using `CADENCE_DIST_DIR=.next-toast`; generated tsconfig changes are reverted.
+  Toast browser tests pass 8/8 on installed Edge, port 3112, two workers: 3 modes × 2 preferences,
+  computed duration and sampled scale, no reduced transform or geometry transition, arrival focus,
+  F6/Escape, stack bounds, action state, dismissal, and light/dark axe with no disabled rules.
+  Both screenshots are generated and visually inspected, preserved locally at `.cache/toast-proof/`.
+  The complete existing browser suite also passes: 170/170 in 2.6 minutes with the same isolated build
+  and two-worker Edge configuration. This includes existing menus, command, overlays, site navigation,
+  and the motion matrix; it does not invent coverage for untested historical visual states.
+- **Batch status:** all seven B5 implementations are complete. B5 stays `gate open` because the older
+  select/menu visual evidence described in §7.6 has not been regenerated or reviewed here. This
+  toast proof does not close historical B1–B5 visual gates. B6 starts with `accordion`; B7–B9 and
+  §8 carried open work remain scheduled/open. No claim of overall parity completion.
 
 ## 8. Backlog
 

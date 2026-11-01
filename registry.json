@@ -1431,6 +1431,35 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "Transient notifications with accessible actions and dismissal.",
+      "categories": ["feedback"],
+      "dependencies": ["@base-ui/react", "lucide-react"],
+      "registryDependencies": ["@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/button"],
+      "files": [
+        {
+          "path": "registry/cadence/toast/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/toast/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B5",
+        "motion": ["popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

@@ -54,4 +54,5 @@ export const previews: Record<string, ComponentType> = {
   menubar: dynamic(() => import("./menubar").then((mod) => ({ default: mod.MenubarPreview }))),
   "code-block": dynamic(() => import("./code-block").then((mod) => ({ default: mod.CodeBlockPreview }))),
   command: dynamic(() => import("./command").then((mod) => ({ default: mod.CommandPreview }))),
+  toast: dynamic(() => import("./toast").then((mod) => ({ default: mod.ToastPreview }))),
 };

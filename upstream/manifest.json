@@ -1668,6 +1668,71 @@
           "className": null
         }
       }
+    },
+    "toast": {
+      "path": "apps/v4/registry/bases/base/ui/toast.tsx",
+      "exports": [
+        "Toast",
+        "ToastAction",
+        "ToastClose",
+        "ToastContent",
+        "ToastDescription",
+        "ToastPortal",
+        "ToastProvider",
+        "ToastTitle",
+        "ToastViewport",
+        "Toaster",
+        "createToastManager",
+        "toast",
+        "useToastManager"
+      ],
+      "slots": [
+        "toast",
+        "toast-action",
+        "toast-close",
+        "toast-content",
+        "toast-description",
+        "toast-icon",
+        "toast-portal",
+        "toast-title",
+        "toast-viewport"
+      ],
+      "props": {
+        "ToastProvider": {},
+        "ToastPortal": {},
+        "ToastViewport": {
+          "className": null
+        },
+        "Toast": {
+          "className": null
+        },
+        "ToastContent": {
+          "className": null
+        },
+        "ToastTitle": {
+          "className": null
+        },
+        "ToastDescription": {
+          "className": null
+        },
+        "ToastAction": {
+          "className": null,
+          "render": "<Button variant=\"outline\" size=\"sm\" />"
+        },
+        "ToastClose": {
+          "className": null,
+          "children": null,
+          "render": "<Button variant=\"ghost\" size=\"icon-sm\" />"
+        },
+        "ToastIcon": {
+          "type": null
+        },
+        "ToastList": {},
+        "Toaster": {
+          "children": null,
+          "toastManager": "toast"
+        }
+      }
     }
   }
 }
