@@ -69,6 +69,7 @@ npx shadcn@latest add @cadence/button
 - [Accordion](https://cadence.dev/r/accordion.md): Reveal related sections while keeping their headings easy to scan. (layout)
 - [Collapsible](https://cadence.dev/r/collapsible.md): Reveal optional detail with a standalone disclosure. (layout)
 - [Tabs](https://cadence.dev/r/tabs.md): Switch between peer views with a shared selection indicator. (navigation)
+- [Table](https://cadence.dev/r/table.md): Invoices, transaction histories, and small collections of structured records. (collection)
 
 ## Docs
 
