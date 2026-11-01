@@ -58,4 +58,5 @@ export const previews: Record<string, ComponentType> = {
   accordion: dynamic(() => import("./accordion").then((mod) => ({ default: mod.AccordionPreview }))),
   collapsible: dynamic(() => import("./collapsible").then((mod) => ({ default: mod.CollapsiblePreview }))),
   tabs: dynamic(() => import("./tabs").then((mod) => ({ default: mod.TabsPreview }))),
+  table: dynamic(() => import("./table").then((mod) => ({ default: mod.TablePreview }))),
 };

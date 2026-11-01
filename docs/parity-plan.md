@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
-> open for earlier components; B6 accordion, collapsible and tabs shipped, table is next.**
+> open for earlier components; B6 accordion, collapsible, tabs and table shipped, carousel is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -265,7 +265,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 2/6 shipped |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 4/6 shipped |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned     |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
@@ -320,7 +320,7 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B6 — disclosure and collections (6)
 
-`accordion`, `collapsible` and `tabs` shipped (§7.9–7.11). Next: `table`, then `carousel`, `scroll-area`.
+`accordion`, `collapsible`, `tabs` and `table` shipped (§7.9–7.12). Next: `carousel`, then `scroll-area`.
 
 ### B7 — heavy data and navigation (5)
 
@@ -989,6 +989,36 @@ the batch row now says `gate open` because the earlier components still lack vis
 - **Remaining:** B6 is 3/6 shipped. Next table, then carousel and scroll-area. B7/B8/B9 and §8 remain
   scheduled/open. Historical B1–B5 visual gates (including earlier B5 selection/menu evidence) remain
   open. This component proof does not close those gates or establish overall parity completion.
+
+### 7.12 B6 table — shipped (2026-11-01)
+
+- **Surface:** eight fixed exports and nine slots from the Base UI source at `96da9cc7f1aa`;
+  new-york-v4 utility classes retained, including row hover/selection/expanded feedback and checkbox
+  alignment. Only table was appended to the manifest using the surface extractors; the pin is unchanged.
+  Native table/caption/thead/tbody/tfoot/tr/th/td props and refs pass through. Table className/ref target
+  the table, with the fixed upstream `relative w-full overflow-x-auto` container outside it.
+- **Motion audit:** T0, declared = implemented = documented empty recipe set. No Motion, Base UI or
+  Provider dependency, no hook, mode attribute, layout measurement, entrance or reorder animation.
+  Full/reduced/none share static markup. Upstream colour feedback and static checkbox alignment are
+  retained; neither is authored motion. No animation-system scheme change was needed.
+- **Proof:** `pnpm check` passes 355 tests across 57 files (six table tests), typecheck, lint,
+  registry freshness/budgets/P11 and pinned parity. Tests cover all eight refs, native tags/props,
+  caller classes/styles, events, caller selection, Tab/Shift+Tab through native controls, and all modes.
+  Isolated `.next-table` production build passes (58 pages). Edge targeted suite passes 8/8 on port
+  3118 with two workers: three modes × two system preferences, native semantics and computed styles,
+  no page errors, desktop/390px overflow, caller-sized wide table, actual arrow-key scrolling, and
+  dual-theme full-page axe (WCAG2A/2AA/2.1AA) with zero violations and no disabled rules.
+  Six screenshots (desktop/natural narrow/scrolled wide table × light/dark) were inspected and saved
+  under `.cache/table-proof/`.
+- **Browser findings fixed:** the preview Grid's intrinsic minimum width initially clipped the table
+  outside its own scroll container; the table preview root now uses `min-w-0`. Narrow-screen axe
+  exposed missing keyboard access to the specimen's scroll area; the preview and Usage example use
+  native table `tabIndex={0}` plus a visible focus ring, with browser-proven ancestor scrolling.
+  API and static motion tables use two columns so docs remain readable without inaccessible overflow.
+  These are caller/preview/docs choices; no upstream component API or wrapper behaviour changed.
+- **Remaining:** B6 is 4/6 shipped; carousel is next, then scroll-area. B7/B8/B9 and §8 carried work
+  remain scheduled/open. Historical B1–B5 visual gates, including earlier B5 select/menu evidence,
+  remain open. This closes table only and does not establish overall parity completion.
 
 ## 8. Backlog
 

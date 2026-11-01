@@ -1815,6 +1815,56 @@
           "className": null
         }
       }
+    },
+    "table": {
+      "path": "apps/v4/registry/bases/base/ui/table.tsx",
+      "exports": [
+        "Table",
+        "TableBody",
+        "TableCaption",
+        "TableCell",
+        "TableFooter",
+        "TableHead",
+        "TableHeader",
+        "TableRow"
+      ],
+      "slots": [
+        "table",
+        "table-body",
+        "table-caption",
+        "table-cell",
+        "table-container",
+        "table-footer",
+        "table-head",
+        "table-header",
+        "table-row"
+      ],
+      "props": {
+        "Table": {
+          "className": null
+        },
+        "TableHeader": {
+          "className": null
+        },
+        "TableBody": {
+          "className": null
+        },
+        "TableFooter": {
+          "className": null
+        },
+        "TableRow": {
+          "className": null
+        },
+        "TableHead": {
+          "className": null
+        },
+        "TableCell": {
+          "className": null
+        },
+        "TableCaption": {
+          "className": null
+        }
+      }
     }
   }
 }
