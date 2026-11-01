@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0, B1, B2, B3 and B4 complete (2026-10-30); B5 in progress — `select`, `dropdown-menu`,
-> `context-menu`, `menubar` and `combobox` shipped, `command` and `toast` to come (2026-11-01).**
+> `context-menu`, `menubar`, `combobox` and `command` shipped, `toast` to come (2026-11-01).**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -291,7 +291,7 @@ validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` 
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
 §7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
 here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus and
-`combobox` that followed, and `command` + `toast` remain. **B9 is open**: `code-block` landed ahead of the
+`combobox` and `command` that followed, and `toast` remains. **B9 is open**: `code-block` landed ahead of the
 batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B1 — atoms (11)
@@ -722,7 +722,7 @@ whose upstream source is already in the pin (`apps/v4/registry/bases/base/ui/cod
 
 ### 7.6 B5 — in progress (2026-10-31, updated 2026-11-01)
 
-Five of the seven items are shipped; the batch row says `next` because `command` and `toast` are not.
+Six of the seven items are shipped; the batch row says `next` because `toast` remains.
 
 - **Scope shipped:** `select` (2026-10-30), `dropdown-menu`, `context-menu`, `menubar` (2026-10-31),
   `combobox` (2026-11-01). 41 components, 47 registry items, 41 docs, 42 previews, 290 unit tests,
@@ -824,11 +824,40 @@ Five of the seven items are shipped; the batch row says `next` because `command`
     size: a 24px X in a 24px box. Both icon controls now declare the glyph size themselves, which is also
     what makes a hand-placed `ComboboxTrigger` render correctly without a `Button` behind it. jsdom and axe
     both pass either way — this is the class the browser pass exists to catch, and it did.
-- **Still open:** `command`, `toast` — the rest of B5. Dual-theme screenshots for B1–B5 are
+- **Still open:** `toast` — the rest of B5 (`command` completed in §7.7). Dual-theme screenshots for B1–B5 are
   still not generated: the browser pass now runs here, but nothing writes the images, so the visual half
   of the batch gate remains a script that does not exist. `combobox` was checked by hand in both themes
   while it was written (closed and open, light and dark), which is how the clear glyph above was found;
   those images live in `.cache`, not in the repo.
+
+### 7.7 `command` — B5 component complete (2026-11-01)
+
+- **Shipped:** nine upstream exports and nine slots, pinned to `96da9cc7f1aa` without moving the
+  upstream ref. `cmdk` 1.1.1 provides search, ranking, highlight, disabled rows, and keyboard selection;
+  Base UI `Dialog` supplies the portal, focus trap, and dismissal. The palette keeps an explicit
+  `Command` child, matching the pinned Base UI source, and `showCloseButton` defaults to `false`.
+  42 components, 48 registry items, 42 docs, 43 previews.
+- **Motion conformance:** declares only `popup.anchored` and `exit.fade`, CSS-transition form,
+  implemented by the direct `@cadence/dialog` dependency. Full mode fades and scales the panel;
+  reduced retains opacity and removes the scale classes; none resolves panel and backdrop durations
+  to zero. The inline command, filtering, and highlight have no motion. No new recipe or token.
+- **Intentional implementation details:** the hidden title/description are inside `DialogContent`,
+  where the portalled dialog can reference them. `CommandInput` composes cmdk's native `asChild`
+  escape hatch with `InputGroupInput`; Base UI parts retain `render`. Native and custom input
+  composition, class merging, filtering by keywords, empty recovery, and disabled keyboard skipping
+  have unit coverage. cmdk's `data-checked` glyph is retained separately from its highlight.
+- **Accessibility repair:** axe found cmdk's `role="separator"` inside the listbox as a forbidden
+  child. The divider now defaults to `aria-hidden="true"` (decoration), retaining its slot, styling,
+  and forwarded props. No axe rules were disabled. Both inline and open dialog scans pass in both themes.
+- **Verification:** `pnpm registry:build`, `pnpm check` (313 tests across 51 files), and production
+  `pnpm build` (53 static pages) pass. The isolated build uses `CADENCE_DIST_DIR=.next-command`;
+  its generated tsconfig includes are reverted. `tests/e2e/command.spec.ts` passes 8/8 on installed
+  Edge (`PLAYWRIGHT_CHANNEL=msedge`, port 3111, two workers): 3 modes × 2 system preferences,
+  real computed panel/backdrop durations and sampled scale, input focus, empty filtering, Escape
+  focus restoration, keyboard selection, and axe in light/dark. Four screenshots (inline/dialog ×
+  light/dark) are generated under `test-results/command-command-*/` and visually inspected.
+- **Still open:** `toast`, then B6 onward in the batch table. Older batches' missing screenshots
+  remain open; this component's screenshot test does not close that historical gate.
 
 ## 8. Backlog
 

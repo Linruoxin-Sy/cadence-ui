@@ -1388,6 +1388,49 @@
           "target": "@components/cadence/code-highlight/use-highlighted-code.tsx"
         }
       ]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "Search and run actions from a keyboard-driven command palette.",
+      "categories": ["navigation"],
+      "dependencies": ["cmdk", "lucide-react"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/dialog",
+        "@cadence/input-group"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/command/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/command/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.3.0",
+        "tier": "T2",
+        "batch": "B5",
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

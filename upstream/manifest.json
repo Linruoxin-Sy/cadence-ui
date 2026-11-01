@@ -1609,6 +1609,65 @@
           "className": null
         }
       }
+    },
+    "command": {
+      "path": "apps/v4/registry/bases/base/ui/command.tsx",
+      "exports": [
+        "Command",
+        "CommandDialog",
+        "CommandEmpty",
+        "CommandGroup",
+        "CommandInput",
+        "CommandItem",
+        "CommandList",
+        "CommandSeparator",
+        "CommandShortcut"
+      ],
+      "slots": [
+        "command",
+        "command-empty",
+        "command-group",
+        "command-input",
+        "command-input-wrapper",
+        "command-item",
+        "command-list",
+        "command-separator",
+        "command-shortcut"
+      ],
+      "props": {
+        "Command": {
+          "className": null
+        },
+        "CommandDialog": {
+          "title": "\"Command Palette\"",
+          "description": "\"Search for a command to run...\"",
+          "children": null,
+          "className": null,
+          "showCloseButton": "false"
+        },
+        "CommandInput": {
+          "className": null
+        },
+        "CommandList": {
+          "className": null
+        },
+        "CommandEmpty": {
+          "className": null
+        },
+        "CommandGroup": {
+          "className": null
+        },
+        "CommandSeparator": {
+          "className": null
+        },
+        "CommandItem": {
+          "className": null,
+          "children": null
+        },
+        "CommandShortcut": {
+          "className": null
+        }
+      }
     }
   }
 }
