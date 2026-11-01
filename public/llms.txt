@@ -68,6 +68,7 @@ npx shadcn@latest add @cadence/button
 - [Toast](https://cadence.dev/r/toast.md): Transient notifications with accessible actions and dismissal. (feedback)
 - [Accordion](https://cadence.dev/r/accordion.md): Reveal related sections while keeping their headings easy to scan. (layout)
 - [Collapsible](https://cadence.dev/r/collapsible.md): Reveal optional detail with a standalone disclosure. (layout)
+- [Tabs](https://cadence.dev/r/tabs.md): Switch between peer views with a shared selection indicator. (navigation)
 
 ## Docs
 
