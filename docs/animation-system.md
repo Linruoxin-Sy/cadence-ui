@@ -630,6 +630,18 @@ compositor tax this section exists to prevent.
 
 ## 4. Four ways to integrate Base UI with Motion
 
+### Native event boundary for press controls
+
+Button's default renderer uses `motion.create()` around a native button adapter.
+React `onAnimationStart`, `onDrag`, `onDragStart` and `onDragEnd` travel in a private
+prop bag to the native button, beyond Motion's reserved-prop filtering. These remain
+React native events, including capture/bubble, cancellation and the real currentTarget;
+they must never receive Motion animation definitions or pan information. The adapter
+adds no DOM wrapper and retains the same `whileTap`, `scale.press` and token transition.
+Caller `render` still replaces the default renderer through Base UI. This boundary
+does not establish compatibility for other Motion-rendered parts or prove live-mode
+cancellation of an already running gesture.
+
 A Base UI popup enters a "closing" phase before it unmounts, waiting for the animation to finish. Understanding these four patterns is what makes "rich animation" land in practice (official docs: [Base UI Animation](https://base-ui.com/react/handbook/animation.md)).
 
 ### Pattern A: pure CSS transition (recommended for simple popups)

@@ -12,23 +12,30 @@ vi.mock("motion/react", async (original) => {
   const React = await import("react");
   const { motionSamples, controlSamples, imperativeSamples } = await import("./motion-observer");
   const cache = new Map<string, React.ComponentType<Sample>>();
+  function observe(Real: React.ComponentType<Sample>) {
+    return function ObservedMotion(props: Sample) {
+      const identity = React.useRef({}).current;
+      motionSamples.set(identity, props);
+      React.useEffect(
+        () => () => {
+          motionSamples.delete(identity);
+        },
+        [identity],
+      );
+      return React.createElement(Real, props, props.children as ReactNode);
+    };
+  }
   const motion = new Proxy(actual.motion, {
     get(target, key, receiver) {
-      if (typeof key !== "string" || key === "create") return Reflect.get(target, key, receiver);
+      if (key === "create") {
+        return (...args: Parameters<typeof actual.motion.create>) =>
+          observe(actual.motion.create(...args) as React.ComponentType<Sample>);
+      }
+      if (typeof key !== "string") return Reflect.get(target, key, receiver);
       let component = cache.get(key);
       if (!component) {
         const Real = Reflect.get(target, key, receiver) as React.ComponentType<Sample>;
-        component = function ObservedMotion(props: Sample) {
-          const identity = React.useRef({}).current;
-          motionSamples.set(identity, props);
-          React.useEffect(
-            () => () => {
-              motionSamples.delete(identity);
-            },
-            [identity],
-          );
-          return React.createElement(Real, props, props.children as ReactNode);
-        };
+        component = observe(Real);
         cache.set(key, component);
       }
       return component;

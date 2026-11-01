@@ -1671,6 +1671,21 @@ Initial JS remains OPEN independently of passing flow checks; no budget/config/m
   This closes only template/coverage work; initial JS and all global compatibility/motion
   audit items stay OPEN.
 
+### Compatibility audit progress (2026-11-02, bounded subset)
+
+The global compatibility item remains **OPEN**. `docs/evidence/compatibility-inventory.json`
+records all 58 items /466 actual exports and installed inherited types, with every
+row explicitly pending runtime/context review. This inventory is not a passing gate.
+The first bounded fix repairs Button's default Motion renderer swallowing native
+onAnimationStart/onDrag/onDragStart/onDragEnd semantics, using a private native
+event prop bag through public motion.create without changing its press recipe,
+classes, props/defaults or slot. Native events/cancellation, callback styles/classes,
+render forms, stable-node updates and cleanup refs have bounded runtime coverage;
+see `docs/evidence/compatibility-button.md` and the serial handoff for exact tests
+and remaining Button paths. All other items still require per-part source/context
+review and risk-based runtime proof; B1–B9 historical evidence is not whole-library
+certification. Same-target live-mode and CSS popup audits remain separate and open.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |
