@@ -132,6 +132,12 @@ The value is always an array, even without `multiple`.
 | `disabled`  | `boolean`| `false` | Keeps it visible but unpressable.    |
 | `className` | `string` / state callback | –       | Merged last.                         |
 
+The default press button preserves native React `onAnimationStart`, `onDrag`,
+`onDragStart` and `onDragEnd` events, including capture and cancellation. Callback
+and object refs follow the same button; replacing a callback runs its React 19
+cleanup before assigning the next ref. A caller `render` replaces the default
+renderer and owns spreading its supplied props.
+
 ## Motion contract
 
 Recipe: `feedback.press`, inherited by every item — pressing compresses that item

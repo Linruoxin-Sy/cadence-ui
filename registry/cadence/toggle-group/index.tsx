@@ -3,10 +3,10 @@
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group";
 import type { VariantProps } from "class-variance-authority";
-import { motion } from "motion/react";
 import { type CSSProperties, createContext, useContext } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
+import { PressButton } from "../lib/press-button";
 import { useCadenceMotion } from "../lib/provider";
 import { toggleVariants } from "../toggle";
 
@@ -119,7 +119,7 @@ function ToggleGroupItem({ className, children, variant, size, ...props }: Toggl
         )
       }
       render={
-        <motion.button
+        <PressButton
           whileTap={cm.reduced ? undefined : { scale: scale.press }}
           transition={cm.transition("feedback.press")}
         />

@@ -141,3 +141,103 @@ it("keeps native form cancellation and keyboard focus on the default renderer", 
   expect(parent).not.toHaveBeenCalled();
   expect(button).toHaveFocus();
 });
+
+it("replaces callback refs during a held press and disables activation on the same node", async () => {
+  const firstCleanup = vi.fn();
+  const secondCleanup = vi.fn();
+  const first = vi.fn(() => firstCleanup);
+  const second = vi.fn(() => secondCleanup);
+  const click = vi.fn();
+  const native = vi.fn();
+  const user = userEvent.setup();
+  const view = render(
+    <Button ref={first} onClick={click} onAnimationStart={native}>
+      Hold
+    </Button>,
+  );
+  const node = screen.getByRole("button");
+  await user.pointer({ target: node, keys: "[MouseLeft>]" });
+  view.rerender(
+    <Button ref={second} disabled onClick={click} onAnimationStart={native}>
+      Hold
+    </Button>,
+  );
+  expect(firstCleanup).toHaveBeenCalledTimes(1);
+  expect(second).toHaveBeenCalledWith(node);
+  expect(screen.getByRole("button")).toBe(node);
+  expect(node).toBeDisabled();
+  await user.pointer({ keys: "[/MouseLeft]" });
+  expect(click).not.toHaveBeenCalled();
+  expect(native).not.toHaveBeenCalled();
+  view.unmount();
+  expect(secondCleanup).toHaveBeenCalledTimes(1);
+});
+
+it.each(["default", "element", "function"] as const)(
+  "%s: caller cancellation preserves handler ownership through nested target",
+  async (kind) => {
+    const order: string[] = [];
+    const submit = vi.fn((event) => event.preventDefault());
+    const parent = vi.fn();
+    const view = render(
+      <form onSubmit={submit} onClick={parent} onKeyDown={() => {}}>
+        <Button
+          type="submit"
+          onClick={(event) => {
+            order.push("caller");
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          render={
+            kind === "default" ? undefined : kind === "element" ? (
+              <button type="submit" onClick={() => order.push("element")} />
+            ) : (
+              (props) => (
+                <button
+                  {...props}
+                  type="submit"
+                  onClick={(event) => {
+                    order.push("function");
+                    props.onClick?.(event);
+                  }}
+                />
+              )
+            )
+          }
+        >
+          <span>Nested label</span>
+        </Button>
+      </form>,
+    );
+    await userEvent.click(screen.getByText("Nested label"));
+    expect(order).toEqual(kind === "default" ? ["caller"] : [kind, "caller"]);
+    expect(submit).not.toHaveBeenCalled();
+    expect(parent).not.toHaveBeenCalled();
+    view.unmount();
+  },
+);
+
+it("render element can prevent the caller Base handler without preventing native bubbling", async () => {
+  const caller = vi.fn();
+  const parent = vi.fn();
+  render(
+    <form onClick={parent} onKeyDown={() => {}}>
+      <Button
+        onClick={caller}
+        render={
+          <button
+            type="button"
+            onClick={(event) => {
+              (event as typeof event & { preventBaseUIHandler(): void }).preventBaseUIHandler();
+            }}
+          />
+        }
+      >
+        Owned
+      </Button>
+    </form>,
+  );
+  await userEvent.click(screen.getByRole("button"));
+  expect(caller).not.toHaveBeenCalled();
+  expect(parent).toHaveBeenCalledTimes(1);
+});

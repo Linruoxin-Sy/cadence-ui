@@ -141,6 +141,12 @@ All native button props are forwarded.
 Base UI state callbacks for `className` are evaluated before merging caller classes last.
 `style` accepts an object or a state callback and is forwarded to the primitive.
 
+The default press button preserves native React `onAnimationStart`, `onDrag`,
+`onDragStart` and `onDragEnd` events, including capture and cancellation. Callback
+and object refs follow the same button; replacing a callback runs its React 19
+cleanup before assigning the next ref. A caller `render` replaces the default
+renderer and owns spreading its supplied props.
+
 ## Motion contract
 
 Recipe: `feedback.press`, driven by the press gesture.

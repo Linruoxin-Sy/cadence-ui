@@ -2,10 +2,9 @@
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
-import { type MotionProps, motion } from "motion/react";
-import type { ComponentProps } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
+import { PressButton } from "../lib/press-button";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
@@ -56,25 +55,6 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps extends ButtonPrimitive.Props, VariantProps<typeof buttonVariants> {}
-
-type NativeEvents = Pick<ComponentProps<"button">, "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd">;
-
-// Motion reserves these names. Keep native handlers outside its prop namespace,
-// then restore them on the same button after Motion has resolved style and refs.
-function NativeButton({ nativeEvents, ...props }: ComponentProps<"button"> & { nativeEvents: NativeEvents }) {
-  return <button {...props} {...nativeEvents} />;
-}
-const MotionNativeButton = motion.create(NativeButton);
-
-function PressButton({
-  onAnimationStart,
-  onDrag,
-  onDragStart,
-  onDragEnd,
-  ...props
-}: ComponentProps<"button"> & Pick<MotionProps, "whileTap" | "transition">) {
-  return <MotionNativeButton {...props} nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }} />;
-}
 
 /**
  * Button with the shadcn API: six variants, eight sizes, and Base UI's `render`

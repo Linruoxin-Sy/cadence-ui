@@ -632,12 +632,14 @@ compositor tax this section exists to prevent.
 
 ### Native event boundary for press controls
 
-Button's default renderer uses `motion.create()` around a native button adapter.
+Button, Toggle and ToggleGroupItem share `lib/press-button.tsx`; their default renderer uses `motion.create()` around a native button adapter.
 React `onAnimationStart`, `onDrag`, `onDragStart` and `onDragEnd` travel in a private
 prop bag to the native button, beyond Motion's reserved-prop filtering. These remain
 React native events, including capture/bubble, cancellation and the real currentTarget;
 they must never receive Motion animation definitions or pan information. The adapter
-adds no DOM wrapper and retains the same `whileTap`, `scale.press` and token transition.
+also commits the Base/caller ref independently of Motion’s stable ref callback,
+cleaning up the previous callback/object ref on identity changes and unmount without
+replacing the DOM node. This preserves React 19 cleanup ownership. It adds no DOM wrapper and retains the same `whileTap`, `scale.press` and token transition.
 Caller `render` still replaces the default renderer through Base UI. This boundary
 does not establish compatibility for other Motion-rendered parts or prove live-mode
 cancellation of an already running gesture.
