@@ -24,3 +24,26 @@ B3 compatibility tests cover all Base state class/style callbacks and caller-las
 ## Provider fallback
 
 Source b8402a3 removes literal timing/easing and corrects obsolete reduced travel comment. MotionConfig fallback now uses base/out and effective mode/clock; actual context test passes same-node full→none→reduced inside inherited 4× clock. Explicit component transitions and targets unchanged. No new recipe; no claim this cancels running effects or controls caller-authored Motion programs. Global live-cancel/first-frame/nested-clock matrix remains OPEN.
+
+## B4: all 56 actual exports
+
+- Dialog / DialogClose / DialogContent / DialogDescription / DialogFooter / DialogHeader / DialogOverlay / DialogPortal / DialogTitle / DialogTrigger.
+- AlertDialog / AlertDialogAction / AlertDialogCancel / AlertDialogContent / AlertDialogDescription / AlertDialogFooter / AlertDialogHeader / AlertDialogMedia / AlertDialogOverlay / AlertDialogPortal / AlertDialogTitle / AlertDialogTrigger.
+- Sheet / SheetClose / SheetContent / SheetDescription / SheetFooter / SheetHeader / SheetOverlay / SheetPortal / SheetTitle / SheetTrigger.
+- Drawer / DrawerClose / DrawerContent / DrawerDescription / DrawerFooter / DrawerHeader / DrawerOverlay / DrawerPortal / DrawerSwipeHandle / DrawerTitle / DrawerTrigger.
+- Popover / PopoverContent / PopoverDescription / PopoverHeader / PopoverTitle / PopoverTrigger.
+- Tooltip / TooltipContent / TooltipProvider / TooltipTrigger.
+- HoverCard / HoverCardContent / HoverCardTrigger.
+
+All current source, fixed cached pin implementation/API and actual installed inherited type surfaces read. Sheet Overlay/Portal are additive actual exports (pin exports fewer); preserved, not silently dropped. No B4 public type or CVA helper export.
+
+- Dialog/Sheet roots are Base Dialog state providers; trigger/close direct Base buttons; portal forwards container/keepMounted/render/ref to real FloatingPortal, not a context-only N/A. Header/Footer are native divs; footer optional Close uses audited Button. Content wraps portal/backdrop but caller props/ref/render go to Popup, not the wrapper. showCloseButton defaults true (footer false); Sheet right side default unchanged.
+- AlertDialog root preserves confirmation semantics; Action is audited Button and deliberately does not auto-close; Cancel is Base Close rendered through Button (outline/default). Header/Footer/Media native div; Title/Description are Base association nodes. Existing suite proves caller-controlled confirmation, cancel/Escape and outside refusal.
+- Drawer root private context really carries snapPoints/modal/showSwipeHandle/direction (true/false/down defaults). Content reads nearest context, passes caller DOM surface to Popup, generated Viewport/Content are internal. Overlay only generated for modal===true. Portal/close/trigger/association parts remain Base; SwipeHandle/Header/Footer native. Existing suite proves opening/handle/closing; B4 compatibility uses real Drawer context and caller Popup renderer. Swipe engine remains Base-owned.
+- Popover root/trigger/Title/Description are Base; Header native. Popup owns local fast clock (caller style last), forwards align/offset/side to private Positioner with center/0/bottom/4 defaults; caller render/ref stays Popup. Original outside/Escape/focus and nested-clock/callback tests apply.
+- TooltipProvider is real Base delay-group provider (delay0), no DOM/ref promise. Tooltip adds private generated-id/open association; controlled open overrides internal state, cancel details blocks internal update. Trigger caller aria-describedby wins; Content caller id/role may override generated association and caller owns matching ids. Private arrow receives no arbitrary caller props. Original hover/focus/Escape suite and B4 canceled-open test prove association/cleanup.
+- HoverCard is Base PreviewCard, preserving bottom/4/center/4 placement; Popup and Trigger forward real Base surfaces. Original keyboard-focus/interactive-content/Escape and hover suite applies.
+
+Shared Base useRenderElement resolves state classes/styles, merges supplied refs including render-element refs using useMergedRefs; element handlers compose, function gets actual props/ref and must spread. mergeProps is not itself a ref merger. No public B4 DOM surface crosses motion.span/div. Native drag names therefore never pass Motion filtering. The nine existing B4 compatibility tests execute each of seven actual popups with state callbacks, caller-last utilities/style, function renderer, native key event, ref cleanup and controlled same-node modes; Dialog element-render test proves composed handlers and both cleanup refs, Tooltip test proves canceled state. Transparent identical Base forwarding and installed types support the remaining parts; not every div needs a duplicate test.
+
+Finite compatibility is reviewed. Historical B4 production evidence applies only to its popup paths; current B3/B4 production rerun follows provider fallback change. Neither static classes, helper calls nor one key event certifies whole-library running-animation/nested-clock/none-first-paint behavior. Those matrices remain independently OPEN.

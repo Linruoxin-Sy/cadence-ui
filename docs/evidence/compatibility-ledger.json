@@ -1029,44 +1029,64 @@
     },
     "dialog": {
       "Dialog": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "DialogClose": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DialogContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DialogDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DialogFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "DialogHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "DialogOverlay": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DialogPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DialogTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DialogTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "checkbox": {
@@ -1287,198 +1307,290 @@
     },
     "alert-dialog": {
       "AlertDialog": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "AlertDialogAction": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogCancel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "AlertDialogHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "AlertDialogMedia": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "AlertDialogOverlay": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "AlertDialogTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "popover": {
       "Popover": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "PopoverContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "PopoverDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "PopoverHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "PopoverTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "PopoverTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "tooltip": {
       "Tooltip": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "TooltipContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "TooltipProvider": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "TooltipTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "hover-card": {
       "HoverCard": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "HoverCardContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "HoverCardTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "sheet": {
       "Sheet": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "SheetClose": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "SheetContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "SheetDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "SheetFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "SheetHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "SheetOverlay": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "SheetPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "SheetTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "SheetTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "drawer": {
       "Drawer": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base root/provider owns open state, controlled requests and descendants; no DOM props surface inferred from empty inventory. Drawer nearest private context owns snap/modal/handle/direction; Tooltip private association context respects cancellation. See per-path evidence."
       },
       "DrawerClose": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DrawerContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DrawerDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DrawerFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "DrawerHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "DrawerOverlay": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DrawerPortal": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DrawerSwipeHandle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Native div string class/object style, caller-last cn and untouched rest including React19 ref/events. Structural part, no hidden animation adapter; follows associated Base root only for children. See per-path evidence."
       },
       "DrawerTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       },
       "DrawerTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "evidence": "compatibility-base.md",
+        "boundary": "Actual Base part forwards evaluated callback class/style, render/ref/events; popup adapters merge clock then caller style and caller-last classes. Native merge/cancel and ref ownership use installed useRenderElement; caller function must spread resolved props/ref. See exact part context, defaults and applicable prior risk suites in evidence."
       }
     },
     "select": {

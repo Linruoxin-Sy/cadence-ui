@@ -1973,3 +1973,10 @@ unchanged Progress evidence reuse. Ledger223/466 classified,243 open; historical
 Toggle/Group3 DOM paths now finite-reviewed using native/ref/cancel evidence plus
 nested-group isolation. See compatibility-base.md. Independent live Motion/CSS
 matrices, B4/B5 and Combobox outside-focus matrix, per-page JS and final audit stay OPEN.
+
+B4 finite review (2026-11-02): seven items/56 actual exports classified with
+actual Base/native/provider/context paths and applicable existing risks; no B4
+production source changes. Ledger279/466 classified (162 compatibility/117 static),
+187 open. See compatibility-base.md. B5 remains the next finite group; actual
+Combobox baseline now reproduces swallowed outside-button activation for mouse/touch
+under Cadence inert guard (Base1.9 default activates); repair/matrix remains OPEN.
