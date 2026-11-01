@@ -57,16 +57,16 @@ Caller render still replaces the default through Base UI, as before.
 
 ## Bounded runtime coverage
 
-| Surface/path | Evidence and boundary |
-| --- | --- |
+| Surface/path                                  | Evidence and boundary                                                                                                                                                            |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Default native animation/drag collision names | Each independently dispatches a real DOM Event through React; exact nativeEvent/currentTarget, capture, preventDefault and stopPropagation asserted. No invocation from a press. |
-| className/style state callbacks | Disabled update evaluated against actual Base state; caller px-8 replaces default px-4; caller opacity remains. Existing Button/B1 callback tests preserved. |
-| Default ref | Stable function ref cleanup once on unmount; object ref receives actual button and resets to null. |
-| render element | Its own handler and caller handler both run; element and caller cleanup refs each run once. This path is Base's custom-render path, not proof of default Motion semantics. |
-| render function | Real props spread to native button, click and drag forwarded. Caller remains responsible for spreading returned props. |
-| Native keyboard/form cancellation | Tab focuses default button; Enter's canceled click neither submits nor bubbles and retains focus. |
-| Node identity | Disabled/style/class updates retain the default DOM button. No mode-key remount is added. |
-| Motion contract | Existing full/reduced/none helper calls retained. Observer now also observes motion.create while rendering the real Motion component. |
+| className/style state callbacks               | Disabled update evaluated against actual Base state; caller px-8 replaces default px-4; caller opacity remains. Existing Button/B1 callback tests preserved.                     |
+| Default ref                                   | Stable function ref cleanup once on unmount; object ref receives actual button and resets to null.                                                                               |
+| render element                                | Its own handler and caller handler both run; element and caller cleanup refs each run once. This path is Base's custom-render path, not proof of default Motion semantics.       |
+| render function                               | Real props spread to native button, click and drag forwarded. Caller remains responsible for spreading returned props.                                                           |
+| Native keyboard/form cancellation             | Tab focuses default button; Enter's canceled click neither submits nor bubbles and retains focus.                                                                                |
+| Node identity                                 | Disabled/style/class updates retain the default DOM button. No mode-key remount is added.                                                                                        |
+| Motion contract                               | Existing full/reduced/none helper calls retained. Observer now also observes motion.create while rendering the real Motion component.                                            |
 
 Ref-identity replacement during a mounted gesture, disabled-during-press,
 render-element preventBaseUIHandler ownership combinations, nested native controls,
