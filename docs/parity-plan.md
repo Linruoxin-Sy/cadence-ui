@@ -257,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done   |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                 |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ---------------------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done                |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done                |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done                |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done                |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open              |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete               |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done                |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done                |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | 1/2 shipped; gate open |
-|       | **Total**                  | **57** |            | **102**     |         |           |
+|       | **Total**                  | **57** |            | **102**     |         |                        |
 
 ### 7.0 Status discipline
 
