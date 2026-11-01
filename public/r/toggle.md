@@ -99,6 +99,12 @@ checkbox.
 
 `toggleVariants` is exported, so a custom part can share the same classes.
 
+The default press button preserves native React `onAnimationStart`, `onDrag`,
+`onDragStart` and `onDragEnd` events, including capture and cancellation. Callback
+and object refs follow the same button; replacing a callback runs its React 19
+cleanup before assigning the next ref. A caller `render` replaces the default
+renderer and owns spreading its supplied props.
+
 ## Motion contract
 
 Recipe: `feedback.press`. The button compresses to 0.97 while the pointer is down
