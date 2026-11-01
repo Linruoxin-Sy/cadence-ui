@@ -82,6 +82,7 @@ npx shadcn@latest add @cadence/button
 - [Data Table](https://cadence.dev/r/data-table.md): An editable payments table with sorting, filtering, selection, visibility, and pagination. ()
 - [Date Picker](https://cadence.dev/r/date-picker.md): Choose a single date or date range from an anchored calendar. (collection)
 - [Attachment](https://cadence.dev/r/attachment.md): Displays file media, metadata, caller-owned upload state, and actions. (ai)
+- [Bubble](https://cadence.dev/r/bubble.md): Displays conversational content with variants, grouping, reactions, and polymorphic surfaces. (ai)
 
 ## Docs
 
@@ -9256,3 +9257,164 @@ message streaming dependency and no reason to remount a composer when a file cha
 [Button](/components/button) supplies actions, [Input](/components/input) supplies
 native file selection, [Progress](/components/progress) displays known progress,
 and [Code Block](/components/code-block) displays textual file contents.
+
+# Bubble
+
+Displays conversational content with variants, grouping, reactions, and polymorphic surfaces.
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/bubble
+```
+
+## Usage
+
+```tsx
+import { Bubble, BubbleContent, BubbleGroup, BubbleReactions } from "@/components/cadence/bubble";
+
+export function Conversation() {
+  return (
+    <BubbleGroup className="gap-8 py-5">
+      <Bubble align="end"><BubbleContent>Ready for review?</BubbleContent></Bubble>
+      <Bubble variant="muted">
+        <BubbleContent>The registry is ready.</BubbleContent>
+        <BubbleReactions role="img" aria-label="Reaction: thumbs up">👍</BubbleReactions>
+      </Bubble>
+    </BubbleGroup>
+  );
+}
+```
+
+## Variants and alignment
+
+Choose default, secondary, muted, tinted, outline, ghost or destructive. Bubbles
+cap at 80% of their container; ghost can use its full width. Start is the default
+alignment; end aligns a bubble to the opposite inline edge. Include readable error
+context for destructive content so color is not the only signal. Destructive uses
+a tinted background and destructive border with foreground text to retain readable
+contrast in both themes.
+
+```tsx
+<Bubble variant="destructive" align="end">
+  <BubbleContent>Message failed. Try again from the message actions.</BubbleContent>
+</Bubble>
+```
+
+## Consecutive messages
+
+BubbleGroup groups surfaces from the same sender. It supplies a small gap; leave
+more vertical space when reactions overlap. Set alignment on each Bubble. Names,
+avatars, timestamps and conversation semantics belong to your surrounding UI.
+
+```tsx
+<BubbleGroup className="gap-8">
+  <Bubble variant="muted"><BubbleContent>First thought.</BubbleContent></Bubble>
+  <Bubble variant="muted"><BubbleContent>One more detail.</BubbleContent></Bubble>
+</BubbleGroup>
+```
+
+## Links and buttons
+
+BubbleContent accepts a Base UI render element or function. Use a real button with
+an explicit type or an anchor with href; their text provides the accessible name.
+Native handlers and refs, including React 19 ref cleanup, are merged by Base UI.
+
+```tsx
+<Bubble variant="outline">
+  <BubbleContent render={<a href="/components/attachment" />}>View attachments</BubbleContent>
+</Bubble>
+```
+
+## Reactions
+
+Side defaults to bottom and align to end. Both accept the opposite edge. The row
+uses static positioning transforms, never animated movement. Label emoji-only
+rows as a single image; for interactive reactions supply named buttons and their
+pressed state instead. Leave vertical space for the overlapping row.
+
+```tsx
+<BubbleReactions side="top" align="start" role="img" aria-label="Reactions: thumbs up and fire">
+  <span>👍</span><span>🔥</span>
+</BubbleReactions>
+```
+
+## Updating text
+
+Keep the message ID and rendered element stable when adding text. Children update
+immediately without replaying entry, moving focus or animating measured height.
+The application owns chunking, message IDs, transport, cancellation, retry and
+scroll anchoring. This component neither parses Markdown nor orchestrates a stream.
+
+## When to use
+
+Use for conversational text, quoted replies, suggestion buttons and short
+structured output; combine surfaces into a caller-owned conversation layout.
+
+## When not to use
+
+Use Attachment for file metadata, Code Block for syntax-highlighted source, and
+Alert for a page-level notice. Bubble supplies a surface rather than a complete
+chat, message scroller, composer or streaming runtime.
+
+## API
+
+| Part | Props and defaults |
+| --- | --- |
+| `Bubble` | Native div props; variant default/secondary/muted/tinted/outline/ghost/destructive (default: default), align start/end (default: start) |
+| `BubbleGroup` | Native div props; groups consecutive bubbles |
+| `BubbleContent` | Base UI useRender div props; render element or function |
+| `BubbleReactions` | Native div props; side top/bottom (default: bottom), align start/end (default: end) |
+
+All four parts retain upstream bubble-* slots (root: bubble), native styles,
+refs and events. Classes merge last; Bubble styles merge after its local clock.
+Bubble exposes data-variant, data-align and data-motion; reactions expose data-side
+and data-align. No additional message-state or validation API is introduced.
+
+## Motion contract
+
+| Cause | Recipe | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| New Bubble enters | `data.transition` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Opacity 1 on first frame, zero duration |
+
+CSS @starting-style performs a one-shot entry. The duration resolves locally through
+cm.transition("data.transition"), including provider timeScale, so an inner full
+scope restores its clock inside outer none. Reduced drops animated transforms;
+this recipe uses opacity in full too. Live none cancels entry on the same node.
+Existing text, variants, alignment, reactions and resize update immediately. Removal
+is immediate; there is no exit or layout animation. Caller-provided motion is caller-owned.
+
+## Keyboard interactions
+
+Presentational surfaces add no tab stops. Tab reaches rendered buttons, links and
+reaction buttons. Enter activates buttons/links; Space activates buttons. Interactive
+BubbleContent has a visible focus ring. Appending text preserves the same focused
+node. The application owns focus after removing a message.
+
+## Accessibility
+
+Keep conversation-level semantics on a surrounding labelled region. Supply readable
+sender/error context and label reactions. Avoid nested interactive content inside
+button/link bubbles. Announce meaningful completed updates in a separate polite
+status region when needed; announcing every chunk can overwhelm assistive technology.
+
+## Responsiveness and performance
+
+Long words wrap within a shrinking container. Reactions overlap vertically; give
+rows sufficient space and keep reaction collections compact. Rich content can use
+ghost with its own overflow treatment. Entry changes only opacity; no layout reads,
+per-frame JavaScript, timers or forced remounts. Application pagination or virtualization
+owns very large histories. No @shadcn/react dependency is needed for this pinned API.
+
+## AI usage notes
+
+Compose the four parts with stable message IDs. Text and reaction state remain in
+your application. Use Collapsible for optional show-more UI and Tooltip/Popover for
+metadata; those components keep their own motion contracts. Do not invent streaming,
+validation or networking props on Bubble.
+
+## Related components
+
+[Attachment](/components/attachment), [Code Block](/components/code-block),
+[Collapsible](/components/collapsible), [Tooltip](/components/tooltip),
+[Popover](/components/popover).

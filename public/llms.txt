@@ -80,6 +80,7 @@ npx shadcn@latest add @cadence/button
 - [Data Table](https://cadence.dev/r/data-table.md): An editable payments table with sorting, filtering, selection, visibility, and pagination. ()
 - [Date Picker](https://cadence.dev/r/date-picker.md): Choose a single date or date range from an anchored calendar. (collection)
 - [Attachment](https://cadence.dev/r/attachment.md): Displays file media, metadata, caller-owned upload state, and actions. (ai)
+- [Bubble](https://cadence.dev/r/bubble.md): Displays conversational content with variants, grouping, reactions, and polymorphic surfaces. (ai)
 
 ## Docs
 
