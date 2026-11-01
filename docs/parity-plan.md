@@ -1708,6 +1708,23 @@ Edge matrix 27/27 passes; cold initial JS remains FAIL at292344 gzip bytes/23 sc
 against120000. This closes these finite compatibility surfaces only; the independent
 running Motion/CSS popup matrices, Combobox focus safety, budget and final audit stay OPEN.
 
+B1/B2 finite compatibility review (2026-11-02) now covers all twenty actual items /
+164 exports, including native DOM, Base forwarders, native useRender parts, pure types
+and CVA helpers; no public provider/context exports were omitted. Source, pinned
+upstream, installed inheritance and existing suites were read per export. Thirteen
+new risk tests verify Card measurement/ref handoff, both render forms on all four
+native useRender exports, composed InputGroupButton native events/ref, Base callback
+updates and Field caller ownership. No production code/DOM/classes/recipes changed.
+Button's finite compatibility obligation is reviewed; its independent same-target
+mode/clock/disabled visual cancellation remains OPEN. Ledger now205/466 classified
+(94 reviewed-compatibility,108 reviewed-static,3 historical bounded-runtime),261 open.
+See `docs/evidence/compatibility-atoms.md` and serial handoff for validation and limits.
+Initial JS remains FAIL292344/120000 gzip bytes,23scripts (prior real measurement
+reused because runtime is unchanged). The contract is **per page** (animation-system
+§7 and overall-design checklist), not Button-only: eventual closure must cover all
+applicable site pages/full shell, especially Chart/Calendar/CodeBlock. All global
+motion/popup/Combobox/final audits remain OPEN; next finite compatibility group is B3.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |

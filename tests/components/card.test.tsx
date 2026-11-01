@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import * as React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   Card,
@@ -226,5 +227,41 @@ describe("Card fit", () => {
     unmount();
     expect(card.style.height).toBe("");
     expect(observers[0]?.elements).toEqual([]);
+  });
+
+  it("keeps measurement and focus through callback-to-object ref replacement", () => {
+    const observers = stubResizeObserver();
+    const height = { current: 120 };
+    stubContentHeight(height);
+    const firstCleanup = vi.fn();
+    const secondCleanup = vi.fn();
+    const first = vi.fn(() => firstCleanup);
+    const second = vi.fn(() => secondCleanup);
+    const object = React.createRef<HTMLDivElement>();
+    const content = (ref: React.Ref<HTMLDivElement>) => (
+      <Card fit="content" ref={ref} style={{ opacity: 0.7 }} className="rounded-none">
+        <button type="button">Keep focus</button>
+      </Card>
+    );
+    const view = render(content(first));
+    const button = screen.getByRole("button");
+    const node = button.closest('[data-slot="card"]');
+    button.focus();
+    view.rerender(content(second));
+    expect(firstCleanup).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledWith(node);
+    expect(observers[0]?.elements).toEqual([]);
+    height.current = 180;
+    observers.at(-1)?.fire();
+    expect(node).toHaveStyle({ height: "180px", opacity: "0.7" });
+    view.rerender(content(object));
+    expect(secondCleanup).toHaveBeenCalledTimes(1);
+    expect(object.current).toBe(node);
+    expect(screen.getByRole("button")).toBe(button);
+    expect(button).toHaveFocus();
+    expect(node).toHaveClass("rounded-none");
+    view.unmount();
+    expect(object.current).toBeNull();
+    expect(observers.at(-1)?.elements).toEqual([]);
   });
 });
