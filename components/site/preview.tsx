@@ -36,9 +36,13 @@ export function PreviewFrame({ id }: { id: string }) {
       {/* The body owns its height so the card around the preview is the size of
           what is inside it, measured on every change and applied at once: the
           preview's own motion is the motion, and a second tween on top of it
-          reads as an easing curve (see `MeasuredHeight`). The padding lives
-          inside, so a focus ring or shadow is clipped at the padding edge rather
-          than at the preview's own box.
+          reads as an easing curve (see `MeasuredHeight`). What is left to soften
+          is the arrival, and that is the specimen's own business — `PreviewStack`
+          lands it with a `@starting-style` fade and a 4px rise, which moves no
+          layout. The padding lives inside the measured box, so a focus ring or
+          shadow is clipped at the padding edge rather than at the preview's own
+          box — and so the 4px of travel stays inside that padding instead of
+          cutting the specimen.
 
           `min-h-80` is the card's floor, not the preview's: every component page
           starts at the same height whatever it happens to show, so browsing the
