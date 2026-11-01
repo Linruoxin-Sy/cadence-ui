@@ -1783,6 +1783,38 @@
         "CollapsibleTrigger": {},
         "CollapsibleContent": {}
       }
+    },
+    "tabs": {
+      "path": "apps/v4/registry/bases/base/ui/tabs.tsx",
+      "exports": [
+        "Tabs",
+        "TabsContent",
+        "TabsList",
+        "TabsTrigger",
+        "tabsListVariants"
+      ],
+      "slots": [
+        "tabs",
+        "tabs-content",
+        "tabs-list",
+        "tabs-trigger"
+      ],
+      "props": {
+        "Tabs": {
+          "className": null,
+          "orientation": "\"horizontal\""
+        },
+        "TabsList": {
+          "className": null,
+          "variant": "\"default\""
+        },
+        "TabsTrigger": {
+          "className": null
+        },
+        "TabsContent": {
+          "className": null
+        }
+      }
     }
   }
 }

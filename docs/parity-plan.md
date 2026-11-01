@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
-> open for earlier components; B6 accordion and collapsible shipped, tabs is next.**
+> open for earlier components; B6 accordion, collapsible and tabs shipped, table is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -320,7 +320,7 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B6 — disclosure and collections (6)
 
-`accordion` and `collapsible` shipped (§7.9–7.10). Next: `tabs`, then `table`, `carousel`, `scroll-area`.
+`accordion`, `collapsible` and `tabs` shipped (§7.9–7.11). Next: `table`, then `carousel`, `scroll-area`.
 
 ### B7 — heavy data and navigation (5)
 
@@ -962,6 +962,33 @@ the batch row now says `gate open` because the earlier components still lack vis
   and preserved in `.cache/collapsible-box-proof/`. No shared runtime changes or upstream pin movement.
 - **Remaining:** B6 is 2/6 shipped; tabs, table, carousel and scroll-area remain in order.
   Historical B1–B5 visual gates, B7–B9, and §8 carried work stay open. This completes only collapsible.
+
+### 7.11 B6 tabs — shipped (2026-11-01)
+
+- **Surface:** five fixed exports (including `tabsListVariants`), four upstream slots, plus decorative
+  `tabs-indicator`. Base UI API and new-york-v4 default/line styling remain pinned at `96da9cc7f1aa`.
+  The root forwards orientation to the primitive, including vertical keyboard semantics. All primitive
+  props, manual activation defaults, state callback classes/styles, render and refs are preserved.
+- **Ownership:** Base UI owns controlled/uncontrolled values, null selection, cancellation, disabled
+  fallback, roving focus and panel lifecycle. Disabled tabs remain arrow-focusable without activation,
+  as in Base UI 1.6.0. Panel keepMounted retains state; no panel height or entrance animation is added.
+- **Motion audit:** declared = implemented = documented `layout.shared`. Each List has a unique
+  LayoutGroup; the active span uses FLIP and the token's physics-defined spring with velocity continuity.
+  Reduced and none render a static aria-hidden span with no layoutId, transform or animation. Every
+  animated indicator reads the reduced branch and emits data-motion. No motion literals, timers,
+  shared runtime changes or new dependencies. The scheme clarifies list isolation and static fallback.
+- **Proof:** isolated `.next-tabs` production build passed (57 pages). Full `pnpm check` passed;
+  tabs has ten unit tests covering all parts' render/ref, callbacks, controlled requests/cancellation,
+  null, uncontrolled disabled fallback, persistence/unmount, manual/automatic activation, both axes,
+  RTL, no-loop focus and three mode branches. Edge targeted suite passed 8/8 on port 3117, two workers:
+  three modes × two system preferences, both orientations and variants, interrupted reversals,
+  final alignment, parent-only resize, controlled external selection, disabled focus, keyboard and
+  independent lists. Dual-theme axe has zero violations with no disabled rules; responsive overflow
+  and six screenshots (initial/selected/vertical × light/dark) passed visual inspection. First browser
+  run exposed a test's missing transparent-border inset in line alignment; corrected assertion passed.
+- **Remaining:** B6 is 3/6 shipped. Next table, then carousel and scroll-area. B7/B8/B9 and §8 remain
+  scheduled/open. Historical B1–B5 visual gates (including earlier B5 selection/menu evidence) remain
+  open. This component proof does not close those gates or establish overall parity completion.
 
 ## 8. Backlog
 

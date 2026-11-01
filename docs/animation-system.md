@@ -341,7 +341,13 @@ new end, with `{ duration: 0 }`: position is information, the animation is not.
 }
 ```
 
-> No DOM measurement needed: `layoutId` performs FLIP between renders automatically. Under reduced motion do not render the animated indicator (apply the background via `className` instead) — `layout` animations are not governed by `MotionConfig` (`layout` counts as a disabled transform animation and Motion does turn it off, but handle it explicitly anyway).
+> No manual DOM measurement needed: `layoutId` performs FLIP between renders automatically. Scope each
+> list with a unique `LayoutGroup` so independent tab sets never share an indicator. Preserve Base UI
+> active state and render/ref composition; selection and panel lifecycle remain primitive-owned. Both
+> horizontal and vertical lists, including the line variant, use the same recipe. Under reduced motion
+> do not render the animated indicator (apply the background via `className` or a static, aria-hidden
+> indicator instead). Handle the branch explicitly: MotionConfig's transform downgrade alone is not
+> the component contract.
 
 #### `gesture.drag` (bottom sheet)
 
