@@ -71,6 +71,7 @@ npx shadcn@latest add @cadence/button
 - [Tabs](https://cadence.dev/r/tabs.md): Switch between peer views with a shared selection indicator. (navigation)
 - [Table](https://cadence.dev/r/table.md): Invoices, transaction histories, and small collections of structured records. (collection)
 - [Carousel](https://cadence.dev/r/carousel.md): A swipeable collection with previous and next controls. (layout)
+- [Scroll Area](https://cadence.dev/r/scroll-area.md): Constrained lists and wide content with native scrolling and custom scrollbars. (scroll)
 
 ## Docs
 
