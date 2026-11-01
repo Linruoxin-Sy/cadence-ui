@@ -200,6 +200,10 @@ import { buttonVariants } from "@/components/cadence/button";
 
 `render` replaces the underlying element; use it for custom button components, not for links.
 
+The default button forwards native React events, including CSS `onAnimationStart`
+and HTML `onDrag` / `onDragStart` / `onDragEnd`. These handlers receive native
+React events; press feedback does not call them as animation lifecycle hooks.
+
 ```tsx
 <Button render={<CopyButton />}>Copy</Button>
 ```
