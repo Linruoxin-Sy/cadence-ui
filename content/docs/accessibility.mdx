@@ -1,0 +1,60 @@
+---
+title: Accessibility
+description: Keyboard, motion preferences, focus, and application responsibilities.
+---
+
+## Keyboard and semantics
+
+Cadence keeps shadcn's pinned Base UI surface. Native buttons activate with Enter or Space;
+links navigate with Enter. Composite widgets own their documented arrow-key navigation,
+selection, Escape and focus behavior. Read each component's Keyboard and accessibility table:
+[Dialog](/components/dialog), [Select](/components/select), [Combobox](/components/combobox),
+and [Tabs](/components/tabs) have different keyboard contracts.
+
+Use the real parts and native disabled props. Supply visible labels or accessible names for
+icon controls, meaningful image alternatives, and DialogTitle/SheetTitle for modal surfaces.
+Do not replace a trigger with a non-focusable element through `render`. Preserve the caller's
+ref and event semantics when composing custom triggers; do not swallow keyboard handlers.
+
+## Motion preferences
+
+[Motion modes](/docs/motion-modes) describes provider resolution, OS preference and nesting.
+Full plays the declared recipes. Reduced removes spatial motion while retaining appropriate
+opacity feedback; Spinner retains its documented single-glyph rotation exception. None disables
+motion transitions. State, labels and access to content must remain usable in every mode.
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function AccessibleRegion({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="none">{children}</CadenceProvider>;
+}
+```
+
+Test with the OS preference as well as explicit full/reduced/none. An explicit nested full
+provider can restore full motion within an outer none region; the OS reduced preference still wins
+over full. Choose overrides deliberately. Site URL preferences resolve
+on hydration; they do not guarantee a none-mode first paint before hydration.
+
+## Application ownership
+
+The application owns initial focus choices, focus restoration when it removes a trigger,
+route-change announcements, asynchronous status messages, content order, contrast after theming,
+and testing with its actual assistive technology. Keep stable keys and avoid remounting controls
+on mode changes. Use a live status region for meaningful async results, not every animation frame.
+
+Cadence is UI only: render errors using `aria-invalid`, `data-invalid`, labels and descriptions.
+The application owns validation, error text, submission, server requests and upload progress.
+See [Field](/components/field) and [Attachment](/components/attachment).
+
+## Verification and limits
+
+Exercise Tab and Shift+Tab, activation, widget arrows, Escape, pointer dismissal, disabled states,
+and focus after closing or removing content. Verify both themes, zoom, narrow layouts and all
+motion modes. Automated axe scans complement keyboard and screen-reader checks.
+
+Current component suites exercise runtime motion contracts, and selected production browser
+flows have keyboard, focus and axe evidence. These are scoped proofs, not a claim of complete
+screen-reader certification or a completed library-wide callback/ref/native-event audit.
+Cross-library live cancellation and first-paint checks remain open, including Combobox outside
+pointer/Tab/nested ownership compatibility. Test those boundaries in your own composition.

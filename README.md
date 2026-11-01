@@ -129,3 +129,11 @@ Upstream source is fetched into `.cache/shadcn/` (gitignored) and summarised in 
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+### Registry distribution
+
+Current `/r` resources revalidate with exact-byte ETags. Explicit retained content snapshots
+provide immutable installs; see [Registry](content/docs/registry.mdx) for local hosting,
+namespace pinning and the freeze command. Snapshot paths are content identities, not releases.
+See [Accessibility](content/docs/accessibility.mdx), [AI usage](content/docs/ai.mdx) and
+[Unreleased changes](content/docs/changelog.mdx) for current responsibilities and boundaries.

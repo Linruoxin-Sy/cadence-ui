@@ -1883,3 +1883,14 @@ and preserve unrelated URL/history state. Validation and remaining limits are re
 `docs/evidence/preview-variants.md` and the serial handoff. This closes only URL variants under its
 recorded gates; index/sidebar, distribution/guides, metadata, initial JS and cross-library audits
 remain OPEN. Older Button-only flow notes above are historical evidence.
+
+
+### Distribution and guide closure (2026-11-02)
+
+ADR-017 corrects the immutable-latest conflict: current /r aliases revalidate with exact-byte
+ETags; explicit tracked tree-hash snapshots retain frozen artifacts across builds/deployments.
+The production beforeFiles rewrite owns public/r requests. Four missing guides now join the
+existing guide index/sidebar/llms order: accessibility, registry, ai, changelog (Unreleased only).
+Production HTTP and browser evidence is recorded in docs/handoffs/registry-distribution.md.
+This closes only distribution/cache and missing-guide work, not T0 performance templates,
+initial JS, global accessibility/native-event/ref/motion audits or unscheduled AI prerequisites.

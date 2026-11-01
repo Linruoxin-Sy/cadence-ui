@@ -86,3 +86,11 @@ running cancellation, first paint, nested providers and measured geometry.
 ## Licensing
 
 By contributing, you agree that your contribution is licensed under the MIT License.
+
+### Retained registry snapshots
+
+Normal `registry:build` preserves and verifies `public/r/snapshots/**`. Never edit or delete a
+previously distributed snapshot. To prepare an explicit snapshot, build/check current aliases,
+run `node scripts/freeze-registry.mjs`, review and commit its entire new hash directory separately.
+Do not freeze for ordinary docs/handoff commits. Verify production GET/HEAD/ETag/304/cache headers
+when changing distribution; static file existence is not HTTP evidence. See ADR-017 and the registry guide.

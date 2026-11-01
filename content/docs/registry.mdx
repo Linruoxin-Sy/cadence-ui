@@ -1,0 +1,105 @@
+---
+title: Registry
+description: Self-host, update, and pin the registry with explicit cache semantics.
+---
+
+## Run a local registry
+
+From a checkout with Node and pnpm installed:
+
+```bash
+pnpm install
+pnpm registry:build
+pnpm build
+pnpm start --port 4173
+```
+
+The Next production server serves `/r/registry.json`, `/r/catalog.json`, all item JSON files,
+and component markdown such as `/r/button.md`. The build embeds file contents, targets,
+dependencies, docs and source provenance. `pnpm registry:check` verifies freshness against source.
+Serve the complete repository build and `public/r`, including retained snapshots; runtime reads
+do not require git or a local build cache. Hosting/deployment is your responsibility.
+
+## Configure the consumer namespace
+
+In a separate shadcn consumer project's `components.json`, set:
+
+```json
+{
+  "registries": {
+    "@cadence": "http://127.0.0.1:4173/r/{name}.json"
+  }
+}
+```
+
+Then install into that consumer:
+
+```package-manager
+npx shadcn@latest add @cadence/cadence-theme
+npx shadcn@latest add @cadence/button
+```
+
+Replace the origin with your reachable host when sharing. Keep the `@cadence` namespace:
+intra-registry dependencies such as `@cadence/motion` use it too. Relative source imports and
+`@components/cadence/...` targets preserve the mirrored install tree. See
+[Installation](/docs/installation) for provider and framework setup. Do not initialize this
+registry-author repository as a shadcn consumer.
+
+## Latest and updates
+
+Unversioned `/r` URLs mean current build, not a release. Responses use
+`public, max-age=0, must-revalidate` and a SHA-256 ETag of exact bytes. GET and HEAD support
+If-None-Match and 304. Missing/invalid files return 404 with no-store. They are never immutable.
+
+Copied code does not update itself. Before reinstalling, commit consumer changes, compare the
+incoming source/docs and review local edits. Use consumer dependency lockfiles and run your
+application checks. `meta.since` records first appearance; it is not an install-version selector.
+The private package version is not a published release promise. See [Changelog](/docs/changelog).
+
+## Freeze and pin a snapshot
+
+After building and checking the desired registry, explicitly freeze it:
+
+```bash
+node scripts/freeze-registry.mjs
+```
+
+The command prints the real 64-character tree SHA-256 and creates
+`public/r/snapshots/<printed-hash>/`. It copies every root JSON/MD file with a hash manifest.
+Commit that directory and retain it in every later deployment. Normal registry builds verify
+all retained snapshots, never create more or overwrite old bytes. Repeating freeze on identical
+bytes returns the same identity. Do not edit or delete a distributed snapshot.
+
+Set the consumer's **same `@cadence` namespace** to
+`http://127.0.0.1:4173/r/snapshots/<printed-hash>/{name}.json`, replacing the placeholder with
+the actual printed hash. Verify its `registry.json` and `button.json` before installing.
+Every dependency then resolves within the snapshot. A direct frozen Button URL with a latest
+namespace would still install latest dependencies; pin the namespace for a coherent install.
+
+Snapshot resources use `public, max-age=31536000, immutable`, with conditional ETags too.
+Captured markdown/catalog links and install prose still refer to latest URLs; they are reference
+text, not a version resolver. Package ranges are captured as written; pin packages with a lockfile.
+Snapshots are content identities, not invented release numbers; no tag aliases are implemented.
+
+A retained checkout snapshot is available at
+[its frozen index](/r/snapshots/84cc78703b354b29c815c3970cb26973e4760dea398fdf48756b8a24c996b2f1/registry.json).
+For that exact snapshot on the local server, the namespace template is:
+
+```json
+{
+  "registries": {
+    "@cadence": "http://127.0.0.1:4173/r/snapshots/84cc78703b354b29c815c3970cb26973e4760dea398fdf48756b8a24c996b2f1/{name}.json"
+  }
+}
+```
+
+## Self-hosting and private distribution
+
+Next `start` is the tested reference server. A before-files rewrite ensures the handler owns
+`/r` responses even though the generated files remain in `public/r`. A static host/CDN must
+implement equivalent headers, ETags and retained paths itself; copying files alone does not
+reproduce that HTTP contract. Test production GET/HEAD/304 after configuring the host.
+
+This public registry sends wildcard read CORS and has no authentication. Put private registries
+behind your own authentication and configure the consumer CLI credentials there. Do not put
+secrets into registry source or payloads: installed code and embedded docs are readable artifacts.
