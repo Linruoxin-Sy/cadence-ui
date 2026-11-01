@@ -39,7 +39,7 @@ const pinPath = path.join(cacheDir, "pin.json");
 const manifestPath = path.join(root, "upstream", "manifest.json");
 
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
-const ids = registry.items.filter((item) => item.type === "registry:ui").map((item) => item.name);
+const components = registry.items.filter((item) => item.type === "registry:ui" || item.type === "registry:block");
 
 async function readJson(file) {
   try {
@@ -79,8 +79,9 @@ await mkdir(cacheSourceDir, { recursive: true });
 const items = {};
 const missing = [];
 
-for (const id of ids) {
-  const upstreamPath = `${SOURCE_PREFIX}/ui/${id}.tsx`;
+for (const item of components) {
+  const id = item.name;
+  const upstreamPath = item.meta?.upstream?.path ?? `${SOURCE_PREFIX}/ui/${id}.tsx`;
   let source;
   try {
     source = await fetchText(`${RAW}/${pin.ref}/${upstreamPath}`);
@@ -91,6 +92,7 @@ for (const id of ids) {
   await writeFile(path.join(cacheSourceDir, `${id}.tsx`), source);
   items[id] = {
     path: upstreamPath,
+    ...(item.meta?.upstream?.guide ? { guide: item.meta.upstream.guide } : {}),
     exports: extractExports(source),
     slots: extractSlots(source),
     props: extractProps(source),

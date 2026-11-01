@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B7 implementations shipped (2026-11-01); B6 and B7 batch gates complete.
-> Historical B1–B5 visual gates remain open. B8 data-table is next; B8/B9 and §8 remain open.**
+> Historical B1–B5 visual gates remain open. B8 data-table shipped; date-picker is next. B8/B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -257,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned   |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
-|       | **Total**                  | **57** |            | **102**     |         |           |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status      |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ----------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done     |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done     |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done     |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done     |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | 1/2 shipped |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
+|       | **Total**                  | **57** |            | **102**     |         |             |
 
 ### 7.0 Status discipline
 
@@ -326,11 +326,11 @@ All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scrol
 ### B7 — heavy data and navigation (5)
 
 Chart, Calendar, Navigation Menu, Resizable and Sidebar shipped (§7.15–7.19).
-Batch gate complete (§7.20); B8 `data-table` is next.
+Batch gate complete (§7.20); B8 `data-table` shipped and `date-picker` is next.
 
 ### B8 — compositions (2, `registry:block`)
 
-`data-table`, `date-picker`.
+`data-table` ✅ shipped (§7.21); `date-picker` next. B8 batch gate remains open.
 
 ### B9 — AI first (2 + 1 early)
 
@@ -1280,6 +1280,39 @@ This closes B7 only. B1–B5 historical visual gates (especially older select/me
 B9 attachment/bubble and all open §8 carried work remain open. B6 remains closed. Sheet's local clock
 repair does not close the historical nested CSS-popup conformance gate for other components.
 Next: B8 `data-table`, followed by `date-picker`, then B9 and the historical/§8 audits in dependency order.
+
+### 7.21 Data Table — ✅ shipped (2026-11-01)
+
+- **Composition:** first `registry:block`, with the pinned Base example at
+  `apps/v4/examples/base/data-table-demo.tsx` and guide at
+  `apps/v4/content/docs/components/base/data-table.mdx`, not an invented `ui/data-table.tsx`.
+  `Payment`, `columns`, `DataTableDemo` remain the upstream exports. Upstream sync and parity write
+  retain real block source/guide paths; parity checks both paths offline. The pin is unchanged.
+- **Dependency:** exact `@tanstack/react-table@9.3.1` (v9 feature registration / row models), committed
+  independently. No validation, fetch ownership, shared motion runtime or build config change.
+- **Behaviour:** email sorting/filtering, page selection, column visibility, pagination, working
+  copy-ID and mailto actions. Stable payment IDs key rows and selection; table/filter nodes survive
+  sort/filter/mode changes. Every state slice can be internally owned or paired with a caller
+  setter. Preview uses external controlled state, 23 records, page size, reset and live data updates.
+  Native table semantics, named checkboxes, header scopes and aria-sort remain; empty rows span
+  visible columns. Inline-flex on composed checkboxes ensures their 16px boxes in table cells.
+- **Motion:** T2 composed `feedback.press`, `state.morph`, `popup.anchored`, `exit.fade` only.
+  Row/data/geometry changes stay instant. Dropdown Menu now resolves a local portal clock,
+  callback classes/styles last, none first-frame opacity, and immediate transition cancellation.
+  The browser caught an active CSS scale continuing after duration became zero: `transition-none`
+  now cancels none, and reduced uses `transition-opacity` so scale is dropped immediately.
+  This does not close the other historical popup or B1–B5 gates.
+- **Evidence:** complete repository check (420 tests / 65 files), 55 pinned surfaces and all tier budgets; isolated
+  `.next-data-table` production build (66 pages); Edge production three modes × two OS preferences,
+  sorting/filtering/paging/selection/visibility, external reset/data updates, keyboard/focus,
+  preserved nodes, nested full inside none and live portal downgrade/system reduce. Full-page
+  WCAG2A/2AA/2.1AA axe in both themes at 1280/390 has zero violations without disabled rules;
+  table scrolls with keyboard on mobile and document does not overflow. Edge Data Table plus
+  Dropdown Menu/Menubar regression matrix passes 23/23, including real clipboard ID and mailto checks. Four full-page screenshots
+  are reviewed under `.cache/data-table-proof/`. Logs: `.cache/data-table-{build,e2e-final,final-check}.log`.
+  Source and final-source-stamped payloads are separate commits.
+- **Remaining:** B8 Date Picker next, then B9 attachment/bubble, historical B1–B5 visual gates and
+  every unclosed §8 carried item. B6/B7 stay closed. B8 batch gate is not closed by this one block.
 
 ## 8. Backlog
 

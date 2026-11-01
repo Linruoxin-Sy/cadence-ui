@@ -1838,6 +1838,44 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "data-table",
+      "type": "registry:block",
+      "title": "Data Table",
+      "description": "An editable payments table with sorting, filtering, selection, visibility, and pagination.",
+      "dependencies": ["@tanstack/react-table@9.3.1"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/checkbox",
+        "@cadence/dropdown-menu",
+        "@cadence/input",
+        "@cadence/table",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/data-table/index.tsx",
+          "type": "registry:component",
+          "target": "@components/cadence/data-table/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T2",
+        "batch": "B8",
+        "motion": ["feedback.press", "state.morph", "popup.anchored", "exit.fade"],
+        "intensity": "medium",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10",
+          "path": "apps/v4/examples/base/data-table-demo.tsx",
+          "guide": "apps/v4/content/docs/components/base/data-table.mdx"
+        }
+      }
     }
   ]
 }

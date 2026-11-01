@@ -855,3 +855,16 @@ CI check: the set of animated properties found in source ⊆ the declared contra
 - [ ] Is it still acceptable on low-end devices (4× CPU throttle)?
 - [ ] Does the duration match the element's place in the hierarchy?
 - [ ] Can it be fully disabled with `data-motion="none"`?
+
+### Data Table composition (B8)
+
+The `registry:block` Data Table is T2 because it composes Button `feedback.press`,
+Checkbox / menu `state.morph`, and Dropdown Menu `popup.anchored` / `exit.fade`.
+Its rows, column visibility, sorting, filters and page changes update immediately
+in all three modes. There is no row reveal, `data.transition` or geometry recipe:
+removing or reordering data must not remount the table or its filter input.
+Stable application IDs key surviving rows. The installed controls own their
+existing motion contracts. Dropdown Menu now owns its portal's token clock just
+as Sheet does, resolves caller class/style callbacks last, and removes starting
+opacity in `none`; nested full, reduced, none and live downgrade are checked with
+the Data Table composition. This closes no other historical CSS-popup gate.

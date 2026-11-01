@@ -6,8 +6,13 @@ import { type HTMLMotionProps, motion } from "motion/react";
 import type * as React from "react";
 import { createContext, type HTMLProps, useContext } from "react";
 import { cn } from "../lib/cn";
-import { scale } from "../lib/motion";
-import { useCadenceMotion } from "../lib/provider";
+import { duration, reducedDurationScale, scale } from "../lib/motion";
+import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
+
+function popupClock(cm: CadenceMotion): React.CSSProperties {
+  const factor = cm.disabled ? 0 : (cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
+  return { "--motion-duration-fast": `${duration.fast * factor}s` } as React.CSSProperties;
+}
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -40,9 +45,18 @@ function DropdownMenuContent({
   side = "bottom",
   sideOffset = 4,
   className,
+  style,
   ...props
 }: MenuPrimitive.Popup.Props & Pick<MenuPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
   const cm = useCadenceMotion();
+  const popupClasses = cn(
+    "z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden",
+    cm.disabled
+      ? "transition-none duration-0"
+      : "ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+    !cm.disabled && (cm.reduced ? "transition-opacity" : "transition-[opacity,scale]"),
+    !cm.reduced && "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+  );
 
   return (
     <MenuPrimitive.Portal>
@@ -56,13 +70,16 @@ function DropdownMenuContent({
         <MenuPrimitive.Popup
           data-slot="dropdown-menu-content"
           data-motion={cm.mode}
-          className={cn(
-            "z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden",
-            "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-            className,
-          )}
+          className={
+            typeof className === "function"
+              ? (state) => cn(popupClasses, className(state))
+              : cn(popupClasses, className)
+          }
+          style={
+            typeof style === "function"
+              ? (state) => ({ ...popupClock(cm), ...style(state) })
+              : { ...popupClock(cm), ...style }
+          }
           {...props}
         />
       </MenuPrimitive.Positioner>

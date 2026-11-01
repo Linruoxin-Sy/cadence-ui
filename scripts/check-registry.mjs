@@ -87,7 +87,7 @@ for (const item of registry.items) {
     if (!tier || !(tier in TIER_BUDGET)) {
       problems.push(`${item.name}: meta.tier must be one of ${Object.keys(TIER_BUDGET).join(", ")}`);
     }
-    if (item.type === "registry:ui") {
+    if (isComponent(item)) {
       if (!Array.isArray(item.meta?.motion)) problems.push(`${item.name}: meta.motion must be an array`);
       if (item.meta?.tier !== "T0" && !item.meta?.motion?.length) {
         problems.push(`${item.name}: non-T0 components need at least one recipe in meta.motion`);

@@ -100,15 +100,35 @@ describe("DropdownMenu", () => {
     expect(panel.className).not.toContain("scale-(--motion-scale-in)");
   });
 
-  it("keeps the class list but zeroes the duration under none", async () => {
+  it("removes starting opacity and zeroes the local duration under none", async () => {
     render(<Demo mode="none" />);
     await openMenu();
 
     const panel = pageSlot("dropdown-menu-content");
-    // `none` resolves `--motion-duration-*` to 0ms in CSS; the branch the DOM shows is
-    // what pins that the mode reached the element at all.
+    expect(panel.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
+    expect(panel.className).not.toContain("opacity-0");
     expect(panel).toHaveAttribute("data-motion", "none");
-    expect(panel.className).toContain("duration-(--motion-duration-fast)");
+    expect(panel.className).toContain("duration-0");
+  });
+
+  it("restores full popup timing inside none and resolves caller state callbacks last", async () => {
+    render(
+      <CadenceProvider mode="none">
+        <CadenceProvider mode="full" timeScale={2}>
+          <DropdownMenu>
+            <DropdownMenuTrigger>Nested</DropdownMenuTrigger>
+            <DropdownMenuContent className={() => "custom-popup"} style={() => ({ color: "red" })}>
+              <DropdownMenuItem>Item</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CadenceProvider>
+      </CadenceProvider>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Nested" }));
+    const menu = await screen.findByRole("menu");
+    expect(menu.style.getPropertyValue("--motion-duration-fast")).toBe("0.32s");
+    expect(menu).toHaveClass("custom-popup");
+    expect(menu).toHaveStyle({ color: "rgb(255, 0, 0)" });
   });
 
   it("opens from the keyboard and focuses the first item", async () => {

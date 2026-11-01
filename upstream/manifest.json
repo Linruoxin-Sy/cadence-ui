@@ -2242,6 +2242,19 @@
           "className": null
         }
       }
+    },
+    "data-table": {
+      "path": "apps/v4/examples/base/data-table-demo.tsx",
+      "exports": [
+        "DataTableDemo",
+        "Payment",
+        "columns"
+      ],
+      "slots": [],
+      "props": {
+        "DataTableDemo": {}
+      },
+      "guide": "apps/v4/content/docs/components/base/data-table.mdx"
     }
   }
 }

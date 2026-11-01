@@ -52,7 +52,7 @@ const problems = [];
 const same = (a = [], b = []) => [...a].sort().join("|") === [...b].sort().join("|");
 
 for (const item of registry.items) {
-  if (item.type !== "registry:ui") continue;
+  if (item.type !== "registry:ui" && item.type !== "registry:block") continue;
   const doc = docs.get(item.name);
   if (!doc) {
     problems.push(`${item.name}: missing content/components/${item.name}.mdx`);

@@ -7,8 +7,8 @@ npx shadcn@latest add @cadence/button
 ```
 
 > Status: **B0–B7 implementations shipped; B6 and B7 batch gates complete.** Historical B1–B5
-> visual gates remain open. B8 data-table/date-picker, B9 attachment/bubble and the carried site/tooling
-> gates remain scheduled; data-table is next.
+> visual gates remain open. B8 date-picker, B9 attachment/bubble and the carried site/tooling
+> gates remain scheduled; Data Table shipped and Date Picker is next.
 > See [the parity plan](docs/parity-plan.md).
 
 ## Install
@@ -88,6 +88,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `calendar` — date selection           | T4   | `data.transition`                                                    |
 | `resizable` — adjustable split panels | T0   | none                                                                 |
 | `sidebar` — workspace navigation      | T3   | `layout.move`                                                        |
+| `data-table` — payments composition   | T2   | `feedback.press`, `state.morph`, `popup.anchored`, `exit.fade`       |
 | `navigation-menu` — site navigation   | T3   | `popup.anchored`, `exit.fade`, `geometry.resize`                     |
 
 The remaining scheduled components, their batches, and the motion tier for each are listed in

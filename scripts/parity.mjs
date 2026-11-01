@@ -58,7 +58,9 @@ if (mode === "write") {
       continue;
     }
     items[item.name] = {
-      path: `apps/v4/registry/bases/${manifest.primitiveBase ?? "base"}/ui/${item.name}.tsx`,
+      path:
+        item.meta?.upstream?.path ?? `apps/v4/registry/bases/${manifest.primitiveBase ?? "base"}/ui/${item.name}.tsx`,
+      ...(item.meta?.upstream?.guide ? { guide: item.meta.upstream.guide } : {}),
       exports: extractExports(source),
       slots: extractSlots(source),
       props: extractProps(source),
@@ -107,6 +109,12 @@ for (const item of components) {
     continue;
   }
 
+  if (item.meta?.upstream?.path && item.meta.upstream.path !== upstream.path) {
+    problems.push(`${item.name}: upstream source path differs from the pinned manifest`);
+  }
+  if (item.meta?.upstream?.guide && item.meta.upstream.guide !== upstream.guide) {
+    problems.push(`${item.name}: upstream guide differs from the pinned manifest`);
+  }
   const source = await readOrNull(path.join(root, localPath(item)));
   if (source === null) {
     problems.push(`${item.name}: missing local source ${localPath(item)}`);
