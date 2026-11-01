@@ -1934,6 +1934,54 @@
           "orientation": "\"vertical\""
         }
       }
+    },
+    "chart": {
+      "path": "apps/v4/registry/bases/base/ui/chart.tsx",
+      "exports": [
+        "ChartConfig",
+        "ChartContainer",
+        "ChartLegend",
+        "ChartLegendContent",
+        "ChartStyle",
+        "ChartTooltip",
+        "ChartTooltipContent"
+      ],
+      "slots": [
+        "chart"
+      ],
+      "props": {
+        "useChart": {},
+        "ChartContainer": {
+          "id": null,
+          "className": null,
+          "children": null,
+          "config": null,
+          "initialDimension": "INITIAL_DIMENSION"
+        },
+        "ChartTooltipContent": {
+          "active": null,
+          "payload": null,
+          "className": null,
+          "indicator": "\"dot\"",
+          "hideLabel": "false",
+          "hideIndicator": "false",
+          "label": null,
+          "labelFormatter": null,
+          "labelClassName": null,
+          "formatter": null,
+          "color": null,
+          "nameKey": null,
+          "labelKey": null
+        },
+        "ChartLegendContent": {
+          "className": null,
+          "hideIcon": "false",
+          "payload": null,
+          "verticalAlign": "\"bottom\"",
+          "nameKey": null
+        },
+        "getPayloadConfigFromPayload": {}
+      }
     }
   }
 }

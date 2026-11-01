@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B6 implementations shipped (2026-11-01); B6 batch gate complete.
-> Historical B1–B5 visual gates remain open. B7 chart is next; B7–B9 and §8 remain open.**
+> Historical B1–B5 visual gates remain open. B7 chart shipped; calendar is next. B7–B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -257,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned   |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
-|       | **Total**                  | **57** |            | **102**     |         |           |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status      |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ----------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done     |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done     |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done     |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 1/5 shipped |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
+|       | **Total**                  | **57** |            | **102**     |         |             |
 
 ### 7.0 Status discipline
 
@@ -321,11 +321,11 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 ### B6 — disclosure and collections (6)
 
 All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scroll-area`
-(§7.9–7.14). Batch gate reviewed and complete (§7.14); B7 `chart` is next.
+(§7.9–7.14). Batch gate reviewed and complete (§7.14); B7 chart shipped (§7.15).
 
 ### B7 — heavy data and navigation (5)
 
-`chart`, `calendar`, `navigation-menu`, `resizable`, `sidebar`.
+Chart shipped (§7.15). Next: `calendar`, `navigation-menu`, `resizable`, `sidebar`.
 
 ### B8 — compositions (2, `registry:block`)
 
@@ -1104,6 +1104,36 @@ the batch row now says `gate open` because the earlier components still lack vis
   were not repeated. This closes B6 only. Historical B1–B5 visual gates remain open.
 - **Next:** B7 `chart`, then calendar, navigation-menu, resizable, sidebar. B8 data-table/date-picker,
   B9 attachment/bubble, and §8 carried work remain scheduled/open. No overall parity completion claim.
+
+### 7.15 B7 chart shipped (2026-11-01)
+
+- **Surface:** pinned Base/new-york-v4 source at unchanged 96da9cc; seven exports including ChartConfig,
+  one upstream chart slot; actual Recharts content prop types, defaults, formatting, theme maps and
+  outer div ref/styles retained. Only chart appended to the manifest. 50 components / 56 items /
+  50 docs / 51 previews. Recharts 3.10.1 is pinned in a separate dependency commit.
+- **Motion decision first:** animation-system §3.1.2 explicitly defines the T4 data.transition engine
+  form. SVG data geometry is a deliberate property-budget exception, never DOM layout. The public
+  AnimationControllerProvider drives numeric progress on duration.base/ease.out and provider timeScale;
+  caller series delay/duration/easing cannot extend it, false still opts out. Reduced/none finish
+  geometry immediately, including an in-flight downgrade, without erasing positional SVG transforms
+  or remounting. Tooltip position animation is always disabled, documented as a Cadence constraint.
+  Caller custom shapes / independent animation controllers retain responsibility for their motion.
+- **Implementation discovery:** Recharts complete() calls onAnimationEnd only after active; the
+  controller enters the public state machine before ticking and completion. Unit proof covers the
+  actual handle, eased midpoint, downgrade and one completion callback. Eight Chart unit tests.
+- **Browser proof:** isolated .next-chart, Edge port 3121, workers=2, tests/e2e/chart.spec.ts: 8 passing.
+  All three modes × both system preferences test Bar/Line/Area/Pie updates against actual SVG paths,
+  full intermediate frames, reduced/none stable geometry, explicit 5-second caller clocks, keyboard
+  tooltip, mode downgrade, responsive resize, exact data table and no pageerror. rAF sampling spans
+  50 frames because this host may refresh faster than 60Hz. No mock geometry in browser proof.
+- **Accessibility and visuals:** both themes at 1280/390, full-page axe WCAG2A/2AA/2.1AA with no
+  disabled rules and zero violations; screenshots in .cache/chart-proof inspected. Narrow preview
+  originally exceeded its centred frame; w-full fixes actual clipping. Wide MDX API tables exposed
+  keyboard scrolling without a focus target; site MDX tables now receive tabIndex=0 (matching the
+  existing Table preview approach). No axe rules were suppressed. Biome permits the intentional table tab stop with a local rationale.
+- **Checks:** registry:build + pnpm check (377 tests / 60 files), 50 pinned parity surfaces, budgets/P11
+  and freshness; isolated Next production build (61 static pages). Browser and screenshot evidence
+  closes Chart only. B7 remains 1/5; calendar is next. B1–B5 visual gates and §8 remain open.
 
 ## 8. Backlog
 

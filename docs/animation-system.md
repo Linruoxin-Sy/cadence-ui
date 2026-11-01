@@ -453,6 +453,28 @@ three modes × system preferences, correct final position, reversal, drag releas
 loop/options, plugins/API, dynamic slides and resize. Engine internals are pinned to 8.6.0 and must
 be reviewed on upgrade. CSS-only computed transition assertions alone cannot prove this engine.
 
+### 3.1.2 `data.transition` for Recharts data geometry
+
+Chart uses Recharts 3.10.1's public AnimationControllerProvider. The cause is a series entering or
+changing data, not a container mounting. This T4 engine form is an explicit exception to the
+transform/opacity/filter rule: SVG paths, sectors and bar geometry interpolate data coordinates,
+not DOM layout. No measurement loop or wrapper reveal is added. Recharts owns interpolation and
+retargeting from its current series state; Cadence owns the numeric progress clock and easing.
+
+Full uses the data.transition duration and ease tokens (including provider timeScale). Explicit
+series animationDuration, animationBegin and animationEasing cannot extend or bypass that clock;
+isAnimationActive=false still opts out. Reduced and none complete geometry immediately: fading
+an entire chart would obscure comparison, so neither adds an opacity fallback. Static positional
+SVG transforms remain in every mode because they encode data coordinates, not animation.
+A running downgrade completes every registered animation without remounting the chart. Updates
+and resize must preserve axes, legend and keyboard tooltip state. No SSR replay wrapper is used.
+
+ChartTooltip disables Recharts' positional CSS animation in every mode; pointer/focus changes
+are immediate. Tooltip content, formatters, cursor and caller props remain supported. Independent
+custom shapes, nested animation controllers and caller-authored CSS/WAAPI own their own motion;
+they must implement the same mode contract. Do not substitute blanket CSS animation suppression
+for the engine controller. Review the public controller integration on Recharts upgrades.
+
 ### 3.2 Continuous recipes run in CSS
 
 Some recipes do not end: a placeholder pulse, a shimmer, a marquee. A page can
@@ -675,7 +697,7 @@ Implementation notes:
 
 Implementation rules:
 
-1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px. The two documented exceptions are disclosure height and `geometry.resize`: both are measured, clamped to the closed size, confined to T3 continuity components, and resolve to zero duration under reduced/none.
+1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px. The documented exceptions are chart SVG data geometry (§3.1.2), disclosure height and `geometry.resize`. The latter two are measured, clamped to the closed size, confined to T3 continuity components, and resolve to zero duration under reduced/none.
 2. **No layout-read loops**: `getBoundingClientRect` and `offsetWidth` are read inside event/`ResizeObserver` callbacks only, and reads precede writes.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
 4. **`layout` animations trigger layout measurement**: for lists over 50 items, switch to manual transform or paginate.

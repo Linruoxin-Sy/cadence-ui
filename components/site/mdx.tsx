@@ -33,7 +33,10 @@ export async function Mdx({ source }: { source: string }) {
         components={{
           table: ({ children, ...props }: ComponentProps<"table">) => (
             <div className="overflow-x-auto">
-              <table {...props}>{children}</table>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard scroll target for wide documentation tables. */}
+              <table tabIndex={0} {...props}>
+                {children}
+              </table>
             </div>
           ),
           pre: ({ children }: ComponentProps<"pre">) => <MdxCodeFence>{children}</MdxCodeFence>,

@@ -6,14 +6,10 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B4 complete; B5 in progress (six of seven).** B0 removed the eight original motion
-> components and shipped the parity foundation; B1 added the eleven atoms (button, badge, kbd, separator,
-> label, input, textarea, card, aspect-ratio, avatar, skeleton) plus the upstream parity check; B2 added the
-> nine structure-and-feedback components (alert, empty, item, field, button-group, input-group, breadcrumb,
-> pagination, spinner); B3 added the eight form controls (checkbox, radio-group, switch, slider, toggle,
-> toggle-group, input-otp, progress); B4 added the seven overlays; B5 has shipped select, combobox and the
-> three menus plus `command`, with `toast` still open. B9 has started ahead of schedule with `code-block`;
-> `attachment` and `bubble` are still open. See [the parity plan](docs/parity-plan.md).
+> Status: **B0–B6 implementations shipped; B7 chart shipped, calendar next.** B6's batch gate is
+> complete; historical B1–B5 visual gates remain open. B7's remaining four items, B8's blocks,
+> B9 attachment/bubble and the carried site/tooling gates remain scheduled.
+> See [the parity plan](docs/parity-plan.md).
 
 ## Install
 
@@ -88,8 +84,9 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `input-otp` — one-time code         | T1   | `state.morph`                                                        |
 | `progress` — determinate completion | T4   | `data.transition`                                                    |
 | `code-block` — code surface         | T5   | `geometry.resize`, `state.morph`, `data.transition`, `layout.shared` |
+| `chart` — data visualisation        | T4   | `data.transition`                                                    |
 
-The remaining 16 components, their batches, and the motion tier for each are listed in
+The remaining scheduled components, their batches, and the motion tier for each are listed in
 [docs/parity-plan.md](docs/parity-plan.md).
 
 ## Rules
