@@ -62,4 +62,5 @@ export const previews: Record<string, ComponentType> = {
   carousel: dynamic(() => import("./carousel").then((mod) => ({ default: mod.CarouselPreview }))),
   "scroll-area": dynamic(() => import("./scroll-area").then((mod) => ({ default: mod.ScrollAreaPreview }))),
   chart: dynamic(() => import("./chart").then((mod) => ({ default: mod.ChartPreview }))),
+  calendar: dynamic(() => import("./calendar").then((mod) => ({ default: mod.CalendarPreview }))),
 };

@@ -1678,6 +1678,40 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Select dates, multiple days, and ranges with accessible month navigation.",
+      "categories": ["collection"],
+      "dependencies": ["react-day-picker@9.13.2", "date-fns@4.1.0", "lucide-react", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/button"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/calendar/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/calendar/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T4",
+        "batch": "B7",
+        "motion": ["data.transition"],
+        "intensity": "subtle",
+        "complexity": "L",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

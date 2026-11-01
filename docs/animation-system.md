@@ -475,6 +475,23 @@ custom shapes, nested animation controllers and caller-authored CSS/WAAPI own th
 they must implement the same mode contract. Do not substitute blanket CSS animation suppression
 for the engine controller. Review the public controller integration on Recharts upgrades.
 
+### 3.1.3 `data.transition` for calendar month grids
+
+Calendar keeps DayPicker 9.13.2 in charge of selection, displayed months and keyboard focus.
+A stable Month component provides its date to the persistent MonthGrid. A changed month moves
+that actual table from signed `distance.sm` to zero and opacity zero to one on the data.transition
+clock through a native WAAPI effect (seconds converted to milliseconds, token easing converted
+to cubic-bezier). Cancelling removes the effect synchronously, including during live downgrades;
+there is no Motion DOM visual-element cache to reapply an interrupted transform. There is no mount reveal, outgoing duplicate, delayed content, layout tween or keyed remount.
+Rapid changes cancel the previous tween and present the latest month; reversing uses the new direction.
+Reduced uses opacity only; none shows the new table immediately. A live mode or clock change cancels
+and settles both properties. Grid height changes immediately (including variable week counts).
+Caller components override the corresponding defaults and own their motion; caller styles win.
+DayPicker's optional `animate` API remains forwarded, but its CSS animation engine requires the caller's
+stylesheet; Cadence does not import that stylesheet or activate a second animation clock.
+Day buttons retain native button semantics and static selection/range styling, using buttonVariants
+without Button's independent press recipe. Navigation uses the same static variants.
+
 ### 3.2 Continuous recipes run in CSS
 
 Some recipes do not end: a placeholder pulse, a shimmer, a marquee. A page can

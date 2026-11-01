@@ -6,8 +6,8 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B0–B6 implementations shipped; B7 chart shipped, calendar next.** B6's batch gate is
-> complete; historical B1–B5 visual gates remain open. B7's remaining four items, B8's blocks,
+> Status: **B0–B6 implementations shipped; B7 chart and calendar shipped, navigation-menu next.** B6's batch gate is
+> complete; historical B1–B5 visual gates remain open. B7's remaining three items, B8's blocks,
 > B9 attachment/bubble and the carried site/tooling gates remain scheduled.
 > See [the parity plan](docs/parity-plan.md).
 
@@ -85,6 +85,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `progress` — determinate completion | T4   | `data.transition`                                                    |
 | `code-block` — code surface         | T5   | `geometry.resize`, `state.morph`, `data.transition`, `layout.shared` |
 | `chart` — data visualisation        | T4   | `data.transition`                                                    |
+| `calendar` — date selection         | T4   | `data.transition`                                                    |
 
 The remaining scheduled components, their batches, and the motion tier for each are listed in
 [docs/parity-plan.md](docs/parity-plan.md).

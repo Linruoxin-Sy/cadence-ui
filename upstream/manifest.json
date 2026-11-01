@@ -1982,6 +1982,34 @@
         },
         "getPayloadConfigFromPayload": {}
       }
+    },
+    "calendar": {
+      "path": "apps/v4/registry/bases/base/ui/calendar.tsx",
+      "exports": [
+        "Calendar",
+        "CalendarDayButton"
+      ],
+      "slots": [
+        "calendar"
+      ],
+      "props": {
+        "Calendar": {
+          "className": null,
+          "classNames": null,
+          "showOutsideDays": "true",
+          "captionLayout": "\"label\"",
+          "buttonVariant": "\"ghost\"",
+          "locale": null,
+          "formatters": null,
+          "components": null
+        },
+        "CalendarDayButton": {
+          "className": null,
+          "day": null,
+          "modifiers": null,
+          "locale": null
+        }
+      }
     }
   }
 }

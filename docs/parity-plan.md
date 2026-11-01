@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B6 implementations shipped (2026-11-01); B6 batch gate complete.
-> Historical B1–B5 visual gates remain open. B7 chart shipped; calendar is next. B7–B9 and §8 remain open.**
+> Historical B1–B5 visual gates remain open. B7 chart and calendar shipped; navigation-menu is next. B7–B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -266,7 +266,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 1/5 shipped |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 2/5 shipped |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
 |       | **Total**                  | **57** |            | **102**     |         |             |
@@ -325,7 +325,7 @@ All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scrol
 
 ### B7 — heavy data and navigation (5)
 
-Chart shipped (§7.15). Next: `calendar`, `navigation-menu`, `resizable`, `sidebar`.
+Chart and Calendar shipped (§7.15–7.16). Next: `navigation-menu`, `resizable`, `sidebar`.
 
 ### B8 — compositions (2, `registry:block`)
 
@@ -1134,6 +1134,41 @@ the batch row now says `gate open` because the earlier components still lack vis
 - **Checks:** registry:build + pnpm check (377 tests / 60 files), 50 pinned parity surfaces, budgets/P11
   and freshness; isolated Next production build (61 static pages). Browser and screenshot evidence
   closes Chart only. B7 remains 1/5; calendar is next. B1–B5 visual gates and §8 remain open.
+
+### 7.16 B7 calendar shipped (2026-11-01)
+
+- **Pinned surface:** both official Calendar sources at 96da9cc7f1aa were read. Preserves Calendar,
+  CalendarDayButton, the calendar slot, complete DayPicker discriminated props/defaults, locale,
+  classes/styles, formatters, components, selection callbacks, native day buttons and focus behavior.
+  DayPicker 9.13.2 and date-fns 4.1.0 are exact dependencies, committed separately. Only calendar
+  was appended to the upstream manifest; the pin is unchanged.
+- **Motion decision:** T4 data.transition on the actual changed month grid (§3.1.3). Stable parts
+  and a date context preserve the month tree. Full uses signed distance.sm plus opacity on the
+  recipe clock; reduced is opacity only; none starts no animation. Native WAAPI cancellation
+  synchronously removes the effect on live mode/clock/style changes. No remount, duplicate grid,
+  selection decoration, height tween or layout read. Caller components/styles remain authoritative.
+- **Actual findings:** Motion DOM cancellation could reapply a cached intermediate transform;
+  native cancellable effects fixed it. DayPicker max in multiple mode resets selection to the
+  newly clicked date; excludeDisabled resets a crossing range to its clicked start. Locale alone
+  leaves default navigation labels in English. Pinned Intl dropdown formatting uses the host
+  locale if none is passed: Chinese Node versus English browser caused a real hydration error.
+  Preview now passes enUS/fr explicitly; docs explain the SSR requirement without changing defaults.
+- **Proof:** 8 component tests cover all modes, stable grid/day nodes, caller rerender focus,
+  keyboard, controlled month changes, disabled/selected days, required/min/max multiple selection,
+  excluded-disabled ranges, locale/week start/week numbers, two months, custom parts and styles.
+  Isolated `.next-calendar` production build generated 62 static pages. Edge browser suite: 8/8,
+  three modes × two system preferences, actual single/multiple/range selection, outside day,
+  arrows/Home/End/PageUp/PageDown, dropdown months, controlled update, rapid reverse/update,
+  active animation cancellation (positive running count → zero, same node), and system downgrade.
+  Both themes at 1280/390 pass full-page axe WCAG2A/2AA/2.1AA with no rules disabled, no horizontal
+  overflow and verified two-month row/stack geometry. Four screenshots were visually reviewed
+  and preserved locally in `.cache/calendar-proof/` (not committed).
+- **Conformance:** declared = implemented = documented data.transition; only transform/opacity,
+  token timing/easing/distance, no persistent will-change or measurements; reduced drops transform,
+  none has zero active effects, live downgrade cancels, grid height updates immediately.
+  `pnpm registry:build` precedes `pnpm check`; source and generated payloads are separate commits.
+- **Remaining:** closes Calendar only. B7 is 2/5; navigation-menu, resizable and sidebar follow.
+  Historical B1–B5 visual gates, B8/B9 and all unclosed §8 carried work remain open; B6 stays closed.
 
 ## 8. Backlog
 

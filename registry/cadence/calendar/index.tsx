@@ -1,0 +1,229 @@
+"use client";
+
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import * as React from "react";
+import {
+  type ChevronProps,
+  type DayButton,
+  DayPicker,
+  getDefaultClassNames,
+  type Locale,
+  type MonthGridProps,
+  type MonthProps,
+  type WeekNumberProps,
+} from "react-day-picker";
+import { type Button, buttonVariants } from "../button";
+import { cn } from "../lib/cn";
+import { useCadenceMotion } from "../lib/provider";
+
+function Calendar({
+  className,
+  classNames,
+  showOutsideDays = true,
+  captionLayout = "label",
+  buttonVariant = "ghost",
+  locale,
+  formatters,
+  components,
+  ...props
+}: React.ComponentProps<typeof DayPicker> & {
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+}) {
+  const defaultClassNames = getDefaultClassNames();
+
+  return (
+    <LocaleContext value={locale}>
+      <DayPicker
+        showOutsideDays={showOutsideDays}
+        className={cn(
+          "group/calendar bg-background p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+          String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
+          String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+          className,
+        )}
+        captionLayout={captionLayout}
+        locale={locale}
+        formatters={{
+          formatMonthDropdown: (date) => date.toLocaleString(locale?.code, { month: "short" }),
+          ...formatters,
+        }}
+        classNames={{
+          root: cn("w-fit", defaultClassNames.root),
+          months: cn("relative flex flex-col gap-4 md:flex-row", defaultClassNames.months),
+          month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
+          nav: cn("absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1", defaultClassNames.nav),
+          button_previous: cn(
+            buttonVariants({ variant: buttonVariant }),
+            "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
+            defaultClassNames.button_previous,
+          ),
+          button_next: cn(
+            buttonVariants({ variant: buttonVariant }),
+            "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
+            defaultClassNames.button_next,
+          ),
+          month_caption: cn(
+            "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)",
+            defaultClassNames.month_caption,
+          ),
+          dropdowns: cn(
+            "flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium",
+            defaultClassNames.dropdowns,
+          ),
+          dropdown_root: cn(
+            "relative rounded-md border border-input shadow-xs has-focus:border-ring has-focus:ring-[3px] has-focus:ring-ring/50",
+            defaultClassNames.dropdown_root,
+          ),
+          dropdown: cn("absolute inset-0 bg-popover opacity-0", defaultClassNames.dropdown),
+          caption_label: cn(
+            "font-medium select-none",
+            captionLayout === "label"
+              ? "text-sm"
+              : "flex h-8 items-center gap-1 rounded-md pr-1 pl-2 text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground",
+            defaultClassNames.caption_label,
+          ),
+          month_grid: cn("w-full border-collapse", defaultClassNames.month_grid),
+          weekdays: cn("flex", defaultClassNames.weekdays),
+          weekday: cn(
+            "flex-1 rounded-md text-[0.8rem] font-normal text-muted-foreground select-none",
+            defaultClassNames.weekday,
+          ),
+          week: cn("mt-2 flex w-full", defaultClassNames.week),
+          week_number_header: cn("w-(--cell-size) select-none", defaultClassNames.week_number_header),
+          week_number: cn("text-[0.8rem] text-muted-foreground select-none", defaultClassNames.week_number),
+          day: cn(
+            "group/day relative aspect-square h-full w-full p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-md",
+            props.showWeekNumber
+              ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-md"
+              : "[&:first-child[data-selected=true]_button]:rounded-l-md",
+            defaultClassNames.day,
+          ),
+          range_start: cn("rounded-l-md bg-accent", defaultClassNames.range_start),
+          range_middle: cn("rounded-none", defaultClassNames.range_middle),
+          range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
+          today: cn(
+            "rounded-md bg-accent text-accent-foreground data-[selected=true]:rounded-none",
+            defaultClassNames.today,
+          ),
+          outside: cn("text-muted-foreground aria-selected:text-muted-foreground", defaultClassNames.outside),
+          disabled: cn("text-muted-foreground opacity-50", defaultClassNames.disabled),
+          hidden: cn("invisible", defaultClassNames.hidden),
+          ...classNames,
+        }}
+        components={{
+          Root: CalendarRoot,
+          Month: CalendarMonth,
+          MonthGrid: CalendarMonthGrid,
+          Chevron: CalendarChevron,
+          DayButton: LocalDayButton,
+          WeekNumber: CalendarWeekNumber,
+          ...components,
+        }}
+        {...props}
+      />
+    </LocaleContext>
+  );
+}
+
+function CalendarDayButton({
+  className,
+  day,
+  modifiers,
+  locale,
+  ...props
+}: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {
+  const defaultClassNames = getDefaultClassNames();
+
+  const ref = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => {
+    if (modifiers.focused) ref.current?.focus();
+  }, [modifiers.focused]);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      data-slot="button"
+      data-variant="ghost"
+      data-size="icon"
+      data-day={day.date.toLocaleDateString(locale?.code)}
+      data-selected-single={
+        modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle
+      }
+      data-range-start={modifiers.range_start}
+      data-range-end={modifiers.range_end}
+      data-range-middle={modifiers.range_middle}
+      className={cn(
+        buttonVariants({ variant: "ghost", size: "icon" }),
+        "flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-accent-foreground [&>span]:text-xs [&>span]:opacity-70",
+        defaultClassNames.day,
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+const LocaleContext = React.createContext<Partial<Locale> | undefined>(undefined);
+function LocalDayButton(props: React.ComponentProps<typeof DayButton>) {
+  const locale = React.useContext(LocaleContext);
+  return <CalendarDayButton locale={locale} {...props} />;
+}
+function CalendarChevron({ className, orientation, ...props }: ChevronProps) {
+  const Icon = orientation === "left" ? ChevronLeftIcon : orientation === "right" ? ChevronRightIcon : ChevronDownIcon;
+  return <Icon className={cn("size-4", className)} {...props} />;
+}
+function CalendarWeekNumber({ children, ...props }: WeekNumberProps) {
+  return (
+    <td {...props}>
+      <div className="flex size-(--cell-size) items-center justify-center text-center">{children}</div>
+    </td>
+  );
+}
+// Stable component identities keep DayPicker's navigation and focus tree mounted.
+const MonthContext = React.createContext(0);
+function CalendarMonth({ calendarMonth, displayIndex: _displayIndex, ...props }: MonthProps) {
+  return (
+    <MonthContext value={calendarMonth.date.getTime()}>
+      <div {...props} />
+    </MonthContext>
+  );
+}
+function CalendarRoot({ rootRef, ...props }: React.ComponentProps<"div"> & { rootRef?: React.Ref<HTMLDivElement> }) {
+  const cm = useCadenceMotion();
+  return <div data-slot="calendar" data-motion={cm.mode} ref={rootRef} {...props} />;
+}
+function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
+  const cm = useCadenceMotion();
+  const month = React.useContext(MonthContext);
+  const previous = React.useRef(month);
+  const scope = React.useRef<HTMLTableElement>(null);
+  const { mode, reduced, timeScale } = cm;
+  const transition = cm.transition("data.transition");
+  // biome-ignore lint/correctness/useExhaustiveDependencies: recipe and distance derive from mode/clock; caller styles remain authoritative.
+  React.useEffect(() => {
+    const changed = previous.current !== month;
+    const direction = month > previous.current ? 1 : -1;
+    previous.current = month;
+    const element = scope.current;
+    if (!element || !changed || mode === "none") return;
+    if (!element.animate) return;
+    const from: Keyframe = {};
+    const to: Keyframe = {};
+    if (style?.opacity === undefined) {
+      from.opacity = 0;
+      to.opacity = 1;
+    }
+    if (!reduced && !style?.transform) {
+      from.transform = `translateX(${direction * cm.distance.sm}px)`;
+      to.transform = "none";
+    }
+    const easing = Array.isArray(transition.ease) ? `cubic-bezier(${transition.ease.join(",")})` : "linear";
+    // WAAPI owns only this effect: cancel removes it synchronously, revealing caller styles.
+    const animation = element.animate([from, to], { duration: (transition.duration ?? 0) * 1000, easing });
+    return () => animation.cancel();
+  }, [month, mode, reduced, timeScale, scope, style?.transform, style?.opacity]);
+  return <table ref={scope} data-slot="calendar-month-grid" data-motion={cm.mode} style={style} {...props} />;
+}
+
+export { Calendar, CalendarDayButton };
