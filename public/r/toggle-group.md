@@ -127,7 +127,7 @@ The value is always an array, even without `multiple`.
 | ----------- | -------- | ------- | ------------------------------------ |
 | `value`     | `string` | –       | Required. Identifies the item.       |
 | `disabled`  | `boolean`| `false` | Keeps it visible but unpressable.    |
-| `className` | `string` | –       | Merged last.                         |
+| `className` | `string` / state callback | –       | Merged last.                         |
 
 ## Motion contract
 

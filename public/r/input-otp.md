@@ -148,6 +148,8 @@ leave a ghost in a field the user is racing against.
 | reduced | `opacity` only                    | `state.morph` | yes           |
 | none    | no transition                     | –             | –             |
 
+The character span stays mounted when its value changes; updates replay the recipe on that same node. Mode changes cancel the running entry, and `none` renders filled slots immediately, including on the first render.
+
 The caret is drawn but does not blink. A blink is a continuous loop that would
 have to be declared as `data.transition`; the active slot's ring already shows
 where the next character goes, so the loop buys nothing.

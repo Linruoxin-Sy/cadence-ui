@@ -102,7 +102,7 @@ appear to vanish.
 | `name`          | `string`                                      | –       | Form field name, submitted with the selection.  |
 | `disabled`      | `boolean`                                     | `false` | Disables every item.                            |
 | `required`      | `boolean`                                     | `false` | Blocks submit until something is selected.      |
-| `className`     | `string`                                      | –       | Merged last; the default is `grid gap-3`.       |
+| `className`     | `string` / state callback                                      | –       | Merged last; the default is `grid gap-3`.       |
 
 ### `RadioGroupItem`
 
@@ -110,7 +110,7 @@ appear to vanish.
 | ----------- | --------- | ------- | ---------------------------------------- |
 | `value`     | `string`  | –       | Required. Identifies this option.        |
 | `disabled`  | `boolean` | `false` | Keeps the option visible but unselectable.|
-| `className` | `string`  | –       | Merged last.                             |
+| `className` | `string` / state callback  | –       | Merged last.                             |
 
 ## Motion contract
 

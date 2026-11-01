@@ -3035,7 +3035,7 @@ decide that anything is wrong.
 | `readOnly`         | `boolean`                         | `false` | Focusable, submitted, not changeable.                |
 | `required`         | `boolean`                         | `false` | Blocks form submission until checked.                |
 | `name`, `value`    | `string`                          | –       | Form field identity and submitted value.             |
-| `className`        | `string`                          | –       | Merged last.                                         |
+| `className`        | `string` / state callback                          | –       | Merged last.                                         |
 
 All native attributes are forwarded, including `aria-invalid` and
 `aria-describedby`.
@@ -3202,7 +3202,7 @@ appear to vanish.
 | `name`          | `string`                                      | –       | Form field name, submitted with the selection.  |
 | `disabled`      | `boolean`                                     | `false` | Disables every item.                            |
 | `required`      | `boolean`                                     | `false` | Blocks submit until something is selected.      |
-| `className`     | `string`                                      | –       | Merged last; the default is `grid gap-3`.       |
+| `className`     | `string` / state callback                                      | –       | Merged last; the default is `grid gap-3`.       |
 
 ### `RadioGroupItem`
 
@@ -3210,7 +3210,7 @@ appear to vanish.
 | ----------- | --------- | ------- | ---------------------------------------- |
 | `value`     | `string`  | –       | Required. Identifies this option.        |
 | `disabled`  | `boolean` | `false` | Keeps the option visible but unselectable.|
-| `className` | `string`  | –       | Merged last.                             |
+| `className` | `string` / state callback  | –       | Merged last.                             |
 
 ## Motion contract
 
@@ -3368,7 +3368,7 @@ that the setting exists.
 | `readOnly`        | `boolean`                   | `false`     | Focusable, submitted, not changeable.          |
 | `required`        | `boolean`                   | `false`     | Blocks submit until switched on.               |
 | `name`, `value`   | `string`                    | –           | Form field identity and submitted value.       |
-| `className`       | `string`                    | –           | Merged last.                                   |
+| `className`       | `string` / state callback                    | –           | Merged last.                                   |
 
 ## Motion contract
 
@@ -3454,7 +3454,7 @@ export function Volume() {
 }
 ```
 
-`defaultValue` and `value` are always arrays: one entry per thumb. `aria-label`
+`defaultValue` and `value` accept a number for one thumb, or an array with one entry per thumb. `aria-label`
 on the slider is forwarded to every thumb's native range input, which is what a
 screen reader announces. A range slider gets one accessible name per thumb —
 `Price (minimum)` and `Price (maximum)` — because two inputs with the same name
@@ -3517,7 +3517,7 @@ Give the vertical slider a height; the track fills it.
 | `orientation`        | `"horizontal" \| "vertical"`      | `"horizontal"` | Axis.                                           |
 | `disabled`           | `boolean`                         | `false`        | Ignores pointer and keyboard.                   |
 | `aria-label`         | `string`                          | –              | Forwarded to each thumb, suffixed per thumb.    |
-| `className`          | `string`                          | –              | Merged last.                                    |
+| `className`          | `string` / state callback                          | –              | Merged last.                                    |
 
 Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchanged.
 
@@ -3579,7 +3579,7 @@ scale. No `layout` animation, no measurement per frame.
 
 ## Notes for AI
 
-- Values are arrays. `value={50}` is a type error; use `value={[50]}`.
+- A numeric value renders one thumb; an array renders one thumb per entry. Omitting both values retains the upstream two-thumb default.
 - Do not animate the fill. Motion here is press feedback only.
 - Pair with an `input` when the exact number must be typeable.
 
@@ -3674,7 +3674,7 @@ checkbox.
 | `variant`          | `"default" \| "outline"`      | `"default"` | Visual weight.                           |
 | `size`             | `"sm" \| "default" \| "lg"`   | `"default"` | Height and minimum width.                |
 | `disabled`         | `boolean`                     | `false`     | Ignores interaction.                     |
-| `className`        | `string`                      | –           | Merged last.                             |
+| `className`        | `string` / state callback                      | –           | Merged last.                             |
 
 `toggleVariants` is exported, so a custom part can share the same classes.
 
@@ -3861,7 +3861,7 @@ The value is always an array, even without `multiple`.
 | ----------- | -------- | ------- | ------------------------------------ |
 | `value`     | `string` | –       | Required. Identifies the item.       |
 | `disabled`  | `boolean`| `false` | Keeps it visible but unpressable.    |
-| `className` | `string` | –       | Merged last.                         |
+| `className` | `string` / state callback | –       | Merged last.                         |
 
 ## Motion contract
 
@@ -4070,6 +4070,8 @@ leave a ghost in a field the user is racing against.
 | reduced | `opacity` only                    | `state.morph` | yes           |
 | none    | no transition                     | –             | –             |
 
+The character span stays mounted when its value changes; updates replay the recipe on that same node. Mode changes cancel the running entry, and `none` renders filled slots immediately, including on the first render.
+
 The caret is drawn but does not blink. A blink is a continuous loop that would
 have to be declared as `data.transition`; the active slot's ring already shows
 where the next character goes, so the loop buys nothing.
@@ -4192,8 +4194,9 @@ of 5" announced instead.
 </Progress>
 ```
 
-Composing the track yourself replaces the default one. The indicator still reads
-the value from the root, so it keeps animating.
+This adds a composed track alongside the default track, matching the upstream
+root composition. The indicator still reads the value from the root, so it keeps
+animating.
 
 ## When to use
 
@@ -4220,7 +4223,7 @@ the value from the root, so it keeps animating.
 | `min`, `max`      | `number`                              | `0`, `100` | Range.                                    |
 | `format`          | `Intl.NumberFormatOptions`            | –       | How `ProgressValue` formats the number.      |
 | `getAriaValueText`| `(value, raw) => string`              | –       | Human-readable value for assistive tech.     |
-| `className`       | `string`                              | –       | Merged last; the default is a wrap layout.   |
+| `className`       | `string` / state callback                              | –       | Merged last; the default is a wrap layout.   |
 
 ### `ProgressTrack`, `ProgressIndicator`, `ProgressLabel`, `ProgressValue`
 

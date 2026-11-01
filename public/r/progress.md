@@ -73,8 +73,9 @@ of 5" announced instead.
 </Progress>
 ```
 
-Composing the track yourself replaces the default one. The indicator still reads
-the value from the root, so it keeps animating.
+This adds a composed track alongside the default track, matching the upstream
+root composition. The indicator still reads the value from the root, so it keeps
+animating.
 
 ## When to use
 
@@ -101,7 +102,7 @@ the value from the root, so it keeps animating.
 | `min`, `max`      | `number`                              | `0`, `100` | Range.                                    |
 | `format`          | `Intl.NumberFormatOptions`            | –       | How `ProgressValue` formats the number.      |
 | `getAriaValueText`| `(value, raw) => string`              | –       | Human-readable value for assistive tech.     |
-| `className`       | `string`                              | –       | Merged last; the default is a wrap layout.   |
+| `className`       | `string` / state callback                              | –       | Merged last; the default is a wrap layout.   |
 
 ### `ProgressTrack`, `ProgressIndicator`, `ProgressLabel`, `ProgressValue`
 

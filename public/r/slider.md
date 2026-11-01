@@ -24,7 +24,7 @@ export function Volume() {
 }
 ```
 
-`defaultValue` and `value` are always arrays: one entry per thumb. `aria-label`
+`defaultValue` and `value` accept a number for one thumb, or an array with one entry per thumb. `aria-label`
 on the slider is forwarded to every thumb's native range input, which is what a
 screen reader announces. A range slider gets one accessible name per thumb —
 `Price (minimum)` and `Price (maximum)` — because two inputs with the same name
@@ -87,7 +87,7 @@ Give the vertical slider a height; the track fills it.
 | `orientation`        | `"horizontal" \| "vertical"`      | `"horizontal"` | Axis.                                           |
 | `disabled`           | `boolean`                         | `false`        | Ignores pointer and keyboard.                   |
 | `aria-label`         | `string`                          | –              | Forwarded to each thumb, suffixed per thumb.    |
-| `className`          | `string`                          | –              | Merged last.                                    |
+| `className`          | `string` / state callback                          | –              | Merged last.                                    |
 
 Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchanged.
 
@@ -149,7 +149,7 @@ scale. No `layout` animation, no measurement per frame.
 
 ## Notes for AI
 
-- Values are arrays. `value={50}` is a type error; use `value={[50]}`.
+- A numeric value renders one thumb; an array renders one thumb per entry. Omitting both values retains the upstream two-thumb default.
 - Do not animate the fill. Motion here is press feedback only.
 - Pair with an `input` when the exact number must be typeable.
 

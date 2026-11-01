@@ -104,7 +104,7 @@ decide that anything is wrong.
 | `readOnly`         | `boolean`                         | `false` | Focusable, submitted, not changeable.                |
 | `required`         | `boolean`                         | `false` | Blocks form submission until checked.                |
 | `name`, `value`    | `string`                          | –       | Form field identity and submitted value.             |
-| `className`        | `string`                          | –       | Merged last.                                         |
+| `className`        | `string` / state callback                          | –       | Merged last.                                         |
 
 All native attributes are forwarded, including `aria-invalid` and
 `aria-describedby`.
