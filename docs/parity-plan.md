@@ -1641,8 +1641,12 @@ Initial JS remains OPEN independently of passing flow checks; no budget/config/m
 
 **Metadata**
 
-- `meta.intensity` is `subtle` on 28 of 29 components, so the filter the site does not have yet would have no
-  discriminating power when it lands. Decide what the dimension means or drop it from the docs table.
+- **Intensity definition — closed 2026-11-02.** animation-system §2.1 now defines authored
+  perceptual scope, independent of runtime mode/tier/complexity. The actual 58-item inventory is
+  31 subtle /26 medium /1 expressive; the former 28/29 statement was historical. Existing values
+  already agree: static/local feedback, surface/geometry motion, cross-surface handoff respectively.
+  `catalog-intensity.mjs` checks semantic classification alongside mandatory frontmatter equality;
+  no rating, shipped motion or defaults changed. Index/sidebar flow evidence is recorded separately.
 - T0 component docs omit the "Responsiveness and performance" section that the 12-section template promises,
   and nothing enforces the template. Either the template is tier-specific or the section is written.
 

@@ -34,6 +34,21 @@ preference can force that mode.
 loud a component's authored motion is, so a catalogue can group by it. No token reads it, and it is
 not adjustable at runtime.
 
+Catalogue intensity is the strongest authored behaviour available in the component (including
+its documented composition), independent of the selected runtime mode, complexity and tier:
+
+- `subtle`: static UI, local press/glyph feedback, opacity-only entry/progress/loading, or a
+  small control indicator. Static T0 belongs here; this label does not promise animation.
+- `medium`: a surface enters/exits, a panel/indicator moves or resizes, a collection slides,
+  or chart geometry interpolates. Carousel and Chart's `data.transition` moves geometry;
+  Calendar, Bubble, Skeleton, Spinner and Attachment's data feedback stays local.
+- `expressive`: coordinated identity/ownership transfers across surfaces (`handoff`, currently
+  Select). This is not a claim that every spring or every T3 component is expressive.
+
+`scripts/catalog-intensity.mjs` enforces this policy against the declared recipe forms and the
+explicit data-geometry owners. Registry/frontmatter equality remains mandatory. A new behaviour
+must update this design and the policy together; never alter motion to obtain a filter label.
+
 The reduced tween multiplier is exported as `reducedDurationScale` from `lib/motion.ts`.
 CSS popup adapters and `transitionFor()` read that same token rather than repeating the multiplier.
 
