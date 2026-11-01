@@ -147,7 +147,6 @@ for (const item of staged.items) {
 // Per-item markdown: what an agent or `curl` reads.
 for (const item of staged.items) {
   const doc = docs.get(item.name);
-  if (!doc) continue;
   const install = `npx shadcn@latest add @cadence/${item.name}`;
   const md = [
     `# ${item.title}`,
@@ -160,7 +159,8 @@ for (const item of staged.items) {
     `- Since: ${item.meta?.since ?? "0.1.0"}`,
     item.meta?.motion?.length ? `- Motion recipes: ${motionRecipes(item.meta.motion).join(", ")}` : "",
     "",
-    doc.body,
+    doc?.body ??
+      `## Registry support item\n\n${item.description}\n\nThis ${item.type} item supports the component registry. Read its JSON payload for the exact files, targets and dependencies. Configure the same @cadence namespace for all dependencies; see ${site}/docs/registry.`,
     "",
     "---",
     "",

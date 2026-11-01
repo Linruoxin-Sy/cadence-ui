@@ -21,8 +21,14 @@ test("production /r overrides public files and serves exact conditional resource
     expect(headers.etag).toBe(`"${createHash("sha256").update(body).digest("hex")}"`);
     expect(headers["content-type"]).toContain(name.endsWith(".md") ? "text/markdown" : "application/json");
     if (name === "registry.json") registrySchema.parse(JSON.parse(body.toString()));
-    else if (name === "catalog.json") expect(JSON.parse(body.toString())).toHaveLength(65);
-    else if (name.endsWith(".json")) registryItemSchema.parse(JSON.parse(body.toString()));
+    else if (name === "catalog.json") {
+      const catalog = JSON.parse(body.toString());
+      expect(catalog).toHaveLength(65);
+      for (const entry of catalog) {
+        expect((await request.get(entry.docs)).status(), entry.docs).toBe(200);
+        expect((await request.get(entry.item)).status(), entry.item).toBe(200);
+      }
+    } else if (name.endsWith(".json")) registryItemSchema.parse(JSON.parse(body.toString()));
     evidence.push({ name, status: response.status(), headers });
   }
   for (const name of ["button.json", "button.md", "catalog.json", "registry.json"]) {
