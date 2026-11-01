@@ -16,6 +16,7 @@ import {
   CodeBlockTitle,
 } from "@/registry/cadence/code-block";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const SOURCE = `export function read() {
   return 1;
@@ -416,9 +417,12 @@ describe("CodeBlock", () => {
 
     // The header's actions do not move — only the floating row fades — so the tab
     // and the copy button are the animated parts a tabbed block adds.
-    for (const name of ["code-block", "code-block-tab", "code-block-viewport", "code-block-copy-button"]) {
-      expect(slot(container, name)).toHaveAttribute("data-motion", mode);
-    }
+    expectMotionContract(mode, {
+      instantImperative: true,
+      parts: ["code-block", "code-block-tab", "code-block-viewport", "code-block-copy-button"].map((name) =>
+        slot(container, name),
+      ),
+    });
   });
 
   it("keeps the copy state without the scale under reduced motion", async () => {

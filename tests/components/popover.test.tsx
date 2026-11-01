@@ -12,6 +12,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/registry/cadence/popover";
+import { expectMotionContract } from "../motion-contract";
 
 function Example() {
   return (
@@ -88,7 +89,7 @@ describe("Popover", () => {
     renderInMode(mode);
     const popup = await open();
 
-    expect(popup).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [popup] });
     // Both the timing and the enter scale are tokens: `none` zeroes the duration on
     // the element itself, and the scale class is a JSX branch, not a media query.
     expect(popup.className).toContain(mode === "none" ? "duration-0" : "duration-(--motion-duration-fast)");

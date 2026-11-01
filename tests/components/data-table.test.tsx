@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { DataTablePreview } from "@/components/site/previews/data-table";
 import { DataTableDemo, type Payment } from "@/registry/cadence/data-table";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const records: [Payment, Payment] = [
   { id: "b", email: "beta@example.com", amount: 2, status: "success" },
@@ -83,7 +84,7 @@ describe("Data Table composition", () => {
         </CadenceProvider>,
       );
       const table = screen.getByRole("table");
-      expect(container.querySelector('[data-slot="data-table"]')).toHaveAttribute("data-motion", mode);
+      expectMotionContract(mode, { parts: [container.querySelector('[data-slot="data-table"]')] });
       await userEvent.click(screen.getByRole("button", { name: "Columns" }));
       const menu = await screen.findByRole("menu");
       expect(menu).toHaveAttribute("data-motion", mode);

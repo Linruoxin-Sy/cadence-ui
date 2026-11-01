@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/registry/cadence/input-otp";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Demo({ onComplete }: { onComplete?: (value: string) => void } = {}) {
   return (
@@ -66,4 +67,13 @@ describe("InputOTP", () => {
     );
     expect(container.querySelector('[data-slot="input-otp"]')).toHaveAttribute("data-motion", "none");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Demo />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

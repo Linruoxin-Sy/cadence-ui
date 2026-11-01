@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/registry/cadence/select";
+import { expectMotionContract } from "../motion-contract";
 
 function Demo({ mode }: { mode?: "full" | "reduced" | "none" }) {
   return (
@@ -169,4 +170,10 @@ describe("Select", () => {
     render(<Demo mode="none" />);
     expect(screen.getByRole("combobox", { name: "Framework" })).toHaveAttribute("data-motion", "none");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s popup contract", async (mode) => {
+  render(<Demo mode={mode} />);
+  await openSelect(screen.getByRole("combobox", { name: "Framework" }));
+  expectMotionContract(mode, { instantImperative: true });
 });

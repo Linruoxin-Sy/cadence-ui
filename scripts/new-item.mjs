@@ -200,13 +200,29 @@ export function ${pascal}Preview() {
 const test = `import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ${pascal} } from "@/registry/cadence/${id}";
-
+${
+  motion.length
+    ? `import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
+`
+    : ""
+}
 describe("${pascal}", () => {
   it("renders with its data-slot", () => {
     render(<${pascal}>Hello</${pascal}>);
     expect(screen.getByText("Hello")).toHaveAttribute("data-slot", "${id}");
   });
-});
+${
+  motion.length
+    ? `  // TODO: mount and exercise the actual animated parts (including portals).
+  // This deliberately fails until the static source stub implements its motion contract.
+  it.each(["full", "reduced", "none"] as const)("honours %s motion", (mode) => {
+    render(<CadenceProvider mode={mode}><${pascal}>Hello</${pascal}></CadenceProvider>);
+    expectMotionContract(mode);
+  });
+`
+    : ""
+}});
 `;
 
 await mkdir(path.dirname(sourcePath), { recursive: true });

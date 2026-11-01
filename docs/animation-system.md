@@ -830,16 +830,32 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
 
 ### 9.3 Asserting the motion "contract"
 
-Every component declares its Motion Contract in its documentation; tests read that table directly:
+Animated component suites must execute `expectMotionContract(mode)` in full, reduced and none.
+`tests/motion-contract-reporter.mjs` (configured in Vitest) enforces successful runtime calls for every
+registry UI/block with a nonempty `meta.motion`; an import, comment, skipped test or dead call does not count. T0 structural suites
+have no provider/helper obligation. The scaffold leaves an intentionally failing contract test until
+the animated fixture is implemented.
 
-```ts
-const contract = {
-  button: { press: ["scale"], reduced: [] },
-  dialog: { enter: ["opacity", "scale"], exit: ["opacity", "scale"], reduced: ["opacity"] },
-};
-```
+The shared unit helper checks mounted `data-motion` parts, CSS state classes and local clocks,
+continuous animation gating, and observed Motion targets/transitions. Only successful test cases
+contribute runtime metadata; skipped suites do not count.
+`registry:check` requires the named animated test file to exist. Test-only pass-through
+observers preserve real Motion rendering and control methods. Neutral scale/translation is legal;
+Switch/Progress retain positional transforms with an instant clock under reduced/none. Static
+placement transforms and direct pointer geometry are not entrance animations. Spinner alone retains
+its documented single-glyph spin under reduced. Decorative glyph orientation (for example CodeBlock's
+expanded chevron) may retain a rotation target with a zero clock; a timed rotation still fails.
+Imperative geometry fixtures opt into `instantImperative` for the reduced clock; none always checks
+observed imperative clocks. Engine and native WAAPI animation tests supply an
+explicit behavior assertion for their actual clock/keyframes; a wrapper's mode alone is insufficient.
+Composition suites include the installed controls, rather than inventing a motion branch on the root.
+Use a homogeneous provider fixture; retain dedicated nested-override tests for mixed mode trees.
 
-CI check: the set of animated properties found in source ⊆ the declared contract; under reduced mode no transform properties appear.
+This is executable unit evidence, not a browser animation sampler or a source property extractor.
+The docs recipe set is checked separately by `registry:check`. Existing interaction assertions stay.
+Computed Tailwind styles, same-target live cancellation, first paint, system preference, nested
+providers, final measured positions and per-frame running geometry still need browser evidence.
+Adopting the helper does not close the cross-library running-mode audit.
 
 ### 9.4 a11y and visual regression
 

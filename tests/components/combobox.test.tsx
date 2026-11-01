@@ -16,6 +16,7 @@ import {
   useComboboxAnchor,
 } from "@/registry/cadence/combobox";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
 
@@ -209,4 +210,11 @@ describe("Combobox", () => {
     expect(screen.getByRole("button", { name: "Remove Design" })).toHaveAttribute("data-slot", "combobox-chip-remove");
     expect(screen.getByRole("combobox", { name: "Topics" })).toHaveAttribute("data-slot", "combobox-chip-input");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s popup contract", async (mode) => {
+  render(<Demo mode={mode} />);
+  await userEvent.click(screen.getByRole("combobox", { name: "Framework" }));
+  await screen.findByRole("listbox");
+  expectMotionContract(mode);
 });

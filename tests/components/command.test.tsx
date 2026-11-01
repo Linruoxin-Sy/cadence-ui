@@ -13,6 +13,7 @@ import {
   CommandShortcut,
 } from "@/registry/cadence/command";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Actions({ onSelect = () => {} }: { onSelect?: (value: string) => void }) {
   return (
@@ -105,7 +106,7 @@ describe("Command", () => {
     );
     const popup = await screen.findByRole("dialog", { name: "Command Palette" });
     expect(popup).toHaveAccessibleDescription("Search for a command to run...");
-    expect(popup).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [popup] });
     expect(popup.className.includes("scale-(--motion-scale-in)")).toBe(mode === "full");
     expect(popup.className).toContain("duration-(--motion-duration-base)");
     expect(document.querySelector('[data-slot="dialog-overlay"]')).toHaveAttribute("data-motion", mode);

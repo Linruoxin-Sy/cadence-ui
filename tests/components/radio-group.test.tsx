@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { RadioGroup, RadioGroupItem } from "@/registry/cadence/radio-group";
+import { expectMotionContract } from "../motion-contract";
 
 function Demo() {
   return (
@@ -69,4 +70,13 @@ describe("RadioGroup", () => {
 
     expect(screen.getByRole("radiogroup")).toHaveAttribute("aria-invalid", "true");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Demo />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

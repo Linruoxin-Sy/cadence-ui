@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Button, buttonVariants } from "@/registry/cadence/button";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function CustomButton(props: ComponentProps<"button">) {
   return <button data-custom="yes" {...props} />;
@@ -64,7 +65,7 @@ describe("Button", () => {
         <Button>Save</Button>
       </CadenceProvider>,
     );
-    expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [screen.getByRole("button", { name: "Save" })] });
   });
   it("evaluates state callback classes after the variants", () => {
     render(

@@ -10,6 +10,7 @@ import {
   useCarousel,
 } from "@/registry/cadence/carousel";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const engine = vi.hoisted(() => {
   const handlers = new Map<string, Set<(api: unknown) => void>>();
@@ -185,6 +186,9 @@ describe("Carousel", () => {
         for (const cb of engine.handlers.get("pointerUp") ?? []) cb(engine.api);
       });
       expect(original).toHaveBeenLastCalledWith(mode === "full" ? 22 : 0);
+      expectMotionContract(mode, {
+        behavior: () => expect(original).toHaveBeenLastCalledWith(mode === "full" ? 22 : 0),
+      });
       expect(view.container.querySelector('[data-slot="carousel"]')).toHaveAttribute("data-motion", mode);
       expect(view.container.querySelector('[data-slot="carousel-content"]')?.firstElementChild).toHaveAttribute(
         "data-motion",

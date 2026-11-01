@@ -4,6 +4,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/cadence/accordion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Items() {
   return (
@@ -128,7 +129,7 @@ describe("Accordion", () => {
         </CadenceProvider>,
       );
       const panel = screen.getByRole("region", { name: "First" });
-      expect(panel).toHaveAttribute("data-motion", mode);
+      expectMotionContract(mode, { parts: [panel] });
       expect(panel.className.includes("transition-[height]")).toBe(mode === "full");
       if (mode !== "full") expect(panel).toHaveClass("duration-0");
       expect(panel.className).not.toMatch(/transform|scale|translate/);

@@ -15,6 +15,7 @@ import {
 } from "@/registry/cadence/alert-dialog";
 import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Example({ onConfirm }: { onConfirm?: () => void } = {}) {
   return (
@@ -126,7 +127,7 @@ describe("AlertDialog", () => {
     renderInMode(mode);
     const dialog = await open();
 
-    expect(dialog).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [dialog] });
     // The duration comes from the token, never from a literal: `data-motion="none"`
     // zeroes the variable on the element itself, which is what makes `none` instant.
     expect(dialog.className).toContain("duration-(--motion-duration-base)");

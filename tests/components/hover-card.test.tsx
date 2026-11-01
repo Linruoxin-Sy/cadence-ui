@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/cadence/hover-card";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Example() {
   return (
@@ -78,7 +79,7 @@ describe("HoverCard", () => {
     await hover();
 
     const content = panel();
-    expect(content).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [content] });
     // Both the timing and the enter scale are tokens: `none` zeroes the duration on
     // the element itself, and the scale class is a JSX branch, not a media query.
     expect(content?.className).toContain("duration-(--motion-duration-fast)");

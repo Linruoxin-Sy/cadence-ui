@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Slider } from "@/registry/cadence/slider";
+import { expectMotionContract } from "../motion-contract";
 
 function parts(container: HTMLElement) {
   return {
@@ -76,4 +77,13 @@ describe("Slider orientation", () => {
     expect(track?.className).toContain("h-full");
     expect(track?.className).not.toContain("h-1.5");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Slider defaultValue={[30]} aria-label="Level" />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

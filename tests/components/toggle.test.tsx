@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Toggle } from "@/registry/cadence/toggle";
+import { expectMotionContract } from "../motion-contract";
 
 describe("Toggle", () => {
   it("renders a button with its slot and variant classes", () => {
@@ -47,4 +48,13 @@ describe("Toggle", () => {
     );
     expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute("data-motion", "none");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Toggle>Bold</Toggle>
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

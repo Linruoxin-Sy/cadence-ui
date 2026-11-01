@@ -13,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/registry/cadence/sheet";
+import { expectMotionContract } from "../motion-contract";
 
 function Example({ side }: { side?: "top" | "right" | "bottom" | "left" } = {}) {
   return (
@@ -99,7 +100,7 @@ describe("Sheet", () => {
     renderInMode(mode);
     const sheet = await open();
 
-    expect(sheet).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [sheet] });
     expect(sheet.className).toContain("duration-(--motion-duration-base)");
     expect(sheet.className).toContain(
       mode === "full"

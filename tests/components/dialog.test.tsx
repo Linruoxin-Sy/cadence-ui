@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/registry/cadence/dialog";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Example() {
   return (
@@ -66,7 +67,7 @@ describe("Dialog", () => {
     await userEvent.click(screen.getByRole("button", { name: "Rename project" }));
 
     const dialog = await screen.findByRole("dialog");
-    expect(dialog).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [dialog] });
     // The duration comes from the token, never from a literal: `data-motion="none"`
     // zeroes the variable on the element itself, which is what makes `none` instant.
     expect(dialog.className).toContain("duration-(--motion-duration-base)");

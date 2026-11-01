@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
+import { expectMotionContract } from "../motion-contract";
 
 describe("ToggleGroup", () => {
   it("renders the group and item slots with the shared variant", () => {
@@ -84,4 +85,15 @@ describe("ToggleGroup orientation", () => {
     expect(item?.className).toContain("first:rounded-t-md");
     expect(item?.className).not.toContain("first:rounded-l-md");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <ToggleGroup>
+        <ToggleGroupItem value="bold">Bold</ToggleGroupItem>
+      </ToggleGroup>
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

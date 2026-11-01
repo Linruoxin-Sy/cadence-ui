@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Spinner } from "@/registry/cadence/spinner";
+import { expectMotionContract } from "../motion-contract";
 
 describe("Spinner", () => {
   it("is a status region with a slot", () => {
@@ -45,4 +46,13 @@ describe("Spinner", () => {
     render(<Spinner aria-label="Saving invoice" />);
     expect(screen.getByRole("status")).toHaveAccessibleName("Saving invoice");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Spinner />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/cadence/tooltip";
+import { expectMotionContract } from "../motion-contract";
 
 function Example() {
   return (
@@ -72,7 +73,7 @@ describe("Tooltip", () => {
     renderInMode(mode);
     const tooltip = await hover();
 
-    expect(tooltip).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [tooltip] });
     // Both the timing and the enter scale are tokens: `none` zeroes the duration on
     // the element itself, and the scale class is a JSX branch, not a media query.
     expect(tooltip.className).toContain("duration-(--motion-duration-fast)");

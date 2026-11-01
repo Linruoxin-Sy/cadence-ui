@@ -8,6 +8,7 @@ export default defineConfig({
     alias: { "@": path.resolve(process.cwd()) },
   },
   test: {
+    reporters: ["default", "./tests/motion-contract-reporter.mjs"],
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],

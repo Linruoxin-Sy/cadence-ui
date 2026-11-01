@@ -13,6 +13,7 @@ import {
   AttachmentTrigger,
 } from "@/registry/cadence/attachment";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 it("retains all nine slots, defaults and native attributes", () => {
   const { container } = render(
@@ -156,7 +157,7 @@ describe.each(["full", "reduced", "none"] as const)("motion %s", (mode) => {
     const { container, rerender } = render(tree("uploading"));
     const title = screen.getByText("File");
     const root = container.querySelector('[data-slot="attachment"]');
-    expect(root).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [root] });
     expect(title).toHaveAttribute("data-motion", mode);
     expect(screen.getByRole("button")).toHaveAttribute("data-motion", mode);
     if (mode === "none") expect(title).toHaveClass("animate-none");

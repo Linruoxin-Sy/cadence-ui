@@ -12,6 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/registry/cadence/navigation-menu";
+import { expectMotionContract } from "../motion-contract";
 
 function Items() {
   return (
@@ -53,7 +54,7 @@ describe("NavigationMenu", () => {
       await user.click(trigger);
       const popup = document.querySelector('[data-slot="navigation-menu-popup"]');
       const content = screen.getByRole("link", { name: "Docs" }).closest('[data-slot="navigation-menu-content"]');
-      expect(popup).toHaveAttribute("data-motion", mode);
+      expectMotionContract(mode, { parts: [popup] });
       expect(content).toHaveAttribute("data-motion", mode);
       if (mode !== "full") expect(popup?.className).not.toContain("data-starting-style:scale-");
       expect(trigger).toHaveAttribute("aria-expanded", "true");

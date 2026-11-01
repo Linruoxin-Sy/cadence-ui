@@ -13,6 +13,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/registry/cadence/sidebar";
+import { expectMotionContract } from "../motion-contract";
+import { imperativeSamples } from "../motion-observer";
 
 function Status() {
   const s = useSidebar();
@@ -70,8 +72,21 @@ describe("Sidebar", () => {
   it.each(["full", "reduced", "none"] as const)("keeps %s mode and cancels transforms on downgrade", async (mode) => {
     const { container, rerender } = render(<Example mode={mode} />);
     const input = screen.getByRole("textbox");
+    imperativeSamples.length = 0;
     await userEvent.click(screen.getByRole("button", { name: "Toggle Sidebar" }));
     const panel = container.querySelector('[data-slot="sidebar-container"]') as HTMLElement;
+    expectMotionContract(mode, {
+      behavior: () => {
+        if (mode !== "full") {
+          expect(panel.style.transform).toBe("none");
+          expect(imperativeSamples).toHaveLength(0);
+        } else {
+          expect(imperativeSamples).toHaveLength(1);
+          expect(imperativeSamples[0]?.[1]).toBe(-100);
+          expect(imperativeSamples[0]?.[2]).toMatchObject({ type: "spring" });
+        }
+      },
+    });
     expect(panel).toHaveAttribute("data-motion", mode);
     rerender(<Example mode="none" />);
     expect(panel).toHaveAttribute("data-motion", "none");

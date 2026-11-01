@@ -1541,8 +1541,33 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
   `.cache/motion-docs-render.html` / `.png` preserve the reviewed, intact tables. This gate proves
   static recipe declarations; the helper, highlight reliability, JS budget and cross-library live
   behavior audits below remain open.
-- **`expectMotionContract()` helper.** The three-mode assertion is hand-written per component, and the two
-  components missing it were the two that were broken. One shared helper that a new component must call.
+- **`expectMotionContract()` helper — done 2026-11-02.** All **38** animated UI/block suites now
+  execute the shared helper in full/reduced/none; the 20 T0 structural suites remain exempt. Motion
+  observation passes through to the real renderer/controls/imperative animate calls. The helper checks
+  mounted part modes, state-dependent CSS geometry, local none clocks, continuous opacity / Spinner's
+  single-glyph rotation, Motion initial/target/gesture/layout geometry and none clocks. Switch/Progress
+  keep instant position; static placement and zero-clock decorative orientation remain legal. Calendar
+  tests now record native WAAPI keyframes/clocks; Chart/Carousel/Sidebar retain actual engine/imperative
+  assertions. Existing API, keyboard, callback/ref and state tests remain; shared calls replace repeated
+  mode assertions while preserving named-part presence requirements.
+  Vitest's mandatory reporter consumes only successful test-case runtime metadata; unused imports,
+  dead calls, skipped suites and incomplete mode coverage fail. `registry:check` requires each named
+  animated test file; the scaffold emits deliberately failing animated contract fixtures until the
+  implementation is complete, and no provider/helper for T0. Design §9.3, AGENTS and CONTRIBUTING
+  describe the gate and its limits. `tests/lib/motion-contract.test.tsx` has **14** tests, including a
+  broken real Motion branch, wrong modes/geometry/none timing, and isolated real Vitest negative entries
+  with positive Spinner/T0 controls. The prior 58-doc/19-test recipe validation remains intact, with
+  an additional missing-suite negative and animated/T0 scaffold assertions (20 tests in that file).
+  The observer exposed four missing CodeBlock `data-motion` attributes (tab pill, two copy glyphs,
+  expand chevron); only those attributes were added, without changing recipes, timing or geometry.
+  Full `pnpm check`: **553/553, 75/75 files**, `.cache/helper-check-fixed.log`; registry build
+  `.cache/helper-build.log`. Isolated production build `.cache/helper-production.log`; CodeBlock
+  3 modes × 2 system preferences plus pill paint test **13/13**, `.cache/helper-browser.log`;
+  dual-theme desktop/mobile screenshot + axe tests **2/2**, `.cache/helper-visual.log`, reviewed
+  `.cache/helper-proof/code-preview-{light,dark}-{1280,390}.png`. These local checks do not close
+  first-frame, same-target live cancellation, nested override, or cross-library running-mode audits.
+  CodeBlock highlight reliability and initial-JS budget remain open; passing highlight tests here
+  do not diagnose the historical 1s timeout. See handoff `docs/handoffs/motion-contract-helper.md`.
 - **Async highlight test reliability.** Investigate the repeated CodeBlock 1s highlight wait timeouts
   recorded in B1/B3. Original-configuration complete retries passed, but repeated retries are not
   a root-cause resolution. Keep this in §8 tooling; do not silently weaken the timeout or reopen B9.

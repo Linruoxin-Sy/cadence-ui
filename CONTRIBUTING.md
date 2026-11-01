@@ -53,7 +53,12 @@ A pull request is ready when the component has:
    `data-motion`. Run the [motion conformance check](AGENTS.md#motion-conformance-check) before the PR.
 6. **Accessibility**: roles, keyboard, focus, and a screen-reader story.
 7. **Tests** in `tests/components/<id>.test.tsx` covering the API, the slot, the keyboard path, the `reduced`
-   branch, and the `none` mode.
+   branch, and the `none` mode. Animated suites must execute `expectMotionContract(mode)` from
+   `tests/motion-contract.tsx` after rendering/exercising the real parts in all three modes. Vitest's
+   mandatory reporter requires successful runtime evidence; importing the helper or skipping its tests
+   fails. Keep behavior assertions for engine/native WAAPI writers and existing interactions. T0
+   structural components need neither a provider nor this helper. See animation-system §9.3 for
+   supported carriers, instant positional geometry and browser-proof limits.
 8. **A preview** in `components/site/previews/<id>.tsx`, registered in `previews/index.tsx`.
 
 Then run:
@@ -63,8 +68,10 @@ pnpm registry:build && pnpm check
 ```
 
 which runs typecheck, Biome (lint, formatting, and import order), the registry checks (targets, payload
-freshness, docs, export names, tier budgets, P11), and the unit tests. `registry:check` does not verify the
-motion contract, so the conformance check above is a review step, not an optional one.
+freshness, docs, export names, tier budgets, P11), and the unit tests. `registry:check` verifies recipe
+declarations and requires animated test files; the test reporter
+requires three-mode helper adoption. Neither replaces the animation review or browser evidence for
+running cancellation, first paint, nested providers and measured geometry.
 
 ## Style
 

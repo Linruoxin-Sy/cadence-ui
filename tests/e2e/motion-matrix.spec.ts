@@ -574,6 +574,14 @@ test.describe("code-block", () => {
           // in-place paint under `reduced` (no `layoutId`) and `none` (zero duration).
           const pill = list.locator('[data-slot="code-block-tab-indicator"]');
           await expect(pill).toHaveCount(1);
+          await expect(pill).toHaveAttribute("data-motion", mode);
+          const glyphs = page
+            .locator(scoped("code-block", '[data-slot="code-block-copy-button"]'))
+            .first()
+            .locator("span[data-motion]");
+          await expect(glyphs).toHaveCount(2);
+          for (const glyph of await glyphs.all()) await expect(glyph).toHaveAttribute("data-motion", mode);
+
           // Polled rather than sampled once: in `full` the pill is still travelling
           // when the click returns, and "it lands on the pressed tab" is the claim.
           await expect
@@ -600,6 +608,8 @@ test.describe("code-block", () => {
           const viewport = page.locator(scoped("code-block", '[data-slot="code-block-viewport"]')).first();
           const toggle = page.locator(scoped("code-block", '[data-slot="code-block-expand-button"]')).first();
           await expect(toggle).toHaveAccessibleName("Show all");
+          await expect(toggle.locator(":scope > span[data-motion]")).toHaveAttribute("data-motion", mode);
+
           await expect(toggle).toHaveAttribute("aria-expanded", "false");
 
           const contentId = (await viewport.locator("pre").first().getAttribute("id")) ?? "";

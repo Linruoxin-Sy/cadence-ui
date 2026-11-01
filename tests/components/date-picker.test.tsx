@@ -5,6 +5,7 @@ import { TZDate } from "react-day-picker";
 import { describe, expect, it, vi } from "vitest";
 import { DatePickerDemo } from "@/registry/cadence/date-picker";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const date = new Date(2026, 10, 12);
 describe("Date Picker composition", () => {
@@ -79,7 +80,7 @@ describe("Date Picker composition", () => {
     );
     await userEvent.click(screen.getByRole("button", { name: /Choose date:/ }));
     const popup = screen.getByRole("dialog");
-    expect(popup).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [popup] });
     expect(screen.getByRole("grid")).toHaveAttribute("data-motion", mode);
     expect(popup.className.includes("scale-(--motion-scale-in)")).toBe(mode === "full");
     if (mode === "none") expect(popup).toHaveClass("transition-none", "duration-0");

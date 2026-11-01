@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Switch } from "@/registry/cadence/switch";
+import { expectMotionContract } from "../motion-contract";
 
 function root(container: HTMLElement) {
   const element = container.querySelector('[data-slot="switch"]');
@@ -55,4 +56,13 @@ describe("Switch", () => {
 
     expect(root(container)).toHaveAttribute("data-motion", "none");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Switch aria-label="Enabled" />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger, tabsListVariants } from "@/registry/cadence/tabs";
+import { expectMotionContract } from "../motion-contract";
 
 function Example({
   orientation = "horizontal",
@@ -200,6 +201,12 @@ describe("Tabs", () => {
         </CadenceProvider>,
       );
       const indicator = container.querySelector('[data-slot="tabs-indicator"]');
+      expectMotionContract(mode, {
+        behavior: () => {
+          if (mode !== "full") expect(indicator).not.toHaveAttribute("style");
+          else expect(indicator).toHaveAttribute("data-motion", "full");
+        },
+      });
       expect(indicator).toHaveAttribute("data-motion", mode);
       expect(indicator).not.toHaveAttribute("style", expect.stringContaining("transform"));
       if (mode !== "full") expect(indicator).not.toHaveAttribute("style");

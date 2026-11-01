@@ -497,6 +497,7 @@ function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlo
         <motion.span
           aria-hidden="true"
           data-slot="code-block-tab-indicator"
+          data-motion={cm.mode}
           // A shared element is the travel; under reduced motion there is no travel
           // to keep, so the pill mounts where the selection landed.
           layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}
@@ -631,6 +632,7 @@ function CodeBlockCopyButton({
         {children ?? (
           <span aria-hidden="true" className="grid place-items-center">
             <motion.span
+              data-motion={cm.mode}
               className="col-start-1 row-start-1 flex"
               initial={false}
               animate={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}
@@ -639,6 +641,7 @@ function CodeBlockCopyButton({
               <CopyIcon />
             </motion.span>
             <motion.span
+              data-motion={cm.mode}
               className="col-start-1 row-start-1 flex"
               initial={false}
               animate={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}
@@ -951,6 +954,7 @@ function CodeBlockExpandButton({ className, children, onClick, ...props }: CodeB
     >
       {children ?? (expanded ? "Show less" : "Show all")}
       <motion.span
+        data-motion={cm.mode}
         aria-hidden="true"
         className="flex"
         initial={false}

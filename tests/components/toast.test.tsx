@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { createToastManager, Toaster } from "@/registry/cadence/toast";
+import { expectMotionContract } from "../motion-contract";
 
 describe("Toast", () => {
   it.each(["full", "reduced", "none"] as const)("renders slots with %s motion", async (mode) => {
@@ -22,7 +23,7 @@ describe("Toast", () => {
     });
     await screen.findByText("Saved");
     const root = document.querySelector('[data-slot="toast"]');
-    expect(root).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [root] });
     expect(root?.className.includes("scale-(--motion-scale-in)")).toBe(mode === "full");
     expect(root?.className.includes("[transform:")).toBe(mode === "full");
     expect(root?.className).toContain("duration-(--motion-duration-base)");

@@ -73,9 +73,13 @@ Rendering is not the finish line. After writing or editing a component, audit th
    width/height through `geometry.resize` (clamped, T3+, instant under `reduced`/`none`). Colour, border,
    and shadow transitions are allowed as state feedback, never as motion, and never through
    `transition: all` or a `setTimeout`.
-6. **Tests prove the modes.** `tests/components/<id>.test.tsx` asserts the `data-motion` value for each mode and
-   that the reduced (and `none`) render drops the transform. `registry:check` only proves a reduced branch
-   exists; it does not prove any of the above.
+6. **Tests prove the modes.** Every animated `tests/components/<id>.test.tsx` must execute the shared
+   `expectMotionContract(mode)` after rendering/exercising the actual parts in full, reduced and none.
+   The mandatory Vitest reporter counts successful runtime calls, never imports, dead calls or skipped
+   tests; `registry:check` requires the test file. Keep meaningful interactions and engine/native WAAPI
+   behavior assertions. The helper respects static placement, instant positional geometry and Spinner's
+   rotation exception (animation-system §9.3); T0 structural components need no helper/provider. Unit
+   adoption does not prove browser first paint, per-frame cancellation or the cross-library live audit.
 
 This applies to a new component and to any component you touch — do not copy an existing component's
 deviation. If a check fails, fix the component. If the scheme itself is wrong, edit

@@ -13,6 +13,7 @@ import {
   DrawerTrigger,
 } from "@/registry/cadence/drawer";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Example({ showSwipeHandle = true }: { showSwipeHandle?: boolean } = {}) {
   return (
@@ -95,7 +96,7 @@ describe("Drawer", () => {
     await open();
 
     const shell = popup();
-    expect(shell).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [shell] });
     expect(shell?.className).toContain("duration-(--motion-duration-slow)");
     // The drag follow itself stays: it is direct manipulation, not authored motion.
     expect(shell?.className).toContain("--drawer-swipe-movement-y");

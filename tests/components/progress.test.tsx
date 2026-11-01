@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Progress, ProgressLabel, ProgressValue } from "@/registry/cadence/progress";
+import { expectMotionContract } from "../motion-contract";
 
 function indicator(container: HTMLElement) {
   const element = container.querySelector('[data-slot="progress-indicator"]');
@@ -62,4 +63,13 @@ describe("Progress", () => {
     expect(fill.className).toContain("animate-none");
     expect(fill.className).not.toContain("animate-pulse");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Progress value={40} aria-label="Upload" />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

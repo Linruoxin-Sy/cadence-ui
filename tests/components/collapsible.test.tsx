@@ -4,6 +4,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/registry/cadence/collapsible";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Example({ defaultOpen = false, disabled = false }) {
   return (
@@ -146,7 +147,7 @@ describe("Collapsible", () => {
         </CadenceProvider>,
       );
       const panel = container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
-      expect(panel).toHaveAttribute("data-motion", mode);
+      expectMotionContract(mode, { parts: [panel] });
       expect(panel.className.includes("transition-[height]")).toBe(mode === "full");
       if (mode !== "full") expect(panel).toHaveClass("duration-0");
       expect(panel.className).not.toMatch(/transform|scale|translate/);

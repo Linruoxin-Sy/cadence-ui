@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { Checkbox } from "@/registry/cadence/checkbox";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function slot(container: HTMLElement) {
   const root = container.querySelector('[data-slot="checkbox"]');
@@ -58,4 +59,13 @@ describe("Checkbox", () => {
     const { container } = render(<Checkbox aria-label="Accept terms" aria-invalid />);
     expect(slot(container)).toHaveAttribute("aria-invalid", "true");
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Checkbox aria-label="Terms" />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -18,6 +18,7 @@ const guide = readFileSync(guidePath, "utf8");
 beforeAll(() => {
   fixture = mkdtempSync(path.join(os.tmpdir(), "cadence-motion-docs-"));
   cpSync("content", path.join(fixture, "content"), { recursive: true });
+  cpSync("tests", path.join(fixture, "tests"), { recursive: true });
   cpSync("registry.json", path.join(fixture, "registry.json"));
   for (const dir of ["registry", "public", "docs", "app", "components"]) {
     symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
@@ -39,6 +40,19 @@ function entry(file: string, source: string) {
 }
 
 describe("registry:check motion docs entry", () => {
+  it("requires an animated component's actual test file", () => {
+    const file = path.join(fixture, "tests/components/button.test.tsx");
+    const source = readFileSync(file, "utf8");
+    unlinkSync(file);
+    try {
+      const result = entry(buttonPath, button);
+      expect(result.status).toBe(1);
+      expect(result.output).toContain("button: missing animated contract suite tests/components/button.test.tsx");
+    } finally {
+      writeFileSync(file, source);
+    }
+  });
+
   it("accepts all 58 real contracts, including T0, composed, continuous, CSS and engine forms", async () => {
     expect(
       registry.items.filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type)),
@@ -145,6 +159,16 @@ describe("new-item motion docs scaffold", () => {
           { cwd: temp, encoding: "utf8" },
         );
         expect(result.status, result.stderr).toBe(0);
+        const testSource = readFileSync(path.join(temp, "tests/components/fixture.test.tsx"), "utf8");
+        if (motion.length) {
+          expect(testSource).toContain('import { expectMotionContract } from "../motion-contract"');
+          expect(testSource).toContain('it.each(["full", "reduced", "none"] as const)');
+          expect(testSource).toContain("expectMotionContract(mode)");
+        } else {
+          expect(testSource).not.toContain("expectMotionContract");
+          expect(testSource).not.toContain("CadenceProvider");
+        }
+
         expect(
           await checkMotionDocs(temp, JSON.parse(readFileSync(path.join(temp, "registry.json"), "utf8")), catalogue),
         ).toEqual([]);

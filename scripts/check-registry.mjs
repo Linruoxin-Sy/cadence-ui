@@ -84,6 +84,9 @@ for (const item of registry.items) {
   }
 
   if (isComponent(item)) {
+    if (item.meta?.motion?.length && !(await exists(path.join(root, "tests", "components", `${item.name}.test.tsx`)))) {
+      problems.push(`${item.name}: missing animated contract suite tests/components/${item.name}.test.tsx`);
+    }
     const tier = item.meta?.tier;
     if (!tier || !(tier in TIER_BUDGET)) {
       problems.push(`${item.name}: meta.tier must be one of ${Object.keys(TIER_BUDGET).join(", ")}`);

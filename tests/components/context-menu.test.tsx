@@ -11,6 +11,7 @@ import {
   ContextMenuTrigger,
 } from "@/registry/cadence/context-menu";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 function Demo({ mode }: { mode?: "full" | "reduced" | "none" }) {
   return (
@@ -113,3 +114,9 @@ function pageSlot(slot: string): HTMLElement {
   if (!element) throw new Error(`no [data-slot="${slot}"] in the document`);
   return element;
 }
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s popup contract", async (mode) => {
+  render(<Demo mode={mode} />);
+  await openMenu();
+  expectMotionContract(mode);
+});

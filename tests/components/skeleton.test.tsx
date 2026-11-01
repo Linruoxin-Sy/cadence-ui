@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Skeleton } from "@/registry/cadence/skeleton";
+import { expectMotionContract } from "../motion-contract";
 
 describe("Skeleton", () => {
   it("renders a placeholder with its slot", () => {
@@ -49,4 +50,13 @@ describe("Skeleton", () => {
     expect(screen.getByTestId("region")).toHaveAttribute("aria-busy", "true");
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
+});
+
+it.each(["full", "reduced", "none"] as const)("asserts the shared %s motion contract", (mode) => {
+  render(
+    <CadenceProvider mode={mode}>
+      <Skeleton />
+    </CadenceProvider>,
+  );
+  expectMotionContract(mode);
 });

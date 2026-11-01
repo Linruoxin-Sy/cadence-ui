@@ -4,6 +4,7 @@ import { Bar, BarChart, JavascriptAnimation } from "recharts";
 import { describe, expect, it, vi } from "vitest";
 import { ChartContainer, ChartLegendContent, ChartStyle, ChartTooltipContent } from "@/registry/cadence/chart";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const engine = vi.hoisted(() => ({ controller: null as import("recharts").AnimationController | null }));
 vi.mock("recharts", async (original) => {
@@ -67,6 +68,29 @@ describe("Chart", () => {
           </ChartContainer>
         </CadenceProvider>,
       );
+      const listener = vi.fn();
+      const handle = new JavascriptAnimation({
+        animationId: "contract",
+        from: 0,
+        to: 1,
+        animationDuration: 5000,
+        animationBegin: 5000,
+        easing: (x) => x,
+        onAnimationStart: undefined,
+        onAnimationEnd: undefined,
+      });
+      act(() => {
+        engine.controller?.({ setTimeout: () => () => {} }, handle, listener);
+      });
+      expectMotionContract(mode, {
+        behavior: () => {
+          if (mode === "full") expect(handle.getState()).not.toBe("completed");
+          else {
+            expect(listener).toHaveBeenLastCalledWith(1);
+            expect(handle.getState()).toBe("completed");
+          }
+        },
+      });
       expect(container.querySelector('[data-slot="chart"]')).toHaveAttribute("data-motion", mode);
       expect(screen.getByText("42")).toBeVisible();
       expect(screen.getAllByText("Visits")).toHaveLength(2);

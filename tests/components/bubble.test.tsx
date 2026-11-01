@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
 import { Bubble, BubbleContent, BubbleGroup, BubbleReactions } from "@/registry/cadence/bubble";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 it("preserves slots defaults variants alignment and native props", () => {
   const { container } = render(
@@ -71,7 +72,7 @@ for (const mode of ["full", "reduced", "none"] as const)
     const { rerender } = render(tree("First chunk"));
     const root = screen.getByTestId("bubble"),
       button = screen.getByRole("button");
-    expect(root).toHaveAttribute("data-motion", mode);
+    expectMotionContract(mode, { parts: [root] });
     expect(root.style.transitionDuration).toBe(mode === "none" ? "0s" : mode === "reduced" ? "0.132s" : "0.22s");
     if (mode !== "full") expect(root).toHaveClass("transform-none");
     if (mode === "none") {

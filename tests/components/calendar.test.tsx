@@ -6,6 +6,7 @@ import { CalendarDay, type DateRange, type DayButtonProps } from "react-day-pick
 import { describe, expect, it, vi } from "vitest";
 import { Calendar, CalendarDayButton } from "@/registry/cadence/calendar";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { expectMotionContract } from "../motion-contract";
 
 const month = new Date(2026, 10, 1);
 describe("Calendar", () => {
@@ -26,6 +27,9 @@ describe("Calendar", () => {
   });
   for (const mode of ["full", "reduced", "none"] as const) {
     it(`preserves navigation and focus in ${mode}`, async () => {
+      const animation = vi.fn(() => ({ cancel: vi.fn() }));
+      const oldAnimate = Element.prototype.animate;
+      Element.prototype.animate = animation as unknown as typeof Element.prototype.animate;
       const user = userEvent.setup();
       const { container, rerender } = render(
         <CadenceProvider mode={mode}>
@@ -38,6 +42,18 @@ describe("Calendar", () => {
       await user.click(screen.getByRole("button", { name: /next month/i }));
       expect(screen.getByRole("grid")).toBe(grid);
       expect(grid).toHaveAttribute("aria-label", "December 2026");
+      expectMotionContract(mode, {
+        behavior: () => {
+          if (mode === "none") expect(animation).not.toHaveBeenCalled();
+          else {
+            expect(animation).toHaveBeenCalledOnce();
+            const [frames, timing] = animation.mock.calls[0] as unknown as [Keyframe[], KeyframeAnimationOptions];
+            expect(timing.duration).toBe(mode === "full" ? 220 : 132);
+            expect(frames[0]?.opacity).toBe(0);
+            expect(Boolean(frames[0]?.transform)).toBe(mode === "full");
+          }
+        },
+      });
       if (mode !== "full") expect(grid.style.transform).toBe("");
       rerender(
         <CadenceProvider mode="none">
@@ -46,6 +62,7 @@ describe("Calendar", () => {
       );
       expect(screen.getByRole("grid")).toBe(grid);
       expect(grid.style.transform).toBe("");
+      Element.prototype.animate = oldAnimate;
     });
   }
   it("forwards selection, disabled dates, overrides and controlled month updates", async () => {
