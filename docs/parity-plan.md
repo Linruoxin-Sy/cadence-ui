@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B9 implementations shipped (2026-11-01); B1–B4 and B6–B9 batch gates complete.
-> Historical B5 visual gate and §8 remain open; B5 is next.**
+> Status: **B0–B9 implementations shipped (2026-11-01); B1–B9 batch gates complete.
+> Historical B5 gate closed in §7.31; §8 and cross-library audits remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -269,7 +269,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ gate complete (§7.28) |
 | B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ gate complete (§7.29) |
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ gate complete (§7.30) |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open                |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | ✅ gate complete         |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete                 |
 | B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done                  |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done                  |
@@ -295,10 +295,10 @@ these rows. Work that landed without updating them is a process defect, and the 
 Implementation record (batch gate status is tracked separately): **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
-§7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
+§7.1, §7.2, §7.3 and §7.4. **B5 gate is complete** (§7.31): `select` reached main on 2026-10-30 without being recorded
 here, which §7.0 treats as a process defect; it is recorded in §7.6 together with the three menus and
 `combobox` and `command` that followed. `toast` completes the implementation in §7.8; the earlier
-components’ visual gate remains open. **B9 is complete** (§7.26): `code-block` landed ahead of the
+components’ visual gate is closed in §7.31. **B9 is complete** (§7.26): `code-block` landed ahead of the
 batch (§7.5), followed by `attachment` (§7.24) and `bubble` (§7.25).
 
 ### B1 — atoms (11)
@@ -1721,3 +1721,45 @@ primitive-owned swipe rather than declaring a spurious gesture.drag recipe.
   timeout occurred in the final B4 check. Repeated B1/B3 timeouts still require §8 tooling diagnosis.
 - Source/docs/tests/plan, final-source payload and complete `docs/handoffs/b4-gate.md` are separate
   commits. B5 and every §8/cross-library audit remain open; this closes B4, not the overall goal.
+
+
+### 7.31 Historical B5 gate — complete (2026-11-02)
+
+- Bounded audit of dropdown-menu, context-menu, menubar, select, combobox, command and toast.
+  Fixed pin remains `96da9cc7f1aa10580a3741664e2a77c721206c00`; cached pinned source,
+  manifest and installed Base UI **1.9.0**, cmdk **1.1.1**, Motion **13.5.1** APIs were checked.
+  Read-only upstream docs/API evidence: `.cache/b5-upstream-docs.log`, `.cache/b5-api-*.md`,
+  `.cache/b5-pinned-api-audit.log`. No consumer CLI operations, dependency/default/export changes.
+- ContextMenu/Select/Combobox/Toast use the B4 popup adapter for local token clocks, callback
+  classes/styles, opacity-only reduced transitions and none's visible first frame/native cancellation.
+  Dropdown's existing equivalent popup adapter is retained. Menu/menubar wrappers now evaluate
+  real Base UI class callbacks before caller-last merging. cmdk retains its native string/object API.
+- Menu/select/combobox indicators stop and retarget their existing state.morph animation on live
+  mode/clock changes; reduced scale snaps while opacity continues, none sets the target immediately.
+  Select merges its internal trigger ref with caller cleanup refs, observes natural inner text width,
+  cancels handoff under reduced/none and rejects flights for cancelled selections.
+  Main component nodes/focus survive mode changes, resize, rapid changes and CSS reversals.
+- Base UI 1.9's typeable combobox focus manager aria-hides outside content without removing its
+  tab stops. A local lifecycle adapter adds native inert to newly hidden nodes only, restores its
+  changes on close, and releases before Tab's default action so native tab-out dismissal survives.
+  Pre-existing hidden/inert nodes retain ownership. Real open-popup full-page axe runs prove this
+  repair; no axe rule is disabled. Context-menu preview surfaces explicitly opt into keyboard focus.
+- `tests/components/b5-compatibility.test.tsx` adds eight tests for typed callbacks, caller-last
+  classes/styles, render function/element, native events, React 19 ref cleanup, controlled mode/open
+  updates and cancelled Select selection. Old component tests remain. Complete check: **474 tests,
+  73 files**, plus typecheck/lint/registry freshness/P11/all tier budgets/parity 58 surfaces.
+- Browser suite `tests/e2e/b5.spec.ts` plus existing Command/Toast regression suites: **104 tests**.
+  42 popup mode × OS cells sample actual entry/exit frames and first-frame none; seven slow-clock
+  interruptions prove active geometry cancellation with opacity retained, then none cancellation.
+  Six indicator cells and six Select cells record real morph/geometry/handoff frames and live cancel;
+  six CSS exit reversals retain the same nodes. Native keyboard/pointer/typeahead/submenu portal,
+  roving focus, selection/typing/empty state, disabled trigger, resize and Tab-out paths are covered.
+  CommandDialog is regressed against the B4 Dialog helper; Toast manager/action/stack tests retained.
+- Seven pages × two themes × 1280/390: full-page and open-popup WCAG2A/2AA/2.1AA axe **zero**, no
+  disabled rules, document overflow or page errors. 56 PNGs in `.cache/b5-proof`, 14 four-image
+  `review-*.jpg` sheets individually reviewed. Mobile API-table column readability remains a §8
+  site issue; zero axe violations does not close it. Logs/build/screenshots are local evidence.
+- Final logs and commit provenance are recorded in [b5-gate.md](handoffs/b5-gate.md). Rebuild payloads
+  from the final source commit, verify, then commit public artifacts and the complete handoff separately.
+  B1–B4/B6–B9 remain closed. This closes only B5: §8 tooling/site/metadata, full-library
+  callback/render/ref/native-event, CSS-popup and Motion running-mode audits remain open.

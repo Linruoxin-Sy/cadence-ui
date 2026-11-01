@@ -16,7 +16,8 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from "@/registry/cadence/combobox";
-import { PreviewRow, PreviewStack } from "./shell";
+import { PopupMotionScope } from "./popup-motion-scope";
+import { PreviewRow } from "./shell";
 
 const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
 
@@ -38,7 +39,7 @@ export function ComboboxPreview() {
   const anchor = useComboboxAnchor();
 
   return (
-    <PreviewStack>
+    <PopupMotionScope>
       <PreviewRow className="items-start">
         <Combobox items={frameworks}>
           <ComboboxInput className="w-56" placeholder="Select a framework" aria-label="Framework" />
@@ -127,6 +128,6 @@ export function ComboboxPreview() {
           </ComboboxContent>
         </Combobox>
       </PreviewRow>
-    </PreviewStack>
+    </PopupMotionScope>
   );
 }

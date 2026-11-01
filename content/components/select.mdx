@@ -137,6 +137,16 @@ folds the surface without re-wrapping the label, and the handoff's destination d
 the width settles. Keyboard selection has no origin, so it changes the width and lets the label swap
 without a flight; the pointer keeps the spatial handoff.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive. A cancelled selection
+does not fly the pointer label over the current value. Natural text width is observed
+separately from the animated outer slot, including content and viewport changes.
+
 ## Keyboard interactions
 
 - `Enter` / `Space` / `ArrowDown` opens the list and focuses the selected item.

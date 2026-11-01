@@ -2,11 +2,13 @@
 
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
-import { type HTMLMotionProps, motion } from "motion/react";
+import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
 import { createContext, type HTMLProps, useContext } from "react";
 import { cn } from "../lib/cn";
+import { ControlSpan } from "../lib/control-animation";
 import { duration, reducedDurationScale, scale } from "../lib/motion";
+import { stateClasses } from "../lib/popup-style";
 import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
 
 function popupClock(cm: CadenceMotion): React.CSSProperties {
@@ -144,14 +146,16 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
-        "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
-        "data-[inset]:pl-8",
-        "data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/10 data-[variant=destructive]:data-highlighted:text-destructive dark:data-[variant=destructive]:data-highlighted:bg-destructive/20",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
-        "data-[variant=destructive]:*:[svg]:text-destructive!",
+      className={stateClasses(
+        cn(
+          "relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
+          "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+          "data-disabled:pointer-events-none data-disabled:opacity-50",
+          "data-[inset]:pl-8",
+          "data-[variant=destructive]:text-destructive data-[variant=destructive]:data-highlighted:bg-destructive/10 data-[variant=destructive]:data-highlighted:text-destructive dark:data-[variant=destructive]:data-highlighted:bg-destructive/20",
+          "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+          "data-[variant=destructive]:*:[svg]:text-destructive!",
+        ),
         className,
       )}
       {...props}
@@ -175,11 +179,13 @@ function DropdownMenuSubTrigger({
     <MenuPrimitive.SubmenuTrigger
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
-      className={cn(
-        "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
-        "data-popup-open:bg-accent data-popup-open:text-accent-foreground data-highlighted:bg-accent data-highlighted:text-accent-foreground",
-        "data-[inset]:pl-8",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+      className={stateClasses(
+        cn(
+          "flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none",
+          "data-popup-open:bg-accent data-popup-open:text-accent-foreground data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+          "data-[inset]:pl-8",
+          "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",
+        ),
         className,
       )}
       {...props}
@@ -201,7 +207,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuContent
       data-slot="dropdown-menu-sub-content"
-      className={cn("w-auto", className)}
+      className={stateClasses(cn("w-auto"), className)}
       align={align}
       alignOffset={alignOffset}
       side={side}
@@ -232,11 +238,13 @@ function DropdownMenuCheckboxItem({
     <MenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
       data-inset={inset}
-      className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
-        "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+      className={stateClasses(
+        cn(
+          "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+          "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+          "data-disabled:pointer-events-none data-disabled:opacity-50",
+          "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        ),
         className,
       )}
       checked={checked}
@@ -252,16 +260,15 @@ function DropdownMenuCheckboxItem({
             const { className: indicatorClassName, ...rest } = indicatorProps as HTMLProps<HTMLSpanElement>;
 
             return (
-              <motion.span
+              <ControlSpan
                 {...(rest as HTMLMotionProps<"span">)}
                 data-motion={cm.mode}
                 className={cn("flex items-center justify-center", indicatorClassName)}
-                initial={false}
-                animate={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
-                transition={cm.transition("state.morph")}
+                target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
+                transition={{ ...cm.transition("state.morph"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}
               >
                 <CheckIcon className="size-4" />
-              </motion.span>
+              </ControlSpan>
             );
           }}
         />
@@ -289,11 +296,13 @@ function DropdownMenuRadioItem({
     <MenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       data-inset={inset}
-      className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
-        "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+      className={stateClasses(
+        cn(
+          "relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none",
+          "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+          "data-disabled:pointer-events-none data-disabled:opacity-50",
+          "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        ),
         className,
       )}
       {...props}
@@ -308,16 +317,15 @@ function DropdownMenuRadioItem({
             const { className: indicatorClassName, ...rest } = indicatorProps as HTMLProps<HTMLSpanElement>;
 
             return (
-              <motion.span
+              <ControlSpan
                 {...(rest as HTMLMotionProps<"span">)}
                 data-motion={cm.mode}
                 className={cn("flex items-center justify-center", indicatorClassName)}
-                initial={false}
-                animate={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
-                transition={cm.transition("state.morph")}
+                target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
+                transition={{ ...cm.transition("state.morph"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}
               >
                 <CircleIcon className="size-2 fill-current" />
-              </motion.span>
+              </ControlSpan>
             );
           }}
         />
@@ -331,7 +339,7 @@ function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.
   return (
     <MenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn("-mx-1 my-1 h-px bg-border", className)}
+      className={stateClasses(cn("-mx-1 my-1 h-px bg-border"), className)}
       {...props}
     />
   );

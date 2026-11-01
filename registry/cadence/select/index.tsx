@@ -11,6 +11,7 @@ import {
   type HTMLProps,
   isValidElement,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -19,8 +20,10 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../lib/cn";
+import { ControlSpan } from "../lib/control-animation";
 import { clampMeasuredSize, measureOrigin, type Origin } from "../lib/geometry";
 import { scale } from "../lib/motion";
+import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -31,6 +34,7 @@ interface HandoffSource {
 }
 
 interface SelectContextValue {
+  cancelled: { current: boolean };
   pending: HandoffSource | null;
   setPending: (pending: HandoffSource | null) => void;
   flying: boolean;
@@ -79,18 +83,26 @@ function Select<Value, Multiple extends boolean | undefined = false>(
 ) {
   const [pending, setPending] = useState<HandoffSource | null>(null);
   const [flying, setFlying] = useState(false);
+  const cancelled = useRef(false);
   const labels = props.items ? null : collectLabels(props.children);
-  const value = { pending, setPending, flying, setFlying, labels };
+  const value = { pending, setPending, flying, setFlying, labels, cancelled };
 
   return (
     <SelectContext.Provider value={value}>
-      <SelectPrimitive.Root {...props} />
+      <SelectPrimitive.Root
+        {...props}
+        onValueChange={(value, details) => {
+          props.onValueChange?.(value, details);
+          cancelled.current = details.isCanceled;
+          if (details.isCanceled) setPending(null);
+        }}
+      />
     </SelectContext.Provider>
   );
 }
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
-  return <SelectPrimitive.Group data-slot="select-group" className={cn(className)} {...props} />;
+  return <SelectPrimitive.Group data-slot="select-group" className={stateClasses("", className)} {...props} />;
 }
 
 function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
@@ -116,24 +128,30 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   useIsomorphicLayoutEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    const next = host.scrollWidth;
-    if (!next) return;
-    const current = width.get();
+    const measure = () => {
+      const next = (host.firstElementChild as HTMLElement | null)?.scrollWidth || host.scrollWidth;
+      if (!next) return;
+      const current = width.get();
 
-    if (current === "auto" || cm.reduced) {
-      floor.current = 0;
-      width.jump(next);
+      if (current === "auto" || cm.reduced) {
+        floor.current = 0;
+        width.jump(next);
+        target.current = next;
+        return;
+      }
+
+      // A spring that inherits velocity can cross its target once. During a grow the
+      // values below the target are the animation itself; during a shrink a value
+      // below the target would clip the new label, so clamp only in that direction.
+      floor.current = next < current ? next : 0;
+      if (target.current === next) return;
       target.current = next;
-      return;
-    }
-
-    // A spring that inherits velocity can cross its target once. During a grow the
-    // values below the target are the animation itself; during a shrink a value
-    // below the target would clip the new label, so clamp only in that direction.
-    floor.current = next < current ? next : 0;
-    if (target.current === next) return;
-    target.current = next;
-    animate(width, next, cm.transition("geometry.resize"));
+      animate(width, next, cm.transition("geometry.resize"));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (host.firstElementChild) observer.observe(host.firstElementChild);
+    return () => observer.disconnect();
   });
 
   return (
@@ -142,9 +160,9 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       data-slot="select-value"
       data-motion={cm.mode}
       style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}
-      className={cn("relative block min-w-0 overflow-hidden whitespace-nowrap", className)}
+      className="relative block min-w-0 overflow-hidden whitespace-nowrap"
     >
-      <SelectPrimitive.Value {...props} className="block w-max">
+      <SelectPrimitive.Value {...props} className={stateClasses("block w-max", className)}>
         {formatter}
       </SelectPrimitive.Value>
     </motion.span>
@@ -153,6 +171,7 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
 
 function SelectTrigger({
   className,
+  ref,
   size = "default",
   children,
   ...props
@@ -162,6 +181,25 @@ function SelectTrigger({
   const cm = useCadenceMotion();
   const context = useContext(SelectContext);
   const triggerRef = useRef<ComponentRef<typeof SelectPrimitive.Trigger>>(null);
+  const mergedRef = useCallback(
+    (node: ComponentRef<typeof SelectPrimitive.Trigger> | null) => {
+      triggerRef.current = node;
+      if (typeof ref === "function") {
+        const cleanup = ref(node);
+        return () => {
+          triggerRef.current = null;
+          if (cleanup) cleanup();
+          else ref(null);
+        };
+      }
+      if (ref) ref.current = node;
+      return () => {
+        triggerRef.current = null;
+        if (ref) ref.current = null;
+      };
+    },
+    [ref],
+  );
   const [flight, setFlight] = useState<{ origin: Origin; text: string; rect: DOMRect } | null>(null);
 
   useIsomorphicLayoutEffect(() => {
@@ -185,6 +223,13 @@ function SelectTrigger({
     context.setPending(null);
   }, [context, cm.reduced]);
 
+  useIsomorphicLayoutEffect(() => {
+    if (cm.reduced && flight) {
+      setFlight(null);
+      context?.setFlying(false);
+    }
+  }, [cm.reduced, flight, context]);
+
   const finish = () => {
     setFlight(null);
     context?.setFlying(false);
@@ -193,17 +238,19 @@ function SelectTrigger({
   return (
     <>
       <SelectPrimitive.Trigger
-        ref={triggerRef}
+        ref={mergedRef}
         data-slot="select-trigger"
         data-size={size}
         data-motion={cm.mode}
-        className={cn(
-          "relative flex h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 pr-8 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none",
-          "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-          "disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20",
-          "data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8",
-          "[&_[data-placeholder]]:text-muted-foreground",
-          "dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40",
+        className={stateClasses(
+          cn(
+            "relative flex h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 pr-8 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none",
+            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            "disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20",
+            "data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8",
+            "[&_[data-placeholder]]:text-muted-foreground",
+            "dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40",
+          ),
           className,
         )}
         {...props}
@@ -219,6 +266,7 @@ function SelectTrigger({
         ? createPortal(
             <motion.span
               aria-hidden
+              data-motion={cm.mode}
               data-slot="select-handoff"
               initial={{ x: flight.origin.x, y: flight.origin.y }}
               animate={{ x: 0, y: 0 }}
@@ -249,6 +297,7 @@ function SelectTrigger({
  */
 function SelectContent({
   className,
+  style,
   children,
   side = "bottom",
   sideOffset = 4,
@@ -274,11 +323,15 @@ function SelectContent({
           data-slot="select-content"
           data-motion={cm.mode}
           data-align-trigger={alignItemWithTrigger}
-          className={cn(
-            "relative z-50 max-h-(--available-height) w-(--anchor-width) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
-            "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+          style={popupStyle(cm, style)}
+          className={popupClasses(
+            cm,
+            cn(
+              "relative z-50 max-h-(--available-height) w-(--anchor-width) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
+              "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+              !cm.reduced &&
+                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+            ),
             className,
           )}
           {...props}
@@ -296,7 +349,7 @@ function SelectLabel({ className, ...props }: SelectPrimitive.GroupLabel.Props) 
   return (
     <SelectPrimitive.GroupLabel
       data-slot="select-label"
-      className={cn("px-2 py-1.5 text-xs text-muted-foreground", className)}
+      className={stateClasses(cn("px-2 py-1.5 text-xs text-muted-foreground"), className)}
       {...props}
     />
   );
@@ -309,16 +362,19 @@ function SelectItem({ className, children, onClick, ...props }: SelectPrimitive.
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
-      className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
-        "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
-        "data-disabled:pointer-events-none data-disabled:opacity-50",
-        "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+      className={stateClasses(
+        cn(
+          "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none",
+          "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+          "data-disabled:pointer-events-none data-disabled:opacity-50",
+          "[&_svg]:pointer-events-none [&_svg]:shrink-0",
+        ),
         className,
       )}
       onClick={(event) => {
         onClick?.(event);
-        if (event.defaultPrevented || event.currentTarget.hasAttribute("data-selected")) return;
+        if (event.defaultPrevented || context?.cancelled.current || event.currentTarget.hasAttribute("data-selected"))
+          return;
 
         const text = event.currentTarget.querySelector<HTMLElement>('[data-slot="select-item-text"]');
         const rect = (text ?? event.currentTarget).getBoundingClientRect();
@@ -335,17 +391,16 @@ function SelectItem({ className, children, onClick, ...props }: SelectPrimitive.
           const { className: indicatorClassName, ...rest } = indicatorProps as HTMLProps<HTMLSpanElement>;
 
           return (
-            <motion.span
+            <ControlSpan
               {...(rest as HTMLMotionProps<"span">)}
               data-slot="select-item-indicator"
               data-motion={cm.mode}
               className={cn("absolute right-2 flex size-3.5 items-center justify-center", indicatorClassName)}
-              initial={false}
-              animate={state.selected ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
-              transition={cm.transition("state.morph")}
+              target={state.selected ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}
+              transition={{ ...cm.transition("state.morph"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}
             >
               <CheckIcon className="size-4" />
-            </motion.span>
+            </ControlSpan>
           );
         }}
       />
@@ -357,7 +412,7 @@ function SelectSeparator({ className, ...props }: SelectPrimitive.Separator.Prop
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("pointer-events-none -mx-1 my-1 h-px bg-border", className)}
+      className={stateClasses(cn("pointer-events-none -mx-1 my-1 h-px bg-border"), className)}
       {...props}
     />
   );
@@ -367,8 +422,8 @@ function SelectScrollUpButton({ className, ...props }: ComponentProps<typeof Sel
   return (
     <SelectPrimitive.ScrollUpArrow
       data-slot="select-scroll-up-button"
-      className={cn(
-        "sticky top-0 z-[1] flex w-full cursor-default items-center justify-center bg-popover py-1",
+      className={stateClasses(
+        cn("sticky top-0 z-[1] flex w-full cursor-default items-center justify-center bg-popover py-1"),
         className,
       )}
       {...props}
@@ -382,8 +437,8 @@ function SelectScrollDownButton({ className, ...props }: ComponentProps<typeof S
   return (
     <SelectPrimitive.ScrollDownArrow
       data-slot="select-scroll-down-button"
-      className={cn(
-        "sticky bottom-0 z-[1] flex w-full cursor-default items-center justify-center bg-popover py-1",
+      className={stateClasses(
+        cn("sticky bottom-0 z-[1] flex w-full cursor-default items-center justify-center bg-popover py-1"),
         className,
       )}
       {...props}

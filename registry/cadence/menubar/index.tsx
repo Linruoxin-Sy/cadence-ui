@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "../dropdown-menu";
 import { cn } from "../lib/cn";
+import { stateClasses } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
@@ -41,7 +42,10 @@ function Menubar({ className, ...props }: React.ComponentProps<typeof MenubarPri
     <MenubarPrimitive
       data-slot="menubar"
       data-motion={cm.mode}
-      className={cn("flex h-9 items-center gap-1 rounded-md border bg-background p-1 shadow-xs", className)}
+      className={stateClasses(
+        cn("flex h-9 items-center gap-1 rounded-md border bg-background p-1 shadow-xs"),
+        className,
+      )}
       {...props}
     />
   );
@@ -63,9 +67,11 @@ function MenubarTrigger({ className, ...props }: React.ComponentProps<typeof Dro
   return (
     <DropdownMenuTrigger
       data-slot="menubar-trigger"
-      className={cn(
-        "flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none",
-        "data-popup-open:bg-accent data-popup-open:text-accent-foreground data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+      className={stateClasses(
+        cn(
+          "flex items-center rounded-sm px-2 py-1 text-sm font-medium outline-hidden select-none",
+          "data-popup-open:bg-accent data-popup-open:text-accent-foreground data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+        ),
         className,
       )}
       {...props}
@@ -86,7 +92,7 @@ function MenubarContent({
       align={align}
       alignOffset={alignOffset}
       sideOffset={sideOffset}
-      className={cn("min-w-[12rem]", className)}
+      className={stateClasses(cn("min-w-[12rem]"), className)}
       {...props}
     />
   );
@@ -103,7 +109,7 @@ function MenubarItem({
       data-slot="menubar-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn("group/menubar-item", className)}
+      className={stateClasses(cn("group/menubar-item"), className)}
       {...props}
     />
   );
@@ -152,7 +158,11 @@ function MenubarLabel({ className, inset, ...props }: React.ComponentProps<typeo
 
 function MenubarSeparator({ className, ...props }: React.ComponentProps<typeof DropdownMenuSeparator>) {
   return (
-    <DropdownMenuSeparator data-slot="menubar-separator" className={cn("-mx-1 my-1 h-px", className)} {...props} />
+    <DropdownMenuSeparator
+      data-slot="menubar-separator"
+      className={stateClasses(cn("-mx-1 my-1 h-px"), className)}
+      {...props}
+    />
   );
 }
 

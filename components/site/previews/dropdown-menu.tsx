@@ -16,7 +16,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/registry/cadence/dropdown-menu";
-import { PreviewRow, PreviewStack } from "./shell";
+import { PopupMotionScope } from "./popup-motion-scope";
+import { PreviewRow } from "./shell";
 
 /**
  * A menu is its panel, so the specimen opens all three shapes it ships with: plain
@@ -26,7 +27,7 @@ import { PreviewRow, PreviewStack } from "./shell";
  */
 export function DropdownMenuPreview() {
   return (
-    <PreviewStack>
+    <PopupMotionScope>
       <PreviewRow className="gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="outline" />}>Actions</DropdownMenuTrigger>
@@ -80,6 +81,6 @@ export function DropdownMenuPreview() {
           </DropdownMenuContent>
         </DropdownMenu>
       </PreviewRow>
-    </PreviewStack>
+    </PopupMotionScope>
   );
 }

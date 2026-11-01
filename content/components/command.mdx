@@ -135,6 +135,13 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 The inline command has no animation. `CommandDialog` inherits Dialog's recipes and mode branches;
 it adds no transition of its own. Fixed centering translation is layout, not motion.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. The Dialog surface retains Base UI callback/render/ref semantics. Command parts use
+cmdk’s native string class and object style props; cmdk owns filtering and keyboard selection.
+
 ## Keyboard interactions
 
 | Keys | Action |

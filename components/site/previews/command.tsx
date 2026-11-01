@@ -12,6 +12,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/registry/cadence/command";
+import { PopupMotionScope } from "./popup-motion-scope";
 
 function Actions({ onSelect }: { onSelect: (value: string) => void }) {
   return (
@@ -44,22 +45,24 @@ export function CommandPreview() {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState("No action yet");
   return (
-    <div className="flex w-full max-w-sm flex-col gap-4">
-      <Actions onSelect={setSelected} />
-      <Button variant="outline" onClick={() => setOpen(true)}>
-        Open command palette
-      </Button>
-      <p role="status" className="text-sm text-muted-foreground">
-        {selected}
-      </p>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <Actions
-          onSelect={(value) => {
-            setSelected(value);
-            setOpen(false);
-          }}
-        />
-      </CommandDialog>
-    </div>
+    <PopupMotionScope>
+      <div className="flex w-full max-w-sm flex-col gap-4">
+        <Actions onSelect={setSelected} />
+        <Button variant="outline" onClick={() => setOpen(true)}>
+          Open command palette
+        </Button>
+        <p role="status" className="text-sm text-muted-foreground">
+          {selected}
+        </p>
+        <CommandDialog open={open} onOpenChange={setOpen}>
+          <Actions
+            onSelect={(value) => {
+              setSelected(value);
+              setOpen(false);
+            }}
+          />
+        </CommandDialog>
+      </div>
+    </PopupMotionScope>
   );
 }

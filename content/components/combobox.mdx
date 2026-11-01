@@ -210,6 +210,18 @@ from the field rather than from its own centre. The list itself never animates: 
 keystroke, and a row that is still travelling when the next character arrives is a list the reader has to
 chase.
 
+Each portal resolves token durations from its local provider, including `full` nested inside
+`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
+geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
+first mounted frame. The preview's **Popup motion** selector changes the local mode on the
+same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events and ref cleanup
+remain owned by the primitive. Base UI 1.9's typeable focus manager hides background
+nodes from assistive technology while leaving their tab stops enabled. Cadence adds native
+`inert` only to newly hidden nodes; Tab releases it before normal focus navigation and
+Base UI's blur dismissal. Existing hidden/inert nodes and parent dialogs keep their owners. `ComboboxInput` string classes style the field frame;
+state callback classes style the native input with its real Base UI input state.
+
 ## Keyboard interactions
 
 - `ArrowDown` or `Alt+ArrowDown` opens the popup; with it open, `ArrowDown`/`ArrowUp` move the highlight.

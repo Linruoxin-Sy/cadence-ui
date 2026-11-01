@@ -1,7 +1,8 @@
 "use client";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select";
-import { PreviewRow, PreviewStack } from "./shell";
+import { PopupMotionScope } from "./popup-motion-scope";
+import { PreviewRow } from "./shell";
 
 const FRAMEWORKS = [
   { value: "next", label: "Next.js" },
@@ -23,7 +24,7 @@ export function SelectPreview() {
   ));
 
   return (
-    <PreviewStack>
+    <PopupMotionScope>
       <PreviewRow className="gap-3">
         <Select defaultValue="next">
           <SelectTrigger aria-label="Framework">
@@ -62,6 +63,6 @@ export function SelectPreview() {
           <SelectContent>{items}</SelectContent>
         </Select>
       </PreviewRow>
-    </PreviewStack>
+    </PopupMotionScope>
   );
 }

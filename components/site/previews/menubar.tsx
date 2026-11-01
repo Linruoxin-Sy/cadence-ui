@@ -16,7 +16,7 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/registry/cadence/menubar";
-import { PreviewStack } from "./shell";
+import { PopupMotionScope } from "./popup-motion-scope";
 
 /**
  * A menubar is a container, so the specimen is the bar: four menus, each one a different
@@ -25,7 +25,7 @@ import { PreviewStack } from "./shell";
  */
 export function MenubarPreview() {
   return (
-    <PreviewStack>
+    <PopupMotionScope>
       <Menubar>
         <MenubarMenu>
           <MenubarTrigger>File</MenubarTrigger>
@@ -91,6 +91,6 @@ export function MenubarPreview() {
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
-    </PreviewStack>
+    </PopupMotionScope>
   );
 }
