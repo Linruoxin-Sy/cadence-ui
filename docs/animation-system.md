@@ -779,6 +779,10 @@ export function useCadenceMotion(): {
 
 Implementation notes:
 
+- The provider's MotionConfig fallback uses `duration.base` and `ease.out`, scaled by
+  the effective mode and clock (zero under none, reducedDurationScale under reduced).
+  Component recipe transitions remain explicit. This fallback does not suppress arbitrary
+  caller-authored targets or cancel an already running animation; components own those branches.
 - `mode === "none"` → every transition is `{ duration: 0 }`;
 - `mode === "reduced"` or a system preference → drop `y/x/scale/rotate/filter`, keep only `opacity`, duration ×0.6;
 - `timeScale` (provider prop, default `1`) multiplies durations, spring `visualDuration`, and delays; the docs

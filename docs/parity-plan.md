@@ -1960,3 +1960,10 @@ existing guide index/sidebar/llms order: accessibility, registry, ai, changelog 
 Production HTTP and browser evidence is recorded in docs/handoffs/registry-distribution.md.
 This closes only distribution/cache and missing-guide work, not T0 performance templates,
 initial JS, global accessibility/native-event/ref/motion audits or unscheduled AI prerequisites.
+
+Provider fallback follow-up (2026-11-02): MotionConfig now consumes duration.base/ease.out
+and the effective none/reduced clock, rather than duplicated literals and an always-full
+fallback. Corrected the obsolete reduced-travel comment. Actual MotionConfig context
+test covers same-node full→none→reduced with inherited 4× clock; this is config evidence,
+not running-animation cancellation proof. Component recipes/targets stay unchanged.
+Validation and current production JS measurement follow in compatibility-base handoff.

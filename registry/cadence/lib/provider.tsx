@@ -4,7 +4,17 @@ import type { Transition } from "motion/react";
 import { MotionConfig } from "motion/react";
 import { createContext, type ReactNode, useContext, useSyncExternalStore } from "react";
 import { cn } from "./cn";
-import { type CadenceMode, distance, type MotionOptions, type Recipe, spring, transitionFor } from "./motion";
+import {
+  type CadenceMode,
+  distance,
+  duration,
+  ease,
+  type MotionOptions,
+  type Recipe,
+  reducedDurationScale,
+  spring,
+  transitionFor,
+} from "./motion";
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -71,7 +81,7 @@ function createMotion(mode: CadenceMode, timeScale = 1): CadenceMotion {
 
 export interface CadenceProviderProps {
   /**
-   * Motion intensity for everything inside. `reduced` halves travel and shortens
+   * Motion mode for everything inside. `reduced` drops transform/layout and shortens
    * timing; `none` disables animation entirely. The system
    * `prefers-reduced-motion` setting always wins over `full`.
    *
@@ -109,7 +119,14 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
 
   return (
     <CadenceContext.Provider value={value}>
-      <MotionConfig reducedMotion="user" transition={{ duration: 0.22 * scale, ease: [0.22, 1, 0.36, 1] }}>
+      <MotionConfig
+        reducedMotion="user"
+        transition={{
+          duration:
+            effective === "none" ? 0 : duration.base * scale * (effective === "reduced" ? reducedDurationScale : 1),
+          ease: ease.out,
+        }}
+      >
         <div data-motion={effective} className={cn("contents", className)}>
           {children}
         </div>

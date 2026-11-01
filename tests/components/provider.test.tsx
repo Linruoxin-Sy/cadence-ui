@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
+import { MotionConfigContext } from "motion/react";
+import { useContext } from "react";
 import { describe, expect, it } from "vitest";
-import { duration } from "@/registry/cadence/lib/motion";
+import { duration, ease, reducedDurationScale } from "@/registry/cadence/lib/motion";
 import { CadenceProvider, useCadenceMotion } from "@/registry/cadence/lib/provider";
 
 /**
@@ -21,6 +23,32 @@ function Probe({ label }: { label: string }) {
     />
   );
 }
+
+function FallbackProbe() {
+  const { transition } = useContext(MotionConfigContext);
+  return <output data-testid="fallback">{JSON.stringify(transition)}</output>;
+}
+
+it("updates the actual MotionConfig fallback across modes and nested clocks", () => {
+  const tree = (mode: "full" | "reduced" | "none") => (
+    <CadenceProvider mode={mode} timeScale={4}>
+      <CadenceProvider>
+        <FallbackProbe />
+      </CadenceProvider>
+    </CadenceProvider>
+  );
+  const view = render(tree("full"));
+  const node = screen.getByTestId("fallback");
+  expect(JSON.parse(node.textContent ?? "")).toEqual({ duration: duration.base * 4, ease: ease.out });
+  view.rerender(tree("none"));
+  expect(screen.getByTestId("fallback")).toBe(node);
+  expect(JSON.parse(node.textContent ?? "")).toEqual({ duration: 0, ease: ease.out });
+  view.rerender(tree("reduced"));
+  expect(JSON.parse(node.textContent ?? "")).toEqual({
+    duration: duration.base * 4 * reducedDurationScale,
+    ease: ease.out,
+  });
+});
 
 describe("CadenceProvider", () => {
   it("inherits the enclosing mode when none is given", () => {
