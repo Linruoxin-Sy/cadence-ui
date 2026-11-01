@@ -2066,6 +2066,29 @@
           "className": null
         }
       }
+    },
+    "resizable": {
+      "path": "apps/v4/registry/bases/base/ui/resizable.tsx",
+      "exports": [
+        "ResizableHandle",
+        "ResizablePanel",
+        "ResizablePanelGroup"
+      ],
+      "slots": [
+        "resizable-handle",
+        "resizable-panel",
+        "resizable-panel-group"
+      ],
+      "props": {
+        "ResizablePanelGroup": {
+          "className": null
+        },
+        "ResizablePanel": {},
+        "ResizableHandle": {
+          "withHandle": null,
+          "className": null
+        }
+      }
     }
   }
 }

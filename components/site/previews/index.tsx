@@ -64,4 +64,5 @@ export const previews: Record<string, ComponentType> = {
   chart: dynamic(() => import("./chart").then((mod) => ({ default: mod.ChartPreview }))),
   calendar: dynamic(() => import("./calendar").then((mod) => ({ default: mod.CalendarPreview }))),
   "navigation-menu": dynamic(() => import("./navigation-menu").then((mod) => ({ default: mod.NavigationMenuPreview }))),
+  resizable: dynamic(() => import("./resizable").then((mod) => ({ default: mod.ResizablePreview }))),
 };

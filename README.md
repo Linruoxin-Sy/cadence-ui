@@ -6,7 +6,7 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B0–B6 implementations shipped; B7 chart, calendar and navigation-menu shipped, resizable next.** B6's batch gate is
+> Status: **B0–B6 implementations shipped; B7 chart, calendar, navigation-menu and resizable shipped, sidebar next.** B6's batch gate is
 > complete; historical B1–B5 visual gates remain open. B7's remaining two items, B8's blocks,
 > B9 attachment/bubble and the carried site/tooling gates remain scheduled.
 > See [the parity plan](docs/parity-plan.md).
@@ -40,53 +40,54 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 
 ## Components
 
-| Component                           | Tier | Motion                                                               |
-| ----------------------------------- | ---- | -------------------------------------------------------------------- |
-| `button` — action trigger           | T1   | `feedback.press`                                                     |
-| `badge` — status label              | T0   | none                                                                 |
-| `kbd` — key or shortcut hint        | T0   | none                                                                 |
-| `separator` — group boundary        | T0   | none                                                                 |
-| `label` — control name              | T0   | none                                                                 |
-| `input` — single-line field         | T0   | none                                                                 |
-| `textarea` — multi-line field       | T0   | none                                                                 |
-| `card` — grouped surface            | T0   | none                                                                 |
-| `aspect-ratio` — reserved media box | T0   | none                                                                 |
-| `avatar` — image with fallback      | T0   | none                                                                 |
-| `skeleton` — loading placeholder    | T4   | `data.transition`                                                    |
-| `dialog` — modal window             | T2   | `popup.anchored`, `exit.fade`                                        |
-| `alert-dialog` — confirmation       | T2   | `popup.anchored`, `exit.fade`                                        |
-| `popover` — anchored panel          | T2   | `popup.anchored`, `exit.fade`                                        |
-| `tooltip` — hint on hover           | T2   | `popup.anchored`, `exit.fade`                                        |
-| `hover-card` — preview panel        | T2   | `popup.anchored`, `exit.fade`                                        |
-| `sheet` — edge panel                | T2   | `popup.anchored`, `exit.fade`                                        |
-| `drawer` — bottom sheet             | T2   | `popup.anchored`, `exit.fade`                                        |
-| `select` — single choice            | T3   | `popup.anchored`, `geometry.resize`, `handoff`, `state.morph`        |
-| `combobox` — searchable choice      | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `dropdown-menu` — actions menu      | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `context-menu` — right-click menu   | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `menubar` — application menu        | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `command` - searchable actions      | T2   | `popup.anchored`, `exit.fade`                                        |
-| `alert` — state message             | T0   | none                                                                 |
-| `empty` — resting state             | T0   | none                                                                 |
-| `item` — list row                   | T0   | none                                                                 |
-| `field` — labelled control          | T0   | none                                                                 |
-| `button-group` — joined controls    | T0   | none                                                                 |
-| `input-group` — framed field        | T0   | none                                                                 |
-| `breadcrumb` — trail                | T0   | none                                                                 |
-| `pagination` — page navigation      | T0   | none                                                                 |
-| `spinner` — indeterminate wait      | T4   | `data.transition`                                                    |
-| `checkbox` — binary choice          | T1   | `state.morph`                                                        |
-| `radio-group` — exclusive choice    | T1   | `state.morph`                                                        |
-| `switch` — on/off control           | T1   | `state.morph`                                                        |
-| `slider` — range control            | T1   | `feedback.press`                                                     |
-| `toggle` — pressed state            | T1   | `feedback.press`                                                     |
-| `toggle-group` — joined toggles     | T1   | `feedback.press`                                                     |
-| `input-otp` — one-time code         | T1   | `state.morph`                                                        |
-| `progress` — determinate completion | T4   | `data.transition`                                                    |
-| `code-block` — code surface         | T5   | `geometry.resize`, `state.morph`, `data.transition`, `layout.shared` |
-| `chart` — data visualisation        | T4   | `data.transition`                                                    |
-| `calendar` — date selection         | T4   | `data.transition`                                                    |
-| `navigation-menu` — site navigation | T3   | `popup.anchored`, `exit.fade`, `geometry.resize`                     |
+| Component                             | Tier | Motion                                                               |
+| ------------------------------------- | ---- | -------------------------------------------------------------------- |
+| `button` — action trigger             | T1   | `feedback.press`                                                     |
+| `badge` — status label                | T0   | none                                                                 |
+| `kbd` — key or shortcut hint          | T0   | none                                                                 |
+| `separator` — group boundary          | T0   | none                                                                 |
+| `label` — control name                | T0   | none                                                                 |
+| `input` — single-line field           | T0   | none                                                                 |
+| `textarea` — multi-line field         | T0   | none                                                                 |
+| `card` — grouped surface              | T0   | none                                                                 |
+| `aspect-ratio` — reserved media box   | T0   | none                                                                 |
+| `avatar` — image with fallback        | T0   | none                                                                 |
+| `skeleton` — loading placeholder      | T4   | `data.transition`                                                    |
+| `dialog` — modal window               | T2   | `popup.anchored`, `exit.fade`                                        |
+| `alert-dialog` — confirmation         | T2   | `popup.anchored`, `exit.fade`                                        |
+| `popover` — anchored panel            | T2   | `popup.anchored`, `exit.fade`                                        |
+| `tooltip` — hint on hover             | T2   | `popup.anchored`, `exit.fade`                                        |
+| `hover-card` — preview panel          | T2   | `popup.anchored`, `exit.fade`                                        |
+| `sheet` — edge panel                  | T2   | `popup.anchored`, `exit.fade`                                        |
+| `drawer` — bottom sheet               | T2   | `popup.anchored`, `exit.fade`                                        |
+| `select` — single choice              | T3   | `popup.anchored`, `geometry.resize`, `handoff`, `state.morph`        |
+| `combobox` — searchable choice        | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
+| `dropdown-menu` — actions menu        | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
+| `context-menu` — right-click menu     | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
+| `menubar` — application menu          | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
+| `command` - searchable actions        | T2   | `popup.anchored`, `exit.fade`                                        |
+| `alert` — state message               | T0   | none                                                                 |
+| `empty` — resting state               | T0   | none                                                                 |
+| `item` — list row                     | T0   | none                                                                 |
+| `field` — labelled control            | T0   | none                                                                 |
+| `button-group` — joined controls      | T0   | none                                                                 |
+| `input-group` — framed field          | T0   | none                                                                 |
+| `breadcrumb` — trail                  | T0   | none                                                                 |
+| `pagination` — page navigation        | T0   | none                                                                 |
+| `spinner` — indeterminate wait        | T4   | `data.transition`                                                    |
+| `checkbox` — binary choice            | T1   | `state.morph`                                                        |
+| `radio-group` — exclusive choice      | T1   | `state.morph`                                                        |
+| `switch` — on/off control             | T1   | `state.morph`                                                        |
+| `slider` — range control              | T1   | `feedback.press`                                                     |
+| `toggle` — pressed state              | T1   | `feedback.press`                                                     |
+| `toggle-group` — joined toggles       | T1   | `feedback.press`                                                     |
+| `input-otp` — one-time code           | T1   | `state.morph`                                                        |
+| `progress` — determinate completion   | T4   | `data.transition`                                                    |
+| `code-block` — code surface           | T5   | `geometry.resize`, `state.morph`, `data.transition`, `layout.shared` |
+| `chart` — data visualisation          | T4   | `data.transition`                                                    |
+| `calendar` — date selection           | T4   | `data.transition`                                                    |
+| `resizable` — adjustable split panels | T0   | none                                                                 |
+| `navigation-menu` — site navigation   | T3   | `popup.anchored`, `exit.fade`, `geometry.resize`                     |
 
 The remaining scheduled components, their batches, and the motion tier for each are listed in
 [docs/parity-plan.md](docs/parity-plan.md).

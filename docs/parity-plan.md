@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B6 implementations shipped (2026-11-01); B6 batch gate complete.
-> Historical B1–B5 visual gates remain open. B7 chart, calendar and navigation-menu shipped; resizable is next. B7–B9 and §8 remain open.**
+> Historical B1–B5 visual gates remain open. B7 chart, calendar, navigation-menu and resizable shipped; sidebar is next. B7–B9 and §8 remain open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -266,7 +266,7 @@ the right heading as soon as its registry item declares one. `registry:check` re
 | B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
 | B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
 | B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 3/5 shipped |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | 4/5 shipped |
 | B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
 | B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
 |       | **Total**                  | **57** |            | **102**     |         |             |
@@ -325,7 +325,7 @@ All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scrol
 
 ### B7 — heavy data and navigation (5)
 
-Chart, Calendar and Navigation Menu shipped (§7.15–7.17). Next: `resizable`, `sidebar`.
+Chart, Calendar, Navigation Menu and Resizable shipped (§7.15–7.18). Next: `sidebar`.
 
 ### B8 — compositions (2, `registry:block`)
 
@@ -1209,6 +1209,29 @@ the batch row now says `gate open` because the earlier components still lack vis
 - **Coordinator conformance review:** extracted the duplicated reduced-duration multiplier into
   `lib/motion.ts`'s `reducedDurationScale` token. Both `transitionFor()` and the local popup clock
   read it. Timing and browser behavior are unchanged; the full 398-test check passes again.
+
+### 7.18 B7 Resizable — completed (2026-11-01)
+
+- **Surface:** pinned Base API plus new-york-v4 styling, all three exports and slots, no parity
+  exceptions. Exact dependency `react-resizable-panels@4.16.0` uses Group/Panel/Separator types;
+  numeric panel sizes are pixels, percentage strings are explicit. DOM elementRef and imperative
+  groupRef/panelRef, callbacks, constraints, collapse/expand, disabled state and caller styles survive.
+- **Motion audit:** T0, empty recipe set. The primitive owns direct manipulation and immediate layout;
+  no spring, opacity reveal, geometry tween, motion hook/provider or data-motion is shipped.
+  Pointer, keyboard and imperative resizing stay functional and immediate in all modes. No shared
+  runtime or design recipe changes are needed. Keep input identity across mode/orientation changes.
+- **Evidence:** five unit tests cover actual primitive rendering, defaults, orientation, disabled state,
+  refs/cleanup, callback passthrough, styles and static modes. Full `pnpm check`: 403 tests / 63 files,
+  53 pinned parity items, typecheck, lint and registry freshness/budgets/P11 pass. Isolated
+  `.next-resizable` production build: 64 pages. Edge: 8/8 cases (three modes × two system preferences,
+  plus two visual cases), real pointer reversal and limits/collapse, live mode downgrade during drag,
+  both axes, keyboard limits/Enter, double-click reset, imperative resize/collapse/expand/setLayout,
+  locked keyboard, rapid external updates and retained input/node identity. No authored animations
+  or transitions in any mode. Full-page axe WCAG2A/2AA/2.1AA zero violations in light/dark at
+  1280/390, both orientations, no document overflow, four screenshots reviewed in `.cache/resizable-proof`.
+  Source and payloads are committed separately, rebuilt from final source before the final check.
+- **Remaining:** B7 is 4/5; Sidebar follows. B1–B5 historical visual gates, B8/B9 and all open §8 work
+  remain open. B6 stays closed. Nested CSS popup clocks remain part of the historical conformance work.
 
 ## 8. Backlog
 
