@@ -1591,8 +1591,21 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
   `.cache/highlight-baseline.log`; full check **558/558, 76/76 files**, 71.30s,
   `.cache/highlight-check.log`, after `.cache/highlight-build.log`. Final-source validation and payload SHAs are in
   `docs/handoffs/highlight-reliability.md`. B9 remains closed; all other open audits remain open.
-- **Site initial JS budget.** `next build` now produces a route-size report; measure `/components/button`
-  against the ≤120 KB gzip budget in [animation-system.md](animation-system.md) §7 and record the number.
+- **Site initial JS budget — measured 2026-11-02, still OPEN / failing.** Actual Next 16.4.3
+  Turbopack production cold load of `/components/button`: **290,171 bytes gzip (290.171 decimal KB),
+  22 scripts**. Final production source is unchanged: rejected server-catalogue experiments grew
+  the result to 674,973 / 691,557 bytes; webpack comparison was 288,719 bytes. Current root runtime
+  alone is 132,767 bytes. A minimal hydrated counter under the same installed Next/React and parent
+  config costs 135,551 bytes total (root runtime 131,598), exceeding both 120,000 and 122,880 bytes.
+  This is evidence against a preview-only solution, not proof that every possible framework
+  configuration has the same floor. No production optimization is retained and this item is not closed.
+  Next's actual build report has no First Load JS column; the old claim above is superseded by real
+  browser requests and build manifests. `test:site-js` builds production and runs the strict browser
+  gate, also included in `test:e2e`; it currently **fails** the unchanged 120,000-byte limit. Unit checks
+  pass independently; they must not be presented as budget success. No prefetch scripts or automatic
+  async chunks are excluded. See [measurement protocol and commands](site-js-budget.md) and
+  [request/manifest evidence](evidence/site-js-budget.json). Resolving the framework/dependency
+  constraint remains required before closing this item; the rest of §8 stays open.
 
 **Documentation site** — see
 [documentation-site-and-distribution.md](documentation-site-and-distribution.md) §2.2 for the promise these

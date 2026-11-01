@@ -755,15 +755,15 @@ Implementation notes:
 
 ## 7. Performance budgets and implementation rules
 
-| Metric                            | Budget                                                                                   | How it is checked         |
-| --------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------- |
-| Motion runtime (initial)          | ≤ 48 KB gzip (full `motion` ≈ 43 KB; the optional `LazyMotion` path brings it to ~30 KB) | Build analysis            |
-| Per-component added JS            | ≤ 8 KB gzip (shared runtime excluded)                                                    | Build script              |
-| Initial JS per page               | ≤ 120 KB gzip                                                                            | Next build output         |
-| Frame rate                        | ≥ 55 fps on a mid-range mobile device                                                    | Playwright trace / manual |
-| CLS                               | < 0.02                                                                                   | Lighthouse / Playwright   |
-| Simultaneously animating elements | ≤ 20 (stagger scenarios)                                                                 | Code review               |
-| Total stagger duration            | ≤ 400 ms                                                                                 | Code review               |
+| Metric                            | Budget                                                                                   | How it is checked                                           |
+| --------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Motion runtime (initial)          | ≤ 48 KB gzip (full `motion` ≈ 43 KB; the optional `LazyMotion` path brings it to ~30 KB) | Build analysis                                              |
+| Per-component added JS            | ≤ 8 KB gzip (shared runtime excluded)                                                    | Build script                                                |
+| Initial JS per page               | ≤ 120 KB gzip                                                                            | Production browser request audit (`site-js-budget.spec.ts`) |
+| Frame rate                        | ≥ 55 fps on a mid-range mobile device                                                    | Playwright trace / manual                                   |
+| CLS                               | < 0.02                                                                                   | Lighthouse / Playwright                                     |
+| Simultaneously animating elements | ≤ 20 (stagger scenarios)                                                                 | Code review                                                 |
+| Total stagger duration            | ≤ 400 ms                                                                                 | Code review                                                 |
 
 Implementation rules:
 
