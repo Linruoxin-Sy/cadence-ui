@@ -1,14 +1,12 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/registry/cadence/lib/cn";
-import { duration } from "@/registry/cadence/lib/motion";
+import { duration, ease } from "@/registry/cadence/lib/motion";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
-import { SIDEBAR_EASE, SIDEBAR_ITEM, SIDEBAR_TIMING } from "./easing";
 import { Reveal } from "./reveal";
 
 export interface SidebarItem {
@@ -30,24 +28,13 @@ export interface SidebarProps {
 /** Nothing is collapsed until the reader says so, so the first paint shows the whole map. */
 const NOTHING_CLOSED: ReadonlySet<string> = new Set();
 
-/**
- * A disclosure body is a large block — the whole navigation column can unfold —
- * so it rides past the `duration.page` token. The extra ~50ms matters: the last
- * row only becomes visible at the bottom of the panel and its own entrance is
- * 0.22s, so a 0.5s panel lets the container and that row stop together instead
- * of the row fading on after the height has settled. `SIDEBAR_EASE` keeps the
- * first half quick and the last few frames moving. Written as a ratio so
- * `reduced` keeps its 0.6 factor and `none` still resolves to zero.
- */
-const PANEL_TIME_SCALE = SIDEBAR_TIMING.panel / duration.base;
-
 function isActive(pathname: string, href: string) {
   return pathname === href;
 }
 
 function NavLink({ href, title, active }: { href: string; title: string; active: boolean }) {
   return (
-    <Reveal className="origin-left" {...SIDEBAR_ITEM}>
+    <Reveal className="origin-left">
       <Link
         href={href}
         aria-current={active ? "page" : undefined}
@@ -72,14 +59,19 @@ function DisclosureChevron({ open }: { open: boolean }) {
   const cm = useCadenceMotion();
 
   return (
-    <motion.span
+    <span
       aria-hidden="true"
       className="inline-flex shrink-0 text-muted-foreground/70 transition-colors group-hover/row:text-foreground"
-      animate={{ rotate: open ? 180 : 0 }}
-      transition={cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
+      data-motion={cm.mode}
+      style={{
+        transform: open ? "rotate(180deg)" : "rotate(0deg)",
+        transition: cm.reduced
+          ? "none"
+          : `transform ${duration.base * cm.timeScale}s cubic-bezier(${ease.out.join(",")})`,
+      }}
     >
       <ChevronDown className="size-3.5" strokeWidth={2.25} />
-    </motion.span>
+    </span>
   );
 }
 
@@ -122,40 +114,53 @@ function DisclosureHeader({
   );
 }
 
-/**
- * Animated disclosure body. Takes its own rows out of the DOM when closed, so a
- * collapsed section is not reachable by Tab and does not need `inert`.
- *
- * Full width animates height + opacity. Reduced keeps the fade and drops the
- * height transition (layout motion is what reduced mode forbids); `none` gets a
- * zero-duration transition, which resolves to an instant toggle.
- */
+/** Persistent CSS geometry.resize owner: observe natural content, never the written shell. */
 function Disclosure({ id, open, children }: { id: string; open: boolean; children: React.ReactNode }) {
   const cm = useCadenceMotion();
-  // The ratio replaces the provider's `timeScale` rather than stacking on it, so
-  // the header's speed gear is multiplied in here (see `document-entrance.tsx`).
-  const panel = {
-    ...cm.transition("reveal", { timeScale: PANEL_TIME_SCALE * cm.timeScale }),
-    ease: SIDEBAR_EASE,
-  };
-  const transition = cm.reduced ? { height: { duration: 0 }, opacity: panel } : panel;
-
+  const panel = useRef<HTMLDivElement>(null);
+  const inner = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const node = panel.current;
+    const content = inner.current;
+    if (!node || !content) return;
+    const measure = () => {
+      const height = Math.max(0, content.getBoundingClientRect().height);
+      // Hidden desktop/mobile copies must retain auto until they have a real measurement.
+      if (height > 0) node.style.setProperty("--site-panel-height", `${height}px`);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(content);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+  const fade = cm.transition("reveal");
+  const opacityTime = "duration" in fade ? Number(fade.duration ?? 0) : 0;
   return (
-    <AnimatePresence initial={false}>
-      {open ? (
-        <motion.div
-          key="panel"
-          id={id}
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={transition}
-          className="overflow-hidden"
-        >
-          {children}
-        </motion.div>
-      ) : null}
-    </AnimatePresence>
+    <div
+      ref={panel}
+      id={id}
+      data-site-panel
+      data-motion={cm.mode}
+      data-open={open}
+      inert={!open}
+      aria-hidden={!open}
+      style={{
+        height: open ? "var(--site-panel-height, auto)" : 0,
+        opacity: open ? 1 : 0,
+        transition: cm.disabled
+          ? "none"
+          : `${cm.reduced ? "" : `height ${duration.slow * cm.timeScale}s cubic-bezier(${ease.out.join(",")}), `}opacity ${opacityTime}s cubic-bezier(${ease.out.join(",")})`,
+      }}
+      className="overflow-hidden"
+    >
+      <div ref={inner} className="flow-root">
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -186,7 +191,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
   const panelId = (key: string) => `${uid}-${key}`;
 
   return (
-    <div className="flex flex-col gap-2">
+    <nav aria-label="Documentation" className="flex flex-col gap-2">
       <div>
         <DisclosureHeader
           open={isOpen("docs")}
@@ -271,7 +276,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
           </div>
         </Disclosure>
       </div>
-    </div>
+    </nav>
   );
 }
 
@@ -285,6 +290,7 @@ function Groups({ groups, guides, pathname, isOpen, onToggle }: GroupsProps) {
  */
 export function Sidebar({ groups, guides }: SidebarProps) {
   const pathname = usePathname();
+  const cm = useCadenceMotion();
   const [closed, setClosed] = useState<ReadonlySet<string>>(NOTHING_CLOSED);
 
   const isOpen = (id: string) => !closed.has(id);
@@ -302,7 +308,16 @@ export function Sidebar({ groups, guides }: SidebarProps) {
       <details className="group mb-6 rounded-xl border border-border px-3 py-2 md:hidden">
         <summary className="flex cursor-pointer list-none items-center justify-between py-1 text-sm font-medium">
           Browse
-          <span aria-hidden="true" className="text-muted-foreground transition-transform group-open:rotate-180">
+          <span
+            aria-hidden="true"
+            data-motion={cm.mode}
+            className="text-muted-foreground group-open:rotate-180"
+            style={{
+              transition: cm.reduced
+                ? "none"
+                : `transform ${duration.base * cm.timeScale}s cubic-bezier(${ease.out.join(",")})`,
+            }}
+          >
             ▾
           </span>
         </summary>

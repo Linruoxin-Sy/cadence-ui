@@ -1885,7 +1885,8 @@
           "path": "apps/v4/examples/base/data-table-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         }
-      }
+      },
+      "categories": ["collection"]
     },
     {
       "name": "date-picker",

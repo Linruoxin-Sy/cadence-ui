@@ -20,6 +20,7 @@ export interface Doc extends DocFrontmatter {
   body: string;
   /** Build batch from `meta.batch`, the sidebar's grouping key. */
   batch?: string;
+  categories?: string[];
 }
 
 /** The sidebar's second level: one batch of components, in build order. */
@@ -61,7 +62,7 @@ async function readDoc(file: string): Promise<Doc> {
 /** Component docs in registry order, so the site and the CLI list items the same way. */
 export async function listComponents(): Promise<Doc[]> {
   const registry = JSON.parse(await readFile(path.join(process.cwd(), "registry.json"), "utf8")) as {
-    items: Array<{ name: string; type: string; meta?: { batch?: string } }>;
+    items: Array<{ name: string; type: string; categories?: string[]; meta?: { batch?: string } }>;
   };
   const dir = path.join(contentRoot, "components");
   const files = await readdir(dir);
@@ -75,7 +76,7 @@ export async function listComponents(): Promise<Doc[]> {
   for (const item of registry.items) {
     if (item.type !== "registry:ui" && item.type !== "registry:block") continue;
     const doc = docs.get(item.name);
-    if (doc) components.push({ ...doc, batch: item.meta?.batch });
+    if (doc) components.push({ ...doc, batch: item.meta?.batch, categories: item.categories ?? [] });
   }
   return components;
 }

@@ -25,7 +25,17 @@
 /lab                           Experimental components (no stability promise)
 ```
 
-**Filter dimensions** (catalog page): category (text/feedback/navigation/overlay/gesture/collection/scroll/theme), motion intensity (subtle/medium/expressive), complexity (S/M/L), dependencies (motion baseline / GSAP optional).
+**Catalogue filters**: search title/id/description and every actual `registry.json` `categories`
+entry (including secondary memberships), authored motion intensity (animation-system §2.1), and
+complexity S/M/L. Category labels are human-readable versions of the existing taxonomy; never
+infer a parent's category from a nested specimen. Registry order is retained. URL keys are `q`,
+`category`, `intensity`, `complexity`; selections compose by AND, search words by AND. Unknown
+filter values fall back to All with a visible status and preserve the URL until the next change.
+Search submits with Enter or Search; selects apply immediately; Clear removes only these four keys.
+SSR and no-JS show the complete default directory, with a no-JS explanation. Hydration reads URL,
+back/forward restores controls/results, unrelated query/hash/history state survive. Hidden results
+remain mounted and cannot receive focus; history that hides a focused result restores search focus.
+Dependencies remain a future catalogue dimension; no optional GSAP entries currently ship.
 
 ---
 

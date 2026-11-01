@@ -301,6 +301,20 @@ ResizeObserver retargets when open content changes, without observing the animat
 Under reduced and none, remove the height transition with `duration-0`; geometry is instant in both.
 A static expanded/collapsed icon swap needs no additional recipe. Every panel carries `data-motion`.
 
+#### Site navigation disclosures (T3 composition, not registry Sidebar)
+
+The site sidebar uses the same measured/clamped native CSS `geometry.resize` form as disclosures:
+`duration.slow` / `ease.out`, zero-height closed endpoint, separate natural-flow inner measurement,
+ResizeObserver retargeting, initially open natural SSR height, instant reduced/none geometry.
+Panels remain mounted with stable unique IDs; closed panels become inert and aria-hidden immediately.
+Ancestor collapse does not reset nested state. Native reversal keeps current position, not spring velocity.
+The panel's opacity uses `reveal`, the chevron's orientation uses the CSS form of `state.morph`
+(`duration.base` / `ease.out`); reduced uses a static orientation and opacity only, none has no transition.
+Rows retain observer-triggered `reveal` entry, bounded by `distance.md`, `scale.in`, blur ≤4px and
+`duration.base`; first paint is visible. Native transition lists remove geometry under reduced and all
+properties under none, cancelling same-target running transitions without remounting. This replaces
+site-only exaggerated literals/auto-height Motion timing; it introduces no public recipe or token.
+
 #### `geometry.resize` for Base UI Navigation Menu (CSS form)
 
 Navigation Menu's shared Popup uses Base UI's `--popup-width` / `--popup-height` targets.

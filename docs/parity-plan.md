@@ -1635,15 +1635,24 @@ shapes are now covered by the complete 58-page [applicability matrix](evidence/p
 DOM/state, SSR/no-JS output and URL/history are preserved; see [proof and limits](evidence/preview-variants.md).
 This closes URL variants only, not the whole site or §8.
 The old unused copy-command claim was stale: installation already uses PackageManagerBlock.
-Index search/category/intensity/complexity filters, sidebar landmark/controls/height audit,
-immutable distribution caching/route and missing guides remain OPEN and are outside this group.
+**Index + site sidebar — closed 2026-11-02** ([evidence](evidence/catalog-sidebar.md)).
+All 58 registry-order links support real category memberships, authored intensity and complexity
+AND filters plus title/id/description search, URL/history/focus recovery, clear/empty/status and full
+SSR/no-JS default directory. Data Table's missing registry category now agrees with existing MDX;
+frontmatter category membership is checked. Site sidebar preserves its groups/guides and mobile
+Browse, owns named navigation/unique persistent regions, and closes descendants with inert.
+Its T3 measured/clamped native CSS geometry.resize uses tokens and instant reduced/none geometry;
+reveal opacity/rows and state.morph icons cancel through native property lists without remounting.
+Production Edge proves modes×OS, keyboard/resize/reversal, dual-theme desktop/mobile axe0 and
+retained route/install/source/URL flows; see evidence and handoff for exact runs and limits.
+Immutable distribution caching/route and missing guides remain OPEN for the next group.
 Initial JS remains OPEN independently of passing flow checks; no budget/config/metering change.
 
 **Metadata**
 
 - **Intensity definition — closed 2026-11-02.** animation-system §2.1 now defines authored
   perceptual scope, independent of runtime mode/tier/complexity. The actual 58-item inventory is
-  31 subtle /26 medium /1 expressive; the former 28/29 statement was historical. Existing values
+  34 subtle /23 medium /1 expressive; the former 28/29 statement was historical. Existing values
   already agree: static/local feedback, surface/geometry motion, cross-surface handoff respectively.
   `catalog-intensity.mjs` checks semantic classification alongside mandatory frontmatter equality;
   no rating, shipped motion or defaults changed. Index/sidebar flow evidence is recorded separately.

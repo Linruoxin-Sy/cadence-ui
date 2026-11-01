@@ -222,6 +222,8 @@ for (const item of registry.items) {
     // Declared = documented. The frontmatter is what readers and agents see.
     const frontmatter = isComponent(item) ? await docFrontmatter(item.name) : null;
     if (frontmatter) {
+      if (!item.categories?.includes(frontmatter.category))
+        problems.push(`${item.name}: frontmatter category must be a declared registry category`);
       const pairs = [
         ["title", item.title],
         ["description", item.description],
