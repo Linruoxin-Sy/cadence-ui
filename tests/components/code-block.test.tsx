@@ -1,6 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   CodeBlock,
   CodeBlockActions,
@@ -15,6 +15,7 @@ import {
   CodeBlockTabs,
   CodeBlockTitle,
 } from "@/registry/cadence/code-block";
+import { loadHighlighter } from "@/registry/cadence/code-highlight/highlight";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
 
@@ -53,6 +54,13 @@ afterEach(() => {
 });
 
 describe("CodeBlock", () => {
+  beforeAll(async () => {
+    // This suite tests rendering, not cold module/grammar throughput. Await real
+    // readiness before starting Testing Library's DOM-update clock. Cold loading,
+    // delayed fallback and cancellation have separate real-engine lifecycle tests.
+    expect(await loadHighlighter("ts")).not.toBeNull();
+  });
+
   it("renders the upstream surface with every slot", () => {
     const { container } = render(
       <CodeBlock>

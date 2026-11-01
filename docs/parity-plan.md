@@ -1568,9 +1568,29 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
   first-frame, same-target live cancellation, nested override, or cross-library running-mode audits.
   CodeBlock highlight reliability and initial-JS budget remain open; passing highlight tests here
   do not diagnose the historical 1s timeout. See handoff `docs/handoffs/motion-contract-helper.md`.
-- **Async highlight test reliability.** Investigate the repeated CodeBlock 1s highlight wait timeouts
-  recorded in B1/B3. Original-configuration complete retries passed, but repeated retries are not
-  a root-cause resolution. Keep this in §8 tooling; do not silently weaken the timeout or reopen B9.
+- **Async highlight test reliability — done 2026-11-02.** B1 final and B3 precommit/final logs show
+  the same missing-token assertion after 1281/1181/1044ms (`.cache/b1-final-check.log`,
+  `.cache/b3-precommit-check.log`, `.cache/b3-final-check.log`). The test started Testing Library's
+  default 1s DOM clock before the first dynamic module import, Shiki core/themes and TS grammar
+  were ready. This made a rendering assertion an accidental cold-initialization throughput test.
+  Those historical logs have no per-stage trace, so they cannot identify which import/init stage
+  consumed the time. A controlled pending delivery now reproduces that exact assertion's timeout,
+  retains complete plain source beyond the deadline, then runs the real cold loader/tokenizer and
+  proves correct themed output after release. No substituted tokens or relaxed deadline.
+  The CodeBlock suite awaits actual `loadHighlighter("ts")` readiness in `beforeAll`; its original
+  DOM assertion and default deadline remain intact. Hook tests replace arbitrary 100/50ms sleeps
+  with awaited dynamic-import/grammar completion and assert the second paint as well.
+  `tests/lib/highlight-lifecycle.test.tsx` adds five real-engine cases: delayed fallback/recovery,
+  concurrent new grammars/aliases, stale language completion + latest pending source, StrictMode
+  cleanup/unmount/remount, and rejection/unknown-language fallback followed by valid recovery.
+  Real Shiki 4.5.0 (JS regex), Vitest 3.2.7, Testing Library React 16.3.3 / DOM 10.4.2 and Base UI
+  1.9.0 were inspected. Hook cancellation and streaming cache remain correct on these exercised
+  paths; no production fix or cache/API change is warranted by this evidence. This closes test
+  reliability, not a cold-load performance budget or the separate initial-JS budget below.
+  Focused evidence: **34/34**, `.cache/highlight-focused.log`; unchanged baseline **29/29**,
+  `.cache/highlight-baseline.log`; full check **558/558, 76/76 files**, 71.30s,
+  `.cache/highlight-check.log`, after `.cache/highlight-build.log`. Final-source validation and payload SHAs are in
+  `docs/handoffs/highlight-reliability.md`. B9 remains closed; all other open audits remain open.
 - **Site initial JS budget.** `next build` now produces a route-size report; measure `/components/button`
   against the ≤120 KB gzip budget in [animation-system.md](animation-system.md) §7 and record the number.
 

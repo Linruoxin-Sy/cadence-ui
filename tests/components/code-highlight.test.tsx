@@ -1,6 +1,6 @@
 import { act, render, waitFor } from "@testing-library/react";
 import type * as React from "react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { highlightCode, loadHighlighter } from "@/registry/cadence/code-highlight/highlight";
 import { useHighlightedCode } from "@/registry/cadence/code-highlight/use-highlighted-code";
 
@@ -109,18 +109,19 @@ describe("useHighlightedCode", () => {
     // The first paint is plain on purpose: the highlight chunk is not in the bundle.
     expect(container.textContent).toBe("plain");
 
-    // Settle the dynamic import inside `act` so the test does not leak the update.
-    // What the second paint says is covered by the streaming test above; the point
-    // here is that the first one is plain.
+    // Await actual import/grammar readiness, not an arbitrary sleep.
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await vi.dynamicImportSettled();
+      await loadHighlighter("ts");
     });
+    expect(container.textContent).toBe("highlighted");
   });
 
   it("stays plain for a language it does not bundle", async () => {
     const { container } = render(<Plain code="MOV AX, BX" language="nope" />);
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await vi.dynamicImportSettled();
+      await loadHighlighter("nope");
     });
     expect(container.textContent).toBe("plain");
   });
