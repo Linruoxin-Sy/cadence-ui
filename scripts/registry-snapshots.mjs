@@ -4,7 +4,7 @@ import path from "node:path";
 
 export const digest = (body) => createHash("sha256").update(body).digest("hex");
 export const treeDigest = (files) =>
-  digest(JSON.stringify(Object.entries(files).sort(([a], [b]) => a.localeCompare(b))));
+  digest(JSON.stringify(Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))));
 
 export async function verifySnapshots(root) {
   const dir = path.join(root, "public/r/snapshots");

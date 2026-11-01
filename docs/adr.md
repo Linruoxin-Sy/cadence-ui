@@ -465,7 +465,7 @@ a Node route with a strict filename/segment grammar. Latest resources revalidate
 SHA-256 ETags identify exact response bytes. GET/HEAD support conditional 304. Errors are no-store.
 Explicit `node scripts/freeze-registry.mjs` copies every current root JSON/MD byte into
 `public/r/snapshots/<tree-sha256>/`, with a manifest of file SHA-256 hashes. Identity is SHA-256
-of sorted JSON [filename, digest] pairs, using localeCompare ordering. Snapshots include sourceSha
+of sorted JSON [filename, digest] pairs, using code-unit filename ordering. Snapshots include sourceSha
 as provenance, but do not depend on git at runtime. They are tracked distribution artifacts.
 The tracked registry-snapshots.json retention inventory detects missing directories.
 Normal builds verify all manifest hashes and identities before writing aliases, and never freeze,
