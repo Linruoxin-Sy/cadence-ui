@@ -66,4 +66,13 @@ describe("Button", () => {
     );
     expect(screen.getByRole("button", { name: "Save" })).toHaveAttribute("data-motion", mode);
   });
+  it("evaluates state callback classes after the variants", () => {
+    render(
+      <Button disabled className={(state) => (state.disabled ? "caller-disabled px-8" : "caller-enabled")}>
+        Callback
+      </Button>,
+    );
+    expect(screen.getByRole("button")).toHaveClass("caller-disabled", "px-8");
+    expect(screen.getByRole("button")).not.toHaveClass("px-4");
+  });
 });

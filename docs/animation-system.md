@@ -868,3 +868,17 @@ existing motion contracts. Dropdown Menu now owns its portal's token clock just
 as Sheet does, resolves caller class/style callbacks last, and removes starting
 opacity in `none`; nested full, reduced, none and live downgrade are checked with
 the Data Table composition. This closes no other historical CSS-popup gate.
+
+### Date Picker composition (B8)
+
+The T2 `registry:block` composes Button `feedback.press`, Popover
+`popup.anchored` / `exit.fade` and Calendar `data.transition`. The date label and
+selection update immediately. Single/range selection never keys the popup or
+calendar by the selected value. Month movement follows §3.1.3 unchanged.
+Popover resolves duration.fast locally through the portal with timeScale and
+reducedDurationScale; caller callback classes/styles are evaluated and merged
+last. Full uses opacity and scale, reduced transitions opacity only, none uses
+transition-none/duration-0 and removes hidden starting/ending opacity. Removing
+the scale transition on downgrade cancels an active scale immediately. Nested
+full under outer none restores the local clock, subject to OS reduce. This local
+repair does not prove conformance of other historical CSS popups.

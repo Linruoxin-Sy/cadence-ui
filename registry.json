@@ -1876,6 +1876,43 @@
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         }
       }
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:block",
+      "title": "Date Picker",
+      "description": "Choose a single date or date range from an anchored calendar.",
+      "categories": ["collection"],
+      "dependencies": ["date-fns@4.1.0", "lucide-react"],
+      "registryDependencies": [
+        "@cadence/button",
+        "@cadence/calendar",
+        "@cadence/popover",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider"
+      ],
+      "files": [
+        {
+          "path": "registry/cadence/date-picker/index.tsx",
+          "type": "registry:component",
+          "target": "@components/cadence/date-picker/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T2",
+        "batch": "B8",
+        "motion": ["feedback.press", "popup.anchored", "exit.fade", "data.transition"],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10",
+          "path": "apps/v4/examples/base/date-picker-demo.tsx",
+          "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
+        }
+      }
     }
   ]
 }

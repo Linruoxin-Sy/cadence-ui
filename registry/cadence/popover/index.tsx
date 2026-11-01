@@ -3,6 +3,7 @@
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import type * as React from "react";
 import { cn } from "../lib/cn";
+import { duration, reducedDurationScale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
@@ -28,6 +29,7 @@ function PopoverTrigger({ ...props }: PopoverPrimitive.Trigger.Props) {
  */
 function PopoverContent({
   className,
+  style,
   align = "center",
   alignOffset = 0,
   side = "bottom",
@@ -37,6 +39,17 @@ function PopoverContent({
   Pick<PopoverPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
   const cm = useCadenceMotion();
 
+  const clock = {
+    "--motion-duration-fast": `${duration.fast * (cm.disabled ? 0 : cm.reduced ? reducedDurationScale : 1) * cm.timeScale}s`,
+  } as React.CSSProperties;
+  const classes = cn(
+    "z-50 w-72 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none",
+    cm.disabled
+      ? "transition-none duration-0"
+      : "ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+    !cm.disabled && (cm.reduced ? "transition-opacity" : "transition-[opacity,scale]"),
+    !cm.reduced && "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+  );
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Positioner
@@ -49,12 +62,10 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           data-motion={cm.mode}
-          className={cn(
-            "z-50 w-72 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-            className,
-          )}
+          className={
+            typeof className === "function" ? (state) => cn(classes, className(state)) : cn(classes, className)
+          }
+          style={typeof style === "function" ? (state) => ({ ...clock, ...style(state) }) : { ...clock, ...style }}
           {...props}
         />
       </PopoverPrimitive.Positioner>
@@ -67,14 +78,26 @@ function PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function PopoverTitle({ className, ...props }: PopoverPrimitive.Title.Props) {
-  return <PopoverPrimitive.Title data-slot="popover-title" className={cn("font-medium", className)} {...props} />;
+  return (
+    <PopoverPrimitive.Title
+      data-slot="popover-title"
+      className={
+        typeof className === "function" ? (state) => cn("font-medium", className(state)) : cn("font-medium", className)
+      }
+      {...props}
+    />
+  );
 }
 
 function PopoverDescription({ className, ...props }: PopoverPrimitive.Description.Props) {
   return (
     <PopoverPrimitive.Description
       data-slot="popover-description"
-      className={cn("text-muted-foreground", className)}
+      className={
+        typeof className === "function"
+          ? (state) => cn("text-muted-foreground", className(state))
+          : cn("text-muted-foreground", className)
+      }
       {...props}
     />
   );

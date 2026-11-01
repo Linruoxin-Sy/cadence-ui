@@ -2245,6 +2245,7 @@
     },
     "data-table": {
       "path": "apps/v4/examples/base/data-table-demo.tsx",
+      "guide": "apps/v4/content/docs/components/base/data-table.mdx",
       "exports": [
         "DataTableDemo",
         "Payment",
@@ -2253,8 +2254,18 @@
       "slots": [],
       "props": {
         "DataTableDemo": {}
-      },
-      "guide": "apps/v4/content/docs/components/base/data-table.mdx"
+      }
+    },
+    "date-picker": {
+      "path": "apps/v4/examples/base/date-picker-demo.tsx",
+      "guide": "apps/v4/content/docs/components/base/date-picker.mdx",
+      "exports": [
+        "DatePickerDemo"
+      ],
+      "slots": [],
+      "props": {
+        "DatePickerDemo": {}
+      }
     }
   }
 }

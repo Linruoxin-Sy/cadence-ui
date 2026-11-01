@@ -67,4 +67,5 @@ export const previews: Record<string, ComponentType> = {
   resizable: dynamic(() => import("./resizable").then((mod) => ({ default: mod.ResizablePreview }))),
   "data-table": dynamic(() => import("./data-table").then((mod) => ({ default: mod.DataTablePreview }))),
   sidebar: dynamic(() => import("./sidebar").then((mod) => ({ default: mod.SidebarPreview }))),
+  "date-picker": dynamic(() => import("./date-picker").then((mod) => ({ default: mod.DatePickerPreview }))),
 };

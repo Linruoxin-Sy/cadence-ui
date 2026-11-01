@@ -76,7 +76,11 @@ export function Button({ className, variant = "default", size = "default", ...pr
       data-variant={variant}
       data-size={size}
       data-motion={cm.mode}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={
+        typeof className === "function"
+          ? (state) => cn(buttonVariants({ variant, size }), className(state))
+          : cn(buttonVariants({ variant, size }), className)
+      }
       render={
         <motion.button
           whileTap={cm.reduced ? undefined : { scale: scale.press }}

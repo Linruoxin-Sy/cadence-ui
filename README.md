@@ -6,10 +6,9 @@ Animation-first React components for [shadcn](https://ui.shadcn.com): Base UI fo
 npx shadcn@latest add @cadence/button
 ```
 
-> Status: **B0–B7 implementations shipped; B6 and B7 batch gates complete.** Historical B1–B5
-> visual gates remain open. B8 date-picker, B9 attachment/bubble and the carried site/tooling
-> gates remain scheduled; Data Table shipped and Date Picker is next.
-> See [the parity plan](docs/parity-plan.md).
+> Status: **B0–B8 implementations shipped; B6, B7 and B8 batch gates complete.**
+> Historical B1–B5 visual gates, B9 attachment/bubble and carried site/tooling
+> gates remain open. B9 is next. See [the parity plan](docs/parity-plan.md).
 
 ## Install
 
@@ -89,6 +88,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `resizable` — adjustable split panels | T0   | none                                                                 |
 | `sidebar` — workspace navigation      | T3   | `layout.move`                                                        |
 | `data-table` — payments composition   | T2   | `feedback.press`, `state.morph`, `popup.anchored`, `exit.fade`       |
+| `date-picker` — calendar composition  | T2   | `feedback.press`, `popup.anchored`, `exit.fade`, `data.transition`   |
 | `navigation-menu` — site navigation   | T3   | `popup.anchored`, `exit.fade`, `geometry.resize`                     |
 
 The remaining scheduled components, their batches, and the motion tier for each are listed in

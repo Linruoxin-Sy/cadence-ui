@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B7 implementations shipped (2026-11-01); B6 and B7 batch gates complete.
-> Historical B1–B5 visual gates remain open. B8 data-table shipped; date-picker is next. B8/B9 and §8 remain open.**
+> Status: **B0–B8 implementations shipped (2026-11-01); B6, B7 and B8 batch gates complete.
+> Historical B1–B5 visual gates remain open. B9 attachment/bubble is next; §8 remains open.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -257,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status      |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ----------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done     |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done     |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done     |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete    |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done     |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | 1/2 shipped |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
-|       | **Total**                  | **57** |            | **102**     |         |             |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done   |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
+|       | **Total**                  | **57** |            | **102**     |         |           |
 
 ### 7.0 Status discipline
 
@@ -326,11 +326,11 @@ All six shipped: `accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scrol
 ### B7 — heavy data and navigation (5)
 
 Chart, Calendar, Navigation Menu, Resizable and Sidebar shipped (§7.15–7.19).
-Batch gate complete (§7.20); B8 `data-table` shipped and `date-picker` is next.
+Batch gate complete (§7.20); B8 blocks and their joint gate are complete (§7.22–7.23).
 
 ### B8 — compositions (2, `registry:block`)
 
-`data-table` ✅ shipped (§7.21); `date-picker` next. B8 batch gate remains open.
+`data-table` ✅ shipped (§7.21); `date-picker` ✅ shipped (§7.22). B8 batch gate complete (§7.23).
 
 ### B9 — AI first (2 + 1 early)
 
@@ -1313,6 +1313,59 @@ Next: B8 `data-table`, followed by `date-picker`, then B9 and the historical/§8
   Source and final-source-stamped payloads are separate commits.
 - **Remaining:** B8 Date Picker next, then B9 attachment/bubble, historical B1–B5 visual gates and
   every unclosed §8 carried item. B6/B7 stay closed. B8 batch gate is not closed by this one block.
+
+### 7.22 Date Picker — ✅ shipped (2026-11-01)
+
+- **Source:** real pinned Base `apps/v4/examples/base/date-picker-demo.tsx` and
+  `apps/v4/content/docs/components/base/date-picker.mdx`, with new-york-v4's icon
+  treatment. `DatePickerDemo` remains the named export. It is a registry:block,
+  not a date primitive. Pin unchanged; no new npm dependency (existing date-fns
+  4.1.0 and DayPicker 9.13.2). No shared motion runtime or build configuration change.
+- **Behaviour:** initially empty optional single selection; additive typed range,
+  value/defaultValue/onValueChange, controlled open, disabled trigger/days, locale,
+  Calendar overrides and caller presets. Present value=undefined clears controlled
+  state. Native div/ref cleanup and Button/Popup callbacks/classes/styles survive.
+  Calendar focuses the selected day, arrows move days, selection stays open,
+  Escape returns focus. Input parsing, time, validation, persistence and time-zone
+  conversion remain application-owned; the guide states the single/range scope.
+  Explicit TZDate plus timeZone preserves civil fields and trigger formatting.
+- **Motion:** T2 composes feedback.press, popup.anchored, exit.fade, data.transition.
+  No label/layout animation or selection-keyed remount. Popover now resolves its
+  portal clock locally (timeScale/reducedDurationScale), evaluates callback classes
+  and styles last, uses transition-opacity in reduced and transition-none/duration-0
+  without hidden starting/ending opacity in none. Button className state callbacks
+  now execute. Other historical wrappers still require their own compatibility audit.
+- **Proof:** 431 unit tests / 66 files, 56 pinned surfaces; typecheck/Biome/registry
+  freshness/tier budgets/P11/parity pass. Isolated .next-date-picker production build:
+  67 static pages. Edge full/reduced/none × both OS preferences samples real popup
+  opacity/scale and month-grid transform/opacity. None is visible first frame;
+  nested full under outer none restores its local clock, live none cancels CSS/WAAPI,
+  OS reduce removes scale, popup/day/grid identity and focus persist. Rapid month
+  reversal, interrupted popup close/reopen, single/range selection, external clear,
+  preset/update, French formatting, disabled state and resize pass. Final B8 plus
+  Button/Popover/Dropdown Menu/Menubar regression: 51/51; final document/axe and
+  interruption refinement: 3/3. Full-page WCAG2A/2AA/2.1AA axe, open and closed,
+  light/dark × 1280/390: zero violations, no disabled rules or document overflow.
+  Four final full-page screenshots individually reviewed; open range and preview
+  screenshots also reviewed under .cache/date-picker-proof. The review caught and
+  corrected Markdown table pipes; browser assertions now require both rendered tables.
+
+### 7.23 B8 — ✅ complete (2026-11-01)
+
+Both blocks and their joint gate pass. Data Table's full production suite ran with
+Date Picker against the same final implementation build; sorting/filtering/selection,
+pagination, column visibility, clipboard/mailto, keyboard/mobile scroll and live
+portal downgrade remain green. Date Picker's joint evidence is recorded above.
+Both pages have dual-theme desktop/mobile full-page axe, overflow and screenshots;
+all size budgets and pinned parity pass. Logs: .cache/date-picker-{build,b8-e2e-final,
+visual-final,final-registry,final-check}.log. Source and final-source-stamped public
+payloads are separate commits.
+
+This closes B8 only. B9 attachment/bubble comes next (code-block already shipped).
+B1–B5 historical visual gates and every unclosed §8 item remain open; B6/B7 stay closed.
+Popover's local clock repair does not prove other historical popups. Base UI
+className state callbacks need a final compatibility audit across older wrappers;
+Button/Popover/Sheet/Dropdown local fixes do not prove full-library compatibility.
 
 ## 8. Backlog
 

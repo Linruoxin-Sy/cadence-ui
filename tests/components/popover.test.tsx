@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type * as React from "react";
 import { describe, expect, it } from "vitest";
 import { Button } from "@/registry/cadence/button";
 import { CadenceProvider, type CadenceProviderProps } from "@/registry/cadence/lib/provider";
@@ -90,8 +91,43 @@ describe("Popover", () => {
     expect(popup).toHaveAttribute("data-motion", mode);
     // Both the timing and the enter scale are tokens: `none` zeroes the duration on
     // the element itself, and the scale class is a JSX branch, not a media query.
-    expect(popup.className).toContain("duration-(--motion-duration-fast)");
+    expect(popup.className).toContain(mode === "none" ? "duration-0" : "duration-(--motion-duration-fast)");
     expect(popup.className).toContain("origin-(--transform-origin)");
     expect(popup.className.includes("scale-(--motion-scale-in)")).toBe(keepsScale);
+  });
+  it("resolves the nested portal clock and evaluates callback classes/styles last", async () => {
+    const { rerender } = render(
+      <CadenceProvider mode="none">
+        <CadenceProvider mode="full" timeScale={4}>
+          <Popover defaultOpen>
+            <PopoverTrigger>Open</PopoverTrigger>
+            <PopoverContent className={(state) => (state.open ? "caller" : "closed")} style={() => ({ padding: 9 })}>
+              <PopoverTitle className={() => "title-caller"}>Test clock</PopoverTitle>
+              <PopoverDescription className={() => "description-caller"}>Details</PopoverDescription>
+            </PopoverContent>
+          </Popover>
+        </CadenceProvider>
+      </CadenceProvider>,
+    );
+    const popup = await screen.findByRole("dialog");
+    expect(popup).toHaveClass("caller");
+    expect(popup.style.getPropertyValue("--motion-duration-fast")).toBe("0.64s");
+    expect(popup.style.padding).toBe("9px");
+    expect(screen.getByText("Test clock")).toHaveClass("title-caller");
+    expect(screen.getByText("Details")).toHaveClass("description-caller");
+    rerender(
+      <CadenceProvider mode="none">
+        <CadenceProvider mode="full" timeScale={4}>
+          <Popover defaultOpen>
+            <PopoverTrigger>Open</PopoverTrigger>
+            <PopoverContent style={() => ({ "--motion-duration-fast": "2s" }) as React.CSSProperties}>
+              <PopoverTitle>Test clock</PopoverTitle>
+            </PopoverContent>
+          </Popover>
+        </CadenceProvider>
+      </CadenceProvider>,
+    );
+    expect(screen.getByRole("dialog")).toBe(popup);
+    expect(popup.style.getPropertyValue("--motion-duration-fast")).toBe("2s");
   });
 });
