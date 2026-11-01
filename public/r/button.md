@@ -140,8 +140,8 @@ Recipe: `feedback.press`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| press | `scale 1 → 0.97` while active | `spring.press` | yes (pointer up) |
-| release | `scale 0.97 → 1` | `spring.press` | yes |
+| press | `scale 1 → 0.97` while active | `feedback.press` / `spring.press` | yes (pointer up) |
+| release | `scale 0.97 → 1` | `feedback.press` / `spring.press` | yes |
 | reduced | no scale; colour and shadow only | – | – |
 | none | no scale; colour and shadow only | – | – |
 

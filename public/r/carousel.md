@@ -134,14 +134,14 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 
 ## Motion contract
 
-| Phase | Behaviour |
-| --- | --- |
-| Enter / exit | No authored entrance or removal animation. |
-| Interaction | `data.transition`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
-| Interruption | Next/previous/drag retarget Embla's existing location and velocity. Release uses the effective base clock, including breakpoint options, instead of a hard-coded release duration. |
-| Reduced | Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
-| None | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
-| Buttons | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
+| Phase | Recipe | Behaviour |
+| --- | --- | --- |
+| Enter / exit | — | No authored entrance or removal animation. |
+| Interaction | `data.transition` | `data.transition`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
+| Interruption | — | Next/previous/drag retarget Embla's existing location and velocity. Release uses the effective base clock, including breakpoint options, instead of a hard-coded release duration. |
+| Reduced | — | Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
+| None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
+| Buttons | — | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
 
 A mode downgrade settles the existing target without resetting selection. Engine friction,
 geometry and momentum destinations remain Embla-owned. Independent plugin animations remain

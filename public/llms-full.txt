@@ -233,8 +233,8 @@ Recipe: `feedback.press`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| press | `scale 1 → 0.97` while active | `spring.press` | yes (pointer up) |
-| release | `scale 0.97 → 1` | `spring.press` | yes |
+| press | `scale 1 → 0.97` while active | `feedback.press` / `spring.press` | yes (pointer up) |
+| release | `scale 0.97 → 1` | `feedback.press` / `spring.press` | yes |
 | reduced | no scale; colour and shadow only | – | – |
 | none | no scale; colour and shadow only | – | – |
 
@@ -1415,7 +1415,7 @@ placeholders and each Motion loop costs a frame callback; the pulse only touches
 
 | Phase   | Properties                | Token                          | Interruptible |
 | ------- | ------------------------- | ------------------------------ | ------------- |
-| pulse   | `opacity 1 → 0.5 → 1`     | `animate-pulse` (theme timing) | yes (CSS)     |
+| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition` / `animate-pulse` (theme timing) | yes (CSS)     |
 | reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
 | none    | no animation; full opacity | `animate-none`                 | –             |
 
@@ -2746,7 +2746,7 @@ the user is waiting on, and it must not add a frame callback to it. Only `transf
 
 | Phase   | Properties          | Token                         | Interruptible |
 | ------- | ------------------- | ----------------------------- | ------------- |
-| spin    | `rotate 0 → 360deg` | `animate-spin` (theme timing) | yes (CSS)     |
+| spin    | `rotate 0 → 360deg` | `data.transition` / `animate-spin` (theme timing) | yes (CSS)     |
 | reduced | same rotation       | `animate-spin`                | yes (CSS)     |
 | none    | none; icon static   | `animate-none`                | –             |
 
@@ -7880,14 +7880,14 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 
 ## Motion contract
 
-| Phase | Behaviour |
-| --- | --- |
-| Enter / exit | No authored entrance or removal animation. |
-| Interaction | `data.transition`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
-| Interruption | Next/previous/drag retarget Embla's existing location and velocity. Release uses the effective base clock, including breakpoint options, instead of a hard-coded release duration. |
-| Reduced | Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
-| None | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
-| Buttons | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
+| Phase | Recipe | Behaviour |
+| --- | --- | --- |
+| Enter / exit | — | No authored entrance or removal animation. |
+| Interaction | `data.transition` | `data.transition`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
+| Interruption | — | Next/previous/drag retarget Embla's existing location and velocity. Release uses the effective base clock, including breakpoint options, instead of a hard-coded release duration. |
+| Reduced | — | Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
+| None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
+| Buttons | — | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
 
 A mode downgrade settles the existing target without resetting selection. Engine friction,
 geometry and momentum destinations remain Embla-owned. Independent plugin animations remain
