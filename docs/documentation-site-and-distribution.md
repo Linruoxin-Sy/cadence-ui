@@ -75,15 +75,15 @@ Tests read this section too (see the Animation system document, §9.3), so it mu
 
 ### 2.2 Preview capabilities
 
-| Capability             | Implementation                                                                                                                        | Value                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Variant switching      | `?variant=` + client state                                                                                                            | One component, several shapes                                                |
-| Playback speed gear    | One `Select` in the site header (`2×` / `1×` / `0.5×` / `0.25×`); `CadenceProvider timeScale={1 / speed}`, never a token edit         | Lets people see the details                                                  |
-| Reduced-motion preview | One switch in the site header (`full` / `reduced` / `none`), mirrored in `?motion=`; the provider resolves it once for the whole site | A mode is a setting; 29 copies of the switch would be 29 chances to disagree |
-| Theme switching        | `data-theme` / `class="dark"`                                                                                                         | Both themes                                                                  |
-| Code copy              | Reads the registry `content`, never hand-written snippets                                                                             | Docs and source never drift                                                  |
-| Install copy           | `npx shadcn add @cadence/<id>`                                                                                                        | Lowers the conversion barrier                                                |
-| Loading transition     | `components/site/measured-height.tsx`: the preview body is measured, and the height is applied in the frame it changed (`ADR-015`)    | The card is always the size of its example, and adds no motion of its own    |
+| Capability             | Implementation                                                                                                                                                                             | Value                                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| Variant switching      | `?variant=` + client state                                                                                                                                                                 | One component, several shapes                                                             |
+| Playback speed gear    | One `Select` in the site header (`2×` / `1×` / `0.5×` / `0.25×`); `CadenceProvider timeScale={1 / speed}`, never a token edit                                                              | Lets people see the details                                                               |
+| Reduced-motion preview | One switch in the site header (`full` / `reduced` / `none`), mirrored in `?motion=`; the provider resolves it once for the whole site                                                      | A mode is a setting; 29 copies of the switch would be 29 chances to disagree              |
+| Theme switching        | `data-theme` / `class="dark"`                                                                                                                                                              | Both themes                                                                               |
+| Code copy              | Reads the registry `content`, never hand-written snippets                                                                                                                                  | Docs and source never drift                                                               |
+| Install copy           | `npx shadcn add @cadence/<id>`                                                                                                                                                             | Lowers the conversion barrier                                                             |
+| Loading transition     | `components/site/measured-height.tsx` applies the measured height in the frame it changed (ADR-015); the specimen itself lands with a CSS `@starting-style` reveal in `previews/shell.tsx` | The card is always the size of its example, and the content arrives without moving layout |
 
 > The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
 
@@ -109,6 +109,17 @@ on a prerendered page that patch happens during parse, before the first paint. T
 there in either version, and covering it would mean giving up SSR for the previews
 (`dynamic(..., { ssr: false })`); a preview that is already in the HTML before first paint is worth more than
 an animation nobody sees.
+
+The one thing the frame does animate is not geometry. `previews/shell.tsx` gives every specimen a
+`@starting-style` landing — 4px up plus a fade, on the `--motion-duration-base` clock with
+`ease-cadence-out` — so a preview arrives instead of appearing, and nothing in layout moves: the height is
+still the measured one, applied at once. `@starting-style` rather than Motion is the whole point: the preview
+usually arrives either as a node inserted during parse or as a route change, and by the time JavaScript could
+run the element is already painted at its final state, so a JS entrance would first have to snap it back to
+`opacity: 0` — the flash it exists to prevent. The duration is a custom property, so `data-motion="none"`
+collapses the landing to zero and `reduced` shortens it, with no second branch in the component. One limit is
+worth knowing: on a cold load with `?motion=none` in the URL, the mode is only resolved after hydration, so
+that first landing still plays once — the frame cannot know a client preference before the client runs.
 
 **Built today:** the speed gear, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
 and per-page dynamic loading of previews. Variant switching of previews is **not** built yet. The gap between
