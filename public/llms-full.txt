@@ -251,6 +251,15 @@ Recipe: `feedback.press`, driven by the press gesture.
   anything — rules, schemas, and error copy stay in your form code; [Field](/components/field)
   shows the pairing.
 
+## Responsiveness and performance
+
+Buttons size to their label and selected size; the caller owns wrapping or stacking
+an action row on small screens. Icon-only buttons need an accessible name. Base UI
+activation and Motion press feedback require hydration; native button/link semantics
+remain browser-owned in server markup. Press feedback uses transform through
+feedback.press, with no layout interpolation. The T1 check budgets this item's own
+shipped source at 6 KiB gzip, excluding installed dependencies and application code.
+
 ## Notes for AI
 
 - Keep the label specific ("Delete project", not "OK").
@@ -364,6 +373,16 @@ on mount.
 - When rendered as a link it inherits the anchor's semantics, focus ring, and
   keyboard behaviour, and gains `[a&]:hover` styles automatically.
 
+## Responsiveness and performance
+
+Badges keep intrinsic width and do not wrap their text. Keep labels short; let the parent wrap a
+collection or provide an overflow strategy for long labels.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Never attach `onClick` to a badge; switch to `button` with `size="sm"`.
@@ -467,6 +486,16 @@ is reading it.
 - If a hint is icon-only, put the key name in `aria-label` on the `Kbd`.
 - Do not attach `tabIndex`; a shortcut hint is not focusable.
 
+## Responsiveness and performance
+
+Keys and key groups use intrinsic inline sizes. The caller owns wrapping or scrolling long shortcut
+descriptions; these labels do not register keyboard shortcuts.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use the platform's own glyphs (`⌘`, `⇧`, `↵`) rather than words, and keep one
@@ -567,6 +596,16 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
 - `decorative` removes it from the accessibility tree for rules that carry no
   meaning (a divider inside a visual layout).
 - Focusable separators are not supported on purpose: a rule is not a control.
+
+## Responsiveness and performance
+
+Horizontal separators fill available width; vertical separators need a parent with a defined height.
+Orientation is caller-owned, with no automatic breakpoint.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -669,6 +708,16 @@ which is an opacity change on a token, not an animation.
   `display: none`. If the design needs a hidden label, use `sr-only`, not removal.
 - `htmlFor` must point at an `id` that exists in the same document. Duplicate ids
   break the association silently.
+
+## Responsiveness and performance
+
+Labels use flex layout and inherit their available width. Keep long labels readable beside controls;
+the caller owns stacking and responsive field layout.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -803,6 +852,16 @@ There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. [Field](/components/field) shows how the invalid state and its message
 are wired.
 
+## Responsiveness and performance
+
+The input fills its parent and uses base text sizing below the md breakpoint. Constrain the parent
+in grids; native input types retain browser keyboards, editing and form behavior.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use `aria-invalid` and `aria-describedby` — never an `error` prop or internal
@@ -918,6 +977,17 @@ Same contract as `input`: the field renders state, you own the state.
 Character counters are yours to render: the component does not count. Keep the
 count in the description slot and point `aria-describedby` at it, so a screen
 reader hears it before the limit is hit.
+
+## Responsiveness and performance
+
+The textarea fills its parent, has a minimum height and uses CSS field-sizing-content where
+supported. The browser owns growth and user resizing; provide a height or overflow policy for long
+text when needed. There is no JavaScript auto-grow fallback.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -1096,6 +1166,19 @@ branch to keep — the geometry is information, and both modes render it identic
 - A card that is clickable must contain a real link or button; do not put
   `onClick` on the card and call it done — it is invisible to keyboard users.
 
+## Responsiveness and performance
+
+Cards follow their parent layout by default. The caller owns grid columns and narrow-screen
+wrapping; size="sm" changes spacing, not a breakpoint. With fit="content", CSS resolves width and a
+ResizeObserver measures content height after mount, applying it immediately without interpolation.
+SSR uses natural content layout before measurement.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. The optional Card observer is
+client code and is disconnected on cleanup. Server-rendered markup does not imply that every
+interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own
+shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use `CardFooter` for actions, not a bare `div` — it keeps spacing consistent when
@@ -1205,6 +1288,16 @@ transition here would reintroduce the layout shift it exists to prevent.
 - Media that animates (autoplay video, GIF) counts against both the CLS budget and
   the reduced-motion contract; pause or replace it under
   `prefers-reduced-motion`.
+
+## Responsiveness and performance
+
+The frame derives height from its available width and ratio. Give it a constrained parent and size
+media to fill the frame; the caller owns breakpoint-specific ratios and image loading.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -1319,6 +1412,17 @@ the image errored, and a cross-fade would show a half-drawn face in the meantime
   `aria-label` on the badge.
 - An avatar that links to a profile must be wrapped in an `<a>` with an accessible
   name; the image `alt` alone is not a link name.
+
+## Responsiveness and performance
+
+Avatar sizes are explicit rather than breakpoint-driven. Groups overlap avatars; the caller limits
+the visible count and supplies overflow text. Base UI owns image loading and fallback state after
+hydration.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -1590,6 +1694,17 @@ animated and carry no timing.
 - The action is a real control. If it is the only way forward, it must be reachable
   by keyboard and come after the message in DOM order (it does).
 
+## Responsiveness and performance
+
+Alerts fill their parent and reserve separate columns for icon, text and optional action. Keep
+action labels short or adapt the composition for narrow containers; the caller owns long-content
+wrapping.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use an alert for a state that persists; use `toast` for a moment.
@@ -1727,6 +1842,17 @@ When the region swaps from empty to populated, that transition belongs to the li
   text the whole message — an icon alone never carries meaning.
 - Keep at least one action focusable. An empty state with no way forward is a dead
   end; the primary action is the reason this component exists.
+
+## Responsiveness and performance
+
+The root can shrink with its parent and increases padding at md. Header and content have bounded
+widths; the caller owns the surrounding height and wrapping action rows.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -1899,6 +2025,17 @@ that animates itself cannot be interrupted by the next render.
   icon only when it carries information the title does not.
 - Keep action buttons out of the tab order of a read-only list. Put them in
   `ItemActions` and reveal them on hover **and** focus, never hover alone.
+
+## Responsiveness and performance
+
+Items fill available width and allow wrapping. The caller owns text overflow and action placement in
+narrow containers; large collections need application pagination or virtualization.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
+contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
+The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
+application bundles are measured separately.
 
 ## Notes for AI
 
@@ -2074,6 +2211,18 @@ There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. `FieldError` accepts messages, not rules: the decision that a
 value is wrong, and the copy that says so, stay in your form code.
 
+## Responsiveness and performance
+
+FieldGroup establishes a named container. Responsive orientation switches from column to row at its
+md container query; explicit vertical and horizontal orientations remain caller-selected. Labels,
+error text and controls must fit the available width.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Do not add an `error` prop to `Input`; put the message in `FieldError` and point
@@ -2207,6 +2356,18 @@ animation on top of it.
   does not name them.
 - Do not mark the active segment with colour alone — use `aria-pressed` on a toggle
   button, or a `data-state` attribute your CSS keys off.
+
+## Responsiveness and performance
+
+Groups use intrinsic width and a caller-selected orientation; no breakpoint switches it
+automatically. Stack or constrain long groups at the application level rather than hiding focused
+controls.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
+contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
+The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
+application bundles are measured separately.
 
 ## Notes for AI
 
@@ -2358,6 +2519,18 @@ P11: the group shows invalid state, it never decides it.
 There is no `validate`, `schema`, or `resolver` prop, and no validation library is
 imported. [Field](/components/field) shows how the invalid state and its message are wired.
 
+## Responsiveness and performance
+
+The group fills its parent and permits shrinking. Block-start/end addons use column layout; inline
+addons share the input row. The caller owns long addon labels, button wrapping and narrow-screen
+composition.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Never wrap `input` in this group to "add a border"; the input already has one.
@@ -2491,6 +2664,17 @@ stable thing on the page move.
   read as names, not as "chevron".
 - An ellipsis must not be the only way to reach the hidden ancestors: pair it with a
   menu, or the collapsed path becomes unreachable.
+
+## Responsiveness and performance
+
+The list wraps and increases its gap at sm. Collapsing a deep trail into an ellipsis is
+caller-owned; the component does not measure width or choose hidden ancestors.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
+contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
+The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
+application bundles are measured separately.
 
 ## Notes for AI
 
@@ -2638,6 +2822,18 @@ If the new page's rows should arrive in sequence, that is `list.stagger` on the 
   `href` and with `aria-disabled="true"`, not a link that 404s.
 - The ordered list gives the count; the ellipsis is decorative and must not be
   focusable.
+
+## Responsiveness and performance
+
+Navigation fills its parent while the inner list remains a single row. The caller chooses the page
+range and ellipses and may hide optional text on small screens; page counts are not computed by the
+component.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 
@@ -5471,6 +5667,12 @@ separately from the animated outer slot, including content and viewport changes.
   the flight alone.
 - The handoff clone is `aria-hidden`: screen readers hear the value once, from the trigger.
 
+## Validation and data ownership
+
+The caller owns selection values, validation, error text, submission and any remote
+loading/filtering. Render supplied aria-invalid/data-invalid and associate described
+errors; this component does not validate or install a form-state library.
+
 ## Responsive behavior
 
 The popup is at least `--anchor-width` wide and caps at `--available-height`, so it flips and scrolls
@@ -5731,6 +5933,12 @@ state callback classes style the native input with its real Base UI input state.
 - Under reduced motion nothing is conveyed by the panel's scale: the list is there, the tick is at full
   size, and `aria-selected` carries the state.
 
+## Validation and data ownership
+
+The caller owns selection values, validation, error text, submission and any remote
+loading/filtering. Render supplied aria-invalid/data-invalid and associate described
+errors; this component does not validate or install a form-state library.
+
 ## Responsive behavior
 
 The popup is exactly `--anchor-width` wide and at least `--spacing(7)` wider than the field, so a narrow
@@ -5915,7 +6123,7 @@ the element the user presses.
 | `alignOffset` | `number`                                      | `0`        | Shift along the alignment axis.                 |
 | `className`   | string or Base UI state callback                                      | –          | Merged last.                                    |
 
-### Items
+### `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`
 
 | Part                     | Props                                                              | Notes                                             |
 | ------------------------ | ------------------------------------------------------------------ | ------------------------------------------------- |
@@ -5927,7 +6135,7 @@ the element the user presses.
 | `DropdownMenuSubTrigger` | `disabled`, `inset`                                                | Renders the chevron.                              |
 | `DropdownMenuSubContent` | Same as `DropdownMenuContent`                                      | `side="right"`, `alignOffset={-3}` by default.    |
 
-### Structure
+### `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`
 
 `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`,
 `DropdownMenuShortcut`, `DropdownMenuPortal`.
@@ -6149,14 +6357,14 @@ long-press; it renders a `div` by default, so give it the box you want to be rig
 | `alignOffset` | `number`                                 | `4`         | Shift along the alignment axis.               |
 | `className`   | string or Base UI state callback                                 | –           | Merged last.                                  |
 
-### Items
+### `ContextMenuItem`, `ContextMenuCheckboxItem`, `ContextMenuRadioItem`
 
 `ContextMenuItem` (`onClick`, `disabled`, `inset`, `variant`), `ContextMenuCheckboxItem`,
 `ContextMenuRadioGroup`, `ContextMenuRadioItem`, `ContextMenuSub`, `ContextMenuSubTrigger`,
 `ContextMenuSubContent` — the same parts and props as `dropdown-menu`, with context-menu
 slots.
 
-### Structure
+### `ContextMenuGroup`, `ContextMenuLabel`, `ContextMenuSeparator`
 
 `ContextMenuGroup`, `ContextMenuLabel`, `ContextMenuSeparator`, `ContextMenuShortcut`,
 `ContextMenuPortal`.
@@ -7747,6 +7955,17 @@ No timing token or interruption lifecycle applies.
 - No layout measurement or data processing runs. Render large datasets through
   application-owned pagination or virtualization; the server markup remains native HTML.
 
+## Responsiveness and performance
+
+The table fills its container, which provides native horizontal scrolling when columns need more
+width. The caller owns column sizing, wrapping and any sticky behavior. Rows are all rendered; large
+datasets need application pagination or virtualization.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Preserve the table hierarchy: caption, header, body and footer belong inside Table.
@@ -8054,6 +8273,17 @@ Caller-added smooth scrolling and CSS animation are application-owned.
   a scroll or viewport resize occurs. Cadence preserves that upstream behaviour. It adds no
   measurement loop, data processing or virtualization. Paginate or virtualize large
   datasets in the application.
+
+## Responsiveness and performance
+
+Give the root explicit dimensions so its viewport can scroll; horizontal scrolling needs the
+corresponding ScrollBar. Parent grids may need min-w-0. Base UI manages custom scrollbar interaction
+while content uses native scrolling; it does not virtualize children.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
 

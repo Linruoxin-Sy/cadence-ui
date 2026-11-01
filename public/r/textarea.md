@@ -113,6 +113,17 @@ Character counters are yours to render: the component does not count. Keep the
 count in the description slot and point `aria-describedby` at it, so a screen
 reader hears it before the limit is hit.
 
+## Responsiveness and performance
+
+The textarea fills its parent, has a minimum height and uses CSS field-sizing-content where
+supported. The browser owns growth and user resizing; provide a height or overflow policy for long
+text when needed. There is no JavaScript auto-grow fallback.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Do not implement auto-resize with a `scrollHeight` loop; `field-sizing-content`

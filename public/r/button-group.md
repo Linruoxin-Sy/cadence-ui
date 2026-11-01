@@ -130,6 +130,18 @@ animation on top of it.
 - Do not mark the active segment with colour alone — use `aria-pressed` on a toggle
   button, or a `data-state` attribute your CSS keys off.
 
+## Responsiveness and performance
+
+Groups use intrinsic width and a caller-selected orientation; no breakpoint switches it
+automatically. Stack or constrain long groups at the application level rather than hiding focused
+controls.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
+contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
+The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
+application bundles are measured separately.
+
 ## Notes for AI
 
 - Use `ButtonGroup` for actions on one object, `toggle-group` for a value the form

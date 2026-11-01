@@ -142,6 +142,18 @@ If the new page's rows should arrive in sequence, that is `list.stagger` on the 
 - The ordered list gives the count; the ellipsis is decorative and must not be
   focusable.
 
+## Responsiveness and performance
+
+Navigation fills its parent while the inner list remains a single row. The caller chooses the page
+range and ellipses and may hide optional text on small screens; page counts are not computed by the
+component.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Every control is an anchor. Do not replace it with `Button` — the shape comes from

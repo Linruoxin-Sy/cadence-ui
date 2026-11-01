@@ -111,6 +111,16 @@ on mount.
 - When rendered as a link it inherits the anchor's semantics, focus ring, and
   keyboard behaviour, and gains `[a&]:hover` styles automatically.
 
+## Responsiveness and performance
+
+Badges keep intrinsic width and do not wrap their text. Keep labels short; let the parent wrap a
+collection or provide an overflow strategy for long labels.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Never attach `onClick` to a badge; switch to `button` with `size="sm"`.

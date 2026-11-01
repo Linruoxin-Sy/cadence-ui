@@ -169,6 +169,18 @@ There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. `FieldError` accepts messages, not rules: the decision that a
 value is wrong, and the copy that says so, stay in your form code.
 
+## Responsiveness and performance
+
+FieldGroup establishes a named container. Responsive orientation switches from column to row at its
+md container query; explicit vertical and horizontal orientations remain caller-selected. Labels,
+error text and controls must fit the available width.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Do not add an `error` prop to `Input`; put the message in `FieldError` and point

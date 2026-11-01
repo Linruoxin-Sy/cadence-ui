@@ -174,6 +174,19 @@ branch to keep — the geometry is information, and both modes render it identic
 - A card that is clickable must contain a real link or button; do not put
   `onClick` on the card and call it done — it is invisible to keyboard users.
 
+## Responsiveness and performance
+
+Cards follow their parent layout by default. The caller owns grid columns and narrow-screen
+wrapping; size="sm" changes spacing, not a breakpoint. With fit="content", CSS resolves width and a
+ResizeObserver measures content height after mount, applying it immediately without interpolation.
+SSR uses natural content layout before measurement.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. The optional Card observer is
+client code and is disconnected on cleanup. Server-rendered markup does not imply that every
+interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own
+shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use `CardFooter` for actions, not a bare `div` — it keeps spacing consistent when

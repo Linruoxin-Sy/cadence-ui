@@ -162,6 +162,12 @@ separately from the animated outer slot, including content and viewport changes.
   the flight alone.
 - The handoff clone is `aria-hidden`: screen readers hear the value once, from the trigger.
 
+## Validation and data ownership
+
+The caller owns selection values, validation, error text, submission and any remote
+loading/filtering. Render supplied aria-invalid/data-invalid and associate described
+errors; this component does not validate or install a form-state library.
+
 ## Responsive behavior
 
 The popup is at least `--anchor-width` wide and caps at `--available-height`, so it flips and scrolls

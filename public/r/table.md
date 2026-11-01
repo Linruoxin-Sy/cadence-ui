@@ -136,6 +136,17 @@ No timing token or interruption lifecycle applies.
 - No layout measurement or data processing runs. Render large datasets through
   application-owned pagination or virtualization; the server markup remains native HTML.
 
+## Responsiveness and performance
+
+The table fills its container, which provides native horizontal scrolling when columns need more
+width. The caller owns column sizing, wrapping and any sticky behavior. Rows are all rendered; large
+datasets need application pagination or virtualization.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Preserve the table hierarchy: caption, header, body and footer belong inside Table.

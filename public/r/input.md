@@ -130,6 +130,16 @@ There is no `schema`, `resolver`, `validate`, or `rules` prop, and no validation
 library is imported. [Field](/components/field) shows how the invalid state and its message
 are wired.
 
+## Responsiveness and performance
+
+The input fills its parent and uses base text sizing below the md breakpoint. Constrain the parent
+in grids; native input types retain browser keyboards, editing and form behavior.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use `aria-invalid` and `aria-describedby` — never an `error` prop or internal

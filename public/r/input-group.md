@@ -146,6 +146,18 @@ P11: the group shows invalid state, it never decides it.
 There is no `validate`, `schema`, or `resolver` prop, and no validation library is
 imported. [Field](/components/field) shows how the invalid state and its message are wired.
 
+## Responsiveness and performance
+
+The group fills its parent and permits shrinking. Block-start/end addons use column layout; inline
+addons share the input row. The caller owns long addon labels, button wrapping and narrow-screen
+composition.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Never wrap `input` in this group to "add a border"; the input already has one.

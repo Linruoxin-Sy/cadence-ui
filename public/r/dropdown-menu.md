@@ -160,7 +160,7 @@ the element the user presses.
 | `alignOffset` | `number`                                      | `0`        | Shift along the alignment axis.                 |
 | `className`   | string or Base UI state callback                                      | –          | Merged last.                                    |
 
-### Items
+### `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`
 
 | Part                     | Props                                                              | Notes                                             |
 | ------------------------ | ------------------------------------------------------------------ | ------------------------------------------------- |
@@ -172,7 +172,7 @@ the element the user presses.
 | `DropdownMenuSubTrigger` | `disabled`, `inset`                                                | Renders the chevron.                              |
 | `DropdownMenuSubContent` | Same as `DropdownMenuContent`                                      | `side="right"`, `alignOffset={-3}` by default.    |
 
-### Structure
+### `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`
 
 `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`,
 `DropdownMenuShortcut`, `DropdownMenuPortal`.

@@ -130,6 +130,17 @@ stable thing on the page move.
 - An ellipsis must not be the only way to reach the hidden ancestors: pair it with a
   menu, or the collapsed path becomes unreachable.
 
+## Responsiveness and performance
+
+The list wraps and increases its gap at sm. Collapsing a deep trail into an ellipsis is
+caller-owned; the component does not measure width or choose hidden ancestors.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
+contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
+The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
+application bundles are measured separately.
+
 ## Notes for AI
 
 - Do not wrap the current page in a link "for consistency". It is a `BreadcrumbPage`.
