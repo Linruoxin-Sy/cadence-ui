@@ -1460,6 +1460,40 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Reveal related sections while keeping their headings easy to scan.",
+      "categories": ["layout"],
+      "dependencies": ["@base-ui/react", "motion", "lucide-react"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/accordion/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/accordion/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.4.0",
+        "tier": "T3",
+        "batch": "B6",
+        "motion": [
+          {
+            "recipe": "geometry.resize",
+            "form": "css-transition"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "shadcn",
+          "style": "base-ui",
+          "version": "2026-10"
+        }
+      }
     }
   ]
 }

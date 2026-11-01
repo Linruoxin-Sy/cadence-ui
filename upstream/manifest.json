@@ -1733,6 +1733,38 @@
           "toastManager": "toast"
         }
       }
+    },
+    "accordion": {
+      "path": "apps/v4/registry/bases/base/ui/accordion.tsx",
+      "exports": [
+        "Accordion",
+        "AccordionContent",
+        "AccordionItem",
+        "AccordionTrigger"
+      ],
+      "slots": [
+        "accordion",
+        "accordion-content",
+        "accordion-item",
+        "accordion-trigger",
+        "accordion-trigger-icon"
+      ],
+      "props": {
+        "Accordion": {
+          "className": null
+        },
+        "AccordionItem": {
+          "className": null
+        },
+        "AccordionTrigger": {
+          "className": null,
+          "children": null
+        },
+        "AccordionContent": {
+          "className": null,
+          "children": null
+        }
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
 > Status: **B0–B4 complete; all seven B5 components shipped (2026-11-01). B5 visual gate remains
-> open for earlier components; B6 implementation is next.**
+> open for earlier components; B6 accordion shipped, collapsible is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -177,17 +177,18 @@ so the list stays a statement about the current code rather than a history of it
 
 ### 6.3 Motion tiers
 
-| Tier | Definition                  | Examples                                                   | Allowed recipes                                     |
-| ---- | --------------------------- | ---------------------------------------------------------- | --------------------------------------------------- |
-| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge | none (colour/focus transitions only)                |
-| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp        | `feedback.press`, `state.morph`                     |
-| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast              | `enter.pop`, `exit.fade`, `popup.anchored`          |
-| T3   | Continuity / shared element | tabs, accordion, collapsible, sidebar, navigation-menu     | `layout.shared`, `layout.move`, `list.stagger`      |
-| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar     | `number.roll`, `scroll.progress`, `data.transition` |
-| T5   | AI / composite              | attachment, bubble (later message, trace)                  | reuse T1–T4                                         |
+| Tier | Definition                  | Examples                                                   | Allowed recipes                                                   |
+| ---- | --------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge | none (colour/focus transitions only)                              |
+| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp        | `feedback.press`, `state.morph`                                   |
+| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast              | `enter.pop`, `exit.fade`, `popup.anchored`                        |
+| T3   | Continuity / shared element | tabs, accordion, collapsible, sidebar, navigation-menu     | `layout.shared`, `layout.move`, `list.stagger`, `geometry.resize` |
+| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar     | `number.roll`, `scroll.progress`, `data.transition`               |
+| T5   | AI / composite              | attachment, bubble (later message, trace)                  | reuse T1–T4                                                       |
 
-Two recipes are added before they are used: `disclosure.height` (height is allowed for disclosures)
-and `data.transition`. Both must land in [animation-system.md](animation-system.md) first.
+Disclosure height uses the measured, clamped `geometry.resize` recipe (including its documented
+Base UI CSS form); there is no separate `disclosure.height` recipe. `data.transition` is also
+defined in [animation-system.md](animation-system.md).
 
 ### 6.4 Budgets
 
@@ -256,19 +257,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | planned   |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned   |
-| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned   |
-|       | **Total**                  | **57** |            | **102**     |         |           |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status      |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ----------- |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done     |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done     |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done     |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done     |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done     |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open   |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | 1/6 shipped |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | planned     |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | planned     |
+| B9    | AI first                   | 2      | B1         | 3.5         | 0.5.0   | planned     |
+|       | **Total**                  | **57** |            | **102**     |         |             |
 
 ### 7.0 Status discipline
 
@@ -319,7 +320,7 @@ batch (see §7.5), and `attachment` + `bubble` are still to come.
 
 ### B6 — disclosure and collections (6)
 
-`accordion`, `collapsible`, `tabs`, `table`, `carousel`, `scroll-area`.
+`accordion` shipped (§7.9). Next: `collapsible`, then `tabs`, `table`, `carousel`, `scroll-area`.
 
 ### B7 — heavy data and navigation (5)
 
@@ -893,6 +894,33 @@ the batch row now says `gate open` because the earlier components still lack vis
   select/menu visual evidence described in §7.6 has not been regenerated or reviewed here. This
   toast proof does not close historical B1–B5 visual gates. B6 starts with `accordion`; B7–B9 and
   §8 carried open work remain scheduled/open. No claim of overall parity completion.
+
+### 7.9 B6 accordion shipped (2026-11-01)
+
+- **Scope:** `accordion` is the first of six B6 items. All four pinned exports and five slots are
+  preserved, plus header and content-inner slots. 44 components, 50 items, 44 docs, 45 previews.
+  The upstream pin stays `96da9cc7f1aa`; only accordion's fixed surface is added to the manifest.
+- **Motion conformance:** `geometry.resize` in the explicitly documented CSS transition form,
+  measured from natural inner content by layout effect and ResizeObserver, clamped to zero.
+  Full uses `duration.slow` / `ease.out`; native reversal preserves current position rather than
+  spring velocity. Reduced and none both remove height transitions. Icons swap without motion.
+  Base UI owns mount/unmount, `keepMounted`, custom `render`/refs, and hidden-until-found behavior.
+  The motion manifest checker now recognises this form only with measured/clamped height, lifecycle
+  selectors, token timing, and the instant mode branch; six regression assertions cover that gate.
+- **API and keyboard:** Base UI 1.6 keeps array values, single/multiple selection, disabled state,
+  cancellation details, and native Tab/Shift+Tab plus Enter/Space. Its `orientation` and `loopFocus`
+  props are deprecated and no longer move focus; Cadence forwards them without inventing navigation.
+- **Verification:** `pnpm check` passes: 331 tests in 54 files, typecheck, lint (only the existing
+  item preview image warning), registry/parity checks, tier budgets, and P11. Accordion has seven
+  unit tests. Production build passes with 55 static pages in isolated `.next-accordion`; generated
+  tsconfig changes are reverted. Eight accordion Edge browser tests pass: three modes × two system
+  preferences, computed height duration and absent transform, content resize, both mid-flight
+  reversals, final unmount, keyboard/focus, narrow viewport, light/dark axe and inspected screenshots.
+  The full Edge browser suite also passes 178/178 in 3.0 minutes with two workers on port 3113.
+  Screenshots are preserved locally in `.cache/accordion-proof/`; these prove accordion only.
+- **Remaining:** B6 is 1/6 shipped; `collapsible` is next, followed by tabs, table, carousel, scroll-area.
+  Historical B1–B5 visual gates remain open as already recorded. B7–B9 and §8 carried work remain
+  scheduled; this is not overall parity completion.
 
 ## 8. Backlog
 

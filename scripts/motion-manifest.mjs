@@ -82,6 +82,18 @@ export function implementedForm(source, recipe, form = "one-shot") {
 
   if (called) return "one-shot";
 
+  if (recipe === "geometry.resize" && form === "css-transition") {
+    const states = source.includes("data-[starting-style]:h-0") && source.includes("data-[ending-style]:h-0");
+    const measured =
+      source.includes("ResizeObserver") && source.includes("getBoundingClientRect") && source.includes("Math.max(0,");
+    const transition =
+      source.includes("transition-[height]") &&
+      source.includes("--motion-duration-slow") &&
+      source.includes("ease-cadence-out");
+    const modes = source.includes("cm.reduced") && source.includes("duration-0");
+    return states && measured && transition && modes ? "css-transition" : null;
+  }
+
   if (CSS_POPUP_RECIPES.has(recipe)) {
     const hasPopupState = /data-(?:starting|ending)-style/.test(source);
     const hasTransition = /\b(?:transition-|duration-\()/.test(source);

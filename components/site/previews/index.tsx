@@ -55,4 +55,5 @@ export const previews: Record<string, ComponentType> = {
   "code-block": dynamic(() => import("./code-block").then((mod) => ({ default: mod.CodeBlockPreview }))),
   command: dynamic(() => import("./command").then((mod) => ({ default: mod.CommandPreview }))),
   toast: dynamic(() => import("./toast").then((mod) => ({ default: mod.ToastPreview }))),
+  accordion: dynamic(() => import("./accordion").then((mod) => ({ default: mod.AccordionPreview }))),
 };
