@@ -107,6 +107,16 @@ transition here would reintroduce the layout shift it exists to prevent.
   the reduced-motion contract; pause or replace it under
   `prefers-reduced-motion`.
 
+## Responsiveness and performance
+
+The frame derives height from its available width and ratio. Give it a constrained parent and size
+media to fill the frame; the caller owns breakpoint-specific ratios and image loading.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Always pass a `ratio`; `16 / 9` for video, `1` for avatars, `4 / 3` for photos.

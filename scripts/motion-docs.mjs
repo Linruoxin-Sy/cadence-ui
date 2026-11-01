@@ -4,10 +4,10 @@ import path from "node:path";
 import matter from "gray-matter";
 import { motionRecipes } from "./motion-manifest.mjs";
 
-function visibleLines(markdown) {
+export function visibleLines(markdown) {
   let fence = null;
   return markdown
-    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(/<!--[\s\S]*?-->/g, (comment) => comment.replace(/[^\n]/g, ""))
     .split(/\r?\n/)
     .map((line) => {
       const marker = line.match(/^\s{0,3}(`{3,}|~{3,})/);

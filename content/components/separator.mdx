@@ -102,6 +102,16 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
   meaning (a divider inside a visual layout).
 - Focusable separators are not supported on purpose: a rule is not a control.
 
+## Responsiveness and performance
+
+Horizontal separators fill available width; vertical separators need a parent with a defined height.
+Orientation is caller-owned, with no automatic breakpoint.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Prefer `gap` and `space-y` first; add a separator only when two groups need a

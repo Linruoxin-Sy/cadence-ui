@@ -131,6 +131,17 @@ animated and carry no timing.
 - The action is a real control. If it is the only way forward, it must be reachable
   by keyboard and come after the message in DOM order (it does).
 
+## Responsiveness and performance
+
+Alerts fill their parent and reserve separate columns for icon, text and optional action. Keep
+action labels short or adapt the composition for narrow containers; the caller owns long-content
+wrapping.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Use an alert for a state that persists; use `toast` for a moment.

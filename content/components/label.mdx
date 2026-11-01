@@ -102,6 +102,16 @@ which is an opacity change on a token, not an animation.
 - `htmlFor` must point at an `id` that exists in the same document. Duplicate ids
   break the association silently.
 
+## Responsiveness and performance
+
+Labels use flex layout and inherit their available width. Keep long labels readable beside controls;
+the caller owns stacking and responsive field layout.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Server-rendered markup does not
+imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
+this item's own shipped source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - One label per control. Do not add `aria-label` on the control as well; two names

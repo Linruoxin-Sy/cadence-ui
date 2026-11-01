@@ -157,6 +157,15 @@ Recipe: `feedback.press`, driven by the press gesture.
   anything — rules, schemas, and error copy stay in your form code; [Field](/components/field)
   shows the pairing.
 
+## Responsiveness and performance
+
+Buttons size to their label and selected size; the caller owns wrapping or stacking
+an action row on small screens. Icon-only buttons need an accessible name. Base UI
+activation and Motion press feedback require hydration; native button/link semantics
+remain browser-owned in server markup. Press feedback uses transform through
+feedback.press, with no layout interpolation. The T1 check budgets this item's own
+shipped source at 6 KiB gzip, excluding installed dependencies and application code.
+
 ## Notes for AI
 
 - Keep the label specific ("Delete project", not "OK").

@@ -10,10 +10,12 @@
  * Usage:
  *   node scripts/new-item.mjs --name tooltip --tier T2 --batch B4 --title "Tooltip" \
  *     --description "Hints for icon buttons, shortcuts, and truncated values." [--category overlay] \
- *     [--motion popup.anchored] [--intensity subtle] [--complexity M] [--since 0.3.0]
+ *     [--input] [--motion popup.anchored] [--intensity subtle] [--complexity M] [--since 0.3.0]
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import matter from "gray-matter";
+import { INPUT_DOCS, validateDocTemplate } from "./doc-template.mjs";
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -79,6 +81,7 @@ for (const file of [sourcePath, docPath, previewPath, testPath]) {
   if (await exists(file)) fail(`${path.relative(root, file)} already exists`);
 }
 
+const input = args.includes("--input") || INPUT_DOCS.has(id);
 const motionLine = `[${motion.join(", ")}]`;
 
 const source = `"use client";
@@ -162,27 +165,36 @@ ${motionSection}
 - TODO: role, keyboard, focus, screen-reader behaviour.
 
 ${
-  ["T2", "T3", "T4", "T5"].includes(tier)
+  !["T0", "T1"].includes(tier)
     ? `## Keyboard interactions
 
 | Keys | Action |
 | --- | --- |
 | Escape | TODO |
 
-## Responsive behavior
-
-TODO.
-
-## Performance
-
-TODO.
 `
     : ""
 }
+${
+  input
+    ? `## Validation and data ownership
+
+TODO: caller owns values, validation, errors and submission; render supplied invalid attributes only.
+`
+    : ""
+}
+## Responsiveness and performance
+
+TODO: describe actual parent sizing, overflow, breakpoint and SSR behavior, installed runtime
+and source budget. T0 has no authored animation/interpolation; this does not mean zero JavaScript.
+
 ## Notes for AI
 
 - TODO: when to pick this component and which mistake to avoid.
 `;
+
+const templateProblems = validateDocTemplate(matter(docs).content, { name: id, meta: { tier }, input }, docPath);
+if (templateProblems.length) fail(templateProblems.join("\n"));
 
 const preview = `"use client";
 

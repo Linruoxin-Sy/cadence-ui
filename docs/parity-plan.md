@@ -1656,8 +1656,20 @@ Initial JS remains OPEN independently of passing flow checks; no budget/config/m
   already agree: static/local feedback, surface/geometry motion, cross-surface handoff respectively.
   `catalog-intensity.mjs` checks semantic classification alongside mandatory frontmatter equality;
   no rating, shipped motion or defaults changed. Index/sidebar flow evidence is recorded separately.
-- T0 component docs omit the "Responsiveness and performance" section that the 12-section template promises,
-  and nothing enforces the template. Either the template is tier-specific or the section is written.
+- **Tier-specific docs template — closed 2026-11-02.** All 58 bodies audited (20 T0,
+  eight T1, 28 T2–T5 UI, two T2 blocks). §2 now separates site chrome from required
+  body membership/order; no nine/twelve heading quota. Compact T0–T1 keeps native
+  keyboard coverage in Accessibility; standard tiers/blocks require both keyboard and
+  accessibility coverage, combined or split. Every tier requires responsiveness/performance.
+  Nineteen missing T0 sections and Button's T1 section are written; Resizable's existing
+  coverage is retained. T0 explicitly permits native/Base UI/observer JavaScript without
+  authored interpolation. Select/Combobox gain missing input ownership; menu API groups
+  name their actual parts. No component source/props/recipes/dependencies changed.
+  Shared template validation runs in registry:build, registry:check/pnpm check and scaffold.
+  Real-entry negative cases, all six tier scaffolds, all 58 bodies and representative MDX
+  rendering are recorded in docs/evidence/doc-template.md and the serial handoff.
+  This closes only template/coverage work; initial JS and all global compatibility/motion
+  audit items stay OPEN.
 
 ### Deferred and excluded
 

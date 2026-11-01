@@ -14,6 +14,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/
 import os from "node:os";
 import path from "node:path";
 import matter from "gray-matter";
+import { checkDocTemplates } from "./doc-template.mjs";
 import { motionRecipes } from "./motion-manifest.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
@@ -50,7 +51,7 @@ async function readDocs() {
 }
 
 const docs = await readDocs();
-const problems = [];
+const problems = await checkDocTemplates(root, registry);
 const same = (a = [], b = []) => [...a].sort().join("|") === [...b].sort().join("|");
 
 for (const item of registry.items) {

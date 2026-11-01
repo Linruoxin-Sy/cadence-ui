@@ -39,9 +39,9 @@ Dependencies remain a future catalogue dimension; no optional GSAP entries curre
 
 ---
 
-## 2. Component page template (12 sections)
+## 2. Component page templates (tier-specific membership)
 
-Every component page renders from the same MDX, in a fixed order:
+Every component page renders from MDX. The table describes content areas, not a total heading count:
 
 | #   | Section                             | Content requirements                                                          |
 | --- | ----------------------------------- | ----------------------------------------------------------------------------- |
@@ -49,7 +49,7 @@ Every component page renders from the same MDX, in a fixed order:
 | 2   | Preview                             | Interactive; motion mode and speed come from the site header                  |
 | 3   | Installation                        | CLI (4 package managers) + manual (file list)                                 |
 | 4   | Usage                               | Smallest runnable code                                                        |
-| 5   | Examples                            | 3–6 examples, each with code — see the flat-heading rule below                |
+| 5   | Examples                            | Named examples as needed, each with code — see the flat-heading rule below    |
 | 6   | When to use                         | 3–5 concrete scenarios                                                        |
 | 7   | When not to use                     | Point to the alternative component (prevents misuse)                          |
 | 8   | API                                 | Props table: type, default, description                                       |
@@ -67,6 +67,51 @@ children. Each example is its own sibling section — `## Controlled`, `## Sizes
 page reads as one even list and every example can be linked, searched, and skimmed on its own. Two
 levels appear only inside `## API`, where a component with distinct parts groups its props under
 `### \`PartName\``. Frontmatter is the only other structure.
+
+### Required body membership and order
+
+Title/description and Preview are site chrome, not MDX headings. The old “12 sections”
+label conflated these areas with body headings. Inventory of all 58 pages shows 20 T0
+structural pages, eight T1 pages, 28 T2–T5 UI pages and two T2 blocks. Examples vary in
+number; neither nine nor twelve is a required total.
+
+All tiers require, in order: Installation, Usage, flat named examples (zero or more),
+When to use, When not to use, API, Motion contract, accessibility/keyboard coverage,
+responsiveness/performance coverage, and AI advice. Related components may follow.
+Each required section appears once and has content. No `Examples` wrapper is allowed.
+Headings use ATX Markdown (`##`), not Setext or HTML. Only API permits `###` headings, naming one or more parts in inline code; no other
+nested headings or body `#` headings are allowed. Fenced code and comments do not
+contribute headings. Additional examples belong between Usage and When to use.
+
+- **Compact T0–T1:** `Accessibility` may include the native keyboard/focus story;
+  a separate `Keyboard interactions` is optional. Both responsiveness and performance
+  are required, as either `Responsiveness and performance` or the ordered pair
+  `Responsive behavior`, `Performance`.
+- **Standard T2–T5 UI and registry:block:** both `Accessibility` and `Keyboard interactions`
+  are required (either order), or the combined `Keyboard and accessibility`. The same
+  combined/split responsiveness and performance alternatives apply. Blocks do not
+  require separate keyboard/performance headings when the combined headings cover them.
+- AI advice is `Notes for AI` or `AI usage notes`; `Related components` is optional.
+- Input/data-owning compositions require `Validation and data ownership`: input,
+  textarea, field, input-group, checkbox, radio-group, switch, slider, toggle,
+  toggle-group, input-otp, select, combobox, calendar, data-table, date-picker, attachment.
+  It goes after accessibility and before performance, or before When to use as an
+  example of caller-owned data (the existing block convention). New input scaffolds
+  use `--input`; authors must apply this requirement to any new input API.
+
+T0 coverage explains actual parent sizing, overflow and breakpoint responsibility,
+SSR/native behavior and runtime limits. T0 means no authored animation runtime or
+interpolation, not zero JavaScript: Base UI interaction, react-resizable-panels and
+Card's optional ResizeObserver still need client code. Composed children retain their
+own motion contracts. Performance claims refer to actual APIs and the existing source
+budget (T0: at most 4 KiB gzip per item's own shipped sources, excluding dependencies),
+never a zero-byte bundle or a cross-library certification. SSR markup does not imply
+hydrated interactions work without JavaScript. T1 describes its real motion costs.
+
+`scripts/doc-template.mjs` enforces this membership/order through both registry:build
+and registry:check (therefore pnpm check); new-item validates its generated body with
+that same gate. This checks structure and nonempty coverage, not prose truth or live
+performance. Contributors must review the claims against source.
 
 ### 2.1 The Motion contract section (this project's signature content)
 
@@ -404,7 +449,7 @@ Package "how to choose a component, how to change motion, how to keep a11y" as `
 
 - [ ] `pnpm check` passes (typecheck + lint + registry + unit)
 - [ ] `pnpm test:e2e` passes (including the reduced-motion matrix)
-- [ ] The component page has all 12 sections in order, flat headings, and an interactive preview
+- [ ] The component page meets §2 tier-specific required membership/order, flat headings, and has an interactive preview
 - [ ] Registry `docs` / `meta.motion` / `meta.intensity` are complete
 - [ ] Within the size budget (computed by `registry:check`)
 - [ ] Dual-theme screenshots (pasted in the PR)

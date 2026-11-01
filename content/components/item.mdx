@@ -170,6 +170,17 @@ that animates itself cannot be interrupted by the next render.
 - Keep action buttons out of the tab order of a read-only list. Put them in
   `ItemActions` and reveal them on hover **and** focus, never hover alone.
 
+## Responsiveness and performance
+
+Items fill available width and allow wrapping. The caller owns text overflow and action placement in
+narrow containers; large collections need application pagination or virtualization.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
+contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
+The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
+application bundles are measured separately.
+
 ## Notes for AI
 
 - Reach for `Item` when the row is a sentence about one object; reach for `table`

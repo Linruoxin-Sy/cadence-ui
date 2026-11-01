@@ -18,6 +18,7 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 import matter from "gray-matter";
 import { checkCatalogIntensity } from "./catalog-intensity.mjs";
+import { checkDocTemplates } from "./doc-template.mjs";
 import { checkMotionDocs } from "./motion-docs.mjs";
 import {
   calledRecipes,
@@ -34,7 +35,7 @@ import { verifySnapshots } from "./registry-snapshots.mjs";
 const root = process.cwd();
 await verifySnapshots(root);
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
-const problems = checkCatalogIntensity(registry);
+const problems = [...checkCatalogIntensity(registry), ...(await checkDocTemplates(root, registry))];
 
 const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
 problems.push(...(await checkMotionDocs(root, registry, RECIPES)));

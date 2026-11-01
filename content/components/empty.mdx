@@ -138,6 +138,17 @@ When the region swaps from empty to populated, that transition belongs to the li
 - Keep at least one action focusable. An empty state with no way forward is a dead
   end; the primary action is the reason this component exists.
 
+## Responsiveness and performance
+
+The root can shrink with its parent and increases padding at md. Header and content have bounded
+widths; the caller owns the surrounding height and wrapping action rows.
+
+T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+children and application handlers still need their own client code. Composed controls retain their
+own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - One primary action per empty state. Two competing buttons read as a decision the

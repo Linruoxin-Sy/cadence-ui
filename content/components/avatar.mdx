@@ -115,6 +115,17 @@ the image errored, and a cross-fade would show a half-drawn face in the meantime
 - An avatar that links to a profile must be wrapped in an `<a>` with an accessible
   name; the image `alt` alone is not a link name.
 
+## Responsiveness and performance
+
+Avatar sizes are explicit rather than breakpoint-driven. Groups overlap avatars; the caller limits
+the visible count and supplies overflow text. Base UI owns image loading and fallback state after
+hydration.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Always render an `AvatarFallback`; without it a failed image leaves an empty hole.

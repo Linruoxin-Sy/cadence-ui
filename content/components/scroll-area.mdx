@@ -133,6 +133,17 @@ Caller-added smooth scrolling and CSS animation are application-owned.
   measurement loop, data processing or virtualization. Paginate or virtualize large
   datasets in the application.
 
+## Responsiveness and performance
+
+Give the root explicit dimensions so its viewport can scroll; horizontal scrolling needs the
+corresponding ScrollBar. Parent grids may need min-w-0. Base UI manages custom scrollbar interaction
+while content uses native scrolling; it does not virtualize children.
+
+T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
+works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+source; dependencies and application bundles are measured separately.
+
 ## Notes for AI
 
 - Preserve root/viewport ownership, native scrolling and Base UI render/ref support.
