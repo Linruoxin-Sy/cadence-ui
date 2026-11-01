@@ -72,6 +72,7 @@ npx shadcn@latest add @cadence/button
 - [Table](https://cadence.dev/r/table.md): Invoices, transaction histories, and small collections of structured records. (collection)
 - [Carousel](https://cadence.dev/r/carousel.md): A swipeable collection with previous and next controls. (layout)
 - [Scroll Area](https://cadence.dev/r/scroll-area.md): Constrained lists and wide content with native scrolling and custom scrollbars. (scroll)
+- [Chart](https://cadence.dev/r/chart.md): Responsive data charts with themed tooltips and legends. (collection)
 
 ## Docs
 
