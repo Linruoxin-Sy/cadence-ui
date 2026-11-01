@@ -80,6 +80,7 @@ npx shadcn@latest add @cadence/button
 - [Resizable](https://cadence.dev/r/resizable.md): Adjustable split panels with pointer and keyboard resizing. (layout)
 - [Sidebar](https://cadence.dev/r/sidebar.md): Workspace navigation for dashboards and application shells. (navigation)
 - [Data Table](https://cadence.dev/r/data-table.md): An editable payments table with sorting, filtering, selection, visibility, and pagination. ()
+- [Date Picker](https://cadence.dev/r/date-picker.md): Choose a single date or date range from an anchored calendar. (collection)
 
 ## Docs
 
@@ -4627,6 +4628,11 @@ default.
 - Do not simulate a modal confirmation with `modal`; it blocks outside interaction but still closes on
   Escape, which is not what a confirmation promises.
 
+Popover resolves its local token clock inside the portal, including timeScale and
+reducedDurationScale. Callback classes/styles are evaluated with Base UI state and
+merged last. Live reduced removes scale transitions; none cancels transitions and
+renders without hidden starting/ending opacity, including nested provider overrides.
+
 # Tooltip
 
 Hints for icon buttons, shortcuts, and truncated values.
@@ -8871,3 +8877,206 @@ block is intended for paginated collections, not an unbounded dataset benchmark.
 - Preserve all three modes of the composed controls; do not animate table geometry.
 - Related: [Table](/components/table), [Checkbox](/components/checkbox),
   [Dropdown Menu](/components/dropdown-menu), [Pagination](/components/pagination).
+
+# Date Picker
+
+Choose a single date or date range from an anchored calendar.
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/date-picker
+```
+
+The block installs Button, Calendar, Popover, their shared libraries and date-fns
+4.1.0. For manual installation copy `registry/cadence/date-picker/index.tsx` to
+`components/cadence/date-picker/index.tsx`, install those registry items and
+`date-fns@4.1.0` plus `lucide-react`. Keep the sibling tree and relative imports.
+
+## Usage
+
+```tsx
+import { DatePickerDemo } from "@/components/cadence/date-picker";
+
+export function Appointment() {
+  return <DatePickerDemo label="Appointment date" />;
+}
+```
+
+An editable composition, using the [pinned Base example](https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/examples/base/date-picker-demo.tsx)
+and [guide](https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/content/docs/components/base/date-picker.mdx),
+with new-york-v4's calendar-icon treatment. There is no new date primitive.
+The named `DatePickerDemo` export and initially empty single selection remain.
+Selection leaves the popup open, including deselection of the selected day.
+
+## Controlled date and clearing
+
+```tsx
+"use client";
+import { useState } from "react";
+import { DatePickerDemo } from "@/components/cadence/date-picker";
+import { Button } from "@/components/cadence/button";
+
+export function ControlledDate() {
+  const [date, setDate] = useState<Date>();
+  return <>
+    <DatePickerDemo value={date} onValueChange={setDate} />
+    <Button onClick={() => setDate(undefined)}>Clear</Button>
+  </>;
+}
+```
+
+A present `value` prop, including `undefined`, is controlled. Without it,
+`defaultValue` initializes internal state and `onValueChange` observes changes.
+A controlled value without a callback is read-only. Keep the ownership model
+stable. `open`, `defaultOpen`, `onOpenChange` follow Base UI Popover semantics.
+The default month is the selected month when the popup mounts; while open,
+external selection changes preserve the displayed month and focus tree. To
+navigate externally, pair `calendarProps.month` and `onMonthChange` explicitly.
+
+## Range and presets
+
+```tsx
+"use client";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { DatePickerDemo } from "@/components/cadence/date-picker";
+import { Button } from "@/components/cadence/button";
+
+export function Trip() {
+  const [range, setRange] = useState<DateRange>();
+  return <>
+    <DatePickerDemo mode="range" label="Travel dates" value={range} onValueChange={setRange} />
+    <Button onClick={() => setRange({ from: new Date(2026, 10, 10), to: new Date(2026, 10, 15) })}>Apply preset</Button>
+  </>;
+}
+```
+
+Range mode uses two months by default, matching the guide's range example.
+The first click can produce an incomplete range (`from` without `to`); both
+endpoints display once complete. DayPicker owns range rules. Pass `min`, `max`,
+`excludeDisabled` or `disabled` through `calendarProps` when your application
+needs them. Clear with a controlled `undefined` value. Presets are caller actions.
+
+## Disabled dates and birth dates
+
+```tsx
+<DatePickerDemo disabled label="Unavailable" />
+<DatePickerDemo label="Birth date" calendarProps={{
+  captionLayout: "dropdown",
+  startMonth: new Date(1920, 0), endMonth: new Date(2026, 11),
+  disabled: { after: new Date(2026, 10, 1) },
+}} />
+```
+
+`disabled` disables the trigger. `calendarProps.disabled` uses DayPicker matchers
+for individual days. Dropdown captions and controlled months retain Calendar's
+API. Application rules decide acceptable dates; disabling UI is not validation.
+
+## Locale, date input and time
+
+```tsx
+import { fr } from "date-fns/locale";
+
+<DatePickerDemo calendarProps={{ locale: fr, weekStartsOn: 1 }} />
+```
+
+The trigger uses date-fns `PPP` with the calendar locale (English by default).
+Pass Date objects, not ambiguous date strings. Use `new Date(year, monthIndex,
+day)` for local calendar dates; `new Date("2026-11-12")` parses as UTC and can
+show the previous local day. This block does not serialize or convert time zones.
+For DayPicker `timeZone`, supply dates constructed for that zone, such as
+DayPicker's `TZDate`, so trigger and calendar share civil-date fields. The caller
+owns persistence, DST policy and UTC conversion.
+
+The upstream guide also illustrates input, time and natural-language compositions.
+This copied block focuses on single/range calendar selection. Compose a labelled
+native date/time Input alongside it if needed; keep parsing and text drafts in
+the host application. No natural-language parser dependency or text validation
+is installed. Locale alone does not set direction; set `dir="rtl"` on the host
+and `calendarProps.dir="rtl"` when required.
+
+## Validation and data ownership
+
+The caller owns validation, parsing, submission, storage, fetching and time-zone
+policy. Use `triggerProps` for `aria-invalid` or `aria-describedby`. No schema,
+resolver, validation callback or hidden form input is added. Serialize selected
+values explicitly in the application.
+
+## When to use
+
+- Appointment dates and optional calendar selection.
+- Travel ranges, with application-owned presets and constraints.
+- A starting composition to edit for your application's form.
+
+## When not to use
+
+- An always-visible date grid: use [Calendar](/components/calendar).
+- Time-only entry: use a labelled [Input](/components/input) with `type="time"`.
+- Free-form language parsing: supply your application's parser and draft state.
+
+## API
+
+`DatePickerDemoProps` is a discriminated union; range values require `mode="range"`.
+Native div props, React 19 ref/cleanup, classes and styles go to `data-slot="date-picker"`.
+
+| Prop | Type | Default / behaviour |
+| --- | --- | --- |
+| `mode` | `"single" \| "range"` | `"single"` |
+| `value` / `defaultValue` | `Date` or `DateRange` | initially empty; present value is controlled |
+| `onValueChange` | `(value: Date \| undefined) => void`, range equivalent | observes selection/deselection |
+| `label` | `string` | `"Choose date"`; accessible trigger prefix and popup title |
+| `placeholder` | `string` | `"Pick a date"` |
+| `disabled` | `boolean` | `false`, disables trigger |
+| `open` / `defaultOpen` / `onOpenChange` | Popover props | Base UI ownership and event details |
+| `calendarProps` | corresponding optional-selection Calendar props | autoFocus, selected default month; range two months |
+| `triggerProps` | `ButtonProps` | outline button; caller classes/styles/callbacks last |
+| `contentProps` | `PopoverContent` props | start-aligned, available-size constrained, scrollable |
+
+Selection props (`mode`, `selected`, `onSelect`, `required`) are owned by the
+composition. Use Calendar directly for required/multiple selection. Other
+calendar overrides remain caller-owned, including month, locale, focus and
+components. A custom render must retain a focusable button and the supplied props.
+
+## Motion contract
+
+T2 describes existing control motion. No date label animation, layout tween,
+selection-keyed remount, new recipe or runtime is added.
+
+| Recipe / cause | full | reduced | none |
+| --- | --- | --- | --- |
+| `feedback.press` / trigger press | token spring scale | no scale | immediate |
+| `popup.anchored` / open | opacity and token scale | opacity only | visible first frame |
+| `exit.fade` / close | opacity and scale | opacity only | immediate |
+| `data.transition` / calendar month | token horizontal translation and opacity | opacity only | immediate |
+
+Popover resolves its own `duration.fast` clock with timeScale and reducedDurationScale
+inside the portal. Nested full can recover under outer none; OS reduce still wins.
+Live reduced drops scale and live none cancels transitions immediately. Calendar
+cancels its WAAPI effect on mode changes without replacing the grid or focused day.
+
+## Keyboard and accessibility
+
+Tab reaches the named trigger; Space/Enter opens the dialog. Calendar focuses the
+selected enabled day or its initial focus target. Arrow keys move days, Home/End
+move within the week, PageUp/PageDown navigate months. Escape dismisses and returns
+focus to the trigger. Selecting a day keeps the popup open. Screen readers hear
+the popup title, grid month, day labels and selected states. Range selection retains
+DayPicker's grid model. Button names include the label and formatted selection.
+
+## Responsiveness and performance
+
+The trigger truncates long labels within the available width. The popup is bounded
+by Base UI's available width/height and scrolls; range months stack on small screens
+and sit side by side on desktop. No document overflow is required. Deterministic
+example dates are SSR-compatible; empty uncontrolled selection renders without
+reading the clock. DayPicker's current-month fallback depends on the host clock;
+pass `defaultMonth` and `today` for deterministic server/client calendars.
+
+## Notes for AI
+
+- Keep this a registry block with namespaced dependencies and relative imports.
+- Keep value presence semantics so controlled undefined clears correctly.
+- Preserve stable Calendar identities and Base UI focus/render/event semantics.
+- Keep locale and civil-date/time-zone policy explicit in the caller.
+- Related: [Calendar](/components/calendar), [Popover](/components/popover), [Button](/components/button).

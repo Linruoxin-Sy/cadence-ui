@@ -78,6 +78,7 @@ npx shadcn@latest add @cadence/button
 - [Resizable](https://cadence.dev/r/resizable.md): Adjustable split panels with pointer and keyboard resizing. (layout)
 - [Sidebar](https://cadence.dev/r/sidebar.md): Workspace navigation for dashboards and application shells. (navigation)
 - [Data Table](https://cadence.dev/r/data-table.md): An editable payments table with sorting, filtering, selection, visibility, and pagination. ()
+- [Date Picker](https://cadence.dev/r/date-picker.md): Choose a single date or date range from an anchored calendar. (collection)
 
 ## Docs
 

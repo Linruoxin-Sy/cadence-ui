@@ -178,6 +178,11 @@ default.
 - Do not simulate a modal confirmation with `modal`; it blocks outside interaction but still closes on
   Escape, which is not what a confirmation promises.
 
+Popover resolves its local token clock inside the portal, including timeScale and
+reducedDurationScale. Callback classes/styles are evaluated with Base UI state and
+merged last. Live reduced removes scale transitions; none cancels transitions and
+renders without hidden starting/ending opacity, including nested provider overrides.
+
 ---
 
 Full index: https://cadence.dev/llms.txt
