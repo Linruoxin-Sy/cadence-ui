@@ -74,6 +74,7 @@ npx shadcn@latest add @cadence/button
 - [Scroll Area](https://cadence.dev/r/scroll-area.md): Constrained lists and wide content with native scrolling and custom scrollbars. (scroll)
 - [Chart](https://cadence.dev/r/chart.md): Responsive data charts with themed tooltips and legends. (collection)
 - [Calendar](https://cadence.dev/r/calendar.md): Select dates, multiple days, and ranges with accessible month navigation. (collection)
+- [Navigation Menu](https://cadence.dev/r/navigation-menu.md): Site navigation with shared popup content and interruptible sizing. (navigation)
 
 ## Docs
 
