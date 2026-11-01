@@ -23,11 +23,11 @@ export function SeparatorPreview() {
       </PreviewRow>
 
       <PreviewRow>
-        <div className="flex h-6 items-center gap-3 text-sm">
+        <div className="flex min-h-6 flex-wrap items-center gap-3 text-sm">
           <span>Draft</span>
-          <Separator orientation="vertical" />
+          <Separator orientation="vertical" className="data-[orientation=vertical]:h-6" />
           <span className="text-muted-foreground">Edited 2 minutes ago</span>
-          <Separator orientation="vertical" />
+          <Separator orientation="vertical" className="data-[orientation=vertical]:h-6" />
           <span className="text-muted-foreground">ada@example.com</span>
         </div>
       </PreviewRow>

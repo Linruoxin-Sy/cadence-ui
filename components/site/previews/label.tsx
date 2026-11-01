@@ -19,10 +19,8 @@ export function LabelPreview() {
           <Input id="label-preview-email" type="email" autoComplete="email" placeholder="ada@example.com" />
         </div>
 
-        <div className="grid w-56 gap-2">
-          <Label htmlFor="label-preview-slug" className="peer-disabled:opacity-50">
-            Slug
-          </Label>
+        <div className="group grid w-56 gap-2" data-disabled="true">
+          <Label htmlFor="label-preview-slug">Slug</Label>
           <Input id="label-preview-slug" className="peer" disabled defaultValue="cadence" />
         </div>
       </PreviewRow>

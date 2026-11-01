@@ -30,10 +30,12 @@ function Separator({ className, orientation = "horizontal", decorative = false, 
       data-orientation={orientation}
       orientation={orientation}
       {...a11y}
-      className={cn(
-        "shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
-        className,
-      )}
+      className={(state) =>
+        cn(
+          "shrink-0 bg-border data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px",
+          typeof className === "function" ? className(state) : className,
+        )
+      }
       {...props}
     />
   );

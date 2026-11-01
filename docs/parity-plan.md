@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B9 implementations shipped (2026-11-01); B6–B9 batch gates complete.
-> Historical B1–B5 visual gates and §8 remain open.**
+> Status: **B0–B9 implementations shipped (2026-11-01); B1 and B6–B9 batch gates complete.
+> Historical B2–B5 visual gates and §8 remain open; B2 is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -262,19 +262,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status    |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | --------- |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done   |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | ✅ done   |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ done   |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ done   |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ done   |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete  |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done   |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done   |
-| B9    | AI first                   | 3      | B1         | 3.5         | 0.5.0   | ✅ done   |
-|       | **Total**                  | **58** |            | **102**     |         |           |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                         |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------------------------------ |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                        |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | complete (§7.27)               |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | implementation done; gate open |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | implementation done; gate open |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | implementation done; gate open |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open                      |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete                       |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done                        |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done                        |
+| B9    | AI first                   | 3      | B1         | 3.5         | 0.5.0   | ✅ done                        |
+|       | **Total**                  | **58** |            | **102**     |         |                                |
 
 ### 7.0 Status discipline
 
@@ -292,7 +292,7 @@ A batch whose row still says `next` is not done. The plan is data, not a diary: 
 sidebar by `meta.batch`, the release notes read §7, and the next contributor decides where to start from
 these rows. Work that landed without updating them is a process defect, and the batch is not closed.
 
-Completed: **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
+Implementation record (batch gate status is tracked separately): **B0** — eight components removed and archived, the tier/P11 checks, the scaffold, the
 validation guide, and the `button` + `dialog` pilots are in place; `pnpm check` and the docs build are
 green, and a real `shadcn add` install was verified (see §5.1). **B1**, **B2**, **B3** and **B4** — see
 §7.1, §7.2, §7.3 and §7.4. **B5 is open**: `select` reached main on 2026-10-30 without being recorded
@@ -348,7 +348,7 @@ prerequisite to clear.
 Every batch must pass: `pnpm check`, `parity:check`, manual `data-motion` full/reduced/none,
 axe with zero violations, size budget, and dual-theme screenshots.
 
-### 7.1 B1 — ✅ complete (2026-10-29)
+### 7.1 B1 — implementation complete (2026-10-29); gate closed in §7.27
 
 - **Scope shipped:** `badge`, `kbd`, `separator`, `label`, `input`, `textarea`, `card`, `aspect-ratio`,
   `avatar`, `skeleton`, joining the `button` pilot. 12 components, 17 registry items, 12 docs, 12 previews.
@@ -380,7 +380,7 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Not yet done:** dual-theme screenshots. The headless browser in this environment could not write
   screenshots, so the visual half of the batch gate is still open; everything else is verified.
 
-### 7.2 B2 — ✅ complete (2026-10-30)
+### 7.2 B2 — implementation complete (2026-10-30); historical gate open
 
 - **Scope shipped:** `alert`, `empty`, `item`, `field`, `button-group`, `input-group`, `breadcrumb`,
   `pagination`, `spinner`. 21 components, 26 registry items, 21 docs, 21 previews.
@@ -418,7 +418,7 @@ axe with zero violations, size budget, and dual-theme screenshots.
 - **Not yet done:** dual-theme screenshots, same environment limitation as B1. The visual half of the
   batch gate stays open for both batches; everything else is verified.
 
-### 7.3 B3 — ✅ complete (2026-10-30)
+### 7.3 B3 — implementation complete (2026-10-30); historical gate open
 
 - **Scope shipped:** `checkbox`, `radio-group`, `switch`, `slider`, `toggle`, `toggle-group`,
   `input-otp`, `progress`. 29 components, 34 registry items, 29 docs, 29 previews.
@@ -475,7 +475,7 @@ axe with zero violations, size budget, and dual-theme screenshots.
   browser pass covered `full` — the site has no mode switcher, so the manual reduced/none pass is the
   one gate item still open, for all three batches.
 
-### 7.4 B4 — ✅ complete (2026-10-30)
+### 7.4 B4 — implementation complete (2026-10-30); historical gate open
 
 - **Why it started as "in progress":** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so
   one item of this batch was already live. Marking the row `next` would have made §7.0's rule ("a batch
@@ -1587,3 +1587,34 @@ With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
 | AI upstream instability                              | Backlog until prerequisites are met                            |
 | Documentation load (58 pages, 12 section slots each) | `new-item.mjs` scaffolding plus the §2 template                |
 | Existing users of the eight components               | Tagged release, migration note (import path only)              |
+
+### 7.27 Historical B1 gate — complete (2026-11-02)
+
+- Scope: eleven B1 atoms, preserving the nine static T0 parts without a provider runtime.
+- Repair Base UI state callback classes on Input, Separator and Avatar Root/Image/Fallback;
+  preserve caller-last classes, state styles, render, native events and React 19 cleanup refs.
+- Card fit content now composes caller refs with its measurement ref; supplying a ref must not
+  silently disable ResizeObserver measurement. This remains immediate layout, not motion.
+- Skeleton explicitly keeps the reduced transform-free branch; its sole recipe remains the CSS
+  opacity-only continuous data.transition, kept in reduced and stopped in none.
+- Responsive input/card grids and separator row; Button/Skeleton local mode controls allow real
+  same-node downgrade and explicit full restoration inside an outer none scope.
+- KbdGroup retains the pinned native div prop surface even though upstream renders a kbd element.
+- Validation: `pnpm check` passed 450 tests / 69 files, registry freshness/P11/tier gzip budgets
+  and parity for all 58 surfaces. Production build `.next-b1-gate` passed (69 pages).
+- Edge, workers=2: `tests/e2e/b1.spec.ts` **40/40 passed (2.0m)**. Twelve animated mode/OS
+  cases prove real Button press/release and held-pointer downgrade, and Skeleton opacity over a
+  complete CSS cycle, none cancellation, nested full restoration and live OS change. Six native
+  mode/OS cases exercise typing/selection/file input, label focus/toggle, linked badge, semantic
+  separators, avatar fallback, ratio geometry, static keys, Card content/rapid toggle/resize/focus.
+- Eleven pages × light/dark × 1280/390: full-page axe WCAG2A/2AA/2.1AA zero violations,
+  no disabled rules, no document overflow or page errors. All 44 full-page and 44 preview captures
+  reviewed; updated six pages reviewed again after docs/preview fixes. Deterministic avatar image
+  response plus independent actual broken-image fallback avoids external network flakiness.
+- Evidence: `.cache/b1-gate-e2e.log`, `.cache/b1-gate-build.log`, `.cache/b1-review-check.log`,
+  `.cache/b1-proof/<id>-<light|dark>-<1280|390>[-preview].png` (untracked).
+- Review caught invisible vertical separators and wrong disabled-label peer order; preview uses
+  an orientation-qualified height override and disabled group, with a real positive-height assertion.
+  Pulse sampling uses the computed CSS duration, not a fixed frame count tied to display Hz.
+- No recipes, motion tokens, runtime, dependencies, upstream pin or checking configuration changed.
+  B2–B5 and every §8 carried item, including global callback/popup audits, remain open.

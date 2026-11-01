@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { Badge } from "@/registry/cadence/badge";
 import { Button } from "@/registry/cadence/button";
 import {
@@ -22,13 +23,15 @@ import { PreviewStack } from "./shell";
  * the columns are equal and both cards stretch to the taller one.
  */
 export function CardPreview() {
+  const [expanded, setExpanded] = useState(false);
+  const fitRef = useRef<HTMLDivElement>(null);
   return (
     <PreviewStack>
-      <div className="grid w-full max-w-lg grid-cols-2 items-stretch gap-4">
+      <div className="grid w-full max-w-lg grid-cols-1 sm:grid-cols-2 items-stretch gap-4">
         <Card>
           <CardHeader>
             <CardTitle>Parity plan</CardTitle>
-            <CardDescription>57 components, nine batches.</CardDescription>
+            <CardDescription>58 components, ten batches.</CardDescription>
             <CardAction>
               <Badge variant="secondary">0.2.0</Badge>
             </CardAction>
@@ -56,6 +59,21 @@ export function CardPreview() {
           </CardFooter>
         </Card>
       </div>
+      <Card fit="content" ref={fitRef} data-testid="fit-card" className="max-w-sm">
+        <CardHeader>
+          <CardTitle>Content fit</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {expanded
+            ? "The surface follows its own content immediately. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows."
+            : "Short content."}
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
+            Toggle content
+          </Button>
+        </CardFooter>
+      </Card>
     </PreviewStack>
   );
 }

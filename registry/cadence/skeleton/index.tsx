@@ -30,7 +30,7 @@ function Skeleton({ className, ...props }: SkeletonProps) {
     <div
       data-slot="skeleton"
       data-motion={cm.mode}
-      className={cn("rounded-md bg-accent", pulse, className)}
+      className={cn("rounded-md bg-accent", pulse, cm.reduced && "transform-none", className)}
       {...props}
     />
   );

@@ -191,6 +191,25 @@ describe("Card fit", () => {
     expect(card.style.height).toBe("180px");
   });
 
+  it("keeps measurement when a caller supplies a React19 cleanup ref", () => {
+    const observers = stubResizeObserver();
+    stubContentHeight({ current: 120 });
+    const cleanup = vi.fn();
+    const ref = vi.fn(() => cleanup);
+    const view = render(
+      <Card fit="content" ref={ref}>
+        <CardContent>Ref body</CardContent>
+      </Card>,
+    );
+    const card = screen.getByText("Ref body").closest('[data-slot="card"]') as HTMLElement;
+    expect(ref).toHaveBeenCalledWith(card);
+    expect(card.style.height).toBe("120px");
+    expect(observers[0]?.elements).toHaveLength(1);
+    view.unmount();
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(card.style.height).toBe("");
+  });
+
   it("hands the shell back to the parent on unmount", () => {
     const observers = stubResizeObserver();
     stubContentHeight({ current: 120 });

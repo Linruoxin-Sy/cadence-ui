@@ -14,7 +14,7 @@ import { PreviewStack } from "./shell";
 export function InputPreview() {
   return (
     <PreviewStack>
-      <div className="grid w-full max-w-[30rem] grid-cols-2 gap-x-4 gap-y-5">
+      <div className="grid w-full max-w-[30rem] grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
         <div className="grid gap-2">
           <Label htmlFor="input-preview-name">Workspace</Label>
           <Input id="input-preview-name" placeholder="Acme" autoComplete="organization" />

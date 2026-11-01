@@ -1,7 +1,10 @@
 "use client";
 
 import { PlusIcon } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/registry/cadence/button";
+import type { CadenceMode } from "@/registry/cadence/lib/motion";
+import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { PreviewRow, PreviewStack } from "./shell";
 
 /**
@@ -10,45 +13,61 @@ import { PreviewRow, PreviewStack } from "./shell";
  * which tightens the horizontal padding through `has-[>svg]`, and `disabled`.
  */
 export function ButtonPreview() {
+  const [mode, setMode] = useState<CadenceMode | undefined>();
   return (
     <PreviewStack>
-      <PreviewRow>
-        <Button>Default</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
-      </PreviewRow>
+      <label className="flex items-center gap-2 text-sm">
+        Button motion
+        <select
+          aria-label="Button motion"
+          value={mode ?? "inherit"}
+          onChange={(e) => setMode(e.target.value === "inherit" ? undefined : (e.target.value as CadenceMode))}
+        >
+          <option value="inherit">Inherit</option>
+          <option value="full">Full</option>
+          <option value="reduced">Reduced</option>
+          <option value="none">None</option>
+        </select>
+      </label>
+      <CadenceProvider mode={mode}>
+        <PreviewRow>
+          <Button>Default</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="destructive">Destructive</Button>
+          <Button variant="outline">Outline</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="link">Link</Button>
+        </PreviewRow>
 
-      <PreviewRow>
-        <Button size="xs">Xs</Button>
-        <Button size="sm">Sm</Button>
-        <Button>Default</Button>
-        <Button size="lg">Lg</Button>
-        <Button size="icon-xs" aria-label="Add">
-          <PlusIcon />
-        </Button>
-        <Button size="icon-sm" aria-label="Add">
-          <PlusIcon />
-        </Button>
-        <Button size="icon" aria-label="Add">
-          <PlusIcon />
-        </Button>
-        <Button size="icon-lg" aria-label="Add">
-          <PlusIcon />
-        </Button>
-      </PreviewRow>
+        <PreviewRow>
+          <Button size="xs">Xs</Button>
+          <Button size="sm">Sm</Button>
+          <Button>Default</Button>
+          <Button size="lg">Lg</Button>
+          <Button size="icon-xs" aria-label="Add">
+            <PlusIcon />
+          </Button>
+          <Button size="icon-sm" aria-label="Add">
+            <PlusIcon />
+          </Button>
+          <Button size="icon" aria-label="Add">
+            <PlusIcon />
+          </Button>
+          <Button size="icon-lg" aria-label="Add">
+            <PlusIcon />
+          </Button>
+        </PreviewRow>
 
-      <PreviewRow>
-        <Button>
-          <PlusIcon />
-          New file
-        </Button>
-        <Button variant="outline" disabled>
-          Disabled
-        </Button>
-      </PreviewRow>
+        <PreviewRow>
+          <Button>
+            <PlusIcon />
+            New file
+          </Button>
+          <Button variant="outline" disabled>
+            Disabled
+          </Button>
+        </PreviewRow>
+      </CadenceProvider>
     </PreviewStack>
   );
 }

@@ -25,7 +25,7 @@ function Kbd({ className, ...props }: KbdProps) {
   );
 }
 
-export interface KbdGroupProps extends React.ComponentProps<"kbd"> {}
+export interface KbdGroupProps extends React.ComponentProps<"div"> {}
 
 /** Groups keys that are pressed together, e.g. `⌘` `K`, with one gap between them. */
 function KbdGroup({ className, ...props }: KbdGroupProps) {

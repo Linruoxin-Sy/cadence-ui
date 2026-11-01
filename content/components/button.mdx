@@ -130,11 +130,16 @@ import { buttonVariants } from "@/components/cadence/button";
 | `variant` | `"default" \| "destructive" \| "outline" \| "secondary" \| "ghost" \| "link"` | `"default"` | Visual weight. |
 | `size` | `"default" \| "xs" \| "sm" \| "lg" \| "icon" \| "icon-xs" \| "icon-sm" \| "icon-lg"` | `"default"` | Height and padding. |
 | `render` | `ReactElement \| (props, state) => ReactElement` | – | Base UI composition; replaces `asChild`. |
-| `className` | `string` | – | Merged last. |
+| `className` | string or state callback | – | Merged last. |
 
 All native button props are forwarded.
 
+Base UI state callbacks for `className` are evaluated before merging caller classes last.
+`style` accepts an object or a state callback and is forwarded to the primitive.
+
 ## Motion contract
+
+Recipe: `feedback.press`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

@@ -85,10 +85,13 @@ const [value, setValue] = useState("");
 | `value`         | `string \| number \| readonly string[]` | –   | Controlled value.                                  |
 | `defaultValue`  | same as `value`                     | –       | Uncontrolled initial value.                        |
 | `onValueChange` | `(value: string, details) => void`  | –       | Base UI change callback, in addition to `onChange`. |
-| `className`     | `string`                            | –       | Merged last.                                       |
+| `className`     | string or state callback                            | –       | Merged last.                                       |
 
 All native input props are forwarded, including `disabled`, `readOnly`, `required`,
 and `aria-*`.
+
+Base UI state callbacks for `className` are evaluated before merging caller classes last.
+`style` accepts an object or a state callback and is forwarded to the primitive.
 
 ## Motion contract
 

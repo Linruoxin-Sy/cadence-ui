@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -42,10 +42,24 @@ const flow =
  * re-wraps when the parent narrows. Because nothing is animated, the mode has
  * nothing to reduce: `full`, `reduced`, and `none` render the same box.
  */
-function Card({ className, size = "default", fit, children, ...props }: CardProps) {
+function Card({ className, size = "default", fit, children, ref, ...props }: CardProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const flowRef = useRef<HTMLDivElement>(null);
   const fitContent = fit === "content";
+  const mergedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node;
+      const cleanup = typeof ref === "function" ? ref(node) : undefined;
+      if (ref && typeof ref !== "function") ref.current = node;
+      return () => {
+        rootRef.current = null;
+        if (typeof cleanup === "function") cleanup();
+        else if (typeof ref === "function") ref(null);
+        else if (ref) ref.current = null;
+      };
+    },
+    [ref],
+  );
 
   useIsomorphicLayoutEffect(() => {
     if (!fitContent) return;
@@ -87,11 +101,11 @@ function Card({ className, size = "default", fit, children, ...props }: CardProp
       observer.disconnect();
       root.style.removeProperty("height");
     };
-  }, [fitContent]);
+  }, [fitContent, ref]);
 
   if (!fitContent) {
     return (
-      <div data-slot="card" data-size={size} className={cn(shell, flow, className)} {...props}>
+      <div ref={ref} data-slot="card" data-size={size} className={cn(shell, flow, className)} {...props}>
         {children}
       </div>
     );
@@ -99,7 +113,7 @@ function Card({ className, size = "default", fit, children, ...props }: CardProp
 
   return (
     <div
-      ref={rootRef}
+      ref={mergedRef}
       data-slot="card"
       data-size={size}
       data-fit="content"
