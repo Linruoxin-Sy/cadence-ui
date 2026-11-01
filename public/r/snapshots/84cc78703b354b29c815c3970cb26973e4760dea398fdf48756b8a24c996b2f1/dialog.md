@@ -1,0 +1,150 @@
+# Dialog
+
+> Focused tasks such as renaming, inviting, or confirming.
+
+- Registry item: https://cadence.dev/r/dialog.json
+- Install: `npx shadcn@latest add @cadence/dialog`
+- Type: registry:ui
+- Since: 0.2.0
+- Motion recipes: popup.anchored, exit.fade
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/dialog
+```
+
+This also installs `button`, which the dialog uses for its close control.
+
+## Usage
+
+```tsx
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Button } from "@/components/cadence/button";
+
+export function DeleteProject() {
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="outline" />}>Delete project</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete this project?</DialogTitle>
+          <DialogDescription>This removes every deployment and cannot be undone.</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+          <Button variant="destructive">Delete project</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Controlled
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent>…</DialogContent>
+</Dialog>;
+```
+
+## Without the built-in close button
+
+```tsx
+<DialogContent showCloseButton={false}>…</DialogContent>
+```
+
+## Footer with a close action
+
+```tsx
+<DialogFooter showCloseButton>
+  <Button>Save</Button>
+</DialogFooter>
+```
+
+## When to use
+
+- A focused task that must interrupt the page: rename, invite, confirm.
+- Content that needs a modal, a focus trap, and an obvious escape route.
+- A short form whose result matters more than the page behind it.
+
+## When not to use
+
+- Non-blocking hints and menus; use `popover` or `tooltip`.
+- Long multi-step flows; use a page or a wizard.
+- Mobile sheets with drag gestures; use `drawer`.
+
+## API
+
+| Part | Props | Notes |
+| --- | --- | --- |
+| `Dialog` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root. |
+| `DialogTrigger` | native button props, `render` | Opens the dialog. |
+| `DialogContent` | `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
+| `DialogOverlay` | `className` | Only needed when replacing `DialogContent`. |
+| `DialogClose` | native button props, `render` | Closes the dialog. |
+| `DialogHeader` / `DialogFooter` | `className` | Layout only. |
+| `DialogTitle` | `className` | Required accessible name. |
+| `DialogDescription` | `className` | Optional supporting text. |
+
+## Motion contract
+
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade` | yes |
+| none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
+
+The panel stays mounted while its exit transition runs; Base UI delays unmount until the
+transition ends, so reopening mid-exit reverses cleanly.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Cycles focus inside the dialog. |
+| Escape | Closes the dialog and returns focus to the trigger. |
+| Enter / Space | Activates the focused control. |
+
+## Accessibility
+
+- Base UI provides `role="dialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby`,
+  focus trapping, focus return, scroll lock, and Escape handling.
+- The close button is a real button with a screen-reader-only label.
+- `DialogTitle` is required; a dialog without an accessible name is invalid.
+- Content is unmounted after the exit transition, so focus is never lost mid-flight.
+
+## Responsive behavior
+
+The panel is centred and capped at `max-w-lg`; on narrow viewports it keeps a 1rem gutter.
+Long content scrolls inside the popup rather than the page.
+
+## Performance
+
+- One popup tree is mounted only while open.
+- Animates opacity and scale only; no layout reads and no JavaScript animation loop.
+
+## Notes for AI
+
+- Always render a `DialogTitle`; it is the accessible name.
+- Keep the confirming action specific ("Delete project", not "OK").
+- Do not animate height inside the dialog; mount content instead.
+
+---
+
+Full index: https://cadence.dev/llms.txt

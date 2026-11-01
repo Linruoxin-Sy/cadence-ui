@@ -1,1 +1,4 @@
 * text=auto eol=lf
+
+# Frozen distributions are exact bytes, including captured line endings.
+/public/r/snapshots/** -text

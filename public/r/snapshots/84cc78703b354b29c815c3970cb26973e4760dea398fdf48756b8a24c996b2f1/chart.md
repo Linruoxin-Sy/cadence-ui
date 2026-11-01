@@ -1,0 +1,174 @@
+# Chart
+
+> Responsive data charts with themed tooltips and legends.
+
+- Registry item: https://cadence.dev/r/chart.json
+- Install: `npx shadcn@latest add @cadence/chart`
+- Type: registry:ui
+- Since: 0.4.0
+- Motion recipes: data.transition
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/chart
+```
+
+## Usage
+
+```tsx
+import { Bar, BarChart, XAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/cadence/chart";
+
+const config = { visits: { label: "Visits", color: "var(--primary)" } };
+const data = [{ month: "Jan", visits: 186 }, { month: "Feb", visits: 305 }];
+
+export function Example() {
+  return (
+    <ChartContainer config={config} className="min-h-48 w-full" aria-label="Monthly visits">
+      <BarChart accessibilityLayer data={data}>
+        <XAxis dataKey="month" />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <Bar dataKey="visits" fill="var(--color-visits)" />
+      </BarChart>
+    </ChartContainer>
+  );
+}
+```
+
+## Legends and theme colours
+
+```tsx
+const config = {
+  visits: { label: "Visits", theme: { light: "#334155", dark: "#cbd5e1" } },
+};
+// Inside your Recharts chart:
+<ChartLegend content={<ChartLegendContent />} />
+```
+
+ChartStyle writes scoped `--color-<key>` variables for both themes. Config labels and optional
+icons are shared by tooltip and legend; use the same data keys in the series and config.
+
+## Tooltip indicators and formatting
+
+```tsx
+<ChartTooltip content={<ChartTooltipContent indicator="dashed" hideLabel />} />
+<ChartTooltip content={<ChartTooltipContent indicator="line" nameKey="category" labelKey="month" />} />
+```
+
+Use `formatter` for custom value rows and `labelFormatter` for the heading. `hideIndicator`
+hides the colour marker; an explicit config icon retains upstream precedence. Entries with
+`type="none"` are omitted. A single line/dashed row nests its label beside its value.
+
+## Live data and motion ownership
+
+```tsx
+// Replacing data interpolates the existing series under full motion.
+<BarChart accessibilityLayer data={latestData}>
+  <Bar dataKey="visits" fill="var(--color-visits)" />
+</BarChart>
+```
+
+Recharts owns the data model, chart type, axes, series and current interpolation state. Cadence
+owns the `data.transition` clock via the public Recharts controller. Series `isAnimationActive={false}`
+opts out; explicit true, duration, delay or easing cannot override the Cadence clock. Tooltip
+position changes are immediate, including when `isAnimationActive` is supplied on ChartTooltip.
+Custom shapes, nested animation controllers and independent CSS/WAAPI must honour the same modes.
+
+## When to use
+
+- Comparing categories with a bar chart.
+- Showing trends with Recharts Line/Area series.
+- Sharing labels, colours and formatting between series, tooltip and legend.
+
+## When not to use
+
+- Exact values without a visual comparison: use Table.
+- A single completion value: use Progress.
+- Large datasets requiring canvas/WebGL: choose a dedicated rendering engine.
+
+## API
+
+### `ChartContainer`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| config | ChartConfig | required | Per-series label, icon, color or light/dark theme. |
+| children | ResponsiveContainer children | required | Recharts chart composition. |
+| initialDimension | `{ width: number; height: number }` | 320 × 200 | Initial SSR/responsive fallback. |
+| id | string | React useId | Scoped data-chart suffix; upstream does not forward id as a DOM id. |
+| className / style / ref | div props | — | Applied to outer div; classes merged last. |
+
+### `ChartTooltip` and `ChartTooltipContent`
+
+ChartTooltip accepts Recharts Tooltip props; positional CSS animation is always disabled.
+ChartTooltipContent retains upstream Recharts Tooltip, default content and div prop types.
+As upstream, it consumes its listed formatting props rather than forwarding arbitrary DOM props.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| indicator | dot / line / dashed | dot | Series marker. |
+| hideLabel / hideIndicator | boolean | false | Suppress heading / marker. |
+| nameKey / labelKey | string | — | Resolve config keys from payload. |
+| formatter / labelFormatter | Recharts callbacks | — | Custom row / heading. |
+| color / labelClassName / className | string | — | Marker / heading / root styles. |
+| active / payload / label | Recharts content props | — | Usually injected by Tooltip. |
+
+### `ChartLegend`, `ChartLegendContent`, `ChartStyle`, `ChartConfig`
+
+ChartLegend is Recharts Legend. ChartLegendContent accepts default legend content + div prop
+types; consumes className, payload, nameKey, hideIcon=false, verticalAlign="bottom". Top alignment
+adds bottom padding. As upstream, arbitrary DOM props are not forwarded. ChartStyle accepts id
+and config and emits nothing without configured colours. ChartConfig is a record of label/icon
+plus either color or a complete light/dark theme map. Helpers require ChartContainer context.
+
+## Motion contract
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| Series enter / data update | SVG data geometry (T4 engine form) | `data.transition` | Recharts retargets from its series state |
+| Tooltip / legend | Immediate placement; no wrapper reveal | — | Immediate |
+| Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition` | Running controller completes |
+| None | Zero animation duration; final data | `data.transition` | Running controller completes |
+
+The full clock is duration.base / ease.out, scaled by provider timeScale. Reduced adds no fade
+because comparison must remain legible. Static SVG coordinate transforms are retained in all
+modes. This is not a DOM layout animation. Mode changes do not remount the chart.
+
+## Accessibility
+
+Give the chart an accessible name, keep Recharts accessibilityLayer enabled, and provide a
+text summary or data table for exact values. Tooltips are supplemental. Labels and values must
+convey meaning independently of colour. Use a visible focus ring on the chart surface when needed.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Enter / leave the Recharts chart surface. |
+| ArrowLeft / ArrowRight | Move the active data point and tooltip in Cartesian charts. |
+
+Legend content is descriptive, not a toggle control. Add native buttons for series filtering.
+
+## Responsive behavior
+
+Give ChartContainer a nonzero height or min-height. ResponsiveContainer measures available
+space through ResizeObserver; the initialDimension fallback is 320 × 200. Use fewer ticks and
+short labels on narrow screens; a caption and data table remain available without pointer input.
+
+## Performance
+
+Recharts is an explicit dependency, loaded only on chart pages in this site. Limit plotted data
+and series rather than animating thousands of marks. Cadence uses one rAF per active series,
+cancels on cleanup, and completes immediately in reduced/none. No render-time DOM measurement
+or wrapper entrance is added. Browser evidence covers data updates, resize and mode downgrade.
+
+## Notes for AI
+
+Keep the upstream composition: ChartContainer wraps a Recharts chart; it does not accept data.
+Import series and axes from Recharts. Never erase SVG coordinate transforms to satisfy a motion
+assertion. Related: Table for values, Progress for one completion value, Calendar for dates.
+
+---
+
+Full index: https://cadence.dev/llms.txt

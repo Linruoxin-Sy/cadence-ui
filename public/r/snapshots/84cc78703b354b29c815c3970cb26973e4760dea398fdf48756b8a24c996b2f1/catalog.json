@@ -1,0 +1,2101 @@
+[
+  {
+    "name": "cadence-base",
+    "type": "registry:base",
+    "title": "Cadence base",
+    "description": "Pins a Cadence project to Base UI, lucide icons, and the neutral shadcn theme.",
+    "categories": [],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/cadence-base.md",
+    "item": "/r/cadence-base.json"
+  },
+  {
+    "name": "cadence-motion",
+    "type": "registry:lib",
+    "title": "Motion presets",
+    "description": "Durations, easings, springs, geometry helpers, and recipe resolution shared by every Cadence component.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/cadence-motion.md",
+    "item": "/r/cadence-motion.json"
+  },
+  {
+    "name": "cadence-utils",
+    "type": "registry:lib",
+    "title": "Utilities",
+    "description": "The cn() helper every Cadence component uses to merge Tailwind classes.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [
+      "clsx",
+      "tailwind-merge"
+    ],
+    "registryDependencies": [],
+    "docs": "/r/cadence-utils.md",
+    "item": "/r/cadence-utils.json"
+  },
+  {
+    "name": "cadence-provider",
+    "type": "registry:lib",
+    "title": "Provider",
+    "description": "Optional provider that wires prefers-reduced-motion, motion intensity, and shared defaults into one MotionConfig.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils"
+    ],
+    "docs": "/r/cadence-provider.md",
+    "item": "/r/cadence-provider.json"
+  },
+  {
+    "name": "cadence-theme",
+    "type": "registry:theme",
+    "title": "Cadence theme",
+    "description": "Motion CSS variables and the three-mode duration overrides, layered on top of the shadcn theme.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/cadence-theme.md",
+    "item": "/r/cadence-theme.json"
+  },
+  {
+    "name": "button",
+    "type": "registry:ui",
+    "title": "Button",
+    "description": "Commands such as save, submit, and delete.",
+    "categories": [
+      "form",
+      "feedback"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.2.0",
+    "tier": "T1",
+    "batch": "B1",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/button.md",
+    "item": "/r/button.json"
+  },
+  {
+    "name": "badge",
+    "type": "registry:ui",
+    "title": "Badge",
+    "description": "Statuses, counts, and categories.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/badge.md",
+    "item": "/r/badge.json"
+  },
+  {
+    "name": "kbd",
+    "type": "registry:ui",
+    "title": "Kbd",
+    "description": "Keyboard shortcuts in tooltips, menus, and command lists.",
+    "categories": [
+      "utility"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/kbd.md",
+    "item": "/r/kbd.json"
+  },
+  {
+    "name": "separator",
+    "type": "registry:ui",
+    "title": "Separator",
+    "description": "Dividing sections, menu groups, and toolbars.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/separator.md",
+    "item": "/r/separator.json"
+  },
+  {
+    "name": "label",
+    "type": "registry:ui",
+    "title": "Label",
+    "description": "Naming inputs, selects, and other form controls.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/label.md",
+    "item": "/r/label.json"
+  },
+  {
+    "name": "input",
+    "type": "registry:ui",
+    "title": "Input",
+    "description": "Names, emails, search queries, and other short text.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/input.md",
+    "item": "/r/input.json"
+  },
+  {
+    "name": "textarea",
+    "type": "registry:ui",
+    "title": "Textarea",
+    "description": "Comments, descriptions, and other longer text.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/textarea.md",
+    "item": "/r/textarea.json"
+  },
+  {
+    "name": "card",
+    "type": "registry:ui",
+    "title": "Card",
+    "description": "Grouping related content, such as a summary or a record.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/card.md",
+    "item": "/r/card.json"
+  },
+  {
+    "name": "aspect-ratio",
+    "type": "registry:ui",
+    "title": "Aspect Ratio",
+    "description": "Images, videos, and embeds that must keep their shape.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/aspect-ratio.md",
+    "item": "/r/aspect-ratio.json"
+  },
+  {
+    "name": "avatar",
+    "type": "registry:ui",
+    "title": "Avatar",
+    "description": "People in comments, assignees, and member lists.",
+    "categories": [
+      "data"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B1",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/avatar.md",
+    "item": "/r/avatar.json"
+  },
+  {
+    "name": "skeleton",
+    "type": "registry:ui",
+    "title": "Skeleton",
+    "description": "Placeholders while cards, tables, and lists load.",
+    "categories": [
+      "feedback",
+      "data"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.2.0",
+    "tier": "T4",
+    "batch": "B1",
+    "motion": [
+      {
+        "recipe": "data.transition",
+        "form": "continuous"
+      }
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/skeleton.md",
+    "item": "/r/skeleton.json"
+  },
+  {
+    "name": "alert",
+    "type": "registry:ui",
+    "title": "Alert",
+    "description": "Errors, warnings, and page-level status messages.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/alert.md",
+    "item": "/r/alert.json"
+  },
+  {
+    "name": "empty",
+    "type": "registry:ui",
+    "title": "Empty",
+    "description": "Lists, tables, and panels with nothing to show yet.",
+    "categories": [
+      "feedback",
+      "layout"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/empty.md",
+    "item": "/r/empty.json"
+  },
+  {
+    "name": "item",
+    "type": "registry:ui",
+    "title": "Item",
+    "description": "Rows in lists of files, members, and invoices.",
+    "categories": [
+      "data",
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/separator"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/item.md",
+    "item": "/r/item.json"
+  },
+  {
+    "name": "field",
+    "type": "registry:ui",
+    "title": "Field",
+    "description": "Form controls that need a label, help text, and error.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/label",
+      "@cadence/separator"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/field.md",
+    "item": "/r/field.json"
+  },
+  {
+    "name": "button-group",
+    "type": "registry:ui",
+    "title": "Button Group",
+    "description": "Toolbars and related actions on the same object.",
+    "categories": [
+      "form",
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/separator"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/button-group.md",
+    "item": "/r/button-group.json"
+  },
+  {
+    "name": "input-group",
+    "type": "registry:ui",
+    "title": "Input Group",
+    "description": "Currency fields, URLs, and inputs with inline actions.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "class-variance-authority"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-utils",
+      "@cadence/input",
+      "@cadence/textarea"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/input-group.md",
+    "item": "/r/input-group.json"
+  },
+  {
+    "name": "breadcrumb",
+    "type": "registry:ui",
+    "title": "Breadcrumb",
+    "description": "Hierarchy navigation, from the root to the current page.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/breadcrumb.md",
+    "item": "/r/breadcrumb.json"
+  },
+  {
+    "name": "pagination",
+    "type": "registry:ui",
+    "title": "Pagination",
+    "description": "Long result sets, tables, and search results.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.2.0",
+    "tier": "T0",
+    "batch": "B2",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/pagination.md",
+    "item": "/r/pagination.json"
+  },
+  {
+    "name": "spinner",
+    "type": "registry:ui",
+    "title": "Spinner",
+    "description": "Short waits such as saving, sending, or publishing.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.2.0",
+    "tier": "T4",
+    "batch": "B2",
+    "motion": [
+      {
+        "recipe": "data.transition",
+        "form": "continuous"
+      }
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/spinner.md",
+    "item": "/r/spinner.json"
+  },
+  {
+    "name": "dialog",
+    "type": "registry:ui",
+    "title": "Dialog",
+    "description": "Focused tasks such as renaming, inviting, or confirming.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.2.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      {
+        "recipe": "popup.anchored",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "exit.fade",
+        "form": "css-transition"
+      }
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/dialog.md",
+    "item": "/r/dialog.json"
+  },
+  {
+    "name": "checkbox",
+    "type": "registry:ui",
+    "title": "Checkbox",
+    "description": "Independent yes/no choices and multi-select lists.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "state.morph"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/checkbox.md",
+    "item": "/r/checkbox.json"
+  },
+  {
+    "name": "radio-group",
+    "type": "registry:ui",
+    "title": "Radio Group",
+    "description": "Choosing one option from a small, fixed set.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "state.morph"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/radio-group.md",
+    "item": "/r/radio-group.json"
+  },
+  {
+    "name": "switch",
+    "type": "registry:ui",
+    "title": "Switch",
+    "description": "Settings that take effect immediately, such as alerts or visibility.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "state.morph"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/switch.md",
+    "item": "/r/switch.json"
+  },
+  {
+    "name": "slider",
+    "type": "registry:ui",
+    "title": "Slider",
+    "description": "Volume, brightness, zoom, and price ranges.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/slider.md",
+    "item": "/r/slider.json"
+  },
+  {
+    "name": "toggle",
+    "type": "registry:ui",
+    "title": "Toggle",
+    "description": "Bold, italic, preview, and other on/off modes.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/toggle.md",
+    "item": "/r/toggle.json"
+  },
+  {
+    "name": "toggle-group",
+    "type": "registry:ui",
+    "title": "Toggle Group",
+    "description": "Text alignment, view density, and other mode sets.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils",
+      "@cadence/toggle"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "parity": {
+      "props": [
+        {
+          "path": "ToggleGroup.spacing",
+          "reason": "base defaults spacing to 2, new-york-v4 to 0. Cadence follows the visuals: 0 is the segmented control every shadcn example shows, and the gap is one prop away."
+        }
+      ]
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/toggle-group.md",
+    "item": "/r/toggle-group.json"
+  },
+  {
+    "name": "input-otp",
+    "type": "registry:ui",
+    "title": "Input OTP",
+    "description": "Login codes, email verification, and device pairing.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "input-otp",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T1",
+    "batch": "B3",
+    "motion": [
+      "state.morph"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/input-otp.md",
+    "item": "/r/input-otp.json"
+  },
+  {
+    "name": "progress",
+    "type": "registry:ui",
+    "title": "Progress",
+    "description": "Uploads, imports, and other work with a measurable end.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.3.0",
+    "tier": "T4",
+    "batch": "B3",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/progress.md",
+    "item": "/r/progress.json"
+  },
+  {
+    "name": "alert-dialog",
+    "type": "registry:ui",
+    "title": "Alert Dialog",
+    "description": "Destructive or irreversible actions that need confirmation.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      {
+        "recipe": "popup.anchored",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "exit.fade",
+        "form": "css-transition"
+      }
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/alert-dialog.md",
+    "item": "/r/alert-dialog.json"
+  },
+  {
+    "name": "popover",
+    "type": "registry:ui",
+    "title": "Popover",
+    "description": "Filters, share links, and other controls tied to a trigger.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/popover.md",
+    "item": "/r/popover.json"
+  },
+  {
+    "name": "tooltip",
+    "type": "registry:ui",
+    "title": "Tooltip",
+    "description": "Hints for icon buttons, shortcuts, and truncated values.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/tooltip.md",
+    "item": "/r/tooltip.json"
+  },
+  {
+    "name": "hover-card",
+    "type": "registry:ui",
+    "title": "Hover Card",
+    "description": "Previews of links, profiles, and repositories.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/hover-card.md",
+    "item": "/r/hover-card.json"
+  },
+  {
+    "name": "sheet",
+    "type": "registry:ui",
+    "title": "Sheet",
+    "description": "Filters, details, and settings that keep the page in view.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/sheet.md",
+    "item": "/r/sheet.json"
+  },
+  {
+    "name": "drawer",
+    "type": "registry:ui",
+    "title": "Drawer",
+    "description": "Quick tasks on touch screens, such as share or move.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B4",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/drawer.md",
+    "item": "/r/drawer.json"
+  },
+  {
+    "name": "select",
+    "type": "registry:ui",
+    "title": "Select",
+    "description": "Choosing one value from a short list of options.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.4.0",
+    "tier": "T3",
+    "batch": "B5",
+    "motion": [
+      "popup.anchored",
+      "geometry.resize",
+      "handoff",
+      "state.morph"
+    ],
+    "intensity": "expressive",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/select.md",
+    "item": "/r/select.json"
+  },
+  {
+    "name": "combobox",
+    "type": "registry:ui",
+    "title": "Combobox",
+    "description": "Picking from a long list you can filter by typing.",
+    "categories": [
+      "form"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/input-group"
+    ],
+    "since": "0.4.0",
+    "tier": "T2",
+    "batch": "B5",
+    "motion": [
+      "popup.anchored",
+      "exit.fade",
+      "state.morph"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/combobox.md",
+    "item": "/r/combobox.json"
+  },
+  {
+    "name": "dropdown-menu",
+    "type": "registry:ui",
+    "title": "Dropdown Menu",
+    "description": "Row actions, filters, and view settings behind one button.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.4.0",
+    "tier": "T2",
+    "batch": "B5",
+    "motion": [
+      "popup.anchored",
+      "exit.fade",
+      "state.morph"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/dropdown-menu.md",
+    "item": "/r/dropdown-menu.json"
+  },
+  {
+    "name": "context-menu",
+    "type": "registry:ui",
+    "title": "Context Menu",
+    "description": "Right-click actions on a file, row, or canvas.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.4.0",
+    "tier": "T2",
+    "batch": "B5",
+    "motion": [
+      "popup.anchored",
+      "exit.fade",
+      "state.morph"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/context-menu.md",
+    "item": "/r/context-menu.json"
+  },
+  {
+    "name": "menubar",
+    "type": "registry:ui",
+    "title": "Menubar",
+    "description": "Application menus along the top of a window.",
+    "categories": [
+      "overlay"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-utils",
+      "@cadence/dropdown-menu"
+    ],
+    "since": "0.4.0",
+    "tier": "T2",
+    "batch": "B5",
+    "motion": [
+      "popup.anchored",
+      "exit.fade",
+      "state.morph"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/menubar.md",
+    "item": "/r/menubar.json"
+  },
+  {
+    "name": "code-block",
+    "type": "registry:ui",
+    "title": "Code block",
+    "description": "Install commands, source snippets, and tool output.",
+    "categories": [
+      "ai"
+    ],
+    "dependencies": [
+      "class-variance-authority",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/code-highlight"
+    ],
+    "since": "0.5.0",
+    "tier": "T5",
+    "batch": "B9",
+    "motion": [
+      "data.transition",
+      "layout.shared",
+      "state.morph",
+      "geometry.resize"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/code-block.md",
+    "item": "/r/code-block.json"
+  },
+  {
+    "name": "code-highlight",
+    "type": "registry:lib",
+    "title": "Code highlighting",
+    "description": "The Shiki-backed tokenizer behind code-block: one node per line, streaming-aware, loaded on demand.",
+    "categories": [
+      "utility"
+    ],
+    "dependencies": [
+      "shiki"
+    ],
+    "registryDependencies": [],
+    "docs": "/r/code-highlight.md",
+    "item": "/r/code-highlight.json"
+  },
+  {
+    "name": "command",
+    "type": "registry:ui",
+    "title": "Command",
+    "description": "Search and run actions from a keyboard-driven command palette.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "cmdk",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/dialog",
+      "@cadence/input-group"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B5",
+    "motion": [
+      {
+        "recipe": "popup.anchored",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "exit.fade",
+        "form": "css-transition"
+      }
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/command.md",
+    "item": "/r/command.json"
+  },
+  {
+    "name": "toast",
+    "type": "registry:ui",
+    "title": "Toast",
+    "description": "Transient notifications with accessible actions and dismissal.",
+    "categories": [
+      "feedback"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/button"
+    ],
+    "since": "0.3.0",
+    "tier": "T2",
+    "batch": "B5",
+    "motion": [
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/toast.md",
+    "item": "/r/toast.json"
+  },
+  {
+    "name": "accordion",
+    "type": "registry:ui",
+    "title": "Accordion",
+    "description": "Reveal related sections while keeping their headings easy to scan.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.4.0",
+    "tier": "T3",
+    "batch": "B6",
+    "motion": [
+      {
+        "recipe": "geometry.resize",
+        "form": "css-transition"
+      }
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/accordion.md",
+    "item": "/r/accordion.json"
+  },
+  {
+    "name": "collapsible",
+    "type": "registry:ui",
+    "title": "Collapsible",
+    "description": "Reveal optional detail with a standalone disclosure.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.4.0",
+    "tier": "T3",
+    "batch": "B6",
+    "motion": [
+      {
+        "recipe": "geometry.resize",
+        "form": "css-transition"
+      }
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/collapsible.md",
+    "item": "/r/collapsible.json"
+  },
+  {
+    "name": "tabs",
+    "type": "registry:ui",
+    "title": "Tabs",
+    "description": "Switch between peer views with a shared selection indicator.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.4.0",
+    "tier": "T3",
+    "batch": "B6",
+    "motion": [
+      "layout.shared"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/tabs.md",
+    "item": "/r/tabs.json"
+  },
+  {
+    "name": "table",
+    "type": "registry:ui",
+    "title": "Table",
+    "description": "Invoices, transaction histories, and small collections of structured records.",
+    "categories": [
+      "collection"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.4.0",
+    "tier": "T0",
+    "batch": "B6",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/table.md",
+    "item": "/r/table.json"
+  },
+  {
+    "name": "carousel",
+    "type": "registry:ui",
+    "title": "Carousel",
+    "description": "A swipeable collection with previous and next controls.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [
+      "embla-carousel-react@8.6.0",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.4.0",
+    "tier": "T4",
+    "batch": "B6",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/carousel.md",
+    "item": "/r/carousel.json"
+  },
+  {
+    "name": "scroll-area",
+    "type": "registry:ui",
+    "title": "Scroll Area",
+    "description": "Constrained lists and wide content with native scrolling and custom scrollbars.",
+    "categories": [
+      "scroll"
+    ],
+    "dependencies": [
+      "@base-ui/react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.4.0",
+    "tier": "T0",
+    "batch": "B6",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/scroll-area.md",
+    "item": "/r/scroll-area.json"
+  },
+  {
+    "name": "chart",
+    "type": "registry:ui",
+    "title": "Chart",
+    "description": "Responsive data charts with themed tooltips and legends.",
+    "categories": [
+      "collection"
+    ],
+    "dependencies": [
+      "recharts@3.10.1",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.4.0",
+    "tier": "T4",
+    "batch": "B7",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/chart.md",
+    "item": "/r/chart.json"
+  },
+  {
+    "name": "calendar",
+    "type": "registry:ui",
+    "title": "Calendar",
+    "description": "Select dates, multiple days, and ranges with accessible month navigation.",
+    "categories": [
+      "collection"
+    ],
+    "dependencies": [
+      "react-day-picker@9.13.2",
+      "date-fns@4.1.0",
+      "lucide-react",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/button"
+    ],
+    "since": "0.5.0",
+    "tier": "T4",
+    "batch": "B7",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "subtle",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/calendar.md",
+    "item": "/r/calendar.json"
+  },
+  {
+    "name": "navigation-menu",
+    "type": "registry:ui",
+    "title": "Navigation Menu",
+    "description": "Site navigation with shared popup content and interruptible sizing.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion",
+      "class-variance-authority",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.5.0",
+    "tier": "T3",
+    "batch": "B7",
+    "motion": [
+      "popup.anchored",
+      "exit.fade",
+      {
+        "recipe": "geometry.resize",
+        "form": "css-transition"
+      }
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/navigation-menu.md",
+    "item": "/r/navigation-menu.json"
+  },
+  {
+    "name": "resizable",
+    "type": "registry:ui",
+    "title": "Resizable",
+    "description": "Adjustable split panels with pointer and keyboard resizing.",
+    "categories": [
+      "layout"
+    ],
+    "dependencies": [
+      "react-resizable-panels@4.16.0",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils"
+    ],
+    "since": "0.4.0",
+    "tier": "T0",
+    "batch": "B7",
+    "motion": [],
+    "intensity": "subtle",
+    "complexity": "S",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/resizable.md",
+    "item": "/r/resizable.json"
+  },
+  {
+    "name": "use-mobile",
+    "type": "registry:hook",
+    "title": "Mobile breakpoint",
+    "description": "Responsive viewport detection for sidebar layouts.",
+    "categories": [],
+    "dependencies": [],
+    "registryDependencies": [],
+    "docs": "/r/use-mobile.md",
+    "item": "/r/use-mobile.json"
+  },
+  {
+    "name": "sidebar",
+    "type": "registry:ui",
+    "title": "Sidebar",
+    "description": "Workspace navigation for dashboards and application shells.",
+    "categories": [
+      "navigation"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "motion",
+      "class-variance-authority",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-utils",
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider",
+      "@cadence/use-mobile",
+      "@cadence/button",
+      "@cadence/input",
+      "@cadence/separator",
+      "@cadence/sheet",
+      "@cadence/skeleton",
+      "@cadence/tooltip"
+    ],
+    "since": "0.5.0",
+    "tier": "T3",
+    "batch": "B7",
+    "motion": [
+      "layout.move"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/sidebar.md",
+    "item": "/r/sidebar.json"
+  },
+  {
+    "name": "data-table",
+    "type": "registry:block",
+    "title": "Data Table",
+    "description": "An editable payments table with sorting, filtering, selection, visibility, and pagination.",
+    "categories": [
+      "collection"
+    ],
+    "dependencies": [
+      "@tanstack/react-table@9.3.1"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/checkbox",
+      "@cadence/dropdown-menu",
+      "@cadence/input",
+      "@cadence/table",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.5.0",
+    "tier": "T2",
+    "batch": "B8",
+    "motion": [
+      "feedback.press",
+      "state.morph",
+      "popup.anchored",
+      "exit.fade"
+    ],
+    "intensity": "medium",
+    "complexity": "L",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10",
+      "path": "apps/v4/examples/base/data-table-demo.tsx",
+      "guide": "apps/v4/content/docs/components/base/data-table.mdx"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/data-table.md",
+    "item": "/r/data-table.json"
+  },
+  {
+    "name": "date-picker",
+    "type": "registry:block",
+    "title": "Date Picker",
+    "description": "Choose a single date or date range from an anchored calendar.",
+    "categories": [
+      "collection"
+    ],
+    "dependencies": [
+      "date-fns@4.1.0",
+      "lucide-react"
+    ],
+    "registryDependencies": [
+      "@cadence/button",
+      "@cadence/calendar",
+      "@cadence/popover",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.5.0",
+    "tier": "T2",
+    "batch": "B8",
+    "motion": [
+      "feedback.press",
+      "popup.anchored",
+      "exit.fade",
+      "data.transition"
+    ],
+    "intensity": "medium",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10",
+      "path": "apps/v4/examples/base/date-picker-demo.tsx",
+      "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/date-picker.md",
+    "item": "/r/date-picker.json"
+  },
+  {
+    "name": "attachment",
+    "type": "registry:ui",
+    "title": "Attachment",
+    "description": "Displays file media, metadata, caller-owned upload state, and actions.",
+    "categories": [
+      "ai"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/button"
+    ],
+    "since": "0.5.0",
+    "tier": "T5",
+    "batch": "B9",
+    "motion": [
+      {
+        "recipe": "data.transition",
+        "form": "continuous"
+      },
+      "feedback.press"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10",
+      "guide": "apps/v4/content/docs/components/base/attachment.mdx"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/attachment.md",
+    "item": "/r/attachment.json"
+  },
+  {
+    "name": "bubble",
+    "type": "registry:ui",
+    "title": "Bubble",
+    "description": "Displays conversational content with variants, grouping, reactions, and polymorphic surfaces.",
+    "categories": [
+      "ai"
+    ],
+    "dependencies": [
+      "@base-ui/react",
+      "class-variance-authority",
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider"
+    ],
+    "since": "0.5.0",
+    "tier": "T5",
+    "batch": "B9",
+    "motion": [
+      "data.transition"
+    ],
+    "intensity": "subtle",
+    "complexity": "M",
+    "upstream": {
+      "registry": "shadcn",
+      "style": "base-ui",
+      "version": "2026-10"
+    },
+    "sourceSha": "18b10ad",
+    "docs": "/r/bubble.md",
+    "item": "/r/bubble.json"
+  }
+]

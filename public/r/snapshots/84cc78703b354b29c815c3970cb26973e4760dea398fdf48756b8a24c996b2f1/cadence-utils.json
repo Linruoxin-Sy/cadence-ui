@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cadence-utils",
+  "title": "Utilities",
+  "description": "The cn() helper every Cadence component uses to merge Tailwind classes.",
+  "dependencies": [
+    "clsx",
+    "tailwind-merge"
+  ],
+  "files": [
+    {
+      "path": "registry/cadence/lib/cn.ts",
+      "content": "import { type ClassValue, clsx } from \"clsx\";\nimport { twMerge } from \"tailwind-merge\";\n\n/** Merge Tailwind classes without fighting the consumer's overrides. */\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}\n",
+      "type": "registry:lib",
+      "target": "@components/cadence/lib/cn.ts"
+    }
+  ],
+  "categories": [
+    "foundation"
+  ],
+  "type": "registry:lib"
+}

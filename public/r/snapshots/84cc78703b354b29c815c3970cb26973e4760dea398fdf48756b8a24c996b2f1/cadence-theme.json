@@ -1,0 +1,55 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cadence-theme",
+  "title": "Cadence theme",
+  "description": "Motion CSS variables and the three-mode duration overrides, layered on top of the shadcn theme.",
+  "cssVars": {
+    "theme": {
+      "--ease-cadence-out": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "--ease-cadence-in-out": "cubic-bezier(0.65, 0, 0.35, 1)",
+      "--color-sidebar": "var(--sidebar, var(--card))",
+      "--color-sidebar-foreground": "var(--sidebar-foreground, var(--card-foreground))",
+      "--color-sidebar-primary": "var(--sidebar-primary, var(--primary))",
+      "--color-sidebar-primary-foreground": "var(--sidebar-primary-foreground, var(--primary-foreground))",
+      "--color-sidebar-accent": "var(--sidebar-accent, var(--accent))",
+      "--color-sidebar-accent-foreground": "var(--sidebar-accent-foreground, var(--accent-foreground))",
+      "--color-sidebar-border": "var(--sidebar-border, var(--border))",
+      "--color-sidebar-ring": "var(--sidebar-ring, var(--ring))"
+    },
+    "light": {
+      "--motion-duration-instant": "100ms",
+      "--motion-duration-fast": "160ms",
+      "--motion-duration-base": "220ms",
+      "--motion-duration-slow": "320ms",
+      "--motion-scale-in": "0.96"
+    }
+  },
+  "css": {
+    "@layer base": {
+      "[data-motion='reduced']": {
+        "--motion-duration-instant": "60ms",
+        "--motion-duration-fast": "96ms",
+        "--motion-duration-base": "132ms",
+        "--motion-duration-slow": "192ms"
+      },
+      "[data-motion='none']": {
+        "--motion-duration-instant": "0ms",
+        "--motion-duration-fast": "0ms",
+        "--motion-duration-base": "0ms",
+        "--motion-duration-slow": "0ms"
+      },
+      "@media (prefers-reduced-motion: reduce)": {
+        ":root": {
+          "--motion-duration-instant": "60ms",
+          "--motion-duration-fast": "96ms",
+          "--motion-duration-base": "132ms",
+          "--motion-duration-slow": "192ms"
+        }
+      }
+    }
+  },
+  "categories": [
+    "foundation"
+  ],
+  "type": "registry:theme"
+}
