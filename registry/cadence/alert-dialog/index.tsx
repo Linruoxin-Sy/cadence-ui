@@ -4,6 +4,7 @@ import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog
 import type * as React from "react";
 import { Button, type ButtonProps } from "../button";
 import { cn } from "../lib/cn";
+import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
@@ -27,15 +28,19 @@ function AlertDialogPortal({ ...props }: AlertDialogPrimitive.Portal.Props) {
  *   zeroed by `[data-motion="none"]`), so the dialog appears and disappears on
  *   the first frame
  */
-function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdrop.Props) {
+function AlertDialogOverlay({ className, style, ...props }: AlertDialogPrimitive.Backdrop.Props) {
   const cm = useCadenceMotion();
 
   return (
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
       data-motion={cm.mode}
-      className={cn(
-        "fixed inset-0 isolate z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      style={popupStyle(cm, style)}
+      className={popupClasses(
+        cm,
+        cn(
+          "fixed inset-0 isolate z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -45,6 +50,7 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdr
 
 function AlertDialogContent({
   className,
+  style,
   children,
   size = "default",
   ...props
@@ -60,10 +66,14 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         data-size={size}
         data-motion={cm.mode}
-        className={cn(
-          "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[size=sm]:max-w-xs data-[starting-style]:opacity-0 data-[size=default]:sm:max-w-lg",
-          !cm.reduced &&
-            "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+        style={popupStyle(cm, style)}
+        className={popupClasses(
+          cm,
+          cn(
+            "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[size=sm]:max-w-xs data-[starting-style]:opacity-0 data-[size=default]:sm:max-w-lg",
+            !cm.reduced &&
+              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+          ),
           className,
         )}
         {...props}
@@ -117,8 +127,10 @@ function AlertDialogTitle({ className, ...props }: AlertDialogPrimitive.Title.Pr
   return (
     <AlertDialogPrimitive.Title
       data-slot="alert-dialog-title"
-      className={cn(
-        "text-lg font-semibold sm:group-data-[size=default]/alert-dialog-content:group-has-data-[slot=alert-dialog-media]/alert-dialog-content:col-start-2",
+      className={stateClasses(
+        cn(
+          "text-lg font-semibold sm:group-data-[size=default]/alert-dialog-content:group-has-data-[slot=alert-dialog-media]/alert-dialog-content:col-start-2",
+        ),
         className,
       )}
       {...props}
@@ -130,30 +142,25 @@ function AlertDialogDescription({ className, ...props }: AlertDialogPrimitive.De
   return (
     <AlertDialogPrimitive.Description
       data-slot="alert-dialog-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={stateClasses(cn("text-sm text-muted-foreground"), className)}
       {...props}
     />
   );
 }
 
-/**
- * The confirming action. Upstream leaves both buttons as plain `Button`s, so
- * neither would close the dialog; a confirmation whose whole job is to end the
- * dialog and a consumer migrating from the Radix registry both expect it to.
- * Exports, `data-slot`, and props are unchanged — only the primitive behind the
- * button differs.
- */
-function AlertDialogAction({
-  className,
-  variant = "default",
-  size = "default",
-  ...props
-}: AlertDialogPrimitive.Close.Props & Pick<ButtonProps, "variant" | "size">) {
+/** Upstream leaves the action open; callers own confirmation and controlled closing. */
+function AlertDialogAction({ className, variant, ...props }: ButtonProps) {
   return (
-    <AlertDialogPrimitive.Close
+    <Button
       data-slot="alert-dialog-action"
-      className={className}
-      render={<Button variant={variant} size={size} />}
+      variant={variant}
+      className={stateClasses(
+        cn(
+          variant === "destructive" &&
+            "bg-destructive/10 text-foreground hover:bg-destructive/20 dark:bg-destructive/20",
+        ),
+        className,
+      )}
       {...props}
     />
   );

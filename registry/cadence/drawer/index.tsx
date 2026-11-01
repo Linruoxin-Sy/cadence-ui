@@ -3,6 +3,7 @@
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { createContext, useContext } from "react";
 import { cn } from "../lib/cn";
+import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
@@ -68,15 +69,19 @@ function DrawerClose({ ...props }: DrawerPrimitive.Close.Props) {
  * back in step with the finger instead of waiting for the release. The transition is
  * the token one; while swiping it is zero, because the variable already moved.
  */
-function DrawerOverlay({ className, ...props }: DrawerPrimitive.Backdrop.Props) {
+function DrawerOverlay({ className, style, ...props }: DrawerPrimitive.Backdrop.Props) {
   const cm = useCadenceMotion();
 
   return (
     <DrawerPrimitive.Backdrop
       data-slot="drawer-overlay"
       data-motion={cm.mode}
-      className={cn(
-        "fixed inset-0 z-50 min-h-dvh bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) opacity-[calc(1_-_var(--drawer-swipe-progress,0))] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 data-swiping:duration-0",
+      style={popupStyle(cm, style)}
+      className={popupClasses(
+        cm,
+        cn(
+          "fixed inset-0 z-50 min-h-dvh bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) opacity-[calc(1_-_var(--drawer-swipe-progress,0))] data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 data-swiping:duration-0",
+        ),
         className,
       )}
       {...props}
@@ -113,7 +118,7 @@ function DrawerSwipeHandle({ className, ...props }: React.ComponentProps<"div">)
  * is `100%` of the sheet, not a distance token — the same reason the `sheet` slides by
  * its own size.
  */
-function DrawerContent({ className, children, ...props }: DrawerPrimitive.Popup.Props) {
+function DrawerContent({ className, style, children, ...props }: DrawerPrimitive.Popup.Props) {
   const cm = useCadenceMotion();
   const { hasSnapPoints, modal, showSwipeHandle, swipeDirection } = useDrawer();
   const swipeAxis = swipeDirection === "down" || swipeDirection === "up" ? "y" : "x";
@@ -149,17 +154,21 @@ function DrawerContent({ className, children, ...props }: DrawerPrimitive.Popup.
           data-swipe-axis={swipeAxis}
           data-snap-points={hasSnapPoints ? "" : undefined}
           data-motion={cm.mode}
-          className={cn(
-            "pointer-events-auto fixed z-50 flex flex-col overflow-hidden border bg-background text-foreground shadow-lg outline-none",
-            "transition-[transform,opacity] ease-cadence-out duration-(--motion-duration-slow) data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-swiping:duration-0",
-            "transform-[translate3d(var(--translate-x,0px),var(--translate-y,0px),0)]",
-            "data-[swipe-axis=y]:[--translate-y:calc(var(--drawer-snap-point-offset,0px)_+_var(--drawer-swipe-movement-y))]",
-            "data-[swipe-axis=x]:[--translate-x:var(--drawer-swipe-movement-x)]",
-            "data-[swipe-axis=y]:max-h-[calc(100dvh_-_3rem)] data-[swipe-axis=y]:data-snap-points:h-(--drawer-height)",
-            placement,
-            !cm.reduced && closedTransform,
-            !cm.reduced &&
-              "data-[starting-style]:transform-(--closed-transform) data-[ending-style]:transform-(--closed-transform)",
+          style={popupStyle(cm, style)}
+          className={popupClasses(
+            cm,
+            cn(
+              "pointer-events-auto fixed z-50 flex flex-col overflow-hidden border bg-background text-foreground shadow-lg outline-none",
+              "transition-[transform,opacity] ease-cadence-out duration-(--motion-duration-slow) data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-swiping:duration-0",
+              "transform-[translate3d(var(--translate-x,0px),var(--translate-y,0px),0)]",
+              "data-[swipe-axis=y]:[--translate-y:calc(var(--drawer-snap-point-offset,0px)_+_var(--drawer-swipe-movement-y))]",
+              "data-[swipe-axis=x]:[--translate-x:var(--drawer-swipe-movement-x)]",
+              "data-[swipe-axis=y]:max-h-[calc(100dvh_-_3rem)] data-[swipe-axis=y]:data-snap-points:h-(--drawer-height)",
+              placement,
+              !cm.reduced && closedTransform,
+              !cm.reduced &&
+                "data-[starting-style]:transform-(--closed-transform) data-[ending-style]:transform-(--closed-transform)",
+            ),
             className,
           )}
           {...props}
@@ -187,7 +196,11 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
 
 function DrawerTitle({ className, ...props }: DrawerPrimitive.Title.Props) {
   return (
-    <DrawerPrimitive.Title data-slot="drawer-title" className={cn("text-lg font-semibold", className)} {...props} />
+    <DrawerPrimitive.Title
+      data-slot="drawer-title"
+      className={stateClasses(cn("text-lg font-semibold"), className)}
+      {...props}
+    />
   );
 }
 
@@ -195,7 +208,7 @@ function DrawerDescription({ className, ...props }: DrawerPrimitive.Description.
   return (
     <DrawerPrimitive.Description
       data-slot="drawer-description"
-      className={cn("text-sm text-balance text-muted-foreground", className)}
+      className={stateClasses(cn("text-sm text-balance text-muted-foreground"), className)}
       {...props}
     />
   );

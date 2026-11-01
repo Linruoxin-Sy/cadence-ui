@@ -5,19 +5,8 @@ import { X } from "lucide-react";
 import type * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
-import { duration, reducedDurationScale } from "../lib/motion";
-import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
-
-function clock(cm: CadenceMotion): React.CSSProperties {
-  const factor = cm.disabled ? 0 : (cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
-  return {
-    "--motion-duration-fast": `${duration.fast * factor}s`,
-    "--motion-duration-base": `${duration.base * factor}s`,
-  } as React.CSSProperties;
-}
-function classes<S>(base: string, value: string | ((state: S) => string | undefined) | undefined) {
-  return typeof value === "function" ? (state: S) => cn(base, value(state)) : cn(base, value);
-}
+import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
+import { useCadenceMotion } from "../lib/provider";
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -42,8 +31,9 @@ function SheetOverlay({ className, style, ...props }: SheetPrimitive.Backdrop.Pr
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
       data-motion={cm.mode}
-      style={typeof style === "function" ? (state) => ({ ...clock(cm), ...style(state) }) : { ...clock(cm), ...style }}
-      className={classes(
+      style={popupStyle(cm, style)}
+      className={popupClasses(
+        cm,
         cn(
           "fixed inset-0 z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast)",
           !cm.disabled && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
@@ -106,10 +96,9 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         data-motion={cm.mode}
-        style={
-          typeof style === "function" ? (state) => ({ ...clock(cm), ...style(state) }) : { ...clock(cm), ...style }
-        }
-        className={classes(
+        style={popupStyle(cm, style)}
+        className={popupClasses(
+          cm,
           cn(
             "fixed z-50 flex flex-col gap-4 bg-background shadow-lg outline-none transition-[opacity,translate] ease-cadence-out duration-(--motion-duration-base)",
             placement,
@@ -145,14 +134,20 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
-  return <SheetPrimitive.Title data-slot="sheet-title" className={cn("text-lg font-semibold", className)} {...props} />;
+  return (
+    <SheetPrimitive.Title
+      data-slot="sheet-title"
+      className={stateClasses(cn("text-lg font-semibold"), className)}
+      {...props}
+    />
+  );
 }
 
 function SheetDescription({ className, ...props }: SheetPrimitive.Description.Props) {
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={stateClasses(cn("text-sm text-muted-foreground"), className)}
       {...props}
     />
   );

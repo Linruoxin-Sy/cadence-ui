@@ -62,6 +62,11 @@
           "target": "@components/cadence/lib/provider.tsx"
         },
         {
+          "path": "registry/cadence/lib/popup-style.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/popup-style.ts"
+        },
+        {
           "path": "registry/cadence/lib/control-animation.tsx",
           "type": "registry:lib",
           "target": "@components/cadence/lib/control-animation.tsx"

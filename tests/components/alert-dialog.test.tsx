@@ -74,7 +74,7 @@ describe("AlertDialog", () => {
     }
   });
 
-  it("confirms through the action, closes, and returns focus to the trigger", async () => {
+  it("confirms through the action without silently closing the confirmation workflow", async () => {
     const onConfirm = vi.fn();
     render(<Example onConfirm={onConfirm} />);
     const trigger = screen.getByRole("button", { name: "Delete project" });
@@ -85,6 +85,8 @@ describe("AlertDialog", () => {
     await userEvent.click(action);
 
     expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Keep project" }));
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
   });

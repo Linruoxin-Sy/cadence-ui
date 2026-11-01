@@ -13,6 +13,7 @@ import {
 } from "@/registry/cadence/dialog";
 import { Field, FieldLabel } from "@/registry/cadence/field";
 import { Input } from "@/registry/cadence/input";
+import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
 
 const CHANGELOG = [
@@ -31,43 +32,45 @@ const CHANGELOG = [
  */
 export function DialogPreview() {
   return (
-    <PreviewStack>
-      <PreviewRow className="gap-3">
-        <Dialog>
-          <DialogTrigger render={<Button variant="outline" />}>Rename project</DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Rename project</DialogTitle>
-              <DialogDescription>
-                The URL stays the same. Existing links keep working after the rename.
-              </DialogDescription>
-            </DialogHeader>
-            <Field>
-              <FieldLabel htmlFor="preview-project-name">Project name</FieldLabel>
-              <Input id="preview-project-name" defaultValue="cadence-ui" />
-            </Field>
-            <DialogFooter>
-              <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
-              <DialogClose render={<Button />}>Save name</DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+    <PopupMotionScope>
+      <PreviewStack>
+        <PreviewRow className="gap-3">
+          <Dialog>
+            <DialogTrigger render={<Button variant="outline" />}>Rename project</DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Rename project</DialogTitle>
+                <DialogDescription>
+                  The URL stays the same. Existing links keep working after the rename.
+                </DialogDescription>
+              </DialogHeader>
+              <Field>
+                <FieldLabel htmlFor="preview-project-name">Project name</FieldLabel>
+                <Input id="preview-project-name" defaultValue="cadence-ui" />
+              </Field>
+              <DialogFooter>
+                <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+                <DialogClose render={<Button />}>Save name</DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-        <Dialog>
-          <DialogTrigger render={<Button variant="ghost" />}>Read the changelog</DialogTrigger>
-          <DialogContent className="max-h-[70vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>0.2.0</DialogTitle>
-              <DialogDescription>Eleven atoms, nine batches, one release train.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-2 text-sm text-muted-foreground">
-              {CHANGELOG.map((entry) => (
-                <p key={entry}>{entry}</p>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
-      </PreviewRow>
-    </PreviewStack>
+          <Dialog>
+            <DialogTrigger render={<Button variant="ghost" />}>Read the changelog</DialogTrigger>
+            <DialogContent className="max-h-[70vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>0.2.0</DialogTitle>
+                <DialogDescription>Eleven atoms, nine batches, one release train.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-2 text-sm text-muted-foreground">
+                {CHANGELOG.map((entry) => (
+                  <p key={entry}>{entry}</p>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </PreviewRow>
+      </PreviewStack>
+    </PopupMotionScope>
   );
 }

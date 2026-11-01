@@ -237,6 +237,14 @@ const cm = useCadenceMotion();
 />;
 ```
 
+Every popup and backdrop owns token-derived local duration variables from its effective mode and
+`timeScale`; a portal must not inherit an ancestor's zero clock. Reduced removes scale/translate/
+transform from the transition list, cancelling running geometry while preserving opacity. None
+removes the transition and starting/ending opacity classes so even its first mounted frame is
+visible. Mode changes preserve the node, focus and Base UI lifecycle. Caller state callbacks are
+evaluated before merging, with caller classes/styles last. This CSS form uses the browser's native
+transition cancellation and reversal, without a second animation controller.
+
 Base UI writes `--transform-origin` on the popup from the positioner, so the scale grows out of the
 anchor rather than out of the element's centre. No distance is involved: a slide would need a distance
 token plus one class per side, and it moves the edge the positioner just lined up. `dialog` and

@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import type * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
+import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
@@ -32,15 +33,19 @@ function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
  *   zeroed by `[data-motion="none"]`), so the dialog appears and disappears on
  *   the first frame
  */
-function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) {
+function DialogOverlay({ className, style, ...props }: DialogPrimitive.Backdrop.Props) {
   const cm = useCadenceMotion();
 
   return (
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       data-motion={cm.mode}
-      className={cn(
-        "fixed inset-0 isolate z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      style={popupStyle(cm, style)}
+      className={popupClasses(
+        cm,
+        cn(
+          "fixed inset-0 isolate z-50 bg-black/50 transition-opacity ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+        ),
         className,
       )}
       {...props}
@@ -50,6 +55,7 @@ function DialogOverlay({ className, ...props }: DialogPrimitive.Backdrop.Props) 
 
 function DialogContent({
   className,
+  style,
   children,
   showCloseButton = true,
   ...props
@@ -64,10 +70,14 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         data-motion={cm.mode}
-        className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 sm:max-w-lg",
-          !cm.reduced &&
-            "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+        style={popupStyle(cm, style)}
+        className={popupClasses(
+          cm,
+          cn(
+            "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 sm:max-w-lg",
+            !cm.reduced &&
+              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+          ),
           className,
         )}
         {...props}
@@ -124,7 +134,11 @@ function DialogFooter({
 
 function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
   return (
-    <DialogPrimitive.Title data-slot="dialog-title" className={cn("text-lg font-semibold", className)} {...props} />
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={stateClasses(cn("text-lg font-semibold"), className)}
+      {...props}
+    />
   );
 }
 
@@ -132,7 +146,7 @@ function DialogDescription({ className, ...props }: DialogPrimitive.Description.
   return (
     <DialogPrimitive.Description
       data-slot="dialog-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={stateClasses(cn("text-sm text-muted-foreground"), className)}
       {...props}
     />
   );

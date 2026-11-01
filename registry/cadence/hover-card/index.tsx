@@ -2,6 +2,7 @@
 
 import { PreviewCard as PreviewCardPrimitive } from "@base-ui/react/preview-card";
 import { cn } from "../lib/cn";
+import { popupClasses, popupStyle } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 function HoverCard({ ...props }: PreviewCardPrimitive.Root.Props) {
@@ -26,6 +27,7 @@ function HoverCardTrigger({ ...props }: PreviewCardPrimitive.Trigger.Props) {
  */
 function HoverCardContent({
   className,
+  style,
   side = "bottom",
   sideOffset = 4,
   align = "center",
@@ -47,10 +49,14 @@ function HoverCardContent({
         <PreviewCardPrimitive.Popup
           data-slot="hover-card-content"
           data-motion={cm.mode}
-          className={cn(
-            "z-50 w-64 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+          style={popupStyle(cm, style)}
+          className={popupClasses(
+            cm,
+            cn(
+              "z-50 w-64 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+              !cm.reduced &&
+                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+            ),
             className,
           )}
           {...props}

@@ -101,7 +101,13 @@ describe("Sheet", () => {
 
     expect(sheet).toHaveAttribute("data-motion", mode);
     expect(sheet.className).toContain("duration-(--motion-duration-base)");
-    expect(sheet.className).toContain("transition-[opacity,translate]");
+    expect(sheet.className).toContain(
+      mode === "full"
+        ? "transition-[opacity,translate]"
+        : mode === "reduced"
+          ? "transition-opacity"
+          : "transition-none",
+    );
     expect(sheet.className.includes("translate-x-full")).toBe(keepsSlide);
 
     const overlay = document.querySelector('[data-slot="sheet-overlay"]');

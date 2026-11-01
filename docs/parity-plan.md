@@ -1,7 +1,7 @@
 # Parity plan: shipping every shadcn component
 
-> Status: **B0–B9 implementations shipped (2026-11-01); B1–B3 and B6–B9 batch gates complete.
-> Historical B4–B5 visual gates and §8 remain open; B4 is next.**
+> Status: **B0–B9 implementations shipped (2026-11-01); B1–B4 and B6–B9 batch gates complete.
+> Historical B5 visual gate and §8 remain open; B5 is next.**
 > This document is the build record for the "parity" effort: replace the eight original motion components
 > with an API-compatible, motion-enhanced
 > superset of shadcn's component catalogue. It is the authority for scope, batching, and the contracts
@@ -262,19 +262,19 @@ deep by batch and drops batches that have not shipped yet, which means a new com
 the right heading as soon as its registry item declares one. `registry:check` requires the field, and
 `scripts/new-item.mjs --batch` writes it.
 
-| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                         |
-| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------------------------------ |
-| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                        |
-| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | complete (§7.27)               |
-| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ gate complete (§7.28)       |
-| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ gate complete (§7.29)       |
-| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | implementation done; gate open |
-| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open                      |
-| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete                       |
-| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done                        |
-| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done                        |
-| B9    | AI first                   | 3      | B1         | 3.5         | 0.5.0   | ✅ done                        |
-|       | **Total**                  | **58** |            | **102**     |         |                                |
+| Batch | Theme                      | Items  | Depends on | Person-days | Version | Status                   |
+| ----- | -------------------------- | ------ | ---------- | ----------- | ------- | ------------------------ |
+| B0    | Removal + pilot            | —      | —          | 3           | 0.1.x   | ✅ done                  |
+| B1    | Atoms                      | 11     | B0         | 9.5         | 0.2.0   | complete (§7.27)         |
+| B2    | Structure and feedback     | 9      | B1         | 9           | 0.2.0   | ✅ gate complete (§7.28) |
+| B3    | Form controls              | 8      | B1         | 11.5        | 0.3.0   | ✅ gate complete (§7.29) |
+| B4    | Overlays                   | 7      | B1         | 15          | 0.3.0   | ✅ gate complete (§7.30) |
+| B5    | Menus and selection        | 7      | B4         | 17.5        | 0.4.0   | gate open                |
+| B6    | Disclosure and collections | 6      | B1, B4     | 11.5        | 0.4.0   | complete                 |
+| B7    | Heavy data and navigation  | 5      | B1, B4, B5 | 17          | 0.5.0   | ✅ done                  |
+| B8    | Compositions (blocks)      | 2      | B3–B7      | 4.5         | 0.5.0   | ✅ done                  |
+| B9    | AI first                   | 3      | B1         | 3.5         | 0.5.0   | ✅ done                  |
+|       | **Total**                  | **58** |            | **102**     |         |                          |
 
 ### 7.0 Status discipline
 
@@ -475,7 +475,7 @@ axe with zero violations, size budget, and dual-theme screenshots.
   browser pass covered `full` — the site has no mode switcher, so the manual reduced/none pass is the
   one gate item still open, for all three batches.
 
-### 7.4 B4 — implementation complete (2026-10-30); historical gate open
+### 7.4 B4 — implementation complete (2026-10-30); gate closed in §7.30
 
 - **Why it started as "in progress":** `dialog` shipped as the B0 pilot but declares `meta.batch: "B4"`, so
   one item of this batch was already live. Marking the row `next` would have made §7.0's rule ("a batch
@@ -1529,6 +1529,9 @@ fixed, and both drift classes now have a CI check behind them. Nothing in that t
   remain unchecked.
 - **`expectMotionContract()` helper.** The three-mode assertion is hand-written per component, and the two
   components missing it were the two that were broken. One shared helper that a new component must call.
+- **Async highlight test reliability.** Investigate the repeated CodeBlock 1s highlight wait timeouts
+  recorded in B1/B3. Original-configuration complete retries passed, but repeated retries are not
+  a root-cause resolution. Keep this in §8 tooling; do not silently weaken the timeout or reopen B9.
 - **Site initial JS budget.** `next build` now produces a route-size report; measure `/components/button`
   against the ≤120 KB gzip budget in [animation-system.md](animation-system.md) §7 and record the number.
 
@@ -1681,3 +1684,40 @@ With a 15% buffer: about 23–24 weeks for one developer, 12–13 weeks for two.
   B4 onward work are in `docs/handoffs/b3-gate.md`. Fixed pin remains96da9cc7f1aa10580a3741664e2a77c721206c00.
   B4/B5 gates, every open §8 item, and global callback/popup/running-mode audits remain open.
   B1/B2/B6–B9 stay closed; this closes only B3, not the overall goal.
+
+### 7.30 Historical B4 gate — complete (2026-11-02)
+
+Dialog, Alert Dialog, Sheet, Drawer, Tooltip and Hover Card now evaluate Base class callbacks;
+every animated surface has a portal-local token clock with caller styles last. Reduced removes
+geometry from native transition properties, while none removes the transition and starting opacity.
+Popover's existing equivalent adapter is retained and verified with the same matrix. Shared CSS
+helpers ship with cadence-provider; no recipe, public prop, dependency or fixed upstream pin changed.
+The installed Base UI is 1.9.0 (declaration ^1.6.0). Fixed upstream Action is a Button, not Close:
+AlertDialogAction now leaves the caller in control of closing; Cancel still closes. Its destructive
+foreground/tinted background fixes real axe contrast failures (4.28 light / 4.37 dark) without
+changing Button or another batch. Tooltip described-by state now respects caller cancellation.
+Docs correct HoverCard Trigger delays (600/300ms defaults), Dialog/Alert clocks, and Drawer’s
+primitive-owned swipe rather than declaring a spurious gesture.drag recipe.
+
+- Complete check: 466/466 tests in 72 files, type/lint/registry/parity58 and all tier budgets pass.
+  `.cache/b4-final-check.log`; original settings, no thresholds weakened.
+- Final isolated production build: 69 pages, `.cache/b4-final-build.log`, `.next-b4-gate`.
+  Next-generated tsconfig changes inspected and restored. Check/build ran sequentially.
+- Edge/msedge port3137, workers2: **76/76 (2.3m)**, `.cache/b4-final-e2e.log`.
+  42 = seven × three modes × two OS preferences: actual popup/backdrop entry/exit frame samples,
+  focus trap, resize and live modes. Seven slowed active-transition tests prove running geometry
+  cancels under reduced while opacity continues, then none cancels opacity, preserving nodes;
+  click popups reverse mid-exit, hover popups preserve nodes on leave/re-entry. Six direct touch
+  drawer swipes cover the same mode/OS matrix; seven keyboard cases open every preview placement
+  through focus/Enter/Space and close/restore through Escape.
+- Fourteen visual cases: seven × two themes, each at1280/390, full-page and open-surface axe
+  WCAG2A/2AA/2.1AA zero violations, no disabled rules, document no horizontal overflow, no pageerror.
+  56 screenshots individually reviewed as four-image full/open sheets in `.cache/b4-proof/`.
+  Tables render as real tables with internal scrolling on mobile; narrow-column readability is
+  carried to the §8 site audit. Screenshots/logs/build are not committed.
+- Initial browser run54/56 exposed the Action contrast failures, then63/63 passed after repair.
+  Final76/76 adds touch/placement proof; earlier runs are not counted as extra unique cases.
+  Existing Item img lint warning and occasional pre-existing act warnings remain; no CodeBlock
+  timeout occurred in the final B4 check. Repeated B1/B3 timeouts still require §8 tooling diagnosis.
+- Source/docs/tests/plan, final-source payload and complete `docs/handoffs/b4-gate.md` are separate
+  commits. B5 and every §8/cross-library audit remain open; this closes B4, not the overall goal.

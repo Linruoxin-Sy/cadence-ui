@@ -11,6 +11,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/registry/cadence/drawer";
+import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
 
 const DESTINATIONS = ["Inbox", "Archive", "Read later"] as const;
@@ -41,23 +42,25 @@ export function DrawerPreview() {
   );
 
   return (
-    <PreviewStack>
-      <PreviewRow className="gap-2">
-        <Drawer showSwipeHandle>
-          <DrawerTrigger render={<Button variant="outline" />}>Down</DrawerTrigger>
-          <DrawerContent>{content}</DrawerContent>
-        </Drawer>
+    <PopupMotionScope>
+      <PreviewStack>
+        <PreviewRow className="gap-2">
+          <Drawer showSwipeHandle>
+            <DrawerTrigger render={<Button variant="outline" />}>Down</DrawerTrigger>
+            <DrawerContent>{content}</DrawerContent>
+          </Drawer>
 
-        <Drawer swipeDirection="up">
-          <DrawerTrigger render={<Button variant="ghost" />}>Up</DrawerTrigger>
-          <DrawerContent>{content}</DrawerContent>
-        </Drawer>
+          <Drawer swipeDirection="up">
+            <DrawerTrigger render={<Button variant="ghost" />}>Up</DrawerTrigger>
+            <DrawerContent>{content}</DrawerContent>
+          </Drawer>
 
-        <Drawer swipeDirection="right">
-          <DrawerTrigger render={<Button variant="ghost" />}>From the right</DrawerTrigger>
-          <DrawerContent>{content}</DrawerContent>
-        </Drawer>
-      </PreviewRow>
-    </PreviewStack>
+          <Drawer swipeDirection="right">
+            <DrawerTrigger render={<Button variant="ghost" />}>From the right</DrawerTrigger>
+            <DrawerContent>{content}</DrawerContent>
+          </Drawer>
+        </PreviewRow>
+      </PreviewStack>
+    </PopupMotionScope>
   );
 }

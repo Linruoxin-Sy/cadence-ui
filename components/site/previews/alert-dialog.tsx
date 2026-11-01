@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/registry/cadence/alert-dialog";
 import { Button } from "@/registry/cadence/button";
+import { PopupMotionScope } from "./popup-motion-scope";
 import { PreviewRow, PreviewStack } from "./shell";
 
 /**
@@ -23,41 +24,43 @@ import { PreviewRow, PreviewStack } from "./shell";
  */
 export function AlertDialogPreview() {
   return (
-    <PreviewStack>
-      <PreviewRow className="gap-3">
-        <AlertDialog>
-          <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogMedia>
-                <Trash2Icon aria-hidden="true" />
-              </AlertDialogMedia>
-              <AlertDialogTitle>Delete this project?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Every deployment and its logs go with it. This cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Keep project</AlertDialogCancel>
-              <AlertDialogAction variant="destructive">Delete project</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+    <PopupMotionScope>
+      <PreviewStack>
+        <PreviewRow className="gap-3">
+          <AlertDialog>
+            <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogMedia>
+                  <Trash2Icon aria-hidden="true" />
+                </AlertDialogMedia>
+                <AlertDialogTitle>Delete this project?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Every deployment and its logs go with it. This cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep project</AlertDialogCancel>
+                <AlertDialogAction variant="destructive">Delete project</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
-        <AlertDialog>
-          <AlertDialogTrigger render={<Button variant="ghost" />}>Archive</AlertDialogTrigger>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle>Archive this project?</AlertDialogTitle>
-              <AlertDialogDescription>It stops deploying, and you can unarchive it later.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Archive</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </PreviewRow>
-    </PreviewStack>
+          <AlertDialog>
+            <AlertDialogTrigger render={<Button variant="ghost" />}>Archive</AlertDialogTrigger>
+            <AlertDialogContent size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Archive this project?</AlertDialogTitle>
+                <AlertDialogDescription>It stops deploying, and you can unarchive it later.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction>Archive</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </PreviewRow>
+      </PreviewStack>
+    </PopupMotionScope>
   );
 }

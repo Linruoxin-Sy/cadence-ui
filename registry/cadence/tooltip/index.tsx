@@ -3,6 +3,7 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { createContext, useContext, useId, useState } from "react";
 import { cn } from "../lib/cn";
+import { popupClasses, popupStyle } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 /**
@@ -36,8 +37,8 @@ function Tooltip({ children, open, defaultOpen = false, onOpenChange, ...props }
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={(next, details) => {
-          setUncontrolledOpen(next);
           onOpenChange?.(next, details);
+          if (!details.isCanceled) setUncontrolledOpen(next);
         }}
         {...props}
       >
@@ -72,6 +73,7 @@ function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
  */
 function TooltipContent({
   className,
+  style,
   side = "top",
   sideOffset = 4,
   align = "center",
@@ -96,11 +98,15 @@ function TooltipContent({
           id={tooltip?.id}
           data-slot="tooltip-content"
           data-motion={cm.mode}
+          style={popupStyle(cm, style)}
           role="tooltip"
-          className={cn(
-            "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+          className={popupClasses(
+            cm,
+            cn(
+              "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+              !cm.reduced &&
+                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+            ),
             className,
           )}
           {...props}
