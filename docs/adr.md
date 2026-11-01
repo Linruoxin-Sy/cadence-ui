@@ -440,3 +440,11 @@ compatibility layer or defer initial functionality to satisfy an observation win
 closes the route gate. Framework migration entails routing/MDX/metadata/asset/immutable-registry
 hosting work and needs a full-route proof, not just removal of App Router bytes. Other open site and
 cross-library audits can proceed independently; this investigation does not close them.
+
+**Code-fence follow-up (2026-11-02)**: a private identity-marker/module split and synchronous scoped
+features reduce the ordinary-fence subset from 135,334 to 120,492 bytes. Adding the real site's
+package-manager tab/copy block restores projection/drag initialization and reaches 136,462 bytes,
+before chrome. See the [bounded experiment](site-js-budget.md#code-fence-feature-boundary-experiment-2026-11-02)
+and `docs/evidence/site-code-fence-boundaries.json`. No product adoption: even the ordinary subset
+fails, and a required install control removes the apparent headroom. Keep the complete-route gate;
+investigate the install layout/fold engine boundary through public APIs before another candidate.

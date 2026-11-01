@@ -179,3 +179,61 @@ dependency boundary while retaining the registry renderer and its real features.
 functions, links and SSR; prove cold navigation, clipboard/search, modes and accessibility, and count
 all automatic scripts. The 135,334-byte fence subset is already over budget, so current evidence does
 not justify migration. ADR-016 records research only; the budget remains open.
+
+## Code-fence feature boundary experiment (2026-11-02)
+
+Production stays unchanged. Run these sequentially:
+
+```powershell
+node scripts/experiment-react-ssr-budget.mjs --dom-animation --fence
+node scripts/experiment-react-ssr-budget.mjs --dom-animation --fence --scoped-fence
+node scripts/experiment-react-ssr-budget.mjs --dom-animation --fence --scoped-fence --package-manager
+```
+
+| Diagnostic subset                                             | Gzip bytes | Scripts |
+| ------------------------------------------------------------- | ---------: | ------: |
+| Existing fence + experimental scoped Button (repeat baseline) |    135,334 |       3 |
+| Scoped CodeBlock ordinary fence + same Button                 |    120,492 |       3 |
+| Above plus actual PackageManagerBlock and preference provider |    136,462 |       3 |
+
+CodeBlock's `firstTabValue` refers to `CodeBlockTab` by function identity. This retains the tab
+implementation even in a fence that never renders tabs. Its `motion.span` initializes the full
+feature set: using fewer exports does not remove that initialization. The experimental fork
+extracts the unchanged tab function into a separate module, with a private identity marker assigned
+using a pure `Object.assign` expression. The root recognizes the marker instead of importing the tab
+value. A plain property assignment was first tried and kept the module's side effect, measuring
+135,290 bytes; it is not the final experiment. The core uses `motion/react-m` and an internal,
+synchronous `LazyMotion features={domAnimation}` boundary. Tab still uses full `motion` and retains
+`layoutId`/`layout.shared`; fold still uses `animate`/`useMotionValue` and `geometry.resize`.
+Copy, reveal, highlight hook, props and original exports remain in the experimental source.
+No Motion internal entry points, host provider requirement, delayed features or recipe changes
+are introduced. Forks exist only under `.cache`, never in registry source or install payloads.
+
+Loaded-output assertions verify that the scoped ordinary fence retains no tab-indicator rendering
+or projection-node/drag-controller implementation. The tab module retains 33 bytes of initialization
+glue; it is not literally absent. The real package-manager block restores the indicator and both
+engines, because it actually renders tabs. Small projection geometry utilities and a
+drag-active-state flag can remain in the ordinary graph; absence of the named engines is not absence
+of every path containing those words. The generic `animate()` sequence implementation also remains;
+there is no claim that unused overloads can be shaken individually. Minified module bytes are
+diagnostic attribution, not additive gzip costs.
+
+The package subset uses unchanged site `PackageManagerBlock`, `PackageManagerProvider` and
+`packageManagerCommands` for the real Button install command. It takes the supported plain-source
+`lines: null` branch. Build-time Shiki tokens, full MDX, styles and chrome are absent, so this remains
+an optimistic diagnostic subset. Fresh Edge cold loads use the unchanged collector, all three
+automatic scripts, disabled cache and the full ten-second observation before interactions. Each subset
+proves SSR's 16 preview buttons, hydration without recoverable errors, counted Button Enter activation,
+three preview modes/held transforms, and real clipboard text `example`. The package subset also proves
+ArrowRight selects npm, copies `npx shadcn@latest add @cadence/button`, and stores npm in localStorage.
+These are bounded checks, not three-mode/two-OS CodeBlock conformance, first-paint, live cancellation,
+shared-layout frame proof, highlight lifecycle, screenshots or accessibility acceptance.
+
+The ordinary subset saves 14,842 bytes but exceeds 120,000 by 492 before chrome. Adding one required
+install control exceeds it by 16,462. This candidate does not advance to full-route migration or product
+adoption. This is not proof that every future implementation is impossible. Evidence is in
+`evidence/site-code-fence-boundaries.json`. Next safe action: investigate the actual install-control
+layout engine boundary (public APIs only, preserving shared-layout) and generic animate/fold graph,
+or another explicitly measured runtime boundary. Every candidate must still pass ADR-016's complete
+Button route gate, all site functionality, SSR, mode/focus/a11y and all automatic scripts before
+adoption. Production remains 290,171 bytes on the retained unchanged-source measurement; budget OPEN.

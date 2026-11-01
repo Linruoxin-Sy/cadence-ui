@@ -1,0 +1,670 @@
+{
+  "date": "2026-11-02",
+  "sourceBase": "5a1a3d5",
+  "scope": "Diagnostic subsets only; product unchanged, initial JS budget OPEN; no architecture adopted",
+  "variants": {
+    "lean-fence": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "lean": true,
+      "fence": true,
+      "scopedFence": false,
+      "packageManager": false,
+      "fenceInteractions": {
+        "clipboard": "example"
+      },
+      "featureBoundary": {
+        "tabIndicator": true,
+        "tabBytes": 0,
+        "projection": true,
+        "drag": true,
+        "sequence": true
+      },
+      "esbuildVersion": "0.28.2",
+      "react": "19.3.1",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 135334,
+        "files": [
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "bytes": 797,
+            "gzip": 499,
+            "sha256": "0963f93e9fea80ad6ccdd34158529cf8f0702abae7b998ed2fdcaa31badd9524",
+            "status": 200
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "bytes": 638,
+            "gzip": 388,
+            "sha256": "9dbaaa1b267ebd74b96fc498735a78d76804f1e96e532871291c937cf83694e7",
+            "status": 200
+          },
+          {
+            "path": "/client.js",
+            "bytes": 421253,
+            "gzip": 134447,
+            "sha256": "81fc925bc76ad4718aab66e4cea5c0b2e83d88d7dd16d0162ed64f76dc0e41e1",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/client.js",
+            "type": "parser"
+          },
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "type": "script"
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "type": "script"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      },
+      "modes": [
+        {
+          "mode": "full",
+          "heldTransform": "matrix(0.97, 0, 0, 0.97, 0, 0)"
+        },
+        {
+          "mode": "reduced",
+          "heldTransform": "none"
+        },
+        {
+          "mode": "none",
+          "heldTransform": "none"
+        }
+      ],
+      "ssrButtons": 16,
+      "moduleCount": 359,
+      "minifiedModuleBytes": 419345,
+      "largestModules": [
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js",
+          "bytesInOutput": 205372
+        },
+        {
+          "module": "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytesInOutput": 27542
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/node/create-projection-node.mjs",
+          "bytesInOutput": 23144
+        },
+        {
+          "module": "registry/cadence/code-block/index.tsx",
+          "bytesInOutput": 9537
+        },
+        {
+          "module": "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js",
+          "bytesInOutput": 7969
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/drag/VisualElementDragControls.mjs",
+          "bytesInOutput": 7452
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/VisualElement.mjs",
+          "bytesInOutput": 6582
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/JSAnimation.mjs",
+          "bytesInOutput": 4376
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/pan/PanSession.mjs",
+          "bytesInOutput": 3938
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/generators/spring.mjs",
+          "bytesInOutput": 3778
+        },
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js",
+          "bytesInOutput": 3665
+        },
+        {
+          "module": "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js",
+          "bytesInOutput": 3662
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/index.mjs",
+          "bytesInOutput": 2951
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/utils/animation-state.mjs",
+          "bytesInOutput": 2496
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/NativeAnimation.mjs",
+          "bytesInOutput": 2241
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs",
+          "bytesInOutput": 2187
+        },
+        {
+          "module": "registry/cadence/lib/motion.ts",
+          "bytesInOutput": 2120
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence/button.tsx",
+          "bytesInOutput": 1972
+        },
+        {
+          "module": "registry/cadence/button/index.tsx",
+          "bytesInOutput": 1943
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs",
+          "bytesInOutput": 1819
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/KeyframesResolver.mjs",
+          "bytesInOutput": 1773
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/use-button/useButton.mjs",
+          "bytesInOutput": 1637
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs",
+          "bytesInOutput": 1596
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/features/layout/MeasureLayout.mjs",
+          "bytesInOutput": 1571
+        },
+        {
+          "module": "components/site/previews/button.tsx",
+          "bytesInOutput": 1561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/types/complex/index.mjs",
+          "bytesInOutput": 1342
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/shared/stack.mjs",
+          "bytesInOutput": 1298
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/merge-props/mergeProps.mjs",
+          "bytesInOutput": 1292
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/utils/mix/complex.mjs",
+          "bytesInOutput": 1186
+        }
+      ],
+      "featureModules": [
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/node/create-projection-node.mjs",
+          "bytesInOutput": 23144
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/drag/VisualElementDragControls.mjs",
+          "bytesInOutput": 7452
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        }
+      ],
+      "forkDigests": {
+        "button.tsx": "ed6b078ae51aacfad783b08900310e6d72c6bb444d486f10a63d8061c1352ea3"
+      }
+    },
+    "lean-fence-scoped": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "lean": true,
+      "fence": true,
+      "scopedFence": true,
+      "packageManager": false,
+      "fenceInteractions": {
+        "clipboard": "example"
+      },
+      "featureBoundary": {
+        "tabIndicator": false,
+        "tabBytes": 33,
+        "projection": false,
+        "drag": false,
+        "sequence": true
+      },
+      "esbuildVersion": "0.28.2",
+      "react": "19.3.1",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 120492,
+        "files": [
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "bytes": 797,
+            "gzip": 499,
+            "sha256": "0963f93e9fea80ad6ccdd34158529cf8f0702abae7b998ed2fdcaa31badd9524",
+            "status": 200
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "bytes": 638,
+            "gzip": 388,
+            "sha256": "9dbaaa1b267ebd74b96fc498735a78d76804f1e96e532871291c937cf83694e7",
+            "status": 200
+          },
+          {
+            "path": "/client.js",
+            "bytes": 369647,
+            "gzip": 119605,
+            "sha256": "1492deb7eec45944a910e360590f06fef147c820cc030b4113429e6918b634ae",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/client.js",
+            "type": "parser"
+          },
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "type": "script"
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "type": "script"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      },
+      "modes": [
+        {
+          "mode": "full",
+          "heldTransform": "matrix(0.97, 0, 0, 0.97, 0, 0)"
+        },
+        {
+          "mode": "reduced",
+          "heldTransform": "none"
+        },
+        {
+          "mode": "none",
+          "heldTransform": "none"
+        }
+      ],
+      "ssrButtons": 16,
+      "moduleCount": 315,
+      "minifiedModuleBytes": 367739,
+      "largestModules": [
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js",
+          "bytesInOutput": 205309
+        },
+        {
+          "module": "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytesInOutput": 27542
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence-scoped/code-block.tsx",
+          "bytesInOutput": 8565
+        },
+        {
+          "module": "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js",
+          "bytesInOutput": 7969
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/VisualElement.mjs",
+          "bytesInOutput": 6584
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/JSAnimation.mjs",
+          "bytesInOutput": 4376
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/generators/spring.mjs",
+          "bytesInOutput": 3778
+        },
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js",
+          "bytesInOutput": 3665
+        },
+        {
+          "module": "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js",
+          "bytesInOutput": 3662
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/index.mjs",
+          "bytesInOutput": 2952
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/utils/animation-state.mjs",
+          "bytesInOutput": 2496
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/NativeAnimation.mjs",
+          "bytesInOutput": 2241
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs",
+          "bytesInOutput": 2187
+        },
+        {
+          "module": "registry/cadence/lib/motion.ts",
+          "bytesInOutput": 2120
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence-scoped/button.tsx",
+          "bytesInOutput": 1972
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs",
+          "bytesInOutput": 1819
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/KeyframesResolver.mjs",
+          "bytesInOutput": 1775
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/use-button/useButton.mjs",
+          "bytesInOutput": 1637
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs",
+          "bytesInOutput": 1596
+        },
+        {
+          "module": "components/site/previews/button.tsx",
+          "bytesInOutput": 1561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/types/complex/index.mjs",
+          "bytesInOutput": 1342
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/merge-props/mergeProps.mjs",
+          "bytesInOutput": 1292
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/utils/mix/complex.mjs",
+          "bytesInOutput": 1187
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/dom/parse-transform.mjs",
+          "bytesInOutput": 1149
+        },
+        {
+          "module": "node_modules/.pnpm/lucide-react@1.62.0_@types+react@19.3.0_react@19.3.1/node_modules/lucide-react/dist/esm/shared/src/build/buildLucideIconNode.mjs",
+          "bytesInOutput": 1141
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/animate/effects.mjs",
+          "bytesInOutput": 1123
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/useRenderElement.mjs",
+          "bytesInOutput": 1109
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/GroupAnimation.mjs",
+          "bytesInOutput": 1041
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/interfaces/visual-element-target.mjs",
+          "bytesInOutput": 1022
+        }
+      ],
+      "featureModules": [
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence-scoped/code-block-tab.tsx",
+          "bytesInOutput": 33
+        }
+      ],
+      "forkDigests": {
+        "button.tsx": "ed6b078ae51aacfad783b08900310e6d72c6bb444d486f10a63d8061c1352ea3",
+        "code-block-tab.tsx": "ee8c5af0fe286bc46de248a215221ff2b8fc445306c55e0c68558a90b731ee9c",
+        "code-block.tsx": "2a32e43d92d60e646a19361ff591728e1f0f6f4bf22110057b348b118fec09b7"
+      }
+    },
+    "lean-fence-scoped-package": {
+      "scope": "Diagnostic subset, not full site or budget closure",
+      "lean": true,
+      "fence": true,
+      "scopedFence": true,
+      "packageManager": true,
+      "fenceInteractions": {
+        "clipboard": "example",
+        "packageManager": {
+          "keyboard": "ArrowRight selects npm",
+          "clipboard": "npx shadcn@latest add @cadence/button",
+          "stored": "npm"
+        }
+      },
+      "featureBoundary": {
+        "tabIndicator": true,
+        "tabBytes": 1074,
+        "projection": true,
+        "drag": true,
+        "sequence": true
+      },
+      "esbuildVersion": "0.28.2",
+      "react": "19.3.1",
+      "report": {
+        "limit": 120000,
+        "gzipBytes": 136462,
+        "files": [
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "bytes": 797,
+            "gzip": 499,
+            "sha256": "0963f93e9fea80ad6ccdd34158529cf8f0702abae7b998ed2fdcaa31badd9524",
+            "status": 200
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "bytes": 638,
+            "gzip": 388,
+            "sha256": "9dbaaa1b267ebd74b96fc498735a78d76804f1e96e532871291c937cf83694e7",
+            "status": 200
+          },
+          {
+            "path": "/client.js",
+            "bytes": 422432,
+            "gzip": 135575,
+            "sha256": "bfa0c19b6f24fe69da9229fd71b3a309eeed0ff7b21159e0cc60a1713d2758e6",
+            "status": 200
+          }
+        ],
+        "requests": [
+          {
+            "path": "/client.js",
+            "type": "parser"
+          },
+          {
+            "path": "/chunk-NGNJTYLW.js",
+            "type": "script"
+          },
+          {
+            "path": "/chunk-OOJM4CTU.js",
+            "type": "script"
+          }
+        ],
+        "errors": [],
+        "observation": "load + networkidle + 10s + networkidle, no interaction"
+      },
+      "modes": [
+        {
+          "mode": "full",
+          "heldTransform": "matrix(0.97, 0, 0, 0.97, 0, 0)"
+        },
+        {
+          "mode": "reduced",
+          "heldTransform": "none"
+        },
+        {
+          "mode": "none",
+          "heldTransform": "none"
+        }
+      ],
+      "ssrButtons": 16,
+      "moduleCount": 362,
+      "minifiedModuleBytes": 420524,
+      "largestModules": [
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom-client.production.js",
+          "bytesInOutput": 205340
+        },
+        {
+          "module": "node_modules/.pnpm/tailwind-merge@3.7.0/node_modules/tailwind-merge/dist/bundle-mjs.mjs",
+          "bytesInOutput": 27542
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/node/create-projection-node.mjs",
+          "bytesInOutput": 23144
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence-scoped-package/code-block.tsx",
+          "bytesInOutput": 9467
+        },
+        {
+          "module": "node_modules/.pnpm/react@19.3.1/node_modules/react/cjs/react.production.js",
+          "bytesInOutput": 7969
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/drag/VisualElementDragControls.mjs",
+          "bytesInOutput": 7452
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/VisualElement.mjs",
+          "bytesInOutput": 6582
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/JSAnimation.mjs",
+          "bytesInOutput": 4376
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/pan/PanSession.mjs",
+          "bytesInOutput": 3938
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/generators/spring.mjs",
+          "bytesInOutput": 3778
+        },
+        {
+          "module": "node_modules/.pnpm/react-dom@19.3.1_react@19.3.1/node_modules/react-dom/cjs/react-dom.production.js",
+          "bytesInOutput": 3665
+        },
+        {
+          "module": "node_modules/.pnpm/scheduler@0.28.0/node_modules/scheduler/cjs/scheduler.production.js",
+          "bytesInOutput": 3662
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/index.mjs",
+          "bytesInOutput": 2951
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/utils/animation-state.mjs",
+          "bytesInOutput": 2496
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/NativeAnimation.mjs",
+          "bytesInOutput": 2241
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/AsyncMotionValueAnimation.mjs",
+          "bytesInOutput": 2187
+        },
+        {
+          "module": "registry/cadence/lib/motion.ts",
+          "bytesInOutput": 2120
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence-scoped-package/button.tsx",
+          "bytesInOutput": 1972
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/utils/use-visual-element.mjs",
+          "bytesInOutput": 1819
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/KeyframesResolver.mjs",
+          "bytesInOutput": 1773
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/internals/use-button/useButton.mjs",
+          "bytesInOutput": 1637
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/animation/keyframes/DOMKeyframesResolver.mjs",
+          "bytesInOutput": 1596
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/motion/features/layout/MeasureLayout.mjs",
+          "bytesInOutput": 1571
+        },
+        {
+          "module": "components/site/previews/button.tsx",
+          "bytesInOutput": 1561
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/value/types/complex/index.mjs",
+          "bytesInOutput": 1342
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/shared/stack.mjs",
+          "bytesInOutput": 1298
+        },
+        {
+          "module": "node_modules/.pnpm/@base-ui+react@1.9.0_@date-_a248e9e6a5b328af56def56a7f0d067d/node_modules/@base-ui/react/merge-props/mergeProps.mjs",
+          "bytesInOutput": 1292
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/utils/mix/complex.mjs",
+          "bytesInOutput": 1186
+        },
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/render/dom/parse-transform.mjs",
+          "bytesInOutput": 1149
+        }
+      ],
+      "featureModules": [
+        {
+          "module": "node_modules/.pnpm/motion-dom@13.5.1/node_modules/motion-dom/dist/es/projection/node/create-projection-node.mjs",
+          "bytesInOutput": 23144
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/gestures/drag/VisualElementDragControls.mjs",
+          "bytesInOutput": 7452
+        },
+        {
+          "module": "node_modules/.pnpm/framer-motion@13.5.1_react-_ecdd998a9879a529d5f572e87f918c3b/node_modules/framer-motion/dist/es/animation/sequence/create.mjs",
+          "bytesInOutput": 2522
+        },
+        {
+          "module": ".cache/react-ssr-budget-lean-fence-scoped-package/code-block-tab.tsx",
+          "bytesInOutput": 1074
+        }
+      ],
+      "forkDigests": {
+        "button.tsx": "ed6b078ae51aacfad783b08900310e6d72c6bb444d486f10a63d8061c1352ea3",
+        "code-block-tab.tsx": "ee8c5af0fe286bc46de248a215221ff2b8fc445306c55e0c68558a90b731ee9c",
+        "code-block.tsx": "2a32e43d92d60e646a19361ff591728e1f0f6f4bf22110057b348b118fec09b7"
+      }
+    }
+  }
+}

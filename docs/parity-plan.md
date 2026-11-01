@@ -1618,6 +1618,14 @@ ADR-016 keeps architecture research explicit. First narrow the real code-fence d
 then prove a complete SSR route and all controls before migration. **Budget remains OPEN**; all other
 §8 and cross-library work stays open.
 
+Code-fence follow-up (2026-11-02): the isolated private-marker/module split plus synchronous scoped
+features reduces the ordinary fence to **120,492 bytes**, still failing before chrome. Adding the actual
+package-manager block restores the full projection/drag feature chain and reaches **136,462 bytes**.
+Real clipboard, ArrowRight selection and stored preference pass in that subset; this is not full
+CodeBlock conformance or complete-route acceptance. Runnable probes, limits and next safe action are
+in `site-js-budget.md`, with requests/module evidence in `evidence/site-code-fence-boundaries.json`.
+No product/component/config/dependency changes adopted. ADR-016 remains investigation; budget **OPEN**.
+
 **Documentation site** — see
 [documentation-site-and-distribution.md](documentation-site-and-distribution.md) §2.2 for the promise these
 items close: preview variant switching and code view, install-command copy (the component exists at

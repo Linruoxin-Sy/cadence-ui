@@ -15,8 +15,47 @@ const { build, version: esbuildVersion } = await import(pathToFileURL(viteRequir
 const root = process.cwd();
 const lean = process.argv.includes("--dom-animation");
 const fence = process.argv.includes("--fence");
-const dir = path.join(root, `.cache/react-ssr-budget${lean ? "-lean" : ""}${fence ? "-fence" : ""}`);
+const scopedFence = process.argv.includes("--scoped-fence");
+const packageManager = process.argv.includes("--package-manager");
+assert.ok(!scopedFence || (lean && fence), "--scoped-fence requires --dom-animation --fence");
+assert.ok(!packageManager || scopedFence, "--package-manager requires --scoped-fence");
+const dir = path.join(
+  root,
+  `.cache/react-ssr-budget${lean ? "-lean" : ""}${fence ? "-fence" : ""}${scopedFence ? "-scoped" : ""}${packageManager ? "-package" : ""}`,
+);
 await mkdir(dir, { recursive: true });
+if (scopedFence) {
+  const source = await readFile(path.join(root, "registry/cadence/code-block/index.tsx"), "utf8");
+  const start = source.indexOf("function CodeBlockTab({");
+  const end = source.indexOf("export interface CodeBlockActionsProps", start);
+  assert.ok(start > 0 && end > start);
+  const tab = source.slice(start, end);
+  // Preserve the exact tab implementation, including layoutId/full Motion features.
+  // A private identity marker breaks root -> tab's value reference; the public export stays.
+  await writeFile(
+    path.join(dir, "code-block-tab.tsx"),
+    `import * as React from "react";
+import { motion } from "motion/react";
+import { cn } from "../../registry/cadence/lib/cn";
+import { useCadenceMotion } from "../../registry/cadence/lib/provider";
+import { useCodeBlockPart, partIds, type CodeBlockTabProps } from "./code-block";
+const CodeBlockTab = /* @__PURE__ */ Object.assign(${tab.trim()}, { cadencePart: "tab" });
+export { CodeBlockTab };
+`,
+  );
+  const core = (source.slice(0, start) + source.slice(end))
+    .replace(
+      'import { animate, type HTMLMotionProps, motion, useMotionValue } from "motion/react";',
+      'import { animate, type HTMLMotionProps, LazyMotion, domAnimation, useMotionValue } from "motion/react";\nimport * as motion from "motion/react-m";',
+    )
+    .replaceAll('"../', '"../../registry/cadence/')
+    .replace("child.type === CodeBlockTab", '(child.type as { cadencePart?: string }).cadencePart === "tab"')
+    .replace("    <CodeBlockContext.Provider", "    <LazyMotion features={domAnimation}><CodeBlockContext.Provider")
+    .replace("    </CodeBlockContext.Provider>", "    </CodeBlockContext.Provider></LazyMotion>")
+    .replace("  CodeBlockTab,\n", "")
+    .concat('\nexport { useCodeBlockPart, partIds };\nexport { CodeBlockTab } from "./code-block-tab";\n');
+  await writeFile(path.join(dir, "code-block.tsx"), core);
+}
 if (lean) {
   // Explicit experimental fork; never rewrites registry source or changes public imports.
   const source = await readFile(path.join(root, "registry/cadence/button/index.tsx"), "utf8");
@@ -33,6 +72,13 @@ if (lean) {
   await writeFile(path.join(dir, "button.tsx"), fork);
 }
 const app = `import { useState } from "react";
+${
+  packageManager
+    ? `import { PackageManagerBlock } from "../../components/site/package-manager-block";
+import { PackageManagerProvider } from "../../components/site/package-manager-preference";
+import { packageManagerCommands } from "../../components/site/package-manager";`
+    : ""
+}
 ${fence ? 'import { CodeBlock, CodeBlockHeader, CodeBlockTitle, CodeBlockActions, CodeBlockCopyButton, CodeBlockContent } from "../../registry/cadence/code-block";' : ""}
 import { ButtonPreview } from "../../components/site/previews/button";
 import { Button } from "../../registry/cadence/button";
@@ -43,6 +89,7 @@ export function App() {
     <div data-preview="button"><ButtonPreview /></div>
     <Button onClick={() => setCount(count + 1)}>Count {count}</Button>
     ${fence ? '<CodeBlock><CodeBlockHeader><CodeBlockTitle>Usage</CodeBlockTitle><CodeBlockActions><CodeBlockCopyButton value="example" /></CodeBlockActions></CodeBlockHeader><CodeBlockContent>example</CodeBlockContent></CodeBlock>' : ""}
+    ${packageManager ? '<PackageManagerProvider><PackageManagerBlock panels={packageManagerCommands("npx shadcn@latest add @cadence/button").map(panel => ({ ...panel, lines: null }))} /></PackageManagerProvider>' : ""}
   </main></CadenceProvider>;
 }`;
 await writeFile(path.join(dir, "app.jsx"), app);
@@ -65,6 +112,10 @@ const plugins = lean
       {
         name: "diagnostic-button-fork",
         setup(builder) {
+          if (scopedFence)
+            builder.onResolve({ filter: /cadence\/code-block$/ }, () => ({
+              path: path.join(dir, "code-block.tsx"),
+            }));
           builder.onResolve({ filter: /(?:cadence\/button|@\/registry\/cadence\/button)$/ }, () => ({
             path: path.join(dir, "button.tsx"),
           }));
@@ -152,6 +203,29 @@ try {
     } else assert.ok(transform === "none" || transform === "matrix(1, 0, 0, 1, 0, 0)", transform);
     modes.push({ mode, heldTransform: transform });
   }
+  let fenceInteractions;
+  if (fence) {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    const copy = page.getByRole("button", { name: "Copy", exact: true }).first();
+    await copy.click();
+    await page.getByRole("button", { name: "Copied", exact: true }).first().waitFor();
+    assert.equal(await page.evaluate(() => navigator.clipboard.readText()), "example");
+    fenceInteractions = { clipboard: "example" };
+  }
+  if (packageManager) {
+    await page.getByRole("tab", { name: "pnpm", exact: true }).focus();
+    await page.keyboard.press("ArrowRight");
+    assert.equal(await page.getByRole("tab", { name: "npm", exact: true }).getAttribute("aria-selected"), "true");
+    await page.getByRole("button", { name: "Copy", exact: true }).last().click();
+    await page.getByRole("button", { name: "Copied", exact: true }).last().waitFor();
+    assert.equal(await page.evaluate(() => navigator.clipboard.readText()), "npx shadcn@latest add @cadence/button");
+    assert.equal(await page.evaluate(() => localStorage.getItem("cadence-package-manager")), "npm");
+    fenceInteractions.packageManager = {
+      keyboard: "ArrowRight selects npm",
+      clipboard: "npx shadcn@latest add @cadence/button",
+      stored: "npm",
+    };
+  }
   assert.deepEqual(await page.evaluate(() => window.__hydrationErrors), []);
   // No JavaScript still exposes every actual preview button: SSR is retained.
   const noJS = await browser.newContext({ javaScriptEnabled: false });
@@ -166,10 +240,32 @@ try {
       Object.entries(output.inputs).map(([module, value]) => ({ module, bytesInOutput: value.bytesInOutput })),
     )
     .sort((a, b) => b.bytesInOutput - a.bytesInOutput);
+  const retainedModules = modules.filter((module) => module.bytesInOutput > 0);
+  const loadedSources = await Promise.all(
+    [...loaded].map((filename) => readFile(path.join(dir, "browser", filename), "utf8")),
+  );
+  const featureBoundary = {
+    tabIndicator: loadedSources.some((source) => source.includes("code-block-tab-indicator")),
+    tabBytes: retainedModules
+      .filter((entry) => entry.module.endsWith("/code-block-tab.tsx"))
+      .reduce((sum, entry) => sum + entry.bytesInOutput, 0),
+    projection: retainedModules.some((entry) => entry.module.endsWith("/projection/node/create-projection-node.mjs")),
+    drag: retainedModules.some((entry) => entry.module.endsWith("/gestures/drag/VisualElementDragControls.mjs")),
+    sequence: retainedModules.some((entry) => entry.module.endsWith("/animation/sequence/create.mjs")),
+  };
+  if (scopedFence) {
+    assert.equal(featureBoundary.projection, packageManager);
+    assert.equal(featureBoundary.drag, packageManager);
+    assert.equal(featureBoundary.tabIndicator, packageManager);
+  }
   const result = {
     scope: "Diagnostic subset, not full site or budget closure",
     lean,
     fence,
+    scopedFence,
+    packageManager,
+    fenceInteractions,
+    featureBoundary,
     esbuildVersion,
     react: require("react/package.json").version,
     report,
