@@ -1997,3 +1997,13 @@ recipe timing via transition/controls.start/animate. The first change to effecti
 fallback timing exceeded the proven token-only scope; restored it without claiming
 causality for first-frame failures. Recipe none stays zero; caller-authored Motion
 programs are not globally controlled. Context tests distinguish these surfaces.
+
+Final B3–B5 validation: runtime source f1a0fa0, check663/85 passed, final Next
+production build passed. Combobox10/10 targeted production cases passed; B4 first
+run76/76 passed. Four B3 none-first-insertion assertions still fail with original
+fallback semantics: line148 combines sample presence and zero animation, so capture
+samples before attributing missing evidence versus an animation defect. Global first-
+frame matrix stays OPEN. Final strict JS292314gzipbytes/23scripts >120000 (all200,
+no pageerrors, original protocol/root body hashes), compatibility-base-js.json.
+Previous292327/292344 retained. Ledger373 classified/93 open; next finite group B6,
+then B7–B9. No global /goal completion or budget closure. Handoff compatibility-base.md.
