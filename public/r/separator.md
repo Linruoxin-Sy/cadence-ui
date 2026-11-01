@@ -72,10 +72,13 @@ decorative so screen readers skip it:
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"`   | Direction of the rule.                                        |
 | `decorative`  | `boolean`                    | `false`          | Renders `role="none"` and `aria-hidden`; additive to upstream. |
 | `render`      | Base UI render prop          | –                | Composition, as on every Base UI primitive.                   |
-| `className`   | `string`                     | –                | Merged last.                                                  |
+| `className`   | string or state callback                     | –                | Merged last.                                                  |
 
 `data-slot="separator"` and `data-orientation` are always set, so a consumer can
 size the rule from CSS: `data-[orientation=vertical]:h-8`.
+
+Base UI state callbacks for `className` are evaluated before merging caller classes last.
+`style` accepts an object or a state callback and is forwarded to the primitive.
 
 ## Motion contract
 

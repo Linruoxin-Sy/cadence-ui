@@ -77,7 +77,9 @@ the hint stays legible on the tooltip surface.
 | Part       | Props                        | Notes                                            |
 | ---------- | ---------------------------- | ------------------------------------------------ |
 | `Kbd`      | native `kbd` props           | One key. `data-slot="kbd"`.                      |
-| `KbdGroup` | native `kbd` props           | Wraps several keys with `data-slot="kbd-group"`. |
+| `KbdGroup` | native `div` props           | Wraps several keys with `data-slot="kbd-group"`. |
+
+KbdGroup keeps the pinned native div prop type while rendering a `kbd` element.
 
 ## Motion contract
 

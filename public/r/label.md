@@ -45,13 +45,13 @@ field and keep it consistent.
 ## Disabled
 
 The label follows the control without any prop: `peer-disabled:` handles a sibling
-control, `group-data-[disabled=true]:` handles a disabled `Field`.
+control placed before the label; `group-data-[disabled=true]:` handles a disabled group.
 
 ```tsx
-<Label htmlFor="slug" className="peer-disabled:opacity-50">
-  Slug
-</Label>
-<Input id="slug" className="peer" disabled defaultValue="cadence" />
+<div className="group grid gap-2" data-disabled="true">
+  <Label htmlFor="slug">Slug</Label>
+  <Input id="slug" disabled defaultValue="cadence" />
+</div>
 ```
 
 ## When to use

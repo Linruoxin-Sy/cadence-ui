@@ -86,6 +86,9 @@ export function Author() {
 All parts carry `data-slot`, so `[&>[data-slot=avatar]]:size-6` style overrides are
 possible without a prop.
 
+Root, Image and Fallback accept Base UI state callbacks for `className` and `style`.
+Caller classes merge last; Badge and group parts use native string classes and object styles.
+
 ## Motion contract
 
 No motion (T0). The image-to-fallback swap is instant by design: Base UI knows when

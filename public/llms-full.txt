@@ -220,11 +220,16 @@ import { buttonVariants } from "@/components/cadence/button";
 | `variant` | `"default" \| "destructive" \| "outline" \| "secondary" \| "ghost" \| "link"` | `"default"` | Visual weight. |
 | `size` | `"default" \| "xs" \| "sm" \| "lg" \| "icon" \| "icon-xs" \| "icon-sm" \| "icon-lg"` | `"default"` | Height and padding. |
 | `render` | `ReactElement \| (props, state) => ReactElement` | – | Base UI composition; replaces `asChild`. |
-| `className` | `string` | – | Merged last. |
+| `className` | string or state callback | – | Merged last. |
 
 All native button props are forwarded.
 
+Base UI state callbacks for `className` are evaluated before merging caller classes last.
+`style` accepts an object or a state callback and is forwarded to the primitive.
+
 ## Motion contract
+
+Recipe: `feedback.press`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -434,7 +439,9 @@ the hint stays legible on the tooltip surface.
 | Part       | Props                        | Notes                                            |
 | ---------- | ---------------------------- | ------------------------------------------------ |
 | `Kbd`      | native `kbd` props           | One key. `data-slot="kbd"`.                      |
-| `KbdGroup` | native `kbd` props           | Wraps several keys with `data-slot="kbd-group"`. |
+| `KbdGroup` | native `div` props           | Wraps several keys with `data-slot="kbd-group"`. |
+
+KbdGroup keeps the pinned native div prop type while rendering a `kbd` element.
 
 ## Motion contract
 
@@ -530,10 +537,13 @@ decorative so screen readers skip it:
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"`   | Direction of the rule.                                        |
 | `decorative`  | `boolean`                    | `false`          | Renders `role="none"` and `aria-hidden`; additive to upstream. |
 | `render`      | Base UI render prop          | –                | Composition, as on every Base UI primitive.                   |
-| `className`   | `string`                     | –                | Merged last.                                                  |
+| `className`   | string or state callback                     | –                | Merged last.                                                  |
 
 `data-slot="separator"` and `data-orientation` are always set, so a consumer can
 size the rule from CSS: `data-[orientation=vertical]:h-8`.
+
+Base UI state callbacks for `className` are evaluated before merging caller classes last.
+`style` accepts an object or a state callback and is forwarded to the primitive.
 
 ## Motion contract
 
@@ -602,13 +612,13 @@ field and keep it consistent.
 ## Disabled
 
 The label follows the control without any prop: `peer-disabled:` handles a sibling
-control, `group-data-[disabled=true]:` handles a disabled `Field`.
+control placed before the label; `group-data-[disabled=true]:` handles a disabled group.
 
 ```tsx
-<Label htmlFor="slug" className="peer-disabled:opacity-50">
-  Slug
-</Label>
-<Input id="slug" className="peer" disabled defaultValue="cadence" />
+<div className="group grid gap-2" data-disabled="true">
+  <Label htmlFor="slug">Slug</Label>
+  <Input id="slug" disabled defaultValue="cadence" />
+</div>
 ```
 
 ## When to use
@@ -741,10 +751,13 @@ const [value, setValue] = useState("");
 | `value`         | `string \| number \| readonly string[]` | –   | Controlled value.                                  |
 | `defaultValue`  | same as `value`                     | –       | Uncontrolled initial value.                        |
 | `onValueChange` | `(value: string, details) => void`  | –       | Base UI change callback, in addition to `onChange`. |
-| `className`     | `string`                            | –       | Merged last.                                       |
+| `className`     | string or state callback                            | –       | Merged last.                                       |
 
 All native input props are forwarded, including `disabled`, `readOnly`, `required`,
 and `aria-*`.
+
+Base UI state callbacks for `className` are evaluated before merging caller classes last.
+`style` accepts an object or a state callback and is forwarded to the primitive.
 
 ## Motion contract
 
@@ -937,7 +950,7 @@ export function Plan() {
     <Card className="max-w-sm">
       <CardHeader>
         <CardTitle>Parity plan</CardTitle>
-        <CardDescription>57 components, nine batches, one release train.</CardDescription>
+        <CardDescription>58 components, ten batches, one release train.</CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">Batch B1 ships the eleven atoms.</p>
@@ -1276,6 +1289,9 @@ export function Author() {
 
 All parts carry `data-slot`, so `[&>[data-slot=avatar]]:size-6` style overrides are
 possible without a prop.
+
+Root, Image and Fallback accept Base UI state callbacks for `className` and `style`.
+Caller classes merge last; Badge and group parts use native string classes and object styles.
 
 ## Motion contract
 
