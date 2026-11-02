@@ -9,7 +9,12 @@ for (const theme of ["light", "dark"] as const) {
 
       // Record every painted flight, including the first one after selection.
       await page.evaluate(() => {
-        const state = { running: true, widths: [] as { box: number; text: number }[] };
+        const state = {
+          running: true,
+          widths: [] as { box: number; text: number }[],
+          landings: [] as { dx: number; dy: number }[],
+          last: null as { left: number; top: number; target: Element } | null,
+        };
         Object.assign(window, { selectFlight: state });
         const sample = () => {
           const clone = document.querySelector('[data-slot="select-handoff"]');
@@ -17,6 +22,17 @@ for (const theme of ["light", "dark"] as const) {
             const range = document.createRange();
             range.selectNodeContents(clone);
             state.widths.push({ box: clone.getBoundingClientRect().width, text: range.getBoundingClientRect().width });
+            const target = [...document.querySelectorAll('[data-preview="select"] [data-slot="select-value"]')].find(
+              (node) => getComputedStyle(node).opacity === "0",
+            )?.firstElementChild;
+            if (target) {
+              const rect = clone.getBoundingClientRect();
+              state.last = { left: rect.left, top: rect.top, target };
+            }
+          } else if (state.last) {
+            const rect = state.last.target.getBoundingClientRect();
+            state.landings.push({ dx: state.last.left - rect.left, dy: state.last.top - rect.top });
+            state.last = null;
           }
           if (state.running) requestAnimationFrame(sample);
         };
@@ -45,15 +61,21 @@ for (const theme of ["light", "dark"] as const) {
             selectFlight: {
               running: boolean;
               widths: { box: number; text: number }[];
+              landings: { dx: number; dy: number }[];
             };
           }
         ).selectFlight;
         state.running = false;
-        return { widths: state.widths };
+        return { widths: state.widths, landings: state.landings };
       });
       if (mode === "full") {
         expect(evidence.widths.length).toBeGreaterThan(0);
         expect(evidence.widths.every(({ box, text }) => box >= text)).toBe(true);
+        expect(evidence.landings).toHaveLength(6);
+        for (const { dx, dy } of evidence.landings) {
+          expect(Math.abs(dx)).toBeLessThan(0.5);
+          expect(Math.abs(dy)).toBeLessThan(0.5);
+        }
       } else {
         expect(evidence.widths).toHaveLength(0);
       }

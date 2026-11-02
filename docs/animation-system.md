@@ -432,6 +432,10 @@ useLayoutEffect(() => {
 > Detail: the outgoing element must leave the document flow via `popLayout`, otherwise it stretches the container back to the old width. `ResizeObserver` only fires when content size changes, so it does not fight the animation (the animation changes the outer slot's width). Clamp the _rendered_ width with `clampMeasuredSize(width, closedWidth)`: a physics-defined spring can cross its target once when it inherits velocity, and half a pixel under the new label is enough to ellipsize it.
 
 Select's portal handoff owns committed controls for its flight target and clock; a zero clock completes the handoff before paint, restoring value opacity and removing the clone. Unmount cancels its driver through the same control owner.
+The portal's placement follows the live destination in ResizeObserver callbacks while the value
+and trigger resize. A centered or right-aligned row can move the trigger during `geometry.resize`;
+freezing the initial viewport coordinates would leave the flight offset when the real label appears.
+This updates placement only; the token-backed inverse transform still owns the flight.
 
 CodeBlock clamps the rendered viewport height with `clampMeasuredSize` against its measured closed size. Zero-duration geometry jumps and synchronously writes the target; unmount stops the owned height MotionValue.
 

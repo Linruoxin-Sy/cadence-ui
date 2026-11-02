@@ -33,6 +33,11 @@ interface HandoffSource {
   text: string;
 }
 
+interface HandoffFlight extends HandoffSource {
+  origin: Origin;
+  destination: HTMLElement;
+}
+
 interface SelectContextValue {
   cancelled: { current: boolean };
   pending: HandoffSource | null;
@@ -76,7 +81,7 @@ function collectLabels(children: ReactNode, labels = new Map<unknown, ReactNode>
  *
  * The label is laid out at its final width inside a clipped slot. Animating the slot's
  * width therefore folds the surface without re-wrapping the text, and the handoff's
- * destination does not move while the width settles.
+ * portal follows the destination while the surrounding layout settles.
  */
 function Select<Value, Multiple extends boolean | undefined = false>(
   props: SelectPrimitive.Root.Props<Value, Multiple>,
@@ -212,7 +217,7 @@ function SelectTrigger({
     },
     [ref],
   );
-  const [flight, setFlight] = useState<{ origin: Origin; text: string; rect: DOMRect } | null>(null);
+  const [flight, setFlight] = useState<HandoffFlight | null>(null);
 
   useIsomorphicLayoutEffect(() => {
     if (!context?.pending) return;
@@ -224,13 +229,14 @@ function SelectTrigger({
     const trigger = triggerRef.current;
     const slot = trigger?.querySelector<HTMLElement>('[data-slot="select-value"]');
     const text = slot?.firstElementChild as HTMLElement | null;
-    const rect = (text ?? slot)?.getBoundingClientRect();
-    if (!rect?.width) {
+    const destination = text ?? slot;
+    const rect = destination?.getBoundingClientRect();
+    if (!destination || !rect?.width) {
       context.setPending(null);
       return;
     }
 
-    setFlight({ origin: measureOrigin(context.pending.rect, rect), text: context.pending.text, rect });
+    setFlight({ origin: measureOrigin(context.pending.rect, rect), text: context.pending.text, rect, destination });
     context.setFlying(true);
     context.setPending(null);
   }, [context, cm.reduced]);
@@ -281,21 +287,39 @@ function SelectTrigger({
   );
 }
 
-function SelectHandoff({
-  flight,
-  onComplete,
-}: {
-  flight: { origin: Origin; text: string; rect: DOMRect };
-  onComplete: () => void;
-}) {
+function SelectHandoff({ flight, onComplete }: { flight: HandoffFlight; onComplete: () => void }) {
   const cm = useCadenceMotion();
+  const hostRef = useRef<HTMLSpanElement>(null);
   const transition = cm.transition("handoff");
   const controls = useControlAnimation({ x: 0, y: 0 }, transition);
+  useIsomorphicLayoutEffect(() => {
+    const followDestination = () => {
+      const rect = flight.destination.getBoundingClientRect();
+      const host = hostRef.current;
+      if (!host) return;
+      host.style.left = `${rect.left}px`;
+      host.style.top = `${rect.top}px`;
+      host.style.height = `${rect.height}px`;
+    };
+    const observer = new ResizeObserver(followDestination);
+    observer.observe(flight.destination);
+    const trigger = flight.destination.closest('[data-slot="select-trigger"]');
+    if (trigger) observer.observe(trigger);
+    followDestination();
+    window.addEventListener("resize", followDestination);
+    window.addEventListener("scroll", followDestination, true);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", followDestination);
+      window.removeEventListener("scroll", followDestination, true);
+    };
+  }, [flight]);
   useIsomorphicLayoutEffect(() => {
     if (transition.duration === 0) onComplete();
   }, [transition.duration, onComplete]);
   return (
     <motion.span
+      ref={hostRef}
       aria-hidden
       data-motion={cm.mode}
       data-slot="select-handoff"

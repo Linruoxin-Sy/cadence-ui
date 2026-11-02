@@ -133,8 +133,9 @@ never decides whether a value is valid.
 | none | every duration is zero | – | – |
 
 The trigger's label is laid out at its final width inside a clipped slot. Animating that slot's width
-folds the surface without re-wrapping the label, and the handoff's destination does not drift while
-the width settles. Keyboard selection has no origin, so it changes the width and lets the label swap
+folds the surface without re-wrapping the label. The portalled label follows the live destination
+as the trigger resizes, including shifts in centered or right-aligned rows, so the flight and real
+label meet at the same position. Keyboard selection has no origin, so it changes the width and lets the label swap
 without a flight; the pointer keeps the spatial handoff.
 The portalled flight label uses its natural text width, so a longer selection stays fully visible
 even if Base UI has not yet committed the destination label when its position is measured.
