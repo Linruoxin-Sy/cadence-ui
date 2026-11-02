@@ -57,6 +57,9 @@ const VISUAL_SETTLE = 1.2;
  * `0 <= bounce <= 0.95`; the tokens never leave that range.
  */
 export function physicalSpring(visualDuration: number, bounce = 0): Transition {
+  if (!Number.isFinite(visualDuration) || visualDuration < 0)
+    throw new RangeError("visualDuration must be finite and non-negative");
+  if (visualDuration === 0) return { duration: 0 };
   const dampingRatio = Math.max(1 - bounce, 0.05);
   const undamped = (2 * Math.PI) / (visualDuration * VISUAL_SETTLE);
   return {
@@ -98,6 +101,7 @@ export interface MotionOptions {
   /**
    * Multiplies every duration, spring `visualDuration`, and delay. `1` is the
    * authored timing; `4` is the "slow motion" used by the docs site.
+   * Finite and non-negative; zero reaches the target immediately without changing mode.
    */
   timeScale?: number;
 }
@@ -156,6 +160,8 @@ const recipes: Record<Recipe, RecipeSpec> = {
 export function transitionFor(recipe: Recipe, mode: CadenceMode, options: MotionOptions = {}): Transition {
   if (mode === "none") return { duration: 0 };
   const timeScale = options.timeScale ?? 1;
+  if (!Number.isFinite(timeScale) || timeScale < 0) throw new RangeError("timeScale must be finite and non-negative");
+  if (timeScale === 0) return { duration: 0, delay: 0 };
   const delay = (options.delay ?? 0) * timeScale;
   const spec = recipes[recipe];
 

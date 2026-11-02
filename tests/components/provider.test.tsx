@@ -102,3 +102,37 @@ describe("CadenceProvider", () => {
     expect(screen.getByTestId("inner")).toHaveAttribute("data-duration", "0");
   });
 });
+
+it("inherits zero and accepts explicit nested zero without changing mode", () => {
+  const view = render(
+    <CadenceProvider mode="full" timeScale={0}>
+      <CadenceProvider>
+        <Probe label="zero" />
+      </CadenceProvider>
+    </CadenceProvider>,
+  );
+  expect(screen.getByTestId("zero")).toHaveAttribute("data-scale", "0");
+  expect(screen.getByTestId("zero")).toHaveAttribute("data-mode", "full");
+  expect(screen.getByTestId("zero")).toHaveAttribute("data-disabled", "false");
+  view.rerender(
+    <CadenceProvider mode="full" timeScale={4}>
+      <CadenceProvider timeScale={0}>
+        <Probe label="zero" />
+      </CadenceProvider>
+    </CadenceProvider>,
+  );
+  expect(screen.getByTestId("zero")).toHaveAttribute("data-duration", "0");
+});
+
+it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+  "rejects invalid provider clock %s",
+  (timeScale) => {
+    expect(() =>
+      render(
+        <CadenceProvider timeScale={timeScale}>
+          <Probe label="invalid" />
+        </CadenceProvider>,
+      ),
+    ).toThrow(RangeError);
+  },
+);

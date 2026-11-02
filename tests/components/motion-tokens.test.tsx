@@ -1,6 +1,6 @@
 import { spring as motionSpring } from "motion/react";
 import { describe, expect, it } from "vitest";
-import { duration, physicalSpring, spring, transitionFor } from "@/registry/cadence/lib/motion";
+import { duration, physicalSpring, type Recipe, spring, transitionFor } from "@/registry/cadence/lib/motion";
 
 /**
  * The token layer is the one place a number is allowed to exist, so it is also the
@@ -134,4 +134,38 @@ describe("measured geometry", () => {
     expect(transitionFor("geometry.resize", "reduced")).not.toHaveProperty("stiffness");
     expect(transitionFor("geometry.resize", "reduced", { delay: 0.05 })).toMatchObject({ duration: 0, delay: 0.05 });
   });
+});
+
+const allRecipes: Recipe[] = [
+  "reveal",
+  "enter.pop",
+  "exit.fade",
+  "exit.shrink",
+  "popup.anchored",
+  "layout.move",
+  "layout.shared",
+  "list.stagger",
+  "gesture.drag",
+  "scroll.progress",
+  "scroll.story",
+  "text.reveal",
+  "text.split",
+  "number.roll",
+  "data.transition",
+  "state.morph",
+  "geometry.resize",
+  "handoff",
+  "feedback.press",
+];
+it.each(allRecipes)("%s has a real zero clock without spring fallback or delay", (recipe) => {
+  for (const mode of ["full", "reduced"] as const)
+    expect(transitionFor(recipe, mode, { timeScale: 0, delay: 3 })).toEqual({ duration: 0, delay: 0 });
+  expect(transitionFor(recipe, "none", { timeScale: 0, delay: 3 })).toEqual({ duration: 0 });
+});
+it("direct physical zero duration never divides by zero", () => {
+  expect(physicalSpring(0)).toEqual({ duration: 0 });
+});
+it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])("rejects invalid clock %s", (clock) => {
+  expect(() => physicalSpring(clock)).toThrow(RangeError);
+  expect(() => transitionFor("state.morph", "full", { timeScale: clock })).toThrow(RangeError);
 });

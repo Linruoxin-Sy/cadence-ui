@@ -93,7 +93,7 @@ export interface CadenceProviderProps {
    * retain the theme's --animate-* timing. `1` (default) is the authored timing;
    * the docs site passes `4` for its 0.25× preview. Additive: it does not change
    * any token, so a component looks the same at `1`. Omitting it inherits the
-   * enclosing scale.
+   * enclosing scale. Finite and non-negative; zero is immediate timing, preserving mode.
    */
   timeScale?: number;
   children: ReactNode;
@@ -114,6 +114,7 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
   const requested = mode ?? parent?.mode ?? FALLBACK_MODE;
   const scale = timeScale ?? parent?.timeScale ?? 1;
   const systemReduced = useSystemReducedMotion();
+  if (!Number.isFinite(scale) || scale < 0) throw new RangeError("timeScale must be finite and non-negative");
   const effective: CadenceMode = requested === "none" ? "none" : systemReduced ? "reduced" : requested;
   const value = createMotion(effective, scale);
 

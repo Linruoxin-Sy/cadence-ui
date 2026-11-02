@@ -1,0 +1,4971 @@
+{
+  "sourceText": "import type { Transition } from \"motion/react\";\n\n/**\n * Motion tokens for Cadence. Every animation must use one of these values so\n * timing stays coherent across components. Durations are seconds.\n */\nexport const duration = {\n  instant: 0.1,\n  fast: 0.16,\n  base: 0.22,\n  slow: 0.32,\n  page: 0.45,\n} as const;\n\nexport const ease = {\n  out: [0.22, 1, 0.36, 1],\n  inOut: [0.65, 0, 0.35, 1],\n  in: [0.7, 0, 0.84, 0],\n} as const;\n\nexport const spring = {\n  press: { type: \"spring\", visualDuration: 0.24, bounce: 0.12 },\n  snappy: { type: \"spring\", visualDuration: 0.26, bounce: 0 },\n  travel: { type: \"spring\", visualDuration: 0.3, bounce: 0 },\n  smooth: { type: \"spring\", visualDuration: 0.4, bounce: 0 },\n  morph: { type: \"spring\", visualDuration: 0.42, bounce: 0 },\n} as const;\n\nexport const distance = { xs: 4, sm: 8, md: 12, lg: 24, xl: 48 } as const;\nexport const scale = { in: 0.96, pop: 1.02, press: 0.97 } as const;\n/** Embla attraction units, calibrated against the data.transition duration (not ms). */\nexport const carouselClock = { unitsPerSecond: 100 } as const;\n\nexport const reducedDurationScale = 0.6;\n\nexport const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;\n\n/**\n * The point at which a spring is ~97% of the way to its target, relative to\n * the authored `visualDuration`. Copied from motion-dom 13.5.1 (`spring.ts`);\n * re-check that source when Motion is upgraded.\n */\nconst VISUAL_SETTLE = 1.2;\n\n/**\n * Restate a token spring as stiffness / damping / mass.\n *\n * A `visualDuration` spring is time-defined: when Motion starts a new\n * animation from an interrupted one it discards the inherited velocity, so a\n * retarget begins from rest. Physics-defined springs keep it. Only recipes\n * marked `continuity: \"velocity\"` use this form; small-range springs keep the\n * time-defined shape because Motion deliberately ignores inherited velocity\n * there.\n *\n * Apply `timeScale` to `visualDuration` before calling this, so the physical\n * parameters scale with the rest of the system. The conversion is exact for\n * `0 <= bounce <= 0.95`; the tokens never leave that range.\n */\nexport function physicalSpring(visualDuration: number, bounce = 0): Transition {\n  if (!Number.isFinite(visualDuration) || visualDuration < 0)\n    throw new RangeError(\"visualDuration must be finite and non-negative\");\n  if (visualDuration === 0) return { duration: 0 };\n  const dampingRatio = Math.max(1 - bounce, 0.05);\n  const undamped = (2 * Math.PI) / (visualDuration * VISUAL_SETTLE);\n  return {\n    type: \"spring\",\n    stiffness: undamped * undamped,\n    damping: 2 * dampingRatio * undamped,\n    mass: 1,\n  };\n}\n\nexport type CadenceMode = \"full\" | \"reduced\" | \"none\";\n\nexport type Recipe =\n  | \"reveal\"\n  | \"enter.pop\"\n  | \"exit.fade\"\n  | \"exit.shrink\"\n  | \"popup.anchored\"\n  | \"layout.move\"\n  | \"layout.shared\"\n  | \"list.stagger\"\n  | \"gesture.drag\"\n  | \"scroll.progress\"\n  | \"scroll.story\"\n  | \"text.reveal\"\n  | \"text.split\"\n  | \"number.roll\"\n  | \"data.transition\"\n  | \"state.morph\"\n  | \"geometry.resize\"\n  | \"handoff\"\n  | \"feedback.press\";\n\nexport interface MotionOptions {\n  /** Delay in seconds. Ignored when motion is disabled. */\n  delay?: number;\n  /** Override the token duration (tween recipes only). */\n  duration?: number;\n  /**\n   * Multiplies every duration, spring `visualDuration`, and delay. `1` is the\n   * authored timing; `4` is the \"slow motion\" used by the docs site.\n   * Finite and non-negative; zero reaches the target immediately without changing mode.\n   */\n  timeScale?: number;\n}\n\ntype RecipeSpec =\n  | { kind: \"tween\"; duration: number; ease: readonly number[] }\n  | {\n      kind: \"spring\";\n      spring: keyof typeof spring;\n      /**\n       * Mark a recipe whose element can be retargeted while it is still\n       * moving. It is resolved into a physics-defined spring so Motion carries\n       * the current velocity into the new target instead of restarting from\n       * rest. Reserved for large-travel recipes (see animation-system §3).\n       */\n      continuity?: \"velocity\";\n      /**\n       * `jump` resolves to zero duration under `reduced` instead of a short\n       * tween. Measured geometry (width/height) uses it: the size is\n       * information, and tweening layout under reduced motion is still layout\n       * motion.\n       */\n      reduced?: \"jump\";\n    };\n\nconst recipes: Record<Recipe, RecipeSpec> = {\n  reveal: { kind: \"tween\", duration: duration.base, ease: ease.out },\n  \"enter.pop\": { kind: \"spring\", spring: \"snappy\" },\n  \"exit.fade\": { kind: \"tween\", duration: duration.fast, ease: ease.in },\n  \"exit.shrink\": { kind: \"tween\", duration: duration.fast, ease: ease.in },\n  \"popup.anchored\": { kind: \"spring\", spring: \"smooth\" },\n  \"layout.move\": { kind: \"spring\", spring: \"smooth\", continuity: \"velocity\" },\n  \"layout.shared\": { kind: \"spring\", spring: \"morph\", continuity: \"velocity\" },\n  \"list.stagger\": { kind: \"tween\", duration: duration.base, ease: ease.out },\n  \"gesture.drag\": { kind: \"spring\", spring: \"snappy\" },\n  \"scroll.progress\": { kind: \"spring\", spring: \"smooth\" },\n  \"scroll.story\": { kind: \"tween\", duration: duration.slow, ease: ease.out },\n  \"text.reveal\": { kind: \"tween\", duration: duration.slow, ease: ease.out },\n  \"text.split\": { kind: \"tween\", duration: duration.slow, ease: ease.out },\n  \"number.roll\": { kind: \"spring\", spring: \"snappy\" },\n  \"data.transition\": { kind: \"tween\", duration: duration.base, ease: ease.out },\n  \"state.morph\": { kind: \"spring\", spring: \"morph\" },\n  \"geometry.resize\": { kind: \"spring\", spring: \"morph\", continuity: \"velocity\", reduced: \"jump\" },\n  handoff: { kind: \"spring\", spring: \"travel\", continuity: \"velocity\" },\n  \"feedback.press\": { kind: \"spring\", spring: \"press\" },\n};\n\n/**\n * Resolve a recipe into a Motion `transition` for the current mode.\n *\n * - `full`: the token as authored, except continuity recipes, which are restated as physics so an\n *   interrupted animation keeps its velocity.\n * - `reduced`: springs collapse to a short tween, tweens run at 60% duration.\n * - `none`: zero duration, so components jump straight to their end state.\n */\nexport function transitionFor(recipe: Recipe, mode: CadenceMode, options: MotionOptions = {}): Transition {\n  if (mode === \"none\") return { duration: 0 };\n  const timeScale = options.timeScale ?? 1;\n  if (!Number.isFinite(timeScale) || timeScale < 0) throw new RangeError(\"timeScale must be finite and non-negative\");\n  if (timeScale === 0) return { duration: 0, delay: 0 };\n  const delay = (options.delay ?? 0) * timeScale;\n  const spec = recipes[recipe];\n\n  if (spec.kind === \"spring\") {\n    if (mode === \"reduced\") {\n      if (spec.reduced === \"jump\") return { duration: 0, delay };\n      return { duration: duration.fast * timeScale, ease: [...ease.out] as [number, number, number, number], delay };\n    }\n    const token = spring[spec.spring];\n    const visualDuration = token.visualDuration * timeScale;\n    if (spec.continuity === \"velocity\") return { ...physicalSpring(visualDuration, token.bounce), delay };\n    return { ...token, visualDuration, delay };\n  }\n\n  const scaleFactor = mode === \"reduced\" ? reducedDurationScale : 1;\n  return {\n    duration: (options.duration ?? spec.duration * scaleFactor) * timeScale,\n    ease: [...spec.ease] as [number, number, number, number],\n    delay,\n  };\n}\n",
+  "sourceSha256": "72305fb185390db69a8d2b9c82837adf7fe42c3f1125e0a069e5237ef09656e6",
+  "cases": [
+    {
+      "label": "initial inherited zero",
+      "target": 100,
+      "samples": [
+        {
+          "request": 0,
+          "starts": 1,
+          "phase": "commit",
+          "value": 0,
+          "velocity": 0,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 0,
+          "starts": 1,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 5076.142131211773,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 0,
+          "starts": 1,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 5076.142131211773,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "reveal: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 2,
+          "starts": 3,
+          "phase": "commit",
+          "value": 2.172995601722505,
+          "velocity": -105.75868072919548,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(2.64891px)"
+        },
+        {
+          "request": 2,
+          "starts": 3,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 39130.801759311,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 2,
+          "starts": 3,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 39130.801759311,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "reveal: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 3,
+          "starts": 3,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 39130.801759311,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 3,
+          "starts": 3,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 39130.801759311,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 3,
+          "starts": 3,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 39130.801759311,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "reveal: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 4,
+          "starts": 4,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 39130.801759311,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 4,
+          "starts": 4,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 4,
+          "starts": 4,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "reveal: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 5,
+          "starts": 5,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 5,
+          "starts": 5,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7142.857142857143,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 5,
+          "starts": 5,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7142.857142857143,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "enter.pop: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 7,
+          "starts": 7,
+          "phase": "commit",
+          "value": 30.05255722892136,
+          "velocity": -457.0807989451626,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(30.921px)"
+        },
+        {
+          "request": 7,
+          "starts": 7,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13989.488554215728,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 7,
+          "starts": 7,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13989.488554215728,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "enter.pop: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 8,
+          "starts": 7,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13989.488554215728,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 8,
+          "starts": 7,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13989.488554215728,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 8,
+          "starts": 7,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13989.488554215728,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "enter.pop: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 9,
+          "starts": 8,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13989.488554215728,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 9,
+          "starts": 8,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 9,
+          "starts": 8,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "enter.pop: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 10,
+          "starts": 9,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 10,
+          "starts": 9,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7246.376809246824,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 10,
+          "starts": 9,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7246.376809246824,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "exit.fade: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 12,
+          "starts": 11,
+          "phase": "commit",
+          "value": 77.28990638424875,
+          "velocity": -926.7389729547385,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(83.3137px)"
+        },
+        {
+          "request": 12,
+          "starts": 11,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 32442.990741519432,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 12,
+          "starts": 11,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 32442.990741519432,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "exit.fade: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 13,
+          "starts": 11,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 32442.990741519432,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 13,
+          "starts": 11,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 32442.990741519432,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 13,
+          "starts": 11,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 32442.990741519432,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "exit.fade: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 14,
+          "starts": 12,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 32442.990741519432,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 14,
+          "starts": 12,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3636.3636363636365,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 14,
+          "starts": 12,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3636.3636363636365,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "exit.fade: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 15,
+          "starts": 13,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3636.3636363636365,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 15,
+          "starts": 13,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 15,
+          "starts": 13,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "exit.shrink: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 17,
+          "starts": 15,
+          "phase": "commit",
+          "value": 79.19683157961117,
+          "velocity": -859.1469089523615,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(82.5475px)"
+        },
+        {
+          "request": 17,
+          "starts": 15,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 6710.699487222292,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 17,
+          "starts": 15,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 6710.699487222292,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "exit.shrink: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 18,
+          "starts": 15,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 6710.699487222292,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 18,
+          "starts": 15,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 6710.699487222292,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 18,
+          "starts": 15,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 6710.699487222292,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "exit.shrink: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 19,
+          "starts": 16,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 6710.699487222292,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 19,
+          "starts": 16,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3610.108302860687,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 19,
+          "starts": 16,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3610.108302860687,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "exit.shrink: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 20,
+          "starts": 17,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3610.108302860687,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 20,
+          "starts": 17,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 20,
+          "starts": 17,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "popup.anchored: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 22,
+          "starts": 19,
+          "phase": "commit",
+          "value": 55.603755638067014,
+          "velocity": -418.3211528186879,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(56.4822px)"
+        },
+        {
+          "request": 22,
+          "starts": 19,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 9060.458035802882,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 22,
+          "starts": 19,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 9060.458035802882,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "popup.anchored: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 23,
+          "starts": 19,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 9060.458035802882,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 23,
+          "starts": 19,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 9060.458035802882,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 23,
+          "starts": 19,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 9060.458035802882,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "popup.anchored: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 24,
+          "starts": 20,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 9060.458035802882,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 24,
+          "starts": 20,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 24,
+          "starts": 20,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "popup.anchored: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 25,
+          "starts": 21,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 25,
+          "starts": 21,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.2446012315795,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 25,
+          "starts": 21,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.2446012315795,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "layout.move: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 27,
+          "starts": 23,
+          "phase": "commit",
+          "value": 234.18382017751148,
+          "velocity": -1155.490647385381,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(241.695px)"
+        },
+        {
+          "request": 27,
+          "starts": 23,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -223639.69974043727,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 27,
+          "starts": 23,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -223639.69974043727,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "layout.move: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 28,
+          "starts": 23,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -223639.69974043727,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 28,
+          "starts": 23,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -223639.69974043727,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 28,
+          "starts": 23,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -223639.69974043727,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "layout.move: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 29,
+          "starts": 24,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -223639.69974043727,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 29,
+          "starts": 24,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3610.108302860687,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 29,
+          "starts": 24,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3610.108302860687,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "layout.move: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 30,
+          "starts": 25,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3610.108302860687,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 30,
+          "starts": 25,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 30,
+          "starts": 25,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "layout.shared: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 32,
+          "starts": 27,
+          "phase": "commit",
+          "value": 252.9317037102494,
+          "velocity": -1063.4009892437284,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(257.611px)"
+        },
+        {
+          "request": 32,
+          "starts": 27,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -58819.88600869267,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 32,
+          "starts": 27,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -58819.88600869267,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "layout.shared: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 33,
+          "starts": 27,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -58819.88600869267,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 33,
+          "starts": 27,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -58819.88600869267,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 33,
+          "starts": 27,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -58819.88600869267,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "layout.shared: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 34,
+          "starts": 28,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -58819.88600869267,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 34,
+          "starts": 28,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 34,
+          "starts": 28,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "layout.shared: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 35,
+          "starts": 29,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 35,
+          "starts": 29,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7246.376809246824,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 35,
+          "starts": 29,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7246.376809246824,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "list.stagger: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 37,
+          "starts": 31,
+          "phase": "commit",
+          "value": 2.9737538847257383,
+          "velocity": -139.58291300306362,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(3.46229px)"
+        },
+        {
+          "request": 37,
+          "starts": 31,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 27721.784604364075,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 37,
+          "starts": 31,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 27721.784604364075,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "list.stagger: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 38,
+          "starts": 31,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 27721.784604364075,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 38,
+          "starts": 31,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 27721.784604364075,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 38,
+          "starts": 31,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 27721.784604364075,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "list.stagger: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 39,
+          "starts": 32,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 27721.784604364075,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 39,
+          "starts": 32,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 39,
+          "starts": 32,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "list.stagger: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 40,
+          "starts": 33,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 40,
+          "starts": 33,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 40,
+          "starts": 33,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "gesture.drag: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 42,
+          "starts": 35,
+          "phase": "commit",
+          "value": 32.72001371584711,
+          "velocity": -443.3284715885485,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(33.651px)"
+        },
+        {
+          "request": 42,
+          "starts": 35,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13730.609449921041,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 42,
+          "starts": 35,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13730.609449921041,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "gesture.drag: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 43,
+          "starts": 35,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13730.609449921041,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 43,
+          "starts": 35,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13730.609449921041,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 43,
+          "starts": 35,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13730.609449921041,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "gesture.drag: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 44,
+          "starts": 36,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13730.609449921041,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 44,
+          "starts": 36,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 44,
+          "starts": 36,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "gesture.drag: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 45,
+          "starts": 37,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3584.229390872434,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 45,
+          "starts": 37,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7299.270071404852,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 45,
+          "starts": 37,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7299.270071404852,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "scroll.progress: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 47,
+          "starts": 39,
+          "phase": "commit",
+          "value": 51.33023802187883,
+          "velocity": -449.22704467046157,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(53.4416px)"
+        },
+        {
+          "request": 47,
+          "starts": 39,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 21160.766036315294,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 47,
+          "starts": 39,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 21160.766036315294,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "scroll.progress: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 48,
+          "starts": 39,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 21160.766036315294,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 48,
+          "starts": 39,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 21160.766036315294,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 48,
+          "starts": 39,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 21160.766036315294,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "scroll.progress: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 49,
+          "starts": 40,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 21160.766036315294,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 49,
+          "starts": 40,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 49,
+          "starts": 40,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "scroll.progress: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 50,
+          "starts": 41,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 50,
+          "starts": 41,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 50,
+          "starts": 41,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "scroll.story: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 52,
+          "starts": 43,
+          "phase": "commit",
+          "value": 9.288635010307189,
+          "velocity": -201.66221365206903,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(9.93395px)"
+        },
+        {
+          "request": 52,
+          "starts": 43,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 23871.41185811452,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 52,
+          "starts": 43,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 23871.41185811452,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "scroll.story: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 53,
+          "starts": 43,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 23871.41185811452,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 53,
+          "starts": 43,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 23871.41185811452,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 53,
+          "starts": 43,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 23871.41185811452,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "scroll.story: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 54,
+          "starts": 44,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 23871.41185811452,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 54,
+          "starts": 44,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 54,
+          "starts": 44,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "scroll.story: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 55,
+          "starts": 45,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 55,
+          "starts": 45,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 55,
+          "starts": 45,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "text.reveal: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 57,
+          "starts": 47,
+          "phase": "commit",
+          "value": 10.155521203705575,
+          "velocity": -216.666920195249,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(11.3472px)"
+        },
+        {
+          "request": 57,
+          "starts": 47,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 59896.319197529614,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 57,
+          "starts": 47,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 59896.319197529614,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "text.reveal: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 58,
+          "starts": 47,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 59896.319197529614,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 58,
+          "starts": 47,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 59896.319197529614,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 58,
+          "starts": 47,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 59896.319197529614,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "text.reveal: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 59,
+          "starts": 48,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 59896.319197529614,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 59,
+          "starts": 48,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3333.3333333333335,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 59,
+          "starts": 48,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3333.3333333333335,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "text.reveal: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 60,
+          "starts": 49,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3333.3333333333335,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 60,
+          "starts": 49,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 21276.595731189533,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 60,
+          "starts": 49,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 21276.595731189533,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "text.split: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 62,
+          "starts": 51,
+          "phase": "commit",
+          "value": 11.108548218908254,
+          "velocity": -218.4889140872229,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(11.5892px)"
+        },
+        {
+          "request": 62,
+          "starts": 51,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 18913.07483504817,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 62,
+          "starts": 51,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 18913.07483504817,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "text.split: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 63,
+          "starts": 51,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 18913.07483504817,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 63,
+          "starts": 51,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 18913.07483504817,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 63,
+          "starts": 51,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 18913.07483504817,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "text.split: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 64,
+          "starts": 52,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 18913.07483504817,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 64,
+          "starts": 52,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 64,
+          "starts": 52,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "text.split: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 65,
+          "starts": 53,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223025438944,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 65,
+          "starts": 53,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 65,
+          "starts": 53,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "number.roll: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 67,
+          "starts": 55,
+          "phase": "commit",
+          "value": 32.262430275289,
+          "velocity": -460.21644369974626,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(33.1829px)"
+        },
+        {
+          "request": 67,
+          "starts": 55,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13823.99382557354,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 67,
+          "starts": 55,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13823.99382557354,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "number.roll: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 68,
+          "starts": 55,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13823.99382557354,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 68,
+          "starts": 55,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13823.99382557354,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 68,
+          "starts": 55,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13823.99382557354,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "number.roll: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 69,
+          "starts": 56,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13823.99382557354,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 69,
+          "starts": 56,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 69,
+          "starts": 56,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "number.roll: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 70,
+          "starts": 57,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 70,
+          "starts": 57,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 70,
+          "starts": 57,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "data.transition: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 72,
+          "starts": 59,
+          "phase": "commit",
+          "value": 2.9737538847257383,
+          "velocity": -106.17337707197429,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(3.32413px)"
+        },
+        {
+          "request": 72,
+          "starts": 59,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 26951.735020864733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 72,
+          "starts": 59,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 26951.735020864733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "data.transition: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 73,
+          "starts": 59,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 26951.735020864733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 73,
+          "starts": 59,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 26951.735020864733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 73,
+          "starts": 59,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 26951.735020864733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "data.transition: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 74,
+          "starts": 60,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 26951.735020864733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 74,
+          "starts": 60,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3610.108303831713,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 74,
+          "starts": 60,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3610.108303831713,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "data.transition: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 75,
+          "starts": 61,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3610.108303831713,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 75,
+          "starts": 61,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7142.857142857143,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 75,
+          "starts": 61,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7142.857142857143,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "state.morph: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 77,
+          "starts": 63,
+          "phase": "commit",
+          "value": 54.259432232514555,
+          "velocity": -354.3574925553494,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(55.4997px)"
+        },
+        {
+          "request": 77,
+          "starts": 63,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13068.733647852985,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 77,
+          "starts": 63,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13068.733647852985,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "state.morph: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 78,
+          "starts": 63,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13068.733647852985,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 78,
+          "starts": 63,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 13068.733647852985,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 78,
+          "starts": 63,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 13068.733647852985,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "state.morph: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 79,
+          "starts": 64,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 13068.733647852985,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 79,
+          "starts": 64,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3584.2293899152805,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 79,
+          "starts": 64,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3584.2293899152805,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "state.morph: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 80,
+          "starts": 65,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3584.2293899152805,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 80,
+          "starts": 65,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7246.376813159122,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 80,
+          "starts": 65,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7246.376813159122,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "geometry.resize: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 82,
+          "starts": 67,
+          "phase": "commit",
+          "value": 245.76561764047037,
+          "velocity": -1165.1278490655282,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(249.494px)"
+        },
+        {
+          "request": 82,
+          "starts": 67,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -39396.11292340128,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 82,
+          "starts": 67,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -39396.11292340128,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "geometry.resize: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 83,
+          "starts": 67,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -39396.11292340128,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 83,
+          "starts": 67,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -39396.11292340128,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 83,
+          "starts": 67,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -39396.11292340128,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "geometry.resize: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 84,
+          "starts": 68,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -39396.11292340128,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 84,
+          "starts": 68,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 84,
+          "starts": 68,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "geometry.resize: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 85,
+          "starts": 69,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3597.1223015798423,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 85,
+          "starts": 69,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7142.857142857143,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 85,
+          "starts": 69,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7142.857142857143,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "handoff: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 87,
+          "starts": 71,
+          "phase": "commit",
+          "value": 133.91763483448867,
+          "velocity": -1432.4726089074338,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(143.658px)"
+        },
+        {
+          "request": 87,
+          "starts": 71,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -56529.39125042218,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 87,
+          "starts": 71,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -56529.39125042218,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "handoff: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 88,
+          "starts": 71,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -56529.39125042218,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 88,
+          "starts": 71,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": -56529.39125042218,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 88,
+          "starts": 71,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": -56529.39125042218,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "handoff: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 89,
+          "starts": 72,
+          "phase": "commit",
+          "value": 100,
+          "velocity": -56529.39125042218,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 89,
+          "starts": 72,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3649.6350366948313,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 89,
+          "starts": 72,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3649.6350366948313,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "handoff: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 90,
+          "starts": 73,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3649.6350366948313,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 90,
+          "starts": 73,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 90,
+          "starts": 73,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "feedback.press: retarget zero removes delay",
+      "target": 100,
+      "samples": [
+        {
+          "request": 92,
+          "starts": 75,
+          "phase": "commit",
+          "value": 22.52544848541525,
+          "velocity": -506.42994550623126,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(23.9435px)"
+        },
+        {
+          "request": 92,
+          "starts": 75,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 18017.337574018744,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 92,
+          "starts": 75,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 18017.337574018744,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "feedback.press: unrelated render stays settled",
+      "target": 100,
+      "samples": [
+        {
+          "request": 93,
+          "starts": 75,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 18017.337574018744,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 93,
+          "starts": 75,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 18017.337574018744,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 93,
+          "starts": 75,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 18017.337574018744,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "feedback.press: nested zero overrides positive",
+      "target": 0,
+      "samples": [
+        {
+          "request": 94,
+          "starts": 76,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 18017.337574018744,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 94,
+          "starts": 76,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -3623.1884056014865,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 94,
+          "starts": 76,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -3623.1884056014865,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "feedback.press: per-call zero overrides positive",
+      "target": 100,
+      "samples": [
+        {
+          "request": 95,
+          "starts": 77,
+          "phase": "commit",
+          "value": 0,
+          "velocity": -3623.1884056014865,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 95,
+          "starts": 77,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 95,
+          "starts": 77,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 7194.244605087789,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 4,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "geometry.resize: real partial positive control",
+      "partial": {
+        "value": 0.0682181120443488,
+        "state": "running"
+      }
+    },
+    {
+      "label": "geometry.resize: positive unrelated render does not restart",
+      "samples": [
+        {
+          "request": 98,
+          "starts": 79,
+          "phase": "commit",
+          "value": 0.0682181120443488,
+          "velocity": 9.608184792962183,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "stiffness": 155.417050911586,
+            "damping": 24.93327502849042,
+            "mass": 1,
+            "delay": 0.3
+          },
+          "transform": "translateX(0.0682181px)"
+        },
+        {
+          "request": 98,
+          "starts": 79,
+          "phase": "paint1",
+          "value": 0.7154224713870718,
+          "velocity": 95.17711160547766,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "stiffness": 155.417050911586,
+            "damping": 24.93327502849042,
+            "mass": 1,
+            "delay": 0.3
+          },
+          "transform": "translateX(0.715422px)"
+        },
+        {
+          "request": 98,
+          "starts": 79,
+          "phase": "paint2",
+          "value": 1.9523269625336042,
+          "velocity": 176.70064159236176,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "stiffness": 155.417050911586,
+            "damping": 24.93327502849042,
+            "mass": 1,
+            "delay": 0.3
+          },
+          "transform": "translateX(1.95233px)"
+        }
+      ]
+    },
+    {
+      "label": "geometry.resize: same-target positive to zero",
+      "target": 100,
+      "samples": [
+        {
+          "request": 99,
+          "starts": 80,
+          "phase": "commit",
+          "value": 2.636923760535609,
+          "velocity": 185.02616184571252,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(1.95233px)"
+        },
+        {
+          "request": 99,
+          "starts": 80,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 30425.961296496236,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 99,
+          "starts": 80,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 30425.961296496236,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "state.morph: real partial positive control",
+      "partial": {
+        "value": 0.12027652460204763,
+        "state": "running"
+      }
+    },
+    {
+      "label": "state.morph: positive unrelated render does not restart",
+      "samples": [
+        {
+          "request": 102,
+          "starts": 82,
+          "phase": "commit",
+          "value": 0.12027652460204763,
+          "velocity": 17.687724213935464,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "visualDuration": 0.42,
+            "bounce": 0,
+            "delay": 0.3
+          },
+          "transform": "translateX(0.120277px)"
+        },
+        {
+          "request": 102,
+          "starts": 82,
+          "phase": "paint1",
+          "value": 0.8585749225457135,
+          "velocity": 105.471199706238,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "visualDuration": 0.42,
+            "bounce": 0,
+            "delay": 0.3
+          },
+          "transform": "translateX(0.858575px)"
+        },
+        {
+          "request": 102,
+          "starts": 82,
+          "phase": "paint2",
+          "value": 2.1709849690682574,
+          "velocity": 190.20435460956094,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "visualDuration": 0.42,
+            "bounce": 0,
+            "delay": 0.3
+          },
+          "transform": "translateX(2.17098px)"
+        }
+      ]
+    },
+    {
+      "label": "state.morph: same-target positive to zero",
+      "target": 100,
+      "samples": [
+        {
+          "request": 103,
+          "starts": 83,
+          "phase": "commit",
+          "value": 2.883665370585021,
+          "velocity": 197.96677811715836,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(2.17098px)"
+        },
+        {
+          "request": 103,
+          "starts": 83,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 28563.627844699444,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 103,
+          "starts": 83,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 28563.627844699444,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "feedback.press: real partial positive control",
+      "partial": {
+        "value": 0.7934489453018188,
+        "state": "running"
+      }
+    },
+    {
+      "label": "feedback.press: positive unrelated render does not restart",
+      "samples": [
+        {
+          "request": 106,
+          "starts": 85,
+          "phase": "commit",
+          "value": 0.7934489453018188,
+          "velocity": 114.99260066904485,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "visualDuration": 0.24,
+            "bounce": 0.12,
+            "delay": 0.3
+          },
+          "transform": "translateX(0.793449px)"
+        },
+        {
+          "request": 106,
+          "starts": 85,
+          "phase": "paint1",
+          "value": 3.406394560503742,
+          "velocity": 373.27794502884615,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "visualDuration": 0.24,
+            "bounce": 0.12,
+            "delay": 0.3
+          },
+          "transform": "translateX(3.40639px)"
+        },
+        {
+          "request": 106,
+          "starts": 85,
+          "phase": "paint2",
+          "value": 7.375091362199328,
+          "velocity": 575.1734496453132,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "type": "spring",
+            "visualDuration": 0.24,
+            "bounce": 0.12,
+            "delay": 0.3
+          },
+          "transform": "translateX(7.37509px)"
+        }
+      ]
+    },
+    {
+      "label": "feedback.press: same-target positive to zero",
+      "target": 100,
+      "samples": [
+        {
+          "request": 107,
+          "starts": 86,
+          "phase": "commit",
+          "value": 9.388946941578325,
+          "velocity": 649.6308317454749,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(7.37509px)"
+        },
+        {
+          "request": 107,
+          "starts": 86,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 23233.60335719037,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 107,
+          "starts": 86,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 23233.60335719037,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "reveal: real partial positive control",
+      "partial": {
+        "value": 6.097286539443303,
+        "state": "running"
+      }
+    },
+    {
+      "label": "reveal: positive unrelated render does not restart",
+      "samples": [
+        {
+          "request": 110,
+          "starts": 88,
+          "phase": "commit",
+          "value": 6.097286539443303,
+          "velocity": 858.7727518540327,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "duration": 0.22,
+            "ease": [0.22, 1, 0.36, 1],
+            "delay": 0.3
+          },
+          "transform": "translateX(6.09729px)"
+        },
+        {
+          "request": 110,
+          "starts": 88,
+          "phase": "paint1",
+          "value": 19.708645112405065,
+          "velocity": 1972.6606631740951,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "duration": 0.22,
+            "ease": [0.22, 1, 0.36, 1],
+            "delay": 0.3
+          },
+          "transform": "translateX(19.7086px)"
+        },
+        {
+          "request": 110,
+          "starts": 88,
+          "phase": "paint2",
+          "value": 32.04999074660009,
+          "velocity": 1788.6008169362674,
+          "state": "running",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 1,
+          "transition": {
+            "duration": 0.22,
+            "ease": [0.22, 1, 0.36, 1],
+            "delay": 0.3
+          },
+          "transform": "translateX(32.05px)"
+        }
+      ]
+    },
+    {
+      "label": "reveal: same-target positive to zero",
+      "target": 100,
+      "samples": [
+        {
+          "request": 111,
+          "starts": 89,
+          "phase": "commit",
+          "value": 37.01855152758071,
+          "velocity": 1552.6752426104035,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(32.05px)"
+        },
+        {
+          "request": 111,
+          "starts": 89,
+          "phase": "paint1",
+          "value": 100,
+          "velocity": 16574.06540047733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 111,
+          "starts": 89,
+          "phase": "paint2",
+          "value": 100,
+          "velocity": 16574.06540047733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0,
+            "delay": 0
+          },
+          "transform": "translateX(100px)"
+        }
+      ]
+    },
+    {
+      "label": "direct physicalSpring zero",
+      "target": 0,
+      "samples": [
+        {
+          "request": 112,
+          "starts": 90,
+          "phase": "commit",
+          "value": 100,
+          "velocity": 16574.06540047733,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0
+          },
+          "transform": "translateX(100px)"
+        },
+        {
+          "request": 112,
+          "starts": 90,
+          "phase": "paint1",
+          "value": 0,
+          "velocity": -7246.376809246824,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0
+          },
+          "transform": "none"
+        },
+        {
+          "request": 112,
+          "starts": 90,
+          "phase": "paint2",
+          "value": 0,
+          "velocity": -7246.376809246824,
+          "state": "idle",
+          "mode": "full",
+          "reduced": false,
+          "disabled": false,
+          "clock": 0,
+          "transition": {
+            "duration": 0
+          },
+          "transform": "none"
+        }
+      ]
+    },
+    {
+      "label": "actual Base Button full zero held",
+      "held": 0.97
+    },
+    {
+      "label": "cleanup from actual partial motion",
+      "old": 99.96942846502286,
+      "stopped": {
+        "value": 99.81361610954785,
+        "running": true
+      },
+      "value": 99.81361610954785,
+      "running": false
+    }
+  ],
+  "failures": [
+    "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///D:/Code/Project/cadence-ui/tests/runtime/zero-clock.mjs:139:10"
+  ],
+  "warnings": ["Failed to load resource: the server responded with a status of 404 (Not Found)"]
+}

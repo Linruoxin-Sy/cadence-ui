@@ -163,3 +163,12 @@ resetting the header's mode:
 
 Run `pnpm registry:check` before opening a pull request; it enforces the per-item size budget
 and the reduced-motion branch.
+
+`timeScale` accepts finite non-negative numbers. `0` makes newly started or retargeted
+recipes immediate (including springs and delays), while preserving the mode and its
+target pose. It inherits through nested providers and can override a positive clock
+on a nested provider or a single `cm.transition()` call. Negative and non-finite
+clock values throw `RangeError`. Continuous CSS loops retain their theme clock.
+Existing native CSS transitions are not promised live retiming on clock changes;
+`none` retains its separate cancellation behavior. A Motion consumer must observe
+clock changes to retarget an unchanged target; see the runtime audit for proven scope.

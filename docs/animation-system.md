@@ -102,6 +102,26 @@ velocity into the new target (`motion-dom`'s `spring.ts`, 13.5.1). The authored 
 the 4× preview still scales correctly, and the conversion lives in `lib/motion.ts` rather than in a
 component.
 
+### 2.2.1 Zero recipe clock
+
+`timeScale` accepts finite non-negative numbers. Zero is a valid clock, including
+provider inheritance, an explicit nested override and a per-call override. Every
+recipe resolves it to `{ duration: 0, delay: 0 }` before spring conversion; direct
+`physicalSpring(0)` also returns a zero-duration transition. Passing a zero visual
+duration to Motion's spring generator is insufficient: it can select default
+physics, and dividing by zero produces invalid physics. Negative or non-finite
+`timeScale` (on the provider or an active recipe) and direct `physicalSpring`
+`visualDuration` inputs throw `RangeError`; `none` still ignores recipe options.
+
+Zero timing preserves the effective mode and semantic target: a full-mode held
+press still has its press scale, reached immediately. It does not set `reduced`
+or `disabled`, and it does not stop continuous CSS `--animate-*` loops. Newly
+started or retargeted recipe animations use the resolved clock. An existing
+consumer must observe clock changes to cancel a same-target flight; the resolver
+alone cannot guarantee that every writer does so. Native CSS transitions already
+in flight are not promised live retiming on clock changes; forced `none`
+cancellation retains its separate contract.
+
 ### 2.3 CSS-side exposure
 
 ```css
