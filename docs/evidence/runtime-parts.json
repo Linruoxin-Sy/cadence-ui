@@ -13,9 +13,11 @@
       "id": "button",
       "recipes": ["feedback.press"],
       "tier": "T1",
-      "targets": ["Motion press-button actual button | Motion gesture | feedback.press"],
+      "targets": [
+        "PressButton actual button | native pointer/Enter lifecycle + Motion committed controls | feedback.press"
+      ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/button/index.tsx",
         "sha256": "284197500ebf2f70db1f3c32567a458c74fe7d953ab75ee55718704ae4525eaf",
@@ -313,7 +315,7 @@
       "tier": "T4",
       "targets": ["skeleton | CSS animation pulse | data.transition"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/skeleton/index.tsx",
         "sha256": "de14b9302080731c547f57354029151096b3d2bdaa55339bf6e8880a45e26497",
@@ -424,7 +426,7 @@
       "tier": "T0",
       "targets": [],
       "delegates": ["Item -> native useRender; no authored list stagger"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/item/index.tsx",
         "sha256": "1f2c959b70b3a1cdf51a1181335eeead7a7e383a580ce963839f3f949af94748",
@@ -490,7 +492,7 @@
       "tier": "T0",
       "targets": [],
       "delegates": ["FieldLabel -> Label; no autonomous motion"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/field/index.tsx",
         "sha256": "9fed876ed6ad16823584f0801e0a81517ddc39dffbd76cedde7f4a1fd47e11e9",
@@ -560,7 +562,7 @@
       "tier": "T0",
       "targets": [],
       "delegates": ["ButtonGroupText -> Button when rendered by caller"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/button-group/index.tsx",
         "sha256": "d72105fa28f802fdb82e4caeaebcb6ed68d41d309a70f0122d416fe8f38cb99f",
@@ -585,7 +587,7 @@
       "tier": "T0",
       "targets": [],
       "delegates": ["InputGroupButton -> Button"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/input-group/index.tsx",
         "sha256": "93714dd498b8c0842cb5ac4856af2a05fd6130672e7521da146f47d11b6ea3df",
@@ -677,7 +679,7 @@
       "tier": "T0",
       "targets": [],
       "delegates": ["PaginationLink/Previous/Next -> buttonVariants CSS only (no press engine)"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/pagination/index.tsx",
         "sha256": "5922bf77b50f769aed3c7d23cc52eef68e2537b3b7da04c61e3ec33d772a6d05",
@@ -722,7 +724,7 @@
       "tier": "T4",
       "targets": ["spinner SVG | CSS animation spin (single glyph reduced exception) | data.transition"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/spinner/index.tsx",
         "sha256": "fe69fa273fb68bac86fa6dde482f6e2f54dedb76d8440ed4399064bf3ab707e5",
@@ -762,7 +764,7 @@
       "tier": "T2",
       "targets": ["dialog-content popup + dialog-overlay backdrop | CSS transition | popup.anchored, exit.fade"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/dialog/index.tsx",
         "sha256": "8acbbaf418878bce6d1d228f4f86fabbd8413f0b2d93a7e7645c5825a4c14059",
@@ -848,10 +850,10 @@
       "tier": "T1",
       "targets": ["checkbox-indicator ControlSpan | Motion controls | state.morph"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/checkbox/index.tsx",
-        "sha256": "ebe0cc2ec40d8b1b0b543082c2873d00bd612e008dd42cbc5bae1e70aaaecf62",
+        "sha256": "b3e0f356a67c4b9d10311ef871af9216254b24681474ce7fa332a1407bfcb085",
         "slots": [
           {
             "owner": "Checkbox",
@@ -873,7 +875,7 @@
           {
             "owner": "Checkbox",
             "line": 61,
-            "text": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"grid size-full place-content-center text-current\", indicatorClassName)}\n              target={\n                state.checked || state.indeterminate\n                  ? { opacity: 1, scale: 1 }\n                  : { opacity: 0, scale: cm.reduced ? 1 : scale.in }\n              }\n              transition={cm.transition(\"state.morph\")}\n            >"
+            "text": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"grid size-full place-content-center text-current\", indicatorClassName)}\n              target={\n                state.checked || state.indeterminate\n                  ? { opacity: 1, scale: 1 }\n                  : { opacity: 0, scale: cm.reduced ? 1 : scale.in }\n              }\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >"
           },
           {
             "owner": "Checkbox",
@@ -889,10 +891,10 @@
       "tier": "T1",
       "targets": ["radio-group-indicator ControlSpan | Motion controls | state.morph"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/radio-group/index.tsx",
-        "sha256": "1857043f467e8fe81219a33d0dd7c2580f558cee0e05ada8c0510dbeaf60b01f",
+        "sha256": "c262cf7267aa7976eb71dd1fff12873aba9e94d169e82dd28007e4cc948aab7a",
         "slots": [
           {
             "owner": "RadioGroup",
@@ -919,7 +921,7 @@
           {
             "owner": "RadioGroupItem",
             "line": 69,
-            "text": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"flex size-full items-center justify-center\", indicatorClassName)}\n              target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={cm.transition(\"state.morph\")}\n            >"
+            "text": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"flex size-full items-center justify-center\", indicatorClassName)}\n              target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >"
           },
           {
             "owner": "RadioGroupItem",
@@ -935,7 +937,7 @@
       "tier": "T1",
       "targets": ["switch-thumb ControlSpan positional target | Motion controls | state.morph"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/switch/index.tsx",
         "sha256": "65c90652dc3c19ff158d070df3dc5c1e6cbb5edc95357eb17a00677adb38c916",
@@ -974,12 +976,12 @@
       "id": "slider",
       "recipes": ["feedback.press"],
       "tier": "T1",
-      "targets": ["slider-thumb MotionNativeDiv | Motion gesture | feedback.press"],
+      "targets": ["slider-thumb ControlDiv | Base dragging + Motion committed controls | feedback.press"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/slider/index.tsx",
-        "sha256": "cbbdcdb638f661cdb96209f1d1712e7967a87a7d7376d0dec22f4fca658b7b52",
+        "sha256": "e48e023dc43045e0675031acd959c41b8d66561d9fd6acd5df6264fdf4c3fd16",
         "slots": [
           {
             "owner": "Slider",
@@ -1006,7 +1008,7 @@
           {
             "owner": "Slider",
             "line": 110,
-            "text": "<ControlDiv\n                  {...(rest as HTMLMotionProps<\"div\">)}\n                  className={cn(\n                    \"block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 outline-none transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4\",\n                    \"data-disabled:pointer-events-none data-disabled:opacity-50\",\n                    thumbClassName,\n                  )}\n                  target={{ scale: state.dragging && !cm.reduced ? scale.press : 1 }}\n                  transition={cm.tr"
+            "text": "<ControlDiv\n                  {...(rest as HTMLMotionProps<\"div\">)}\n                  className={cn(\n                    \"block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 outline-none transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4\",\n                    \"data-disabled:pointer-events-none data-disabled:opacity-50\",\n                    thumbClassName,\n                  )}\n                  target={{ scale: state.dragging && !state.disabled && !cm.reduced ? scale.press : 1 }}\n                "
           },
           {
             "owner": "Slider",
@@ -1025,9 +1027,9 @@
       "id": "toggle",
       "recipes": ["feedback.press"],
       "tier": "T1",
-      "targets": ["toggle MotionNativeButton | Motion gesture | feedback.press"],
+      "targets": ["toggle PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/toggle/index.tsx",
         "sha256": "bf996b996c38c1a9ab3ea934d6c8981095b6a60657b196645d16fe7fac477380",
@@ -1056,9 +1058,11 @@
       "id": "toggle-group",
       "recipes": ["feedback.press"],
       "tier": "T1",
-      "targets": ["toggle-group-item MotionNativeButton | Motion gesture | feedback.press"],
+      "targets": [
+        "toggle-group-item PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press"
+      ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/toggle-group/index.tsx",
         "sha256": "1ead6864602243154df027a3e9c235b41a0557ca0d9610226695e7f51cb72925",
@@ -1089,56 +1093,56 @@
       "tier": "T1",
       "targets": ["input-otp-slot > unslotted character motion.span | Motion controls | state.morph"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/input-otp/index.tsx",
-        "sha256": "c415485288e379c090c310e8d064064f4ba829f71966346728898705b6dcedaf",
+        "sha256": "25c37162c6d99a4d2a1a49626ff774b2866f58fae86c198a2fc17129fe4fdbdc",
         "slots": [
           {
             "owner": "InputOTP",
-            "line": 51,
+            "line": 52,
             "value": "\"input-otp\""
           },
           {
             "owner": "InputOTPGroup",
-            "line": 61,
+            "line": 62,
             "value": "\"input-otp-group\""
           },
           {
             "owner": "InputOTPSlot",
-            "line": 85,
+            "line": 86,
             "value": "\"input-otp-slot\""
           },
           {
             "owner": "InputOTPSeparator",
-            "line": 111,
+            "line": 112,
             "value": "\"input-otp-separator\""
           }
         ],
         "signals": [
           {
             "owner": "InputOTPSlot",
-            "line": 78,
+            "line": 79,
             "text": "controls.start({ opacity: 1, scale: 1 }, cm.transition(\"state.morph\"))"
           },
           {
             "owner": "InputOTPSlot",
-            "line": 78,
+            "line": 79,
             "text": "cm.transition(\"state.morph\")"
           },
           {
             "owner": "InputOTPSlot",
-            "line": 88,
+            "line": 89,
             "text": "\"relative flex h-9 w-9 items-center justify-center border-y border-r border-input text-sm shadow-xs outline-none transition-[color,box-shadow] first:rounded-l-md first:border-l last:rounded-r-md\""
           },
           {
             "owner": "InputOTPSlot",
-            "line": 96,
+            "line": 97,
             "text": "<motion.span data-motion={cm.mode} initial={false} animate={controls} transition={cm.transition(\"state.morph\")}>"
           },
           {
             "owner": "InputOTPSlot",
-            "line": 96,
+            "line": 97,
             "text": "cm.transition(\"state.morph\")"
           }
         ]
@@ -1153,7 +1157,7 @@
         "same indicator indeterminate pulse | CSS animation | data.transition"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/progress/index.tsx",
         "sha256": "5d1d5f20189d3812b31d5e79220f6e89d330b9ebe193c976f82c4ce0d913f4df",
@@ -1225,7 +1229,7 @@
         "alert-dialog-content popup + alert-dialog-overlay backdrop | CSS transition | popup.anchored, exit.fade"
       ],
       "delegates": ["Action/Cancel -> Button"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/alert-dialog/index.tsx",
         "sha256": "d88dc14289fda8e6370c0d308d8d09ed1ccf9c30c0efdfb95a7b6402f1f4093d",
@@ -1311,7 +1315,7 @@
       "tier": "T2",
       "targets": ["popover-content | CSS transition | popup.anchored, exit.fade"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/popover/index.tsx",
         "sha256": "316ffef06dac3beec56c20e536a54180c0c14b72f633c46ffe59f4d4f50c1aca",
@@ -1372,7 +1376,7 @@
       "tier": "T2",
       "targets": ["tooltip-content | CSS transition | popup.anchored, exit.fade"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/tooltip/index.tsx",
         "sha256": "d103f756a9530295408746806a1775546c21c74edd48f5ab9c824285c14198e9",
@@ -1413,7 +1417,7 @@
       "tier": "T2",
       "targets": ["hover-card-content | CSS transition | popup.anchored, exit.fade"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/hover-card/index.tsx",
         "sha256": "6aa207d35e93845b94787e8e7386ffbb640e001059fd7b330dbf53476d4e314c",
@@ -1454,7 +1458,7 @@
       "tier": "T2",
       "targets": ["sheet-content popup + sheet-overlay backdrop | CSS transition | popup.anchored, exit.fade"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/sheet/index.tsx",
         "sha256": "4feb1b50080aecf73daf9edc6d13ba9cbaa54b046b096dd0577d7b01956138ad",
@@ -1538,7 +1542,7 @@
         "drawer swipe transform custom properties | Base UI direct gesture + native settling (not Motion) | primitive-owned"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/drawer/index.tsx",
         "sha256": "8ede1d504c2c48cc783fc9b25352db5ea48d5d5745db3fca603b6e711af322de",
@@ -1639,10 +1643,10 @@
         "select-item-indicator ControlSpan | Motion controls | state.morph"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/select/index.tsx",
-        "sha256": "122806d659a503103fb7a91748fa07b3a3798248ee8527f9eb50e0440f11872b",
+        "sha256": "48ed51ccb5ba23a432dfea0dbc2817f36617edb3489c46d16c1c005b9d68510f",
         "slots": [
           {
             "owner": "SelectGroup",
@@ -1651,104 +1655,104 @@
           },
           {
             "owner": "SelectValue",
-            "line": 160,
+            "line": 165,
             "value": "\"select-value\""
           },
           {
             "owner": "SelectTrigger",
-            "line": 242,
+            "line": 247,
             "value": "\"select-trigger\""
           },
           {
             "owner": "SelectTrigger",
-            "line": 270,
+            "line": 275,
             "value": "\"select-handoff\""
           },
           {
             "owner": "SelectContent",
-            "line": 323,
+            "line": 328,
             "value": "\"select-content\""
           },
           {
             "owner": "SelectLabel",
-            "line": 351,
+            "line": 356,
             "value": "\"select-label\""
           },
           {
             "owner": "SelectItem",
-            "line": 364,
+            "line": 369,
             "value": "\"select-item\""
           },
           {
             "owner": "SelectItem",
-            "line": 385,
+            "line": 390,
             "value": "\"select-item-text\""
           },
           {
             "owner": "SelectItem",
-            "line": 396,
+            "line": 401,
             "value": "\"select-item-indicator\""
           },
           {
             "owner": "SelectSeparator",
-            "line": 414,
+            "line": 419,
             "value": "\"select-separator\""
           },
           {
             "owner": "SelectScrollUpButton",
-            "line": 424,
+            "line": 429,
             "value": "\"select-scroll-up-button\""
           },
           {
             "owner": "SelectScrollDownButton",
-            "line": 439,
+            "line": 444,
             "value": "\"select-scroll-down-button\""
           }
         ],
         "signals": [
           {
             "owner": "measure",
-            "line": 149,
+            "line": 154,
             "text": "animate(width, next, cm.transition(\"geometry.resize\"))"
           },
           {
             "owner": "measure",
-            "line": 149,
+            "line": 154,
             "text": "cm.transition(\"geometry.resize\")"
           },
           {
             "owner": "SelectValue",
-            "line": 158,
+            "line": 163,
             "text": "<motion.span\n      ref={hostRef}\n      data-slot=\"select-value\"\n      data-motion={cm.mode}\n      style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}\n      className=\"relative block min-w-0 overflow-hidden whitespace-nowrap\"\n    >"
           },
           {
             "owner": "SelectTrigger",
-            "line": 247,
+            "line": 252,
             "text": "\"relative flex h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 pr-8 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none\""
           },
           {
             "owner": "SelectTrigger",
-            "line": 267,
+            "line": 272,
             "text": "<motion.span\n              aria-hidden\n              data-motion={cm.mode}\n              data-slot=\"select-handoff\"\n              initial={{ x: flight.origin.x, y: flight.origin.y }}\n              animate={{ x: 0, y: 0 }}\n              transition={cm.transition(\"handoff\")}\n              onAnimationComplete={finish}\n              style={{\n                position: \"fixed\",\n                left: flight.rect.left,\n                top: flight.rect.top,\n                width: flight.rect.width,\n                height: flight.rect.height,\n           "
           },
           {
             "owner": "SelectTrigger",
-            "line": 273,
+            "line": 278,
             "text": "cm.transition(\"handoff\")"
           },
           {
             "owner": "SelectContent",
-            "line": 331,
+            "line": 336,
             "text": "\"transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0\""
           },
           {
             "owner": "SelectItem",
-            "line": 394,
+            "line": 399,
             "text": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              data-slot=\"select-item-indicator\"\n              data-motion={cm.mode}\n              className={cn(\"absolute right-2 flex size-3.5 items-center justify-center\", indicatorClassName)}\n              target={state.selected ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >"
           },
           {
             "owner": "SelectItem",
-            "line": 400,
+            "line": 405,
             "text": "cm.transition(\"state.morph\")"
           }
         ]
@@ -1765,7 +1769,7 @@
       "delegates": [
         "ComboboxInput showTrigger -> InputGroupButton -> Button render ComboboxTrigger; standalone Trigger/Clear use static variants"
       ],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/combobox/index.tsx",
         "sha256": "b08aa48720ebba1e4b77ea23d40da6324cee15a3ed015f55a28c09f56336c56a",
@@ -1894,7 +1898,7 @@
         "checkbox/radio item > indicator ControlSpan (unslotted) | Motion controls | state.morph"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/dropdown-menu/index.tsx",
         "sha256": "abcabf9c24c51e76c3622184416f003ba6ea59df758774cbf76bd1ff825b8cff",
@@ -2038,7 +2042,7 @@
         "checkbox/radio item > indicator ControlSpan (unslotted) | Motion controls | state.morph"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/context-menu/index.tsx",
         "sha256": "0a71f3e17e80d6c8cd330dc3b6c4f6834669b5bc00cc1dfe6042e12223033eff",
@@ -2172,7 +2176,7 @@
         "Content/SubContent -> DropdownMenuContent",
         "CheckboxItem/RadioItem -> DropdownMenu control indicator"
       ],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/menubar/index.tsx",
         "sha256": "947979674285c4d0e5455ecea7b146fcba94635f201b9e9d9e75c9ba5f069778",
@@ -2273,10 +2277,10 @@
         "code-block-expand-button > unslotted motion.svg orientation | Motion declarative | state.morph"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/code-block/index.tsx",
-        "sha256": "6d210521f5144bd563f7dc2de110498cdc371ccd1867f412903c721762bccbf6",
+        "sha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
         "slots": [
           {
             "owner": "CodeBlock",
@@ -2320,47 +2324,47 @@
           },
           {
             "owner": "CodeBlockCopyButton",
-            "line": 616,
+            "line": 615,
             "value": "\"code-block-copy-button\""
           },
           {
             "owner": "CodeBlockContent",
-            "line": 768,
+            "line": 762,
             "value": "\"code-block-viewport\""
           },
           {
             "owner": "CodeBlockContent",
-            "line": 775,
+            "line": 769,
             "value": "\"code-block-content\""
           },
           {
             "owner": "CodeBlockContent",
-            "line": 793,
+            "line": 787,
             "value": "\"code-block-code\""
           },
           {
             "owner": "CodeBlockPanel",
-            "line": 846,
+            "line": 840,
             "value": "\"code-block-panel\""
           },
           {
             "owner": "CodeBlockLine",
-            "line": 888,
+            "line": 882,
             "value": "\"code-block-line\""
           },
           {
             "owner": "CodeBlockLine",
-            "line": 898,
+            "line": 892,
             "value": "\"code-block-line-content\""
           },
           {
             "owner": "CodeBlockFooter",
-            "line": 915,
+            "line": 909,
             "value": "\"code-block-footer\""
           },
           {
             "owner": "CodeBlockExpandButton",
-            "line": 950,
+            "line": 944,
             "value": "\"code-block-expand-button\""
           }
         ],
@@ -2382,47 +2386,52 @@
           },
           {
             "owner": "CodeBlockActions",
-            "line": 545,
+            "line": 539,
+            "text": "<NativeControlDiv\n      data-slot=\"code-block-actions\"\n      data-motion={cm.mode}\n      data-revealed={revealed || undefined}\n      target={{ opacity: revealed ? 1 : 0 }}\n      transition={cm.transition(\"data.transition\")}\n      className={cn(\n        \"absolute end-3 top-3 z-10 flex shrink-0 items-center gap-1 group-data-[size=sm]/code-block:end-2 group-data-[size=sm]/code-block:top-2\",\n        // A floating control needs its own surface, or it reads as part of the code.\n        \"[&_button]:bg-background [&_button]:ring-1 [&_button]:ring-foreg"
+          },
+          {
+            "owner": "CodeBlockActions",
+            "line": 544,
             "text": "cm.transition(\"data.transition\")"
           },
           {
             "owner": "swap",
-            "line": 610,
+            "line": 609,
             "text": "cm.transition(\"state.morph\")"
           },
           {
             "owner": "CodeBlockCopyButton",
-            "line": 640,
-            "text": "<motion.span\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              initial={false}\n              animate={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}\n              transition={swap}\n            >"
+            "line": 639,
+            "text": "<ControlSpan\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              target={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}\n              transition={swap}\n            >"
           },
           {
             "owner": "CodeBlockCopyButton",
-            "line": 649,
-            "text": "<motion.span\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              initial={false}\n              animate={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}\n              transition={swap}\n            >"
+            "line": 647,
+            "text": "<ControlSpan\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              target={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}\n              transition={swap}\n            >"
           },
           {
             "owner": "measure",
-            "line": 756,
+            "line": 750,
             "text": "animate(height, target, cm.transition(\"geometry.resize\"))"
           },
           {
             "owner": "measure",
-            "line": 756,
+            "line": 750,
             "text": "cm.transition(\"geometry.resize\")"
           },
           {
             "owner": "CodeBlockContent",
-            "line": 766,
+            "line": 760,
             "text": "<motion.div\n      ref={viewportRef}\n      data-slot=\"code-block-viewport\"\n      data-motion={cm.mode}\n      style={measured ? { height } : undefined}\n      className=\"min-h-0 overflow-hidden\"\n    >"
           },
           {
             "owner": "CodeBlockExpandButton",
-            "line": 964,
-            "text": "<motion.span\n        data-motion={cm.mode}\n        aria-hidden=\"true\"\n        className=\"flex\"\n        initial={false}\n        animate={{ rotate: expanded ? 180 : 0 }}\n        transition={cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}\n      >"
+            "line": 958,
+            "text": "<ControlSpan\n        data-motion={cm.mode}\n        aria-hidden=\"true\"\n        className=\"flex\"\n        target={{ rotate: expanded ? 180 : 0 }}\n        transition={cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}\n      >"
           },
           {
             "owner": "CodeBlockExpandButton",
-            "line": 970,
+            "line": 963,
             "text": "cm.transition(\"state.morph\")"
           }
         ]
@@ -2443,7 +2452,7 @@
       "tier": "T2",
       "targets": [],
       "delegates": ["CommandDialog -> DialogContent/Overlay"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/command/index.tsx",
         "sha256": "d00bdd5dbe55251fb79fadc9206b5319cd828bee2d256374540b7c82a013c5f0",
@@ -2506,7 +2515,7 @@
         "swipe variables | Base UI direct gesture | primitive-owned"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/toast/index.tsx",
         "sha256": "1ba0adfe17be5c9bb239e7ca130537fd02c426404a44660f62e8f7be2ced1c92",
@@ -2584,7 +2593,7 @@
         "accordion-content measured panel (inner is measurement only) | CSS height transition | geometry.resize"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/accordion/index.tsx",
         "sha256": "3dd26a3136aa44dd38767a6143fb85202d88b1edfbfd2be881660f22fd963ad5",
@@ -2657,7 +2666,7 @@
         "collapsible-content measured panel (inner is measurement only) | CSS height transition | geometry.resize"
       ],
       "delegates": ["caller render Button owns separate press"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/collapsible/index.tsx",
         "sha256": "38d618cfdae7013895b7ad4a7b573151e43fde8e69041d4081917cb65b5ee1a8",
@@ -2703,7 +2712,7 @@
       "tier": "T3",
       "targets": ["tabs-trigger > unslotted motion.span shared indicator | Motion layoutId | layout.shared"],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/tabs/index.tsx",
         "sha256": "6667b08c8c9072e35bb9d2b5bd528ef47eac9a1741db8552a0d958c44225f2c5",
@@ -2830,7 +2839,7 @@
       "tier": "T4",
       "targets": ["carousel-content inner Embla track; loop slide relocations | Embla rAF engine | data.transition"],
       "delegates": ["Previous/Next -> Button"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/carousel/index.tsx",
         "sha256": "8b8e163b8e156393db128a868fc974c4fb47bab449e5f063ed2db6c074615bb1",
@@ -2925,7 +2934,7 @@
         "ChartTooltip isAnimationActive=false | Recharts positioning only | no tooltip entrance"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/chart/index.tsx",
         "sha256": "3ebcace2ed433d7fb71415c9679d58151a91fc35379fb202bd3cdb55e607820c",
@@ -2951,7 +2960,7 @@
       "tier": "T4",
       "targets": ["calendar-month-grid table | native element.animate WAAPI | data.transition"],
       "delegates": ["CalendarDayButton -> Button"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/calendar/index.tsx",
         "sha256": "1f24111e6a89dcd7c570f751c3cfe7f41d30e1b754987f01714efba9cb10e333",
@@ -3004,7 +3013,7 @@
         "indicator arrow rotate-45 | static orientation | no autonomous motion"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/navigation-menu/index.tsx",
         "sha256": "6723665e0762dc6dbf6c3907be063bf315272f2208e3bb3d057e7e32590e924f",
@@ -3142,7 +3151,7 @@
         "MenuSkeleton -> Skeleton",
         "Trigger -> Button"
       ],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/sidebar/index.tsx",
         "sha256": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
@@ -3283,7 +3292,7 @@
       "tier": "T2",
       "targets": [],
       "delegates": ["Button", "Checkbox indicator", "DropdownMenuContent/SubContent and control indicators"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/data-table/index.tsx",
         "sha256": "53a400f1082823da69377bf567c07ff76f0531cfb06bed7a4a042d885774584c",
@@ -3303,7 +3312,7 @@
       "tier": "T2",
       "targets": [],
       "delegates": ["Button", "PopoverContent", "CalendarMonthGrid native WAAPI"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/date-picker/index.tsx",
         "sha256": "74005a7fddf6d3635c16b335e5a7505ec32f16e176440146eab9a274b5c861b6",
@@ -3329,7 +3338,7 @@
       "tier": "T5",
       "targets": ["attachment-title processing/uploading pulse | CSS animation | data.transition"],
       "delegates": ["AttachmentAction -> Button", "caller-composed Spinner"],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/attachment/index.tsx",
         "sha256": "90fd99e09d18113812ee12dd38fb3096ad6ff084d458e0f2a60ac4b0a41e5771",
@@ -3403,7 +3412,7 @@
         "bubble-reactions translate-y-3/4 | static placement | no autonomous motion"
       ],
       "delegates": [],
-      "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
+      "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/bubble/index.tsx",
         "sha256": "9f039663c62ead1c4ced2ffad1dc3f665922e71e46263838d3e1d61709d2668d",
@@ -3452,32 +3461,32 @@
   "site": [
     {
       "path": "components/site/document-entrance.tsx",
-      "sha256": "e9c1a425a21f99531dd17210440c35a95ac28d96b7d91eace9ada41b06ed8af5",
+      "sha256": "7bbee25dcdc7fe70f9ab1fafb6b0781f49cd628f0ea1161a7e2587b7308cda1f",
       "slots": [],
       "signals": [
         {
           "owner": "entrance",
-          "line": 105,
+          "line": 106,
           "text": "cm.transition(\"reveal\", { timeScale: scale })"
         },
         {
           "owner": "clip",
-          "line": 106,
+          "line": 107,
           "text": "cm.transition(\"reveal\", { timeScale: clipScale })"
         },
         {
           "owner": "DocumentEntrance",
-          "line": 133,
+          "line": 136,
           "text": "<motion.article ref={ref} {...motionProps}>"
         },
         {
           "owner": "DocumentEntrance",
-          "line": 141,
+          "line": 144,
           "text": "<motion.section ref={ref} {...motionProps}>"
         },
         {
           "owner": "DocumentEntrance",
-          "line": 148,
+          "line": 151,
           "text": "<motion.div ref={ref as RefObject<HTMLDivElement>} {...motionProps}>"
         }
       ],
@@ -3607,22 +3616,22 @@
     },
     {
       "path": "registry/cadence/lib/control-animation.tsx",
-      "sha256": "987ff0abe38dabaf23d1e57ec59fd9309ed935ebc339eb56994c4cbc56caaca8",
+      "sha256": "881bf4c41a4ff5f766eb1a17a1457ff08ca0c58ca8e929c8372cb7c364982d92",
       "slots": [],
       "signals": [
         {
           "owner": "useControlAnimation",
-          "line": 24,
+          "line": 25,
           "text": "controls.start(target, transition)"
         },
         {
           "owner": "ControlSpan",
-          "line": 44,
+          "line": 45,
           "text": "<motion.span {...props} initial={target} animate={controls} />"
         },
         {
           "owner": "ControlDiv",
-          "line": 48,
+          "line": 49,
           "text": "<motion.div {...props} initial={target} animate={controls} />"
         }
       ]
@@ -3670,13 +3679,13 @@
     },
     {
       "path": "registry/cadence/lib/press-button.tsx",
-      "sha256": "9ae806858d5ab86c1627a791357842ce0301ec35a57ed5e0ab175690f3608aaf",
+      "sha256": "6c4e1bea1bb1012ff64b1e03f0b64bcf87958a861c47cd96178b87e2cd83bcc2",
       "slots": [],
       "signals": [
         {
           "owner": "PressButton",
-          "line": 68,
-          "text": "<MotionNativeButton\n      {...props}\n      nativeRef={ref}\n      nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }}\n    />"
+          "line": 97,
+          "text": "<MotionNativeButton\n      {...props}\n      initial={false}\n      animate={controls}\n      onPointerDown={(event) => {\n        props.onPointerDown?.(event);\n        if (enabled && event.button === 0) setPressed(true);\n      }}\n      onPointerUp={(event) => {\n        props.onPointerUp?.(event);\n        setPressed(false);\n      }}\n      onPointerCancel={(event) => {\n        props.onPointerCancel?.(event);\n        setPressed(false);\n      }}\n      onKeyDown={(event) => {\n        props.onKeyDown?.(event);\n        if (enabled && event.key === \"Enter\""
         }
       ]
     },

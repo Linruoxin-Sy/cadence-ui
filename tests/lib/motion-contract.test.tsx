@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { act, render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { motion } from "motion/react";
 import { describe, expect, it } from "vitest";
 import { Button } from "@/registry/cadence/button";
@@ -26,8 +26,9 @@ describe("expectMotionContract", () => {
     expect(motionSamples.size).toBeGreaterThan(0);
     const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
     if (!button) throw new Error("real Button Motion host missing");
-    expect(typeof button?.onTapStart).toBe("function");
-    act(() => (button.onTapStart as () => void)());
+    const node = document.querySelector("button");
+    if (!node) throw new Error("button missing");
+    fireEvent.keyDown(node, { key: "Enter" });
     const controls = button?.animate as object;
     expect(controlSamples.get(controls)?.target).toEqual({ scale: mode === "full" ? scale.press : 1 });
     expectMotionContract(mode);
@@ -49,7 +50,8 @@ describe("expectMotionContract", () => {
     const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
     if (!button) throw new Error("real Button Motion host missing");
     const controls = button.animate as object;
-    act(() => (button.onTapStart as () => void)());
+    if (!node) throw new Error("button missing");
+    fireEvent.keyDown(node, { key: "Enter" });
     expect(controlSamples.get(controls)?.target).toEqual({ scale: scale.press });
     rerender(draw(true));
     expect(controlSamples.get(controls)?.target).toEqual({ scale: 1 });
@@ -64,7 +66,8 @@ describe("expectMotionContract", () => {
     rerender(off(false));
     const inactive = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
     if (!inactive) throw new Error("real Button Motion host missing");
-    act(() => (inactive.onTapStart as () => void)());
+    if (!node) throw new Error("button missing");
+    fireEvent.keyDown(node, { key: "Enter" });
     rerender(off(true));
     rerender(off(false));
     rerender(draw(false));

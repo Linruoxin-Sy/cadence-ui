@@ -71,6 +71,19 @@ export function PressButton({
   const disabled = props.disabled || props["aria-disabled"] === true || props["aria-disabled"] === "true";
   const enabled = !disabled && !!whileTap;
   useCommittedEffect(() => {
+    if (!pressed) return;
+    const release = (event: PointerEvent) => {
+      // Keyboard-generated pointercancel from another control is not this press.
+      if (event.isTrusted) setPressed(false);
+    };
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
+    return () => {
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
+    };
+  }, [pressed]);
+  useCommittedEffect(() => {
     // Native disabled can swallow pointerup. Cancel this visual gesture rather
     // than reviving it when the same button is enabled again.
     if (!enabled) setPressed(false);
@@ -85,11 +98,30 @@ export function PressButton({
       {...props}
       initial={false}
       animate={controls}
-      onTapStart={() => {
-        if (enabled) setPressed(true);
+      onPointerDown={(event) => {
+        props.onPointerDown?.(event);
+        if (enabled && event.button === 0) setPressed(true);
       }}
-      onTap={() => setPressed(false)}
-      onTapCancel={() => setPressed(false)}
+      onPointerUp={(event) => {
+        props.onPointerUp?.(event);
+        setPressed(false);
+      }}
+      onPointerCancel={(event) => {
+        props.onPointerCancel?.(event);
+        setPressed(false);
+      }}
+      onKeyDown={(event) => {
+        props.onKeyDown?.(event);
+        if (enabled && event.key === "Enter" && event.target === event.currentTarget) setPressed(true);
+      }}
+      onKeyUp={(event) => {
+        props.onKeyUp?.(event);
+        if (event.key === "Enter") setPressed(false);
+      }}
+      onBlur={(event) => {
+        props.onBlur?.(event);
+        setPressed(false);
+      }}
       nativeRef={ref}
       nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }}
     />

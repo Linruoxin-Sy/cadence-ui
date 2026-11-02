@@ -230,7 +230,7 @@ Stopping before paint applies to asynchronous controlled commits as well as inpu
 Checkbox and Radio explicitly give scale a zero clock in reduced mode; opacity keeps its recipe.
 The same adapter owns CodeBlock's floating Actions, copy glyphs and expand orientation:
 an unchanged target must still cancel/retarget when its mode or clock changes.
-Press buttons use Motion's tap lifecycle to drive this adapter, and disabled/aria-disabled
+Press buttons use native pointer/Enter/blur lifecycle to drive this adapter, and disabled/aria-disabled
 or a removed press recipe resolves the scale immediately to one without replacing the button.
 It also clears the private held gesture: native disabled can swallow pointerup, so
 re-enabling the button must not revive that cancelled press. Base owns focus/activation.
@@ -680,7 +680,13 @@ React native events, including capture/bubble, cancellation and the real current
 they must never receive Motion animation definitions or pan information. The adapter
 also commits the Base/caller ref independently of Motion’s stable ref callback,
 cleaning up the previous callback/object ref on identity changes and unmount without
-replacing the DOM node. This preserves React 19 cleanup ownership. It adds no DOM wrapper and retains the same `whileTap`, `scale.press` and token transition.
+replacing the DOM node. This preserves React 19 cleanup ownership. It adds no DOM wrapper.
+The private `whileTap` input selects `scale.press`; native pointer and Enter handlers drive
+committed controls with the token transition. Release outside the button uses cleaned-up
+window pointer listeners; disabled, recipe removal and blur clear the visual press.
+Motion 13.5.1's keyboard tap synthesizes a bubbling pointercancel on a later blur, even
+after keyup. That event can cancel a new Base Slider drag, so the adapter does not install
+Motion tap listeners. Caller native events and Base activation/focus still run on the same node.
 Caller `render` still replaces the default renderer through Base UI. This boundary
 does not establish compatibility for other Motion-rendered parts or prove live-mode
 cancellation of an already running gesture.
@@ -691,8 +697,8 @@ ProgressIndicator's default renderer and floating CodeBlockActions use `lib/nati
 Its `motion.create()` native div adapter carries the four reserved React handlers and
 caller ref in private props, restoring them to the same DOM node and committing ref
 identity changes with React 19 cleanup, as for press controls above. Progress keeps
-its existing imperative control animation; Actions keeps its declarative opacity
-animation. No recipe, token, DOM wrapper, or caller render ownership changes. Internal
+committed control animation; Actions uses the same committed controller for opacity,
+including same-target mode/clock retargeting. No recipe, token, DOM wrapper, or caller render ownership changes. Internal
 ControlDiv/ControlSpan consumers are not implicitly migrated or certified.
 
 A Base UI popup enters a "closing" phase before it unmounts, waiting for the animation to finish. Understanding these four patterns is what makes "rich animation" land in practice (official docs: [Base UI Animation](https://base-ui.com/react/handbook/animation.md)).

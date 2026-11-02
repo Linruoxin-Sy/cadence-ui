@@ -30,15 +30,17 @@ const delegates = {
 };
 // Explicit runtime targets, including unslotted surfaces and engine-generated descendants.
 const parts = {
-  button: ["Motion press-button actual button | Motion gesture | feedback.press"],
+  button: ["PressButton actual button | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],
   skeleton: ["skeleton | CSS animation pulse | data.transition"],
   spinner: ["spinner SVG | CSS animation spin (single glyph reduced exception) | data.transition"],
   checkbox: ["checkbox-indicator ControlSpan | Motion controls | state.morph"],
   "radio-group": ["radio-group-indicator ControlSpan | Motion controls | state.morph"],
   switch: ["switch-thumb ControlSpan positional target | Motion controls | state.morph"],
-  slider: ["slider-thumb MotionNativeDiv | Motion gesture | feedback.press"],
-  toggle: ["toggle MotionNativeButton | Motion gesture | feedback.press"],
-  "toggle-group": ["toggle-group-item MotionNativeButton | Motion gesture | feedback.press"],
+  slider: ["slider-thumb ControlDiv | Base dragging + Motion committed controls | feedback.press"],
+  toggle: ["toggle PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],
+  "toggle-group": [
+    "toggle-group-item PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press",
+  ],
   "input-otp": ["input-otp-slot > unslotted character motion.span | Motion controls | state.morph"],
   progress: [
     "progress-indicator NativeControlDiv determinate scaleX | Motion controls | data.transition",
@@ -162,7 +164,7 @@ const items = registry.items
     delegates: delegates[i.name] ?? [],
     disposition:
       parts[i.name] || delegates[i.name]
-        ? "See per-part evidence/gaps in css-runtime.md; not a global runtime pass"
+        ? "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass"
         : "Source reviewed: structural/state colour-border-shadow feedback only; no autonomous writer",
     source: scan(`registry/cadence/${i.name}/index.tsx`),
   }));

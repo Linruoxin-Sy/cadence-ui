@@ -2136,3 +2136,13 @@ check is retained. Old819482c measurements are separately preserved.48KB runtime
 8KB compiled per-item,55fps/CLS<0.02 and final whole-goal audit are still unmeasured
 gaps, not falsely reported failures or passes. Test/evidence-only review does not
 refresh runtime sourceSha. Final payload and complete handoff are separate commits.
+
+Basic controls follow-up (2026-11-02): actual Button/Toggle/Group, Slider thumb,
+Checkbox/Radio indicators, Switch thumb, default/public composed Progress indicators
+and OTP character now have six client mode/OS cells with async commits, positive
+inherited/explicit clocks, reversal, cancellation and cleanup samples. Actual-source
+negatives expose Motion Enter's delayed synthetic blur pointercancel cancelling a
+new Base Slider drag, and Slider's reduced partial-scale tween. Native press lifecycle
+with committed controls and zero-clock reduced Slider feedback repair these. See
+engine-runtime.md and basic-controls handoff for final counts and precise SSR/resize
+limits. Other writers, all performance gates and the whole goal remain OPEN.

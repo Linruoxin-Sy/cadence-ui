@@ -115,7 +115,7 @@ function Slider<Value extends number | readonly number[] = number | readonly num
                     thumbClassName,
                   )}
                   target={{ scale: state.dragging && !state.disabled && !cm.reduced ? scale.press : 1 }}
-                  transition={state.disabled ? { duration: 0 } : cm.transition("feedback.press")}
+                  transition={state.disabled || cm.reduced ? { duration: 0 } : cm.transition("feedback.press")}
                 />
               );
             }}

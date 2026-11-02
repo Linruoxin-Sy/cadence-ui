@@ -97,10 +97,10 @@ The following gaps keep the full Motion/engine matrix OPEN:
 
 | Actual writer                              | Existing applicable proof                                                                                                              | Remaining condition to execute                                                                                                                                                     |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Button/Toggle/ToggleGroupItem              | Toggle/Group B3 six cells; four genuine pointer/Enter held-disabled/re-enable paths ×2 gestures; latent none gesture unit negative     | Button new-carrier six initial mode/OS cells; disabled under OS reduce, per-part inherited/explicit clocks and cleanup                                                             |
-| Slider ControlDiv                          | six-cell B3 drag; actual held disabled negative and repair                                                                             | async mode/clock/value first paint on the actual dragged thumb, disabled under both OS                                                                                             |
-| Checkbox/Radio ControlSpan                 | six-cell B3 insertion/interaction; async partial-scale reduced/none samples                                                            | external clock retarget and cleanup/reversal first-paint samples on actual indicator                                                                                               |
-| Switch/Progress/OTP                        | six-cell B3; OTP async character/mode first paint                                                                                      | Switch/Progress external controlled commits and same-target clock at first paint; OTP clock/unrelated-render/cleanup trajectory                                                    |
+| Button/Toggle/ToggleGroupItem | basic-controls-runtime.json: six cells, actual native hosts, initial disabled and held pointer/Enter, inherited clock, mode cancellation, same-node cleanup; old eight-path proof retained | Real Next proof remains scoped to its actual assertions; native press replaces Motion keyboard synthesis (negative retained). No global hydration claim. |
+| Slider ControlDiv | basic-controls-runtime.json: actual value-changing drag, full partial scale, live explicit clock/reduced/disabled, external value first frames, both OS and cleanup | Positive clocks 8/4/2 only; independent CSS/direct drag geometry is semantic. Real Next first-frame coverage remains as asserted by B3. |
+| Checkbox/Radio ControlSpan | six client cells; real indicator IDs, controlled selection/reversal, positive inherited/explicit clock native timing plus numeric JS samples, first-frame mode cancellation and cleanup | Existing production insertion/hydration proof is scoped; no expanded all-host SSR matrix. |
+| Switch/Progress/OTP | six client cells; async checked/value/character, default and public composed Progress indicator, clock changes, reversal/deletion, no unrelated replay, semantic terminal transforms and cleanup | Switch resize first rAF may precede RO delivery; second rAF is proven. No claim that this isolated client fixture proves full-shell SSR. |
 | Select/Combobox/Menu checkbox/radio        | Dropdown checkbox only: six B5 cells with nonempty raw samples; all other actual hosts source-inventoried                              | Dropdown radio, Context checkbox/radio, Select and Combobox actual indicator matrices; MenuBar exact delegation reuse; async clock/first-paint interruption                        |
 | Select measured value/portal flight        | correctly scoped B5 six cells including true width/flight frames, resize and live cancellation; two separate source negatives repaired | same-target full spring clock, async first-paint cancel, flight handoff/cleanup and inherited/explicit clocks                                                                      |
 | Tabs/CodeBlock shared indicator            | Tabs six cells; historical CodeBlock tab tests                                                                                         | CodeBlock actual shared host source/trajectory, mode downgrade at partial projection, reversal/resize; decorative branch identity follows source, not permanent-node assumptions   |
@@ -117,6 +117,33 @@ Compositions reuse their actual controls/context; they do not gain a new root en
 Performance120KB/48KB/8KB/55fps/CLS and the final whole-goal audit remain OPEN.
 
 ## Final authority
+
+Basic-control increment: `tests/runtime/controls.mjs` records actual host identities,
+numeric computed styles, native timing/keyframes, commit and first two rAFs (plus
+later samples), external asynchronous React commits and detached-node cleanup.
+The 85ms collection wait does not defer recording. A full child inherits clock8
+inside none; inherited4 and explicit2 retarget the same hosts, with OS reduce winning.
+OTP clock changes settle the existing character; unrelated renders preserve its
+progress, replacement animates a new character, deletion empties the same span.
+Switch/Progress retain their semantic x/scaleX endpoints. Progress's public composed
+indicator and its automatically appended default are sampled separately.
+
+Two actual-source negatives are retained in `basic-controls-negative.json` and
+`basic-controls-slider-negative.json`. Motion13.5.1's Enter keyboard press leaves a
+blur listener that later synthesizes a bubbling pointercancel from the previous
+button; Base Slider's document listener cancels the new real drag. PressButton now
+drives the same controller through native pointer/Enter/blur handlers, forwarding
+caller/Base handlers and cleaning up outside-release listeners. No remount, timeout,
+event suppression, dependency patch or public API change. Slider reduced retarget
+now zeroes the feedback scale immediately rather than tweening its old partial scale.
+
+Native spring WAAPI duration is generated from the interrupted distance/thresholds;
+positive clock reduction shortens it but is not asserted to divide its baked duration
+exactly. Raw actual durations remain. Switch's width change reaches ResizeObserver
+after the first rAF; second rAF has the new endpoint. This is not proof of synchronous
+first-rAF resize measurement. Zero/negative/nonfinite timeScale is not certified here.
+Other independent writers in the remaining table stay OPEN. Final commands, counts,
+source hashes and production proof are recorded in basic-controls handoff.
 
 Runtime source50cc262: full pnpm check687/687 in88 files, isolated production build
 and106/106 behavior cases. Correctly scoped Select6/6 and strengthened nonempty

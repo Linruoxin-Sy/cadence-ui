@@ -12,11 +12,11 @@
       "source": "<PressButton\n          whileTap={cm.reduced ? undefined : { scale: scale.press }}\n          transition={cm.transition(\"feedback.press\")}\n        />",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -48,11 +48,11 @@
       "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"grid size-full place-content-center text-current\", indicatorClassName)}\n              target={\n                state.checked || state.indeterminate\n                  ? { opacity: 1, scale: 1 }\n                  : { opacity: 0, scale: cm.reduced ? 1 : scale.in }\n              }\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -282,11 +282,11 @@
       "source": "<motion.span data-motion={cm.mode} initial={false} animate={controls} transition={cm.transition(\"state.morph\")}>",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -300,11 +300,11 @@
       "source": "<NativeControlDiv\n            {...rest}\n            className={cn(\"h-full w-full origin-left bg-primary\", pulse, indicatorClassName)}\n            target={{ scaleX: fraction ?? 1 }}\n            transition={cm.reduced ? { duration: 0 } : cm.transition(\"data.transition\")}\n          />",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -318,11 +318,11 @@
       "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"flex size-full items-center justify-center\", indicatorClassName)}\n              target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -423,16 +423,16 @@
       "line": 110,
       "writer": "ControlDiv",
       "target": "Base Slider Thumb rendered div; Base dragging state",
-      "recipe": "{state.disabled ? { duration: 0 } : cm.transition(\"feedback.press\")}",
-      "sourceSha256": "f3615df3b787a947969dcb9fcd38d7b6149fd72e3f3fe4973183db8ba8fccf9f",
-      "source": "<ControlDiv\n                  {...(rest as HTMLMotionProps<\"div\">)}\n                  className={cn(\n                    \"block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 outline-none transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4\",\n                    \"data-disabled:pointer-events-none data-disabled:opacity-50\",\n                    thumbClassName,\n                  )}\n                  target={{ scale: state.dragging && !state.disabled && !cm.reduced ? scale.press : 1 }}\n                  transition={state.disabled ? { duration: 0 } : cm.transition(\"feedback.press\")}\n                />",
+      "recipe": "{state.disabled || cm.reduced ? { duration: 0 } : cm.transition(\"feedback.press\")}",
+      "sourceSha256": "e48e023dc43045e0675031acd959c41b8d66561d9fd6acd5df6264fdf4c3fd16",
+      "source": "<ControlDiv\n                  {...(rest as HTMLMotionProps<\"div\">)}\n                  className={cn(\n                    \"block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 outline-none transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4\",\n                    \"data-disabled:pointer-events-none data-disabled:opacity-50\",\n                    thumbClassName,\n                  )}\n                  target={{ scale: state.dragging && !state.disabled && !cm.reduced ? scale.press : 1 }}\n                  transition={state.disabled || cm.reduced ? { duration: 0 } : cm.transition(\"feedback.press\")}\n                />",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -446,11 +446,11 @@
       "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              ref={(node: HTMLSpanElement | null) => {\n                thumbRef.current = node;\n                if (typeof forwardedRef === \"function\") return forwardedRef(node);\n                else if (forwardedRef) (forwardedRef as RefObject<HTMLSpanElement | null>).current = node;\n              }}\n              className={cn(\n                \"pointer-events-none block rounded-full bg-background ring-0\",\n                \"group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3\",\n                \"dark:data-checked:bg-primary-foreground dark:data-unchecked:bg-foreground\",\n                thumbClassName,\n              )}\n              target={{ x: state.checked ? (travel ?? 0) : 0 }}\n              // Until the measured distance has been painted, there is nothing to\n              // animate *between*: jump into place, then spring on user input.\n              transition={!settled || cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}\n            />",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -482,11 +482,11 @@
       "source": "<PressButton\n          whileTap={cm.reduced ? undefined : { scale: scale.press }}\n          transition={cm.transition(\"feedback.press\")}\n        />",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {
@@ -500,11 +500,11 @@
       "source": "<PressButton\n          whileTap={cm.reduced ? undefined : { scale: scale.press }}\n          transition={cm.transition(\"feedback.press\")}\n        />",
       "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
       "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "status": "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits",
       "remaining": [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+        "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+        "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+        "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
       ]
     },
     {

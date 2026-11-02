@@ -13,6 +13,17 @@ for (const path of paths) {
   const source = readFileSync(path, "utf8");
   const file = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const id = path.split("/")[2];
+  const basic = [
+    "button",
+    "toggle",
+    "toggle-group",
+    "slider",
+    "checkbox",
+    "radio-group",
+    "switch",
+    "progress",
+    "input-otp",
+  ].includes(id);
   const existing =
     id === "document-entrance.tsx"
       ? []
@@ -68,12 +79,20 @@ for (const path of paths) {
       existingProofCandidates: existing,
       applicableProof:
         "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      status: "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
-      remaining: [
-        "initial full/reduced/none × two OS; SSR/hydration where applicable",
-        "active same-target mode/clock, inherited/explicit clock and full inside none",
-        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup",
-      ],
+      status: basic
+        ? "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits"
+        : "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      remaining: basic
+        ? [
+            "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
+            "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
+            "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified",
+          ]
+        : [
+            "initial full/reduced/none × two OS; SSR/hydration where applicable",
+            "active same-target mode/clock, inherited/explicit clock and full inside none",
+            "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup",
+          ],
     });
   function owner(node) {
     for (let p = node.parent; p; p = p.parent) if (ts.isFunctionDeclaration(p) && p.name) return p.name.text;
