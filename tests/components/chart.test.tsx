@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { createRef } from "react";
+import { createContext, createRef } from "react";
 import { Bar, BarChart, JavascriptAnimation } from "recharts";
 import { describe, expect, it, vi } from "vitest";
 import { ChartContainer, ChartLegendContent, ChartStyle, ChartTooltipContent } from "@/registry/cadence/chart";
@@ -37,6 +37,29 @@ function Content() {
   );
 }
 describe("Chart", () => {
+  it("preserves context render children across motion modes and context updates", () => {
+    const Context = createContext("initial");
+    const tree = (mode: "full" | "reduced" | "none", value: string) => (
+      <CadenceProvider mode={mode}>
+        <Context.Provider value={value}>
+          <ChartContainer config={config}>
+            <svg aria-label="Context chart">
+              <Context.Consumer>{(current) => <text>{current}</text>}</Context.Consumer>
+            </svg>
+          </ChartContainer>
+        </Context.Provider>
+      </CadenceProvider>
+    );
+    const { container, rerender } = render(tree("full", "initial"));
+    const svg = screen.getByLabelText("Context chart");
+    const text = screen.getByText("initial");
+    for (const mode of ["reduced", "none", "full"] as const) {
+      rerender(tree(mode, `updated-${mode}`));
+      expect(screen.getByText(`updated-${mode}`)).toBe(text);
+      expect(screen.getByLabelText("Context chart")).toBe(svg);
+      expect(container.querySelector('[data-slot="chart"]')).toHaveAttribute("data-motion", mode);
+    }
+  });
   it("preserves div ref, caller styles/classes and scoped theme", () => {
     const ref = createRef<HTMLDivElement>();
     const { container } = render(

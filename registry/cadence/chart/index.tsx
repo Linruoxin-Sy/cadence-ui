@@ -68,7 +68,7 @@ function chartSeries(element: React.ReactElement, instant: boolean): React.React
     : terminalItems;
   return React.cloneElement(child, {
     ...(animatedSeries.has(child.type) && instant ? { animationInterpolateFn: terminal } : {}),
-    ...(child.props.children !== undefined
+    ...(child.props.children !== undefined && typeof child.props.children !== "function"
       ? {
           children: React.Children.map(child.props.children, (nested) =>
             React.isValidElement(nested) ? chartSeries(nested, instant) : nested,
