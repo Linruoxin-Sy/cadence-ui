@@ -292,6 +292,10 @@ The server paints the hidden state. The root layout's `<noscript>` rule and the 
 come from `lib/motion.ts`, and the `reduced` branch keeps opacity only while `none` resolves every duration to
 zero.
 
+The entrance uses the committed control adapter so mode/clock changes stop an existing
+writer before paint even when its target is unchanged. Explicit none renders RESTING
+in server HTML; other modes retain the hidden SSR state and no-script/print restoration.
+
 ---
 
 ## 3. Data flow: one MDX drives every output

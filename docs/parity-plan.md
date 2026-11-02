@@ -2078,3 +2078,23 @@ frame matrix stays OPEN. Final strict JS292314gzipbytes/23scripts >120000 (all20
 no pageerrors, original protocol/root body hashes), compatibility-base-js.json.
 Previous292327/292344 retained. Ledger373 classified/93 open; next finite group B6,
 then B7–B9. No global /goal completion or budget closure. Handoff compatibility-base.md.
+
+### Motion/engine first-paint increment (2026-11-02)
+
+Actual source discovery records33 writer sites including private CodeBlock spans,
+Select flight/width, Sidebar scalar, native Calendar, Embla and Recharts. The
+part-specific proof and executable remaining conditions are in
+`docs/evidence/engine-runtime.md` and `engine-writers.json`. Full runtime matrix is OPEN.
+
+Real async commit/rAF negatives exposed passive controller/OTP latency, Checkbox/Radio
+reduced scale interpolation, unchanged-target DocumentEntrance and CodeBlock drivers
+surviving none, held-disabled press/Slider scale, and CodeBlock reduced copy scale.
+Committed layout controls and explicit zero clocks repair these without replacing
+primary DOM or Base lifecycles. The fixture records commit and first two frames;
+23 assertions pass; old-source raw negatives remain. Explicit entrance SSR adds9 tests.
+Actual production article and bounded engine suites passed93/93 before the last
+Slider/copy-scale repairs; final-source verification and JS follow in the handoff.
+
+API466/CSS closure and old gates remain closed. Whole-library engine reconciliation,
+all-page120KB JS,48KB initial Motion runtime,8KB compiled per-component addition,
+55fps/CLS<0.02 and final whole-goal audit remain OPEN. This is no goal completion.

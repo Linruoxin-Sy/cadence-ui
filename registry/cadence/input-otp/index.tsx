@@ -4,7 +4,7 @@ import { OTPInput, OTPInputContext } from "input-otp";
 import { MinusIcon } from "lucide-react";
 import { motion, useAnimationControls } from "motion/react";
 import type * as React from "react";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
@@ -20,6 +20,7 @@ export interface InputOTPSlotProps extends React.ComponentProps<"div"> {
 }
 
 export interface InputOTPSeparatorProps extends React.ComponentProps<"div"> {}
+const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
  * A one-time password field: one slot per character, all of them backed by a
@@ -68,8 +69,8 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
 
   const controls = useAnimationControls();
   const previousCharacter = useRef(char);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: mode and clock fully determine cm; slot focus changes must not restart a character.
-  useEffect(() => {
+  // mode and clock fully determine cm; slot focus changes must not restart a character.
+  useCommittedEffect(() => {
     controls.stop();
     const changed = previousCharacter.current !== char;
     previousCharacter.current = char;

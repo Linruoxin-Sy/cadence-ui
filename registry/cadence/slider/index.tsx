@@ -114,8 +114,8 @@ function Slider<Value extends number | readonly number[] = number | readonly num
                     "data-disabled:pointer-events-none data-disabled:opacity-50",
                     thumbClassName,
                   )}
-                  target={{ scale: state.dragging && !cm.reduced ? scale.press : 1 }}
-                  transition={cm.transition("feedback.press")}
+                  target={{ scale: state.dragging && !state.disabled && !cm.reduced ? scale.press : 1 }}
+                  transition={state.disabled ? { duration: 0 } : cm.transition("feedback.press")}
                 />
               );
             }}

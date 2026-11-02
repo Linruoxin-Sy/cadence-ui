@@ -9,8 +9,8 @@ import * as React from "react";
 import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
 import { cn } from "../lib/cn";
+import { ControlSpan, NativeControlDiv } from "../lib/control-animation";
 import { scale } from "../lib/motion";
-import { NativeMotionDiv } from "../lib/native-div";
 import { useCadenceMotion } from "../lib/provider";
 
 /** How long the copy button shows its tick before returning to the copy glyph. */
@@ -215,7 +215,7 @@ export interface CodeBlockProps extends React.ComponentProps<"div">, VariantProp
  * - floating actions: fade in on hover and focus, `data.transition`
  * - copy tick and chevron: swap in place, `state.morph`
  * - tab indicator: one pill shared between tabs, `layout.shared`
- * - reduced: opacity and rotation stay, the height jumps (size is information),
+ * - reduced: opacity stays, orientation and height jump (size is information),
  *   and the tab pill changes tabs without travelling
  * - none: every transition resolves to zero duration
  *
@@ -536,12 +536,11 @@ function CodeBlockActions({ className, children, ...props }: CodeBlockActionsPro
   }
 
   return (
-    <NativeMotionDiv
+    <NativeControlDiv
       data-slot="code-block-actions"
       data-motion={cm.mode}
       data-revealed={revealed || undefined}
-      initial={false}
-      animate={{ opacity: revealed ? 1 : 0 }}
+      target={{ opacity: revealed ? 1 : 0 }}
       transition={cm.transition("data.transition")}
       className={cn(
         "absolute end-3 top-3 z-10 flex shrink-0 items-center gap-1 group-data-[size=sm]/code-block:end-2 group-data-[size=sm]/code-block:top-2",
@@ -554,7 +553,7 @@ function CodeBlockActions({ className, children, ...props }: CodeBlockActionsPro
       {...props}
     >
       {children}
-    </NativeMotionDiv>
+    </NativeControlDiv>
   );
 }
 
@@ -607,7 +606,7 @@ function CodeBlockCopyButton({
     return () => window.clearTimeout(timeout);
   }, [copiedText]);
 
-  const swap = cm.transition("state.morph");
+  const swap = { ...cm.transition("state.morph"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) };
   const tickOnly = cm.reduced;
 
   return (
@@ -637,24 +636,22 @@ function CodeBlockCopyButton({
       >
         {children ?? (
           <span aria-hidden="true" className="grid place-items-center">
-            <motion.span
+            <ControlSpan
               data-motion={cm.mode}
               className="col-start-1 row-start-1 flex"
-              initial={false}
-              animate={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}
+              target={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}
               transition={swap}
             >
               <CopyIcon />
-            </motion.span>
-            <motion.span
+            </ControlSpan>
+            <ControlSpan
               data-motion={cm.mode}
               className="col-start-1 row-start-1 flex"
-              initial={false}
-              animate={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}
+              target={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}
               transition={swap}
             >
               <CheckIcon />
-            </motion.span>
+            </ControlSpan>
           </span>
         )}
       </Button>
@@ -742,11 +739,8 @@ function CodeBlockContent({
       setOverflowing?.(full - foldedHeight > 1);
 
       if (!measured) {
-        // The first measurement is not a movement: paint the folded height and let
-        // later toggles animate from it, or the block would unfold itself on load.
-        // Motion applies a motion value on the next frame, so the first fold is
-        // written to the node now — one frame at full height is a layout shift the
-        // reader sees, and Motion overwrites the same property with the same number.
+        // First measurement is static. Write the fold before paint because Motion
+        // flushes the motion value next frame; showing full height first causes CLS.
         height.jump(target);
         if (viewportRef.current) viewportRef.current.style.height = `${target}px`;
         setMeasured(true);
@@ -961,16 +955,15 @@ function CodeBlockExpandButton({ className, children, onClick, ...props }: CodeB
       }}
     >
       {children ?? (expanded ? "Show less" : "Show all")}
-      <motion.span
+      <ControlSpan
         data-motion={cm.mode}
         aria-hidden="true"
         className="flex"
-        initial={false}
-        animate={{ rotate: expanded ? 180 : 0 }}
+        target={{ rotate: expanded ? 180 : 0 }}
         transition={cm.reduced ? { duration: 0 } : cm.transition("state.morph")}
       >
         <ChevronDownIcon />
-      </motion.span>
+      </ControlSpan>
     </Button>
   );
 }

@@ -1,0 +1,583 @@
+{
+  "scope": "Actual source discovery; CSS closure stays in css-lifecycle. Menubar and composite delegates inherit actual owners; no GSAP writer exists.",
+  "records": [
+    {
+      "path": "registry/cadence/button/index.tsx",
+      "owner": "Button",
+      "line": 85,
+      "writer": "PressButton",
+      "target": "Base Button default rendered button",
+      "recipe": "{cm.transition(\"feedback.press\")}",
+      "sourceSha256": "284197500ebf2f70db1f3c32567a458c74fe7d953ab75ee55718704ae4525eaf",
+      "source": "<PressButton\n          whileTap={cm.reduced ? undefined : { scale: scale.press }}\n          transition={cm.transition(\"feedback.press\")}\n        />",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/calendar/index.tsx",
+      "owner": "CalendarMonthGrid",
+      "line": 223,
+      "writer": "element.animate",
+      "target": "[from, to]",
+      "recipe": "{ duration: (transition.duration ?? 0) * 1000, easing }",
+      "sourceSha256": "1f24111e6a89dcd7c570f751c3cfe7f41d30e1b754987f01714efba9cb10e333",
+      "source": "element.animate([from, to], { duration: (transition.duration ?? 0) * 1000, easing })",
+      "existingProofCandidates": ["tests/e2e/calendar.spec.ts (inspect applicability; filename alone is not proof)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/checkbox/index.tsx",
+      "owner": "Checkbox",
+      "line": 61,
+      "writer": "ControlSpan",
+      "target": "Base Checkbox Indicator rendered span",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "b3e0f356a67c4b9d10311ef871af9216254b24681474ce7fa332a1407bfcb085",
+      "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"grid size-full place-content-center text-current\", indicatorClassName)}\n              target={\n                state.checked || state.indeterminate\n                  ? { opacity: 1, scale: 1 }\n                  : { opacity: 0, scale: cm.reduced ? 1 : scale.in }\n              }\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockTab",
+      "line": 499,
+      "writer": "motion.span",
+      "target": "\"code-block-tab-indicator\"",
+      "recipe": "{cm.reduced ? { duration: 0 } : cm.transition(\"layout.shared\")}",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "<motion.span\n          aria-hidden=\"true\"\n          data-slot=\"code-block-tab-indicator\"\n          data-motion={cm.mode}\n          // A shared element is the travel; under reduced motion there is no travel\n          // to keep, so the pill mounts where the selection landed.\n          layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}\n          transition={cm.reduced ? { duration: 0 } : cm.transition(\"layout.shared\")}\n          className=\"absolute inset-0 rounded-sm bg-muted\"\n        />",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockActions",
+      "line": 539,
+      "writer": "NativeControlDiv",
+      "target": "\"code-block-actions\"",
+      "recipe": "{cm.transition(\"data.transition\")}",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "<NativeControlDiv\n      data-slot=\"code-block-actions\"\n      data-motion={cm.mode}\n      data-revealed={revealed || undefined}\n      target={{ opacity: revealed ? 1 : 0 }}\n      transition={cm.transition(\"data.transition\")}\n      className={cn(\n        \"absolute end-3 top-3 z-10 flex shrink-0 items-center gap-1 group-data-[size=sm]/code-block:end-2 group-data-[size=sm]/code-block:top-2\",\n        // A floating control needs its own surface, or it reads as part of the code.\n        \"[&_button]:bg-background [&_button]:ring-1 [&_button]:ring-foreground/10\",\n        // Invisible but still tabbable: focusing it reveals the row again.\n        !revealed && \"pointer-events-none\",\n        className,\n      )}\n      {...props}\n    >",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockCopyButton",
+      "line": 639,
+      "writer": "ControlSpan",
+      "target": "one of two private copy/check glyph spans; target expression distinguishes them",
+      "recipe": "{swap}",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "<ControlSpan\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              target={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}\n              transition={swap}\n            >",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockCopyButton",
+      "line": 647,
+      "writer": "ControlSpan",
+      "target": "one of two private copy/check glyph spans; target expression distinguishes them",
+      "recipe": "{swap}",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "<ControlSpan\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              target={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}\n              transition={swap}\n            >",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockContent",
+      "line": 750,
+      "writer": "animate",
+      "target": "height",
+      "recipe": "cm.transition(\"geometry.resize\")",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "animate(height, target, cm.transition(\"geometry.resize\"))",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockContent",
+      "line": 760,
+      "writer": "motion.div",
+      "target": "\"code-block-viewport\"",
+      "recipe": "imperative motion value or parent recipe; inspect source",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "<motion.div\n      ref={viewportRef}\n      data-slot=\"code-block-viewport\"\n      data-motion={cm.mode}\n      style={measured ? { height } : undefined}\n      className=\"min-h-0 overflow-hidden\"\n    >",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/code-block/index.tsx",
+      "owner": "CodeBlockExpandButton",
+      "line": 958,
+      "writer": "ControlSpan",
+      "target": "direct motion span inside expand button, not its SVG",
+      "recipe": "{cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}",
+      "sourceSha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+      "source": "<ControlSpan\n        data-motion={cm.mode}\n        aria-hidden=\"true\"\n        className=\"flex\"\n        target={{ rotate: expanded ? 180 : 0 }}\n        transition={cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}\n      >",
+      "existingProofCandidates": ["tests/e2e/motion-matrix.spec.ts (tabs/fold only)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/combobox/index.tsx",
+      "owner": "ComboboxItem",
+      "line": 309,
+      "writer": "ControlSpan",
+      "target": "\"combobox-item-indicator\"",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "b08aa48720ebba1e4b77ea23d40da6324cee15a3ed015f55a28c09f56336c56a",
+      "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              data-slot=\"combobox-item-indicator\"\n              data-motion={cm.mode}\n              className={cn(\n                \"pointer-events-none absolute right-2 flex size-4 items-center justify-center\",\n                indicatorClassName,\n              )}\n              target={state.selected ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/context-menu/index.tsx",
+      "owner": "ContextMenuCheckboxItem",
+      "line": 250,
+      "writer": "ControlSpan",
+      "target": "Base ContextMenu CheckboxItemIndicator span",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "0a71f3e17e80d6c8cd330dc3b6c4f6834669b5bc00cc1dfe6042e12223033eff",
+      "source": "<ControlSpan\n                {...(rest as HTMLMotionProps<\"span\">)}\n                data-motion={cm.mode}\n                className={cn(\"flex items-center justify-center\", indicatorClassName)}\n                target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n                transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n              >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/context-menu/index.tsx",
+      "owner": "ContextMenuRadioItem",
+      "line": 307,
+      "writer": "ControlSpan",
+      "target": "Base ContextMenu RadioItemIndicator span",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "0a71f3e17e80d6c8cd330dc3b6c4f6834669b5bc00cc1dfe6042e12223033eff",
+      "source": "<ControlSpan\n                {...(rest as HTMLMotionProps<\"span\">)}\n                data-motion={cm.mode}\n                className={cn(\"flex items-center justify-center\", indicatorClassName)}\n                target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n                transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n              >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/dropdown-menu/index.tsx",
+      "owner": "DropdownMenuCheckboxItem",
+      "line": 263,
+      "writer": "ControlSpan",
+      "target": "Base Dropdown CheckboxItemIndicator span",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "abcabf9c24c51e76c3622184416f003ba6ea59df758774cbf76bd1ff825b8cff",
+      "source": "<ControlSpan\n                {...(rest as HTMLMotionProps<\"span\">)}\n                data-motion={cm.mode}\n                className={cn(\"flex items-center justify-center\", indicatorClassName)}\n                target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n                transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n              >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/dropdown-menu/index.tsx",
+      "owner": "DropdownMenuRadioItem",
+      "line": 320,
+      "writer": "ControlSpan",
+      "target": "Base Dropdown RadioItemIndicator span",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "abcabf9c24c51e76c3622184416f003ba6ea59df758774cbf76bd1ff825b8cff",
+      "source": "<ControlSpan\n                {...(rest as HTMLMotionProps<\"span\">)}\n                data-motion={cm.mode}\n                className={cn(\"flex items-center justify-center\", indicatorClassName)}\n                target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n                transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n              >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/input-otp/index.tsx",
+      "owner": "InputOTPSlot",
+      "line": 97,
+      "writer": "motion.span",
+      "target": "OTP slot character span",
+      "recipe": "{cm.transition(\"state.morph\")}",
+      "sourceSha256": "25c37162c6d99a4d2a1a49626ff774b2866f58fae86c198a2fc17129fe4fdbdc",
+      "source": "<motion.span data-motion={cm.mode} initial={false} animate={controls} transition={cm.transition(\"state.morph\")}>",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/progress/index.tsx",
+      "owner": "ProgressIndicator",
+      "line": 108,
+      "writer": "NativeControlDiv",
+      "target": "Base Progress Indicator rendered native div",
+      "recipe": "{cm.reduced ? { duration: 0 } : cm.transition(\"data.transition\")}",
+      "sourceSha256": "5d1d5f20189d3812b31d5e79220f6e89d330b9ebe193c976f82c4ce0d913f4df",
+      "source": "<NativeControlDiv\n            {...rest}\n            className={cn(\"h-full w-full origin-left bg-primary\", pulse, indicatorClassName)}\n            target={{ scaleX: fraction ?? 1 }}\n            transition={cm.reduced ? { duration: 0 } : cm.transition(\"data.transition\")}\n          />",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/radio-group/index.tsx",
+      "owner": "RadioGroupItem",
+      "line": 69,
+      "writer": "ControlSpan",
+      "target": "Base Radio Indicator rendered span",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "c262cf7267aa7976eb71dd1fff12873aba9e94d169e82dd28007e4cc948aab7a",
+      "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              className={cn(\"flex size-full items-center justify-center\", indicatorClassName)}\n              target={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/select/index.tsx",
+      "owner": "SelectValue",
+      "line": 149,
+      "writer": "animate",
+      "target": "width",
+      "recipe": "cm.transition(\"geometry.resize\")",
+      "sourceSha256": "122806d659a503103fb7a91748fa07b3a3798248ee8527f9eb50e0440f11872b",
+      "source": "animate(width, next, cm.transition(\"geometry.resize\"))",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/select/index.tsx",
+      "owner": "SelectValue",
+      "line": 158,
+      "writer": "motion.span",
+      "target": "\"select-value\"",
+      "recipe": "imperative motion value or parent recipe; inspect source",
+      "sourceSha256": "122806d659a503103fb7a91748fa07b3a3798248ee8527f9eb50e0440f11872b",
+      "source": "<motion.span\n      ref={hostRef}\n      data-slot=\"select-value\"\n      data-motion={cm.mode}\n      style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}\n      className=\"relative block min-w-0 overflow-hidden whitespace-nowrap\"\n    >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/select/index.tsx",
+      "owner": "SelectTrigger",
+      "line": 267,
+      "writer": "motion.span",
+      "target": "\"select-handoff\"",
+      "recipe": "{cm.transition(\"handoff\")}",
+      "sourceSha256": "122806d659a503103fb7a91748fa07b3a3798248ee8527f9eb50e0440f11872b",
+      "source": "<motion.span\n              aria-hidden\n              data-motion={cm.mode}\n              data-slot=\"select-handoff\"\n              initial={{ x: flight.origin.x, y: flight.origin.y }}\n              animate={{ x: 0, y: 0 }}\n              transition={cm.transition(\"handoff\")}\n              onAnimationComplete={finish}\n              style={{\n                position: \"fixed\",\n                left: flight.rect.left,\n                top: flight.rect.top,\n                width: flight.rect.width,\n                height: flight.rect.height,\n              }}\n              className=\"pointer-events-none z-[60] flex items-center overflow-hidden text-sm whitespace-nowrap\"\n            >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/select/index.tsx",
+      "owner": "SelectItem",
+      "line": 394,
+      "writer": "ControlSpan",
+      "target": "\"select-item-indicator\"",
+      "recipe": "{{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}",
+      "sourceSha256": "122806d659a503103fb7a91748fa07b3a3798248ee8527f9eb50e0440f11872b",
+      "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              data-slot=\"select-item-indicator\"\n              data-motion={cm.mode}\n              className={cn(\"absolute right-2 flex size-3.5 items-center justify-center\", indicatorClassName)}\n              target={state.selected ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >",
+      "existingProofCandidates": ["tests/e2e/b5.spec.ts"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/sidebar/index.tsx",
+      "owner": "Sidebar",
+      "line": 187,
+      "writer": "animate",
+      "target": "progress",
+      "recipe": "{ ...transition, onUpdate: write }",
+      "sourceSha256": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
+      "source": "animate(progress, target, { ...transition, onUpdate: write })",
+      "existingProofCandidates": [
+        "tests/e2e/sidebar-component.spec.ts (inspect applicability; filename alone is not proof)"
+      ],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/slider/index.tsx",
+      "owner": "Slider",
+      "line": 110,
+      "writer": "ControlDiv",
+      "target": "Base Slider Thumb rendered div; Base dragging state",
+      "recipe": "{state.disabled ? { duration: 0 } : cm.transition(\"feedback.press\")}",
+      "sourceSha256": "f3615df3b787a947969dcb9fcd38d7b6149fd72e3f3fe4973183db8ba8fccf9f",
+      "source": "<ControlDiv\n                  {...(rest as HTMLMotionProps<\"div\">)}\n                  className={cn(\n                    \"block size-4 shrink-0 rounded-full border border-primary bg-white shadow-sm ring-ring/50 outline-none transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4\",\n                    \"data-disabled:pointer-events-none data-disabled:opacity-50\",\n                    thumbClassName,\n                  )}\n                  target={{ scale: state.dragging && !state.disabled && !cm.reduced ? scale.press : 1 }}\n                  transition={state.disabled ? { duration: 0 } : cm.transition(\"feedback.press\")}\n                />",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/switch/index.tsx",
+      "owner": "Switch",
+      "line": 96,
+      "writer": "ControlSpan",
+      "target": "Base Switch Thumb rendered span",
+      "recipe": "{!settled || cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}",
+      "sourceSha256": "65c90652dc3c19ff158d070df3dc5c1e6cbb5edc95357eb17a00677adb38c916",
+      "source": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              ref={(node: HTMLSpanElement | null) => {\n                thumbRef.current = node;\n                if (typeof forwardedRef === \"function\") return forwardedRef(node);\n                else if (forwardedRef) (forwardedRef as RefObject<HTMLSpanElement | null>).current = node;\n              }}\n              className={cn(\n                \"pointer-events-none block rounded-full bg-background ring-0\",\n                \"group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3\",\n                \"dark:data-checked:bg-primary-foreground dark:data-unchecked:bg-foreground\",\n                thumbClassName,\n              )}\n              target={{ x: state.checked ? (travel ?? 0) : 0 }}\n              // Until the measured distance has been painted, there is nothing to\n              // animate *between*: jump into place, then spring on user input.\n              transition={!settled || cm.reduced ? { duration: 0 } : cm.transition(\"state.morph\")}\n            />",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/tabs/index.tsx",
+      "owner": "TriggerSurface",
+      "line": 87,
+      "writer": "motion.span",
+      "target": "\"tabs-indicator\"",
+      "recipe": "{cm.transition(\"layout.shared\")}",
+      "sourceSha256": "6667b08c8c9072e35bb9d2b5bd528ef47eac9a1741db8552a0d958c44225f2c5",
+      "source": "<motion.span\n                aria-hidden=\"true\"\n                data-slot=\"tabs-indicator\"\n                data-motion={cm.mode}\n                className={indicatorClass}\n                layoutId=\"selection\"\n                initial={false}\n                transition={cm.transition(\"layout.shared\")}\n              />",
+      "existingProofCandidates": ["tests/e2e/tabs.spec.ts (inspect applicability; filename alone is not proof)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/toggle/index.tsx",
+      "owner": "Toggle",
+      "line": 60,
+      "writer": "PressButton",
+      "target": "Base Toggle default button",
+      "recipe": "{cm.transition(\"feedback.press\")}",
+      "sourceSha256": "bf996b996c38c1a9ab3ea934d6c8981095b6a60657b196645d16fe7fac477380",
+      "source": "<PressButton\n          whileTap={cm.reduced ? undefined : { scale: scale.press }}\n          transition={cm.transition(\"feedback.press\")}\n        />",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/toggle-group/index.tsx",
+      "owner": "ToggleGroupItem",
+      "line": 122,
+      "writer": "PressButton",
+      "target": "Base ToggleGroup item button",
+      "recipe": "{cm.transition(\"feedback.press\")}",
+      "sourceSha256": "1ead6864602243154df027a3e9c235b41a0557ca0d9610226695e7f51cb72925",
+      "source": "<PressButton\n          whileTap={cm.reduced ? undefined : { scale: scale.press }}\n          transition={cm.transition(\"feedback.press\")}\n        />",
+      "existingProofCandidates": ["tests/e2e/b3.spec.ts (Button: motion-matrix.spec.ts)"],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "components/site/document-entrance.tsx",
+      "owner": "DocumentEntrance",
+      "line": 136,
+      "writer": "motion.article",
+      "target": "actual article/section/div selected by as; shared motionProps",
+      "recipe": "imperative motion value or parent recipe; inspect source",
+      "sourceSha256": "7bbee25dcdc7fe70f9ab1fafb6b0781f49cd628f0ea1161a7e2587b7308cda1f",
+      "source": "<motion.article ref={ref} {...motionProps}>",
+      "existingProofCandidates": [],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "components/site/document-entrance.tsx",
+      "owner": "DocumentEntrance",
+      "line": 144,
+      "writer": "motion.section",
+      "target": "actual article/section/div selected by as; shared motionProps",
+      "recipe": "imperative motion value or parent recipe; inspect source",
+      "sourceSha256": "7bbee25dcdc7fe70f9ab1fafb6b0781f49cd628f0ea1161a7e2587b7308cda1f",
+      "source": "<motion.section ref={ref} {...motionProps}>",
+      "existingProofCandidates": [],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "components/site/document-entrance.tsx",
+      "owner": "DocumentEntrance",
+      "line": 151,
+      "writer": "motion.div",
+      "target": "actual article/section/div selected by as; shared motionProps",
+      "recipe": "imperative motion value or parent recipe; inspect source",
+      "sourceSha256": "7bbee25dcdc7fe70f9ab1fafb6b0781f49cd628f0ea1161a7e2587b7308cda1f",
+      "source": "<motion.div ref={ref as RefObject<HTMLDivElement>} {...motionProps}>",
+      "existingProofCandidates": [],
+      "applicableProof": "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
+      "status": "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
+      "remaining": [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup"
+      ]
+    },
+    {
+      "path": "registry/cadence/chart/index.tsx",
+      "line": 64,
+      "writer": "Recharts AnimationController",
+      "target": "supported series actual SVG/data targets",
+      "status": "OPEN: reconcile installed engine, per-series/per-target raw trajectories and cancellation",
+      "sourceSha256": "3ebcace2ed433d7fb71415c9679d58151a91fc35379fb202bd3cdb55e607820c",
+      "existingProofCandidates": ["tests/e2e/chart.spec.ts"]
+    },
+    {
+      "path": "registry/cadence/carousel/index.tsx",
+      "line": 86,
+      "writer": "Embla",
+      "target": "track transform and loop relocation",
+      "status": "OPEN: reconcile installed engine, per-series/per-target raw trajectories and cancellation",
+      "sourceSha256": "8b8e163b8e156393db128a868fc974c4fb47bab449e5f063ed2db6c074615bb1",
+      "existingProofCandidates": ["tests/e2e/carousel.spec.ts"]
+    }
+  ]
+}

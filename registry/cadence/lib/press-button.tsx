@@ -1,7 +1,8 @@
 "use client";
 
 import { type MotionProps, motion } from "motion/react";
-import { type ComponentProps, useCallback, useEffect, useLayoutEffect, useRef } from "react";
+import { type ComponentProps, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useControlAnimation } from "./control-animation";
 
 type NativeEvents = Pick<ComponentProps<"button">, "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd">;
 
@@ -62,11 +63,25 @@ export function PressButton({
   onDrag,
   onDragStart,
   onDragEnd,
+  whileTap,
+  transition = {},
   ...props
 }: ComponentProps<"button"> & Pick<MotionProps, "whileTap" | "transition">) {
+  const [pressed, setPressed] = useState(false);
+  const disabled = props.disabled || props["aria-disabled"] === true || props["aria-disabled"] === "true";
+  const pressScale = typeof whileTap === "object" && "scale" in whileTap ? whileTap.scale : 1;
+  const controls = useControlAnimation(
+    { scale: pressed && !disabled && typeof pressScale === "number" ? pressScale : 1 },
+    disabled || !whileTap ? { duration: 0 } : transition,
+  );
   return (
     <MotionNativeButton
       {...props}
+      initial={false}
+      animate={controls}
+      onTapStart={() => setPressed(true)}
+      onTap={() => setPressed(false)}
+      onTapCancel={() => setPressed(false)}
       nativeRef={ref}
       nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }}
     />

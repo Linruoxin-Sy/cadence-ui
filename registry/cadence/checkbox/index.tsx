@@ -66,7 +66,7 @@ function Checkbox({ className, ...props }: CheckboxProps) {
                   ? { opacity: 1, scale: 1 }
                   : { opacity: 0, scale: cm.reduced ? 1 : scale.in }
               }
-              transition={cm.transition("state.morph")}
+              transition={{ ...cm.transition("state.morph"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}
             >
               {state.indeterminate ? <Minus className="size-3.5" /> : <Check className="size-3.5" />}
             </ControlSpan>

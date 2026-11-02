@@ -217,7 +217,8 @@ animation Cadence authors: swapping them for `gesture.drag` would mean re-implem
 `drawer` declares `popup.anchored` + `exit.fade` and documents the swipe in its Motion contract table.
 `gesture.drag` stays in the catalogue for a component that drives Motion directly.
 
-Control adapters use committed effects with value/transition signatures, compatible with React
+Control adapters use committed layout effects on the client (ordinary effects on the server)
+with value/transition signatures, compatible with React
 19.0, rather than requiring React 19.2's `useEffectEvent`. For a zero-clock retarget they stop
 the old controller, set the target immediately and reassert it once in Motion's public
 `frame.update` phase. Motion 13.5.1 queues same-target writes there; an earlier full-mode
@@ -225,6 +226,14 @@ write must not overwrite the later none target. Cleanup cancels that reassertion
 the controls. This is ordering within `state.morph` / `data.transition`, not a new recipe,
 delay, remount or nonzero none transition. The OTP effect similarly keys only on character,
 mode and clock, so focus and unrelated renders do not replay a character.
+Stopping before paint applies to asynchronous controlled commits as well as input events.
+Checkbox and Radio explicitly give scale a zero clock in reduced mode; opacity keeps its recipe.
+The same adapter owns CodeBlock's floating Actions, copy glyphs and expand orientation:
+an unchanged target must still cancel/retarget when its mode or clock changes.
+Press buttons use Motion's tap lifecycle to drive this adapter, and disabled/aria-disabled
+or a removed press recipe resolves the scale immediately to one without replacing the button.
+Slider uses Base's dragging state, rather than tap, and likewise resolves a disabled thumb
+to scale one with a zero clock. CodeBlock copy glyphs explicitly snap scale under reduced.
 
 ### 3.0 Sidebar composition
 

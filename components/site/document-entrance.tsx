@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "motion/react";
 import { type ReactNode, type RefObject, useRef, useState } from "react";
+import { useControlAnimation } from "@/registry/cadence/lib/control-animation";
 import { distance, duration, ease } from "@/registry/cadence/lib/motion";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 
@@ -118,12 +119,14 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
   const show = cm.disabled || inView;
   const target = show ? (settled ? RESTING : shown) : hidden;
   const activeTransition = show ? (settled ? { duration: 0 } : transition) : { duration: 0 };
+  const controls = useControlAnimation(target, activeTransition);
 
   const motionProps = {
     "data-document-entrance": true,
+    "data-motion": cm.mode,
     className,
-    initial: hidden,
-    animate: target,
+    initial: cm.disabled ? RESTING : hidden,
+    animate: controls,
     transition: activeTransition,
     onAnimationComplete: show && !settled ? () => setSettled(true) : undefined,
   };

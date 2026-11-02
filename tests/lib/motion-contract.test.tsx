@@ -1,10 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { motion } from "motion/react";
 import { describe, expect, it } from "vitest";
 import { Button } from "@/registry/cadence/button";
+import { scale } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
 import { controlSamples, motionSamples } from "../motion-observer";
@@ -24,7 +25,11 @@ describe("expectMotionContract", () => {
     );
     expect(motionSamples.size).toBeGreaterThan(0);
     const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
-    expect(button?.whileTap).toEqual(mode === "full" ? { scale: 0.97 } : undefined);
+    if (!button) throw new Error("real Button Motion host missing");
+    expect(typeof button?.onTapStart).toBe("function");
+    act(() => (button.onTapStart as () => void)());
+    const controls = button?.animate as object;
+    expect(controlSamples.get(controls)?.target).toEqual({ scale: mode === "full" ? scale.press : 1 });
     expectMotionContract(mode);
   });
   it("rejects a broken real Motion branch rather than counting its mode attribute", () => {

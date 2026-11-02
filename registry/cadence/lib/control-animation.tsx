@@ -1,19 +1,20 @@
 "use client";
 
 import { cancelFrame, frame, type HTMLMotionProps, motion, type Transition, useAnimationControls } from "motion/react";
-import { type ComponentProps, useEffect } from "react";
+import { type ComponentProps, useEffect, useLayoutEffect } from "react";
 
 import { NativeMotionDiv } from "./native-div";
 
-type Target = Record<string, number>;
+type Target = Record<string, number | string>;
+const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-function useControlAnimation(target: Target, transition: Transition) {
+export function useControlAnimation(target: Target, transition: Transition) {
   const controls = useAnimationControls();
   const signature = JSON.stringify([target, transition]);
   // The signature tracks values rather than object identity. This effect's closure
   // belongs to the committed render; unrelated renders never restart the recipe.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: signature includes every target and transition value.
-  useEffect(() => {
+  // signature includes every target and transition value.
+  useCommittedEffect(() => {
     controls.stop();
     const settle = () => controls.set(target);
     if (transition.duration === 0) {
