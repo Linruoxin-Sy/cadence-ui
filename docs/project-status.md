@@ -80,10 +80,16 @@ AI 25 个组件未排期、direction deferred、form/native-select/sonner exclus
 `.cache` raw 副本，共 81139065 bytes。必要负例、可复现脚本、当前构建、固定 upstream 缓存及
 React19 consumer fixture 保留。
 
-历史 48 个旧 `.next-*` 目录和 18 个旧 `.cache` 文件（后者 374823052 bytes）的清理，
-曾被自动审批以 `blocked by policy` 拒绝；命令没有执行，这些项目仍未清理，也未换工具绕过。
+历史清理曾被自动审批以 `blocked by policy` 拒绝。2026-11-02 用户明确要求再次尝试后，
+已成功删除全部 48 个旧 `.next-*` 构建目录和原定 18 个旧缓存文件，另删除 2 份与已存 gzip
+逐字节一致的 W2 raw 副本；本次合计 20 个缓存文件、18494340144 bytes（约 18.49 GB）。
+原定缓存中 17 份独有诊断已先归档至 `.cache/basic-controls-exploratory-20261102.tar.gz`，
+并校验每份原始字节的 SHA256；其余 3 份 raw 有完全一致的既有证据归档。
+旧构建中的 92 个 junction 仅移除链接本身，依赖目标未删除。`.next`、`.next-motion-runtime`、
+固定 upstream 缓存和 React19 consumer fixture 均保留。清理结果与固定清单在
+`.cache/cleanup-result.json`、`cleanup-old-builds.json`、`cleanup-cache-targets.json`。
 当前收尾使用的 Next 服务端口 3183 已停止，fixture 3181 已退出，未触碰用户 `.next`/3000。
-提交后应保持 tracked 工作区干净；被拒清理的 ignored 产物不因 `git status` 干净而消失。
+本次仅完成上述固定清单的临时产物清理，不恢复 W3/W4 实施或改变性能门的未完成状态。
 
 ## 恢复入口
 
