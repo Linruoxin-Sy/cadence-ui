@@ -111,3 +111,13 @@ layout functions resolve before serialization; client boundaries retain their or
 The full Button route, CSS, controls, and linked production destinations are the acceptance scope.
 Generated files belong in .cache/button-route-prototype. ADR-009 remains the product decision and
 ADR-016 remains investigation. See button-route-prototype.md for the inventory and verification plan.
+
+## W3 route A measured delivery
+
+The complete authorized Button candidate is delivered under the existing W3 package, not a new W5.
+Measured source4fe1a51, complete report [here](evidence/button-route-prototype.md): initial JS221511,
+FAIL120000 in both fresh Edge samples; complete runnable source and original functionality retained.
+Cold CLS0; the new mobile source/variant/install/TOC+15s interaction window is0.0402032 on both the
+candidate and product baseline, FAIL. Existing W4 windows remain bounded passing evidence.
+No framework adoption or broader rollout follows. Route A authorization is resolved; only a new
+specifically scoped architecture decision and physical-device conditions remain to be decided.

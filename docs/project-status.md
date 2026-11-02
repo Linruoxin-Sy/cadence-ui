@@ -135,3 +135,19 @@ Button hydration/framework prototype. Historical requests for that choice are re
 migration, changed budgets, dependency exemptions and other-page rollout remain unauthorized.
 The prototype is isolated; the existing product runtime and frozen distribution remain authoritative.
 Real-device FPS remains unproven. See [prototype contract](button-route-prototype.md).
+
+## W3 route A complete candidate delivery (2026-11-02)
+
+用户已明确批准路线A；历史W4中的等待A/B/C答复已被覆盖。本轮完成了隔离、可运行的完整
+Button hydration原型，而非再交付subset。原型实现4fe1a51；报告与复现见
+[evidence/button-route-prototype.md](evidence/button-route-prototype.md)及[合同](button-route-prototype.md)。
+
+全新Edge双视口均221511 bytes gzip，67自动实体，FAIL120000。完整SSR/noJS正文/链接/标题与
+产品相同；原16示例、source/copy、真实3包管理器、URL/history、目录搜索筛选/真实结果、
+侧栏持续挂载、主题/mode/speed持久化与Button真实按压/在途降级验证已交付；双主题双视口axe0。
+冷加载CLS均0。新增source/variant/install/TOC+15s窗口，桌面两者0.0028987，移动候选与产品
+均0.0402032，FAIL；不冒称W4其他6窗口或全站终身CLS失败。真机FPS仍未证。
+
+候选未满足迁移条件；ADR009产品Next决定有效，ADR016仍调查。产品runtime f60e7fe、payload
+201975a/sourceSha f60e7fe及固定pin/冻结snapshot均未改。没有批准迁移、改变预算、删功能、
+依赖豁免或其余68页推广。整体保持INCOMPLETE；后续架构动作需要具体新决策，不能重复问A是否获准。

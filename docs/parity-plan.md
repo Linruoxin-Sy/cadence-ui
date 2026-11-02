@@ -2252,3 +2252,14 @@ No runtime, registry/content, payload, framework, dependency or budget changes; 
 W4 verification delivery is complete; overall remains INCOMPLETE with W3 FAIL/UNPROVEN gates.
 Follow [final handoff](handoffs/w4-closure.md); existing framework/budget and device questions remain
 pending user response. No successor, push, publish or deployment is created by W4.
+
+### W3 authorized complete Button prototype delivery (2026-11-02)
+
+The user chose route A, superseding the historical unanswered A/B/C decision. The full runnable
+candidate (implementation4fe1a51) is delivered, preserving original SSR/MDX/client controls and full
+Motion features. See [evidence](evidence/button-route-prototype.md). Fresh Edge desktop/mobile both
+221511 gzip bytes, FAIL120000. SSR/noJS equality, exercised controls/navigation/history/focus,
+Button press/cancellation and dual-theme responsive axe checks pass within their reported scopes.
+Cold CLS0; new specified mobile interaction CLS0.0402032 on candidate and original baseline, FAIL;
+no physical FPS proof. Product source, dependencies, payload and frozen snapshot remain unchanged.
+This does not adopt a framework, expand to68 other pages, change budgets or close the overall goal.
