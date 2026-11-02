@@ -103,6 +103,9 @@ form/native-select/sonnerexcluded不扩；MCP/分发Skill/release/hosting未实�
 
 ## 清理和下一prompt
 
+> 下方下一 prompt 为历史交接，已由 W2 收尾及用户停止要求替代。当前不得自动新建实施会话；
+> 以 [项目状态](../project-status.md) 和 [W2 交接](engine-runtime-closure.md) 为准。
+
 冻结目录public/r/snapshots/84cc78703b354b29c815c3970cb26973e4760dea398fdf48756b8a24c996b2f1/、
 registry-snapshots.json及.gitattributes与起点无diff，无重新freeze。
 历史48旧.next-*目录与18旧.cache文件374823052bytes的删除曾被auto-review以blocked by policy拒绝，

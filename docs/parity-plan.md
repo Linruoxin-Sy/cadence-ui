@@ -12,8 +12,10 @@
 > same change. A batch whose row still says `next` is not done, whatever the branch contains.
 
 > **Execution boundary (2026-11-02):** follow the [fixed remaining work packages](execution-boundary.md).
-> The zero-clock package is complete; remaining engine acceptance, performance acceptance and final
-> verification/cleanup are the only follow-up packages. New non-blocking findings go to backlog.
+> W1 and the fixed W2 engine ledger are complete. Execution stops after W2 at the user’s request;
+> performance acceptance and final verification/cleanup remain unstarted pending explicit resume.
+> Current commits, evidence and remaining gates are in [project-status.md](project-status.md).
+> New non-blocking findings go to backlog.
 
 ---
 
@@ -2187,3 +2189,27 @@ Final four-page initial JS: Button293597, Chart414647, Calendar318955,
 CodeBlock376994 gzip bytes (23/24/24/29 scripts), all FAIL120000; audit exits1.
 Full engine matrix, all-shell JS,48KB Motion/8KB compiled addition,55fps/CLS and
 final whole-goal audit remain OPEN. Existing API/CSS/gates are not reset.
+
+
+### W2 fixed engine ledger and requested stop (2026-11-02)
+
+The 11 remaining rows in `docs/execution-boundary.md` are closed within their frozen source/context
+scope. Final runtime **f60e7fe** includes committed writer cancellation, measured viewport clamp,
+consumed offscreen entrance stability, and the introduced Chart Consumer callback regression repair.
+The source is bound by `docs/evidence/engine-runtime-closure.json`; its companion Markdown explains
+actual hosts, first-paint/clock/cleanup proof and exact historical reuse boundaries. This supersedes
+the historical remaining-engine OPEN table, without reopening closed API/CSS/catalogue work.
+
+Final proof: engines1236, geometry384, indicators264, Select flight24, CodeBlock Actions60,
+base zero-clock12; all pass. Full check **723/723 in88 files**, isolated production build successful,
+final affected production **29/29** with zero skipped/unexpected/flaky. Earlier W2 production273/273
+is retained as historical evidence, not relabelled as a final-source whole-suite rerun.
+Runtime source **f60e7fe**, sampler proof **49064c7**, evidence **5193c0b**, payload **201975a**.
+Current payload sourceSha remains f60e7fe; frozen distribution snapshot is unchanged.
+
+The current four-page strict initial-JS measurements are Button293222, Chart426590,
+Calendar318581 and CodeBlock376619 gzip bytes, all FAIL120000. Initial Motion48KB,
+compiled per-item8KB, midrange55fps and CLS<0.02 remain unmeasured. The whole goal remains
+incomplete. Per the latest user instruction, stop after W2 and record current project state;
+**do not start W3, W4 or a successor chat without explicit resume**. See `docs/project-status.md`
+and `docs/handoffs/engine-runtime-closure.md` for the bounded continuation handoff.
