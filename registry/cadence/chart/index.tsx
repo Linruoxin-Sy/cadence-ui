@@ -159,6 +159,49 @@ function ChartTooltip(props: React.ComponentProps<typeof RechartsPrimitive.Toolt
   return <RechartsPrimitive.Tooltip {...props} isAnimationActive={false} />;
 }
 
+// Engine content records also contain placement/animation metadata. Keep those off
+// the DOM while forwarding the inherited native div API (including refs/events).
+const contentEngineKeys = new Set([
+  "allowEscapeViewBox",
+  "animationDuration",
+  "animationEasing",
+  "axisId",
+  "content",
+  "contentStyle",
+  "cursor",
+  "defaultIndex",
+  "filterNull",
+  "includeHidden",
+  "isAnimationActive",
+  "itemSorter",
+  "itemStyle",
+  "labelStyle",
+  "offset",
+  "payloadUniqBy",
+  "portal",
+  "position",
+  "reverseDirection",
+  "separator",
+  "shared",
+  "trigger",
+  "useTranslate3d",
+  "wrapperStyle",
+  "wrapperClassName",
+  "accessibilityLayer",
+  "coordinate",
+  "activeIndex",
+  "viewBox",
+  "iconSize",
+  "iconType",
+  "layout",
+  "align",
+  "inactiveColor",
+  "legendType",
+]);
+function contentDivProps(props: Record<string, unknown>) {
+  return Object.fromEntries(Object.entries(props).filter(([key]) => !contentEngineKeys.has(key)));
+}
+
 function ChartTooltipContent({
   active,
   payload,
@@ -173,6 +216,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
+  ...divProps
 }: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
   React.ComponentProps<"div"> & {
     hideLabel?: boolean;
@@ -216,6 +260,7 @@ function ChartTooltipContent({
         "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
         className,
       )}
+      {...contentDivProps(divProps)}
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
@@ -293,6 +338,11 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
+  formatter,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  ...divProps
 }: React.ComponentProps<"div"> & {
   hideIcon?: boolean;
   nameKey?: string;
@@ -304,7 +354,10 @@ function ChartLegendContent({
   }
 
   return (
-    <div className={cn("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}>
+    <div
+      className={cn("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}
+      {...contentDivProps(divProps)}
+    >
       {payload
         .filter((item) => item.type !== "none")
         .map((item, index) => {
@@ -312,10 +365,22 @@ function ChartLegendContent({
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
           return (
+            // biome-ignore lint/a11y/noStaticElementInteractions: role and keyboard activation are enabled together only for a caller click handler.
             <div
               // biome-ignore lint/suspicious/noArrayIndexKey: Preserve upstream payload order and duplicate series names.
               key={index}
               className={cn("flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground")}
+              role={onClick ? "button" : undefined}
+              tabIndex={onClick ? 0 : undefined}
+              onClick={(event) => onClick?.(item, index, event)}
+              onKeyDown={(event) => {
+                if (onClick && (event.key === "Enter" || event.key === " ")) {
+                  event.preventDefault();
+                  event.currentTarget.click();
+                }
+              }}
+              onMouseEnter={(event) => onMouseEnter?.(item, index, event)}
+              onMouseLeave={(event) => onMouseLeave?.(item, index, event)}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
@@ -327,7 +392,7 @@ function ChartLegendContent({
                   }}
                 />
               )}
-              {itemConfig?.label}
+              {formatter ? formatter(itemConfig?.label ?? item.value, item, index) : itemConfig?.label}
             </div>
           );
         })}

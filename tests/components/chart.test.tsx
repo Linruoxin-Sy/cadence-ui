@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { Bar, BarChart, JavascriptAnimation } from "recharts";
 import { describe, expect, it, vi } from "vitest";
@@ -189,4 +189,82 @@ describe("Chart", () => {
     expect(container.firstChild).toBe(root);
     expect(screen.getAllByText("Sessions")).toHaveLength(2);
   });
+});
+
+it.each(["tooltip", "legend"] as const)(
+  "forwards %s content native props and ref cleanup without leaking engine metadata",
+  (kind) => {
+    const cleanup = vi.fn();
+    const ref = vi.fn(() => cleanup);
+    const capture = vi.fn();
+    const drag = vi.fn((event) => event.preventDefault());
+    const native = {
+      ref,
+      style: { color: "red" },
+      "data-testid": "content",
+      onDragStartCapture: capture,
+      onDragStart: drag,
+    };
+    const tree = (color: string) => (
+      <ChartContainer config={config}>
+        {kind === "tooltip" ? (
+          <ChartTooltipContent
+            {...native}
+            style={{ color }}
+            active
+            payload={payload}
+            animationDuration={900}
+            wrapperStyle={{ opacity: 0.1 }}
+          />
+        ) : (
+          <ChartLegendContent
+            {...native}
+            style={{ color }}
+            payload={[{ ...payload[0], value: "visits" }]}
+            iconSize={20}
+          />
+        )}
+      </ChartContainer>
+    );
+    const view = render(tree("red"));
+    const node = screen.getByTestId("content");
+    expect(ref).toHaveBeenCalledWith(node);
+    expect(node.style.color).toBe("red");
+    expect(node).not.toHaveAttribute("animationDuration");
+    expect(node).not.toHaveAttribute("wrapperStyle");
+    expect(node).not.toHaveAttribute("iconSize");
+    const event = new Event("dragstart", { bubbles: true, cancelable: true });
+    fireEvent(node, event);
+    expect(capture).toHaveBeenCalledOnce();
+    expect(drag).toHaveBeenCalledOnce();
+    expect(event.defaultPrevented).toBe(true);
+    view.rerender(tree("blue"));
+    expect(screen.getByTestId("content")).toBe(node);
+    expect(node.style.color).toBe("blue");
+    view.unmount();
+    expect(cleanup).toHaveBeenCalledOnce();
+  },
+);
+
+it("uses Recharts legend formatter and entry callback signatures with keyboard activation", () => {
+  const click = vi.fn();
+  const enter = vi.fn();
+  const item = { ...payload[0], value: "visits" };
+  render(
+    <ChartContainer config={config}>
+      <ChartLegendContent
+        payload={[item]}
+        onClick={click}
+        onMouseEnter={enter}
+        formatter={(value, entry, index) => `${value} ${entry.value} ${index}`}
+      />
+    </ChartContainer>,
+  );
+  const entry = screen.getByRole("button", { name: "Visits visits 0" });
+  fireEvent.mouseEnter(entry);
+  expect(enter).toHaveBeenCalledWith(item, 0, expect.objectContaining({ type: "mouseenter" }));
+  fireEvent.keyDown(entry, { key: "Enter" });
+  fireEvent.keyDown(entry, { key: " " });
+  expect(click).toHaveBeenCalledTimes(2);
+  expect(click).toHaveBeenLastCalledWith(item, 0, expect.objectContaining({ type: "click" }));
 });

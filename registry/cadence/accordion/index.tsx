@@ -1,20 +1,29 @@
 "use client";
 
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion";
+import { useRender } from "@base-ui/react/use-render";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
-  return <AccordionPrimitive.Root data-slot="accordion" className={cn("flex w-full flex-col", className)} {...props} />;
+  return (
+    <AccordionPrimitive.Root
+      data-slot="accordion"
+      className={(state) => cn("flex w-full flex-col", typeof className === "function" ? className(state) : className)}
+      {...props}
+    />
+  );
 }
 
 function AccordionItem({ className, ...props }: AccordionPrimitive.Item.Props) {
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
-      className={cn("border-b last:border-b-0", className)}
+      className={(state) =>
+        cn("border-b last:border-b-0", typeof className === "function" ? className(state) : className)
+      }
       {...props}
     />
   );
@@ -25,10 +34,12 @@ function AccordionTrigger({ className, children, ...props }: AccordionPrimitive.
     <AccordionPrimitive.Header data-slot="accordion-header" className="flex">
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
-        className={cn(
-          "group/accordion-trigger relative flex flex-1 items-start justify-between gap-4 rounded-md border border-transparent py-4 text-left text-sm font-medium outline-none hover:underline focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
-          className,
-        )}
+        className={(state) =>
+          cn(
+            "group/accordion-trigger relative flex flex-1 items-start justify-between gap-4 rounded-md border border-transparent py-4 text-left text-sm font-medium outline-none hover:underline focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+            typeof className === "function" ? className(state) : className,
+          )
+        }
         {...props}
       >
         {children}
@@ -48,7 +59,7 @@ function AccordionTrigger({ className, children, ...props }: AccordionPrimitive.
 }
 
 /** geometry.resize CSS form: natural content measurement, never animated-panel feedback. */
-function AccordionBody({ className, children }: Pick<AccordionPrimitive.Panel.Props, "className" | "children">) {
+function AccordionBody({ className, children }: React.ComponentProps<"div">) {
   const ref = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const content = ref.current;
@@ -78,7 +89,33 @@ function AccordionBody({ className, children }: Pick<AccordionPrimitive.Panel.Pr
   );
 }
 
-function AccordionContent({ className, children, ...props }: AccordionPrimitive.Panel.Props) {
+function AccordionSurface({
+  elementProps,
+  state,
+  render,
+}: {
+  elementProps: React.ComponentPropsWithRef<"div">;
+  state: AccordionPrimitive.Panel.State;
+  render: AccordionPrimitive.Panel.Props["render"];
+}) {
+  return useRender({
+    defaultTagName: "div",
+    render,
+    props: { ...elementProps },
+    state: { ...state },
+    stateAttributesMapping: {
+      open: () => null,
+      disabled: () => null,
+      transitionStatus: () => null,
+      hidden: () => null,
+      index: () => null,
+      value: () => null,
+      orientation: () => null,
+    },
+  });
+}
+
+function AccordionContent({ className, children, render, ...props }: AccordionPrimitive.Panel.Props) {
   const cm = useCadenceMotion();
   return (
     <AccordionPrimitive.Panel
@@ -88,10 +125,22 @@ function AccordionContent({ className, children, ...props }: AccordionPrimitive.
         "h-[max(0px,var(--cadence-disclosure-height,var(--accordion-panel-height)))] overflow-hidden text-sm data-[ending-style]:h-0 data-[starting-style]:h-0",
         cm.reduced ? "duration-0" : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",
       )}
+      render={(elementProps, state) => (
+        <AccordionSurface
+          elementProps={{
+            ...elementProps,
+            children: (
+              <AccordionBody className={typeof className === "function" ? className(state) : className}>
+                {children}
+              </AccordionBody>
+            ),
+          }}
+          state={state}
+          render={render}
+        />
+      )}
       {...props}
-    >
-      <AccordionBody className={className}>{children}</AccordionBody>
-    </AccordionPrimitive.Panel>
+    />
   );
 }
 

@@ -196,6 +196,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         ref={ref}
+        dir={dir}
         style={style}
         className={cn("flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground", className)}
         {...props}
@@ -207,14 +208,14 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           ref={ref}
           dir={dir}
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className={cn("w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden", className)}
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -222,6 +223,7 @@ function Sidebar({
             } as React.CSSProperties
           }
           side={side}
+          {...props}
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
@@ -256,6 +258,7 @@ function Sidebar({
       />
       <div
         ref={mergedRef}
+        dir={dir}
         style={{ transform: cm.reduced || progress.get() === 0 ? "none" : `translateX(${progress.get()}%)`, ...style }}
         data-slot="sidebar-container"
         data-motion={cm.mode}
@@ -294,7 +297,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon-sm"
-      className={cn("size-7", className)}
+      className={(state) => cn("size-7", typeof className === "function" ? className(state) : className)}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
@@ -351,7 +354,9 @@ function SidebarInput({ className, ...props }: React.ComponentProps<typeof Input
     <Input
       data-slot="sidebar-input"
       data-sidebar="input"
-      className={cn("h-8 w-full bg-background shadow-none", className)}
+      className={(state) =>
+        cn("h-8 w-full bg-background shadow-none", typeof className === "function" ? className(state) : className)
+      }
       {...props}
     />
   );
@@ -384,7 +389,9 @@ function SidebarSeparator({ className, ...props }: React.ComponentProps<typeof S
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn("mx-2 w-auto bg-sidebar-border", className)}
+      className={(state) =>
+        cn("mx-2 w-auto bg-sidebar-border", typeof className === "function" ? className(state) : className)
+      }
       {...props}
     />
   );

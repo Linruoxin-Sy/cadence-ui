@@ -76,7 +76,6 @@ function TriggerSurface({
       orientation: () => null,
       tabActivationDirection: () => null,
     },
-    ref: elementProps.ref,
     props: {
       ...elementProps,
       children: (
