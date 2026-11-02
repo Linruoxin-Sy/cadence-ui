@@ -5,7 +5,7 @@ import { Button } from "@/registry/cadence/button";
 import { cn } from "@/registry/cadence/lib/cn";
 import type { CadenceMode } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select";
 
 /** Remembered across visits, like the theme. */
 const MODE_KEY = "cadence-motion";
@@ -23,6 +23,7 @@ const MODES: CadenceMode[] = ["full", "reduced", "none"];
  * looks like a debugging switch rather than a setting.
  */
 const SPEEDS = [2, 1, 0.5, 0.25] as const;
+const SPEED_ITEMS = SPEEDS.map((speed) => ({ value: String(speed), label: `${speed}×` }));
 type MotionSpeed = (typeof SPEEDS)[number];
 
 interface MotionSettingsValue {
@@ -189,6 +190,7 @@ export function MotionSpeedSelect({ className }: { className?: string }) {
 
   return (
     <Select
+      items={SPEED_ITEMS}
       value={String(speed)}
       onValueChange={(value) => {
         const next = parseSpeed(value);
@@ -199,16 +201,18 @@ export function MotionSpeedSelect({ className }: { className?: string }) {
         size="sm"
         aria-label="Motion speed"
         title="Playback speed for the whole site"
-        className={cn("text-[11px]", className)}
+        className={className}
       >
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="end" sideOffset={6} alignItemWithTrigger={false}>
-        {SPEEDS.map((value) => (
-          <SelectItem key={value} value={String(value)} className="text-xs">
-            {value}×
-          </SelectItem>
-        ))}
+        <SelectGroup>
+          {SPEED_ITEMS.map((item) => (
+            <SelectItem key={item.value} value={item.value}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </Select>
   );
