@@ -165,10 +165,10 @@ export function MotionModeSwitch({ className }: { className?: string }) {
         const next = values[0];
         if (next && isMode(next)) setMode(next);
       }}
-      className={cn("hidden p-0.5 sm:flex", className)}
+      className={cn("hidden h-8 border border-input p-0.5 sm:flex", className)}
     >
       {MODES.map((value) => (
-        <ToggleGroupItem key={value} value={value} className="h-6 px-2 text-[11px] capitalize">
+        <ToggleGroupItem key={value} value={value} className="h-full px-2 text-[11px] capitalize">
           {value}
         </ToggleGroupItem>
       ))}
