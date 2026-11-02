@@ -32,21 +32,21 @@ export function SelectPreview() {
       {control}
       <PopupMotionScope>
         <PreviewRow className="gap-3">
-          <Select defaultValue="next">
+          <Select items={FRAMEWORKS} defaultValue="next">
             <SelectTrigger aria-label="Framework" size={choose("default")}>
               <SelectValue placeholder="Choose a framework" />
             </SelectTrigger>
             <SelectContent>{items}</SelectContent>
           </Select>
 
-          <Select>
+          <Select items={FRAMEWORKS}>
             <SelectTrigger aria-label="Framework, empty" size={choose("default")}>
               <SelectValue placeholder="Choose a framework" />
             </SelectTrigger>
             <SelectContent>{items}</SelectContent>
           </Select>
 
-          <Select defaultValue="remix">
+          <Select items={FRAMEWORKS} defaultValue="remix">
             <SelectTrigger size={choose("sm")} aria-label="Framework, small">
               <SelectValue />
             </SelectTrigger>
@@ -55,14 +55,14 @@ export function SelectPreview() {
         </PreviewRow>
 
         <PreviewRow className="gap-3">
-          <Select disabled defaultValue="next">
+          <Select items={FRAMEWORKS} disabled defaultValue="next">
             <SelectTrigger aria-label="Framework, disabled" size={choose("default")}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>{items}</SelectContent>
           </Select>
 
-          <Select defaultValue="astro">
+          <Select items={FRAMEWORKS} defaultValue="astro">
             <SelectTrigger aria-label="Framework, invalid" aria-invalid="true" size={choose("default")}>
               <SelectValue />
             </SelectTrigger>
