@@ -1,8 +1,7 @@
 # Cadence UI 项目状态
 
-2026-11-02。当前 W2 剩余引擎验收已收尾，按用户要求停止自动执行并暂停 goal。
-**项目整体尚未完成**：性能门仍有失败和未测项，W3、W4 尚未启动。继续工作需要用户明确恢复；
-当前不新建实施会话、不发布、不部署。
+2026-11-02。用户已明确恢复串行执行，W2 已收尾，W3 测量与决策报告已交付。
+**项目整体尚未完成**：性能门仍有失败和未测项；W4 尚未启动。不发布、不部署。
 
 ## 已完成范围
 
@@ -27,6 +26,8 @@ W2 修复了旧 writer 在 clock/mode 变化时的首帧取消、Recharts instan
 | 最终 sampler/cleanup 探针                  | `49064c7`                       |
 | 固定 W2 证据与逐行结论                     | `5193c0b`                       |
 | 当前 registry payload                      | `201975a`，`sourceSha: f60e7fe` |
+| W3测量工具与CLS测试                         | `7242346` |
+| W3完整测量、原始归档与决策报告              | `ebf64c2` |
 
 最终 `pnpm registry:build`、`pnpm check` 通过：类型、lint、registry、parity 均通过，
 **88 files / 723 tests**。独立 `.next-motion-runtime` 生产构建成功；最终受影响生产回归
@@ -45,7 +46,7 @@ CodeBlock Actions 60 条、基础零时钟 12 条，均无 failures/errors。首
 
 ## 未完成的性能与最终验收
 
-当前 runtime `f60e7fe` 的完整站点四页初始 JS 实测如下，门槛为每页 **≤120000 bytes gzip**。
+runtime `f60e7fe` 的W2四页基线（W3桌面重测相同）如下，门槛为每页 **≤120000 bytes gzip**。
 计量保留 fresh browser、cache disabled、所有自动脚本/prefetch/async 去重、
 load + networkidle + 10s + networkidle、逐响应 gzip6 和 manifest/hash 核验，未缩短窗口或抬高预算。
 
@@ -61,13 +62,19 @@ load + networkidle + 10s + networkidle、逐响应 gzip6 和 manifest/hash 核�
 
 | 剩余性能门                                    | 状态                                      |
 | --------------------------------------------- | ----------------------------------------- |
-| Initial Motion runtime ≤48 KB gzip            | 待实测归因                                |
-| 编译后每组件增量 ≤8 KB gzip，排除共享 runtime | 待实测；source tier gzip 预算不等于该指标 |
-| 中端移动设备 ≥55 fps                          | 待真实环境采证                            |
-| CLS <0.02                                     | 待实测                                    |
+| Initial Motion runtime ≤48 KB gzip            | 参考 consumer 编译47294符合；Next production精确分摊仍未证 |
+| 编译后每组件增量 ≤8 KB gzip，排除共享 runtime | 依赖计入的独立增量21/58符合、37/58超限；仅模块编译58/58符合，不替代完整门 |
+| 中端移动设备 ≥55 fps                          | 未证；ADB无设备，未用桌面模拟替代 |
+| CLS <0.02                                     | 全站双视口冷加载证据见W3报告；交互/长窗口仍未证 |
 
-W3 性能验收尚未启动。若恢复后达标需要迁移框架、改变功能或调整预算，先交付具体测量、
-候选方案和影响，等待用户决定；不自动展开架构修改。W4 全目标逐要求验收与最终清理也尚未启动，
+W3已完成69个适用HTML页面双视口严格冷加载审计，共138记录，JS 0符合、138失败，
+范围284526–426590 bytes；冷加载CLS 138/138符合，最大0。并已完成58组件编译图。
+五个必载root实体132767 bytes已超整页预算；公开m/LazyMotion/domMax候选49621，
+比原Motion API合集47294更大，拒绝采纳。具体结果、原始证据、测量边界及可review决策见
+[W3性能报告](evidence/w3-performance.md)和[汇总](evidence/w3-performance.json)。
+产品源码、预算、功能、框架和payload未变；W3性能门尚未整体通过。
+下一步需要用户确定框架/预算约束优先级，并提供真机条件；不自动展开架构修改。
+W4 全目标逐要求验收与最终清理尚未启动，
 不能以 W2 检查通过宣称整体完成。[执行边界](execution-boundary.md) 继续约束剩余范围。
 
 AI 25 个组件未排期、direction deferred、form/native-select/sonner exclusions 保持计划决定。
@@ -89,10 +96,15 @@ React19 consumer fixture 保留。
 固定 upstream 缓存和 React19 consumer fixture 均保留。清理结果与固定清单在
 `.cache/cleanup-result.json`、`cleanup-old-builds.json`、`cleanup-cache-targets.json`。
 当前收尾使用的 Next 服务端口 3183 已停止，fixture 3181 已退出，未触碰用户 `.next`/3000。
-本次仅完成上述固定清单的临时产物清理，不恢复 W3/W4 实施或改变性能门的未完成状态。
+上述是W2清理记录；最新用户指令已恢复W3，性能门仍保持真实未完成状态。
+
+W3最终检查88 files/724 tests通过；本轮复用production构建，不新增Next目录。
+两份大型原始报告约13.38MB已无损归档为约616KB并核验SHA与解压字节，重复.cache副本及
+可重建的两个bundle入口已删除。本轮Next3183与自行启动的ADB5037均已停止。
 
 ## 恢复入口
 
-用户明确要求继续后，从 [W2 handoff](handoffs/engine-runtime-closure.md) 进入 **W3 性能验收**，
-保持一个实施者并使用 GPT-6.1 Sol High。W2 已闭项目按实际 source/context 范围复用，
-不再逐个 writer 重新派生修改任务。W4 在 W3 之后按原目标执行；当前不自动启动任何一步。
+从 [W3交接](handoffs/w4-final-verification.md) 进入 W4 的独立核对；先由协调核实当前会话结束、
+git状态及本轮服务退出，再创建唯一后继，使用 GPT-6.1 Sol High。
+W3的JS/依赖增量失败、生产Motion归因和真机/交互CLS缺口继续阻止整体完成。
+W2已闭项目按实际source/context范围复用，不再逐writer展开；未获用户架构/预算决策前不迁移或改门槛。

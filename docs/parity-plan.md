@@ -12,8 +12,9 @@
 > same change. A batch whose row still says `next` is not done, whatever the branch contains.
 
 > **Execution boundary (2026-11-02):** follow the [fixed remaining work packages](execution-boundary.md).
-> W1 and the fixed W2 engine ledger are complete. Execution stops after W2 at the user’s request;
-> performance acceptance and final verification/cleanup remain unstarted pending explicit resume.
+> W1 and the fixed W2 engine ledger are complete. The user explicitly resumed execution;
+> W3 measurements and a decision report are delivered; performance acceptance remains failed/unproven.
+> W4 remains unstarted pending coordinator verification. See the W3 evidence below.
 > Current commits, evidence and remaining gates are in [project-status.md](project-status.md).
 > New non-blocking findings go to backlog.
 
@@ -2213,3 +2214,27 @@ compiled per-item8KB, midrange55fps and CLS<0.02 remain unmeasured. The whole go
 incomplete. Per the latest user instruction, stop after W2 and record current project state;
 **do not start W3, W4 or a successor chat without explicit resume**. See `docs/project-status.md`
 and `docs/handoffs/engine-runtime-closure.md` for the bounded continuation handoff.
+
+### W3 performance measurements and decision point (2026-11-02)
+
+The user explicitly resumed sequential execution; the historical W2 stop above is superseded.
+Tools **7242346**, evidence **ebf64c2**. Product runtime/payload remain f60e7fe/201975a;
+no product source, dependency, framework, budget or frozen distribution change.
+
+- All69 applicable HTML pages × desktop/mobile emulation =138 strict cold-load records:
+  initial JS **0/138 pass**, 284526–426590 gzip bytes. Mandatory manifest roots alone132767.
+- Actual Motion API union reference consumer compilation47294≤48000; production Next mixed-entity
+  exact allocation remains unproven. Public m/LazyMotion/domMax candidate49621 is larger and rejected.
+- Compiled component dependency-inclusive added graph:21/58≤8000,37/58 over, excluding the real
+  shared Cadence/Motion baseline. Local-module-only compilation58/58≤8000 is a separate comparison,
+  not acceptance of the dependency-inclusive gate. Async cumulative code is not initial download.
+- Real midrange mobile≥55fps remains unproven: adb reports no devices; no physical trace supplied.
+- Cold-load CLS138/138 pass, maximum0; interaction/lifetime/real-device CLS remains unproven.
+
+Full check **724/724 in88 files**, final targeted accounting/CLS tests2/2. Production retained from W2,
+not rebuilt or relabelled as a new build. Raw requests/module graphs/logs are verified gzip archives.
+See [W3 report](evidence/w3-performance.md), [summary](evidence/w3-performance.json), and
+[W4 handoff](handoffs/w4-final-verification.md). Own Next3183/ADB5037 stopped; duplicate raw reports
+and reconstructible temporary bundle entries removed, current production build retained.
+W3 acceptance and the overall objective remain incomplete. Framework/budget priority and real-device
+access need user input; W4 may independently verify the fixed remaining requirements without closing red gates.
