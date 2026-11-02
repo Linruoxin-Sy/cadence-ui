@@ -249,12 +249,12 @@ if (process.argv.includes("--serve")) await new Promise(() => {});
 else {
   let browser;
   try {
-    browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || "msedge" });
     const results = [];
     for (const viewport of [
       { width: 1440, height: 1000 },
       { width: 390, height: 844 },
     ]) {
+      browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || "msedge" });
       const context = await browser.newContext({ viewport, reducedMotion: "no-preference" });
       await context.addInitScript(() => {
         window.__shifts = [];
@@ -274,7 +274,9 @@ else {
         cls: summarizeLayoutShifts(await page.evaluate(() => window.__shifts)),
       });
       await context.close();
+      await browser.close();
     }
+    browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || "msedge" });
     const functionality = await auditButtonPrototype(browser, origin, fallback, dir);
     const hash = (body) => createHash("sha256").update(body).digest("hex");
     const sourceHashes = {};
