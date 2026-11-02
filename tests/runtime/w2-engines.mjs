@@ -6,6 +6,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
+import { observeControllers } from "./observe-controllers.mjs";
 
 const require = createRequire(import.meta.url);
 const { createServer, transformWithEsbuild } = await import(
@@ -29,6 +30,7 @@ const server = await createServer({
   ...config,
   plugins: negative
     ? [
+        observeControllers,
         {
           name: "w2-engine-negative",
           enforce: "pre",
@@ -40,7 +42,7 @@ const server = await createServer({
           },
         },
       ]
-    : [],
+    : [observeControllers],
   configFile: false,
   logLevel: "error",
   esbuild: { jsx: "automatic" },
@@ -92,6 +94,18 @@ try {
         await page.waitForFunction(() => window.w2insertions?.some((s) => s.phase === "paint2" && s.parts.length));
         const insertion = await page.evaluate(() => window.w2insertions);
         report.cases.push({ label, name: "initial", samples: insertion });
+        if (kind === "entrance" && spec.offscreen && mode === "none") {
+          await record("offscreen consumed entrance stays settled on full", { mode: "full" }, (paints) => {
+            for (const f of paints)
+              for (const p of f.parts) {
+                assert.equal(p.opacity, 1);
+                assert.equal(p.transform, "none");
+                assert.equal(p.filter, "none");
+                assert.equal(p.clip, "none");
+              }
+          });
+          await record("restore initial none", { mode: "none" });
+        }
         if (kind === "entrance" && spec.offscreen) {
           await page.evaluate(() => scrollTo(0, 1800));
           await page.waitForTimeout(80);
@@ -151,6 +165,13 @@ try {
           }
         }
         await start();
+        if (kind === "chart")
+          await record("same-target positive inherited clock", { clock: 4 }, (paints) => {
+            if (mode === "full" && os === "no-preference") {
+              assert(paints[1].registered > 0);
+              assert(paints[1].controllers.some((c) => c.state === "running" && c.appliedDuration === 880));
+            }
+          });
         const inherited = await record("same-target inherited zero", { clock: 0 }, settled);
         if (kind === "chart") {
           await page.waitForTimeout(100);
@@ -186,8 +207,26 @@ try {
             samples: [await page.evaluate(() => window.sampleW2("active cleanup"))],
           });
         }
+        if (kind === "chart") {
+          await record("restore before active controller cleanup", { mode: "full", explicit: 8, selected: false });
+          await page.waitForTimeout(60);
+          const active = await page.evaluate(() => window.sampleW2("active controller"));
+          report.cases.push({ label, name: "active controller before cleanup", samples: [active] });
+          if (os === "no-preference")
+            try {
+              assert(active.registered > 0);
+              assert(
+                active.controllers.some((c) => c.state === "running" && c.ticks > 0 && c.value > 0 && c.value < 1),
+              );
+            } catch (e) {
+              report.failures.push(`${label}/real active controller: ${e.message}`);
+            }
+        }
         const detached = await record("cleanup", { mounted: false }, (p) => {
-          for (const s of p) for (const n of s.parts) assert.equal(n.connected, false);
+          for (const s of p) {
+            for (const n of s.parts) assert.equal(n.connected, false);
+            if (kind === "chart") assert.equal(s.registered, 0);
+          }
         });
         await page.waitForTimeout(90);
         const after = await page.evaluate(() => window.sampleW2("detached later"));
@@ -201,11 +240,28 @@ try {
         try {
           assert(after.parts.length > 0);
           if (kind === "carousel") assert.deepEqual(after.engine, detached.at(-1).engine);
+          if (kind === "chart") assert.deepEqual(after.controllers, detached.at(-1).controllers);
           assert.equal(after.parts.length, detached.at(-1).parts.length);
           for (const [i, p] of after.parts.entries()) assert.equal(p.html, detached.at(-1).parts[i].html);
         } catch (e) {
           report.failures.push(`${label}/cleanup: ${e.message}`);
         }
+        if (kind === "chart")
+          report.cases.push({
+            label,
+            name: "complete public controller event history",
+            controllers: await page.evaluate(() =>
+              (window.w2controllers || []).map((c) => ({
+                state: c.state,
+                nativeState: c.handle.getState(),
+                from: c.handle.getFrom(),
+                to: c.handle.getTo(),
+                ticks: c.ticks,
+                updates: c.updates,
+                applied: c.applied,
+              })),
+            ),
+          });
         await page.close();
       }
 } finally {

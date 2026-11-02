@@ -26,6 +26,15 @@ window.sampleW2 = (phase, state) => {
   if (live.length) window.w2nodes = live;
   const e = window.embla?.internalEngine();
   return {
+    controllers: (window.w2controllers || []).map((c) => ({
+      state: c.state,
+      nativeState: c.handle.getState(),
+      ticks: c.ticks.length,
+      updates: c.updates.length,
+      value: c.updates.at(-1)?.value,
+      appliedDuration: c.applied.at(-1)?.duration,
+    })),
+    registered: [...(window.w2controllerSets || [])].reduce((count, set) => count + set.size, 0),
     phase,
     request: state?.request ?? request,
     state,

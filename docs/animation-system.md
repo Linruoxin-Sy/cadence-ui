@@ -1062,3 +1062,5 @@ transition-none/duration-0 and removes hidden starting/ending opacity. Removing
 the scale transition on downgrade cancels an active scale immediately. Nested
 full under outer none restores the local clock, subject to OS reduce. This local
 repair does not prove conformance of other historical CSS popups.
+
+Site DocumentEntrance treats a consumed entrance as shown even when offscreen: restoring full mode after initial none must not re-hide or replay the same document host. SSR hidden, noscript and print restoration stay unchanged.

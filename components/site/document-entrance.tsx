@@ -116,7 +116,7 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
       }
     : { ...entrance, clipPath: clip };
 
-  const show = cm.disabled || inView;
+  const show = settled || cm.disabled || inView;
   const instant = cm.disabled || cm.timeScale === 0;
   const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
   useCommittedEffect(() => {
