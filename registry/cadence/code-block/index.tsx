@@ -683,22 +683,7 @@ export interface CodeBlockContentProps extends React.ComponentProps<"pre"> {
   language?: string;
 }
 
-/**
- * The scrollable source. A string child renders as one text node, which is what
- * keeps a streaming block cheap; `CodeBlockLine` children are for diffs and
- * highlighted lines.
- *
- * With a `language` — from the block or from this part — the string is tokenized by
- * `useHighlightedCode` and rendered one line at a time. Highlighting and streaming
- * pull in opposite directions (a tokenizer wants the whole file, a stream has only
- * the first half), so the hook keeps the grammar state after the last finished line
- * and re-tokenizes only what arrived: the cost per chunk is one line, not the file.
- *
- * When `CodeBlock` is given `maxLines`, this is the part that folds: the viewport
- * around the `pre` takes a measured height, so the fold follows wrapped lines and
- * whatever font the page uses. The measurement lives in a `ResizeObserver` — a
- * layout read in render would be a synchronous reflow on every chunk of a stream.
- */
+/** Scrollable source with highlighting, line numbers and a measured geometry.resize fold. */
 function CodeBlockContent({
   ref,
   className,
