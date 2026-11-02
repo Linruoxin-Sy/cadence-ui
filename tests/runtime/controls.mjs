@@ -44,7 +44,14 @@ const part = (frame, name) => {
   return p;
 };
 const first = (frames) => {
-  const paints = frames.filter((f) => ["paint1", "paint2"].includes(f.phase));
+  // An older commit can deliver a queued rAF after the collector was cleared but
+  // before the requested async commit. Keep it in raw evidence; associate the
+  // first two paints with the actual requested commit rather than that old tail.
+  const commit = frames.findLast((f) => f.phase === "commit");
+  assert.ok(commit, "requested commit recorded");
+  const paints = frames.filter(
+    (f) => ["paint1", "paint2"].includes(f.phase) && f.state.probeRequest === commit.state.probeRequest,
+  );
   assert.equal(paints.length, 2);
   return paints;
 };
@@ -88,6 +95,7 @@ for (const os of ["no-preference", "reduce"])
     await page.waitForFunction(() => window.controlFrames?.some((f) => f.phase === "paint2"));
     const capture = async (name, patch, delay = 85) => {
       if (!patch && name !== "initial") patch = { unrelated: ++tick };
+      if (patch) patch = { ...patch, probeRequest: ++tick };
       if (patch)
         await page.evaluate((p) => {
           window.controlFrames = [];

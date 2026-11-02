@@ -20,7 +20,7 @@ does not count a provider, static SVG or a forwarding export as animation proof.
   same DOM identity, neutral geometry and opacity1 at the first none sample are required.
   Existing no-script/print rules, in-view trigger and completion cleanup stay.
 - Button, native focusableWhenDisabled Button, Toggle and inherited-disabled
-  ToggleGroupItem remained compressed after disabled. Motion tap callbacks now drive
+  ToggleGroupItem remained compressed after disabled. Native owned press handlers now drive
   a controlled scale, immediately neutralized for disabled/aria-disabled or a removed
   press recipe. Base still owns activation, focus and refs. Slider's actual Base
   dragging state likewise stayed true after disabled: its scale now explicitly cancels.
@@ -117,6 +117,30 @@ Compositions reuse their actual controls/context; they do not gain a new root en
 Performance120KB/48KB/8KB/55fps/CLS and the final whole-goal audit remain OPEN.
 
 ## Final authority
+
+Primary-pointer follow-up: runtime **a656074** fixes the native adapter's missing
+pointer ownership. `press-ownership-negative.json` preserves exact4d06c24 and
+legacy50cc262 source, trusted two-contact events and numerical scale samples.
+The4d06c24 regression starts nonprimary Toggle feedback and releases held Press
+when only the second contact ends. The legacy comparison itself fails final cleanup;
+it is not a complete behaviour oracle. The initial diagnostic also expected a click
+after multitouch; both implementations actually suppress it. That exploratory
+expectation remains visible in the raw negative and was corrected before positive proof.
+
+`press-ownership-runtime.json`: **36 cases /222 assertions**, full/reduced/none ×
+both OS preferences, real CDP primary/nonprimary touch, owner release/cancel,
+disabled/none/blur/unmount, same-node numeric transforms. Six release cases also
+prove single-touch Toggle activation, Enter activation/feedback, and outside mouse
+release. Secondary release cannot start feedback or release the primary. No synthetic
+pointercancel, dependency patch, timer or event suppression was introduced.
+`press-ownership-controls.json` retains a new exact full raw gzip, **138/138**;
+legacy23/23 and held-release8/8 remain passing. The first rerun's raw gzip is retained
+separately: an old queued paint2 crossed collector reset, producing three paints.
+The sampler now tags requested commits and requires exactly their paint1/paint2,
+retaining every raw frame. Source hashes identify the runtime; the ownership report's
+capture-start HEAD predates its source commit and verifiedRuntimeSource binds exact bytes.
+All remaining conditions below, including zero/nonfinite clocks, SSR and other writers,
+remain OPEN. New performance/production/check results are in the pointer ownership handoff.
 
 Basic-control increment: `tests/runtime/controls.mjs` records actual host identities,
 numeric computed styles, native timing/keyframes, commit and first two rAFs (plus

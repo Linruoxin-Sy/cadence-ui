@@ -17,7 +17,8 @@
         "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
         "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
         "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
-      ]
+      ],
+      "ownershipProof": "a656074: press-ownership-runtime.json, trusted primary pointerId ownership; 36 cases/222 assertions across mode/OS and lifecycle endings. Previous bounds and remaining conditions still apply."
     },
     {
       "path": "registry/cadence/calendar/index.tsx",
@@ -487,7 +488,8 @@
         "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
         "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
         "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
-      ]
+      ],
+      "ownershipProof": "a656074: press-ownership-runtime.json, trusted primary pointerId ownership; 36 cases/222 assertions across mode/OS and lifecycle endings. Previous bounds and remaining conditions still apply."
     },
     {
       "path": "registry/cadence/toggle-group/index.tsx",
@@ -505,7 +507,8 @@
         "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
         "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
         "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified"
-      ]
+      ],
+      "ownershipProof": "a656074: press-ownership-runtime.json, trusted primary pointerId ownership; 36 cases/222 assertions across mode/OS and lifecycle endings. Previous bounds and remaining conditions still apply."
     },
     {
       "path": "components/site/document-entrance.tsx",
