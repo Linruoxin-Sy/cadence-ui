@@ -158,7 +158,7 @@ export function MotionModeSwitch({ className }: { className?: string }) {
   return (
     <ToggleGroup
       aria-label="Motion mode"
-      variant="segmented"
+      variant="outline"
       size="sm"
       value={[mode]}
       onValueChange={(values) => {
