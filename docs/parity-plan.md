@@ -2164,3 +2164,22 @@ request tags associate exactly two paints without discarding any frames.
 Current strict JS293501/414551/318859/376898 gzip bytes still FAIL120000.
 See docs/handoffs/press-ownership.md for commands, hashes, cleanup and remaining work.
 Other engines, timeScale edge inputs, performance and final whole-goal audit stay OPEN.
+
+
+### Zero recipe clock increment (2026-11-02)
+
+Runtime **384e94a** fixes valid timeScale0 before any spring conversion, including
+all19 recipes/delays and direct physicalSpring0. Mode flags and full target pose
+remain intact; continuous CSS clocks remain independent. Invalid clock input domain
+is explicit. Positive physics and native Press ownership are preserved.
+Exact old-source generator and real dispatcher negatives are retained. Final
+Edge fixture92 records/0 failures versus49 old-source failures,345 raw commit/first-two
+frame samples; actual Base Button full0 held scale0.97. Unit/full check721/721,
+88files; production193/193. See `docs/evidence/zero-clock-review.md` and
+`docs/handoffs/zero-clock.md` for source bindings, commands and precise scope.
+This does not certify every writer's same-target clock subscription or network SSR.
+
+Final four-page initial JS: Button293597, Chart414647, Calendar318955,
+CodeBlock376994 gzip bytes (23/24/24/29 scripts), all FAIL120000; audit exits1.
+Full engine matrix, all-shell JS,48KB Motion/8KB compiled addition,55fps/CLS and
+final whole-goal audit remain OPEN. Existing API/CSS/gates are not reset.
