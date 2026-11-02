@@ -79,3 +79,11 @@ fresh production JS measurement are recorded in the handoff; green checks do not
 initial JS. Ledger remains373/466 classified,93 open B6–B9. Global CSS/Motion nested clocks,
 first paint, live same-target cancellation/full→reduced, held-press disabled cancellation,
 all applicable pages'120KB initial-JS budget and final goal audit remain OPEN.
+
+Final source c53c55a: registry65/58docs; full check663/85 passes, mandatory38 animated
+reporter unchanged. B3 strengthened48/48 + negative1/1 + affected B5 subset18/18 pass.
+Post-commit production rebuild rechecks original four none cells + negative5/5.
+The budget case remains a real FAIL292267gzipbytes/23scripts >120000, all responses200,
+no pageerrors, exact root body hashes/manifests verified (control-runtime-js.json).
+Final isolated consumer prepare/build/runner passes against committed source; physical
+React/ReactDOM resolution and npm dedupe tree are retained in control-runtime.json.

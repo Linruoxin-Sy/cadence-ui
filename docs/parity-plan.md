@@ -1746,6 +1746,15 @@ serial handoff for final commands/results/SHAs. This closes only the recorded B3
 minimum-React paths. Ledger373 classified/93 open B6–B9, global live CSS/Motion/disabled
 press matrices, per-page initial-JS budget and final goal audit remain OPEN.
 
+Final control runtime validation: source c53c55a, registry build65payloads/58docs,
+full check663/85 passed; unchanged mandatory38-suite motion reporter. Production
+B3 strengthened48/48 + real-motion probe negative1/1 + affected B5 subset18/18 passed.
+Final post-commit production rebuild confirms original four none cells and negative
+control5/5. Real React19.0 isolated fixture rebuilt/reran successfully; every dependency
+resolves the same React/ReactDOM installation. Strict production initial JS remains
+FAIL292267gzipbytes/23scripts >120000, control-runtime-js.json, all200/no pageerrors
+and root manifests/hashes verified. No per-page budget closure or global motion claim.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |
