@@ -14,7 +14,7 @@
 > **Execution boundary (2026-11-02):** follow the [fixed remaining work packages](execution-boundary.md).
 > W1 and the fixed W2 engine ledger are complete. The user explicitly resumed execution;
 > W3 measurements and a decision report are delivered; performance acceptance remains failed/unproven.
-> W4 remains unstarted pending coordinator verification. See the W3 evidence below.
+> W4 independent requirement reconciliation and cleanup are delivered; the overall objective remains incomplete.
 > Current commits, evidence and remaining gates are in [project-status.md](project-status.md).
 > New non-blocking findings go to backlog.
 
@@ -2238,3 +2238,17 @@ See [W3 report](evidence/w3-performance.md), [summary](evidence/w3-performance.j
 and reconstructible temporary bundle entries removed, current production build retained.
 W3 acceptance and the overall objective remain incomplete. Framework/budget priority and real-device
 access need user input; W4 may independently verify the fixed remaining requirements without closing red gates.
+
+### W4 final requirement reconciliation (2026-11-02)
+
+[Requirement matrix](evidence/w4-verification.md) and [machine evidence](evidence/w4-verification.json)
+reconcile source, docs, distribution and retained evidence within the fixed execution boundary.
+25 W2 final source hashes and all58 W3 component hashes match;466 finite API records are reviewed.
+W3 graph accounting is independently recomputed, including16 dynamic edges. Its registry consumer
+Motion union has10 value APIs; site-only useInView is outside that reference metric.
+Six production Accordion/Tabs/Select full-mode interaction/scroll windows across desktop/mobile
+emulation pass CLS with maximum0; this does not certify other pages/modes, lifetime CLS or devices.
+No runtime, registry/content, payload, framework, dependency or budget changes; retained W2 build reused.
+W4 verification delivery is complete; overall remains INCOMPLETE with W3 FAIL/UNPROVEN gates.
+Follow [final handoff](handoffs/w4-closure.md); existing framework/budget and device questions remain
+pending user response. No successor, push, publish or deployment is created by W4.

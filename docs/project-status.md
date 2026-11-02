@@ -1,7 +1,7 @@
 # Cadence UI 项目状态
 
 2026-11-02。用户已明确恢复串行执行，W2 已收尾，W3 测量与决策报告已交付。
-**项目整体尚未完成**：性能门仍有失败和未测项；W4 尚未启动。不发布、不部署。
+**项目整体尚未完成**：性能门仍有失败和未测项；W4 独立逐要求核对与清理已交付。不发布、不部署。
 
 ## 已完成范围
 
@@ -26,8 +26,8 @@ W2 修复了旧 writer 在 clock/mode 变化时的首帧取消、Recharts instan
 | 最终 sampler/cleanup 探针                  | `49064c7`                       |
 | 固定 W2 证据与逐行结论                     | `5193c0b`                       |
 | 当前 registry payload                      | `201975a`，`sourceSha: f60e7fe` |
-| W3测量工具与CLS测试                         | `7242346` |
-| W3完整测量、原始归档与决策报告              | `ebf64c2` |
+| W3测量工具与CLS测试                        | `7242346`                       |
+| W3完整测量、原始归档与决策报告             | `ebf64c2`                       |
 
 最终 `pnpm registry:build`、`pnpm check` 通过：类型、lint、registry、parity 均通过，
 **88 files / 723 tests**。独立 `.next-motion-runtime` 生产构建成功；最终受影响生产回归
@@ -60,12 +60,12 @@ load + networkidle + 10s + networkidle、逐响应 gzip6 和 manifest/hash 核�
 完整记录见 [w2-close-site-js.json](evidence/w2-close-site-js.json)，audit exit 1。
 四页失败已阻止全站预算通过；其余适用页面也不能用这四页替代验收。
 
-| 剩余性能门                                    | 状态                                      |
-| --------------------------------------------- | ----------------------------------------- |
-| Initial Motion runtime ≤48 KB gzip            | 参考 consumer 编译47294符合；Next production精确分摊仍未证 |
+| 剩余性能门                                    | 状态                                                                      |
+| --------------------------------------------- | ------------------------------------------------------------------------- |
+| Initial Motion runtime ≤48 KB gzip            | 参考 consumer 编译47294符合；Next production精确分摊仍未证                |
 | 编译后每组件增量 ≤8 KB gzip，排除共享 runtime | 依赖计入的独立增量21/58符合、37/58超限；仅模块编译58/58符合，不替代完整门 |
-| 中端移动设备 ≥55 fps                          | 未证；ADB无设备，未用桌面模拟替代 |
-| CLS <0.02                                     | 全站双视口冷加载证据见W3报告；交互/长窗口仍未证 |
+| 中端移动设备 ≥55 fps                          | 未证；ADB无设备，未用桌面模拟替代                                         |
+| CLS <0.02                                     | 全站双视口冷加载证据见W3报告；交互/长窗口仍未证                           |
 
 W3已完成69个适用HTML页面双视口严格冷加载审计，共138记录，JS 0符合、138失败，
 范围284526–426590 bytes；冷加载CLS 138/138符合，最大0。并已完成58组件编译图。
@@ -74,7 +74,7 @@ W3已完成69个适用HTML页面双视口严格冷加载审计，共138记录，
 [W3性能报告](evidence/w3-performance.md)和[汇总](evidence/w3-performance.json)。
 产品源码、预算、功能、框架和payload未变；W3性能门尚未整体通过。
 下一步需要用户确定框架/预算约束优先级，并提供真机条件；不自动展开架构修改。
-W4 全目标逐要求验收与最终清理尚未启动，
+W4 已交付[逐要求核对](evidence/w4-verification.md)及机器可读对账，
 不能以 W2 检查通过宣称整体完成。[执行边界](execution-boundary.md) 继续约束剩余范围。
 
 AI 25 个组件未排期、direction deferred、form/native-select/sonner exclusions 保持计划决定。
@@ -104,7 +104,26 @@ W3最终检查88 files/724 tests通过；本轮复用production构建，不新�
 
 ## 恢复入口
 
-从 [W3交接](handoffs/w4-final-verification.md) 进入 W4 的独立核对；先由协调核实当前会话结束、
-git状态及本轮服务退出，再创建唯一后继，使用 GPT-6.1 Sol High。
+从 [W4最终交接](handoffs/w4-closure.md) 恢复；先由协调核实当前会话结束、
+git状态及本轮服务退出，再依用户决策安排唯一后继。
 W3的JS/依赖增量失败、生产Motion归因和真机/交互CLS缺口继续阻止整体完成。
 W2已闭项目按实际source/context范围复用，不再逐writer展开；未获用户架构/预算决策前不迁移或改门槛。
+
+## W4 独立核对（2026-11-02）
+
+要求→实现→证据→PASS/FAIL/UNPROVEN 见 [W4核对表](evidence/w4-verification.md)。
+W2最终25个源码hash、W3全部58组件hash匹配；466有限API记录已分类，
+W3完整图重算包含16条动态import边，21/58结果一致。Motion参考合集实际为registry的10个API，
+已修正文案；站点独用useInView不在该参考consumer口径内。产品源码与payload未改。
+
+新增生产Accordion/Tabs/Select双视口full模式交互/滚动采样6/6符合，CLS均为0，
+保留原始shift与操作时间；仅覆盖这些明确窗口，不关闭全站交互/任意长窗口/真机缺口。
+本轮复用W2构建，未新build或刷新payload。本轮Next3183已停止。
+W4核对交付完成不等于整体达标；JS、组件增量失败，Next Motion精确归因、
+真机FPS及更广CLS仍未证；既有用户决策问题继续待答，不重复发问或代选。
+
+W4工具提交`e09a058`、证据提交`f9db6f3`。最终串行完整检查链全部通过，
+88 files/724 tests；细节与初次lint失败/修复日志见[evidence/w4-checks.json](evidence/w4-checks.json)。
+已有raw元数据引用的58份归档及W3另两份报告重新校验长度/SHA。
+本轮9份日志92398 bytes无损归档后删除重复缓存，清单见[evidence/w4-cleanup.json](evidence/w4-cleanup.json)。
+端口3181/3183/5037无listener；没有新build目录或重复历史大清理。
