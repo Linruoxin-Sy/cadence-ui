@@ -7,16 +7,15 @@ import { listComponentGroups, listGuides } from "@/lib/content";
  * them: a remount would restart its disclosure state and re-arm the row
  * entrance, so the navigation would replay on every section switch.
  *
- * The shell is full-bleed, not a centred column: the sidebar starts at the
- * viewport's left edge, aligned with the site header's wordmark, and the reading
- * column is centred in whatever space is left. The measure lives on the article
- * (`max-w-3xl` in the page files), not here, so a page can still choose its own.
+ * The shell shares the header's centred site container, keeping the sidebar
+ * aligned with the wordmark. The reading column is centred in the remaining
+ * space, with its own measure (`max-w-3xl` in the page files).
  */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [groups, guides] = await Promise.all([listComponentGroups(), listGuides()]);
 
   return (
-    <div className="flex w-full flex-col gap-8 px-6 md:flex-row">
+    <div className="mx-auto flex w-full max-w-site flex-col gap-8 px-4 md:flex-row md:px-6">
       <Sidebar groups={groups} guides={guides} />
       <div className="min-w-0 flex-1">{children}</div>
     </div>

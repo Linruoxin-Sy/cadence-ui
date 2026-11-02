@@ -4,6 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
+  --container-site: 1500px;
   --color-sidebar: var(--sidebar, var(--card));
   --color-sidebar-foreground: var(--sidebar-foreground, var(--card-foreground));
   --color-sidebar-primary: var(--sidebar-primary, var(--primary));

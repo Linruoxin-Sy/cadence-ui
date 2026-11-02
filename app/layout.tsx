@@ -67,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <SiteHeader />
             <main id="content">{children}</main>
             <footer className="mt-24 border-t border-border">
-              <div className="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <div className="mx-auto flex w-full max-w-site flex-col gap-2 px-4 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between md:px-6">
                 <p>Cadence UI · MIT licensed · Built with Base UI, Tailwind CSS v4, and Motion.</p>
                 <p>
                   <a className="underline underline-offset-4 hover:text-foreground" href="/llms.txt">

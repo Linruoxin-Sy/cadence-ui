@@ -296,6 +296,18 @@ The entrance uses the committed control adapter so mode/clock changes stop an ex
 writer before paint even when its target is unchanged. Explicit none renders RESTING
 in server HTML; other modes retain the hidden SSR state and no-script/print restoration.
 
+### 2.5 Site width and alignment
+
+The header's inner row, documentation shell (sidebar and content), home page, and footer's
+inner row share a centred `max-w-site` container. Its site-only `--container-site` token in
+`app/globals.css` is 1500px, including horizontal padding: 16px below `md`, 24px from `md`
+upwards. Header and footer backgrounds and separators still span the viewport.
+
+The documentation sidebar remains 224px wide on desktop with a 32px column gap. Articles
+and the component catalogue retain their independent `max-w-3xl` (48rem) reading measure,
+centred in the remaining content area. Below `md`, the existing Browse disclosure replaces
+the sidebar and the content uses the available width within the shared padding.
+
 ---
 
 ## 3. Data flow: one MDX drives every output
