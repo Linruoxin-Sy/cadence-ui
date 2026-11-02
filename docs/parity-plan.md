@@ -1755,6 +1755,23 @@ resolves the same React/ReactDOM installation. Strict production initial JS rema
 FAIL292267gzipbytes/23scripts >120000, control-runtime-js.json, all200/no pageerrors
 and root manifests/hashes verified. No per-page budget closure or global motion claim.
 
+### B6–B9 finite API/context closure (2026-11-02)
+
+Reviewed remaining93 actual exports against complete source, fixed pin, installed types and
+real DOM/provider/context paths. Repaired callback class loss in Accordion/Carousel/Sidebar,
+mobile Sidebar DOM forwarding, duplicate Tabs ref cleanup, Chart native content forwarding
+and Legend entry callbacks. Old-source negative9fail/11pass; fixed targeted20/20. Details and
+per-export boundaries: evidence/compatibility-collections.md and compatibility-ledger.json.
+Ledger58items/466exports now342 compatibility +124 static,0open/historicalbounded; unchanged
+inventory names independently checked. This closes finite compatibility only. Global CSS/Motion
+live-mode/clock/first-paint matrices, held-press disabled visuals, per-page JS budget and final
+whole-goal audit remain OPEN. c53c55a passive-effect asynchronous first-paint probe is explicitly
+carried to the next runtime group; no defect inferred without actual evidence.
+Final runtime4d34639: registry build and check675/675,86files passed; isolated production build
+passed. Targeted production41 unique behavior/a11y cases passed after exact Sidebar control-name
+locator corrections. Strict budget still FAIL292267gzipbytes/23scripts (120000 limit); see
+evidence/compatibility-collections-js.json. Complete provenance/remaining work in the handoff.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |

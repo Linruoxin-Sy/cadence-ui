@@ -2295,404 +2295,590 @@
     },
     "accordion": {
       "Accordion": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base root/item/trigger/panel state callbacks evaluated caller-last; Content class remains on measured inner div as pinned, evaluated with actual panel state through render bridge. Style/events/ref stay on Panel. New element/function render, native capture/cancel and replacement cleanup counterexamples repaired. Existing controlled/multiple/disabled/keepMounted/beforematch/keyboard/three-mode suite retained. CSS geometry.resize unchanged; independent live/nested-clock matrix remains OPEN.",
+        "evidence": "compatibility-collections.md"
       },
       "AccordionContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base root/item/trigger/panel state callbacks evaluated caller-last; Content class remains on measured inner div as pinned, evaluated with actual panel state through render bridge. Style/events/ref stay on Panel. New element/function render, native capture/cancel and replacement cleanup counterexamples repaired. Existing controlled/multiple/disabled/keepMounted/beforematch/keyboard/three-mode suite retained. CSS geometry.resize unchanged; independent live/nested-clock matrix remains OPEN.",
+        "evidence": "compatibility-collections.md"
       },
       "AccordionItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base root/item/trigger/panel state callbacks evaluated caller-last; Content class remains on measured inner div as pinned, evaluated with actual panel state through render bridge. Style/events/ref stay on Panel. New element/function render, native capture/cancel and replacement cleanup counterexamples repaired. Existing controlled/multiple/disabled/keepMounted/beforematch/keyboard/three-mode suite retained. CSS geometry.resize unchanged; independent live/nested-clock matrix remains OPEN.",
+        "evidence": "compatibility-collections.md"
       },
       "AccordionTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base root/item/trigger/panel state callbacks evaluated caller-last; Content class remains on measured inner div as pinned, evaluated with actual panel state through render bridge. Style/events/ref stay on Panel. New element/function render, native capture/cancel and replacement cleanup counterexamples repaired. Existing controlled/multiple/disabled/keepMounted/beforematch/keyboard/three-mode suite retained. CSS geometry.resize unchanged; independent live/nested-clock matrix remains OPEN.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "collapsible": {
       "Collapsible": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Root/Trigger transparent Base forwarding; Content resolves class callback on Panel and preserves style/render/ref/events. Natural inner measurement observes caller panel attributes and viewport, cleans observers/listener. Existing controlled cancellation, both render forms/ref, decorated panel, find-in-page/keyboard/modes and B6 browser evidence. No second state owner; global running CSS audit separate.",
+        "evidence": "compatibility-collections.md"
       },
       "CollapsibleContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Root/Trigger transparent Base forwarding; Content resolves class callback on Panel and preserves style/render/ref/events. Natural inner measurement observes caller panel attributes and viewport, cleans observers/listener. Existing controlled cancellation, both render forms/ref, decorated panel, find-in-page/keyboard/modes and B6 browser evidence. No second state owner; global running CSS audit separate.",
+        "evidence": "compatibility-collections.md"
       },
       "CollapsibleTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Root/Trigger transparent Base forwarding; Content resolves class callback on Panel and preserves style/render/ref/events. Natural inner measurement observes caller panel attributes and viewport, cleans observers/listener. Existing controlled cancellation, both render forms/ref, decorated panel, find-in-page/keyboard/modes and B6 browser evidence. No second state owner; global running CSS audit separate.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "tabs": {
       "Tabs": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base Root/List/Panel callbacks and rest props; horizontal/default variants and primitive controlled/disabled/removal/RTL/loopFocus/keepMounted semantics preserved. List LayoutGroup has stable useId; does not own tab state. Existing Tabs tests and historical browser gate. Native ref/events are Base-owned; global shared-layout live mode proof separate.",
+        "evidence": "compatibility-collections.md"
       },
       "TabsContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base Root/List/Panel callbacks and rest props; horizontal/default variants and primitive controlled/disabled/removal/RTL/loopFocus/keepMounted semantics preserved. List LayoutGroup has stable useId; does not own tab state. Existing Tabs tests and historical browser gate. Native ref/events are Base-owned; global shared-layout live mode proof separate.",
+        "evidence": "compatibility-collections.md"
       },
       "TabsList": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base Root/List/Panel callbacks and rest props; horizontal/default variants and primitive controlled/disabled/removal/RTL/loopFocus/keepMounted semantics preserved. List LayoutGroup has stable useId; does not own tab state. Existing Tabs tests and historical browser gate. Native ref/events are Base-owned; global shared-layout live mode proof separate.",
+        "evidence": "compatibility-collections.md"
       },
       "TabsTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-render-bridge",
+        "status": "reviewed-compatibility",
+        "boundary": "Base Tab owns state/native events; TriggerSurface useRender preserves both render forms and actual elementProps. Removed duplicate ref parameter because props already carries same merged ref: old source ran cleanup twice. New same-node/focus controlled active-state and callback-to-object ref test; old render/keyboard/mode tests retained. Private indicator may swap branch; main tab DOM stays stable. Caller render must spread actual props/ref.",
+        "evidence": "compatibility-collections.md"
       },
       "tabsListVariants": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "variant-helper",
+        "status": "reviewed-static",
+        "boundary": "Pure CVA default/line classes and defaultVariants checked against pin. No runtime DOM/ref/event/context owner.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "table": {
       "Table": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableBody": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableCaption": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableCell": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableHead": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       },
       "TableRow": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native table/thead/tbody/tfoot/tr/th/td/caption rest forwarding, string class/object style and React19 native refs/events; cn caller-last. Table public props/ref belong to actual table inside private scroll container. No render callback/provider/validation/motion writer. Existing semantic/table suites and DataTable real composition support finite source review.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "carousel": {
       "Carousel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-provider-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div string class/object style/ref/events; caller onKeyDownCapture intentionally replaces pinned left/right engine navigation. Embla axis forced by orientation, opts/plugins retained, setApi effect and select/reInit subscriptions clean up. Stable internal plugin restores scrollBody method and pointerUp listener. Existing actual engine-option/subscription/override tests plus historical browser engine/drag gate. Mode-ref render assignment and asynchronous engine/live-clock proof remain in independent global runtime audit, not a finite API certification.",
+        "evidence": "compatibility-collections.md"
       },
       "CarouselApi": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Exact installed Embla hook API union, exported type only; no DOM. Runtime engine API/setApi/context reviewed with Carousel/useCarousel.",
+        "evidence": "compatibility-collections.md"
       },
       "CarouselContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-context-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "useCarousel checks nearest provider; Content private outer viewport owns Embla ref while public class/style/events/ref target inner track, as pinned. Item forwards native div props and derives spacing from context orientation. Existing track/item native ref/style tests and real engine browser coverage; no new transform writer.",
+        "evidence": "compatibility-collections.md"
       },
       "CarouselItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-context-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "useCarousel checks nearest provider; Content private outer viewport owns Embla ref while public class/style/events/ref target inner track, as pinned. Item forwards native div props and derives spacing from context orientation. Existing track/item native ref/style tests and real engine browser coverage; no new transform writer.",
+        "evidence": "compatibility-collections.md"
       },
       "CarouselNext": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Button-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Inherited Button Base state class callbacks now evaluated before caller-last cn; style/render/ref/native handlers forwarded to audited Button adapter. Default outline/icon-sm retained; caller rest intentionally overrides disabled/onClick (pinned). New both-direction callback/disabled/caller override/native drag counterexamples; existing engine API and render override tests.",
+        "evidence": "compatibility-collections.md"
       },
       "CarouselPrevious": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Button-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Inherited Button Base state class callbacks now evaluated before caller-last cn; style/render/ref/native handlers forwarded to audited Button adapter. Default outline/icon-sm retained; caller rest intentionally overrides disabled/onClick (pinned). New both-direction callback/disabled/caller override/native drag counterexamples; existing engine API and render override tests.",
+        "evidence": "compatibility-collections.md"
       },
       "useCarousel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-hook",
+        "status": "reviewed-compatibility",
+        "boundary": "Reads actual nearest CarouselContext and throws outside provider; returns engine viewport/API/orientation/selection-navigation state. No DOM props; correctness established by source and existing Context/engine subscription tests, not N/A for absent class/ref.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "scroll-area": {
       "ScrollArea": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base class/style callbacks, element/function render and native props/ref flow to Root/Scrollbar. Default vertical scrollbar; caller orientation passed to engine. Private Viewport/Thumb/Corner retain Base scroll/focus/drag ownership. Existing root/bar callback/render/ref/style, pointer, keyboard and static three-mode tests plus historical native scrolling browser gate. No authored motion.",
+        "evidence": "compatibility-collections.md"
       },
       "ScrollBar": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Base class/style callbacks, element/function render and native props/ref flow to Root/Scrollbar. Default vertical scrollbar; caller orientation passed to engine. Private Viewport/Thumb/Corner retain Base scroll/focus/drag ownership. Existing root/bar callback/render/ref/style, pointer, keyboard and static three-mode tests plus historical native scrolling browser gate. No authored motion.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "chart": {
       "ChartConfig": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Pure config union for color versus two-theme colors plus label/icon; real context/style emitter reviewed below. No DOM or validation.",
+        "evidence": "compatibility-collections.md"
       },
       "ChartContainer": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-provider-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div class/style/events/ref spread; config provider updates nearest content and stable root; initialDimension retained. Public Recharts AnimationControllerProvider uses token controller and completes registered geometry under downgrade; engine cleanup cancels rAF. Existing real JavascriptAnimation completion/cancel, actual BarChart, config update/native root tests; global same-target clock/first-paint matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "ChartLegend": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Legend direct installed Recharts export retains engine props/ref/content semantics; Tooltip forwards props to actual engine and forces isAnimationActive=false after spread as documented. Their content is engine data rendering (element/function), not Base DOM render. Existing production chart tooltip/legend/keyboard gate plus installed engine declarations; no claim of caller-authored custom shape/motion control.",
+        "evidence": "compatibility-collections.md"
       },
       "ChartLegendContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "data-renderer-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Both read nearest config, filter type=none and render actual payload. Previously dropped inherited native div style/ref/events/attributes; now forward native rest after excluding installed engine metadata. Tooltip label/value formatter signatures preserved; Legend now invokes formatter and three-argument entry click/enter/leave handlers; optional click entries have keyboard activation. New native capture/cancel/style/same-node/cleanup and real entry-signature tests fail old source. Empty/inactive returns null intentionally. Engine placement/animation options belong to Tooltip/Legend, not content DOM. Arbitrary custom engine renderers own spreading and motion.",
+        "evidence": "compatibility-collections.md"
       },
       "ChartStyle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "style-emitter",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual style node emits scoped light/dark --color-* config entries, returns null for no color; not DOM div forwarding. Public id/config only, no native style/ref/render API. Existing theme/empty/config rerender assertions. Caller config strings are trusted CSS just as pinned; no new sanitizer or validation API.",
+        "evidence": "compatibility-collections.md"
       },
       "ChartTooltip": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Legend direct installed Recharts export retains engine props/ref/content semantics; Tooltip forwards props to actual engine and forces isAnimationActive=false after spread as documented. Their content is engine data rendering (element/function), not Base DOM render. Existing production chart tooltip/legend/keyboard gate plus installed engine declarations; no claim of caller-authored custom shape/motion control.",
+        "evidence": "compatibility-collections.md"
       },
       "ChartTooltipContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "data-renderer-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Both read nearest config, filter type=none and render actual payload. Previously dropped inherited native div style/ref/events/attributes; now forward native rest after excluding installed engine metadata. Tooltip label/value formatter signatures preserved; Legend now invokes formatter and three-argument entry click/enter/leave handlers; optional click entries have keyboard activation. New native capture/cancel/style/same-node/cleanup and real entry-signature tests fail old source. Empty/inactive returns null intentionally. Engine placement/animation options belong to Tooltip/Legend, not content DOM. Arbitrary custom engine renderers own spreading and motion.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "calendar": {
       "Calendar": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DayPicker-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "Calendar forwards actual DayPicker selection union/month/native root/style options; string classes/object styles, not Base callbacks/render. Caller classNames/formatters/components merge last; stable Locale/Month contexts keep nodes/focus. Public CalendarDayButton inherits DayButton native ButtonHTMLAttributes (no public ref prop), private ref handles focused modifier; rest events/styles forwarded to native button. Existing single/multiple/range/required/disabled/localization/override/focus/WAAPI tests and browser gate. Caller components replace defaults and own prop/ref spread/motion; global first-paint audit independent.",
+        "evidence": "compatibility-collections.md"
       },
       "CalendarDayButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "DayPicker-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "Calendar forwards actual DayPicker selection union/month/native root/style options; string classes/object styles, not Base callbacks/render. Caller classNames/formatters/components merge last; stable Locale/Month contexts keep nodes/focus. Public CalendarDayButton inherits DayButton native ButtonHTMLAttributes (no public ref prop), private ref handles focused modifier; rest events/styles forwarded to native button. Existing single/multiple/range/required/disabled/localization/override/focus/WAAPI tests and browser gate. Caller components replace defaults and own prop/ref spread/motion; global first-paint audit independent.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "navigation-menu": {
       "NavigationMenu": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-guard-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Root/portal Positioner Base callbacks/render/native props; custom guard ref composes caller cleanup, observes only owned subtree and disconnects. New dynamic root callback-to-object ref test preserves DOM. Existing actionsRef/cleanup, controlled cancellation, retained input/focus, callback styles and production native guard/keyboard evidence. Positioner public children intentionally replaced by pinned private Popup/Viewport; align defaults preserved. Local token clocks/three-mode branches unchanged, global CSS matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual Base callback classes merged caller-last and other style/render/ref/native props forwarded. Content composes local token style before caller object/callback; Link active semantics and Trigger children plus private chevron retained. Indicator uses Base Icon and pinned private arrow. Nearest Base root/item/portal context, existing controlled/cancel/render/ref/style/keyboard tests and B7 real browser gate; no independent state owner. No whole-library motion claim.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuIndicator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual Base callback classes merged caller-last and other style/render/ref/native props forwarded. Content composes local token style before caller object/callback; Link active semantics and Trigger children plus private chevron retained. Indicator uses Base Icon and pinned private arrow. Nearest Base root/item/portal context, existing controlled/cancel/render/ref/style/keyboard tests and B7 real browser gate; no independent state owner. No whole-library motion claim.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual Base callback classes merged caller-last and other style/render/ref/native props forwarded. Content composes local token style before caller object/callback; Link active semantics and Trigger children plus private chevron retained. Indicator uses Base Icon and pinned private arrow. Nearest Base root/item/portal context, existing controlled/cancel/render/ref/style/keyboard tests and B7 real browser gate; no independent state owner. No whole-library motion claim.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuLink": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual Base callback classes merged caller-last and other style/render/ref/native props forwarded. Content composes local token style before caller object/callback; Link active semantics and Trigger children plus private chevron retained. Indicator uses Base Icon and pinned private arrow. Nearest Base root/item/portal context, existing controlled/cancel/render/ref/style/keyboard tests and B7 real browser gate; no independent state owner. No whole-library motion claim.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuList": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual Base callback classes merged caller-last and other style/render/ref/native props forwarded. Content composes local token style before caller object/callback; Link active semantics and Trigger children plus private chevron retained. Indicator uses Base Icon and pinned private arrow. Nearest Base root/item/portal context, existing controlled/cancel/render/ref/style/keyboard tests and B7 real browser gate; no independent state owner. No whole-library motion claim.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuPositioner": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-guard-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Real Root/portal Positioner Base callbacks/render/native props; custom guard ref composes caller cleanup, observes only owned subtree and disconnects. New dynamic root callback-to-object ref test preserves DOM. Existing actionsRef/cleanup, controlled cancellation, retained input/focus, callback styles and production native guard/keyboard evidence. Positioner public children intentionally replaced by pinned private Popup/Viewport; align defaults preserved. Local token clocks/three-mode branches unchanged, global CSS matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "NavigationMenuTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual Base callback classes merged caller-last and other style/render/ref/native props forwarded. Content composes local token style before caller object/callback; Link active semantics and Trigger children plus private chevron retained. Indicator uses Base Icon and pinned private arrow. Nearest Base root/item/portal context, existing controlled/cancel/render/ref/style/keyboard tests and B7 real browser gate; no independent state owner. No whole-library motion claim.",
+        "evidence": "compatibility-collections.md"
       },
       "navigationMenuTriggerStyle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "variant-helper",
+        "status": "reviewed-static",
+        "boundary": "Pure exported CVA class helper with pinned no-variant default; no DOM/events/ref/context owner.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "resizable": {
       "ResizableHandle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Installed panels4.16 Group/Panel/Separator string classes/object styles; DOM refs are elementRef, engine handles groupRef/panelRef, not native React ref prop. Rest forwards native events/constraints/layout callbacks/imperative handles. Handle decorates children only on withHandle; Group class caller-last. Existing actual handle/DOM cleanup/layout API, orientation/disabled tests and B7 pointer/keyboard/resize browser gate. Engine geometry is direct interaction; T0 no authored animation/provider.",
+        "evidence": "compatibility-collections.md"
       },
       "ResizablePanel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Installed panels4.16 Group/Panel/Separator string classes/object styles; DOM refs are elementRef, engine handles groupRef/panelRef, not native React ref prop. Rest forwards native events/constraints/layout callbacks/imperative handles. Handle decorates children only on withHandle; Group class caller-last. Existing actual handle/DOM cleanup/layout API, orientation/disabled tests and B7 pointer/keyboard/resize browser gate. Engine geometry is direct interaction; T0 no authored animation/provider.",
+        "evidence": "compatibility-collections.md"
       },
       "ResizablePanelGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "engine-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Installed panels4.16 Group/Panel/Separator string classes/object styles; DOM refs are elementRef, engine handles groupRef/panelRef, not native React ref prop. Rest forwards native events/constraints/layout callbacks/imperative handles. Handle decorates children only on withHandle; Group class caller-last. Existing actual handle/DOM cleanup/layout API, orientation/disabled tests and B7 pointer/keyboard/resize browser gate. Engine geometry is direct interaction; T0 no authored animation/provider.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "sidebar": {
       "Sidebar": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "responsive-context-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Nearest SidebarProvider chooses static/native desktop/mobile Sheet paths. Desktop callback ref privately retains animation node and caller React19 cleanup; style transform caller-owned. Fixed mobile native props/events/class now target actual SheetContent, not non-DOM Sheet Root; native dir forwarded in all branches. New mobile DOM/ref/event counterexample, old desktop cleanup/style/stability tests and production responsive gate. Mobile/desktop branch may naturally change DOM at breakpoint; mode changes do not force remount. Global animation cancellation audit separate.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarFooter": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarGroupAction": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native useRender string class/object style with mergeProps; element/function render merges props and element refs, caller renderer must spread actual props/ref. State supplies data-slot/sidebar/size/active. MenuButton tooltip adds real TooltipTrigger layer and nearest sidebar collapse/mobile policy. New all-five two-form native capture/cancel/style/cleanup tests (MenuButton with Tooltip) plus existing link/render/tooltip browser evidence. No Base class callback on these native useRender APIs.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarGroupContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarGroupLabel": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native useRender string class/object style with mergeProps; element/function render merges props and element refs, caller renderer must spread actual props/ref. State supplies data-slot/sidebar/size/active. MenuButton tooltip adds real TooltipTrigger layer and nearest sidebar collapse/mobile policy. New all-five two-form native capture/cancel/style/cleanup tests (MenuButton with Tooltip) plus existing link/render/tooltip browser evidence. No Base class callback on these native useRender APIs.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarHeader": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarInput": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "Inherited Input/Separator/Button callback classes now evaluated with real state caller-last; style/render/ref/native events forwarded to reviewed parts. Trigger explicitly calls caller onClick then toggle even if defaultPrevented, pinned ownership retained (no claimed cancellation veto); disabled Base prevents activation. New disabled/orientation callback counterexamples; existing controlled/cookie/shortcut/context tests.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarInset": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenu": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuAction": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native useRender string class/object style with mergeProps; element/function render merges props and element refs, caller renderer must spread actual props/ref. State supplies data-slot/sidebar/size/active. MenuButton tooltip adds real TooltipTrigger layer and nearest sidebar collapse/mobile policy. New all-five two-form native capture/cancel/style/cleanup tests (MenuButton with Tooltip) plus existing link/render/tooltip browser evidence. No Base class callback on these native useRender APIs.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuBadge": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native useRender string class/object style with mergeProps; element/function render merges props and element refs, caller renderer must spread actual props/ref. State supplies data-slot/sidebar/size/active. MenuButton tooltip adds real TooltipTrigger layer and nearest sidebar collapse/mobile policy. New all-five two-form native capture/cancel/style/cleanup tests (MenuButton with Tooltip) plus existing link/render/tooltip browser evidence. No Base class callback on these native useRender APIs.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuSkeleton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuSub": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuSubButton": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native useRender string class/object style with mergeProps; element/function render merges props and element refs, caller renderer must spread actual props/ref. State supplies data-slot/sidebar/size/active. MenuButton tooltip adds real TooltipTrigger layer and nearest sidebar collapse/mobile policy. New all-five two-form native capture/cancel/style/cleanup tests (MenuButton with Tooltip) plus existing link/render/tooltip browser evidence. No Base class callback on these native useRender APIs.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarMenuSubItem": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarProvider": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual nearest context owns open/openMobile/isMobile/toggle; provider forwards native wrapper props/ref, caller style overrides width tokens. Controlled open is read-only unless callback owner updates; cookie and Ctrl/Meta+B behavior retained and keyboard subscription removed. useSidebar throws without provider. Existing external state/cookie/keyboard/unmount tests and responsive browser gate. Not N/A for missing hook DOM props; no whole-library nested mode claim.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarRail": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/main/ul/li/button rest forwarding incl refs/style/events, string class caller-last; rail default onClick toggle is intentionally overridable by rest. Skeleton private children/70% width and showIcon match pinned ownership. No render callback; ancestor data selectors supply state, no private Motion DOM collision. Source and existing sidebar slot/default/variant/ref/keyboard suites; no per-div mirror test required.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarSeparator": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "Inherited Input/Separator/Button callback classes now evaluated with real state caller-last; style/render/ref/native events forwarded to reviewed parts. Trigger explicitly calls caller onClick then toggle even if defaultPrevented, pinned ownership retained (no claimed cancellation veto); disabled Base prevents activation. New disabled/orientation callback counterexamples; existing controlled/cookie/shortcut/context tests.",
+        "evidence": "compatibility-collections.md"
       },
       "SidebarTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Base-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "Inherited Input/Separator/Button callback classes now evaluated with real state caller-last; style/render/ref/native events forwarded to reviewed parts. Trigger explicitly calls caller onClick then toggle even if defaultPrevented, pinned ownership retained (no claimed cancellation veto); disabled Base prevents activation. New disabled/orientation callback counterexamples; existing controlled/cookie/shortcut/context tests.",
+        "evidence": "compatibility-collections.md"
       },
       "useSidebar": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "context-provider",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual nearest context owns open/openMobile/isMobile/toggle; provider forwards native wrapper props/ref, caller style overrides width tokens. Controlled open is read-only unless callback owner updates; cookie and Ctrl/Meta+B behavior retained and keyboard subscription removed. useSidebar throws without provider. Existing external state/cookie/keyboard/unmount tests and responsive browser gate. Not N/A for missing hook DOM props; no whole-library nested mode claim.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "data-table": {
       "DataTableDemo": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "data-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "columns is real TanStack definition data with runtime header/cell renderers and row payment closure, not a pure type/helper. Features/useTable nearest actual table instance owns models; controlled callbacks receive actual updater functions, caller owns data/state. Demo native root ref/style/events forwards; selection uses stable payment id, filtering/sorting/pagination/visibility empty colSpan and clipboard/mailto actions preserved. Existing real table/control/updater/filter/selection/external update tests and B8 browser joint gate support finite review. No authored row motion or schema/data fetching.",
+        "evidence": "compatibility-collections.md"
       },
       "Payment": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Pure exported row/type declarations; native div and controlled TanStack state callback types resolved against actual9.3.1. Runtime columns/demo reviewed separately; no validation added.",
+        "evidence": "compatibility-collections.md"
       },
       "columns": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "data-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "columns is real TanStack definition data with runtime header/cell renderers and row payment closure, not a pure type/helper. Features/useTable nearest actual table instance owns models; controlled callbacks receive actual updater functions, caller owns data/state. Demo native root ref/style/events forwards; selection uses stable payment id, filtering/sorting/pagination/visibility empty colSpan and clipboard/mailto actions preserved. Existing real table/control/updater/filter/selection/external update tests and B8 browser joint gate support finite review. No authored row motion or schema/data fetching.",
+        "evidence": "compatibility-collections.md"
       },
       "DataTableDemoProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Pure exported row/type declarations; native div and controlled TanStack state callback types resolved against actual9.3.1. Runtime columns/demo reviewed separately; no validation added.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "date-picker": {
       "DatePickerDemo": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "controlled-composition",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div rest/ref/style/events, string class. Present value including undefined remains controlled; default internal state only otherwise. Actual Popover controlled open/details and Button render composition; trigger/content callback classes evaluated caller-last, caller bags retain style/ref/events/render. Calendar bags merge before owned mode/required/selected/onSelect. Existing explicit undefined/ref cleanup, controlled selection/open details, range/disabled/localized/zoned/focus/modes and real B8 joint gate. No automatic close or validation ownership; composed motion global audit separate.",
+        "evidence": "compatibility-collections.md"
       },
       "DatePickerDemoProps": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "type",
+        "status": "reviewed-static",
+        "boundary": "Actual single/range discriminated union with DayPicker Options, Button/Popover bags and native div attrs; no runtime type DOM and no validation props.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "attachment": {
       "Attachment": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentAction": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "Button-forwarder",
+        "status": "reviewed-compatibility",
+        "boundary": "Actual inherited audited Button callbacks/style/render/ref/native events forwarded; callback class evaluates caller-last, defaults ghost/icon-xs. Existing callback/disabled/action-vs-trigger/native cleanup tests, B9 real keyboard/browser gate; caller owns upload/delete action.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentActions": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentDescription": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentMedia": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentTitle": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div/span rest incl style/events/refs; string classes caller-last. Root state/size/orientation are caller data, media variant and title pulse derive actual ancestor data attrs, no upload engine/context. Title uses continuous token opacity full/reduced and animate-none under none. Existing native attrs/default/all slots/state updates/modes/identity and B9 browser gate. No native Motion prop collision; independent live matrix separate.",
+        "evidence": "compatibility-collections.md"
       },
       "AttachmentTrigger": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native string class/object style, useRender element/function and actual mergeProps/ref semantics; type defaults button only without caller render, pinned link render remains link. New two-form capture/cancel/style/cleanup plus existing link/element merging/React19 cleanup prove finite path. Caller function must spread actual props/ref; no upload state provider or motion writer.",
+        "evidence": "compatibility-collections.md"
       }
     },
     "bubble": {
       "Bubble": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div rest/ref/events, string class/object style. Bubble token transitionDuration precedes caller style; full/reduced opacity-only, none transition-none. Parent message/bubble data attributes supply align/reaction positioning, no public context/provider. Existing default/variant/native props/stable text/nested clocks and B9 browser evidence; finite API review distinct from full-library native transition matrix.",
+        "evidence": "compatibility-collections.md"
       },
       "BubbleContent": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "useRender-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native useRender string classes/object style, element/function rendering, merged native props/events/refs. New both-form capture/cancel/style/cleanup tests plus existing click/link/render state/element ref tests; mergeProps is not itself ref merging (installed useRender owns refs). Caller renderer must spread actual props/ref. Bubble context is CSS parent attributes, not hidden React provider.",
+        "evidence": "compatibility-collections.md"
       },
       "BubbleGroup": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div rest/ref/events, string class/object style. Bubble token transitionDuration precedes caller style; full/reduced opacity-only, none transition-none. Parent message/bubble data attributes supply align/reaction positioning, no public context/provider. Existing default/variant/native props/stable text/nested clocks and B9 browser evidence; finite API review distinct from full-library native transition matrix.",
+        "evidence": "compatibility-collections.md"
       },
       "BubbleReactions": {
-        "kind": "unreviewed",
-        "status": "open"
+        "kind": "native-DOM",
+        "status": "reviewed-compatibility",
+        "boundary": "Native div rest/ref/events, string class/object style. Bubble token transitionDuration precedes caller style; full/reduced opacity-only, none transition-none. Parent message/bubble data attributes supply align/reaction positioning, no public context/provider. Existing default/variant/native props/stable text/nested clocks and B9 browser evidence; finite API review distinct from full-library native transition matrix.",
+        "evidence": "compatibility-collections.md"
       }
     }
   }

@@ -22,7 +22,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await input.fill("retain me");
         await input.evaluate((el) => ((window as unknown as { sidebarInput: Element }).sidebarInput = el));
         for (const side of ["left", "right"]) {
-          await preview.getByRole("combobox", { name: /^Side/ }).selectOption(side);
+          await preview.getByRole("combobox", { name: "Side", exact: true }).selectOption(side);
           for (const collapse of ["offcanvas", "icon"]) {
             await preview.getByLabel("Collapse mode").selectOption(collapse);
             await preview.getByRole("button", { name: "Expand", exact: true }).click();
@@ -70,7 +70,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await page.emulateMedia({ reducedMotion });
         await motion.selectOption(mode);
         for (const variant of ["sidebar", "floating", "inset"]) {
-          await preview.getByLabel("Variant").selectOption(variant);
+          await preview.getByRole("combobox", { name: "Variant", exact: true }).selectOption(variant);
           await preview.getByRole("button", { name: "Expand", exact: true }).click();
           expect(await panel.evaluate((el) => el.getBoundingClientRect().width)).toBeGreaterThan(200);
         }

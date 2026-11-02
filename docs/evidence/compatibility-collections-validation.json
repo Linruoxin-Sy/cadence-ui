@@ -1,0 +1,246 @@
+{
+  "date": "2026-11-02 Asia/Shanghai",
+  "runtimeSource": "4d34639",
+  "previousRuntime": "c53c55a",
+  "pin": "96da9cc7f1aa10580a3741664e2a77c721206c00",
+  "scope": "Finite API/context review only; global runtime matrices and initial-JS budget remain OPEN.",
+  "inventoryUnchanged": true,
+  "onlyPreviouslyOpenLedgerRowsChanged": 93,
+  "items": 58,
+  "exports": 466,
+  "classification": {
+    "reviewed-compatibility": 342,
+    "reviewed-static": 124,
+    "open": 0,
+    "historical-bounded": 0
+  },
+  "reviewedItems": {
+    "accordion": {
+      "exports": ["Accordion", "AccordionItem", "AccordionTrigger", "AccordionContent"],
+      "sourceSha256": "3ee349b4d56faaead66cd710456c66d6fd019711473ebede6a0275160cffac58"
+    },
+    "collapsible": {
+      "exports": ["Collapsible", "CollapsibleTrigger", "CollapsibleContent"],
+      "sourceSha256": "c75cb696d8b383480f1c0b21919518cbff186c5110f69ac389d41d5743ab3827"
+    },
+    "tabs": {
+      "exports": ["Tabs", "TabsList", "TabsContent", "TabsTrigger", "tabsListVariants"],
+      "sourceSha256": "6667b08c8c9072e35bb9d2b5bd528ef47eac9a1741db8552a0d958c44225f2c5"
+    },
+    "table": {
+      "exports": [
+        "Table",
+        "TableBody",
+        "TableCaption",
+        "TableCell",
+        "TableFooter",
+        "TableHead",
+        "TableHeader",
+        "TableRow"
+      ],
+      "sourceSha256": "2c04a4696206dbd637f2ac4f2e94df6675b11ac802d69b0eb6bc2bec4d041908"
+    },
+    "carousel": {
+      "exports": [
+        "Carousel",
+        "CarouselContent",
+        "CarouselItem",
+        "CarouselNext",
+        "CarouselPrevious",
+        "CarouselApi",
+        "useCarousel"
+      ],
+      "sourceSha256": "8b8e163b8e156393db128a868fc974c4fb47bab449e5f063ed2db6c074615bb1"
+    },
+    "scroll-area": {
+      "exports": ["ScrollArea", "ScrollBar"],
+      "sourceSha256": "5016d881deef00b8c38aafebf19b9af1ad1264cfabcf7f16008405ae288c8cb4"
+    },
+    "chart": {
+      "exports": [
+        "ChartConfig",
+        "ChartContainer",
+        "ChartLegend",
+        "ChartTooltip",
+        "ChartStyle",
+        "ChartLegendContent",
+        "ChartTooltipContent"
+      ],
+      "sourceSha256": "3ebcace2ed433d7fb71415c9679d58151a91fc35379fb202bd3cdb55e607820c"
+    },
+    "calendar": {
+      "exports": ["Calendar", "CalendarDayButton"],
+      "sourceSha256": "1f24111e6a89dcd7c570f751c3cfe7f41d30e1b754987f01714efba9cb10e333"
+    },
+    "navigation-menu": {
+      "exports": [
+        "NavigationMenu",
+        "NavigationMenuPositioner",
+        "NavigationMenuContent",
+        "NavigationMenuIndicator",
+        "NavigationMenuItem",
+        "NavigationMenuLink",
+        "NavigationMenuList",
+        "NavigationMenuTrigger",
+        "navigationMenuTriggerStyle"
+      ],
+      "sourceSha256": "e9a4d81f12646843c4876b0be19c21965df557129b2c54b9edf84347ffe1f513"
+    },
+    "resizable": {
+      "exports": ["ResizableHandle", "ResizablePanel", "ResizablePanelGroup"],
+      "sourceSha256": "c1d3cfdd67b3814e3d1677b7049770c2528a892ce769d86094e6d62915ea69b5"
+    },
+    "sidebar": {
+      "exports": [
+        "Sidebar",
+        "SidebarInput",
+        "SidebarSeparator",
+        "SidebarTrigger",
+        "SidebarProvider",
+        "useSidebar",
+        "SidebarGroupAction",
+        "SidebarGroupLabel",
+        "SidebarMenuAction",
+        "SidebarMenuButton",
+        "SidebarMenuSubButton",
+        "SidebarContent",
+        "SidebarFooter",
+        "SidebarGroup",
+        "SidebarGroupContent",
+        "SidebarHeader",
+        "SidebarInset",
+        "SidebarMenu",
+        "SidebarMenuBadge",
+        "SidebarMenuItem",
+        "SidebarMenuSkeleton",
+        "SidebarMenuSub",
+        "SidebarMenuSubItem",
+        "SidebarRail"
+      ],
+      "sourceSha256": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5"
+    },
+    "data-table": {
+      "exports": ["Payment", "DataTableDemoProps", "columns", "DataTableDemo"],
+      "sourceSha256": "53a400f1082823da69377bf567c07ff76f0531cfb06bed7a4a042d885774584c"
+    },
+    "date-picker": {
+      "exports": ["DatePickerDemoProps", "DatePickerDemo"],
+      "sourceSha256": "74005a7fddf6d3635c16b335e5a7505ec32f16e176440146eab9a274b5c861b6"
+    },
+    "attachment": {
+      "exports": [
+        "Attachment",
+        "AttachmentActions",
+        "AttachmentContent",
+        "AttachmentDescription",
+        "AttachmentGroup",
+        "AttachmentMedia",
+        "AttachmentTitle",
+        "AttachmentAction",
+        "AttachmentTrigger"
+      ],
+      "sourceSha256": "90fd99e09d18113812ee12dd38fb3096ad6ff084d458e0f2a60ac4b0a41e5771"
+    },
+    "bubble": {
+      "exports": ["Bubble", "BubbleGroup", "BubbleReactions", "BubbleContent"],
+      "sourceSha256": "9f039663c62ead1c4ced2ffad1dc3f665922e71e46263838d3e1d61709d2668d"
+    }
+  },
+  "counterexamples": {
+    "log": ".cache/compat-final-counterexamples.log",
+    "oldSource": "438a716",
+    "failed": 9,
+    "passed": 11,
+    "fixedTargetedPassed": 20
+  },
+  "authorityCheck": {
+    "log": ".cache/compat-final-authority-check.log",
+    "tests": 675,
+    "files": 86,
+    "exit": 0,
+    "durationSeconds": 87.26,
+    "command": "VITEST_MAX_FORKS=2 VITEST_MIN_FORKS=1 pnpm registry:build then pnpm check",
+    "registryLog": ".cache/compat-final-authority-registry.log"
+  },
+  "productionBuild": {
+    "directory": ".next-compat-final",
+    "log": ".cache/compat-final-authority-next.log",
+    "exit": 0,
+    "config": "RAYON_NUM_THREADS=2 NODE_OPTIONS=--max-old-space-size=768",
+    "tsconfig": "Generated format/include-only diff inspected, saved .cache/compat-final-authority-tsconfig.diff and restored only this run change."
+  },
+  "browser": {
+    "channel": "msedge",
+    "port": 3162,
+    "workers": 2,
+    "reports": {
+      "compat-final-browser": {
+        "startTime": "2026-11-02T00:48:29.772Z",
+        "duration": 79796.029,
+        "expected": 35,
+        "skipped": 0,
+        "unexpected": 7,
+        "flaky": 0
+      },
+      "compat-final-sidebar-browser": {
+        "startTime": "2026-11-02T00:50:19.428Z",
+        "duration": 99962.25799999999,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "compat-final-sidebar-exact-browser": {
+        "startTime": "2026-11-02T00:52:15.493Z",
+        "duration": 16935.653,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 6,
+        "flaky": 0
+      },
+      "compat-final-sidebar-authority-browser": {
+        "startTime": "2026-11-02T00:53:02.856Z",
+        "duration": 14960.401,
+        "expected": 8,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      },
+      "compat-final-visual-browser": {
+        "startTime": "2026-11-02T00:54:02.679Z",
+        "duration": 26647.651,
+        "expected": 14,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    "uniqueBehaviorCasesPassed": 41,
+    "strictBudgetFailed": 1,
+    "corrections": "Original Sidebar /^Side/ and getByLabel(Variant) collided with added Sidebar variant selector. Whitespace attempt did not match actual accessible name Side. Final exact role/name Side and Variant fixes preserve all assertions/timeouts.",
+    "screenshots": "18 PNGs individually inspected in 3 six-image review sheets in .cache/compat-final-proof; final visual rerun14 cases all pass (axe grep also matches carousel axes titles). Sidebar8/8 includes both responsive axe cases; no disabled rules.",
+    "limits": "Historical unmodified B6-B9 paths reused per ledger. No whole-library running motion or arbitrary caller-renderer certification."
+  },
+  "budget": {
+    "evidence": "compatibility-collections-js.json",
+    "gzipBytes": 292267,
+    "scripts": 23,
+    "limit": 120000,
+    "result": "FAIL",
+    "allHttp200": true,
+    "pageErrors": [],
+    "protocol": "fresh Edge/cache disabled/no interaction/networkidle+10s+networkidle; all automatic async/prefetch script bodies gzip6; manifest/root body hashes checked by original test"
+  },
+  "postBrowserTypes": {
+    "log": ".cache/compat-final-post-browser-types.log",
+    "exit": 0
+  },
+  "remaining": [
+    "Per-page initial JS budget solution across complete shell and all applicable routes especially Chart/Calendar/CodeBlock",
+    "All-library CSS popup nested clocks, none first paint, live cancellation and full-to-reduced geometry removal retaining opacity",
+    "All-library Motion same-target mode/clock cancellation, nested full and none first paint",
+    "Disabled-during-held-press visual cancellation",
+    "c53c55a passive ControlAnimation/OTP external asynchronous controlled value/mode/clock first-paint probe (not a proven defect)",
+    "Final whole-goal requirements audit"
+  ]
+}
