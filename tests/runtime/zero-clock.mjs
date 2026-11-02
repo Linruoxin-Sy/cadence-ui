@@ -71,6 +71,8 @@ try {
       assert.equal(paints.length, 2);
       for (const s of paints) {
         assert.equal(s.value, target);
+        assert.equal(s.transform, target === 0 ? "none" : `translateX(${target}px)`);
+        assert.equal(s.state, "idle");
         assert.equal(s.mode, "full");
         assert.equal(s.reduced, false);
         assert.equal(s.disabled, false);
@@ -140,6 +142,7 @@ try {
   for (const sample of cleanup.stopped.frames) assert.equal(sample.value, cleanup.stopped.value);
   assert.equal(cleanup.running, false);
   assert.equal(cleanup.value, cleanup.stopped.value);
+  report.rawSamples = await page.evaluate(() => window.clockSamples);
   assert.equal(currentSource, readFileSync("registry/cadence/lib/motion.ts", "utf8"));
 } catch (e) {
   report.failures.push(e.stack);

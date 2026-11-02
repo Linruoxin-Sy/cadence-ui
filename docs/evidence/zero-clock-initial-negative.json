@@ -19,12 +19,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -42,12 +37,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -65,12 +55,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -94,12 +79,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(4.00161px)"
@@ -117,12 +97,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -140,12 +115,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -169,12 +139,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -192,12 +157,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -215,12 +175,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -244,12 +199,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -267,12 +217,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -290,12 +235,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -319,12 +259,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -342,12 +277,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -365,12 +295,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -646,12 +571,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(27.5019px)"
@@ -669,12 +589,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -692,12 +607,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -721,12 +631,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -744,12 +649,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -767,12 +667,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -796,12 +691,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -819,12 +709,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "none"
@@ -842,12 +727,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "none"
@@ -871,12 +751,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "none"
@@ -894,12 +769,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -917,12 +787,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -946,12 +811,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(87.1489px)"
@@ -969,12 +829,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -992,12 +847,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -1021,12 +871,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -1044,12 +889,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -1067,12 +907,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -1096,12 +931,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -1119,12 +949,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "none"
@@ -1142,12 +967,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "none"
@@ -1171,12 +991,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "none"
@@ -1194,12 +1009,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -1217,12 +1027,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.7,
-              0,
-              0.84,
-              0
-            ],
+            "ease": [0.7, 0, 0.84, 0],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2026,12 +1831,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(0.49312px)"
@@ -2049,12 +1849,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2072,12 +1867,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2101,12 +1891,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2124,12 +1909,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2147,12 +1927,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2176,12 +1951,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2199,12 +1969,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -2222,12 +1987,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -2251,12 +2011,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -2274,12 +2029,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2297,12 +2047,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2830,12 +2575,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(2.02084px)"
@@ -2853,12 +2593,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2876,12 +2611,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2905,12 +2635,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2928,12 +2653,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2951,12 +2671,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -2980,12 +2695,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3003,12 +2713,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3026,12 +2731,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3055,12 +2755,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3078,12 +2773,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3101,12 +2791,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3130,12 +2815,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(11.5892px)"
@@ -3153,12 +2833,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3176,12 +2851,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3205,12 +2875,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3228,12 +2893,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3251,12 +2911,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3280,12 +2935,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3303,12 +2953,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3326,12 +2971,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3355,12 +2995,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3378,12 +3013,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3401,12 +3031,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3430,12 +3055,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(9.93395px)"
@@ -3453,12 +3073,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3476,12 +3091,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3505,12 +3115,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3528,12 +3133,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3551,12 +3151,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3580,12 +3175,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3603,12 +3193,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3626,12 +3211,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3655,12 +3235,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -3678,12 +3253,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3701,12 +3271,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -3982,12 +3547,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(0.868967px)"
@@ -4005,12 +3565,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4028,12 +3583,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4057,12 +3607,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4080,12 +3625,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4103,12 +3643,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4132,12 +3667,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4155,12 +3685,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -4178,12 +3703,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -4207,12 +3727,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "none"
@@ -4230,12 +3745,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -4253,12 +3763,7 @@
           "clock": 4,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -5722,12 +5227,7 @@
           "clock": 1,
           "transition": {
             "duration": 0.22,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0.3
           },
           "transform": "translateX(8.05014px)"
@@ -5745,12 +5245,7 @@
           "clock": 1,
           "transition": {
             "duration": 0.22,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0.3
           },
           "transform": "translateX(21.4672px)"
@@ -5768,12 +5263,7 @@
           "clock": 1,
           "transition": {
             "duration": 0.22,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0.3
           },
           "transform": "translateX(33.7342px)"
@@ -5797,12 +5287,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(33.7342px)"
@@ -5820,12 +5305,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -5843,12 +5323,7 @@
           "clock": 0,
           "transition": {
             "duration": 0,
-            "ease": [
-              0.22,
-              1,
-              0.36,
-              1
-            ],
+            "ease": [0.22, 1, 0.36, 1],
             "delay": 0
           },
           "transform": "translateX(100px)"
@@ -5985,7 +5460,5 @@
     "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(Math.abs(held - 0.97) < 0.00001)\n\n    at file:///D:/Code/Project/cadence-ui/tests/runtime/zero-clock.mjs:123:5",
     "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///D:/Code/Project/cadence-ui/tests/runtime/zero-clock.mjs:139:10"
   ],
-  "warnings": [
-    "Failed to load resource: the server responded with a status of 404 (Not Found)"
-  ]
+  "warnings": ["Failed to load resource: the server responded with a status of 404 (Not Found)"]
 }
