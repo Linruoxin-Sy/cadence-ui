@@ -1,0 +1,95 @@
+{
+  "measuredSource": "4fe1a515903fafaca11e1c5f7143d054435fb0fd",
+  "environment": {
+    "nodeHeapMB": 768,
+    "rayonThreads": 2,
+    "vitestPool": "forks",
+    "maxWorkers": 2,
+    "minWorkers": 1
+  },
+  "checks": [
+    {
+      "command": "pnpm typecheck",
+      "exit": 0
+    },
+    {
+      "command": "pnpm lint",
+      "exit": 0
+    },
+    {
+      "command": "pnpm registry:check",
+      "exit": 0
+    },
+    {
+      "command": "pnpm parity:check",
+      "exit": 0
+    },
+    {
+      "command": "pnpm exec vitest run --pool=forks --maxWorkers=2 --minWorkers=1",
+      "exit": 0,
+      "files": 88,
+      "tests": 724
+    }
+  ],
+  "prototype": {
+    "command": "node scripts/prototype-button-route.mjs",
+    "exit": 1,
+    "status": "FAIL_BUDGET_AND_MOBILE_INTERACTION_CLS",
+    "gzipBytes": 221511,
+    "mobileCLS": 0.04020317268122824
+  },
+  "registryBuild": "not run; no shipped source/content/registry changes",
+  "logs": {
+    "file": "docs/evidence/button-route-prototype-logs.json.gz",
+    "bytes": 62340,
+    "gzipBytes": 13558,
+    "sha256": "e8b3c164688bb0239eeddf1fb36b121c8f6c77e0c37d376556beb188f0c96622",
+    "entries": [
+      {
+        "name": "button-prototype-final-control.log",
+        "bytes": 1520,
+        "sha256": "234f294c5d33e6c543f568946e0926bab6f39d0df50dad27f927a52f8f7d2469"
+      },
+      {
+        "name": "button-prototype-final-fresh.log",
+        "bytes": 1521,
+        "sha256": "d313a21607d609a5cfb426ef08c21b72c61c1a45d0db629817856b9e9412bab1"
+      },
+      {
+        "name": "button-prototype-final-settled.log",
+        "bytes": 1520,
+        "sha256": "a6cb7aba9c1e8b3ec1f6e96550f4f2379a552676cd36a323b04bacf6041d65a2"
+      },
+      {
+        "name": "button-prototype-final.log",
+        "bytes": 1395,
+        "sha256": "c36af34f3c44798bd84e74becf62343dd3845462ff4911c4ba4c15639b69b137"
+      },
+      {
+        "name": "button-prototype-lint.log",
+        "bytes": 14413,
+        "sha256": "924f7fd5e9a12a8dba4d74fcc51463f51e19162f453e55dfb17df6ba87269d24"
+      },
+      {
+        "name": "button-prototype-parity.log",
+        "bytes": 340,
+        "sha256": "0788cc4a349850255db12ffabbd005dfa1d3eac9fd68ba9e4991eea27f17292a"
+      },
+      {
+        "name": "button-prototype-registry.log",
+        "bytes": 222,
+        "sha256": "fffe63e45ec0e98ee3148e703f53036abe3152a6f1ee0c6f7e753904ce723702"
+      },
+      {
+        "name": "button-prototype-typecheck.log",
+        "bytes": 77,
+        "sha256": "684c5d75aa23beb46335894a79d7f32f9984537461f1687c255322f711f65651"
+      },
+      {
+        "name": "button-prototype-vitest.log",
+        "bytes": 24778,
+        "sha256": "4ebe6c35c441179fe702a74b09728812bc318e4395dd6b0d875034fb7cfe571f"
+      }
+    ]
+  }
+}
