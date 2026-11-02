@@ -4,12 +4,13 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
-import { animate, motion, useMotionValue } from "motion/react";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import * as React from "react";
 import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
 import { cn } from "../lib/cn";
 import { ControlSpan, NativeControlDiv } from "../lib/control-animation";
+import { clampMeasuredSize } from "../lib/geometry";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
@@ -716,6 +717,8 @@ function CodeBlockContent({
   React.useImperativeHandle(ref, () => preRef.current as HTMLPreElement, []);
   const viewportRef = React.useRef<HTMLDivElement>(null);
   const height = useMotionValue(0);
+  const floor = React.useRef(0);
+  const renderedHeight = useTransform(height, (value) => clampMeasuredSize(value, floor.current));
   const [measured, setMeasured] = React.useState(false);
 
   const maxLines = block?.maxLines;
@@ -744,10 +747,11 @@ function CodeBlockContent({
       // boundary. `floor` keeps a fractional line height from spilling the same way.
       const foldedHeight = Number.isFinite(lineHeight) ? top + Math.floor(lineHeight * maxLines) : full;
       const target = Math.min(folded ? foldedHeight : full, full);
+      floor.current = Math.min(foldedHeight, full);
 
       setOverflowing?.(full - foldedHeight > 1);
 
-      if (!measured) {
+      if (!measured || cm.transition("geometry.resize").duration === 0) {
         // First measurement is static. Write the fold before paint because Motion
         // flushes the motion value next frame; showing full height first causes CLS.
         height.jump(target);
@@ -765,12 +769,14 @@ function CodeBlockContent({
     return () => observer.disconnect();
   }, [cm, folded, height, maxLines, measured, setOverflowing]);
 
+  useIsomorphicLayoutEffect(() => () => height.stop(), [height]);
+
   return (
     <motion.div
       ref={viewportRef}
       data-slot="code-block-viewport"
       data-motion={cm.mode}
-      style={measured ? { height } : undefined}
+      style={measured ? { height: renderedHeight } : undefined}
       className="min-h-0 overflow-hidden"
     >
       <pre

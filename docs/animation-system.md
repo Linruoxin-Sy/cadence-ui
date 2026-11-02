@@ -433,6 +433,8 @@ useLayoutEffect(() => {
 
 Select's portal handoff owns committed controls for its flight target and clock; a zero clock completes the handoff before paint, restoring value opacity and removing the clone. Unmount cancels its driver through the same control owner.
 
+CodeBlock clamps the rendered viewport height with `clampMeasuredSize` against its measured closed size. Zero-duration geometry jumps and synchronously writes the target; unmount stops the owned height MotionValue.
+
 Measured MotionValue owners subscribe to the effective recipe clock even when the measured target is unchanged. A zero clock jumps and writes the same terminal size before paint; observer and driver cleanup belong to the owner. Initial measurement stays static.
 
 #### `state.morph` (control indicators: tick, dot, thumb)
