@@ -69,6 +69,12 @@ export function PressButton({
 }: ComponentProps<"button"> & Pick<MotionProps, "whileTap" | "transition">) {
   const [pressed, setPressed] = useState(false);
   const disabled = props.disabled || props["aria-disabled"] === true || props["aria-disabled"] === "true";
+  const enabled = !disabled && !!whileTap;
+  useCommittedEffect(() => {
+    // Native disabled can swallow pointerup. Cancel this visual gesture rather
+    // than reviving it when the same button is enabled again.
+    if (!enabled) setPressed(false);
+  }, [enabled]);
   const pressScale = typeof whileTap === "object" && "scale" in whileTap ? whileTap.scale : 1;
   const controls = useControlAnimation(
     { scale: pressed && !disabled && typeof pressScale === "number" ? pressScale : 1 },
@@ -79,7 +85,9 @@ export function PressButton({
       {...props}
       initial={false}
       animate={controls}
-      onTapStart={() => setPressed(true)}
+      onTapStart={() => {
+        if (enabled) setPressed(true);
+      }}
       onTap={() => setPressed(false)}
       onTapCancel={() => setPressed(false)}
       nativeRef={ref}

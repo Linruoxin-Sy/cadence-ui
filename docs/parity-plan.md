@@ -2105,3 +2105,9 @@ assertions; source0a97033 then genuinely failed2/6 cells (none, both OS): old wi
 survived one frame after the natural label became37.171875. Reduced/none now render
 intrinsic width; full retains measured physics. Source negatives are preserved in
 engine-select-width.json. Final production scoped proof follows in the handoff.
+
+Held press recovery: a real disable→pointerup→enable sequence exposed stale private
+press state on native Button/Toggle/ToggleGroupItem (focusable-disabled Button already
+received release). Clearing the cancelled visual gesture fixes re-enable without
+changing Base activation/focus. Raw negatives and final keyboard applicability follow
+in the engine-runtime handoff. No whole-library runtime or performance closure.

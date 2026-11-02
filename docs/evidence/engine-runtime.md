@@ -49,6 +49,18 @@ same-target/reduced glyph failures. These are actual-source negative controls.
 No getAnimations-only inference is used for JS-driven scale/rotation: raw numerical
 computed matrices are compared across the commit and paint samples.
 
+`tests/runtime/press-reenable.mjs` additionally drives real pointer and Enter-held
+presses on the four actual button paths. Native disabled swallows pointerup, which
+previously revived scale on re-enable for Button/Toggle/Group. The shared adapter
+now clears the cancelled visual gesture and ignores inactive tap starts. All8
+paths have genuine partial scale before disable and neutral scale after disable
+and re-enable; native versus focusable focus strategy is recorded, not overridden.
+Original Space samples were static and are not claimed as keyboard animation proof.
+The unit regression also first failed a none→disable→release→enable→full sequence
+(target0.97), then passed after inactive tap starts stopped storing a latent press.
+Raw records are in engine-press-reenable-negative/final.json. These supplement23,
+not an inflated full-library case count.
+
 Production `.next-motion-runtime`, Edge/msedge workers2, port3167: **93/93** passed
 before the final two bounded Slider/copy-scale repairs. Breakdown: B3 48, B5 indicator/
 Select12, Calendar6, Carousel7, Chart6, Tabs6, Sidebar6, actual DocumentEntrance2.

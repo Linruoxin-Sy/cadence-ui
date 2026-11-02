@@ -232,6 +232,8 @@ The same adapter owns CodeBlock's floating Actions, copy glyphs and expand orien
 an unchanged target must still cancel/retarget when its mode or clock changes.
 Press buttons use Motion's tap lifecycle to drive this adapter, and disabled/aria-disabled
 or a removed press recipe resolves the scale immediately to one without replacing the button.
+It also clears the private held gesture: native disabled can swallow pointerup, so
+re-enabling the button must not revive that cancelled press. Base owns focus/activation.
 Slider uses Base's dragging state, rather than tap, and likewise resolves a disabled thumb
 to scale one with a zero clock. CodeBlock copy glyphs explicitly snap scale under reduced.
 Select's measured value uses intrinsic `width: auto` in reduced/none. Base can commit

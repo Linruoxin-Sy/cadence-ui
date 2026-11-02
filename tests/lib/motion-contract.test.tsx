@@ -38,6 +38,38 @@ describe("expectMotionContract", () => {
     );
     expect(() => expectMotionContract("none")).toThrow(/zero clock/);
   });
+  it("does not revive a disabled press when the same button is enabled again", () => {
+    const draw = (disabled: boolean) => (
+      <CadenceProvider mode="full">
+        <Button disabled={disabled}>Press</Button>
+      </CadenceProvider>
+    );
+    const { container, rerender } = render(draw(false));
+    const node = container.querySelector("button");
+    const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
+    if (!button) throw new Error("real Button Motion host missing");
+    const controls = button.animate as object;
+    act(() => (button.onTapStart as () => void)());
+    expect(controlSamples.get(controls)?.target).toEqual({ scale: scale.press });
+    rerender(draw(true));
+    expect(controlSamples.get(controls)?.target).toEqual({ scale: 1 });
+    rerender(draw(false));
+    expect(controlSamples.get(controls)?.target).toEqual({ scale: 1 });
+    expect(container.querySelector("button")).toBe(node);
+    const off = (disabled: boolean) => (
+      <CadenceProvider mode="none">
+        <Button disabled={disabled}>Press</Button>
+      </CadenceProvider>
+    );
+    rerender(off(false));
+    const inactive = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
+    if (!inactive) throw new Error("real Button Motion host missing");
+    act(() => (inactive.onTapStart as () => void)());
+    rerender(off(true));
+    rerender(off(false));
+    rerender(draw(false));
+    expect(controlSamples.get(controls)?.target).toEqual({ scale: 1 });
+  });
   it("allows an instant decorative orientation but rejects its animated downgrade", () => {
     const { rerender } = render(
       <motion.span
