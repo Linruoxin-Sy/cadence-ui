@@ -1,0 +1,37 @@
+{
+  "sourceHashes": {
+    "select": "48ed51ccb5ba23a432dfea0dbc2817f36617edb3489c46d16c1c005b9d68510f",
+    "code-block": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+    "sidebar": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
+    "calendar": "1f24111e6a89dcd7c570f751c3cfe7f41d30e1b754987f01714efba9cb10e333",
+    "tabs": "6667b08c8c9072e35bb9d2b5bd528ef47eac9a1741db8552a0d958c44225f2c5"
+  },
+  "cases": 330,
+  "failures": [
+    "select/full/no-preference/same target inherited clock zero: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "select/full/no-preference/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "code/full/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n-147.861 !== 0\n",
+    "code/full/no-preference/async downgrade none: Expected values to be strictly equal:\n\n-145.848 !== 0\n",
+    "calendar/full/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n0.251697 !== 1\n",
+    "tabs/full/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n-221.738 !== 0\n",
+    "select/reduced/no-preference/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "calendar/reduced/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n0.396844 !== 1\n",
+    "calendar/reduced/no-preference/explicit zero same target: Expected values to be strictly equal:\n\n1 !== 0\n",
+    "select/none/no-preference/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "select/full/reduce/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "calendar/full/reduce/same target inherited clock zero: Expected values to be strictly equal:\n\n0.373665 !== 1\n",
+    "calendar/full/reduce/explicit zero same target: Expected values to be strictly equal:\n\n1 !== 0\n",
+    "select/reduced/reduce/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "calendar/reduced/reduce/same target inherited clock zero: Expected values to be strictly equal:\n\n0.396181 !== 1\n",
+    "calendar/reduced/reduce/explicit zero same target: Expected values to be strictly equal:\n\n1 !== 0\n",
+    "select/none/reduce/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n"
+  ],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-geometry-initial.json.gz",
+    "bytes": 5123731,
+    "gzipBytes": 133381,
+    "sha256": "eb80245b67d694f8001088a4ea5649180c1bdf4c63ee55cb40f379609a710226",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView } from "motion/react";
-import { type ReactNode, type RefObject, useRef, useState } from "react";
+import { type ReactNode, type RefObject, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useControlAnimation } from "@/registry/cadence/lib/control-animation";
 import { distance, duration, ease } from "@/registry/cadence/lib/motion";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
@@ -117,7 +117,12 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
     : { ...entrance, clipPath: clip };
 
   const show = cm.disabled || inView;
-  const target = show ? (settled ? RESTING : shown) : hidden;
+  const instant = cm.disabled || cm.timeScale === 0;
+  const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+  useCommittedEffect(() => {
+    if (show && instant) setSettled(true);
+  }, [show, instant]);
+  const target = show ? (settled || instant ? RESTING : shown) : hidden;
   const activeTransition = show ? (settled ? { duration: 0 } : transition) : { duration: 0 };
   const controls = useControlAnimation(target, activeTransition);
 

@@ -278,6 +278,8 @@ transform duration. The same panel and its children survive desktop toggles and 
 Mobile delegates enter/exit to Sheet; button, tooltip and skeleton children retain their own recipes.
 No new geometry engine or measured resize recipe is introduced.
 
+Sidebar's scalar owner jumps at zero clock (resetting velocity), stops its MotionValue as well as its returned handle on cleanup, and guards detached `onUpdate` writes.
+
 ### 3.0.1 Bubble surface entry
 
 Bubble uses the one-shot `data.transition` recipe for opacity-only entry through
@@ -429,6 +431,10 @@ useLayoutEffect(() => {
 
 > Detail: the outgoing element must leave the document flow via `popLayout`, otherwise it stretches the container back to the old width. `ResizeObserver` only fires when content size changes, so it does not fight the animation (the animation changes the outer slot's width). Clamp the _rendered_ width with `clampMeasuredSize(width, closedWidth)`: a physics-defined spring can cross its target once when it inherits velocity, and half a pixel under the new label is enough to ellipsize it.
 
+Select's portal handoff owns committed controls for its flight target and clock; a zero clock completes the handoff before paint, restoring value opacity and removing the clone. Unmount cancels its driver through the same control owner.
+
+Measured MotionValue owners subscribe to the effective recipe clock even when the measured target is unchanged. A zero clock jumps and writes the same terminal size before paint; observer and driver cleanup belong to the owner. Initial measurement stays static.
+
 #### `state.morph` (control indicators: tick, dot, thumb)
 
 State indicators must cancel an active animation when the effective mode or clock changes,
@@ -490,6 +496,8 @@ new end, with `{ duration: 0 }`: position is information, the animation is not.
 > do not render the animated indicator (apply the background via `className` or a static, aria-hidden
 > indicator instead). Handle the branch explicitly: MotionConfig's transform downgrade alone is not
 > the component contract.
+
+A zero recipe clock also uses the static decorative indicator branch. Removing a `layoutId` from an existing Motion element does not itself cancel its active projection; reduced/none must render the static branch, preserving the interactive tab and panel identities.
 
 #### `gesture.drag` (bottom sheet)
 
@@ -595,6 +603,8 @@ three modes × system preferences, correct final position, reversal, drag releas
 loop/options, plugins/API, dynamic slides and resize. Engine internals are pinned to 8.6.0 and must
 be reviewed on upgrade. CSS-only computed transition assertions alone cannot prove this engine.
 
+Embla's existing active-engine cancellation runs in the committed layout phase for reduced/none and a zero clock, so no old trajectory survives the first paint.
+
 ### 3.1.2 `data.transition` for Recharts data geometry
 
 Chart uses Recharts 3.10.1's public AnimationControllerProvider. The cause is a series entering or
@@ -608,7 +618,7 @@ series animationDuration, animationBegin and animationEasing cannot extend or by
 isAnimationActive=false still opts out. Reduced and none complete geometry immediately: fading
 an entire chart would obscure comparison, so neither adds an opacity fallback. Static positional
 SVG transforms remain in every mode because they encode data coordinates, not animation.
-A running downgrade completes every registered animation without remounting the chart. Updates
+Recharts starts controllers in a passive effect. For its eight installed series, Cadence also supplies a terminal `animationInterpolateFn` in reduced/none or at zero clock, so their first rendered data geometry does not depend on that passive callback. Traversal preserves element types and keys, custom shapes and other props; full mode preserves the caller interpolator, and instantaneous modes call a custom interpolator at its terminal progress. A running downgrade or zero recipe clock completes every registered animation without remounting the chart. Positive live clock changes integrate subsequent frame deltas against the current token duration, preserving numeric progress. Updates
 and resize must preserve axes, legend and keyboard tooltip state. No SSR replay wrapper is used.
 
 ChartTooltip disables Recharts' positional CSS animation in every mode; pointer/focus changes

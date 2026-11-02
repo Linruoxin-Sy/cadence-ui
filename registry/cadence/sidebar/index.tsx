@@ -175,18 +175,23 @@ function Sidebar({
   React.useLayoutEffect(() => {
     const element = node.current;
     if (!element || isMobile || collapsible === "none" || style?.transform !== undefined) return;
+    let active = true;
     const write = (value: number) => {
+      if (!active) return;
       element.style.transform = value === 0 ? "none" : `translateX(${value}%)`;
     };
-    if (cm.reduced) {
-      progress.set(0);
-      write(0);
+    if (cm.reduced || transition.duration === 0) {
+      const resting = cm.reduced ? 0 : target;
+      progress.jump(resting);
+      write(resting);
       return;
     }
     write(progress.get());
     const controls = animate(progress, target, { ...transition, onUpdate: write });
     return () => {
+      active = false;
       controls.stop();
+      progress.stop();
     };
     // The recipe is determined exclusively by effective mode and timeScale.
   }, [target, cm.mode, cm.timeScale, cm.reduced, isMobile, collapsible, style?.transform]);

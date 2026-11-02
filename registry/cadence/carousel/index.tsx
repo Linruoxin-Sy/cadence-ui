@@ -91,15 +91,15 @@ function Carousel({
     },
     [policy, ...(plugins ?? [])],
   );
-  React.useEffect(() => {
-    if (!api || !cm.reduced) return;
+  React.useLayoutEffect(() => {
+    if (!api || (!cm.reduced && clock !== 0)) return;
     const engine = api.internalEngine();
     // biome-ignore lint/correctness/useHookAtTopLevel: Embla engine method, not a React hook.
     engine.scrollBody.useDuration(0);
     engine.animation.update();
     engine.animation.render(1);
     engine.animation.update();
-  }, [api, cm.reduced]);
+  }, [api, cm.reduced, clock]);
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
 

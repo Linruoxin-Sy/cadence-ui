@@ -201,7 +201,7 @@ function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
   const { mode, reduced, timeScale } = cm;
   const transition = cm.transition("data.transition");
   // biome-ignore lint/correctness/useExhaustiveDependencies: recipe and distance derive from mode/clock; caller styles remain authoritative.
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const changed = previous.current !== month;
     const direction = month > previous.current ? 1 : -1;
     previous.current = month;

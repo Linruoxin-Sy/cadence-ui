@@ -125,53 +125,56 @@ describe("Chart", () => {
     expect(container.querySelector("style")).toBeNull();
     expect(container.textContent).toBe("");
   });
-  it("uses the token clock, cancels on downgrade and honours completion callbacks", () => {
-    const callbacks: FrameRequestCallback[] = [];
-    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
-      callbacks.push(callback);
-      return callbacks.length;
-    });
-    vi.stubGlobal("cancelAnimationFrame", vi.fn());
-    const onEnd = vi.fn();
-    const listener = vi.fn();
-    const { rerender } = render(
-      <CadenceProvider mode="full">
-        <ChartContainer config={config}>
-          <Content />
-        </ChartContainer>
-      </CadenceProvider>,
-    );
-    const handle = new JavascriptAnimation({
-      animationId: "test",
-      from: 0,
-      to: 1,
-      animationDuration: 5000,
-      animationBegin: 5000,
-      easing: (x) => x,
-      onAnimationStart: undefined,
-      onAnimationEnd: onEnd,
-    });
-    act(() => {
-      engine.controller?.({ setTimeout: () => () => {} }, handle, listener);
-      callbacks.shift()?.(0);
-      callbacks.shift()?.(110);
-    });
-    expect(listener.mock.lastCall?.[0]).toBeGreaterThan(0.5);
-    expect(listener.mock.lastCall?.[0]).toBeLessThan(1);
-    act(() =>
-      rerender(
-        <CadenceProvider mode="none">
+  it.each(["none", "zero"] as const)(
+    "uses the token clock, cancels on %s and honours completion callbacks",
+    (ending) => {
+      const callbacks: FrameRequestCallback[] = [];
+      vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+        callbacks.push(callback);
+        return callbacks.length;
+      });
+      vi.stubGlobal("cancelAnimationFrame", vi.fn());
+      const onEnd = vi.fn();
+      const listener = vi.fn();
+      const { rerender } = render(
+        <CadenceProvider mode="full">
           <ChartContainer config={config}>
             <Content />
           </ChartContainer>
         </CadenceProvider>,
-      ),
-    );
-    expect(listener).toHaveBeenLastCalledWith(1);
-    expect(onEnd).toHaveBeenCalledOnce();
-    expect(handle.getState()).toBe("completed");
-    vi.unstubAllGlobals();
-  });
+      );
+      const handle = new JavascriptAnimation({
+        animationId: "test",
+        from: 0,
+        to: 1,
+        animationDuration: 5000,
+        animationBegin: 5000,
+        easing: (x) => x,
+        onAnimationStart: undefined,
+        onAnimationEnd: onEnd,
+      });
+      act(() => {
+        engine.controller?.({ setTimeout: () => () => {} }, handle, listener);
+        callbacks.shift()?.(0);
+        callbacks.shift()?.(110);
+      });
+      expect(listener.mock.lastCall?.[0]).toBeGreaterThan(0.5);
+      expect(listener.mock.lastCall?.[0]).toBeLessThan(1);
+      act(() =>
+        rerender(
+          <CadenceProvider mode={ending === "none" ? "none" : "full"} timeScale={ending === "zero" ? 0 : 1}>
+            <ChartContainer config={config}>
+              <Content />
+            </ChartContainer>
+          </CadenceProvider>,
+        ),
+      );
+      expect(listener).toHaveBeenLastCalledWith(1);
+      expect(onEnd).toHaveBeenCalledOnce();
+      expect(handle.getState()).toBe("completed");
+      vi.unstubAllGlobals();
+    },
+  );
   it("updates context without remounting its div", () => {
     const { container, rerender } = render(
       <ChartContainer config={config}>

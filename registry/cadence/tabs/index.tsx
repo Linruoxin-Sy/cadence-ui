@@ -81,7 +81,7 @@ function TriggerSurface({
       children: (
         <>
           {state.active &&
-            (cm.reduced ? (
+            (cm.reduced || cm.timeScale === 0 ? (
               <span aria-hidden="true" data-slot="tabs-indicator" data-motion={cm.mode} className={indicatorClass} />
             ) : (
               <motion.span

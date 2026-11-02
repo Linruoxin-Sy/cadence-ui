@@ -38,6 +38,46 @@ function useChart() {
   return context;
 }
 
+const animatedSeries = new Set<unknown>([
+  RechartsPrimitive.Bar,
+  RechartsPrimitive.Line,
+  RechartsPrimitive.Area,
+  RechartsPrimitive.Pie,
+  RechartsPrimitive.Scatter,
+  RechartsPrimitive.Radar,
+  RechartsPrimitive.RadialBar,
+  RechartsPrimitive.Funnel,
+]);
+function terminalItems(items: ReadonlyArray<RechartsPrimitive.AnimationItem<unknown>> | null) {
+  return items?.flatMap((item) => (item.status === "removed" ? [] : [item.next])) ?? [];
+}
+type SeriesInterpolator = (
+  items: ReadonlyArray<RechartsPrimitive.AnimationItem<unknown>> | null,
+  progress: number,
+  layout: unknown,
+) => ReadonlyArray<unknown>;
+function chartSeries(element: React.ReactElement, instant: boolean): React.ReactElement {
+  if (element.type === RechartsPrimitive.AnimationControllerProvider) return element;
+  const child = element as React.ReactElement<{
+    children?: React.ReactNode;
+    animationInterpolateFn?: SeriesInterpolator;
+  }>;
+  const authored = child.props.animationInterpolateFn;
+  const terminal: SeriesInterpolator = authored
+    ? (items, _progress, layout) => authored(items, 1, layout)
+    : terminalItems;
+  return React.cloneElement(child, {
+    ...(animatedSeries.has(child.type) && instant ? { animationInterpolateFn: terminal } : {}),
+    ...(child.props.children !== undefined
+      ? {
+          children: React.Children.map(child.props.children, (nested) =>
+            React.isValidElement(nested) ? chartSeries(nested, instant) : nested,
+          ),
+        }
+      : {}),
+  });
+}
+
 function ChartContainer({
   id,
   className,
@@ -59,7 +99,7 @@ function ChartContainer({
   const running = React.useRef(new Set<() => void>());
   React.useLayoutEffect(() => {
     current.current = { reduced: cm.reduced, duration: clock.duration ?? 0 };
-    if (cm.reduced) for (const finish of running.current) finish();
+    if (cm.reduced || clock.duration === 0) for (const finish of running.current) finish();
   }, [cm.reduced, clock.duration]);
   const controller = React.useCallback<RechartsPrimitive.AnimationController>((_timeout, handle, listener) => {
     // Enter the active phase so complete() delivers Recharts' completion callback.
@@ -81,12 +121,14 @@ function ChartContainer({
       finish();
       return () => {};
     }
-    const duration = current.current.duration * 1000;
     const easing = cubicBezier(...ease.out);
-    let start: number | undefined;
+    let previous: number | undefined;
+    let progress = 0;
     const tick = (now: number) => {
-      start ??= now;
-      const progress = Math.min(1, (now - start) / duration);
+      const duration = current.current.duration * 1000;
+      if (duration === 0) return finish();
+      progress = Math.min(1, progress + (previous === undefined ? 0 : now - previous) / duration);
+      previous = now;
       if (progress === 1) {
         finish();
         return;
@@ -120,7 +162,7 @@ function ChartContainer({
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.AnimationControllerProvider value={controller}>
           <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
-            {children}
+            {React.isValidElement(children) ? chartSeries(children, cm.reduced || clock.duration === 0) : children}
           </RechartsPrimitive.ResponsiveContainer>
         </RechartsPrimitive.AnimationControllerProvider>
       </div>

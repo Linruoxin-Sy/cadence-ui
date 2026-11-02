@@ -496,16 +496,25 @@ function CodeBlockTab({ value, className, children, onClick, ...props }: CodeBlo
       }}
     >
       {active ? (
-        <motion.span
-          aria-hidden="true"
-          data-slot="code-block-tab-indicator"
-          data-motion={cm.mode}
-          // A shared element is the travel; under reduced motion there is no travel
-          // to keep, so the pill mounts where the selection landed.
-          layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}
-          transition={cm.reduced ? { duration: 0 } : cm.transition("layout.shared")}
-          className="absolute inset-0 rounded-sm bg-muted"
-        />
+        cm.reduced || cm.timeScale === 0 ? (
+          <span
+            aria-hidden="true"
+            data-slot="code-block-tab-indicator"
+            data-motion={cm.mode}
+            className="absolute inset-0 rounded-sm bg-muted"
+          />
+        ) : (
+          <motion.span
+            aria-hidden="true"
+            data-slot="code-block-tab-indicator"
+            data-motion={cm.mode}
+            // A shared element is the travel; under reduced motion there is no travel
+            // to keep, so the pill mounts where the selection landed.
+            layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}
+            transition={cm.reduced ? { duration: 0 } : cm.transition("layout.shared")}
+            className="absolute inset-0 rounded-sm bg-muted"
+          />
+        )
       ) : null}
       <span className="relative z-10">{children}</span>
     </button>

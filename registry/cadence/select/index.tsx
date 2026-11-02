@@ -20,7 +20,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../lib/cn";
-import { ControlSpan } from "../lib/control-animation";
+import { ControlSpan, useControlAnimation } from "../lib/control-animation";
 import { clampMeasuredSize, measureOrigin, type Origin } from "../lib/geometry";
 import { scale } from "../lib/motion";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
@@ -112,6 +112,8 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   const width = useMotionValue<number | "auto">("auto");
   const target = useRef(0);
   const floor = useRef(0);
+  const clock = JSON.stringify(cm.transition("geometry.resize"));
+  const activeClock = useRef(clock);
   const rendered = useTransform(width, (value) =>
     typeof value === "number" ? clampMeasuredSize(value, floor.current) : value,
   );
@@ -133,7 +135,10 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       if (!next) return;
       const current = width.get();
 
-      if (current === "auto" || cm.reduced) {
+      const transition = cm.transition("geometry.resize");
+      const clockChanged = activeClock.current !== clock;
+      activeClock.current = clock;
+      if (current === "auto" || cm.reduced || transition.duration === 0) {
         floor.current = 0;
         // Keep one MotionValue owner across mode changes. Switching from a
         // MotionValue to a React width prop lets queued Motion renders restore
@@ -149,15 +154,17 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       // values below the target are the animation itself; during a shrink a value
       // below the target would clip the new label, so clamp only in that direction.
       floor.current = next < current ? next : 0;
-      if (target.current === next) return;
+      if (target.current === next && !clockChanged) return;
       target.current = next;
-      animate(width, next, cm.transition("geometry.resize"));
+      animate(width, next, transition);
     };
     measure();
     const observer = new ResizeObserver(measure);
     if (host.firstElementChild) observer.observe(host.firstElementChild);
     return () => observer.disconnect();
   });
+
+  useIsomorphicLayoutEffect(() => () => width.stop(), [width]);
 
   return (
     <motion.span
@@ -268,30 +275,44 @@ function SelectTrigger({
         />
       </SelectPrimitive.Trigger>
       {flight && typeof document !== "undefined"
-        ? createPortal(
-            <motion.span
-              aria-hidden
-              data-motion={cm.mode}
-              data-slot="select-handoff"
-              initial={{ x: flight.origin.x, y: flight.origin.y }}
-              animate={{ x: 0, y: 0 }}
-              transition={cm.transition("handoff")}
-              onAnimationComplete={finish}
-              style={{
-                position: "fixed",
-                left: flight.rect.left,
-                top: flight.rect.top,
-                width: flight.rect.width,
-                height: flight.rect.height,
-              }}
-              className="pointer-events-none z-[60] flex items-center overflow-hidden text-sm whitespace-nowrap"
-            >
-              {flight.text}
-            </motion.span>,
-            document.body,
-          )
+        ? createPortal(<SelectHandoff flight={flight} onComplete={finish} />, document.body)
         : null}
     </>
+  );
+}
+
+function SelectHandoff({
+  flight,
+  onComplete,
+}: {
+  flight: { origin: Origin; text: string; rect: DOMRect };
+  onComplete: () => void;
+}) {
+  const cm = useCadenceMotion();
+  const transition = cm.transition("handoff");
+  const controls = useControlAnimation({ x: 0, y: 0 }, transition);
+  useIsomorphicLayoutEffect(() => {
+    if (transition.duration === 0) onComplete();
+  }, [transition.duration, onComplete]);
+  return (
+    <motion.span
+      aria-hidden
+      data-motion={cm.mode}
+      data-slot="select-handoff"
+      initial={{ x: flight.origin.x, y: flight.origin.y }}
+      animate={controls}
+      onAnimationComplete={onComplete}
+      style={{
+        position: "fixed",
+        left: flight.rect.left,
+        top: flight.rect.top,
+        width: flight.rect.width,
+        height: flight.rect.height,
+      }}
+      className="pointer-events-none z-[60] flex items-center overflow-hidden text-sm whitespace-nowrap"
+    >
+      {flight.text}
+    </motion.span>
   );
 }
 
