@@ -8412,7 +8412,8 @@ Custom shapes, nested animation controllers and independent CSS/WAAPI must honou
 
 ChartTooltip accepts Recharts Tooltip props; positional CSS animation is always disabled.
 ChartTooltipContent retains upstream Recharts Tooltip, default content and div prop types.
-As upstream, it consumes its listed formatting props rather than forwarding arbitrary DOM props.
+Native div attributes, styles, events and refs apply to the content root. Engine placement and
+animation metadata is not emitted as DOM attributes.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -8427,7 +8428,10 @@ As upstream, it consumes its listed formatting props rather than forwarding arbi
 
 ChartLegend is Recharts Legend. ChartLegendContent accepts default legend content + div prop
 types; consumes className, payload, nameKey, hideIcon=false, verticalAlign="bottom". Top alignment
-adds bottom padding. As upstream, arbitrary DOM props are not forwarded. ChartStyle accepts id
+adds bottom padding. Native div attributes, styles, events and refs apply to the content root.
+Legend formatter receives the resolved label, entry and index; onClick/onMouseEnter/onMouseLeave
+receive entry, index and event. Clickable entries support Tab, Enter and Space. Engine placement
+and animation options belong on ChartLegend/ChartTooltip. ChartStyle accepts id
 and config and emits nothing without configured colours. ChartConfig is a record of label/icon
 plus either color or a complete light/dark theme map. Helpers require ChartContainer context.
 
@@ -8991,7 +8995,7 @@ provide routing, permissions, or application state.
 | side | left / right | left | Physical panel edge. |
 | variant | sidebar / floating / inset | sidebar | Surface treatment. |
 | collapsible | offcanvas / icon / none | offcanvas | Hide, compact, or remain visible. |
-| dir | string | — | Mobile sheet direction, matching Base upstream. |
+| dir | string | — | Native panel direction in desktop, static and mobile layouts. |
 | className / style / ref | native | — | Desktop container; static sidebar or mobile popup respectively. |
 
 `SidebarTrigger` accepts Button props and calls caller `onClick` before toggling. `SidebarRail`
