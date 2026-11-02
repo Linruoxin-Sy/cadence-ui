@@ -109,12 +109,17 @@ describe("Select", () => {
     await waitFor(() => expect(value.style.width).toBe("160px"));
   });
 
-  it("jumps the measured width under reduced motion", async () => {
+  it("uses intrinsic reduced/none width and retains the measured value for full", async () => {
     const { container, rerender } = render(<Demo mode="reduced" />);
     const value = container.querySelector('[data-slot="select-value"]') as HTMLElement;
     Object.defineProperty(value, "scrollWidth", { configurable: true, get: () => 96 });
 
     rerender(<Demo mode="reduced" />);
+    expect(value.style.width).toBe("auto");
+    rerender(<Demo mode="none" />);
+    expect(value.style.width).toBe("auto");
+    expect(container.querySelector('[data-slot="select-value"]')).toBe(value);
+    rerender(<Demo mode="full" />);
     await waitFor(() => expect(value.style.width).toBe("96px"));
   });
 

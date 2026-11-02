@@ -381,7 +381,7 @@ for (const preference of ["no-preference", "reduce"] as const)
   test.describe(`B5 Select continuity ${preference}`, () => {
     test.use({ reducedMotion: preference });
     for (const requested of MODES)
-      test(`handoff and measured width frames, resize and live cancellation ${requested}`, async ({ page }) => {
+      test(`handoff and measured width frames, resize and live cancellation ${requested}`, async ({ page }, info) => {
         await page.goto(`/components/select?motion=${requested}&speed=0.25`);
         await page.waitForLoadState("networkidle");
         const trigger = page.getByRole("combobox", { name: "Framework", exact: true });
@@ -393,7 +393,7 @@ for (const preference of ["no-preference", "reduce"] as const)
           w.selectFrames = [];
           w.selectRecording = true;
           const tick = () => {
-            const n = document.querySelector('[data-slot="select-value"]') as HTMLElement;
+            const n = document.querySelector('[data-preview="select"] [data-slot="select-value"]') as HTMLElement;
             const text = n?.firstElementChild;
             const flight = document.querySelector('[data-slot="select-handoff"]');
             if (n && text) {
@@ -421,6 +421,10 @@ for (const preference of ["no-preference", "reduce"] as const)
           return w.selectFrames;
         });
         const expected = effectiveMode(requested, preference === "reduce");
+        await info.attach("actual-select-width-frames", {
+          body: JSON.stringify(frames),
+          contentType: "application/json",
+        });
         if (expected === "full") {
           expect(frames.some((f) => f.flight && f.moving)).toBe(true);
           expect(frames.some((f) => Math.abs(f.width - f.natural) > 1)).toBe(true);

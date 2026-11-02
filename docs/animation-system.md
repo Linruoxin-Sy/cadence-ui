@@ -234,6 +234,10 @@ Press buttons use Motion's tap lifecycle to drive this adapter, and disabled/ari
 or a removed press recipe resolves the scale immediately to one without replacing the button.
 Slider uses Base's dragging state, rather than tap, and likewise resolves a disabled thumb
 to scale one with a zero clock. CodeBlock copy glyphs explicitly snap scale under reduced.
+Select's measured value uses intrinsic `width: auto` in reduced/none. Base can commit
+new label text in its own subtree before the parent's ResizeObserver runs; a cached
+numeric width must not survive that paint. The measured motion value is still jumped
+(stopping its spring) for subsequent full-mode work, but only full renders that value.
 
 ### 3.0 Sidebar composition
 

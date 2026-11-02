@@ -2098,3 +2098,10 @@ Slider/copy-scale repairs; final-source verification and JS follow in the handof
 API466/CSS closure and old gates remain closed. Whole-library engine reconciliation,
 all-page120KB JS,48KB initial Motion runtime,8KB compiled per-component addition,
 55fps/CLS<0.02 and final whole-goal audit remain OPEN. This is no goal completion.
+
+Select follow-up: the old B5 width sampler observed the header's SelectValue, not
+Framework. Corrected to the real preview with raw-frame attachments and unchanged
+assertions; source0a97033 then genuinely failed2/6 cells (none, both OS): old width41
+survived one frame after the natural label became37.171875. Reduced/none now render
+intrinsic width; full retains measured physics. Source negatives are preserved in
+engine-select-width.json. Final production scoped proof follows in the handoff.

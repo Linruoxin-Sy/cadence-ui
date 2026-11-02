@@ -159,7 +159,7 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       ref={hostRef}
       data-slot="select-value"
       data-motion={cm.mode}
-      style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}
+      style={{ width: cm.reduced ? "auto" : rendered, opacity: context?.flying ? 0 : 1 }}
       className="relative block min-w-0 overflow-hidden whitespace-nowrap"
     >
       <SelectPrimitive.Value {...props} className={stateClasses("block w-max", className)}>

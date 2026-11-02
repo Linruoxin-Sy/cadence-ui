@@ -61,6 +61,16 @@ broken geometry/clock examples still reject violations. Explicit SSR states add9
 
 ## Exact remaining runtime work
 
+Select probe correction: the historical B5 width sampler used the global first
+SelectValue (the header speed select), not Framework. Its width samples cannot
+prove Framework geometry. The new selector is scoped to the actual preview and
+retains all original assertions, adding raw-frame attachments. It reproduced two
+none failures at source0a97033: width41 versus natural37.171875 for one frame.
+`engine-select-width.json` preserves all six scoped source cases. Reduced/none now
+render intrinsic width immediately instead of waiting for a cached measured value;
+the measured spring remains full-only and jump still stops its old driver. Final
+scoped production verification is recorded in the handoff. No assertion is weakened.
+
 Existing production suites are usable evidence for the behaviors they assert; they
 do not prove earlier first paint when they skip first samples or poll a final state.
 The following gaps keep the full Motion/engine matrix OPEN:
