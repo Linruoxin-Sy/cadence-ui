@@ -141,6 +141,16 @@ for (const [path, needle, writer, target] of [
     existingProofCandidates: [`tests/e2e/${path.split("/")[2]}.spec.ts`],
   });
 }
+const acceptancePath = "docs/evidence/engine-runtime-closure.json";
+const acceptance = existsSync(acceptancePath) ? JSON.parse(readFileSync(acceptancePath, "utf8")) : null;
+for (const record of records) {
+  if (acceptance?.status === "CLOSED_W2_FIXED_LEDGER" && acceptance.sourceHashes[record.path] === record.sourceSha256) {
+    record.status = "CLOSED W2 fixed ledger; bounded source/context proof, not universal caller certification";
+    record.remaining = [];
+    record.applicableProof =
+      "docs/evidence/engine-runtime-closure.md and engine-runtime-closure.json; actual host/phase and reuse rationale per fixed row";
+  }
+}
 writeFileSync(
   "docs/evidence/engine-writers.json",
   `${JSON.stringify({ scope: "Actual source discovery; CSS closure stays in css-lifecycle. Menubar and composite delegates inherit actual owners; no GSAP writer exists.", records }, null, 2)}\n`,

@@ -12,7 +12,7 @@ const { createServer, transformWithEsbuild } = await import(
   pathToFileURL(require.resolve("vite", { paths: [path.dirname(require.resolve("vitest/node"))] }))
 );
 const config = (await import("./vite.config.mjs")).default;
-const report = { sources: {}, cases: [], failures: [], errors: [] };
+const report = { sources: {}, cases: [], failures: [], errors: [], rawFrames: [] };
 for (const id of ["select", "code-block", "sidebar", "calendar", "tabs"]) {
   const text = readFileSync(`registry/cadence/${id}/index.tsx`, "utf8");
   report.sources[id] = { text, sha256: createHash("sha256").update(text).digest("hex") };
@@ -81,7 +81,42 @@ try {
       } catch (e) {
         report.failures.push(`${label}/zero: ${e.message}`);
       }
+      if (mode === "full" && os === "no-preference") {
+        const finishCheck = (name, samples) => {
+          try {
+            const paints = samples.filter((s) => ["paint1", "paint2"].includes(s.phase));
+            assert.equal(paints.length, 2);
+            for (const f of paints) {
+              assert(!f.parts.some((p) => p.slot === "select-handoff"));
+              assert.equal(f.parts.find((p) => p.slot === "select-value").opacity, 1);
+            }
+          } catch (e) {
+            report.failures.push(`${label}/${name}: ${e.message}`);
+          }
+        };
+        await update("explicit flight setup", { clock: 4, explicit: 8 });
+        await page.getByRole("option", { name: "B", exact: true }).click();
+        await page.waitForTimeout(60);
+        report.cases.push({
+          label,
+          name: "explicit partial flight",
+          samples: [await page.evaluate(() => window.sampleW2("explicit partial"))],
+        });
+        finishCheck("explicit zero", await update("explicit flight zero", { explicit: 0 }));
+        await update("live none setup", { explicit: 8 });
+        await page.getByRole("option", { name: "A long Framework label" }).click();
+        await page.waitForTimeout(60);
+        finishCheck("async none", await update("async flight none", { mode: "none" }));
+        await update("active cleanup setup", { mode: "full", explicit: 8 });
+        await page.getByRole("option", { name: "B", exact: true }).click();
+        await page.waitForTimeout(60);
+      }
       await update("cleanup", { mounted: false });
+      report.rawFrames.push({
+        label,
+        frames: await page.evaluate(() => window.w2frames),
+        insertions: await page.evaluate(() => window.w2insertions || []),
+      });
       await page.close();
     }
 } finally {

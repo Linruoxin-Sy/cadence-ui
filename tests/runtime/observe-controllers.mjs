@@ -9,7 +9,7 @@ export const observeControllers = {
     code = code.replace(
       head,
       `$1
-const observed = {handle, state:"running", ticks:[], updates:[], applied:[]};
+const observed = {handle, state:"running", ticks:[], updates:[], applied:[], readClock:()=>current.current};
 (window.w2controllers ??= []).push(observed);
 (window.w2controllerSets ??= new Set()).add(running.current);
 const installedListener = listener;

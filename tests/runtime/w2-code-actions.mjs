@@ -11,7 +11,7 @@ const { createServer } = await import(
   pathToFileURL(require.resolve("vite", { paths: [path.dirname(require.resolve("vitest/node"))] }))
 );
 const config = (await import("./vite.config.mjs")).default;
-const report = { sources: {}, cases: [], failures: [], errors: [] };
+const report = { sources: {}, cases: [], failures: [], errors: [], rawFrames: [] };
 for (const id of ["select", "code-block", "sidebar", "calendar", "tabs"]) {
   const text = readFileSync(`registry/cadence/${id}/index.tsx`, "utf8");
   report.sources[id] = { text, sha256: createHash("sha256").update(text).digest("hex") };
@@ -89,7 +89,7 @@ try {
         for (const f of p) assert.equal(f.parts.find((n) => n.slot === "code-block-actions").opacity, 1);
       });
       await update("restore clock", { clock: 8 });
-      const copied = await action(
+      await action(
         "real clipboard copy glyphs",
         () => page.locator("[data-slot=code-block-copy-button]").click(),
         "data-copied",
@@ -133,6 +133,11 @@ try {
       } catch (e) {
         report.failures.push(`${label}/cleanup: ${e.message}`);
       }
+      report.rawFrames.push({
+        label,
+        frames: await page.evaluate(() => window.w2frames),
+        insertions: await page.evaluate(() => window.w2insertions || []),
+      });
       await page.close();
     }
 } finally {

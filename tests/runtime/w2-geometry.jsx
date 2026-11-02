@@ -51,6 +51,11 @@ window.sampleW2 = (phase, state) => {
         y: m.f,
         transform: css.transform,
         width: r.width,
+        left: r.left,
+        top: r.top,
+        layoutWidth: n.offsetWidth,
+        parentWidth: n.parentElement?.clientWidth,
+        parentLayoutWidth: n.parentElement?.offsetWidth,
         height: r.height,
         naturalWidth: n.firstElementChild?.scrollWidth,
         naturalHeight: n.firstElementChild?.scrollHeight,
@@ -117,7 +122,9 @@ function App() {
       <K.CodeBlock maxLines={3} expanded={s.selected} tab={s.selected ? "b" : "a"} style={{ width: s.width }}>
         <K.CodeBlockTabs>
           <K.CodeBlockTab value="a">A</K.CodeBlockTab>
-          <K.CodeBlockTab value="b">Another tab</K.CodeBlockTab>
+          <K.CodeBlockTab value="b" style={{ width: s.width }}>
+            Another tab
+          </K.CodeBlockTab>
         </K.CodeBlockTabs>
         <K.CodeBlockActions>
           <K.CodeBlockCopyButton value={s.selected ? "second" : "first"} />
@@ -158,6 +165,6 @@ function App() {
 }
 const css = document.createElement("style");
 css.textContent =
-  "[data-slot=select-trigger]{display:inline-flex;position:relative}[data-slot=select-trigger]>svg{position:absolute;right:0}[data-slot=select-value]{flex:none}[data-slot=select-value]{display:block;overflow:hidden;white-space:nowrap}[data-slot=select-value]>span{display:block;width:max-content}[data-slot=code-block-viewport]{overflow:hidden}[data-slot=code-block-tabs],[data-slot=tabs-list]{display:flex;position:relative;width:500px}[data-slot=code-block-tab],[data-slot=tabs-trigger]{position:relative;width:150px;height:32px}[data-slot$=tab-indicator],[data-slot=tabs-indicator]{position:absolute;inset:0}[data-slot=sidebar-container]{width:250px;position:fixed;left:0;top:0}";
+  "[data-slot=select-trigger]{display:inline-flex;position:relative}[data-slot=select-trigger]>svg{position:absolute;right:0}[data-slot=select-value]{flex:none}[data-slot=select-value]{display:block;overflow:hidden;white-space:nowrap}[data-slot=select-value]>span{display:block;width:max-content}[data-slot=code-block-viewport]{overflow:hidden}[data-slot=code-block-tabs],[data-slot=tabs-list]{display:flex;position:relative;width:500px}[data-slot=code-block-tab],[data-slot=tabs-trigger]{position:relative;flex-shrink:0;width:150px;height:32px}[data-slot$=tab-indicator],[data-slot=tabs-indicator]{position:absolute;inset:0}[data-slot=sidebar-container]{width:250px;position:fixed;left:0;top:0}";
 document.head.append(css);
 createRoot(document.getElementById("root")).render(<App />);

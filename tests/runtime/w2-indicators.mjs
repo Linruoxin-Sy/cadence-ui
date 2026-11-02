@@ -11,7 +11,7 @@ const { createServer } = await import(
   pathToFileURL(require.resolve("vite", { paths: [path.dirname(require.resolve("vitest/node"))] }))
 );
 const config = (await import("./vite.config.mjs")).default;
-const report = { sources: {}, cases: [], failures: [], errors: [] };
+const report = { sources: {}, cases: [], failures: [], errors: [], rawFrames: [] };
 for (const id of ["dropdown-menu", "context-menu", "select", "combobox", "lib/control-animation"]) {
   const text = readFileSync(`registry/cadence/${id}${id.startsWith("lib/") ? ".tsx" : "/index.tsx"}`, "utf8");
   report.sources[id] = { text, sha256: createHash("sha256").update(text).digest("hex") };
@@ -129,6 +129,11 @@ try {
         } catch (e) {
           report.failures.push(`${label}/detached: ${e.message}`);
         }
+        report.rawFrames.push({
+          label,
+          frames: await page.evaluate(() => window.w2frames),
+          insertions: await page.evaluate(() => window.w2insertions || []),
+        });
         await page.close();
       }
 } finally {

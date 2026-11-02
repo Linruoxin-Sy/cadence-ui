@@ -13,7 +13,7 @@ const { createServer, transformWithEsbuild } = await import(
   pathToFileURL(require.resolve("vite", { paths: [path.dirname(require.resolve("vitest/node"))] }))
 );
 const config = (await import("./vite.config.mjs")).default;
-const report = { sources: {}, cases: [], failures: [], errors: [] };
+const report = { sources: {}, cases: [], failures: [], errors: [], rawFrames: [] };
 const negative = process.argv.includes("--negative");
 const sourcePaths = [
   "registry/cadence/chart/index.tsx",
@@ -130,6 +130,9 @@ try {
           JSON.stringify(
             s.parts.map((p) => ({
               d: p.d,
+              clipWidth: p.clipWidth,
+              clipHeight: p.clipHeight,
+              strokeDash: p.strokeDash,
               cx: p.cx,
               cy: p.cy,
               opacity: p.opacity,
@@ -165,13 +168,35 @@ try {
           }
         }
         await start();
-        if (kind === "chart")
-          await record("same-target positive inherited clock", { clock: 4 }, (paints) => {
+        if (kind === "chart") {
+          const clocked = await record("same-target positive inherited clock", { clock: 4 }, (paints) => {
             if (mode === "full" && os === "no-preference") {
               assert(paints[1].registered > 0);
-              assert(paints[1].controllers.some((c) => c.state === "running" && c.appliedDuration === 880));
+              const active = paints[1].controllers.filter((c) => c.state === "running");
+              assert(active.length > 0);
+              for (const c of active) assert.equal(c.configuredDuration, 880);
             }
           });
+          if (mode === "full" && os === "no-preference") {
+            const committed = clocked.find((s) => s.phase === "commit").time;
+            await page.waitForFunction(
+              (t) => window.w2controllers.some((c) => c.applied.some((a) => a.time > t)),
+              committed,
+            );
+            const applied = await page.evaluate(
+              (t) =>
+                window.w2controllers.flatMap((c, id) => c.applied.filter((a) => a.time > t).map((a) => ({ id, ...a }))),
+              committed,
+            );
+            report.cases.push({ label, name: "first actual positive-clock application", committed, applied });
+            try {
+              assert(applied.length > 0);
+              for (const a of applied) assert.equal(a.duration, 880);
+            } catch (e) {
+              report.failures.push(`${label}/actual positive clock: ${e.message}`);
+            }
+          }
+        }
         const inherited = await record("same-target inherited zero", { clock: 0 }, settled);
         if (kind === "chart") {
           await page.waitForTimeout(100);
@@ -262,6 +287,11 @@ try {
               })),
             ),
           });
+        report.rawFrames.push({
+          label,
+          frames: await page.evaluate(() => window.w2frames),
+          insertions: await page.evaluate(() => window.w2insertions || []),
+        });
         await page.close();
       }
 } finally {

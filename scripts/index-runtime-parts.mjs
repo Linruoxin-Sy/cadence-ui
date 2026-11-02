@@ -24,7 +24,7 @@ const delegates = {
   "date-picker": ["Button", "PopoverContent", "CalendarMonthGrid native WAAPI"],
   attachment: ["AttachmentAction -> Button", "caller-composed Spinner"],
   collapsible: ["caller render Button owns separate press"],
-  calendar: ["CalendarDayButton -> Button"],
+  calendar: ["CalendarDayButton/navigation -> native button + static buttonVariants; no PressButton engine"],
   carousel: ["Previous/Next -> Button"],
   "alert-dialog": ["Action/Cancel -> Button"],
 };
@@ -170,7 +170,7 @@ const items = registry.items
   }));
 const siteTargets = {
   "document-entrance": [
-    "actual article/div/section motion element | Motion declarative/useInView | site-only reveal + documented clipPath exception; SSR hidden, noscript/print restore",
+    "actual article/div/section motion element | Motion committed controls/useInView | site-only reveal + documented clipPath exception; SSR hidden, noscript/print restore",
   ],
   reveal: [
     "data-site-reveal row div | native CSS transition + IntersectionObserver trigger | reveal opacity/transform/filter",

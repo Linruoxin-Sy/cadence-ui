@@ -13,7 +13,7 @@ const { createServer, transformWithEsbuild } = await import(
   pathToFileURL(require.resolve("vite", { paths: [path.dirname(require.resolve("vitest/node"))] }))
 );
 const config = (await import("./vite.config.mjs")).default;
-const report = { sources: {}, cases: [], failures: [], errors: [] };
+const report = { sources: {}, cases: [], failures: [], errors: [], rawFrames: [] };
 for (const id of ["select", "code-block", "sidebar", "calendar", "tabs"]) {
   const text = readFileSync(`registry/cadence/${id}/index.tsx`, "utf8");
   report.sources[id] = { text, sha256: createHash("sha256").update(text).digest("hex") };
@@ -53,6 +53,10 @@ try {
         const page = await browser.newPage({ reducedMotion: os });
         page.on("pageerror", (e) => report.errors.push(`${kind}: ${e.stack}`));
         const label = `${kind}/${mode}/${os}`;
+        if (process.env.W2_FILTER && !label.includes(process.env.W2_FILTER)) {
+          await page.close();
+          continue;
+        }
         const effective = mode === "none" ? "none" : os === "reduce" ? "reduced" : mode;
         const record = async (name, patch, verify) => {
           const r = await page.evaluate((p) => window.updateW2(p), patch);
@@ -87,6 +91,22 @@ try {
           } catch (e) {
             report.failures.push(`${label}/actual partial height: ${e.message}`);
           }
+        if (kind === "code" || kind === "tabs") {
+          const slot = kind === "code" ? "code-block-tab-indicator" : "tabs-indicator";
+          const moving = partial.parts.find((p) => p.slot === slot);
+          await record("actual in-flight projection reversal", { selected: false }, (paints) => {
+            if (effective === "full") {
+              for (const f of paints) {
+                const p = f.parts.find((p) => p.slot === slot);
+                assert(p);
+                assert(Math.abs(p.left - moving.left) < 10);
+              }
+            }
+          });
+          await page.waitForTimeout(60);
+          await record("actual second reversal", { selected: true });
+          await page.waitForTimeout(60);
+        }
         const final = (paints) => {
           for (const s of paints)
             for (const p of s.parts) {
@@ -118,6 +138,17 @@ try {
         });
         await record("partial again", { explicit: 8, selected: true });
         await page.waitForTimeout(90);
+        if (kind === "code" || kind === "tabs")
+          await record("actual active host resize", { width: 400, lines: 20 }, (paints) => {
+            for (const f of paints) {
+              const indicator = f.parts.find(
+                (p) => p.slot === (kind === "code" ? "code-block-tab-indicator" : "tabs-indicator"),
+              );
+              assert(indicator);
+              assert.equal(indicator.parentLayoutWidth, 400);
+              assert.equal(indicator.layoutWidth, indicator.parentWidth);
+            }
+          });
         await record("async downgrade none", { mode: "none" }, (paints) => {
           for (const s of paints)
             for (const p of s.parts) {
@@ -135,6 +166,19 @@ try {
         });
         await record("reverse resize", { mode: "full", explicit: 8, selected: false, width: 400, lines: 20 });
         await page.waitForTimeout(90);
+        if (kind === "sidebar") {
+          await record("active scalar cleanup setup", { selected: true });
+          await page.waitForTimeout(60);
+          const active = await page.evaluate(() => window.sampleW2("active scalar before cleanup"));
+          report.cases.push({ label, name: "active scalar before cleanup", samples: [active] });
+          if (os === "no-preference")
+            try {
+              assert(active.drivers.length > 0);
+              assert(active.drivers.some((d) => d.animating && d.value < 0 && d.value > -100));
+            } catch (e) {
+              report.failures.push(`${label}/actual active scalar: ${e.message}`);
+            }
+        }
         const detached = await record("unmount", { mounted: false }, (p) => {
           for (const s of p)
             for (const n of s.parts) {
@@ -158,6 +202,23 @@ try {
         } catch (e) {
           report.failures.push(`${label}/cleanup: ${e.message}`);
         }
+        if (kind === "calendar")
+          await record("reopen stable month", { mounted: true }, (paints) => {
+            for (const f of paints) {
+              assert(f.parts.length > 0);
+              for (const p of f.parts) {
+                assert(p.connected);
+                assert.equal(p.animations.length, 0);
+                assert.equal(p.opacity, 1);
+                assert.equal(p.x, 0);
+              }
+            }
+          });
+        report.rawFrames.push({
+          label,
+          frames: await page.evaluate(() => window.w2frames),
+          insertions: await page.evaluate(() => window.w2insertions || []),
+        });
         await page.close();
       }
 } finally {

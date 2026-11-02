@@ -40,14 +40,12 @@ window.sampleW2 = (phase, state) => {
         opacity: +css.opacity,
         scale: m.a,
         transform: css.transform,
-        animations: n
-          .getAnimations()
-          .map((a) => ({
-            state: a.playState,
-            time: a.currentTime,
-            timing: a.effect.getComputedTiming(),
-            frames: a.effect.getKeyframes(),
-          })),
+        animations: n.getAnimations().map((a) => ({
+          state: a.playState,
+          time: a.currentTime,
+          timing: a.effect.getComputedTiming(),
+          frames: a.effect.getKeyframes(),
+        })),
       };
     }),
   };

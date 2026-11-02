@@ -103,7 +103,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         body: await article.evaluate((n) => n.outerHTML.slice(0, 1500)),
         contentType: "text/plain",
       });
-      const context = await page.context().browser()!.newContext({ javaScriptEnabled: false });
+      const browser = page.context().browser();
+      if (!browser) throw new Error("Browser unavailable");
+      const context = await browser.newContext({ javaScriptEnabled: false });
       const noJS = await context.newPage();
       await noJS.goto(`${new URL(page.url()).origin}/components/button`);
       const staticArticle = noJS.locator("article[data-document-entrance]");

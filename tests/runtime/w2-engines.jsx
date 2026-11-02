@@ -17,7 +17,7 @@ window.w2nodes = [];
 window.w2events = [];
 const selectors = {
   chart:
-    ".recharts-bar-rectangle path,.recharts-curve,.recharts-sector,.recharts-symbols,.recharts-trapezoid,.recharts-radar-polygon .recharts-polygon",
+    ".recharts-bar-rectangle path,.recharts-curve,.recharts-sector,.recharts-symbols,.recharts-trapezoid,.recharts-radar-polygon .recharts-polygon,.recharts-area clipPath rect,.recharts-line-dot,.recharts-area-dot,.recharts-radar-dot",
   carousel: "[data-slot=carousel-content] > div,[data-slot=carousel-item]",
   entrance: "[data-document-entrance]",
 };
@@ -33,6 +33,7 @@ window.sampleW2 = (phase, state) => {
       updates: c.updates.length,
       value: c.updates.at(-1)?.value,
       appliedDuration: c.applied.at(-1)?.duration,
+      configuredDuration: c.readClock().duration * 1000,
     })),
     registered: [...(window.w2controllerSets || [])].reduce((count, set) => count + set.size, 0),
     phase,
@@ -58,6 +59,12 @@ window.sampleW2 = (phase, state) => {
         html: n.outerHTML,
         inline: n.getAttribute("style"),
         d: n.getAttribute("d"),
+        clipWidth: n.tagName === "rect" ? n.getAttribute("width") : null,
+        clipHeight: n.tagName === "rect" ? n.getAttribute("height") : null,
+        strokeDash:
+          css.strokeDasharray === "none" || css.strokeDasharray.split(/[, ]+/).every((v) => parseFloat(v) === 0)
+            ? null
+            : css.strokeDasharray,
         cx: n.getAttribute("cx"),
         cy: n.getAttribute("cy"),
         opacity: +css.opacity,
@@ -120,6 +127,7 @@ function App() {
   );
   const cb = React.useMemo(
     () => ({
+      isAnimationActive: true,
       onAnimationStart: () => window.w2events.push({ event: "start", time: performance.now() }),
       onAnimationEnd: () => window.w2events.push({ event: "end", time: performance.now() }),
     }),
