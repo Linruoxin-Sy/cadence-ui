@@ -306,10 +306,12 @@ function SelectHandoff({
         position: "fixed",
         left: flight.rect.left,
         top: flight.rect.top,
-        width: flight.rect.width,
         height: flight.rect.height,
       }}
-      className="pointer-events-none z-[60] flex items-center overflow-hidden text-sm whitespace-nowrap"
+      // Base UI can commit the new label after the destination is measured.
+      // Use that rect only for placement: its width may still belong to the
+      // previous label, and must never clip the incoming text.
+      className="pointer-events-none z-[60] flex w-max items-center text-sm whitespace-nowrap"
     >
       {flight.text}
     </motion.span>

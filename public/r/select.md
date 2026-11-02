@@ -133,6 +133,8 @@ The trigger's label is laid out at its final width inside a clipped slot. Animat
 folds the surface without re-wrapping the label, and the handoff's destination does not drift while
 the width settles. Keyboard selection has no origin, so it changes the width and lets the label swap
 without a flight; the pointer keeps the spatial handoff.
+The portalled flight label uses its natural text width, so a longer selection stays fully visible
+even if Base UI has not yet committed the destination label when its position is measured.
 
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
