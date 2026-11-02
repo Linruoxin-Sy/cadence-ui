@@ -2146,3 +2146,9 @@ new Base Slider drag, and Slider's reduced partial-scale tween. Native press lif
 with committed controls and zero-clock reduced Slider feedback repair these. See
 engine-runtime.md and basic-controls handoff for final counts and precise SSR/resize
 limits. Other writers, all performance gates and the whole goal remain OPEN.
+
+Final basic-control source4d06c24: client138/138, legacy23/23 plus8/8 held-release,
+production193/193, full check687/687 in88 files (including final evidence review).
+Current four-page strict JS293406/414456/318764/376803 bytes all FAIL120000;
+details, exact client/SSR/resize boundaries and blocked temporary cleanup are in
+docs/handoffs/basic-controls-runtime.md. No whole-library engine or goal closure.
