@@ -110,8 +110,9 @@ registry-snapshots.json及.gitattributes与起点无diff，无重新freeze。
 固定upstream缓存、当前.next-motion-runtime和react19 consumer。新probe没有持久临时server目录。
 最终本步临时日志清理、端口和git状态见下方完成记录。
 
-下一prompt：只开唯一下一实施会话，读本交接及engine-runtime.md表，优先选menus/Select/Combobox
-一个实际writer推进零/正clock订阅及真实首帧条件；不要重开已充分证明的正时钟有限排列。
+下一prompt：遵守用户最新的[固定执行边界](../execution-boundary.md)，只开唯一 W2 实施会话，
+一次性收尾现有 engine-runtime.md 未闭清单；包内阻断在本包解决，不按单个 writer 或新发现另开修改任务。
+不要重开已充分证明的正时钟有限排列。
 保留本轮基础零clock及原生Press所有修复。串行source→registrybuild→完整check→production，
 source/proof/payload/handoff原子提交；实际生产依赖变动重测现成JS审计，失败如实记账。
 不自己创建后继/子代理，不push/发布，由协调确认completed+idle后开下一唯一会话。

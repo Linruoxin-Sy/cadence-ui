@@ -11,6 +11,10 @@
 > **Working rule — see §7.0:** when a batch or a component finishes, mark it complete **in this file**, in the
 > same change. A batch whose row still says `next` is not done, whatever the branch contains.
 
+> **Execution boundary (2026-11-02):** follow the [fixed remaining work packages](execution-boundary.md).
+> The zero-clock package is complete; remaining engine acceptance, performance acceptance and final
+> verification/cleanup are the only follow-up packages. New non-blocking findings go to backlog.
+
 ---
 
 ## 1. Why this plan exists
