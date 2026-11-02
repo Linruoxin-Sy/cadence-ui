@@ -68,26 +68,31 @@ export function PressButton({
   ...props
 }: ComponentProps<"button"> & Pick<MotionProps, "whileTap" | "transition">) {
   const [pressed, setPressed] = useState(false);
+  const owner = useRef<number | "Enter" | null>(null);
+  const release = useCallback(() => {
+    owner.current = null;
+    setPressed(false);
+  }, []);
   const disabled = props.disabled || props["aria-disabled"] === true || props["aria-disabled"] === "true";
   const enabled = !disabled && !!whileTap;
   useCommittedEffect(() => {
     if (!pressed) return;
-    const release = (event: PointerEvent) => {
+    const releasePointer = (event: PointerEvent) => {
       // Keyboard-generated pointercancel from another control is not this press.
-      if (event.isTrusted) setPressed(false);
+      if (event.isTrusted && event.pointerId === owner.current) release();
     };
-    window.addEventListener("pointerup", release);
-    window.addEventListener("pointercancel", release);
+    window.addEventListener("pointerup", releasePointer);
+    window.addEventListener("pointercancel", releasePointer);
     return () => {
-      window.removeEventListener("pointerup", release);
-      window.removeEventListener("pointercancel", release);
+      window.removeEventListener("pointerup", releasePointer);
+      window.removeEventListener("pointercancel", releasePointer);
     };
-  }, [pressed]);
+  }, [pressed, release]);
   useCommittedEffect(() => {
     // Native disabled can swallow pointerup. Cancel this visual gesture rather
     // than reviving it when the same button is enabled again.
-    if (!enabled) setPressed(false);
-  }, [enabled]);
+    if (!enabled) release();
+  }, [enabled, release]);
   const pressScale = typeof whileTap === "object" && "scale" in whileTap ? whileTap.scale : 1;
   const controls = useControlAnimation(
     { scale: pressed && !disabled && typeof pressScale === "number" ? pressScale : 1 },
@@ -100,27 +105,33 @@ export function PressButton({
       animate={controls}
       onPointerDown={(event) => {
         props.onPointerDown?.(event);
-        if (enabled && event.button === 0) setPressed(true);
+        if (enabled && event.button === 0 && event.isPrimary && owner.current === null) {
+          owner.current = event.pointerId;
+          setPressed(true);
+        }
       }}
       onPointerUp={(event) => {
         props.onPointerUp?.(event);
-        setPressed(false);
+        if (event.pointerId === owner.current) release();
       }}
       onPointerCancel={(event) => {
         props.onPointerCancel?.(event);
-        setPressed(false);
+        if (event.pointerId === owner.current) release();
       }}
       onKeyDown={(event) => {
         props.onKeyDown?.(event);
-        if (enabled && event.key === "Enter" && event.target === event.currentTarget) setPressed(true);
+        if (enabled && event.key === "Enter" && event.target === event.currentTarget && owner.current === null) {
+          owner.current = "Enter";
+          setPressed(true);
+        }
       }}
       onKeyUp={(event) => {
         props.onKeyUp?.(event);
-        if (event.key === "Enter") setPressed(false);
+        if (event.key === "Enter" && owner.current === "Enter") release();
       }}
       onBlur={(event) => {
         props.onBlur?.(event);
-        setPressed(false);
+        release();
       }}
       nativeRef={ref}
       nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }}

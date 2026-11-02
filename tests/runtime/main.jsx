@@ -98,4 +98,6 @@ function App() {
     </CadenceProvider>
   );
 }
-createRoot(document.getElementById("root")).render(<App />);
+const root = createRoot(document.getElementById("root"));
+window.unmountRuntime = () => root.unmount();
+root.render(<App />);

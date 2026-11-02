@@ -4,6 +4,32 @@ import { createRef } from "react";
 import { expect, it, vi } from "vitest";
 import { Button } from "@/registry/cadence/button";
 
+it.each(["onPointerDown", "onPointerUp", "onPointerCancel", "onKeyDown", "onKeyUp"] as const)(
+  "press lifecycle forwards %s exactly once with native cancellation and currentTarget",
+  (handler) => {
+    const parent = vi.fn();
+    const capture = vi.fn();
+    const listener = vi.fn((event) => {
+      expect(event.currentTarget).toBe(screen.getByRole("button"));
+      expect(event.nativeEvent).toBe(native);
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    const view = render(
+      <div {...{ [handler]: parent, [`${handler}Capture`]: capture }}>
+        <Button {...{ [handler]: listener }}>Native lifecycle</Button>
+      </div>,
+    );
+    const native = new Event(handler.slice(2).toLowerCase(), { bubbles: true, cancelable: true });
+    fireEvent(screen.getByRole("button"), native);
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(capture).toHaveBeenCalledTimes(1);
+    expect(parent).not.toHaveBeenCalled();
+    expect(native.defaultPrevented).toBe(true);
+    view.unmount();
+  },
+);
+
 it("delivers native animation and drag events through the default renderer", () => {
   const animation = vi.fn();
   const drag = vi.fn();
