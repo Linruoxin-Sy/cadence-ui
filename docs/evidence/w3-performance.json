@@ -1,0 +1,2369 @@
+{
+  "source": "f60e7fe",
+  "buildId": "19Ek7XDFoWB78EgcZRqpJ",
+  "date": "2026-11-02",
+  "protocol": "fresh Edge per route; cache disabled; all automatic JS; load + networkidle + 10s + networkidle; no interaction/scroll/blocking; gzip6 per decoded entity",
+  "clsScope": "cold-load only; desktop 1280x720 and mobile emulation 390x844; maximum CLS session window (1s gap/5s cap), excludes recent input; not lifetime or real-device FPS certification",
+  "raw": [
+    {
+      "file": "docs/evidence/w3-site.json.gz",
+      "bytes": 6637844,
+      "gzip": 358144,
+      "sha256": "e6ce6920b2edce6842021c7bbdf5662cac42c4d1fd1da9b3e371d59f7c3a79be"
+    },
+    {
+      "file": "docs/evidence/w3-bundles.json.gz",
+      "bytes": 6742319,
+      "gzip": 257615,
+      "sha256": "3dbe8abe12b6f8804cf10c382e5a83f478abbb79aa7157dcd0bd56e6c8293c4e"
+    }
+  ],
+  "roots": {
+    "files": [
+      {
+        "file": "static/chunks/0ywrj6uoh6hzn.js",
+        "sha256": "c3b2229c0111ffa1ec23943e526b8e151911f4189d675df6fce212124e986c25",
+        "gzip": 1979
+      },
+      {
+        "file": "static/chunks/2mduzyscstvmx.js",
+        "sha256": "3f152127a667b792818f6eb892eacf7182c6b4c4238733c24417c0d857d04d82",
+        "gzip": 8756
+      },
+      {
+        "file": "static/chunks/2h42467wjznxd.js",
+        "sha256": "355c9715eb1bf00592b474cc123faff48a97749a353d1dc4cf9f4f7619335d0d",
+        "gzip": 72047
+      },
+      {
+        "file": "static/chunks/3agwwx34v3msc.js",
+        "sha256": "03523f8cb155405667527111ded7790f185c2e96038ad388f650055c1eeaa121",
+        "gzip": 45595
+      },
+      {
+        "file": "static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "sha256": "b5f9b5199b99ab6c141f4540f0b7d0fe803c4ecf6956849ecb6e59d3d439272e",
+        "gzip": 4390
+      }
+    ],
+    "gzip": 132767
+  },
+  "site": [
+    {
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 289528,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/accordion",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 295497,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/accordion",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 296651,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/alert",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 292767,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/alert",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 293921,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/alert-dialog",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 297556,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/alert-dialog",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 298710,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/aspect-ratio",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 290677,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/aspect-ratio",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 291831,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/attachment",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 295040,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/attachment",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 296194,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/avatar",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294019,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/avatar",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295173,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/badge",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 293065,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/badge",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 294219,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/breadcrumb",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 291629,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/breadcrumb",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 292783,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/bubble",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294650,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/bubble",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295804,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/button",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 292068,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/button",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 293222,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/button-group",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 293375,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/button-group",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 294529,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/calendar",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 317427,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/calendar",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 318581,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/card",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294018,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/card",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295172,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/carousel",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 301470,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/carousel",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 302624,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/chart",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 425436,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/chart",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 426590,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/checkbox",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294438,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/checkbox",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295592,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/code-block",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 375465,
+      "scripts": 28,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/code-block",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 376619,
+      "scripts": 29,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/collapsible",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294067,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/collapsible",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295221,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/combobox",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 312154,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/combobox",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 313308,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/command",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 317751,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/command",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 318905,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/context-menu",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 315152,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/context-menu",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 316306,
+      "scripts": 25,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/data-table",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 335485,
+      "scripts": 25,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/data-table",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 336639,
+      "scripts": 26,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/date-picker",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 327233,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/date-picker",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 328387,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/dialog",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 300068,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/dialog",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 301222,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/drawer",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 309119,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/drawer",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 310273,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/dropdown-menu",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 314678,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/dropdown-menu",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 315832,
+      "scripts": 25,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/empty",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 292515,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/empty",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 293669,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/field",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 295592,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/field",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 296746,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/hover-card",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 303032,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/hover-card",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 304186,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/input",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 292175,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/input",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 293329,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/input-group",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 295566,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/input-group",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 296720,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/input-otp",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 296387,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/input-otp",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 297541,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/item",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295956,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/item",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294802,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/kbd",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 291911,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/kbd",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 290757,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/label",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 296101,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/label",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294947,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/menubar",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 318254,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/menubar",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 319408,
+      "scripts": 25,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/navigation-menu",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 306401,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/navigation-menu",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 307555,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/pagination",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 293163,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/pagination",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 294317,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/popover",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 304653,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/popover",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 305807,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/progress",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 293234,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/progress",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 294388,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/radio-group",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 296308,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/radio-group",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 297462,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/resizable",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 312919,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/resizable",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 314073,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/scroll-area",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 296325,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/scroll-area",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 297479,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/select",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 292452,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/select",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 293606,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/separator",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 292266,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/separator",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 293420,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/sheet",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 300488,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/sheet",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 301642,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/sidebar",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 315480,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/sidebar",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 316634,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/skeleton",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 291063,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/skeleton",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 292217,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/slider",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 301761,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/slider",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 302915,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/spinner",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 291181,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/spinner",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 292335,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/switch",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 295023,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/switch",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 296177,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/table",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 291230,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/table",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 292384,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/tabs",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 298144,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/tabs",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 299298,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/textarea",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 291076,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/textarea",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 292230,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/toast",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 304876,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/toast",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 306030,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/toggle",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 294298,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/toggle",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 295452,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/toggle-group",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 297981,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/toggle-group",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 299135,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/tooltip",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 304090,
+      "scripts": 23,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/components/tooltip",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 305244,
+      "scripts": 24,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/accessibility",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/accessibility",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/ai",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/ai",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/changelog",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/changelog",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/installation",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/installation",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/motion",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/motion",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/motion-modes",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/motion-modes",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/registry",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/registry",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/theming",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "gzipBytes": 284526,
+      "scripts": 21,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    },
+    {
+      "route": "/docs/theming",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "gzipBytes": 290682,
+      "scripts": 22,
+      "cls": 0,
+      "jsPassed": false,
+      "clsPassed": true,
+      "errors": [],
+      "browser": "156.0.4314.58"
+    }
+  ],
+  "excludedRoutes": ["/_global-error", "/_not-found", "/robots.txt", "/sitemap.xml"],
+  "motion": [
+    {
+      "name": "actual-api-union",
+      "files": [
+        {
+          "file": "actual-api-union.js",
+          "bytes": 140405,
+          "gzip": 47294,
+          "sha256": "ee61404e28ec913db8b4973659faccf2f84ee9a9111ad928a43657a92e086db6"
+        }
+      ],
+      "gzip": 47294,
+      "passed": true
+    },
+    {
+      "name": "public-m-domMax-candidate",
+      "files": [
+        {
+          "file": "public-m-domMax-candidate.js",
+          "bytes": 145497,
+          "gzip": 49621,
+          "sha256": "848839ae9d84a682b0dc83ed811fdbfda1c1c1574f6a53150bafb0140e2807cb"
+        }
+      ],
+      "gzip": 49621,
+      "passed": false
+    }
+  ],
+  "componentProtocol": "58-entry split consumer graph plus explicit baseline of actual Motion API union/all Cadence lib exports; subtract only baseline-reachable outputs; keep component dependencies and other installed Cadence components; includes every emitted reachable async JS output (conservative for on-demand code); React external; not Next chunk attribution",
+  "components": [
+    {
+      "id": "button",
+      "gzip": 6372,
+      "passed": true,
+      "localOnlyGzip": 954
+    },
+    {
+      "id": "badge",
+      "gzip": 2919,
+      "passed": true,
+      "localOnlyGzip": 649
+    },
+    {
+      "id": "kbd",
+      "gzip": 394,
+      "passed": true,
+      "localOnlyGzip": 365
+    },
+    {
+      "id": "separator",
+      "gzip": 2393,
+      "passed": true,
+      "localOnlyGzip": 315
+    },
+    {
+      "id": "label",
+      "gzip": 376,
+      "passed": true,
+      "localOnlyGzip": 266
+    },
+    {
+      "id": "input",
+      "gzip": 16705,
+      "passed": false,
+      "localOnlyGzip": 487
+    },
+    {
+      "id": "textarea",
+      "gzip": 494,
+      "passed": true,
+      "localOnlyGzip": 387
+    },
+    {
+      "id": "card",
+      "gzip": 1072,
+      "passed": true,
+      "localOnlyGzip": 1045
+    },
+    {
+      "id": "aspect-ratio",
+      "gzip": 224,
+      "passed": true,
+      "localOnlyGzip": 195
+    },
+    {
+      "id": "avatar",
+      "gzip": 6683,
+      "passed": true,
+      "localOnlyGzip": 683
+    },
+    {
+      "id": "skeleton",
+      "gzip": 380,
+      "passed": true,
+      "localOnlyGzip": 261
+    },
+    {
+      "id": "alert",
+      "gzip": 1065,
+      "passed": true,
+      "localOnlyGzip": 614
+    },
+    {
+      "id": "empty",
+      "gzip": 1063,
+      "passed": true,
+      "localOnlyGzip": 616
+    },
+    {
+      "id": "item",
+      "gzip": 3924,
+      "passed": true,
+      "localOnlyGzip": 1090
+    },
+    {
+      "id": "field",
+      "gzip": 4333,
+      "passed": true,
+      "localOnlyGzip": 1321
+    },
+    {
+      "id": "button-group",
+      "gzip": 3599,
+      "passed": true,
+      "localOnlyGzip": 757
+    },
+    {
+      "id": "input-group",
+      "gzip": 21208,
+      "passed": false,
+      "localOnlyGzip": 1264
+    },
+    {
+      "id": "breadcrumb",
+      "gzip": 5820,
+      "passed": true,
+      "localOnlyGzip": 671
+    },
+    {
+      "id": "pagination",
+      "gzip": 10240,
+      "passed": false,
+      "localOnlyGzip": 668
+    },
+    {
+      "id": "spinner",
+      "gzip": 3604,
+      "passed": true,
+      "localOnlyGzip": 274
+    },
+    {
+      "id": "dialog",
+      "gzip": 56675,
+      "passed": false,
+      "localOnlyGzip": 1014
+    },
+    {
+      "id": "checkbox",
+      "gzip": 16894,
+      "passed": false,
+      "localOnlyGzip": 720
+    },
+    {
+      "id": "radio-group",
+      "gzip": 25010,
+      "passed": false,
+      "localOnlyGzip": 716
+    },
+    {
+      "id": "switch",
+      "gzip": 10369,
+      "passed": false,
+      "localOnlyGzip": 956
+    },
+    {
+      "id": "slider",
+      "gzip": 25269,
+      "passed": false,
+      "localOnlyGzip": 929
+    },
+    {
+      "id": "toggle",
+      "gzip": 9083,
+      "passed": false,
+      "localOnlyGzip": 761
+    },
+    {
+      "id": "toggle-group",
+      "gzip": 19012,
+      "passed": false,
+      "localOnlyGzip": 843
+    },
+    {
+      "id": "input-otp",
+      "gzip": 8137,
+      "passed": false,
+      "localOnlyGzip": 996
+    },
+    {
+      "id": "progress",
+      "gzip": 5052,
+      "passed": true,
+      "localOnlyGzip": 801
+    },
+    {
+      "id": "alert-dialog",
+      "gzip": 53287,
+      "passed": false,
+      "localOnlyGzip": 1218
+    },
+    {
+      "id": "popover",
+      "gzip": 59669,
+      "passed": false,
+      "localOnlyGzip": 797
+    },
+    {
+      "id": "tooltip",
+      "gzip": 54004,
+      "passed": false,
+      "localOnlyGzip": 929
+    },
+    {
+      "id": "hover-card",
+      "gzip": 53523,
+      "passed": false,
+      "localOnlyGzip": 576
+    },
+    {
+      "id": "sheet",
+      "gzip": 56691,
+      "passed": false,
+      "localOnlyGzip": 1034
+    },
+    {
+      "id": "drawer",
+      "gzip": 67840,
+      "passed": false,
+      "localOnlyGzip": 1567
+    },
+    {
+      "id": "select",
+      "gzip": 72149,
+      "passed": false,
+      "localOnlyGzip": 3171
+    },
+    {
+      "id": "combobox",
+      "gzip": 85071,
+      "passed": false,
+      "localOnlyGzip": 2723
+    },
+    {
+      "id": "dropdown-menu",
+      "gzip": 83628,
+      "passed": false,
+      "localOnlyGzip": 1910
+    },
+    {
+      "id": "context-menu",
+      "gzip": 84637,
+      "passed": false,
+      "localOnlyGzip": 1782
+    },
+    {
+      "id": "menubar",
+      "gzip": 86808,
+      "passed": false,
+      "localOnlyGzip": 954
+    },
+    {
+      "id": "code-block",
+      "gzip": 198321,
+      "passed": false,
+      "localOnlyGzip": 4643
+    },
+    {
+      "id": "command",
+      "gzip": 84827,
+      "passed": false,
+      "localOnlyGzip": 1175
+    },
+    {
+      "id": "toast",
+      "gzip": 61577,
+      "passed": false,
+      "localOnlyGzip": 1437
+    },
+    {
+      "id": "accordion",
+      "gzip": 19188,
+      "passed": false,
+      "localOnlyGzip": 1255
+    },
+    {
+      "id": "collapsible",
+      "gzip": 12947,
+      "passed": false,
+      "localOnlyGzip": 909
+    },
+    {
+      "id": "tabs",
+      "gzip": 24878,
+      "passed": false,
+      "localOnlyGzip": 1325
+    },
+    {
+      "id": "table",
+      "gzip": 729,
+      "passed": true,
+      "localOnlyGzip": 573
+    },
+    {
+      "id": "carousel",
+      "gzip": 18982,
+      "passed": false,
+      "localOnlyGzip": 1505
+    },
+    {
+      "id": "scroll-area",
+      "gzip": 12274,
+      "passed": false,
+      "localOnlyGzip": 512
+    },
+    {
+      "id": "chart",
+      "gzip": 118999,
+      "passed": false,
+      "localOnlyGzip": 3059
+    },
+    {
+      "id": "calendar",
+      "gzip": 32164,
+      "passed": false,
+      "localOnlyGzip": 2212
+    },
+    {
+      "id": "navigation-menu",
+      "gzip": 64461,
+      "passed": false,
+      "localOnlyGzip": 1675
+    },
+    {
+      "id": "resizable",
+      "gzip": 19256,
+      "passed": false,
+      "localOnlyGzip": 566
+    },
+    {
+      "id": "sidebar",
+      "gzip": 80966,
+      "passed": false,
+      "localOnlyGzip": 4039
+    },
+    {
+      "id": "data-table",
+      "gzip": 114452,
+      "passed": false,
+      "localOnlyGzip": 2320
+    },
+    {
+      "id": "date-picker",
+      "gzip": 87841,
+      "passed": false,
+      "localOnlyGzip": 986
+    },
+    {
+      "id": "attachment",
+      "gzip": 7905,
+      "passed": true,
+      "localOnlyGzip": 1537
+    },
+    {
+      "id": "bubble",
+      "gzip": 3557,
+      "passed": true,
+      "localOnlyGzip": 1283
+    }
+  ],
+  "mobileFPS": {
+    "status": "unproven",
+    "discovery": "adb devices -l returned no devices; no physical device model/OS/GPU/trace supplied; desktop emulation is not evidence"
+  }
+}
