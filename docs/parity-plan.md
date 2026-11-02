@@ -2271,7 +2271,8 @@ Toggle Group now offers toolbar strips (`default`, `outline`) and a pill track
 (`segmented`) through the same two exports. It is T3 / medium because single
 selection uses a per-instance `layout.shared` fill. Multiple selection uses
 `state.morph` opacity/scale fills with instant adjacent-corner joins at zero
-spacing; `feedback.press` retains its existing token-backed behavior.
+spacing; `feedback.press` retains its existing token-backed behavior. The header
+motion selector composes the segmented variant and ignores empty change requests.
 
 Base UI still owns array values, optional deselection, controlled requests,
 cancellation, roving focus, native events, refs and caller render composition.

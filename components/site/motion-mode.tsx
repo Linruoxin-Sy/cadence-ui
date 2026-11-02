@@ -1,11 +1,11 @@
 "use client";
 
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import { Button } from "@/registry/cadence/button";
 import { cn } from "@/registry/cadence/lib/cn";
 import type { CadenceMode } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select";
+import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
 
 /** Remembered across visits, like the theme. */
 const MODE_KEY = "cadence-motion";
@@ -156,23 +156,23 @@ export function MotionModeSwitch({ className }: { className?: string }) {
   const { mode, setMode } = useMotionMode();
 
   return (
-    <fieldset
+    <ToggleGroup
       aria-label="Motion mode"
-      className={cn("hidden items-center gap-0.5 rounded-md border border-border p-0.5 sm:flex", className)}
+      variant="segmented"
+      size="sm"
+      value={[mode]}
+      onValueChange={(values) => {
+        const next = values[0];
+        if (next && isMode(next)) setMode(next);
+      }}
+      className={cn("hidden p-0.5 sm:flex", className)}
     >
       {MODES.map((value) => (
-        <Button
-          key={value}
-          size="xs"
-          variant={mode === value ? "secondary" : "ghost"}
-          aria-pressed={mode === value}
-          onClick={() => setMode(value)}
-          className="h-6 px-2 text-[11px] capitalize"
-        >
+        <ToggleGroupItem key={value} value={value} className="h-6 px-2 text-[11px] capitalize">
           {value}
-        </Button>
+        </ToggleGroupItem>
       ))}
-    </fieldset>
+    </ToggleGroup>
   );
 }
 
