@@ -51,6 +51,36 @@ const first = (frames) => {
 for (const os of ["no-preference", "reduce"])
   for (const mode of ["full", "reduced", "none"]) {
     const page = await browser.newPage({ reducedMotion: os });
+    await page.addInitScript(() => {
+      window.controlObservers = [];
+      const NativeObserver = window.ResizeObserver;
+      window.ResizeObserver = class extends NativeObserver {
+        constructor(callback) {
+          const record = { targets: new Set(), active: new Set(), calls: [] };
+          super((entries, observer) => {
+            record.calls.push(
+              entries.map((entry) => ({ slot: entry.target.dataset.slot, width: entry.contentRect.width })),
+            );
+            callback(entries, observer);
+          });
+          this.record = record;
+          window.controlObservers.push(record);
+        }
+        observe(target, options) {
+          this.record.targets.add(target);
+          this.record.active.add(target);
+          return super.observe(target, options);
+        }
+        unobserve(target) {
+          this.record.active.delete(target);
+          return super.unobserve(target);
+        }
+        disconnect() {
+          this.record.active.clear();
+          return super.disconnect();
+        }
+      };
+    });
     const cell = { os, mode, steps: [], errors: [] };
     report.cases.push(cell);
     page.on("pageerror", (e) => cell.errors.push(e.message));
@@ -303,6 +333,16 @@ for (const os of ["no-preference", "reduce"])
       return { before, after: read(), refs: window.refEvents };
     });
     cell.cleanup = detached;
+    cell.observers = await page.evaluate(() =>
+      window.controlObservers
+        .filter((r) => [...r.targets].some((n) => n.dataset.slot === "switch-thumb"))
+        .map((r) => ({ targets: [...r.targets].map((n) => n.dataset.slot), active: r.active.size, calls: r.calls })),
+    );
+    check(`${os}/${mode} real ResizeObserver delivery and disconnect`, () => {
+      assert.equal(cell.observers.length, 1);
+      assert.ok(cell.observers[0].calls.length > 0);
+      assert.equal(cell.observers[0].active, 0);
+    });
     check(`${os}/${mode} cleanup no later writes and callback cleanup`, () => {
       assert.ok(detached.before.length >= 13);
       assert.ok(detached.before.every((p) => !p.connected));

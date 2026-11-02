@@ -1,0 +1,58 @@
+{
+  "source": "4d06c24",
+  "date": "2026-11-02 Asia/Shanghai",
+  "check": {
+    "command": "VITEST_MAX_FORKS=2 VITEST_MIN_FORKS=1 pnpm check",
+    "tests": 687,
+    "files": 88,
+    "passed": true,
+    "log": ".cache/basic-controls-check-final.log"
+  },
+  "production": {
+    "command": "CADENCE_DIST_DIR=.next-motion-runtime PLAYWRIGHT_CHANNEL=msedge PLAYWRIGHT_PORT=3167 pnpm exec playwright test tests/e2e/b3.spec.ts tests/e2e/motion-matrix.spec.ts tests/e2e/calendar.spec.ts tests/e2e/carousel.spec.ts tests/e2e/code-block.spec.ts --workers=2 --reporter=json",
+    "stats": {
+      "startTime": "2026-11-02T05:12:37.360Z",
+      "duration": 241838.342,
+      "expected": 193,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "report": ".cache/basic-controls-production.json"
+  },
+  "fixture": {
+    "checks": 138,
+    "failures": 0,
+    "raw": {
+      "path": "docs/evidence/basic-controls-runtime.json.gz",
+      "bytes": 51195294,
+      "gzipBytes": 746611,
+      "sha256": "75310a5e907367132b730c646a4be80ee85acf1caea8b240b431bdbaa6ba9042",
+      "encoding": "gzip, exact original UTF8 JSON; no samples discarded"
+    }
+  },
+  "legacy": {
+    "checks": 23,
+    "pressReleasePaths": 8,
+    "failed": 0
+  },
+  "minimumConsumer": {
+    "react": "19.0.0",
+    "command": "node tests/fixtures/react19-consumer/run.mjs",
+    "passed": true,
+    "report": ".cache/basic-controls-react19.json",
+    "sourceSubsetBytesMatch": true,
+    "scope": "Control adapters/OTP and native ref cleanup. Does not separately certify new PressButton event lifecycle on React19.0."
+  },
+  "performance": {
+    "initialJS": "FAIL all four pages; basic-controls-js.json",
+    "otherGates": "48KB initial Motion, 8KB compiled per item, 55fps and CLS remain unproven"
+  },
+  "notClaimed": [
+    "all independent writers",
+    "whole-goal completion",
+    "full SSR/hydration matrix from client fixture",
+    "synchronous first-rAF ResizeObserver delivery",
+    "zero/negative/nonfinite clocks"
+  ]
+}

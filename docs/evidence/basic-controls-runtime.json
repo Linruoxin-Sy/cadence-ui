@@ -1,0 +1,3038 @@
+{
+  "source": "4d06c24",
+  "sourceHashes": {
+    "lib/press-button": "6c4e1bea1bb1012ff64b1e03f0b64bcf87958a861c47cd96178b87e2cd83bcc2",
+    "lib/control-animation": "881bf4c41a4ff5f766eb1a17a1457ff08ca0c58ca8e929c8372cb7c364982d92",
+    "lib/provider": "28eee1958079e889f7abd9ce7979c42ef8a878185a9186a2734b213f1267812a",
+    "checkbox/index": "b3e0f356a67c4b9d10311ef871af9216254b24681474ce7fa332a1407bfcb085",
+    "radio-group/index": "c262cf7267aa7976eb71dd1fff12873aba9e94d169e82dd28007e4cc948aab7a",
+    "switch/index": "65c90652dc3c19ff158d070df3dc5c1e6cbb5edc95357eb17a00677adb38c916",
+    "slider/index": "e48e023dc43045e0675031acd959c41b8d66561d9fd6acd5df6264fdf4c3fd16",
+    "progress/index": "5d1d5f20189d3812b31d5e79220f6e89d330b9ebe193c976f82c4ce0d913f4df",
+    "input-otp/index": "25c37162c6d99a4d2a1a49626ff774b2866f58fae86c198a2fc17129fe4fdbdc"
+  },
+  "fixture": "tests/runtime/controls.jsx",
+  "checks": 138,
+  "failures": [],
+  "raw": {
+    "path": "docs/evidence/basic-controls-runtime.json.gz",
+    "bytes": 51195294,
+    "gzipBytes": 746611,
+    "sha256": "75310a5e907367132b730c646a4be80ee85acf1caea8b240b431bdbaa6ba9042",
+    "encoding": "gzip, exact original UTF8 JSON; no samples discarded"
+  },
+  "cases": [
+    {
+      "os": "no-preference",
+      "mode": "full",
+      "errors": [],
+      "steps": [
+        {
+          "name": "initial",
+          "frames": 11,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external controlled commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unrelated render",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target inherited clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target explicit clock",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "same target none cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external reversal and character replacement",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode reduced",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode none",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "none checked resize observer",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "character deletion",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "restore requested mode",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer button",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter button",
+          "frames": 13,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer focusable",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter focusable",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter toggle",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer group",
+          "frames": 14,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter group",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "enable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held button",
+          "frames": 15,
+          "earliest": ["paint23", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled button",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable button",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual button",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock button",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release button",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held focusable",
+          "frames": 14,
+          "earliest": ["paint23", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter actual focusable",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release focusable",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held toggle",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable toggle",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual toggle",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held group",
+          "frames": 15,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual group",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "actual dragged thumb",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target explicit clock",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target reduced cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag disabled async commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "disabled external value commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "start before cleanup",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unmount actual hosts",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        }
+      ],
+      "observers": [
+        {
+          "targets": ["switch", "switch-thumb"],
+          "active": 0,
+          "calls": [
+            [
+              {
+                "slot": "switch",
+                "width": 48
+              },
+              {
+                "slot": "switch-thumb",
+                "width": 16
+              }
+            ],
+            [
+              {
+                "slot": "switch",
+                "width": 64
+              }
+            ]
+          ]
+        }
+      ],
+      "cleanup": {
+        "before": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.938984; transform: scale(0.997714);",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.938984; transform: scale(0.997714);",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.0610158; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: translateX(45.2571px);",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.757618);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.757618);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.757618);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: scale(0.995436);",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.0571439; transform: scale(0.962286);",
+            "animations": []
+          }
+        ],
+        "after": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.938984; transform: scale(0.997714);",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.938984; transform: scale(0.997714);",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.0610158; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: translateX(45.2571px);",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.757618);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.757618);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.757618);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: scale(0.995436);",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.0571439; transform: scale(0.962286);",
+            "animations": []
+          }
+        ],
+        "refs": [
+          {
+            "phase": "attach",
+            "node": true
+          },
+          {
+            "phase": "cleanup"
+          }
+        ]
+      }
+    },
+    {
+      "os": "no-preference",
+      "mode": "reduced",
+      "errors": [],
+      "steps": [
+        {
+          "name": "initial",
+          "frames": 17,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external controlled commit",
+          "frames": 12,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unrelated render",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target inherited clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target explicit clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target none cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external reversal and character replacement",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode reduced",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode none",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "none checked resize observer",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "character deletion",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "restore requested mode",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer button",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter button",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer focusable",
+          "frames": 14,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter focusable",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer group",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "enable",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "pointer held button",
+          "frames": 14,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable button",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual button",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation button",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release button",
+          "frames": 14,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held focusable",
+          "frames": 15,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable focusable",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual focusable",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock focusable",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release focusable",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held toggle",
+          "frames": 15,
+          "earliest": ["paint23", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable toggle",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual toggle",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release toggle",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held group",
+          "frames": 15,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual group",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock group",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release group",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "actual dragged thumb",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target explicit clock",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target reduced cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag disabled async commit",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "disabled external value commit",
+          "frames": 16,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "start before cleanup",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unmount actual hosts",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        }
+      ],
+      "observers": [
+        {
+          "targets": ["switch", "switch-thumb"],
+          "active": 0,
+          "calls": [
+            [
+              {
+                "slot": "switch",
+                "width": 48
+              },
+              {
+                "slot": "switch-thumb",
+                "width": 16
+              }
+            ],
+            [
+              {
+                "slot": "switch",
+                "width": 64
+              }
+            ]
+          ]
+        }
+      ],
+      "cleanup": {
+        "before": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.947509; transform: scale(0.998093);",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.947509; transform: scale(0.998093);",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.0524906; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: translateX(45.7116px);",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.745526);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.745526);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.745526);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: scale(0.996139);",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.0476758; transform: scale(0.961907);",
+            "animations": []
+          }
+        ],
+        "after": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.947509; transform: scale(0.998093);",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.947509; transform: scale(0.998093);",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.0524906; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: translateX(45.7116px);",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.745526);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.745526);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.745526);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: scale(0.996139);",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.0476758; transform: scale(0.961907);",
+            "animations": []
+          }
+        ],
+        "refs": [
+          {
+            "phase": "attach",
+            "node": true
+          },
+          {
+            "phase": "cleanup"
+          }
+        ]
+      }
+    },
+    {
+      "os": "no-preference",
+      "mode": "none",
+      "errors": [],
+      "steps": [
+        {
+          "name": "initial",
+          "frames": 17,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external controlled commit",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unrelated render",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target inherited clock",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target explicit clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target none cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external reversal and character replacement",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "partial same target mode reduced",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode none",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "none checked resize observer",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "character deletion",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "restore requested mode",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer button",
+          "frames": 15,
+          "earliest": ["paint24", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter button",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer focusable",
+          "frames": 13,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter focusable",
+          "frames": 15,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter toggle",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter group",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "enable",
+          "frames": 14,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "pointer held button",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable button",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock button",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation button",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release button",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "pointer held focusable",
+          "frames": 14,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled focusable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter actual focusable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock focusable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release focusable",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held toggle",
+          "frames": 14,
+          "earliest": ["paint23", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable toggle",
+          "frames": 16,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release toggle",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held group",
+          "frames": 15,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable group",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual group",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation group",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release group",
+          "frames": 14,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "actual dragged thumb",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target explicit clock",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target reduced cancellation",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag disabled async commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "disabled external value commit",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "start before cleanup",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unmount actual hosts",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        }
+      ],
+      "observers": [
+        {
+          "targets": ["switch", "switch-thumb"],
+          "active": 0,
+          "calls": [
+            [
+              {
+                "slot": "switch",
+                "width": 48
+              },
+              {
+                "slot": "switch-thumb",
+                "width": 16
+              }
+            ],
+            [
+              {
+                "slot": "switch",
+                "width": 64
+              }
+            ]
+          ]
+        }
+      ],
+      "cleanup": {
+        "before": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.949237; transform: scale(0.997969);",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.949237; transform: scale(0.997969);",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.0507629; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: translateX(45.5634px);",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.749723);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.749723);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.749723);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: scale(0.995908);",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.0507629; transform: scale(0.962031);",
+            "animations": []
+          }
+        ],
+        "after": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.949237; transform: scale(0.997969);",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.949237; transform: scale(0.997969);",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.0507629; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: translateX(45.5634px);",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.749723);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.749723);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.749723);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: scale(0.995908);",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.0507629; transform: scale(0.962031);",
+            "animations": []
+          }
+        ],
+        "refs": [
+          {
+            "phase": "attach",
+            "node": true
+          },
+          {
+            "phase": "cleanup"
+          }
+        ]
+      }
+    },
+    {
+      "os": "reduce",
+      "mode": "full",
+      "errors": [],
+      "steps": [
+        {
+          "name": "initial",
+          "frames": 17,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external controlled commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unrelated render",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target inherited clock",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "same target explicit clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target none cancellation",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external reversal and character replacement",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode reduced",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode none",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "none checked resize observer",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "character deletion",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "restore requested mode",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer button",
+          "frames": 15,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter button",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer focusable",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter focusable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer toggle",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer group",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter group",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "enable",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "pointer held button",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable button",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter actual button",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock button",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release button",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held focusable",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled focusable",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable focusable",
+          "frames": 15,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual focusable",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release focusable",
+          "frames": 15,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held toggle",
+          "frames": 14,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled toggle",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter actual toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation toggle",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release toggle",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held group",
+          "frames": 15,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter actual group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release group",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "actual dragged thumb",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target explicit clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target reduced cancellation",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag disabled async commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "disabled external value commit",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "start before cleanup",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unmount actual hosts",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        }
+      ],
+      "observers": [
+        {
+          "targets": ["switch", "switch-thumb"],
+          "active": 0,
+          "calls": [
+            [
+              {
+                "slot": "switch",
+                "width": 48
+              },
+              {
+                "slot": "switch-thumb",
+                "width": 16
+              }
+            ],
+            [
+              {
+                "slot": "switch",
+                "width": 64
+              }
+            ]
+          ]
+        }
+      ],
+      "cleanup": {
+        "before": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.365661; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.365661; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.634339; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.614516; transform: none;",
+            "animations": []
+          }
+        ],
+        "after": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.365661; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.365661; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.634339; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.614516; transform: none;",
+            "animations": []
+          }
+        ],
+        "refs": [
+          {
+            "phase": "attach",
+            "node": true
+          },
+          {
+            "phase": "cleanup"
+          }
+        ]
+      }
+    },
+    {
+      "os": "reduce",
+      "mode": "reduced",
+      "errors": [],
+      "steps": [
+        {
+          "name": "initial",
+          "frames": 17,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external controlled commit",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unrelated render",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target inherited clock",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target explicit clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target none cancellation",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external reversal and character replacement",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode reduced",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode none",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "none checked resize observer",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "character deletion",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "restore requested mode",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer button",
+          "frames": 15,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter button",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer focusable",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter focusable",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer toggle",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter group",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "enable",
+          "frames": 14,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "pointer held button",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled button",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable button",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual button",
+          "frames": 16,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release button",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held focusable",
+          "frames": 13,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable focusable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter actual focusable",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release focusable",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held toggle",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled toggle",
+          "frames": 16,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "pointer release reenable toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock toggle",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held group",
+          "frames": 14,
+          "earliest": ["paint23", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release group",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "actual dragged thumb",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target explicit clock",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target reduced cancellation",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag disabled async commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "disabled external value commit",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "start before cleanup",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unmount actual hosts",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        }
+      ],
+      "observers": [
+        {
+          "targets": ["switch", "switch-thumb"],
+          "active": 0,
+          "calls": [
+            [
+              {
+                "slot": "switch",
+                "width": 48
+              },
+              {
+                "slot": "switch-thumb",
+                "width": 16
+              }
+            ],
+            [
+              {
+                "slot": "switch",
+                "width": 64
+              }
+            ]
+          ]
+        }
+      ],
+      "cleanup": {
+        "before": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.333683; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.333683; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.666317; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.657072; transform: none;",
+            "animations": []
+          }
+        ],
+        "after": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.333683; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.333683; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.666317; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.657072; transform: none;",
+            "animations": []
+          }
+        ],
+        "refs": [
+          {
+            "phase": "attach",
+            "node": true
+          },
+          {
+            "phase": "cleanup"
+          }
+        ]
+      }
+    },
+    {
+      "os": "reduce",
+      "mode": "none",
+      "errors": [],
+      "steps": [
+        {
+          "name": "initial",
+          "frames": 17,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external controlled commit",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unrelated render",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target inherited clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target explicit clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "same target none cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "external reversal and character replacement",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode reduced",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "partial same target mode none",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "none checked resize observer",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "character deletion",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "restore requested mode",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "initial disabled pointer button",
+          "frames": 15,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter button",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer focusable",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter focusable",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer toggle",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled pointer group",
+          "frames": 13,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "initial disabled Enter group",
+          "frames": 14,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "enable",
+          "frames": 15,
+          "earliest": ["paint16", "commit", "paint1"]
+        },
+        {
+          "name": "pointer held button",
+          "frames": 13,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable button",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual button",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock button",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation button",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release button",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held focusable",
+          "frames": 13,
+          "earliest": ["paint21", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled focusable",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable focusable",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual focusable",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter inherited clock focusable",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation focusable",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release focusable",
+          "frames": 14,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held toggle",
+          "frames": 15,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual toggle",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation toggle",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release toggle",
+          "frames": 15,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer held group",
+          "frames": 14,
+          "earliest": ["paint22", "commit", "paint1"]
+        },
+        {
+          "name": "pointer disabled group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "pointer release reenable group",
+          "frames": 14,
+          "earliest": ["paint17", "commit", "paint1"]
+        },
+        {
+          "name": "Enter actual group",
+          "frames": 15,
+          "earliest": ["paint18", "commit", "paint1"]
+        },
+        {
+          "name": "Enter inherited clock group",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter none cancellation group",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "Enter release group",
+          "frames": 14,
+          "earliest": ["paint19", "commit", "paint1"]
+        },
+        {
+          "name": "reset clock",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "actual dragged thumb",
+          "frames": 15,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target explicit clock",
+          "frames": 13,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag same target reduced cancellation",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "drag disabled async commit",
+          "frames": 16,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "disabled external value commit",
+          "frames": 14,
+          "earliest": ["paint20", "commit", "paint1"]
+        },
+        {
+          "name": "start before cleanup",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        },
+        {
+          "name": "unmount actual hosts",
+          "frames": 14,
+          "earliest": ["commit", "paint1", "paint2"]
+        }
+      ],
+      "observers": [
+        {
+          "targets": ["switch", "switch-thumb"],
+          "active": 0,
+          "calls": [
+            [
+              {
+                "slot": "switch",
+                "width": 48
+              },
+              {
+                "slot": "switch-thumb",
+                "width": 16
+              }
+            ],
+            [
+              {
+                "slot": "switch",
+                "width": 64
+              }
+            ]
+          ]
+        }
+      ],
+      "cleanup": {
+        "before": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.401211; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.401211; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.598789; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.598789; transform: none;",
+            "animations": []
+          }
+        ],
+        "after": [
+          {
+            "probe": "button",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "focusable",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "toggle",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "group",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "checkbox",
+            "connected": false,
+            "style": "opacity: 0.401211; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-a",
+            "connected": false,
+            "style": "opacity: 0.401211; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "radio-b",
+            "connected": false,
+            "style": "opacity: 0.598789; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "switch",
+            "connected": false,
+            "style": "transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "progress",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "composed-default",
+            "connected": false,
+            "style": "inset-inline-start: 0px; height: inherit; width: 100%; transform: scaleX(0.9);",
+            "animations": []
+          },
+          {
+            "probe": "slider",
+            "connected": false,
+            "style": "position: absolute; inset-inline-start: var(--position); top: 50%; translate: -50% -50%; --position: 87.86666666666667%; transform: none;",
+            "animations": []
+          },
+          {
+            "probe": "otp",
+            "connected": false,
+            "style": "opacity: 0.598789; transform: none;",
+            "animations": []
+          }
+        ],
+        "refs": [
+          {
+            "phase": "attach",
+            "node": true
+          },
+          {
+            "phase": "cleanup"
+          }
+        ]
+      }
+    }
+  ]
+}

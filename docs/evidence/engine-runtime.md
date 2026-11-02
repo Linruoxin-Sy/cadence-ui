@@ -145,6 +145,15 @@ first-rAF resize measurement. Zero/negative/nonfinite timeScale is not certified
 Other independent writers in the remaining table stay OPEN. Final commands, counts,
 source hashes and production proof are recorded in basic-controls handoff.
 
+Final basic-control authority is `basic-controls-validation.json`: runtime4d06c24,
+client138/138, legacy23/23 + held-release8/8, complete check687/687 in88 files,
+production193/193. `basic-controls-runtime.json` indexes the exact original raw
+JSON in its `.json.gz` sibling (51,195,294 UTF8 bytes; no frames discarded).
+The archive tool verifies lossless decompression and records SHA256. Real native
+ResizeObserver delivery and disconnect are instrumented without mocking delivery.
+Current strict four-page JS is Button293406, Chart414456, Calendar318764 and
+CodeBlock376803 gzip bytes; all FAIL120000. Source50cc262 numbers below remain history.
+
 Runtime source50cc262: full pnpm check687/687 in88 files, isolated production build
 and106/106 behavior cases. Correctly scoped Select6/6 and strengthened nonempty
 Dropdown-checkbox6/6 pass; the latter samples only that actual checkbox writer, not
