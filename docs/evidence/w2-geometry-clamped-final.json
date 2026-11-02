@@ -1,0 +1,19 @@
+{
+  "sourceHashes": {
+    "select": "fe9d11ba6777b13e88c6f27fde11eb87f98ab6091911858ddaa93d5ce6820ecc",
+    "code-block": "23817e67eead341bff99f618801ab51dd8d067939df0e04d0173df9cd5ad5090",
+    "sidebar": "03d452b3343d5953a4f460020670a5702fbcff397485335b6f27642a17ba40e9",
+    "calendar": "8b8211aff3de0a99c802cdd5493e9d29e9c3f2c59e1b433d3aa25ce07714f68e",
+    "tabs": "7e5066857fb5a266cb1747dd703b61ee1db33c956185c59f73cdc5bcf4881ae5"
+  },
+  "cases": 348,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-geometry-clamped-final.json.gz",
+    "bytes": 5926203,
+    "gzipBytes": 148263,
+    "sha256": "e9a779cf30e73c99467f643219d6b6360af1e6c792aecd27641bdf9ca0f26389",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

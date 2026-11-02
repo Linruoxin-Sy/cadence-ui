@@ -1,5 +1,9 @@
 # Motion/engine runtime increment — 2026-11-02
 
+> W2 固定剩余清单现已由 [最终验收](engine-runtime-closure.md) 和其 JSON 收尾。
+> 下文的 OPEN 表是历史增量记录；当前状态以最终验收及 [项目状态](../project-status.md) 为准。
+> 整体 goal 仍未完成，按用户要求在 W2 后停止。
+
 This is a partial runtime audit, not full-library closure. API466 and the CSS lifecycle
 closure remain authoritative. `engine-writers.json` discovers 33 real source sites,
 including private glyphs, flight, measured values and engine integration sites. It

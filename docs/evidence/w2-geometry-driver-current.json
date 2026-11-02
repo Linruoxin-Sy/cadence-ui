@@ -1,0 +1,19 @@
+{
+  "sourceHashes": {
+    "select": "fe9d11ba6777b13e88c6f27fde11eb87f98ab6091911858ddaa93d5ce6820ecc",
+    "code-block": "a76411040aad9ef0d8d7bd5806b46cca1877c5bc53bcd36f49f6a52b9aedf6f5",
+    "sidebar": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
+    "calendar": "8b8211aff3de0a99c802cdd5493e9d29e9c3f2c59e1b433d3aa25ce07714f68e",
+    "tabs": "7e5066857fb5a266cb1747dd703b61ee1db33c956185c59f73cdc5bcf4881ae5"
+  },
+  "cases": 330,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-geometry-driver-current.json.gz",
+    "bytes": 5142553,
+    "gzipBytes": 135753,
+    "sha256": "332fbfdc12962edc568b98db43afcea4e1b4d32222ba35853edf53814933373f",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

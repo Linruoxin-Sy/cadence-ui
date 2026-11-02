@@ -1,0 +1,17 @@
+{
+  "sourceHashes": {
+    "registry/cadence/chart/index.tsx": "8845c21c50e65c1d17131d040316d5f665cf320ba824f0e13824d6adb52d217d",
+    "registry/cadence/carousel/index.tsx": "78e2dd7c016e7b24a1ff3c339ebbb9ab4db585a7c0c0c4580a7b94ec3aff699a",
+    "components/site/document-entrance.tsx": "acdd43aa914730176c0de8ff6162f0baf5ac1fb0342037dd26c265bc64d9204c"
+  },
+  "cases": 1236,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-close-engines.json.gz",
+    "bytes": 72486558,
+    "gzipBytes": 909482,
+    "sha256": "30d41f70c4048e0f307bbda44529a9206c790daac18e05d38689c9e39b7d680c",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "sourceHashes": {
+    "dropdown-menu": "abcabf9c24c51e76c3622184416f003ba6ea59df758774cbf76bd1ff825b8cff",
+    "context-menu": "0a71f3e17e80d6c8cd330dc3b6c4f6834669b5bc00cc1dfe6042e12223033eff",
+    "select": "5c2a5130d8d59bdba123e302f6375e341db9a71673489166921ef2aea52298f2",
+    "combobox": "b08aa48720ebba1e4b77ea23d40da6324cee15a3ed015f55a28c09f56336c56a",
+    "lib/control-animation": "881bf4c41a4ff5f766eb1a17a1457ff08ca0c58ca8e929c8372cb7c364982d92"
+  },
+  "cases": 264,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-indicators-current.json.gz",
+    "bytes": 4074822,
+    "gzipBytes": 127290,
+    "sha256": "b5f25f02e319c5e2ab6fe66a963a3dc3b76a8009ccb524bea2864adb32da246c",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

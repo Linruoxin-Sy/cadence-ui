@@ -1,0 +1,21 @@
+{
+  "sourceHashes": {
+    "registry/cadence/chart/index.tsx": "195121487d2b525c081901194745336909ba5052fbba532e491c109fceeac89f",
+    "registry/cadence/carousel/index.tsx": "78e2dd7c016e7b24a1ff3c339ebbb9ab4db585a7c0c0c4580a7b94ec3aff699a",
+    "components/site/document-entrance.tsx": "ce96e738701ee29240d9b863429ecdc3e9f8b79f09ec4a464e3e3a5b2f42fb22"
+  },
+  "cases": 39,
+  "failures": [
+    "entrance/article/none/no-preference/true/offscreen consumed entrance stays settled on full: Expected values to be strictly equal:\n\n0 !== 1\n",
+    "entrance/section/none/no-preference/true/offscreen consumed entrance stays settled on full: Expected values to be strictly equal:\n\n0 !== 1\n",
+    "entrance/div/none/no-preference/true/offscreen consumed entrance stays settled on full: Expected values to be strictly equal:\n\n0 !== 1\n"
+  ],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-entrance-offscreen-negative.json.gz",
+    "bytes": 141264,
+    "gzipBytes": 13049,
+    "sha256": "017e0eff53edb0a8aa424b12cbf21ba3e1db35e1a4e5cf57b0e437ab999e835d",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

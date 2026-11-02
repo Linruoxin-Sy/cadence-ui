@@ -1,0 +1,17 @@
+{
+  "sourceHashes": {
+    "registry/cadence/chart/index.tsx": "195121487d2b525c081901194745336909ba5052fbba532e491c109fceeac89f",
+    "registry/cadence/carousel/index.tsx": "78e2dd7c016e7b24a1ff3c339ebbb9ab4db585a7c0c0c4580a7b94ec3aff699a",
+    "components/site/document-entrance.tsx": "acdd43aa914730176c0de8ff6162f0baf5ac1fb0342037dd26c265bc64d9204c"
+  },
+  "cases": 1236,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-engines-clock-accepted.json.gz",
+    "bytes": 56703605,
+    "gzipBytes": 772958,
+    "sha256": "ca06ccc3239d19f2350fb92fe34dd88dddef74a6302d16a36e4efb966ac91bd0",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

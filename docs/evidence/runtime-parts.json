@@ -1646,7 +1646,7 @@
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/select/index.tsx",
-        "sha256": "48ed51ccb5ba23a432dfea0dbc2817f36617edb3489c46d16c1c005b9d68510f",
+        "sha256": "fe9d11ba6777b13e88c6f27fde11eb87f98ab6091911858ddaa93d5ce6820ecc",
         "slots": [
           {
             "owner": "SelectGroup",
@@ -1655,104 +1655,114 @@
           },
           {
             "owner": "SelectValue",
-            "line": 165,
+            "line": 172,
             "value": "\"select-value\""
           },
           {
             "owner": "SelectTrigger",
-            "line": 247,
+            "line": 254,
             "value": "\"select-trigger\""
           },
           {
-            "owner": "SelectTrigger",
-            "line": 275,
+            "owner": "SelectHandoff",
+            "line": 301,
             "value": "\"select-handoff\""
           },
           {
             "owner": "SelectContent",
-            "line": 328,
+            "line": 349,
             "value": "\"select-content\""
           },
           {
             "owner": "SelectLabel",
-            "line": 356,
+            "line": 377,
             "value": "\"select-label\""
           },
           {
             "owner": "SelectItem",
-            "line": 369,
+            "line": 390,
             "value": "\"select-item\""
           },
           {
             "owner": "SelectItem",
-            "line": 390,
+            "line": 411,
             "value": "\"select-item-text\""
           },
           {
             "owner": "SelectItem",
-            "line": 401,
+            "line": 422,
             "value": "\"select-item-indicator\""
           },
           {
             "owner": "SelectSeparator",
-            "line": 419,
+            "line": 440,
             "value": "\"select-separator\""
           },
           {
             "owner": "SelectScrollUpButton",
-            "line": 429,
+            "line": 450,
             "value": "\"select-scroll-up-button\""
           },
           {
             "owner": "SelectScrollDownButton",
-            "line": 444,
+            "line": 465,
             "value": "\"select-scroll-down-button\""
           }
         ],
         "signals": [
           {
-            "owner": "measure",
-            "line": 154,
-            "text": "animate(width, next, cm.transition(\"geometry.resize\"))"
+            "owner": "clock",
+            "line": 115,
+            "text": "JSON.stringify(cm.transition(\"geometry.resize\"))"
           },
           {
-            "owner": "measure",
-            "line": 154,
+            "owner": "clock",
+            "line": 115,
             "text": "cm.transition(\"geometry.resize\")"
           },
           {
+            "owner": "transition",
+            "line": 138,
+            "text": "cm.transition(\"geometry.resize\")"
+          },
+          {
+            "owner": "measure",
+            "line": 159,
+            "text": "animate(width, next, transition)"
+          },
+          {
             "owner": "SelectValue",
-            "line": 163,
+            "line": 170,
             "text": "<motion.span\n      ref={hostRef}\n      data-slot=\"select-value\"\n      data-motion={cm.mode}\n      style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}\n      className=\"relative block min-w-0 overflow-hidden whitespace-nowrap\"\n    >"
           },
           {
             "owner": "SelectTrigger",
-            "line": 252,
+            "line": 259,
             "text": "\"relative flex h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 pr-8 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none\""
           },
           {
-            "owner": "SelectTrigger",
-            "line": 272,
-            "text": "<motion.span\n              aria-hidden\n              data-motion={cm.mode}\n              data-slot=\"select-handoff\"\n              initial={{ x: flight.origin.x, y: flight.origin.y }}\n              animate={{ x: 0, y: 0 }}\n              transition={cm.transition(\"handoff\")}\n              onAnimationComplete={finish}\n              style={{\n                position: \"fixed\",\n                left: flight.rect.left,\n                top: flight.rect.top,\n                width: flight.rect.width,\n                height: flight.rect.height,\n           "
-          },
-          {
-            "owner": "SelectTrigger",
-            "line": 278,
+            "owner": "transition",
+            "line": 292,
             "text": "cm.transition(\"handoff\")"
           },
           {
+            "owner": "SelectHandoff",
+            "line": 298,
+            "text": "<motion.span\n      aria-hidden\n      data-motion={cm.mode}\n      data-slot=\"select-handoff\"\n      initial={{ x: flight.origin.x, y: flight.origin.y }}\n      animate={controls}\n      onAnimationComplete={onComplete}\n      style={{\n        position: \"fixed\",\n        left: flight.rect.left,\n        top: flight.rect.top,\n        width: flight.rect.width,\n        height: flight.rect.height,\n      }}\n      className=\"pointer-events-none z-[60] flex items-center overflow-hidden text-sm whitespace-nowrap\"\n    >"
+          },
+          {
             "owner": "SelectContent",
-            "line": 336,
+            "line": 357,
             "text": "\"transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0\""
           },
           {
             "owner": "SelectItem",
-            "line": 399,
+            "line": 420,
             "text": "<ControlSpan\n              {...(rest as HTMLMotionProps<\"span\">)}\n              data-slot=\"select-item-indicator\"\n              data-motion={cm.mode}\n              className={cn(\"absolute right-2 flex size-3.5 items-center justify-center\", indicatorClassName)}\n              target={state.selected ? { opacity: 1, scale: 1 } : { opacity: 0, scale: cm.reduced ? 1 : scale.in }}\n              transition={{ ...cm.transition(\"state.morph\"), ...(cm.reduced ? { scale: { duration: 0 } } : {}) }}\n            >"
           },
           {
             "owner": "SelectItem",
-            "line": 405,
+            "line": 426,
             "text": "cm.transition(\"state.morph\")"
           }
         ]
@@ -2280,51 +2290,56 @@
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/code-block/index.tsx",
-        "sha256": "02d75db64b26eeb7034dea8fff1e2aaf3b21bc3103c82c9ec6a4bbcf2d21c4ac",
+        "sha256": "f5ec61d77f71179460457c98e786ae6b05d0cbe56d3b2c46f2389836798f23cd",
         "slots": [
           {
             "owner": "CodeBlock",
-            "line": 294,
+            "line": 295,
             "value": "\"code-block\""
           },
           {
             "owner": "CodeBlockHeader",
-            "line": 343,
+            "line": 344,
             "value": "\"code-block-header\""
           },
           {
             "owner": "CodeBlockTitle",
-            "line": 371,
+            "line": 372,
             "value": "\"code-block-title\""
           },
           {
             "owner": "CodeBlockTabs",
-            "line": 428,
+            "line": 429,
             "value": "\"code-block-tabs\""
           },
           {
             "owner": "CodeBlockTab",
-            "line": 484,
+            "line": 485,
             "value": "\"code-block-tab\""
           },
           {
             "owner": "CodeBlockTab",
-            "line": 501,
+            "line": 503,
+            "value": "\"code-block-tab-indicator\""
+          },
+          {
+            "owner": "CodeBlockTab",
+            "line": 510,
             "value": "\"code-block-tab-indicator\""
           },
           {
             "owner": "CodeBlockActions",
-            "line": 529,
+            "line": 539,
             "value": "\"code-block-actions\""
           },
           {
             "owner": "CodeBlockActions",
-            "line": 540,
+            "line": 550,
             "value": "\"code-block-actions\""
           },
           {
             "owner": "CodeBlockCopyButton",
-            "line": 615,
+            "line": 625,
             "value": "\"code-block-copy-button\""
           },
           {
@@ -2371,58 +2386,63 @@
         "signals": [
           {
             "owner": "CodeBlockTab",
-            "line": 489,
+            "line": 490,
             "text": "\"relative inline-flex h-6 shrink-0 cursor-pointer items-center rounded-sm px-2 text-xs font-medium leading-6 text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 data-[active]:text-foreground\""
           },
           {
             "owner": "CodeBlockTab",
-            "line": 499,
-            "text": "<motion.span\n          aria-hidden=\"true\"\n          data-slot=\"code-block-tab-indicator\"\n          data-motion={cm.mode}\n          // A shared element is the travel; under reduced motion there is no travel\n          // to keep, so the pill mounts where the selection landed.\n          layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}\n          transition={cm.reduced ? { duration: 0 } : cm.transition(\"layout.shared\")}\n          className=\"absolute inset-0 rounded-sm bg-muted\"\n        />"
+            "line": 508,
+            "text": "<motion.span\n            aria-hidden=\"true\"\n            data-slot=\"code-block-tab-indicator\"\n            data-motion={cm.mode}\n            // A shared element is the travel; under reduced motion there is no travel\n            // to keep, so the pill mounts where the selection landed.\n            layoutId={cm.reduced ? undefined : `${block.contentId}-tab-indicator`}\n            transition={cm.reduced ? { duration: 0 } : cm.transition(\"layout.shared\")}\n            className=\"absolute inset-0 rounded-sm bg-muted\"\n          />"
           },
           {
             "owner": "CodeBlockTab",
-            "line": 506,
+            "line": 515,
             "text": "cm.transition(\"layout.shared\")"
           },
           {
             "owner": "CodeBlockActions",
-            "line": 539,
+            "line": 549,
             "text": "<NativeControlDiv\n      data-slot=\"code-block-actions\"\n      data-motion={cm.mode}\n      data-revealed={revealed || undefined}\n      target={{ opacity: revealed ? 1 : 0 }}\n      transition={cm.transition(\"data.transition\")}\n      className={cn(\n        \"absolute end-3 top-3 z-10 flex shrink-0 items-center gap-1 group-data-[size=sm]/code-block:end-2 group-data-[size=sm]/code-block:top-2\",\n        // A floating control needs its own surface, or it reads as part of the code.\n        \"[&_button]:bg-background [&_button]:ring-1 [&_button]:ring-foreg"
           },
           {
             "owner": "CodeBlockActions",
-            "line": 544,
+            "line": 554,
             "text": "cm.transition(\"data.transition\")"
           },
           {
             "owner": "swap",
-            "line": 609,
+            "line": 619,
             "text": "cm.transition(\"state.morph\")"
           },
           {
             "owner": "CodeBlockCopyButton",
-            "line": 639,
+            "line": 649,
             "text": "<ControlSpan\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              target={{ opacity: copied ? 0 : 1, scale: copied && !tickOnly ? scale.in : 1 }}\n              transition={swap}\n            >"
           },
           {
             "owner": "CodeBlockCopyButton",
-            "line": 647,
+            "line": 657,
             "text": "<ControlSpan\n              data-motion={cm.mode}\n              className=\"col-start-1 row-start-1 flex\"\n              target={{ opacity: copied ? 1 : 0, scale: copied || tickOnly ? 1 : scale.in }}\n              transition={swap}\n            >"
           },
           {
             "owner": "measure",
-            "line": 750,
+            "line": 739,
+            "text": "cm.transition(\"geometry.resize\")"
+          },
+          {
+            "owner": "measure",
+            "line": 748,
             "text": "animate(height, target, cm.transition(\"geometry.resize\"))"
           },
           {
             "owner": "measure",
-            "line": 750,
+            "line": 748,
             "text": "cm.transition(\"geometry.resize\")"
           },
           {
             "owner": "CodeBlockContent",
             "line": 760,
-            "text": "<motion.div\n      ref={viewportRef}\n      data-slot=\"code-block-viewport\"\n      data-motion={cm.mode}\n      style={measured ? { height } : undefined}\n      className=\"min-h-0 overflow-hidden\"\n    >"
+            "text": "<motion.div\n      ref={viewportRef}\n      data-slot=\"code-block-viewport\"\n      data-motion={cm.mode}\n      style={measured ? { height: renderedHeight } : undefined}\n      className=\"min-h-0 overflow-hidden\"\n    >"
           },
           {
             "owner": "CodeBlockExpandButton",
@@ -2715,7 +2735,7 @@
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/tabs/index.tsx",
-        "sha256": "6667b08c8c9072e35bb9d2b5bd528ef47eac9a1741db8552a0d958c44225f2c5",
+        "sha256": "7e5066857fb5a266cb1747dd703b61ee1db33c956185c59f73cdc5bcf4881ae5",
         "slots": [
           {
             "owner": "Tabs",
@@ -2842,7 +2862,7 @@
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/carousel/index.tsx",
-        "sha256": "8b8e163b8e156393db128a868fc974c4fb47bab449e5f063ed2db6c074615bb1",
+        "sha256": "78e2dd7c016e7b24a1ff3c339ebbb9ab4db585a7c0c0c4580a7b94ec3aff699a",
         "slots": [
           {
             "owner": "Carousel",
@@ -2937,18 +2957,18 @@
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/chart/index.tsx",
-        "sha256": "3ebcace2ed433d7fb71415c9679d58151a91fc35379fb202bd3cdb55e607820c",
+        "sha256": "8845c21c50e65c1d17131d040316d5f665cf320ba824f0e13824d6adb52d217d",
         "slots": [
           {
             "owner": "ChartContainer",
-            "line": 111,
+            "line": 153,
             "value": "\"chart\""
           }
         ],
         "signals": [
           {
             "owner": "clock",
-            "line": 57,
+            "line": 97,
             "text": "cm.transition(\"data.transition\")"
           }
         ]
@@ -2959,11 +2979,11 @@
       "recipes": ["data.transition"],
       "tier": "T4",
       "targets": ["calendar-month-grid table | native element.animate WAAPI | data.transition"],
-      "delegates": ["CalendarDayButton -> Button"],
+      "delegates": ["CalendarDayButton/navigation -> native button + static buttonVariants; no PressButton engine"],
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/calendar/index.tsx",
-        "sha256": "1f24111e6a89dcd7c570f751c3cfe7f41d30e1b754987f01714efba9cb10e333",
+        "sha256": "8b8211aff3de0a99c802cdd5493e9d29e9c3f2c59e1b433d3aa25ce07714f68e",
         "slots": [
           {
             "owner": "CalendarDayButton",
@@ -3154,7 +3174,7 @@
       "disposition": "See per-part evidence/gaps in engine-runtime.md (basic controls: basic-controls-runtime.json); CSS proof stays in css-lifecycle.md. Not a global runtime pass",
       "source": {
         "path": "registry/cadence/sidebar/index.tsx",
-        "sha256": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
+        "sha256": "03d452b3343d5953a4f460020670a5702fbcff397485335b6f27642a17ba40e9",
         "slots": [
           {
             "owner": "SidebarProvider",
@@ -3163,112 +3183,112 @@
           },
           {
             "owner": "Sidebar",
-            "line": 197,
+            "line": 202,
             "value": "\"sidebar\""
           },
           {
             "owner": "Sidebar",
-            "line": 216,
+            "line": 221,
             "value": "\"sidebar\""
           },
           {
             "owner": "Sidebar",
-            "line": 245,
+            "line": 250,
             "value": "\"sidebar\""
           },
           {
             "owner": "Sidebar",
-            "line": 249,
+            "line": 254,
             "value": "\"sidebar-gap\""
           },
           {
             "owner": "Sidebar",
-            "line": 263,
+            "line": 268,
             "value": "\"sidebar-container\""
           },
           {
             "owner": "Sidebar",
-            "line": 281,
+            "line": 286,
             "value": "\"sidebar-inner\""
           },
           {
             "owner": "SidebarTrigger",
-            "line": 297,
+            "line": 302,
             "value": "\"sidebar-trigger\""
           },
           {
             "owner": "SidebarRail",
-            "line": 319,
+            "line": 324,
             "value": "\"sidebar-rail\""
           },
           {
             "owner": "SidebarInset",
-            "line": 341,
+            "line": 346,
             "value": "\"sidebar-inset\""
           },
           {
             "owner": "SidebarInput",
-            "line": 355,
+            "line": 360,
             "value": "\"sidebar-input\""
           },
           {
             "owner": "SidebarHeader",
-            "line": 368,
+            "line": 373,
             "value": "\"sidebar-header\""
           },
           {
             "owner": "SidebarFooter",
-            "line": 379,
+            "line": 384,
             "value": "\"sidebar-footer\""
           },
           {
             "owner": "SidebarSeparator",
-            "line": 390,
+            "line": 395,
             "value": "\"sidebar-separator\""
           },
           {
             "owner": "SidebarContent",
-            "line": 403,
+            "line": 408,
             "value": "\"sidebar-content\""
           },
           {
             "owner": "SidebarGroup",
-            "line": 417,
+            "line": 422,
             "value": "\"sidebar-group\""
           },
           {
             "owner": "SidebarGroupContent",
-            "line": 480,
+            "line": 485,
             "value": "\"sidebar-group-content\""
           },
           {
             "owner": "SidebarMenu",
-            "line": 491,
+            "line": 496,
             "value": "\"sidebar-menu\""
           },
           {
             "owner": "SidebarMenuItem",
-            "line": 502,
+            "line": 507,
             "value": "\"sidebar-menu-item\""
           },
           {
             "owner": "SidebarMenuBadge",
-            "line": 620,
+            "line": 625,
             "value": "\"sidebar-menu-badge\""
           },
           {
             "owner": "SidebarMenuSkeleton",
-            "line": 647,
+            "line": 652,
             "value": "\"sidebar-menu-skeleton\""
           },
           {
             "owner": "SidebarMenuSub",
-            "line": 669,
+            "line": 674,
             "value": "\"sidebar-menu-sub\""
           },
           {
             "owner": "SidebarMenuSubItem",
-            "line": 684,
+            "line": 689,
             "value": "\"sidebar-menu-sub-item\""
           }
         ],
@@ -3280,7 +3300,7 @@
           },
           {
             "owner": "controls",
-            "line": 187,
+            "line": 190,
             "text": "animate(progress, target, { ...transition, onUpdate: write })"
           }
         ]
@@ -3461,7 +3481,7 @@
   "site": [
     {
       "path": "components/site/document-entrance.tsx",
-      "sha256": "7bbee25dcdc7fe70f9ab1fafb6b0781f49cd628f0ea1161a7e2587b7308cda1f",
+      "sha256": "acdd43aa914730176c0de8ff6162f0baf5ac1fb0342037dd26c265bc64d9204c",
       "slots": [],
       "signals": [
         {
@@ -3476,22 +3496,22 @@
         },
         {
           "owner": "DocumentEntrance",
-          "line": 136,
+          "line": 141,
           "text": "<motion.article ref={ref} {...motionProps}>"
         },
         {
           "owner": "DocumentEntrance",
-          "line": 144,
+          "line": 149,
           "text": "<motion.section ref={ref} {...motionProps}>"
         },
         {
           "owner": "DocumentEntrance",
-          "line": 151,
+          "line": 156,
           "text": "<motion.div ref={ref as RefObject<HTMLDivElement>} {...motionProps}>"
         }
       ],
       "targets": [
-        "actual article/div/section motion element | Motion declarative/useInView | site-only reveal + documented clipPath exception; SSR hidden, noscript/print restore"
+        "actual article/div/section motion element | Motion committed controls/useInView | site-only reveal + documented clipPath exception; SSR hidden, noscript/print restore"
       ]
     },
     {
@@ -3644,7 +3664,7 @@
     },
     {
       "path": "registry/cadence/lib/motion.ts",
-      "sha256": "5091af569d54981515b3154aa7ad328b08b78632dd3a5649e796a6408d5d52f6",
+      "sha256": "72305fb185390db69a8d2b9c82837adf7fe42c3f1125e0a069e5237ef09656e6",
       "slots": [],
       "signals": []
     },
@@ -3679,24 +3699,24 @@
     },
     {
       "path": "registry/cadence/lib/press-button.tsx",
-      "sha256": "6c4e1bea1bb1012ff64b1e03f0b64bcf87958a861c47cd96178b87e2cd83bcc2",
+      "sha256": "72ae32309c83aaa8065e5dc5337026adc9ebc0fbffbbef614edcad88d63dbedf",
       "slots": [],
       "signals": [
         {
           "owner": "PressButton",
-          "line": 97,
-          "text": "<MotionNativeButton\n      {...props}\n      initial={false}\n      animate={controls}\n      onPointerDown={(event) => {\n        props.onPointerDown?.(event);\n        if (enabled && event.button === 0) setPressed(true);\n      }}\n      onPointerUp={(event) => {\n        props.onPointerUp?.(event);\n        setPressed(false);\n      }}\n      onPointerCancel={(event) => {\n        props.onPointerCancel?.(event);\n        setPressed(false);\n      }}\n      onKeyDown={(event) => {\n        props.onKeyDown?.(event);\n        if (enabled && event.key === \"Enter\""
+          "line": 102,
+          "text": "<MotionNativeButton\n      {...props}\n      initial={false}\n      animate={controls}\n      onPointerDown={(event) => {\n        props.onPointerDown?.(event);\n        if (enabled && event.button === 0 && event.isPrimary && owner.current === null) {\n          owner.current = event.pointerId;\n          setPressed(true);\n        }\n      }}\n      onPointerUp={(event) => {\n        props.onPointerUp?.(event);\n        if (event.pointerId === owner.current) release();\n      }}\n      onPointerCancel={(event) => {\n        props.onPointerCancel?.(event);\n   "
         }
       ]
     },
     {
       "path": "registry/cadence/lib/provider.tsx",
-      "sha256": "28eee1958079e889f7abd9ce7979c42ef8a878185a9186a2734b213f1267812a",
+      "sha256": "d8a91762f4f39fcc1aa2f323716da97ddfdbe10ef0decda60cdeeb5259960a54",
       "slots": [],
       "signals": [
         {
           "owner": "CadenceProvider",
-          "line": 122,
+          "line": 123,
           "text": "<MotionConfig\n        reducedMotion=\"user\"\n        transition={{\n          duration: duration.base * scale,\n          ease: ease.out,\n        }}\n      >"
         }
       ]

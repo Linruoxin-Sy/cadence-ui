@@ -1,0 +1,16 @@
+{
+  "sourceHashes": {
+    "chart": "184dbae4d983d5a6bee10859c70c284390c71ad65640ab470c6056a792604cca",
+    "carousel": "8b8e163b8e156393db128a868fc974c4fb47bab449e5f063ed2db6c074615bb1"
+  },
+  "cases": 10,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-chart-stable-repair.json.gz",
+    "bytes": 108232,
+    "gzipBytes": 9441,
+    "sha256": "e00bf174059bdf853eec4d6d7233d1bdd97fc0fa9f7dfbe4314966791448d1ec",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "sourceHashes": {
+    "select": "fe9d11ba6777b13e88c6f27fde11eb87f98ab6091911858ddaa93d5ce6820ecc",
+    "code-block": "a76411040aad9ef0d8d7bd5806b46cca1877c5bc53bcd36f49f6a52b9aedf6f5",
+    "sidebar": "03d452b3343d5953a4f460020670a5702fbcff397485335b6f27642a17ba40e9",
+    "calendar": "8b8211aff3de0a99c802cdd5493e9d29e9c3f2c59e1b433d3aa25ce07714f68e",
+    "tabs": "7e5066857fb5a266cb1747dd703b61ee1db33c956185c59f73cdc5bcf4881ae5"
+  },
+  "cases": 348,
+  "failures": [
+    "code/full/no-preference/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "tabs/full/no-preference/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "code/reduced/no-preference/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "tabs/reduced/no-preference/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "code/none/no-preference/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "tabs/none/no-preference/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "code/full/reduce/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "tabs/full/reduce/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "code/reduced/reduce/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "tabs/reduced/reduce/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "code/none/reduce/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n",
+    "tabs/none/reduce/actual active host resize: Expected values to be strictly equal:\n\n396 !== 400\n"
+  ],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-geometry-closure-final.json.gz",
+    "bytes": 5793317,
+    "gzipBytes": 146295,
+    "sha256": "29898178548c82eeb3b9c8dd8ed8fdcae7ea4a174fcacec82702caadf3937580",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

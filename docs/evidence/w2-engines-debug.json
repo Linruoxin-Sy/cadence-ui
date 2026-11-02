@@ -1,0 +1,16 @@
+{
+  "sourceHashes": {
+    "chart": "3ebcace2ed433d7fb71415c9679d58151a91fc35379fb202bd3cdb55e607820c",
+    "carousel": "8b8e163b8e156393db128a868fc974c4fb47bab449e5f063ed2db6c074615bb1"
+  },
+  "cases": 0,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-engines-debug.json.gz",
+    "bytes": 23659,
+    "gzipBytes": 6489,
+    "sha256": "f6cdac7feba3ac262275a68a475161a3e56ae6a5c188c727f4f7031b99e21b23",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "sourceHashes": {
+    "select": "5c2a5130d8d59bdba123e302f6375e341db9a71673489166921ef2aea52298f2",
+    "code-block": "a76411040aad9ef0d8d7bd5806b46cca1877c5bc53bcd36f49f6a52b9aedf6f5",
+    "sidebar": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
+    "calendar": "8b8211aff3de0a99c802cdd5493e9d29e9c3f2c59e1b433d3aa25ce07714f68e",
+    "tabs": "7e5066857fb5a266cb1747dd703b61ee1db33c956185c59f73cdc5bcf4881ae5"
+  },
+  "cases": 60,
+  "failures": [],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-code-actions-current.json.gz",
+    "bytes": 1752200,
+    "gzipBytes": 85222,
+    "sha256": "671bc2990424260e70ed4b67deedec8a91b835a7cc2b8c912907eb5ab535aff1",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}

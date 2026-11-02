@@ -1,0 +1,30 @@
+{
+  "sourceHashes": {
+    "select": "5c2a5130d8d59bdba123e302f6375e341db9a71673489166921ef2aea52298f2",
+    "code-block": "bee6113c9850c2fd66a91f68f12df6b90200d0b99dfa9249ff713b8ecd806b13",
+    "sidebar": "d87a852de5ba241ba2ef3c4a67d0d31f940894a89ceaa218e4377e3b95734eb5",
+    "calendar": "8b8211aff3de0a99c802cdd5493e9d29e9c3f2c59e1b433d3aa25ce07714f68e",
+    "tabs": "7e5066857fb5a266cb1747dd703b61ee1db33c956185c59f73cdc5bcf4881ae5"
+  },
+  "cases": 330,
+  "failures": [
+    "select/full/no-preference/same target inherited clock zero: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "select/full/no-preference/explicit zero same target: The expression evaluated to a falsy value:\n\n  assert(Math.abs(p.width-p.naturalWidth)<1)\n",
+    "code/full/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n-147.79 !== 0\n",
+    "code/full/no-preference/async downgrade none: Expected values to be strictly equal:\n\n-145.117 !== 0\n",
+    "calendar/full/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n0.251672 !== 1\n",
+    "tabs/full/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n-221.632 !== 0\n",
+    "calendar/reduced/no-preference/same target inherited clock zero: Expected values to be strictly equal:\n\n0.396579 !== 1\n",
+    "calendar/full/reduce/same target inherited clock zero: Expected values to be strictly equal:\n\n0.418722 !== 1\n",
+    "calendar/reduced/reduce/same target inherited clock zero: Expected values to be strictly equal:\n\n0.373608 !== 1\n",
+    "calendar/reduced/reduce/async downgrade none: Expected values to be strictly equal:\n\n1 !== 0\n"
+  ],
+  "errors": [],
+  "raw": {
+    "path": "docs/evidence/w2-geometry-negative-committed.json.gz",
+    "bytes": 5127403,
+    "gzipBytes": 134633,
+    "sha256": "a8282e4de56abbf667554f111dd9d881fe15b4ed4e5aba0fef2bb67a6d04d760",
+    "encoding": "gzip; exact original UTF8 JSON, all samples and source text retained"
+  }
+}
