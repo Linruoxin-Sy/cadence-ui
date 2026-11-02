@@ -6,6 +6,14 @@ import { DocumentEntrance } from "@/components/site/document-entrance";
 import { Mdx } from "@/components/site/mdx";
 import { PreviewFrame } from "@/components/site/preview";
 import { getComponent, getComponentSource, listComponents } from "@/lib/content";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/registry/cadence/breadcrumb";
 
 export async function generateStaticParams() {
   const components = await listComponents();
@@ -32,13 +40,17 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
 
   return (
     <DocumentEntrance as="article" className="mx-auto max-w-3xl py-12">
-      <nav className="text-xs text-muted-foreground">
-        <Link className="underline underline-offset-4 hover:text-foreground" href="/components">
-          Components
-        </Link>
-        <span className="px-2">/</span>
-        <span>{doc.title}</span>
-      </nav>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink render={<Link href="/components" />}>Components</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{doc.title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
 
       <header className="mt-4">
         <h1 className="text-3xl font-semibold tracking-tight">{doc.title}</h1>
