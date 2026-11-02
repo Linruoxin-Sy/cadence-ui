@@ -9,7 +9,7 @@ const parts = {
   switch: ["switch", "switch-thumb"],
   slider: ["slider", "slider-thumb"],
   toggle: ["toggle", "toggle"],
-  "toggle-group": ["toggle-group-item", "toggle-group-item"],
+  "toggle-group": ["toggle-group-item", "press-button-content"],
   "input-otp": ["input-otp", "input-otp-slot"],
   progress: ["progress", "progress-indicator"],
 } as const;

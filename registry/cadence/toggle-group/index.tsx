@@ -2,18 +2,27 @@
 
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle";
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group";
+import { useRender } from "@base-ui/react/use-render";
 import type { VariantProps } from "class-variance-authority";
-import { type CSSProperties, createContext, useContext } from "react";
+import { LayoutGroup, motion } from "motion/react";
+import { type ComponentPropsWithRef, type CSSProperties, createContext, useContext, useId } from "react";
 import { cn } from "../lib/cn";
+import { ControlSpan } from "../lib/control-animation";
 import { scale } from "../lib/motion";
 import { PressButton } from "../lib/press-button";
 import { useCadenceMotion } from "../lib/provider";
 import { toggleVariants } from "../toggle";
 
+type ToggleGroupVariant = "default" | "outline" | "segmented";
+type ToggleGroupAppearance = Omit<VariantProps<typeof toggleVariants>, "variant"> & {
+  variant?: ToggleGroupVariant | null;
+};
+
 const ToggleGroupContext = createContext<
-  VariantProps<typeof toggleVariants> & {
+  ToggleGroupAppearance & {
     spacing?: number;
     orientation?: "horizontal" | "vertical";
+    multiple?: boolean;
   }
 >({
   size: "default",
@@ -22,26 +31,25 @@ const ToggleGroupContext = createContext<
   orientation: "horizontal",
 });
 
-export interface ToggleGroupProps extends ToggleGroupPrimitive.Props, VariantProps<typeof toggleVariants> {
-  /** Gap between items in Tailwind's spacing steps; `0` joins the borders. */
+export interface ToggleGroupProps extends ToggleGroupPrimitive.Props, ToggleGroupAppearance {
+  /** Gap between items in Tailwind's spacing steps; `0` joins adjacent pressed fills. */
   spacing?: number;
   orientation?: "horizontal" | "vertical";
 }
 
-export interface ToggleGroupItemProps extends TogglePrimitive.Props, VariantProps<typeof toggleVariants> {}
+export interface ToggleGroupItemProps extends TogglePrimitive.Props, ToggleGroupAppearance {}
 
 /**
- * A row of toggles that share a single visual surface: with `spacing={0}` the
- * outline variant collapses into one segmented control.
- *
- * Recipe: `feedback.press`, inherited by every item — pressing an item
- * compresses it and springs back, exactly like a standalone `toggle`. The group
- * itself never animates: a shared sliding indicator would need the pressed item
- * to change size, and that would move the neighbours the user is aiming at.
+ * A shared strip of toggles, with a pill-shaped `segmented` variant.
+ * Single selection moves only the decorative fill (`layout.shared`). Multiple
+ * selection fades/scales independent fills (`state.morph`); adjacent fills join
+ * at zero spacing. Button layout boxes never move. `feedback.press` adds the
+ * same local press as a standalone toggle.
  *
  * Motion contract:
- * - full: item scale 1 → 0.97 while active
- * - reduced / none: no scale; the pressed background carries the state
+ * - full: shared fill travels, local fills morph, content compresses while held
+ * - reduced: shared fill jumps, local fills fade, no press scale
+ * - none: all state changes settle immediately
  *
  * a11y: Base UI renders `role="group"` with roving focus, so arrow keys move
  * between items and Space presses one. Pass `multiple` to allow more than one
@@ -54,48 +62,121 @@ function ToggleGroup({
   style,
   spacing = 0,
   orientation = "horizontal",
+  multiple = false,
   children,
   ...props
 }: ToggleGroupProps) {
+  const id = useId();
   return (
-    <ToggleGroupPrimitive
-      data-slot="toggle-group"
-      data-variant={variant}
-      data-size={size}
-      data-spacing={spacing}
-      orientation={orientation}
-      data-orientation={orientation}
-      style={(state) =>
-        ({ "--gap": spacing, ...(typeof style === "function" ? style(state) : style) }) as CSSProperties
-      }
-      className={(state) =>
-        cn(
-          // Orientation is a JS branch, not a `data-vertical:` variant: Base UI writes
-          // `data-orientation="vertical"`, while the shorthand utility compiles to
-          // `[data-vertical]`, which nothing ever sets — a vertical group would lay out
-          // as a row.
-          "group/toggle-group flex w-fit gap-[calc(var(--spacing)*var(--gap))] rounded-md",
-          orientation === "vertical" ? "flex-col items-stretch" : "items-center",
-          "data-[spacing=0]:data-[variant=outline]:shadow-xs",
-          typeof className === "function" ? className(state) : className,
-        )
-      }
-      {...props}
-    >
-      <ToggleGroupContext.Provider value={{ variant, size, spacing, orientation }}>
-        {children}
-      </ToggleGroupContext.Provider>
-    </ToggleGroupPrimitive>
+    <LayoutGroup id={id}>
+      <ToggleGroupPrimitive
+        data-slot="toggle-group"
+        data-variant={variant}
+        data-size={size}
+        data-spacing={spacing}
+        orientation={orientation}
+        data-orientation={orientation}
+        multiple={multiple}
+        data-multiple={multiple ? "" : undefined}
+        style={(state) =>
+          ({ "--gap": spacing, ...(typeof style === "function" ? style(state) : style) }) as CSSProperties
+        }
+        className={(state) =>
+          cn(
+            // Orientation is a JS branch, not a `data-vertical:` variant: Base UI writes
+            // `data-orientation="vertical"`, while the shorthand utility compiles to
+            // `[data-vertical]`, which nothing ever sets — a vertical group would lay out
+            // as a row.
+            "group/toggle-group isolate flex w-fit max-w-full gap-[calc(var(--spacing)*var(--gap))] rounded-lg p-1",
+            orientation === "vertical" ? "flex-col items-stretch" : "items-center",
+            variant === "segmented" ? "rounded-full bg-muted/60" : "border border-border/60 bg-muted/40",
+            variant === "outline" && "bg-background shadow-xs",
+            typeof className === "function" ? className(state) : className,
+          )
+        }
+        {...props}
+      >
+        <ToggleGroupContext.Provider value={{ variant, size, spacing, orientation, multiple }}>
+          {children}
+        </ToggleGroupContext.Provider>
+      </ToggleGroupPrimitive>
+    </LayoutGroup>
   );
 }
 
-function ToggleGroupItem({ className, children, variant, size, ...props }: ToggleGroupItemProps) {
+function ItemSurface({
+  elementProps,
+  state,
+  render,
+  variant,
+}: {
+  elementProps: ComponentPropsWithRef<"button">;
+  state: TogglePrimitive.State;
+  render: TogglePrimitive.Props["render"];
+  variant: ToggleGroupAppearance["variant"];
+}) {
+  const cm = useCadenceMotion();
+  const context = useContext(ToggleGroupContext);
+  const fillProps = {
+    "aria-hidden": true as const,
+    "data-slot": "toggle-group-indicator",
+    "data-motion": cm.mode,
+    className: cn(
+      "pointer-events-none absolute inset-0 -z-10 rounded-[inherit]",
+      variant === "segmented" ? "bg-background shadow-sm dark:bg-input" : "bg-accent",
+    ),
+  };
+  const indicator = context.multiple ? (
+    <ControlSpan
+      {...fillProps}
+      target={{ opacity: state.pressed ? 1 : 0, scale: state.pressed || cm.reduced ? 1 : scale.in }}
+      transition={cm.transition("state.morph")}
+    />
+  ) : (
+    state.pressed &&
+    (cm.reduced || cm.timeScale === 0 ? (
+      <span {...fillProps} />
+    ) : (
+      <motion.span {...fillProps} layoutId="selection" initial={false} transition={cm.transition("layout.shared")} />
+    ))
+  );
+  return useRender({
+    defaultTagName: "button",
+    render: render ?? (
+      <PressButton
+        contentOnly
+        decoration={indicator}
+        whileTap={cm.reduced ? undefined : { scale: scale.press }}
+        transition={cm.transition("feedback.press")}
+      />
+    ),
+    state: { ...state },
+    stateAttributesMapping: { pressed: () => null, disabled: () => null },
+    props: {
+      ...elementProps,
+      children: render ? (
+        <>
+          {indicator}
+          <span
+            data-slot="toggle-group-content"
+            className="relative z-10 inline-flex items-center justify-center gap-[inherit]"
+          >
+            {elementProps.children}
+          </span>
+        </>
+      ) : (
+        elementProps.children
+      ),
+    },
+  });
+}
+
+function ToggleGroupItem({ className, children, variant, size, render, ...props }: ToggleGroupItemProps) {
   const cm = useCadenceMotion();
   const context = useContext(ToggleGroupContext);
   const resolvedVariant = context.variant ?? variant;
   const resolvedSize = context.size ?? size;
-  // The joined-control radii and the doubled-border fix follow the *group's*
-  // orientation, which an item cannot read from its own attributes.
+  // Neighbor joins follow the group's axis and use logical inline corners for RTL.
   const vertical = context.orientation === "vertical";
   const joined = context.spacing === 0;
 
@@ -108,22 +189,20 @@ function ToggleGroupItem({ className, children, variant, size, ...props }: Toggl
       data-motion={cm.mode}
       className={(state) =>
         cn(
-          toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
-          "w-auto min-w-0 shrink-0 px-3 focus:z-10 focus-visible:z-10",
-          joined && "rounded-none shadow-none",
-          joined && (vertical ? "first:rounded-t-md last:rounded-b-md" : "first:rounded-l-md last:rounded-r-md"),
+          toggleVariants({ size: resolvedSize }),
+          "relative w-auto min-w-0 shrink-0 rounded-md px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-pressed:bg-transparent data-pressed:text-foreground",
+          resolvedVariant === "segmented" && "rounded-full",
           joined &&
-            resolvedVariant === "outline" &&
-            (vertical ? "border-t-0 first:border-t" : "border-l-0 first:border-l"),
+            context.multiple &&
+            (vertical
+              ? "data-pressed:[&:has(+[data-pressed])]:rounded-b-none [&[data-pressed]+[data-pressed]]:rounded-t-none"
+              : "data-pressed:[&:has(+[data-pressed])]:rounded-e-none [&[data-pressed]+[data-pressed]]:rounded-s-none"),
           typeof className === "function" ? className(state) : className,
         )
       }
-      render={
-        <PressButton
-          whileTap={cm.reduced ? undefined : { scale: scale.press }}
-          transition={cm.transition("feedback.press")}
-        />
-      }
+      render={(elementProps, state) => (
+        <ItemSurface elementProps={elementProps} state={state} render={render} variant={resolvedVariant} />
+      )}
       {...props}
     >
       {children}

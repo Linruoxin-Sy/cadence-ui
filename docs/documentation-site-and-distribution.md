@@ -72,7 +72,7 @@ levels appear only inside `## API`, where a component with distinct parts groups
 
 Title/description and Preview are site chrome, not MDX headings. The old “12 sections”
 label conflated these areas with body headings. Inventory of all 58 pages shows 20 T0
-structural pages, eight T1 pages, 28 T2–T5 UI pages and two T2 blocks. Examples vary in
+structural pages, seven T1 pages, 29 T2–T5 UI pages and two T2 blocks. Examples vary in
 number; neither nine nor twelve is a required total.
 
 All tiers require, in order: Installation, Usage, flat named examples (zero or more),

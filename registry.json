@@ -935,10 +935,10 @@
       ],
       "meta": {
         "since": "0.3.0",
-        "tier": "T1",
+        "tier": "T3",
         "batch": "B3",
-        "motion": ["feedback.press"],
-        "intensity": "subtle",
+        "motion": ["feedback.press", "layout.shared", "state.morph"],
+        "intensity": "medium",
         "complexity": "M",
         "upstream": {
           "registry": "shadcn",

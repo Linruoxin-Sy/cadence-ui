@@ -1,7 +1,7 @@
 "use client";
 
 import { type MotionProps, motion } from "motion/react";
-import { type ComponentProps, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type ComponentProps, type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useControlAnimation } from "./control-animation";
 
 type NativeEvents = Pick<ComponentProps<"button">, "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd">;
@@ -65,8 +65,17 @@ export function PressButton({
   onDragEnd,
   whileTap,
   transition = {},
+  contentOnly = false,
+  decoration,
+  "data-motion": mode,
   ...props
-}: ComponentProps<"button"> & Pick<MotionProps, "whileTap" | "transition">) {
+}: ComponentProps<"button"> &
+  Pick<MotionProps, "whileTap" | "transition"> & {
+    /** Keep the button out of a stacking context so shared decorations can pass under siblings. */
+    contentOnly?: boolean;
+    decoration?: ReactNode;
+    "data-motion"?: string;
+  }) {
   const [pressed, setPressed] = useState(false);
   const owner = useRef<number | "Enter" | null>(null);
   const release = useCallback(() => {
@@ -101,8 +110,9 @@ export function PressButton({
   return (
     <MotionNativeButton
       {...props}
+      data-motion={mode}
       initial={false}
-      animate={controls}
+      animate={contentOnly ? undefined : controls}
       onPointerDown={(event) => {
         props.onPointerDown?.(event);
         if (enabled && event.button === 0 && event.isPrimary && owner.current === null) {
@@ -135,6 +145,21 @@ export function PressButton({
       }}
       nativeRef={ref}
       nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }}
-    />
+    >
+      {decoration}
+      {contentOnly ? (
+        <motion.span
+          data-slot="press-button-content"
+          data-motion={mode}
+          className="relative z-10 inline-flex items-center justify-center gap-[inherit]"
+          initial={false}
+          animate={controls}
+        >
+          {props.children}
+        </motion.span>
+      ) : (
+        props.children
+      )}
+    </MotionNativeButton>
   );
 }

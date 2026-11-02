@@ -25,7 +25,11 @@ window.sampleControls = (phase) => {
     time: performance.now(),
     parts: (nodes.length ? nodes : window.controlNodes).map((node) => {
       if (!ids.has(node)) ids.set(node, ++nextId);
-      const css = getComputedStyle(node);
+      // Keep button identity/focus assertions on the native host; its press now animates content only.
+      const motionNode =
+        node.dataset.probe === "group" ? node.querySelector('[data-slot="press-button-content"]') : node;
+      if (!motionNode) throw Error("Missing press content");
+      const css = getComputedStyle(motionNode);
       const matrix = css.transform === "none" ? new DOMMatrix() : new DOMMatrix(css.transform);
       return {
         id: ids.get(node),
@@ -39,13 +43,13 @@ window.sampleControls = (phase) => {
         scale: matrix.a,
         x: matrix.e,
         transform: css.transform,
-        inline: node.getAttribute("style"),
+        inline: motionNode.getAttribute("style"),
         width: node.clientWidth,
         parentWidth: node.parentElement?.clientWidth,
         checked: node.getAttribute("aria-checked"),
         value: node.getAttribute("aria-valuenow"),
         focus: document.activeElement === node,
-        animations: node.getAnimations().map((a) => ({
+        animations: motionNode.getAnimations().map((a) => ({
           state: a.playState,
           time: a.currentTime,
           timing: (() => {

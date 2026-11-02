@@ -79,7 +79,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `switch` — on/off control             | T1   | `state.morph`                                                        |
 | `slider` — range control              | T1   | `feedback.press`                                                     |
 | `toggle` — pressed state              | T1   | `feedback.press`                                                     |
-| `toggle-group` — joined toggles       | T1   | `feedback.press`                                                     |
+| `toggle-group` — toolbar and segments | T3   | `feedback.press`, `layout.shared`, `state.morph`                     |
 | `input-otp` — one-time code           | T1   | `state.morph`                                                        |
 | `progress` — determinate completion   | T4   | `data.transition`                                                    |
 | `code-block` — code surface           | T5   | `geometry.resize`, `state.morph`, `data.transition`, `layout.shared` |

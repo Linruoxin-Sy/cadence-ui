@@ -2,10 +2,10 @@
 title: Toggle Group
 description: Text alignment, view density, and other mode sets.
 category: form
-motion: [feedback.press]
-intensity: subtle
+motion: [feedback.press, layout.shared, state.morph]
+intensity: medium
 complexity: M
-tier: T1
+tier: T3
 since: 0.3.0
 deps: ["@base-ui/react", "class-variance-authority", "motion"]
 registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils", "@cadence/toggle"]
@@ -56,7 +56,36 @@ export function Alignment() {
 </ToggleGroup>
 ```
 
-Without `multiple`, pressing an item releases the others.
+Without `multiple`, pressing an item releases the others and the selected fill
+slides to it. Pressing the selected item again clears the selection, matching
+Base UI. With `multiple`, fills fade and settle independently; adjacent pressed
+items join into one shape when `spacing={0}`.
+
+## Segmented
+
+Use `variant="segmented"` for a pill-shaped track with a raised selection fill.
+This is a Toggle Group variant, with the same parts, array value and keyboard
+behavior as the toolbar variants.
+
+```tsx
+const [range, setRange] = useState(["week"]);
+
+<ToggleGroup
+  variant="segmented"
+  value={range}
+  onValueChange={(next) => {
+    if (next.length) setRange(next);
+  }}
+  aria-label="Time range"
+>
+  <ToggleGroupItem value="day">Day</ToggleGroupItem>
+  <ToggleGroupItem value="week">Week</ToggleGroupItem>
+  <ToggleGroupItem value="month">Month</ToggleGroupItem>
+</ToggleGroup>;
+```
+
+Ignoring an empty array makes a controlled selection required. The visual
+variant does not silently change selection semantics or activate items on focus.
 
 ## Spacing
 
@@ -70,8 +99,9 @@ Without `multiple`, pressing an item releases the others.
 </ToggleGroup>
 ```
 
-`spacing={0}` joins the borders into one segmented control; a positive value
-keeps the items apart in Tailwind spacing steps.
+`spacing={0}` joins adjacent pressed fills in a multiple group; a positive value
+keeps them apart in Tailwind spacing steps. The strip keeps its outer surface in
+both cases. Single selection slides between items at either spacing.
 
 ## Vertical
 
@@ -99,8 +129,8 @@ The value is always an array, even without `multiple`.
   a time range.
 - A formatting toolbar where several marks can be active at once
   (`multiple`).
-- Anywhere the options are icons and the choice should read as one segmented
-  control (`spacing={0}` + `variant="outline"`).
+- Icon toolbars with a shared tinted fill (`default` or `outline`), or short text
+  choices on a pill-shaped track (`segmented`).
 
 ## When not to use
 
@@ -121,7 +151,7 @@ The value is always an array, even without `multiple`.
 | `multiple`      | `boolean`                                   | `false`        | Allow more than one pressed item.        |
 | `spacing`       | `number`                                    | `0`            | Gap in Tailwind spacing steps.           |
 | `orientation`   | `"horizontal" \| "vertical"`                | `"horizontal"` | Axis, also drives arrow keys.            |
-| `variant`       | `"default" \| "outline"`                    | `"default"`    | Inherited by every item.                 |
+| `variant`       | `"default" \| "outline" \| "segmented"`     | `"default"`    | Shared strip, bordered strip, or pill track. |
 | `size`          | `"sm" \| "default" \| "lg"`                 | `"default"`    | Inherited by every item.                 |
 
 ### `ToggleGroupItem`
@@ -140,19 +170,28 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
-Recipe: `feedback.press`, inherited by every item — pressing compresses that item
-and springs it back, exactly like a standalone `toggle`.
+Single selection uses one shared decorative fill scoped to each group. Multiple
+selection keeps one local fill per item. Neither changes the buttons' layout
+boxes; corner changes that join neighboring fills are immediate state styling.
 
 | Phase   | Properties       | Token            | Interruptible |
 | ------- | ---------------- | ---------------- | ------------- |
 | press   | `scale 1 → 0.97` | `feedback.press` | yes           |
 | release | `scale 0.97 → 1` | `feedback.press` | yes           |
-| reduced | no scale; the pressed background carries the state | – | – |
-| none    | no scale         | –                | –             |
+| single selection | fill transform between items | `layout.shared` | yes |
+| multiple selection | fill opacity and `scale 0.96 → 1` | `state.morph` | yes |
+| reduced | shared fill jumps; local fills fade; no press scale | – | – |
+| none | immediate selection, opacity and press state; zero duration | – | – |
 
-The group itself does not animate. A shared sliding indicator would need the
-pressed item to change size, which would move the neighbours the user is aiming
-at — a T3 concern, not a press.
+Press scale applies only to the content, keeping the button and decorative fill
+in the group's common stacking context. A travelling fill stays below all labels
+and icons, including the items it crosses and the focused destination.
+
+Full mode uses the velocity-preserving shared spring. Reduced, none and a zero
+recipe clock render a static single-selection fill, cancelling an in-flight
+projection without replacing the focused button. Local fills keep opacity under
+reduced and settle immediately under none. All animated parts expose
+`data-motion`; every duration, scale and spring comes from Cadence tokens.
 
 ## Keyboard interactions
 
@@ -174,6 +213,7 @@ With `loopFocus` (default) the arrows wrap around at the ends.
   them.
 - Do not use a toggle group where `role="tablist"` is correct; tabs imply a panel
   that is shown, a toggle group implies state.
+- Selection fills are decorative (`aria-hidden`) and never receive focus.
 
 ## Validation and data ownership
 
@@ -192,11 +232,15 @@ switch to `orientation="vertical"` or replace the group with a `select`.
 
 ## Performance
 
-One Motion element per item, pressing on demand. No layout animation and no
-measurement, so a group of eight items costs nothing until one is pressed.
+One shared layout identity per single-selection group; Motion measures the fill
+when selection changes. Multiple selection uses one local opacity/scale fill per
+item. Press feedback stays on demand. No observers, timers or render-time layout
+reads; use small option sets rather than long lists.
 
 ## Notes for AI
 
 - `value` is an array in every mode, with or without `multiple`.
-- Use `spacing={0}` + `variant="outline"` for a segmented control.
+- Use `variant="segmented"` for a pill-shaped control; no separate component is needed.
+- Use `multiple` for independent pressed fills; `spacing={0}` joins neighbors.
+- To require a selection, control the value and ignore empty change requests.
 - For "one of N" with text labels, prefer `radio-group`; for panels, `tabs`.

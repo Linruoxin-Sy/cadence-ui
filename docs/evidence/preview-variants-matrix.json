@@ -231,7 +231,7 @@
     "applicable": true,
     "part": "ToggleGroup",
     "prop": "variant",
-    "options": ["default", "outline"],
+    "options": ["default", "outline", "segmented"],
     "default": "all",
     "source": "components/site/previews/toggle-group.tsx",
     "api": "registry/cadence/toggle-group/index.tsx"

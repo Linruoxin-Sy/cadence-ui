@@ -189,14 +189,14 @@ so the list stays a statement about the current code rather than a history of it
 
 ### 6.3 Motion tiers
 
-| Tier | Definition                  | Examples                                                   | Allowed recipes                                                   |
-| ---- | --------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
-| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge | none (colour/focus transitions only)                              |
-| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp        | `feedback.press`, `state.morph`                                   |
-| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast              | `enter.pop`, `exit.fade`, `popup.anchored`                        |
-| T3   | Continuity / shared element | tabs, accordion, collapsible, sidebar, navigation-menu     | `layout.shared`, `layout.move`, `list.stagger`, `geometry.resize` |
-| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar     | `number.roll`, `scroll.progress`, `data.transition`               |
-| T5   | AI / composite              | attachment, bubble (later message, trace)                  | reuse T1–T4                                                       |
+| Tier | Definition                  | Examples                                                             | Allowed recipes                                                   |
+| ---- | --------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge           | none (colour/focus transitions only)                              |
+| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp                  | `feedback.press`, `state.morph`                                   |
+| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast                        | `enter.pop`, `exit.fade`, `popup.anchored`                        |
+| T3   | Continuity / shared element | tabs, toggle-group, accordion, collapsible, sidebar, navigation-menu | `layout.shared`, `layout.move`, `list.stagger`, `geometry.resize` |
+| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar               | `number.roll`, `scroll.progress`, `data.transition`               |
+| T5   | AI / composite              | attachment, bubble (later message, trace)                            | reuse T1–T4                                                       |
 
 Disclosure height uses the measured, clamped `geometry.resize` recipe (including its documented
 Base UI CSS form); there is no separate `disclosure.height` recipe. `data.transition` is also
@@ -466,10 +466,11 @@ axe with zero violations, size budget, and dual-theme screenshots.
     T1 has no `data.transition` allocation in §6.3. The active slot's ring plus a static caret carry the
     same information, and the component keeps `state.morph` only. The npm dependency `input-otp`
     (1.5.0) is new to the repo.
-  - **`toggle` and `toggle-group` declare `feedback.press` only.** Their pressed fill is a colour
+  - **At B3, `toggle` and `toggle-group` declared `feedback.press` only.** Their pressed fill was a colour
     transition — state feedback, not motion — so declaring `state.morph` would have been a
     declared-but-unused recipe. The group has no shared indicator in upstream's markup, and a sliding
-    one would move the neighbours the user is aiming at (that is `layout.move`, a T3 concern).
+    one was deferred to T3. The subsequent Toggle Group update below supersedes this implementation:
+    an absolutely positioned decorative fill can move without changing any button's layout box.
   - **`separator` rolls are suppressed in two files**: `useSemanticElements` on
     `input-otp`'s separator (`<hr>` is void and cannot hold the dash glyph) and `noArrayIndexKey` on the
     slider thumb (a thumb's only identity is its index in the value array). Reasons sit above the line.
@@ -2263,3 +2264,33 @@ Button press/cancellation and dual-theme responsive axe checks pass within their
 Cold CLS0; new specified mobile interaction CLS0.0402032 on candidate and original baseline, FAIL;
 no physical FPS proof. Product source, dependencies, payload and frozen snapshot remain unchanged.
 This does not adopt a framework, expand to68 other pages, change budgets or close the overall goal.
+
+### Toggle Group shared fills and segmented variant (2026-11-03)
+
+Toggle Group now offers toolbar strips (`default`, `outline`) and a pill track
+(`segmented`) through the same two exports. It is T3 / medium because single
+selection uses a per-instance `layout.shared` fill. Multiple selection uses
+`state.morph` opacity/scale fills with instant adjacent-corner joins at zero
+spacing; `feedback.press` retains its existing token-backed behavior.
+
+Base UI still owns array values, optional deselection, controlled requests,
+cancellation, roving focus, native events, refs and caller render composition.
+No separate segmented registry item or new recipe was introduced. Source,
+frontmatter, Motion contract table, registry metadata and generated payloads
+declare the same three recipes. Reduced uses a static shared fill and local fades;
+none stops all motion, including an active shared projection.
+
+Focused browser proof: 17 passing cases across the new Toggle Group suite and
+the existing B3 Toggle Group matrix, covering system reduction, full/reduced/none,
+interrupted shared travel, live cancellation with button/focus identity, local
+fills, keyboard, header persistence, narrow layout and dual-theme axe/screenshots.
+This component-scoped update does not close the existing site-wide JS/FPS budgets.
+
+Layering correction: item isolation, focus z-index and whole-button press transforms
+trapped the shared fill above labels in sibling items. Isolation now belongs only
+to the group; the press adapter scales content above the shared fill, preserving
+the native button's event/ref/cancellation behavior. The browser suite now has 23
+passing cases, including per-frame crossed-label paint-order checks in all three
+variants and both themes, with mid-flight reversal. The new regression fails on
+the previous production build. Existing B3 and runtime press probes observe the
+new content target while retaining native-host identity/focus checks.

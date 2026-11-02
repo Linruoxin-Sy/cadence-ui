@@ -473,7 +473,7 @@ travel instead of writing it down â€” `track.clientWidth - thumb.offsetWidth` â€
 re-measure from a `ResizeObserver`. Under `reduced` the thumb still moves to the
 new end, with `{ duration: 0 }`: position is information, the animation is not.
 
-#### `layout.shared` (Tabs indicator)
+#### `layout.shared` (Tabs and Toggle Group indicators)
 
 ```tsx
 {
@@ -504,6 +504,22 @@ new end, with `{ duration: 0 }`: position is information, the animation is not.
 > the component contract.
 
 A zero recipe clock also uses the static decorative indicator branch. Removing a `layoutId` from an existing Motion element does not itself cancel its active projection; reduced/none must render the static branch, preserving the interactive tab and panel identities.
+
+Toggle Group is T3 when it offers a shared selection fill. Single selection uses
+this same per-instance `LayoutGroup` contract: only the decorative fill moves;
+the buttons keep their layout boxes. `variant="segmented"` gives the group a
+pill-shaped track and fill without adding another component or changing Base UI
+selection semantics. Multiple selection uses local `state.morph` opacity/scale
+fills instead of a shared identity. Adjacent pressed fills join through static
+corner styles when `spacing={0}`; corners and spacing never tween. Reduced keeps
+only the local opacity transition, none settles immediately. `feedback.press`
+scales only the item's content in every variant. Keep one isolated stacking
+context on the group: items must not isolate, gain a focus z-index, or transform
+their button box. The decorative fill belongs below every item's content, even
+while crossing an unselected item or reversing a held press. Content-only
+presses use the shared press adapter's native event/cancellation handling.
+Selection, callbacks, cancellation, refs, render composition and keyboard focus stay owned
+by Base UI; a required selection remains caller-owned.
 
 #### `gesture.drag` (bottom sheet)
 

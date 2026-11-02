@@ -6,12 +6,12 @@ import { ControlMotionScope } from "./control-motion-scope";
 import { PreviewRow } from "./shell";
 import { usePreviewVariant } from "./use-preview-variant";
 
-const previewVariantOptions = ["default", "outline"] as const;
+const previewVariantOptions = ["default", "outline", "segmented"] as const;
 
 /**
  * The group's characteristics are `variant`, `spacing`, `multiple`, `size`, and
  * `orientation`. Shown as: a joined outline control (the common case), a detached
- * one, a multi-select one, and a vertical one. Each starts with an item pressed, so
+ * one, a multi-select one, a segmented range, and vertical ones. Each starts with an item pressed, so
  * the shared surface is visible without a click.
  */
 export function ToggleGroupPreview() {
@@ -60,6 +60,14 @@ export function ToggleGroupPreview() {
           </ToggleGroup>
 
           <ToggleGroup variant={choose("outline")} size="sm" defaultValue={["week"]} aria-label="Range, small">
+            <ToggleGroupItem value="day">Day</ToggleGroupItem>
+            <ToggleGroupItem value="week">Week</ToggleGroupItem>
+            <ToggleGroupItem value="month">Month</ToggleGroupItem>
+          </ToggleGroup>
+        </PreviewRow>
+
+        <PreviewRow>
+          <ToggleGroup variant={choose("segmented")} defaultValue={["week"]} aria-label="Time range">
             <ToggleGroupItem value="day">Day</ToggleGroupItem>
             <ToggleGroupItem value="week">Week</ToggleGroupItem>
             <ToggleGroupItem value="month">Month</ToggleGroupItem>
