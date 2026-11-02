@@ -34,5 +34,10 @@ for (const gesture of ["pointer", "Enter"])
   }
 writeFileSync(".cache/engine-press-reenable.json", JSON.stringify(reports, null, 2));
 await browser.close();
+for (const report of reports) {
+  const scale = Number.parseFloat(report.before.split("(")[1]);
+  expect(scale).toBeGreaterThan(0);
+  expect(scale).toBeLessThan(1);
+}
 expect(reports.every((x) => x.disabled.transform === "none" && x.after === "none")).toBe(true);
 console.log("8 held pointer/keyboard disable-release-reenable paths passed");

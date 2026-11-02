@@ -22,7 +22,7 @@ export function summarizeScripts(scripts) {
 }
 
 /** No request blocking, prefetch exclusions, cache, scrolling or interaction. */
-export async function measureInitialScripts(page, url) {
+export async function measureInitialScripts(page, url, readySelector = '[data-preview="button"] button') {
   const session = await page.context().newCDPSession(page);
   await session.send("Network.enable");
   await session.send("Network.setCacheDisabled", { cacheDisabled: true });
@@ -40,7 +40,7 @@ export async function measureInitialScripts(page, url) {
   };
   page.on("response", collect);
   await page.goto(url);
-  await page.locator('[data-preview="button"] button').first().waitFor();
+  await page.locator(readySelector).first().waitFor();
   await page.waitForLoadState("networkidle");
   // An observation window, not a deferral: retain every automatic asynchronous load.
   // Keep listening after networkidle (which alone can precede hydration imports).

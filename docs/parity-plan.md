@@ -2118,3 +2118,21 @@ overwrote React's auto while the new natural label was about41.35px. Exact actua
 DOM/mode/error records are in engine-select-live-negative.json. Width now keeps
 one MotionValue owner, jumps that value to auto and writes the same target before
 paint. This avoids React/Motion ownership switching and preserves full springs.
+
+Final runtime source **50cc262**: rebuilt registry/full check **687/687,88 files**;
+isolated Next production build and **106/106** behavior cases pass. Correctly scoped
+Select6/6 and strengthened nonempty Dropdown-checkbox6/6 pass. Real pointer/Enter
+disabled-release-enable8/8 and commit/first-frame fixture23/23 pass. No claim that
+one checkbox proves all menu indicators. See engine-runtime-final.json and the
+part-specific remaining conditions in engine-runtime.md; full Motion/engine audit
+and overall goal remain OPEN.
+
+Final strict initial JS (all200/no pageerrors/root manifest hashes verified):
+Button **293136/23 scripts**, Chart **414186/24**, Calendar **318494/24**, CodeBlock
+**376533/29** gzip bytes/scripts. All exceed **120000**. The reproducible four-page
+audit tool retains fresh Edge/cache-off/no-interaction/networkidle+10s+networkidle
+and every automatic script; it exits1 for these budget failures. Original Button
+check is retained. Old819482c measurements are separately preserved.48KB runtime,
+8KB compiled per-item,55fps/CLS<0.02 and final whole-goal audit are still unmeasured
+gaps, not falsely reported failures or passes. Test/evidence-only review does not
+refresh runtime sourceSha. Final payload and complete handoff are separate commits.

@@ -312,7 +312,7 @@ for (const preference of ["no-preference", "reduce"] as const)
   test.describe(`B5 running recipes ${preference}`, () => {
     test.use({ reducedMotion: preference });
     for (const requested of MODES)
-      test(`indicator frames and live cancellation ${requested}`, async ({ page }) => {
+      test(`indicator frames and live cancellation ${requested}`, async ({ page }, info) => {
         await page.goto(`/components/dropdown-menu?motion=${requested}&speed=0.25`);
         await page.waitForLoadState("networkidle");
         await page.getByRole("button", { name: "View", exact: true }).click();
@@ -348,6 +348,11 @@ for (const preference of ["no-preference", "reduce"] as const)
           };
           w.recordIndicator = false;
           return w.indicatorFrames;
+        });
+        expect(frames.length).toBeGreaterThan(4);
+        await info.attach("actual-dropdown-checkbox-frames", {
+          body: JSON.stringify(frames),
+          contentType: "application/json",
         });
         const expected = effectiveMode(requested, preference === "reduce");
         if (expected === "full") expect(frames.some((f) => f.scale > 0.96 && f.scale < 1)).toBe(true);
