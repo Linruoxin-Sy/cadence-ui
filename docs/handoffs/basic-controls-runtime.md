@@ -1,5 +1,8 @@
 # 基础控制器 runtime 交接
 
+后续主指针归属修复已完成，当前继续入口为 [press-ownership.md](press-ownership.md)。
+本文保留4d06c24历史证据与边界，不将历史数字改写成新源码结果。
+
 2026-11-02 Asia/Shanghai，D:/Code/Project/cadence-ui。起点 clean48a4db5。
 本轮唯一实施者；没有子代理、后继聊天、新 goal、push、部署、发布或 freeze。
 整体 /goal 和全库 engine 矩阵仍未完成。由协调确认 completed/idle、实际 clean/log 后衔接。

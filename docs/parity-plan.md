@@ -2152,3 +2152,15 @@ production193/193, full check687/687 in88 files (including final evidence review
 Current four-page strict JS293406/414456/318764/376803 bytes all FAIL120000;
 details, exact client/SSR/resize boundaries and blocked temporary cleanup are in
 docs/handoffs/basic-controls-runtime.md. No whole-library engine or goal closure.
+
+Primary-pointer ownership follow-up (2026-11-02), runtime **a656074**: native press
+now admits only a primary pointer and tracks its pointerId independently of Enter.
+Trusted nonprimary release cannot release another held button. Raw actual-source
+negative,36 cases/222 real-touch/lifecycle assertions,138/138 actual control checks,
+legacy23/23 and held-release8/8 are retained. Production193/193 passes with no skips,
+retries or flaky cases; full check692/692 in88 files. First control rerun exposed a
+collector attribution race (old paint2 before requested commit); raw retained and
+request tags associate exactly two paints without discarding any frames.
+Current strict JS293501/414551/318859/376898 gzip bytes still FAIL120000.
+See docs/handoffs/press-ownership.md for commands, hashes, cleanup and remaining work.
+Other engines, timeScale edge inputs, performance and final whole-goal audit stay OPEN.
