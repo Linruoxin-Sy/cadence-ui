@@ -1,0 +1,375 @@
+{
+  "date": "2026-11-02 Asia/Shanghai",
+  "startHead": "5c9d7f5",
+  "runtime": "f60e7fe",
+  "payloadCommit": "201975a",
+  "unchangedProductSince": "5372576",
+  "productPaths": [
+    "registry",
+    "content",
+    "components",
+    "app",
+    "lib",
+    "public/r",
+    "public/llms.txt",
+    "public/llms-full.txt",
+    "registry.json",
+    "registry-snapshots.json",
+    ".gitattributes",
+    "upstream/manifest.json",
+    "package.json",
+    "pnpm-lock.yaml",
+    "next.config.ts"
+  ],
+  "archives": [
+    {
+      "file": "docs/evidence/w3-site.json.gz",
+      "bytes": 6637844,
+      "sha256": "e6ce6920b2edce6842021c7bbdf5662cac42c4d1fd1da9b3e371d59f7c3a79be"
+    },
+    {
+      "file": "docs/evidence/w3-bundles.json.gz",
+      "bytes": 6742319,
+      "sha256": "3dbe8abe12b6f8804cf10c382e5a83f478abbb79aa7157dcd0bd56e6c8293c4e"
+    }
+  ],
+  "retainedArchives": [
+    {
+      "file": "docs/evidence/basic-controls-runtime.json.gz",
+      "bytes": 51195294,
+      "sha256": "75310a5e907367132b730c646a4be80ee85acf1caea8b240b431bdbaa6ba9042"
+    },
+    {
+      "file": "docs/evidence/press-ownership-controls.json.gz",
+      "bytes": 51750541,
+      "sha256": "989b60162bcd4e4894a64095dcc8025077a8f469f087305bb685a623d7bf3278"
+    },
+    {
+      "file": "docs/evidence/w2-area-os-reduced-targets.json.gz",
+      "bytes": 515311,
+      "sha256": "5d06efce2734a31851d20c637c8df162f983ef5fac4ae36f03e26d5f572f7b89"
+    },
+    {
+      "file": "docs/evidence/w2-area-reveal-probe.json.gz",
+      "bytes": 533659,
+      "sha256": "406656b961840b4c76e1d95187f8e3d2a1eab75c83e6b5b0e2ce0bff1a2d8d79"
+    },
+    {
+      "file": "docs/evidence/w2-chart-active-cleanup.json.gz",
+      "bytes": 211409,
+      "sha256": "ceba6c7fb47482f46ef7a08e075c46fbc6114aed9e43ccabab7c7c39524fac97"
+    },
+    {
+      "file": "docs/evidence/w2-chart-positive-clock-current.json.gz",
+      "bytes": 225952,
+      "sha256": "cef0ead542749b58123e3f7b8a798eb1826d168475fee32a46dd39e8f0007f68"
+    },
+    {
+      "file": "docs/evidence/w2-chart-stable-negative.json.gz",
+      "bytes": 127714,
+      "sha256": "b8cdd73b25fe57c381c98be399940df18e9e3d676525448564b803cd8c587eca"
+    },
+    {
+      "file": "docs/evidence/w2-chart-stable-repair.json.gz",
+      "bytes": 108232,
+      "sha256": "e00bf174059bdf853eec4d6d7233d1bdd97fc0fa9f7dfbe4314966791448d1ec"
+    },
+    {
+      "file": "docs/evidence/w2-close-code-actions.json.gz",
+      "bytes": 8652507,
+      "sha256": "6e3f650e440c92bd676f41ad2393592ab96e0d540ac6a13c1c0be847ea6b4153"
+    },
+    {
+      "file": "docs/evidence/w2-close-engines.json.gz",
+      "bytes": 72486558,
+      "sha256": "30d41f70c4048e0f307bbda44529a9206c790daac18e05d38689c9e39b7d680c"
+    },
+    {
+      "file": "docs/evidence/w2-close-production-increment.json.gz",
+      "bytes": 25413801,
+      "sha256": "6f480ad728b8b004c2c8ebd42a58e4f744c1ae1256fab20497043c78541b22bf"
+    },
+    {
+      "file": "docs/evidence/w2-close-production.json.gz",
+      "bytes": 17432193,
+      "sha256": "7c96626dab833305019168acd35cbf96528b44f6f1077365e336d0cb9927716d"
+    },
+    {
+      "file": "docs/evidence/w2-code-actions-accepted.json.gz",
+      "bytes": 1914941,
+      "sha256": "d16a91aa92a4168e8671e5ad4be51ab8b9207a4b92da649011b346bfe7b25ac6"
+    },
+    {
+      "file": "docs/evidence/w2-code-actions-current.json.gz",
+      "bytes": 1752200,
+      "sha256": "671bc2990424260e70ed4b67deedec8a91b835a7cc2b8c912907eb5ab535aff1"
+    },
+    {
+      "file": "docs/evidence/w2-code-actions-source-final.json.gz",
+      "bytes": 1867402,
+      "sha256": "334399de19668eb0231cc3503d00fbd86c619fa1b033243c15b06559767631f8"
+    },
+    {
+      "file": "docs/evidence/w2-code-actions.json.gz",
+      "bytes": 1752246,
+      "sha256": "fec71e2c3b2fe3f0af65297d38c15304ff145b5868520ffab836b3c307a822d4"
+    },
+    {
+      "file": "docs/evidence/w2-code-geometry-accepted.json.gz",
+      "bytes": 1884215,
+      "sha256": "b8c3fd3f10ccd5636c0b3d01b7ec62bc6130e89df0f01f7f190cf1650c2e93df"
+    },
+    {
+      "file": "docs/evidence/w2-controls-zero-current.json.gz",
+      "bytes": 1120548,
+      "sha256": "5a5e926f020e8afecefb5c02acd4985d45eb15e54d220cdc06e7b8178ef38e48"
+    },
+    {
+      "file": "docs/evidence/w2-embla-current.json.gz",
+      "bytes": 1382590,
+      "sha256": "3cb15d9755f9448355a8c7d88dce9d530366e82acc19d84c69612585f1cd2854"
+    },
+    {
+      "file": "docs/evidence/w2-engines-accepted.json.gz",
+      "bytes": 8022104,
+      "sha256": "cb18bc01ab46ebac5c143f266c5a334aff79958e8c3be3cb9827a4d290c51a86"
+    },
+    {
+      "file": "docs/evidence/w2-engines-clock-accepted.json.gz",
+      "bytes": 56703605,
+      "sha256": "ca06ccc3239d19f2350fb92fe34dd88dddef74a6302d16a36e4efb966ac91bd0"
+    },
+    {
+      "file": "docs/evidence/w2-engines-committed.json.gz",
+      "bytes": 5286274,
+      "sha256": "4e0ecc4e7d374d9457196292a6c5d4d0aa7fa354f4ac7ab29f258032132f564b"
+    },
+    {
+      "file": "docs/evidence/w2-engines-current.json.gz",
+      "bytes": 5609452,
+      "sha256": "e829227a6e90a1a68df8bf8d6f3e9a222ebf593081f4d20ca01fd52ec61c6113"
+    },
+    {
+      "file": "docs/evidence/w2-engines-debug.json.gz",
+      "bytes": 23659,
+      "sha256": "f6cdac7feba3ac262275a68a475161a3e56ae6a5c188c727f4f7031b99e21b23"
+    },
+    {
+      "file": "docs/evidence/w2-engines-final-targets.json.gz",
+      "bytes": 72727985,
+      "sha256": "229fa636996cd818dc2e5e25d659572612072fa104a76901c62c4fb90edeba58"
+    },
+    {
+      "file": "docs/evidence/w2-engines-final.json.gz",
+      "bytes": 5769716,
+      "sha256": "76ef9f2de28390071143f59de9deb47790708d6fd0f9bec3b7fb11ac21a15c17"
+    },
+    {
+      "file": "docs/evidence/w2-engines-first.json.gz",
+      "bytes": 5241076,
+      "sha256": "54516a1cd90123e3408e38e23b87fa412630a03d741228fc18619ff683acf917"
+    },
+    {
+      "file": "docs/evidence/w2-engines-initial.json.gz",
+      "bytes": 23659,
+      "sha256": "f6cdac7feba3ac262275a68a475161a3e56ae6a5c188c727f4f7031b99e21b23"
+    },
+    {
+      "file": "docs/evidence/w2-engines-negative-final.json.gz",
+      "bytes": 1099296,
+      "sha256": "bc1e86c46c98072cc805cbed521fa62f5a8af53cb1dcaff14f610146b3f406ff"
+    },
+    {
+      "file": "docs/evidence/w2-engines-observed-final.json.gz",
+      "bytes": 7244283,
+      "sha256": "de629d00458503cc38be9db7bf4c1d7fdd327780ca4aa726b54e8a3dca7b1877"
+    },
+    {
+      "file": "docs/evidence/w2-engines-source-final.json.gz",
+      "bytes": 5768175,
+      "sha256": "2f0582d3986159e79bbc5751e39fc9bbfc5b21ace22cc4f73223901379b38764"
+    },
+    {
+      "file": "docs/evidence/w2-engines-terminal-current.json.gz",
+      "bytes": 5519081,
+      "sha256": "f24f1f0afe7fb9ef104910a52c2409b0e5dbc3d879a5b2a7ded469a6e93e00a9"
+    },
+    {
+      "file": "docs/evidence/w2-entrance-offscreen-current.json.gz",
+      "bytes": 139907,
+      "sha256": "e8226c1fc7b312cc842ab67e1014b1932cb0ab496da5a814bec6380d1de0aef3"
+    },
+    {
+      "file": "docs/evidence/w2-entrance-offscreen-negative.json.gz",
+      "bytes": 141264,
+      "sha256": "017e0eff53edb0a8aa424b12cbf21ba3e1db35e1a4e5cf57b0e437ab999e835d"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-accepted.json.gz",
+      "bytes": 5996754,
+      "sha256": "32c5e9d9d5ab628bb27996da10195326e8832a61fc88d158f37296600a53d5e8"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-clamped-final.json.gz",
+      "bytes": 5926203,
+      "sha256": "e9a779cf30e73c99467f643219d6b6360af1e6c792aecd27641bdf9ca0f26389"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-closure-final.json.gz",
+      "bytes": 5793317,
+      "sha256": "29898178548c82eeb3b9c8dd8ed8fdcae7ea4a174fcacec82702caadf3937580"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-complete.json.gz",
+      "bytes": 26869423,
+      "sha256": "b2f747e39a58603393f987452688fd2a2f02b03031935eba9e809829d4a24d84"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-current.json.gz",
+      "bytes": 5109405,
+      "sha256": "c013810a0a20c9994fd5f305c6871e7db11bd642ee31e122b5606d1679c6094b"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-driver-current.json.gz",
+      "bytes": 5142553,
+      "sha256": "332fbfdc12962edc568b98db43afcea4e1b4d32222ba35853edf53814933373f"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-initial.json.gz",
+      "bytes": 5123731,
+      "sha256": "eb80245b67d694f8001088a4ea5649180c1bdf4c63ee55cb40f379609a710226"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-negative-committed.json.gz",
+      "bytes": 5127403,
+      "sha256": "a8282e4de56abbf667554f111dd9d881fe15b4ed4e5aba0fef2bb67a6d04d760"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-repair1.json.gz",
+      "bytes": 5119835,
+      "sha256": "32c6b8843f9de07ddf7fd80a99703dc5b1049983e5a1e9948a32604068a5d182"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-repair2.json.gz",
+      "bytes": 5124861,
+      "sha256": "d5f012c361454e5a63ce56944aab40895e849514eda7098238fa2acfc2255db2"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-scalar-final.json.gz",
+      "bytes": 5190469,
+      "sha256": "61747dcc14a4dd115844f6100bd01822c1d59d40a1a67de2a5d4b0e7507b5c0e"
+    },
+    {
+      "file": "docs/evidence/w2-geometry-source-final.json.gz",
+      "bytes": 5466128,
+      "sha256": "0908a53a4e44f21b1859639ce97c50a95cec4d748eef7c1a67730f75e200f116"
+    },
+    {
+      "file": "docs/evidence/w2-indicators-corrected.json.gz",
+      "bytes": 3998265,
+      "sha256": "08f06790ae039d6bf449e6befcd5ff5c8fd82bd397adc395810156871588fba9"
+    },
+    {
+      "file": "docs/evidence/w2-indicators-current.json.gz",
+      "bytes": 4074822,
+      "sha256": "b5f25f02e319c5e2ab6fe66a963a3dc3b76a8009ccb524bea2864adb32da246c"
+    },
+    {
+      "file": "docs/evidence/w2-indicators-initial.json.gz",
+      "bytes": 3500638,
+      "sha256": "cdccb7350fb5d54e9c19e7e6e8a67229f47cca052fe99420ee87033e291e1efe"
+    },
+    {
+      "file": "docs/evidence/w2-indicators-source-final.json.gz",
+      "bytes": 4059718,
+      "sha256": "c630c72e46837e78f53e209cfb6f2569e83e72575c2aad5cb57062e7b03359e1"
+    },
+    {
+      "file": "docs/evidence/w2-pie-terminal.json.gz",
+      "bytes": 144260,
+      "sha256": "bfd7fac87039666ba1bbf2e7c13f17c8a5dcaed9af019502160e6b15c869f426"
+    },
+    {
+      "file": "docs/evidence/w2-radar-clock-current.json.gz",
+      "bytes": 173440,
+      "sha256": "b14d0462c6a65d62a9d821c6885b2004fa23830ae86a1d5af06cf1209e5fb620"
+    },
+    {
+      "file": "docs/evidence/w2-select-flight-current.json.gz",
+      "bytes": 151182,
+      "sha256": "108d9b19794c0570f075444cece86b95a728a7a5c7564e58ca23143e6d6e833d"
+    },
+    {
+      "file": "docs/evidence/w2-select-flight-negative.json.gz",
+      "bytes": 154502,
+      "sha256": "0cf6334f15e05d1b84397c6c28d26077e5daf2a1d5982996e51aaf590779f143"
+    },
+    {
+      "file": "docs/evidence/w2-select-flight-source-final.json.gz",
+      "bytes": 175977,
+      "sha256": "9303692ff399bd1ffaeffc5a71d5984a51b3ac706dd8909770a7bb46a2b033ae"
+    },
+    {
+      "file": "docs/evidence/w2-viewport-clamp-current.json.gz",
+      "bytes": 753146,
+      "sha256": "2c0e52d7b37020d9ae33dcc66827796d57dae9a92fcd619233bfead849491585"
+    },
+    {
+      "file": "docs/evidence/w2-viewport-clamp-late-negative.json.gz",
+      "bytes": 702856,
+      "sha256": "340b374da77a8ae5c457c22aee501c519f7807ede4afc9668ba681a7a48292cd"
+    },
+    {
+      "file": "docs/evidence/w2-viewport-clamp-negative.json.gz",
+      "bytes": 677349,
+      "sha256": "620cfe28ed1b217a0d438fe935a025614e04f53e4ddaf717a6f9ebfa88177bfc"
+    }
+  ],
+  "w2SourceHashesVerified": 25,
+  "w3ComponentSourceHashesVerified": 58,
+  "registryItems": 65,
+  "components": 58,
+  "finiteAPIEntries": 466,
+  "pin": "96da9cc7f1aa10580a3741664e2a77c721206c00",
+  "snapshots": ["84cc78703b354b29c815c3970cb26973e4760dea398fdf48756b8a24c996b2f1"],
+  "motionValueAPIs": [
+    "LayoutGroup",
+    "MotionConfig",
+    "animate",
+    "cancelFrame",
+    "cubicBezier",
+    "frame",
+    "motion",
+    "useAnimationControls",
+    "useMotionValue",
+    "useTransform"
+  ],
+  "motionScope": "registry/cadence only, not site-exclusive useInView or all possible caller APIs",
+  "dynamicEdges": 16,
+  "graphStatus": "PASS: all nonexternal edges, including emitted async outputs, traversed; baseline only subtracted; standalone modules remain separate metric",
+  "modes": "Compilation retains all exported code; does not simulate modes or prove runtime behavior; W2 source-matched scoped evidence and unit checks cover runtime modes",
+  "performance": {
+    "initialJS": {
+      "status": "FAIL",
+      "records": 138,
+      "passed": 0
+    },
+    "motionNext": {
+      "status": "UNPROVEN",
+      "consumerGzip": 47294
+    },
+    "components": {
+      "status": "FAIL",
+      "passed": 21,
+      "total": 58
+    },
+    "physicalMobileFPS": "UNPROVEN",
+    "coldCLS": {
+      "status": "PASS",
+      "records": 138,
+      "max": 0
+    },
+    "lifetimeCLS": "UNPROVEN"
+  },
+  "overall": "INCOMPLETE: W4 reconciliation does not close W3 failures or unproven requirements"
+}

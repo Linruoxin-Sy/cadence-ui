@@ -6,13 +6,13 @@ build ID `19Ek7XDFoWB78EgcZRqpJ`。本轮不改产品源码、依赖、框架、
 
 ## 最终五门状态
 
-| 门 | 结果 |
-| --- | --- |
-| 全部适用页initial JS≤120000 | **失败**：69页×2视口=138记录，0符合；284526–426590 bytes gzip |
-| initial Motion≤48000 | 参考consumer编译47294符合；Next生产混合实体的精确分摊**仍未证** |
+| 门                             | 结果                                                                  |
+| ------------------------------ | --------------------------------------------------------------------- |
+| 全部适用页initial JS≤120000    | **失败**：69页×2视口=138记录，0符合；284526–426590 bytes gzip         |
+| initial Motion≤48000           | 参考consumer编译47294符合；Next生产混合实体的精确分摊**仍未证**       |
 | 每组件增量≤8000，排共享runtime | 依赖计入21/58符合、37/58超限；仅自有编译代码58/58符合，不能替代完整门 |
-| 真中端移动≥55fps | **未证**：无连接设备或原始trace |
-| CLS<.02 | **冷加载范围符合**：138/138，最大0；交互/长窗口/真机未证 |
+| 真中端移动≥55fps               | **未证**：无连接设备或原始trace                                       |
+| CLS<.02                        | **冷加载范围符合**：138/138，最大0；交互/长窗口/真机未证              |
 
 最终完整检查88 files /724 tests通过，另最终helper两测试通过；工具提交`7242346`。
 沿用W2已验证production构建，无产品改动，未机械重建payload。原始日志见w3-checks.json。
@@ -69,8 +69,9 @@ summary 要求 69×2 唯一记录，原始 site/bundle 报告无损 gzip 并解�
 
 使用现有工具链中的 esbuild0.28.2，无新增依赖；production minify、ES2020、ESM、React/
 ReactDOM external。保留 registry 每个公开 value export，避免只测一个最小部件。
-Motion 取源码实际使用的 11 个 value API，包括 motion、animate、LayoutGroup、MotionConfig、
+Motion 取 registry/cadence 源码实际使用的 10 个 value API，包括 motion、animate、LayoutGroup、MotionConfig、
 useMotionValue/useTransform/useAnimationControls、frame/cancelFrame/cubicBezier。
+站点 DocumentEntrance 独用的 useInView 不在此 registry consumer 合集中；这不是全站 Motion API 集合。
 47294 是该参考 consumer 编译的 runtime 值，距 48000 仅 706 bytes；**参考编译符合门槛**。
 Next 实际把包混入多个实体，没有 production source map，此值不冒称实际页面 Motion chunk
 分摊 gzip 的精确认证；该生产口径仍未证，分块压缩也可能消耗这 706 bytes 余量。
