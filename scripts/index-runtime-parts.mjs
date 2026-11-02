@@ -175,7 +175,8 @@ const siteTargets = {
   ],
   sidebar: [
     "data-site-panel Disclosure div | native CSS measured height/opacity | geometry.resize + reveal",
-    "Chevron SVG + mobile Browse summary SVG | native CSS transform | state.morph orientation",
+    "DisclosureChevron span wrapping SVG | native CSS transform | state.morph orientation",
+    "mobile Browse summary text span | native CSS rotate | state.morph orientation",
   ],
   "previews/shell": [
     "data-preview-stack div | native CSS @starting-style transition | site-only reveal opacity/translate",

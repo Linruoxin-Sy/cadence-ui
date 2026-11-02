@@ -2587,7 +2587,7 @@
       "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
       "source": {
         "path": "registry/cadence/accordion/index.tsx",
-        "sha256": "22c8c769a58a8742daa8dd22f1025f7cfc191a51b497a9501d3c6de3abf716d9",
+        "sha256": "3dd26a3136aa44dd38767a6143fb85202d88b1edfbfd2be881660f22fd963ad5",
         "slots": [
           {
             "owner": "Accordion",
@@ -2633,7 +2633,12 @@
         "signals": [
           {
             "owner": "AccordionContent",
-            "line": 128,
+            "line": 129,
+            "text": "\"transition-none duration-0\""
+          },
+          {
+            "owner": "AccordionContent",
+            "line": 130,
             "text": "\"transition-[height] duration-(--motion-duration-slow) ease-cadence-out\""
           }
         ]
@@ -2655,7 +2660,7 @@
       "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
       "source": {
         "path": "registry/cadence/collapsible/index.tsx",
-        "sha256": "221748ff0fbe330ab1b82ebebe843435b6b5920a2df7a04bbdf17296cae5a622",
+        "sha256": "38d618cfdae7013895b7ad4a7b573151e43fde8e69041d4081917cb65b5ee1a8",
         "slots": [
           {
             "owner": "Collapsible",
@@ -2681,7 +2686,12 @@
         "signals": [
           {
             "owner": "CollapsibleContent",
-            "line": 69,
+            "line": 70,
+            "text": "\"transition-none duration-0\""
+          },
+          {
+            "owner": "CollapsibleContent",
+            "line": 71,
             "text": "\"transition-[height] duration-(--motion-duration-slow) ease-cadence-out\""
           }
         ]
@@ -2997,7 +3007,7 @@
       "disposition": "See per-part evidence/gaps in css-runtime.md; not a global runtime pass",
       "source": {
         "path": "registry/cadence/navigation-menu/index.tsx",
-        "sha256": "e9a4d81f12646843c4876b0be19c21965df557129b2c54b9edf84347ffe1f513",
+        "sha256": "6723665e0762dc6dbf6c3907be063bf315272f2208e3bb3d057e7e32590e924f",
         "slots": [
           {
             "owner": "NavigationMenu",
@@ -3026,27 +3036,27 @@
           },
           {
             "owner": "NavigationMenuPositioner",
-            "line": 152,
+            "line": 153,
             "value": "\"navigation-menu-positioner\""
           },
           {
             "owner": "NavigationMenuPositioner",
-            "line": 166,
+            "line": 167,
             "value": "\"navigation-menu-popup\""
           },
           {
             "owner": "NavigationMenuPositioner",
-            "line": 177,
+            "line": 180,
             "value": "\"navigation-menu-viewport\""
           },
           {
             "owner": "NavigationMenuLink",
-            "line": 189,
+            "line": 192,
             "value": "\"navigation-menu-link\""
           },
           {
             "owner": "NavigationMenuIndicator",
-            "line": 205,
+            "line": 208,
             "value": "\"navigation-menu-indicator\""
           }
         ],
@@ -3059,21 +3069,31 @@
           {
             "owner": "NavigationMenuContent",
             "line": 127,
+            "text": "\"transition-none\""
+          },
+          {
+            "owner": "NavigationMenuContent",
+            "line": 128,
             "text": "\"data-ending-style:opacity-0 data-starting-style:opacity-0\""
           },
           {
             "owner": "NavigationMenuPositioner",
-            "line": 170,
+            "line": 171,
             "text": "\"data-ending-style:opacity-0 data-starting-style:opacity-0\""
-          },
-          {
-            "owner": "NavigationMenuPositioner",
-            "line": 172,
-            "text": "\"transition-opacity\""
           },
           {
             "owner": "NavigationMenuPositioner",
             "line": 173,
+            "text": "\"transition-none\""
+          },
+          {
+            "owner": "NavigationMenuPositioner",
+            "line": 175,
+            "text": "\"transition-opacity\""
+          },
+          {
+            "owner": "NavigationMenuPositioner",
+            "line": 176,
             "text": "\"transition-[opacity,scale,width,height] duration-[var(--motion-duration-fast),var(--motion-duration-fast),var(--motion-duration-slow),var(--motion-duration-slow)] data-starting-style:scale-(--motion-scale-in) data-ending-style:scale-(--motion-scale-in)\""
           }
         ]
@@ -3482,7 +3502,7 @@
     },
     {
       "path": "components/site/sidebar.tsx",
-      "sha256": "2827f6a84bc3a06569c35579e4307849f233a0b2c559aae439d39f8acf630aa9",
+      "sha256": "0a61aff0060c4c13a92e1312e7948363332cd04cf434e40231f729e4658aeacc",
       "slots": [],
       "signals": [
         {
@@ -3528,7 +3548,8 @@
       ],
       "targets": [
         "data-site-panel Disclosure div | native CSS measured height/opacity | geometry.resize + reveal",
-        "Chevron SVG + mobile Browse summary SVG | native CSS transform | state.morph orientation"
+        "DisclosureChevron span wrapping SVG | native CSS transform | state.morph orientation",
+        "mobile Browse summary text span | native CSS rotate | state.morph orientation"
       ]
     },
     {

@@ -5,6 +5,11 @@ This is a runtime dimension, separate from the closed 58-item/466-export API led
 Runtime commit: **7548345**. The full CSS obligation is **not yet closed** by this increment. Passing a row below
 does not certify every lifecycle/clock combination or all other engines.
 
+Follow-up **eec81c8** closes the finite CSS-owned obligations, including the remaining
+conditions listed historically below. See [css-lifecycle.md](css-lifecycle.md) for the
+complete reconciliation, eight real old-source negatives, final raw samples and limits.
+The Motion/other-engine and performance scope remains OPEN.
+
 ## Reproducible source inventory
 
 `node scripts/index-runtime-parts.mjs` (then `pnpm exec biome format --write docs/evidence/runtime-parts.json`)
