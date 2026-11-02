@@ -127,3 +127,11 @@ W4工具提交`e09a058`、证据提交`f9db6f3`。最终串行完整检查链全
 已有raw元数据引用的58份归档及W3另两份报告重新校验长度/SHA。
 本轮9份日志92398 bytes无损归档后删除重复缓存，清单见[evidence/w4-cleanup.json](evidence/w4-cleanup.json)。
 端口3181/3183/5037无listener；没有新build目录或重复历史大清理。
+
+## Authorized W3 Button prototype (2026-11-02)
+
+The user selected route A: preserve 120000 bytes and all functionality, build and measure a complete
+Button hydration/framework prototype. Historical requests for that choice are resolved. Product
+migration, changed budgets, dependency exemptions and other-page rollout remain unauthorized.
+The prototype is isolated; the existing product runtime and frozen distribution remain authoritative.
+Real-device FPS remains unproven. See [prototype contract](button-route-prototype.md).

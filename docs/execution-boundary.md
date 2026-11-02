@@ -96,3 +96,18 @@ W2 raw 副本。独有诊断先无损归档，junction 仅移除链接；共清�
 不代表全站全模式或终身CLS。生产Next3183已停止；当前构建与唯一负例/证据/缓存保留。
 下一实质动作仍取决于用户已收到的架构/预算约束选择及真实设备条件，详见
 [W4最终交接](handoffs/w4-closure.md)。不以W4文档闭合替代W3红项。
+
+## W3 route A authorization (2026-11-02)
+
+The user explicitly approved preserving the budget and all features while building and measuring a
+complete Button hydration/framework prototype. This supersedes the unanswered A/B/C descriptions in
+historical handoffs. It does not approve migration, budget changes, dependency exemptions, removal of
+features, or expansion to the other 68 pages. Device/FPS evidence remains separately unproven.
+
+The isolated candidate uses direct React SSR with a serialized server-element tree and one hydrated
+React root, retaining original client components and full Motion features. It removes Next's client
+bootstrap rather than repeating the failed feature-scoped subsets. Server-only MDX/highlighting and
+layout functions resolve before serialization; client boundaries retain their original implementations.
+The full Button route, CSS, controls, and linked production destinations are the acceptance scope.
+Generated files belong in .cache/button-route-prototype. ADR-009 remains the product decision and
+ADR-016 remains investigation. See button-route-prototype.md for the inventory and verification plan.
