@@ -315,7 +315,7 @@ export function Sidebar({ groups, guides }: SidebarProps) {
             style={{
               transition: cm.reduced
                 ? "none"
-                : `transform ${duration.base * cm.timeScale}s cubic-bezier(${ease.out.join(",")})`,
+                : `rotate ${duration.base * cm.timeScale}s cubic-bezier(${ease.out.join(",")})`,
             }}
           >
             ▾

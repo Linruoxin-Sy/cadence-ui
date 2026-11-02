@@ -66,7 +66,9 @@ function CollapsibleContent({ className, children, style, ...props }: Collapsibl
       className={(state) =>
         cn(
           "h-[max(0px,var(--cadence-disclosure-height,var(--collapsible-panel-height)))] overflow-hidden data-[ending-style]:h-0 data-[starting-style]:h-0",
-          cm.reduced ? "duration-0" : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",
+          cm.reduced
+            ? "transition-none duration-0"
+            : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",
           typeof className === "function" ? className(state) : className,
         )
       }

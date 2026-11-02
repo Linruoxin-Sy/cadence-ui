@@ -1790,6 +1790,14 @@ InitialJS per complete site page stays OPEN/red; Motion initial48KB, compiled ad
 
 ### Deferred and excluded
 
+CSS lifecycle follow-up (2026-11-02): actual Reveal/Chevron/PreviewStack, Content exit/reopen,
+native clock identity and explicit nested clock, and Progress indeterminate samples now fill
+the previous CSS gaps. Real old-source negatives exposed Browse's rotate/transform mismatch,
+Content/Popup's continuing opacity under none, and both disclosures' continuing height under
+reduced/none. Repairs remove the native transition property without replacing nodes/controllers.
+The finite CSS closure reconciliation and final validation are in evidence/css-lifecycle.md;
+Motion/engine, performance budgets and the whole-goal audit remain OPEN.
+
 | Item            | Decision                                                         |
 | --------------- | ---------------------------------------------------------------- |
 | `direction`     | Deferred                                                         |

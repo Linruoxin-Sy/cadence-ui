@@ -131,7 +131,7 @@ describe("Accordion", () => {
       const panel = screen.getByRole("region", { name: "First" });
       expectMotionContract(mode, { parts: [panel] });
       expect(panel.className.includes("transition-[height]")).toBe(mode === "full");
-      if (mode !== "full") expect(panel).toHaveClass("duration-0");
+      if (mode !== "full") expect(panel).toHaveClass("duration-0", "transition-none");
       expect(panel.className).not.toMatch(/transform|scale|translate/);
       expect(panel.style.transform).toBe("");
       expect(panel.style.getPropertyValue("--cadence-disclosure-height")).toBe("0px");

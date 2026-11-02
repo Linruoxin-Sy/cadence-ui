@@ -125,7 +125,9 @@ function AccordionContent({ className, children, render, style, ...props }: Acco
       style={popupStyle(cm, style)}
       className={cn(
         "h-[max(0px,var(--cadence-disclosure-height,var(--accordion-panel-height)))] overflow-hidden text-sm data-[ending-style]:h-0 data-[starting-style]:h-0",
-        cm.reduced ? "duration-0" : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",
+        cm.reduced
+          ? "transition-none duration-0"
+          : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",
       )}
       render={(elementProps, state) => (
         <AccordionSurface

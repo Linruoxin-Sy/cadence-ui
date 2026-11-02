@@ -124,6 +124,7 @@ function NavigationMenuContent({ className, style, ...props }: NavigationMenuPri
       className={classes(
         cn(
           "h-full w-auto p-2 transition-opacity duration-(--motion-duration-fast) ease-cadence-out",
+          cm.disabled && "transition-none",
           !cm.disabled && "data-ending-style:opacity-0 data-starting-style:opacity-0",
         ),
         className,
@@ -168,9 +169,11 @@ function NavigationMenuPositioner({
           className={cn(
             "relative h-(--popup-height) w-(--popup-width) min-h-0 min-w-0 max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-md border bg-popover text-popover-foreground shadow-md ease-cadence-out duration-(--motion-duration-fast)",
             !cm.disabled && "data-ending-style:opacity-0 data-starting-style:opacity-0",
-            cm.reduced
-              ? "transition-opacity"
-              : "transition-[opacity,scale,width,height] duration-[var(--motion-duration-fast),var(--motion-duration-fast),var(--motion-duration-slow),var(--motion-duration-slow)] data-starting-style:scale-(--motion-scale-in) data-ending-style:scale-(--motion-scale-in)",
+            cm.disabled
+              ? "transition-none"
+              : cm.reduced
+                ? "transition-opacity"
+                : "transition-[opacity,scale,width,height] duration-[var(--motion-duration-fast),var(--motion-duration-fast),var(--motion-duration-slow),var(--motion-duration-slow)] data-starting-style:scale-(--motion-scale-in) data-ending-style:scale-(--motion-scale-in)",
           )}
         >
           <NavigationMenuPrimitive.Viewport

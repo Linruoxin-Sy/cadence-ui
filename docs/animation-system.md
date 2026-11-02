@@ -269,6 +269,12 @@ visible. Mode changes preserve the node, focus and Base UI lifecycle. Caller sta
 evaluated before merging, with caller classes/styles last. This CSS form uses the browser's native
 transition cancellation and reversal, without a second animation controller.
 
+Changing a positive CSS duration changes the clock used for a new or retargeted transition;
+it does not restart or retime an existing native CSSTransition. A zero computed duration
+alone likewise does not cancel an unchanged running target. Reduced geometry and all none
+transitions must be removed from the transition-property list (`transition-none` for none),
+including persistent Content and disclosure panels. Preserve the node and primitive lifecycle.
+
 Base UI writes `--transform-origin` on the popup from the positioner, so the scale grows out of the
 anchor rather than out of the element's centre. No distance is involved: a slide would need a distance
 token plus one class per side, and it moves the edge the positioner just lined up. `dialog` and
