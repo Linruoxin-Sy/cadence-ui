@@ -223,6 +223,8 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
           localStorage.setItem("cadence-theme", theme);
           document.documentElement.classList.toggle("dark", theme === "dark");
         }, theme);
+        // State-feedback color transitions must settle before comparing static themes.
+        await page.waitForTimeout(500);
         await page.evaluate(() => scrollTo(0, 0));
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
         const violations = (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze())
@@ -233,6 +235,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
         await base.goto(`${baseline}/components/button?motion=none`);
         await base.waitForLoadState("networkidle");
         await base.evaluate((theme) => document.documentElement.classList.toggle("dark", theme === "dark"), theme);
+        await base.waitForTimeout(500);
         await base.screenshot({ path: path.join(dir, `baseline-${width}-${theme}.png`), fullPage: true });
         await base.close();
         if (width === 390) {
