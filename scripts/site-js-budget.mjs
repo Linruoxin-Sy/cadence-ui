@@ -3,6 +3,22 @@ import { gzipSync } from "node:zlib";
 
 // Explicit decimal KB convention for animation-system §7; gzip each HTTP entity.
 export const INITIAL_JS_LIMIT = 120_000;
+export function summarizeLayoutShifts(entries) {
+  let start = -Infinity;
+  let last = -Infinity;
+  let session = 0;
+  let cls = 0;
+  for (const entry of entries.filter((entry) => !entry.hadRecentInput)) {
+    if (entry.startTime - last >= 1000 || entry.startTime - start >= 5000) {
+      session = 0;
+      start = entry.startTime;
+    }
+    session += entry.value;
+    last = entry.startTime;
+    cls = Math.max(cls, session);
+  }
+  return cls;
+}
 export function summarizeScripts(scripts) {
   const unique = new Map();
   for (const { url, body, ...details } of scripts) {
@@ -11,7 +27,7 @@ export function summarizeScripts(scripts) {
       unique.set(identity, {
         url: identity,
         bytes: body.length,
-        gzip: gzipSync(body).length,
+        gzip: gzipSync(body, { level: 6 }).length,
         sha256: createHash("sha256").update(body).digest("hex"),
         ...details,
       });
@@ -34,7 +50,7 @@ export async function measureInitialScripts(page, url, readySelector = '[data-pr
   });
   page.on("pageerror", (error) => errors.push(error.message));
   const collect = (response) => {
-    if (response.request().resourceType() === "script") {
+    if (response.request().resourceType() === "script" || /\.m?js$/.test(new URL(response.url()).pathname)) {
       responses.push((async () => ({ url: response.url(), status: response.status(), body: await response.body() }))());
     }
   };
