@@ -83,6 +83,14 @@ render intrinsic width immediately instead of waiting for a cached measured valu
 the measured spring remains full-only and jump still stops its old driver. Final
 scoped production verification is recorded in the handoff. No assertion is weakened.
 
+The first auto-style repair still switched the property from Motion to React.
+Source819482c subsequently failed3/6 live cells, with actual data-motion=reduced
+already committed and an old numeric37.067px width still present (not a precommit
+observation). engine-select-live-negative.json records actual DOM and delta.
+The final repair keeps a single MotionValue width owner in all modes, jumps it to
+auto, and synchronously writes the identical target before paint. Full still uses
+numeric measured physics. The same scoped assertions and raw attachments remain.
+
 Existing production suites are usable evidence for the behaviors they assert; they
 do not prove earlier first paint when they skip first samples or poll a final state.
 The following gaps keep the full Motion/engine matrix OPEN:

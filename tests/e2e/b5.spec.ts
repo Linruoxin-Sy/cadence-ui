@@ -438,11 +438,13 @@ for (const preference of ["no-preference", "reduce"] as const)
         await mode(page, "reduced");
         await expect(page.locator('[data-slot="select-handoff"]')).toHaveCount(0);
         const value = trigger.locator('[data-slot="select-value"]');
-        expect(
-          await value.evaluate((n) =>
-            Math.abs(n.getBoundingClientRect().width - (n.firstElementChild?.getBoundingClientRect().width ?? 0)),
-          ),
-        ).toBeLessThan(1);
+        const live = await value.evaluate((n) => ({
+          delta: Math.abs(n.getBoundingClientRect().width - (n.firstElementChild?.getBoundingClientRect().width ?? 0)),
+          mode: n.getAttribute("data-motion"),
+          html: n.outerHTML,
+        }));
+        await info.attach("actual-select-live-commit", { body: JSON.stringify(live), contentType: "application/json" });
+        expect(live.delta).toBeLessThan(1);
         await mode(page, "none");
         await trigger.click();
         await page.getByRole("option", { name: "Astro", exact: true }).click();

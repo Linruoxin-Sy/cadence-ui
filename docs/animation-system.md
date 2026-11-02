@@ -238,8 +238,12 @@ Slider uses Base's dragging state, rather than tap, and likewise resolves a disa
 to scale one with a zero clock. CodeBlock copy glyphs explicitly snap scale under reduced.
 Select's measured value uses intrinsic `width: auto` in reduced/none. Base can commit
 new label text in its own subtree before the parent's ResizeObserver runs; a cached
-numeric width must not survive that paint. The measured motion value is still jumped
-(stopping its spring) for subsequent full-mode work, but only full renders that value.
+numeric width must not survive that paint. A single MotionValue owns width in every
+mode: jump it to auto and synchronously write that same auto target under reduced/none,
+stopping its spring. Switching the style from a MotionValue to a React string permits
+an older queued Motion render to overwrite React's auto. Keep the numeric measurement
+in the target ref; full resolves its first auto measurement instantly, then springs
+on later label changes. The synchronous write is the same prepaint fold policy as CodeBlock.
 
 ### 3.0 Sidebar composition
 

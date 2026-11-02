@@ -135,7 +135,12 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
 
       if (current === "auto" || cm.reduced) {
         floor.current = 0;
-        width.jump(next);
+        // Keep one MotionValue owner across mode changes. Switching from a
+        // MotionValue to a React width prop lets queued Motion renders restore
+        // the old numeric width after React has committed `auto`.
+        const resting = cm.reduced ? "auto" : next;
+        width.jump(resting);
+        host.style.width = typeof resting === "number" ? `${resting}px` : resting;
         target.current = next;
         return;
       }
@@ -159,7 +164,7 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       ref={hostRef}
       data-slot="select-value"
       data-motion={cm.mode}
-      style={{ width: cm.reduced ? "auto" : rendered, opacity: context?.flying ? 0 : 1 }}
+      style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}
       className="relative block min-w-0 overflow-hidden whitespace-nowrap"
     >
       <SelectPrimitive.Value {...props} className={stateClasses("block w-max", className)}>

@@ -2111,3 +2111,10 @@ press state on native Button/Toggle/ToggleGroupItem (focusable-disabled Button a
 received release). Clearing the cancelled visual gesture fixes re-enable without
 changing Base activation/focus. Raw negatives and final keyboard applicability follow
 in the engine-runtime handoff. No whole-library runtime or performance closure.
+
+Select live follow-up: 819482c's initial scoped none samples passed, but3/6 live
+cells still failed after data-motion=reduced committed: numeric width37.067px
+overwrote React's auto while the new natural label was about41.35px. Exact actual
+DOM/mode/error records are in engine-select-live-negative.json. Width now keeps
+one MotionValue owner, jumps that value to auto and writes the same target before
+paint. This avoids React/Motion ownership switching and preserves full springs.
