@@ -209,6 +209,8 @@ This is how a docs preview can demonstrate a spring on a page a reviewer has swi
 `timeScale` multiplies durations, spring `visualDuration`, and delays, and re-derives the
 physical springs after scaling. It never edits a token, and it cannot revive a transition
 under `none`: scaling zero is still zero.
+Continuous CSS loops use the theme's `--animate-pulse` / `--animate-spin` timing,
+independently of provider `timeScale`. Theme retuning updates those loops; `none` cancels them.
 
 ## Writing a component for three modes
 

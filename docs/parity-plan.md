@@ -1772,6 +1772,22 @@ passed. Targeted production41 unique behavior/a11y cases passed after exact Side
 locator corrections. Strict budget still FAIL292267gzipbytes/23scripts (120000 limit); see
 evidence/compatibility-collections-js.json. Complete provenance/remaining work in the handoff.
 
+### CSS runtime increment and engine index (2026-11-02)
+
+Source-indexed all58 items,38 animated declarations, actual unslotted/portal/engine targets,
+six site surfaces and shared adapters in evidence/runtime-parts.json (reproducible script).
+This is separate from the closed466-export API ledger. Fixed real reduced PreviewStack travel,
+including the pre-hydration OS preference window, and Accordion/Collapsible missing local 4x
+clocks. Old-source production negatives are preserved; loops retain theme --animate-* timing,
+with actual theme-retune/cancellation samples and clarified Provider comments/guides.
+Native CSS stagger writers=0, authored stagger0ms; §7's20/400ms stagger budgets are satisfied.
+Detailed per-part reused evidence, raw browser results and remaining CSS gaps are in
+evidence/css-runtime.md and the CSS handoff. This increment does **not** close the whole CSS
+class or Motion/engine matrix. Content/site/keepMounted/live-clock gaps remain explicit.
+InitialJS per complete site page stays OPEN/red; Motion initial48KB, compiled added8KB,
+> =55fps mobile and CLS<0.02 evidence still required, distinct from source-tier gzip limits.
+> No overall goal completion; no dependency/pin/API/default/recipe change or publication.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |

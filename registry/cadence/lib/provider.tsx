@@ -54,7 +54,7 @@ export interface CadenceMotion {
    * deciding that a transition has zero duration.
    */
   disabled: boolean;
-  /** The multiplier applied to every duration in this subtree. */
+  /** Recipe/portal clock multiplier; continuous CSS loops use theme --animate-* clocks. */
   timeScale: number;
   /** Resolve a recipe into a Motion transition for the current mode. */
   transition: (recipe: Recipe, options?: MotionOptions) => Transition;
@@ -89,7 +89,8 @@ export interface CadenceProviderProps {
    */
   mode?: CadenceMode;
   /**
-   * Multiplies every duration and spring. `1` (default) is the authored timing;
+   * Multiplies recipe durations, springs and portal clocks. Continuous CSS loops
+   * retain the theme's --animate-* timing. `1` (default) is the authored timing;
    * the docs site passes `4` for its 0.25× preview. Additive: it does not change
    * any token, so a component looks the same at `1`. Omitting it inherits the
    * enclosing scale.

@@ -48,7 +48,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await p.getByRole("button", { name: "Reset attachment" }).click();
         await root.getByRole("button", { name: "Inspect sales-dashboard.pdf" }).focus();
         await page.keyboard.press("Enter");
-        await expect(p.getByRole("status")).toHaveText("Inspecting sales-dashboard.pdf");
+        await expect(p.locator("#attachment-details")).toHaveText("Inspecting sales-dashboard.pdf");
         await root.getByRole("button", { name: "Inspect sales-dashboard.pdf" }).click();
         const liveTitle = root.locator('[data-slot="attachment-title"]');
         await liveTitle.evaluate((el) => {
@@ -93,7 +93,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(root.getByRole("button", { name: "Remove a-long-selected-local-filename.txt" })).toBeFocused();
         await page.keyboard.press(" ");
         await expect(root).toHaveCount(0);
-        await expect(p.getByRole("status")).toContainText("Removed");
+        await expect(p.locator("#attachment-details")).toContainText("Removed");
         const group = p.getByRole("group", { name: "Reference files" });
         await group.focus();
         await page.keyboard.press("ArrowRight");

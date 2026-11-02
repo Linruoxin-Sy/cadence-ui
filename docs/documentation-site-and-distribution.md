@@ -217,7 +217,9 @@ still the measured one, applied at once. `@starting-style` rather than Motion is
 usually arrives either as a node inserted during parse or as a route change, and by the time JavaScript could
 run the element is already painted at its final state, so a JS entrance would first have to snap it back to
 `opacity: 0` — the flash it exists to prevent. The duration is a custom property, so `data-motion="none"`
-collapses the landing to zero and `reduced` shortens it, with no second branch in the component. One limit is
+collapses the landing to zero. PreviewStack resolves its local mode/timeScale clock; reduced keeps only
+opacity, and none removes the starting state and transition. A complementary system media rule
+removes travel before hydration can resolve the effective React mode. One limit is
 worth knowing: on a cold load with `?motion=none` in the URL, the mode is only resolved after hydration, so
 that first landing still plays once — the frame cannot know a client preference before the client runs.
 

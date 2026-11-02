@@ -140,6 +140,8 @@ If you want the slowdown inside your own app, it is a provider prop, not a token
 
 `timeScale` multiplies durations, spring `visualDuration`, and delays, and re-derives the physical
 springs after scaling. It never changes a token, and it cannot revive a transition under `none`.
+Continuous CSS loops retain the theme's `--animate-pulse` / `--animate-spin` clock;
+retune those theme tokens to change their speed. Provider `timeScale` does not multiply them.
 
 A nested provider inherits whatever it does not set, which is how the preview slows down without
 resetting the header's mode:

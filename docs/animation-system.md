@@ -302,6 +302,8 @@ Callers needing a visually zero-height closing endpoint can put decoration on a 
 Initially open panels render at natural height before hydration, without an entrance animation.
 
 This form uses `duration.slow` / `ease.out` via `--motion-duration-slow` / `ease-cadence-out`.
+Each panel resolves that CSS clock locally from its effective mode and inherited or explicit
+`timeScale`, with caller styles last, so full inside none restores its own clock.
 Unlike the Motion form's velocity-preserving spring, a native CSS reversal retains current position
 and uses the browser's transition reversal rules; it does not promise spring velocity continuity.
 It must be browser-tested mid-transition in both directions. This deliberate form keeps Base UI's
@@ -599,6 +601,11 @@ const pulse = cm.mode === "none" ? "animate-none" : "animate-pulse";
 ```
 
 Rules for the continuous form:
+
+The loop clock belongs to the framework theme's `--animate-pulse` / `--animate-spin`
+token, including live theme retuning. Provider `timeScale` scales recipes and local
+popup clocks; it does not multiply these continuous theme clocks. Removing the
+animation class under none cancels the loop on the existing node.
 
 1. **Opacity only** (or `filter`, at ≤ 4px blur). A loop on `transform` or on a
    layout property keeps the compositor busy forever.

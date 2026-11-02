@@ -63,7 +63,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         const action = p.getByRole("button", { name: "Show the review checklist" });
         await action.focus();
         await page.keyboard.press("Enter");
-        await expect(p.getByRole("status")).toHaveText("Reply selected.");
+        await expect(p.locator('[role="status"].text-muted-foreground')).toHaveText("Reply selected.");
         await root.evaluate((el) => {
           (window as unknown as { bubble: Element }).bubble = el;
         });

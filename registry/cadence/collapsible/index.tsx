@@ -3,6 +3,7 @@
 import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible";
 import { useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
+import { popupStyle } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 function Collapsible({ ...props }: CollapsiblePrimitive.Root.Props) {
@@ -55,12 +56,13 @@ function CollapsibleBody({ children }: Pick<CollapsiblePrimitive.Panel.Props, "c
   );
 }
 
-function CollapsibleContent({ className, children, ...props }: CollapsiblePrimitive.Panel.Props) {
+function CollapsibleContent({ className, children, style, ...props }: CollapsiblePrimitive.Panel.Props) {
   const cm = useCadenceMotion();
   return (
     <CollapsiblePrimitive.Panel
       data-slot="collapsible-content"
       data-motion={cm.mode}
+      style={popupStyle(cm, style)}
       className={(state) =>
         cn(
           "h-[max(0px,var(--cadence-disclosure-height,var(--collapsible-panel-height)))] overflow-hidden data-[ending-style]:h-0 data-[starting-style]:h-0",

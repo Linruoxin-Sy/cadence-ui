@@ -5,6 +5,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
+import { popupStyle } from "../lib/popup-style";
 import { useCadenceMotion } from "../lib/provider";
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
@@ -115,12 +116,13 @@ function AccordionSurface({
   });
 }
 
-function AccordionContent({ className, children, render, ...props }: AccordionPrimitive.Panel.Props) {
+function AccordionContent({ className, children, render, style, ...props }: AccordionPrimitive.Panel.Props) {
   const cm = useCadenceMotion();
   return (
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
       data-motion={cm.mode}
+      style={popupStyle(cm, style)}
       className={cn(
         "h-[max(0px,var(--cadence-disclosure-height,var(--accordion-panel-height)))] overflow-hidden text-sm data-[ending-style]:h-0 data-[starting-style]:h-0",
         cm.reduced ? "duration-0" : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",

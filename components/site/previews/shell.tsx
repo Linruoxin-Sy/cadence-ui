@@ -1,7 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/registry/cadence/lib/cn";
+import { popupStyle } from "@/registry/cadence/lib/popup-style";
+import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 
 /**
  * Layout shell shared by every component preview.
@@ -35,14 +37,29 @@ import { cn } from "@/registry/cadence/lib/cn";
  * `Skeleton` at hydration. A JS entrance cannot: the element is already painted
  * at its final state by then, so Motion would snap it back to `opacity: 0` and
  * play catch-up in view. The duration comes from `--motion-duration-*`, so
- * `data-motion="none"` resolves it to zero and `reduced` shortens it without a
- * second branch here.
+ * Each stack owns its effective clock. Reduced keeps the fade and removes travel;
+ * none removes the starting state and cancels every running transition.
  */
-const entrance =
-  "transition-[translate,opacity] ease-cadence-out duration-(--motion-duration-base) starting:opacity-0 starting:translate-y-1";
-
 export function PreviewStack({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("flex w-full flex-col items-center gap-5", entrance, className)}>{children}</div>;
+  const cm = useCadenceMotion();
+  return (
+    <div
+      data-preview-stack
+      data-motion={cm.mode}
+      style={popupStyle(cm, undefined) as CSSProperties}
+      className={cn(
+        "flex w-full flex-col items-center gap-5 ease-cadence-out duration-(--motion-duration-base)",
+        cm.disabled
+          ? "transition-none"
+          : cm.reduced
+            ? "transition-opacity starting:opacity-0"
+            : "transition-[translate,opacity] starting:opacity-0 starting:translate-y-1 motion-reduce:transition-opacity motion-reduce:starting:translate-none",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
 }
 
 export function PreviewRow({ className, children }: { className?: string; children: ReactNode }) {
