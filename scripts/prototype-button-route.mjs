@@ -69,10 +69,6 @@ await writeFile(
 export function usePathname(){return useSyncExternalStore(fn=>{window.addEventListener("prototype-navigation",fn);return ()=>window.removeEventListener("prototype-navigation",fn);},()=>location.pathname,()=>globalThis.__prototypePath || "/components/button");}
 export function notFound(){throw Error("Not found");}`,
 );
-await writeFile(
-  path.join(dir, "previews.jsx"),
-  `import {ButtonPreview} from "../../components/site/previews/button"; export const previews={button:ButtonPreview};`,
-);
 const previewSource = await readFile("components/site/previews/index.tsx", "utf8");
 const previewEntries = [
   ...previewSource.matchAll(

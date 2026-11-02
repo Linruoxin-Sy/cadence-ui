@@ -12,7 +12,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
       const detail = await run();
       checks.push({ name, status: "PASS", detail });
     } catch (e) {
-      checks.push({ name, status: "FAIL", error: e.stack });
+      checks.push({ name, status: "FAIL", error: e.stack, detail: e.detail });
       console.log(e.message);
     }
     console.log(`${name}: ${checks.at(-1).status}`);
@@ -246,53 +246,64 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
       });
   checks.push({ name: "runtime errors", status: errors.length ? "FAIL" : "PASS", detail: errors });
   for (const width of [1440, 390])
-    await check(`bounded full-mode interaction CLS ${width}`, async () => {
-      const isolated = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: "no-preference" });
-      try {
-        await isolated.addInitScript(() => {
-          window.__shifts = [];
-          window.__firstFrames = [];
-          new PerformanceObserver((list) => {
-            for (const entry of list.getEntries())
-              window.__shifts.push({
-                value: entry.value,
-                startTime: entry.startTime,
-                hadRecentInput: entry.hadRecentInput,
-              });
-          }).observe({ type: "layout-shift", buffered: true });
-          const frame = () => {
-            const button = document.querySelector('[data-preview="button"] button');
-            if (button && window.__firstFrames.length < 3)
-              window.__firstFrames.push({
-                time: performance.now(),
-                mode: button.dataset.motion,
-                transform: getComputedStyle(button).transform,
-              });
-            if (window.__firstFrames.length < 3) requestAnimationFrame(frame);
-          };
-          requestAnimationFrame(frame);
-        });
-        const p = await isolated.newPage();
-        await p.goto(`${origin}/components/button?motion=full`);
-        await p.waitForFunction(() => window.__prototypeReady);
-        await p.waitForLoadState("networkidle");
-        await p.getByLabel("Button variant", { exact: true }).selectOption("outline");
-        await p.locator("article details summary").click();
-        await p.getByRole("tab", { name: "npm", exact: true }).click();
-        await p
-          .getByRole("navigation", { name: "On this page" })
-          .getByRole("link", { name: "API", exact: true })
-          .click();
-        await p.waitForTimeout(15000);
-        const detail = await p.evaluate(() => ({ shifts: window.__shifts, firstFrames: window.__firstFrames }));
-        detail.cls = summarizeLayoutShifts(detail.shifts);
-        assert.ok(detail.cls < 0.02);
-        assert.equal(detail.firstFrames.length, 3);
-        return detail;
-      } finally {
-        await isolated.close();
-      }
-    });
+    for (const target of [origin, baseline])
+      await check(
+        `bounded full-mode interaction CLS ${width} ${target === origin ? "candidate" : "baseline"}`,
+        async () => {
+          const isolated = await browser.newContext({
+            viewport: { width, height: 900 },
+            reducedMotion: "no-preference",
+          });
+          try {
+            await isolated.addInitScript(() => {
+              window.__shifts = [];
+              window.__firstFrames = [];
+              new PerformanceObserver((list) => {
+                for (const entry of list.getEntries())
+                  window.__shifts.push({
+                    value: entry.value,
+                    startTime: entry.startTime,
+                    hadRecentInput: entry.hadRecentInput,
+                  });
+              }).observe({ type: "layout-shift", buffered: true });
+              const frame = () => {
+                const button = document.querySelector('[data-preview="button"] button');
+                if (button && window.__firstFrames.length < 3)
+                  window.__firstFrames.push({
+                    time: performance.now(),
+                    mode: button.dataset.motion,
+                    transform: getComputedStyle(button).transform,
+                  });
+                if (window.__firstFrames.length < 3) requestAnimationFrame(frame);
+              };
+              requestAnimationFrame(frame);
+            });
+            const p = await isolated.newPage();
+            await p.goto(`${target}/components/button?motion=full`);
+            if (target === origin) await p.waitForFunction(() => window.__prototypeReady);
+            await p.waitForLoadState("networkidle");
+            await p.getByLabel("Button variant", { exact: true }).selectOption("outline");
+            await p.locator("article details summary").click();
+            await p.getByRole("tab", { name: "npm", exact: true }).click();
+            await p
+              .getByRole("navigation", { name: "On this page" })
+              .getByRole("link", { name: "API", exact: true })
+              .click();
+            await p.waitForTimeout(15000);
+            const detail = await p.evaluate(() => ({ shifts: window.__shifts, firstFrames: window.__firstFrames }));
+            detail.cls = summarizeLayoutShifts(detail.shifts);
+            if (detail.cls >= 0.02) {
+              const error = new Error(`CLS ${detail.cls} exceeds 0.02`);
+              error.detail = detail;
+              throw error;
+            }
+            assert.equal(detail.firstFrames.length, 3);
+            return detail;
+          } finally {
+            await isolated.close();
+          }
+        },
+      );
   await context.close();
   await writeFile(path.join(dir, "functionality.json"), JSON.stringify(checks, null, 2));
   return checks;
