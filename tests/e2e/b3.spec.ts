@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES, openComponent } from "./helpers";
+import { installInitialControlProbe } from "./initial-control-probe";
 
 const parts = {
   checkbox: ["checkbox", "checkbox-indicator"],
@@ -92,37 +93,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     test.use({ reducedMotion });
     for (const mode of MODES)
       for (const id of ids)
-        test(`${id} recipe frames, cancellation and stable controls ${mode}`, async ({ page }) => {
+        test(`${id} recipe frames, cancellation and stable controls ${mode}`, async ({ page }, testInfo) => {
           const selector = `[data-preview="${id}"] [data-slot="${parts[id][1]}"]${id === "input-otp" ? " > span" : ""}`;
-          await page.addInitScript(() => {
-            const store = window as unknown as {
-              initial: { transform: string; animations: number; opacity: string }[];
-            };
-            store.initial = [];
-            new MutationObserver(() => {
-              const scope = document.querySelector('[data-testid="initial-none"]');
-              if (scope && store.initial.length === 0)
-                for (const node of scope.querySelectorAll('[data-motion="none"]')) {
-                  const style = getComputedStyle(node);
-                  store.initial.push({
-                    transform: style.transform,
-                    animations: node
-                      .getAnimations()
-                      .filter(
-                        (animation) =>
-                          animation.effect instanceof KeyframeEffect &&
-                          animation.effect
-                            .getKeyframes()
-                            .some(
-                              (frame) =>
-                                "opacity" in frame || "transform" in frame || "filter" in frame || "scale" in frame,
-                            ),
-                      ).length,
-                    opacity: style.opacity,
-                  });
-                }
-            }).observe(document, { childList: true, subtree: true });
-          });
+          await installInitialControlProbe(page);
           const actual = effectiveMode(mode, reducedMotion === "reduce");
           await openComponent(page, id, mode, parts[id][0], actual);
           const p = page.locator(`[data-preview="${id}"]`);
@@ -134,6 +107,28 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
                 (window as unknown as { initial: { animations: number }[] }).initial.every((s) => s.animations === 0),
             ),
           ).toBe(true);
+          const expectedPart = id === "input-otp" ? "otp-character" : parts[id][1];
+          expect(
+            await page.evaluate(
+              (slot) => (window as unknown as { initial: { slot: string }[] }).initial.some((s) => s.slot === slot),
+              expectedPart,
+            ),
+          ).toBe(true);
+          if (id === "checkbox" || id === "radio-group") {
+            expect(
+              await page.evaluate(
+                (slot) =>
+                  (
+                    window as unknown as {
+                      initial: { slot: string; mode: string; opacity: string; transform: string }[];
+                    }
+                  ).initial
+                    .filter((s) => s.slot === slot)
+                    .every((s) => s.mode === "none" && s.opacity === "1" && s.transform === "none"),
+                expectedPart,
+              ),
+            ).toBe(true);
+          }
           const staticScope = p.getByTestId("initial-none");
           expect(await staticScope.evaluate((n) => n.getAnimations({ subtree: true }).length)).toBe(0);
           await node.evaluate((n) => {
@@ -142,6 +137,21 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           await record(page, selector);
           await act(page, id, true);
           const samples = await frames(page);
+          await testInfo.attach("raw-control-frames", {
+            body: JSON.stringify(
+              await page.evaluate(
+                (samples) => ({
+                  initial: (window as unknown as { initial: unknown }).initial,
+                  samples,
+                  staticDOM: document.querySelector('[data-testid="initial-none"]')?.outerHTML,
+                }),
+                samples,
+              ),
+              null,
+              2,
+            ),
+            contentType: "application/json",
+          });
           expect(samples.length).toBeGreaterThan(4);
           if (["checkbox", "radio-group", "input-otp"].includes(id)) {
             if (actual === "full") expect(samples.some((s) => s.scale < 0.999)).toBe(true);

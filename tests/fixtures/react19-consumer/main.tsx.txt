@@ -1,0 +1,10 @@
+import {StrictMode, useState, version} from "react";
+import {createRoot} from "react-dom/client";
+import {ControlSpan, ControlDiv, NativeControlDiv} from "./registry/cadence/lib/control-animation";
+import {CadenceProvider, useCadenceMotion} from "./registry/cadence/lib/provider";
+import {InputOTP, InputOTPGroup, InputOTPSlot} from "./registry/cadence/input-otp";
+window.proof={refs:[0,0,0],cleanups:[0,0,0],drags:0};
+const refs=[0,1,2].map(i=>node=>{if(node){window.proof.refs[i]++;return ()=>window.proof.cleanups[i]++;}});
+function Controls(){const cm=useCadenceMotion();const [value,setValue]=useState(0);const [noise,setNoise]=useState(0);const target={opacity:value?1:0.4,scale:cm.reduced?1:value?1:0.96};return <><button id="value" onClick={()=>setValue(v=>1-v)}>Value</button><button id="noise" onClick={()=>setNoise(v=>v+1)}>Noise {noise}</button>{[ControlSpan,ControlDiv,NativeControlDiv].map((C,i)=><C key={i} ref={refs[i]} onDrag={i===2?()=>window.proof.drags++:undefined} data-testid={`adapter-${i}`} data-motion={cm.mode} target={target} transition={cm.transition("state.morph")}>Control</C>)}<InputOTP aria-label="Code" maxLength={2}><InputOTPGroup><InputOTPSlot index={0}/><InputOTPSlot index={1}/></InputOTPGroup></InputOTP></>}
+function App(){const [mode,setMode]=useState("full");const [clock,setClock]=useState(4);const [mounted,setMounted]=useState(true);return <><output id="version">{version}</output><select aria-label="Mode" value={mode} onChange={e=>setMode(e.target.value)}>{["full","reduced","none"].map(m=><option key={m}>{m}</option>)}</select><button id="clock" onClick={()=>setClock(v=>v===4?8:4)}>Clock</button><button id="mount" onClick={()=>setMounted(v=>!v)}>Mount</button><CadenceProvider mode={mode} timeScale={clock}>{mounted&&<Controls/>}</CadenceProvider></>}
+createRoot(document.getElementById("root")).render(<StrictMode><App/></StrictMode>);

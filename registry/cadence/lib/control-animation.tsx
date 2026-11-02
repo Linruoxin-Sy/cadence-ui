@@ -1,25 +1,31 @@
 "use client";
 
-import { type HTMLMotionProps, motion, type Transition, useAnimationControls } from "motion/react";
-import { type ComponentProps, useEffect, useEffectEvent, useLayoutEffect } from "react";
+import { cancelFrame, frame, type HTMLMotionProps, motion, type Transition, useAnimationControls } from "motion/react";
+import { type ComponentProps, useEffect } from "react";
 
 import { NativeMotionDiv } from "./native-div";
 
-const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 type Target = Record<string, number>;
 
 function useControlAnimation(target: Target, transition: Transition) {
   const controls = useAnimationControls();
   const signature = JSON.stringify([target, transition]);
-  const update = useEffectEvent(() => {
+  // The signature tracks values rather than object identity. This effect's closure
+  // belongs to the committed render; unrelated renders never restart the recipe.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: signature includes every target and transition value.
+  useEffect(() => {
     controls.stop();
-    if (transition.duration === 0) controls.set(target);
-    else void controls.start(target, transition);
-  });
-  // Value signatures retarget on clock changes; the event reads the latest inputs.
-  useCommittedEffect(() => {
-    update();
-    return () => controls.stop();
+    const settle = () => controls.set(target);
+    if (transition.duration === 0) {
+      settle();
+      // Motion queues same-target writes in its update phase. Reassert this
+      // committed zero-clock target after older queued writes, before paint.
+      frame.update(settle);
+    } else void controls.start(target, transition);
+    return () => {
+      cancelFrame(settle);
+      controls.stop();
+    };
   }, [signature, controls]);
   return controls;
 }

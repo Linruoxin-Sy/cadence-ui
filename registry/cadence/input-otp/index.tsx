@@ -4,7 +4,7 @@ import { OTPInput, OTPInputContext } from "input-otp";
 import { MinusIcon } from "lucide-react";
 import { motion, useAnimationControls } from "motion/react";
 import type * as React from "react";
-import { useContext, useEffect, useEffectEvent, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 import { scale } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
@@ -68,7 +68,8 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
 
   const controls = useAnimationControls();
   const previousCharacter = useRef(char);
-  const animateCharacter = useEffectEvent(() => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: mode and clock fully determine cm; slot focus changes must not restart a character.
+  useEffect(() => {
     controls.stop();
     const changed = previousCharacter.current !== char;
     previousCharacter.current = char;
@@ -76,10 +77,6 @@ function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
       controls.set(cm.reduced ? { opacity: 0, scale: 1 } : { opacity: 0, scale: scale.in });
       void controls.start({ opacity: 1, scale: 1 }, cm.transition("state.morph"));
     } else controls.set({ opacity: 1, scale: 1 });
-  });
-  // biome-ignore lint/correctness/useExhaustiveDependencies: character/mode/clock changes trigger the effect; the event reads their latest values without re-running for unrelated slot focus updates.
-  useEffect(() => {
-    animateCharacter();
     return () => controls.stop();
   }, [char, cm.mode, cm.timeScale, controls]);
 

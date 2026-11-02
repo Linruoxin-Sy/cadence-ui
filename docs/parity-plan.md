@@ -1725,6 +1725,27 @@ reused because runtime is unchanged). The contract is **per page** (animation-sy
 applicable site pages/full shell, especially Chart/Calendar/CodeBlock. All global
 motion/popup/Combobox/final audits remain OPEN; next finite compatibility group is B3.
 
+### B3 control runtime / React minimum follow-up (2026-11-02)
+
+Corrected the four-failure attribution from compatibility-base: fresh unchanged-source
+production rerun fails interaction scale===1, not the initial nonempty/zero-animation
+assertion. Old initial sampling covered roots only; the new probe requires actual
+animated parts from SSR insertion through hydration, with a real opacity-animation
+negative control. Raw baseline shows none's stale scale0.96 and zero active animations.
+Motion13.5.1 queues same-target writes after the immediate none set; the adapter now
+reasserts the committed zero-clock target in frame.update and cancels that task on
+cleanup. No timeouts/assertions weakened, remount, new recipe or fallback-mode change.
+
+Real isolated React/ReactDOM19.0.0 consumer reproduced useEffectEvent missing/blank
+runtime before repair. Both shipped imports replaced by normal committed effects,
+with meaningful target/transition/character/mode/clock dependencies. React19.x support
+is preserved, not narrowed to19.2. Three adapters and actual OTP run in StrictMode under
+both OS settings/all modes, with running cancellation, same-target clock, unrelated
+render, DOM/focus and cleanup evidence. See docs/evidence/control-runtime.md/json and
+serial handoff for final commands/results/SHAs. This closes only the recorded B3 and
+minimum-React paths. Ledger373 classified/93 open B6–B9, global live CSS/Motion/disabled
+press matrices, per-page initial-JS budget and final goal audit remain OPEN.
+
 ### Deferred and excluded
 
 | Item            | Decision                                                         |
