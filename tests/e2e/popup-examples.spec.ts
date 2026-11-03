@@ -195,6 +195,8 @@ if (catalog.dialog)
     await expect(surface.getByRole("status")).toHaveText("Export prepared");
     await surface.locator('[data-slot="dialog-footer"]').getByRole("button", { name: "Close", exact: true }).click();
     await card(page, "dialog", "long-content").getByRole("button").click();
+    await expect(surface.getByRole("heading", { name: "Release notes", exact: true })).toBeFocused();
+    expect(await surface.evaluate((node) => node.scrollTop)).toBe(0);
     expect(
       await surface.evaluate(
         (node) => node.scrollHeight > node.clientHeight && node.clientHeight <= innerHeight * 0.7 + 1,

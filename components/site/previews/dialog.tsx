@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Button } from "@/registry/cadence/button";
 import {
   Dialog,
@@ -123,12 +123,15 @@ function FooterCloseDialog() {
 }
 
 function LongContentDialog() {
+  const titleRef = useRef<HTMLHeadingElement>(null);
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline" />}>Read the changelog</DialogTrigger>
-      <DialogContent className="max-h-[70vh] overflow-y-auto">
+      <DialogContent initialFocus={titleRef} className="max-h-[70vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Release notes</DialogTitle>
+          <DialogTitle ref={titleRef} tabIndex={-1}>
+            Release notes
+          </DialogTitle>
           <DialogDescription>Scroll this panel to read every change.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 text-sm text-muted-foreground">
@@ -155,8 +158,8 @@ function DialogModality() {
             <DialogHeader>
               <DialogTitle>Modal: {String(modal)}</DialogTitle>
               <DialogDescription>
-                True traps focus and locks page scrolling; false allows page interaction; trap-focus keeps the focus
-                trap without scroll locking.
+                True traps focus and locks page scrolling; false removes the focus trap and scroll lock; trap-focus
+                keeps the focus trap without scroll locking. DialogContent still renders a backdrop.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter showCloseButton />

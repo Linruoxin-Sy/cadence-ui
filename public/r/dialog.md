@@ -290,36 +290,28 @@ export function FooterCloseDialog() {
 
 ## Long content
 
-Constrain the panel height and enable overflow-y-auto when its body is long. The panel scrolls independently and the final Close action remains reachable. The component does not impose a scrolling height for every consumer.
+Constrain the panel height and enable overflow-y-auto when its body is long. The panel scrolls independently and the final Close action remains reachable. The component does not impose a scrolling height for every consumer. Initial focus targets the heading so opening a long panel starts at the top; Tab can then reach its close controls.
 
 <ComponentExample name="long-content" />
 
 ```tsx
 "use client";
 
-import { useId, useState } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/cadence/button";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/cadence/dialog";
-import { Field, FieldLabel } from "@/components/cadence/field";
-import { Input } from "@/components/cadence/input";
-import { CadenceProvider } from "@/components/cadence/lib/provider";
 
 export function LongContentDialog() {
+  const titleRef = useRef<HTMLHeadingElement>(null);
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline" />}>Read the changelog</DialogTrigger>
-      <DialogContent className="max-h-[70vh] overflow-y-auto">
+      <DialogContent initialFocus={titleRef} className="max-h-[70vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Release notes</DialogTitle>
+          <DialogTitle ref={titleRef} tabIndex={-1}>Release notes</DialogTitle>
           <DialogDescription>Scroll this panel to read every change.</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 text-sm text-muted-foreground">
@@ -339,7 +331,7 @@ export function LongContentDialog() {
 
 ## Modal and non-modal behavior
 
-The fixed triggers cover modal=true (the default), false, and trap-focus. True traps focus and locks page scrolling; false allows outside interaction; trap-focus retains the focus trap without locking page scrolling. Every form still has a named panel and close action.
+The fixed triggers cover modal=true (the default), false, and trap-focus. True traps focus and locks page scrolling; false removes focus trapping and scroll locking; trap-focus retains the focus trap without locking page scrolling. DialogContent still renders its backdrop in every case, so an outside pointer press hits that backdrop and dismisses the panel; modal=false does not remove it. Use Popover for an anchored non-modal surface without this backdrop. Every panel still has a name and close action.
 
 <ComponentExample name="modality" />
 
@@ -372,8 +364,8 @@ export function DialogModality() {
             <DialogHeader>
               <DialogTitle>Modal: {String(modal)}</DialogTitle>
               <DialogDescription>
-                True traps focus and locks page scrolling; false allows page interaction; trap-focus keeps the focus
-                trap without scroll locking.
+                True traps focus and locks page scrolling; false removes the focus trap and scroll lock; trap-focus keeps the focus
+                trap without scroll locking. DialogContent still renders a backdrop.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter showCloseButton />
