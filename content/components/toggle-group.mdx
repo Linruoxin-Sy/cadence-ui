@@ -43,85 +43,262 @@ export function Alignment() {
 }
 ```
 
+## Visual variants
+
+Default, outline and segmented are fixed, independent single-selection groups. Each starts on Week; clicking its selected item clears it.
+
+<ComponentExample name="variants" />
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function GroupVariants() {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      {(["default", "outline", "segmented"] as const).map((variant) => (
+        <ToggleGroup key={variant} variant={variant} defaultValue={["week"]} aria-label={`${variant} range`}>
+          <ToggleGroupItem value="day">Day</ToggleGroupItem>
+          <ToggleGroupItem value="week">Week</ToggleGroupItem>
+          <ToggleGroupItem value="month">Month</ToggleGroupItem>
+        </ToggleGroup>
+      ))}
+    </div>
+  );
+}
+```
+
 ## Multiple
 
-```tsx
-<ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style">
-  <ToggleGroupItem value="bold" aria-label="Bold">
-    <Bold />
-  </ToggleGroupItem>
-  <ToggleGroupItem value="italic" aria-label="Italic">
-    <Italic />
-  </ToggleGroupItem>
-</ToggleGroup>
-```
+Multiple permits independent marks. Adjacent pressed fills join at zero spacing. Pressing Bold off does not change Italic.
 
-Without `multiple`, pressing an item releases the others and the selected fill
-slides to it. Pressing the selected item again clears the selection, matching
-Base UI. With `multiple`, fills fade and settle independently; adjacent pressed
-items join into one shape when `spacing={0}`.
-
-## Segmented
-
-Use `variant="segmented"` for a pill-shaped track with a raised selection fill.
-This is a Toggle Group variant, with the same parts, array value and keyboard
-behavior as the toolbar variants.
+<ComponentExample name="multiple" />
 
 ```tsx
-const [range, setRange] = useState(["week"]);
+import { BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
 
-<ToggleGroup
-  variant="segmented"
-  value={range}
-  onValueChange={(next) => {
-    if (next.length) setRange(next);
-  }}
-  aria-label="Time range"
->
-  <ToggleGroupItem value="day">Day</ToggleGroupItem>
-  <ToggleGroupItem value="week">Week</ToggleGroupItem>
-  <ToggleGroupItem value="month">Month</ToggleGroupItem>
-</ToggleGroup>;
+export function MultipleGroup() {
+  return (
+    <ToggleGroup multiple defaultValue={["bold"]} aria-label="Text style">
+      <ToggleGroupItem value="bold" aria-label="Bold">
+        <BoldIcon />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="italic" aria-label="Italic">
+        <ItalicIcon />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="underline" aria-label="Underline">
+        <UnderlineIcon />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  );
+}
 ```
 
-Ignoring an empty array makes a controlled selection required. The visual
-variant does not silently change selection semantics or activate items on focus.
+## Segmented with a required selection
+
+The caller ignores empty arrays to require one selection. The pill style alone does not require a value or select a newly focused item.
+
+<ComponentExample name="segmented" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function SegmentedGroup() {
+  const [range, setRange] = useState(["week"]);
+  return (
+    <ToggleGroup
+      variant="segmented"
+      value={range}
+      onValueChange={(next) => {
+        if (next.length) setRange(next);
+      }}
+      aria-label="Time range"
+    >
+      <ToggleGroupItem value="day">Day</ToggleGroupItem>
+      <ToggleGroupItem value="week">Week</ToggleGroupItem>
+      <ToggleGroupItem value="month">Month</ToggleGroupItem>
+    </ToggleGroup>
+  );
+}
+```
 
 ## Spacing
 
+Zero spacing joins adjacent pressed fills; one spacing step separates them. Both groups retain independent multiple selection and an outer strip.
+
+<ComponentExample name="spacing" />
+
 ```tsx
-<ToggleGroup variant="outline" spacing={0} aria-label="Range">
-  …
-</ToggleGroup>
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
 
-<ToggleGroup variant="outline" spacing={1} aria-label="Range">
-  …
-</ToggleGroup>
+export function GroupSpacing() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {[0, 1].map((spacing) => (
+        <ToggleGroup
+          key={spacing}
+          variant="outline"
+          multiple
+          spacing={spacing}
+          defaultValue={["bold", "italic"]}
+          aria-label={`Spacing ${spacing}`}
+        >
+          <ToggleGroupItem value="bold">Bold</ToggleGroupItem>
+          <ToggleGroupItem value="italic">Italic</ToggleGroupItem>
+          <ToggleGroupItem value="underline">Underline</ToggleGroupItem>
+        </ToggleGroup>
+      ))}
+    </div>
+  );
+}
 ```
-
-`spacing={0}` joins adjacent pressed fills in a multiple group; a positive value
-keeps them apart in Tailwind spacing steps. The strip keeps its outer surface in
-both cases. Single selection slides between items at either spacing.
 
 ## Vertical
 
+A fixed vertical group lays out items in a column and uses Up/Down for roving focus. Focus alone does not change selection.
+
+<ComponentExample name="vertical" />
+
 ```tsx
-<ToggleGroup orientation="vertical" aria-label="Zoom">
-  …
-</ToggleGroup>
+import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function VerticalGroup() {
+  return (
+    <ToggleGroup orientation="vertical" variant="outline" defaultValue={["left"]} aria-label="Vertical alignment">
+      <ToggleGroupItem value="left" aria-label="Align left">
+        <AlignLeftIcon />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="center" aria-label="Align center">
+        <AlignCenterIcon />
+      </ToggleGroupItem>
+      <ToggleGroupItem value="right" aria-label="Align right">
+        <AlignRightIcon />
+      </ToggleGroupItem>
+    </ToggleGroup>
+  );
+}
+```
+
+## Sizes
+
+Small, default and large items are 32, 36 and 40px tall. These three horizontal groups use their own fixed size, inherited by each item.
+
+<ComponentExample name="sizes" />
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function GroupSizes() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {(["sm", "default", "lg"] as const).map((size) => (
+        <ToggleGroup key={size} size={size} variant="outline" defaultValue={["day"]} aria-label={`${size} size`}>
+          <ToggleGroupItem value="day">Day</ToggleGroupItem>
+          <ToggleGroupItem value="week">Week</ToggleGroupItem>
+        </ToggleGroup>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## Controlled
 
-```tsx
-const [value, setValue] = useState(["center"]);
+The value is always an array, including for a single-selection group. The external alignment button changes only this caller-owned value; choosing the selected item can clear it.
 
-<ToggleGroup value={value} onValueChange={setValue} aria-label="Alignment">
-  …
-</ToggleGroup>;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function ControlledGroup() {
+  const [value, setValue] = useState(["center"]);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <ToggleGroup value={value} onValueChange={setValue} aria-label="Controlled alignment">
+        <ToggleGroupItem value="left">Left</ToggleGroupItem>
+        <ToggleGroupItem value="center">Center</ToggleGroupItem>
+        <ToggleGroupItem value="right">Right</ToggleGroupItem>
+      </ToggleGroup>
+      <p role="status" className="text-sm text-muted-foreground">
+        Selection: {value[0] ?? "none"}
+      </p>
+      <Button variant="outline" size="sm" onClick={() => setValue(["left"])}>
+        Align left externally
+      </Button>
+    </div>
+  );
+}
 ```
 
-The value is always an array, even without `multiple`.
+## Disabled
+
+The first group skips a disabled middle item when moving focus and uses loopFocus={false} to stop at either end. The default is to wrap focus. The second disables the whole group and retains its selected Day.
+
+<ComponentExample name="disabled" />
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function DisabledGroups() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      <ToggleGroup defaultValue={["day"]} loopFocus={false} aria-label="Disabled item" variant="outline">
+        <ToggleGroupItem value="day">Day</ToggleGroupItem>
+        <ToggleGroupItem value="week" disabled>
+          Week
+        </ToggleGroupItem>
+        <ToggleGroupItem value="month">Month</ToggleGroupItem>
+      </ToggleGroup>
+      <ToggleGroup disabled defaultValue={["day"]} aria-label="Disabled group" variant="outline">
+        <ToggleGroupItem value="day">Day</ToggleGroupItem>
+        <ToggleGroupItem value="week">Week</ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The first group is fixed to none from its first DOM appearance. A second provider explicitly selects full inside that outer none scope; the system reduced-motion preference still wins. All ordinary groups inherit the site header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function StaticGroup() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-4">
+        <div data-testid="initial-none">
+          <ToggleGroup value={["static"]} aria-label="Static group">
+            <ToggleGroupItem value="static">On</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <CadenceProvider mode="full">
+          <div data-testid="explicit-full">
+            <ToggleGroup defaultValue={["first"]} aria-label="Explicit full toggle-group">
+              <ToggleGroupItem value="first">First</ToggleGroupItem>
+              <ToggleGroupItem value="second">Second</ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
+```
 
 ## When to use
 
@@ -148,6 +325,8 @@ The value is always an array, even without `multiple`.
 | `value`         | `readonly string[]`                         | –              | Controlled pressed values.               |
 | `defaultValue`  | `readonly string[]`                         | `[]`           | Uncontrolled initial values.             |
 | `onValueChange` | `(value: string[], details) => void`        | –              | Fired when any item changes.             |
+| `disabled`      | `boolean` | `false` | Disables every item. |
+| `loopFocus`     | `boolean` | `true` | Wrap arrow focus at either end. |
 | `multiple`      | `boolean`                                   | `false`        | Allow more than one pressed item.        |
 | `spacing`       | `number`                                    | `0`            | Gap in Tailwind spacing steps.           |
 | `orientation`   | `"horizontal" \| "vertical"`                | `"horizontal"` | Axis, also drives arrow keys.            |

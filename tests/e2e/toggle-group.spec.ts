@@ -24,7 +24,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         const mode = effectiveMode(requested, reducedMotion === "reduce");
         await openComponent(page, "toggle-group", requested, "toggle-group-item", mode);
         const preview = page.locator('[data-preview="toggle-group"]');
-        const range = preview.getByRole("group", { name: "Time range", exact: true });
+        const range = page
+          .locator('[data-component-example="toggle-group/variants"]')
+          .getByRole("group", { name: "segmented range", exact: true });
         const month = range.getByRole("button", { name: "Month", exact: true });
         const samples = await month.evaluate(async (el) => {
           const root = el.closest('[data-slot="toggle-group"]');
@@ -76,7 +78,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await page.keyboard.press("Space");
         await expect(range.locator('[data-slot="toggle-group-indicator"]')).toHaveCount(0);
 
-        const marks = preview.getByRole("group", { name: "Text style", exact: true });
+        const marks = page
+          .locator('[data-component-example="toggle-group/multiple"]')
+          .getByRole("group", { name: "Text style", exact: true });
         const bold = marks.getByRole("button", { name: "Bold", exact: true });
         const italic = marks.getByRole("button", { name: "Italic", exact: true });
         await italic.click();
@@ -117,22 +121,22 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
 
 test("live downgrade cancels shared movement and preserves focused controls", async ({ page }) => {
   await openComponent(page, "toggle-group", "full", "toggle-group-item");
-  const preview = page.locator('[data-preview="toggle-group"]');
-  await preview.getByLabel("Control motion", { exact: true }).selectOption("full");
-  const month = preview
-    .getByRole("group", { name: "Time range", exact: true })
+  const month = page
+    .locator('[data-component-example="toggle-group/variants"]')
+    .getByRole("group", { name: "segmented range", exact: true })
     .getByRole("button", { name: "Month", exact: true });
   const frames = await month.evaluate(async (el) => {
     const root = el.closest('[data-slot="toggle-group"]');
-    const select = el
-      .closest("[data-preview]")
-      ?.querySelector<HTMLSelectElement>('select[aria-label="Control motion"]');
-    if (!root || !select) throw Error("Missing mode controls");
+    const none =
+      document.querySelector<HTMLButtonElement>('[role="group"][aria-label="Motion mode"] button[aria-label="none"]') ??
+      [...document.querySelectorAll<HTMLButtonElement>('[role="group"][aria-label="Motion mode"] button')].find(
+        (n) => n.textContent === "none",
+      );
+    if (!root || !none) throw Error("Missing mode controls");
     (el as HTMLElement).focus();
     (el as HTMLElement).click();
     for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
-    select.value = "none";
-    select.dispatchEvent(new Event("change", { bubbles: true }));
+    none.click();
     const samples = [];
     for (let i = 0; i < 5; i++) {
       await new Promise(requestAnimationFrame);
@@ -169,10 +173,10 @@ for (const colorScheme of ["light", "dark"] as const) {
     for (const variant of ["default", "outline", "segmented"]) {
       test(`travelling ${variant} fill stays below crossed labels`, async ({ page }) => {
         await openComponent(page, "toggle-group", "full", "toggle-group-item");
-        await page.getByLabel("ToggleGroup variant", { exact: true }).selectOption(variant);
         const group = page
-          .locator('[data-preview="toggle-group"]')
-          .getByRole("group", { name: "Time range", exact: true });
+          .locator('[data-component-example="toggle-group/variants"]')
+          .getByRole("group", { name: `${variant} range`, exact: true });
+        await group.scrollIntoViewIfNeeded();
         const day = group.getByRole("button", { name: "Day", exact: true });
         await day.click();
         await aligned(day);
@@ -229,8 +233,8 @@ for (const colorScheme of ["light", "dark"] as const) {
       // Explicitly set the site's theme; stored theme is independent of the OS.
       const dark = await page.locator("html").evaluate((el) => el.classList.contains("dark"));
       if (dark !== (colorScheme === "dark")) await page.getByRole("button", { name: "Toggle color theme" }).click();
-      const preview = page.locator('[data-preview="toggle-group"]');
-      await preview
+      await page
+        .locator('[data-component-example="toggle-group/multiple"]')
         .getByRole("group", { name: "Text style", exact: true })
         .getByRole("button", { name: "Italic", exact: true })
         .click();
@@ -241,8 +245,9 @@ for (const colorScheme of ["light", "dark"] as const) {
       await page.setViewportSize({ width: 390, height: 844 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await aligned(
-        preview
-          .getByRole("group", { name: "Time range", exact: true })
+        page
+          .locator('[data-component-example="toggle-group/variants"]')
+          .getByRole("group", { name: "segmented range", exact: true })
           .getByRole("button", { name: "Week", exact: true }),
       );
     });

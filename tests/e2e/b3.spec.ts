@@ -334,7 +334,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             await expect(control).toBeFocused();
           }
           if (id === "toggle-group") {
-            const vertical = p.getByRole("group", { name: "Vertical alignment", exact: true });
+            const vertical = page
+              .locator('[data-component-example="toggle-group/vertical"]')
+              .getByRole("group", { name: "Vertical alignment", exact: true });
             const first = vertical.getByRole("button").first();
             await first.focus();
             await first.press("ArrowDown");

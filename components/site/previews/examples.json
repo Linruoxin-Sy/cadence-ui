@@ -27,5 +27,16 @@
   "radio-group": ["controlled", "invalid", "disabled", "locked", "horizontal", "form-submission", "without-motion"],
   "switch": ["sizes", "controlled", "settings", "disabled", "without-motion"],
   "slider": ["controlled", "range", "vertical", "disabled", "collisions", "alignment", "without-motion"],
-  "toggle": ["variants", "sizes", "label", "controlled", "disabled", "form-submission", "without-motion"]
+  "toggle": ["variants", "sizes", "label", "controlled", "disabled", "form-submission", "without-motion"],
+  "toggle-group": [
+    "variants",
+    "multiple",
+    "segmented",
+    "spacing",
+    "vertical",
+    "sizes",
+    "controlled",
+    "disabled",
+    "without-motion"
+  ]
 }
