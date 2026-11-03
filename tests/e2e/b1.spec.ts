@@ -252,12 +252,13 @@ for (const preference of ["no-preference", "reduce"] as const)
               ).toBe(true);
           }
           if (id === "card") {
-            const fit = p.getByTestId("fit-card");
+            const content = page.locator('[data-component-example="card/content-sized"]');
+            const fit = content.getByTestId("fit-card");
             const before = await fit.evaluate((node) => node.getBoundingClientRect().height);
             await fit.evaluate((node) => {
               (window as unknown as { fit: Element }).fit = node;
             });
-            const toggle = p.getByRole("button", { name: "Toggle content" });
+            const toggle = content.getByRole("button", { name: "Toggle content" });
             await toggle.focus();
             await toggle.press("Enter");
             await expect

@@ -147,3 +147,87 @@ for (const mode of ["full", "reduced", "none"] as const)
           ),
         ).toBe(0);
     });
+
+for (const mode of ["full", "reduced", "none"] as const)
+  for (const os of [false, true])
+    test(`Card examples: fixed sizes and immediate content measurement ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
+      await page.goto(`/components/card?motion=${mode}&variant=sm`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="card"]');
+      await expect(top.locator('[data-slot="card"]')).toHaveCount(1);
+      await expect(top.locator('[data-slot="card"]')).toHaveAttribute("data-size", "default");
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.getByRole("button", { name: "Toggle content" })).toHaveCount(0);
+      await expect(top.getByRole("link", { name: "Open setup" })).toHaveAttribute("href", "/docs/installation");
+      const sizes = page.locator('[data-component-example="card/sizes"]');
+      const padding: number[] = [];
+      for (const size of ["default", "sm"]) {
+        const card = sizes.locator(`[data-slot="card"][data-size="${size}"]`);
+        await expect(card).toBeVisible();
+        padding.push(
+          await card
+            .locator('[data-slot="card-content"]')
+            .evaluate((el) => Number.parseFloat(getComputedStyle(el).paddingLeft)),
+        );
+      }
+      expect(padding[0]).toBeGreaterThan(padding[1] ?? 0);
+      const header = page.locator('[data-component-example="card/header-action"]');
+      await expect(header.locator('[data-slot="card-action"]').getByRole("link", { name: "Setup" })).toHaveAttribute(
+        "href",
+        "/docs/installation",
+      );
+      const boundaries = page.locator('[data-component-example="card/boundaries"]');
+      expect(
+        await boundaries.locator('[data-slot="card-header"]').evaluate((el) => getComputedStyle(el).borderBottomWidth),
+      ).toBe("1px");
+      expect(
+        await boundaries.locator('[data-slot="card-footer"]').evaluate((el) => getComputedStyle(el).borderTopWidth),
+      ).toBe("1px");
+      const content = page.locator('[data-component-example="card/content-sized"]');
+      await expect(content).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
+      const fit = content.getByTestId("fit-card");
+      const toggle = content.getByRole("button", { name: "Toggle content" });
+      await expect(toggle).toHaveAttribute("data-motion", effectiveMode(mode, os));
+      const fitNode = await fit.elementHandle();
+      await toggle.focus();
+      const before = await fit.evaluate((el) => el.getBoundingClientRect().height);
+      await toggle.press("Enter");
+      await expect.poll(() => fit.evaluate((el) => el.getBoundingClientRect().height)).toBeGreaterThan(before);
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button) => (button as HTMLButtonElement).click());
+      await expect(toggle).toBeFocused();
+      await expect(toggle).toHaveAttribute("data-motion", "none");
+      await expect(fit).toContainText("The surface follows its own content immediately.");
+      await page.setViewportSize({ width: 390, height: 1000 });
+      await expect
+        .poll(() =>
+          fit.evaluate((el) =>
+            Math.abs(
+              el.getBoundingClientRect().height -
+                (el.querySelector('[data-slot="card-flow"]')?.getBoundingClientRect().height ?? 0) -
+                2,
+            ),
+          ),
+        )
+        .toBeLessThan(1);
+      expect(await fit.evaluate((el, saved) => el === saved, fitNode)).toBe(true);
+      expect(
+        await fit.evaluate(
+          (el) =>
+            el
+              .getAnimations()
+              .filter(
+                (a) =>
+                  a.effect instanceof KeyframeEffect &&
+                  a.effect
+                    .getKeyframes()
+                    .some((k) => "height" in k || "width" in k || "transform" in k || "opacity" in k),
+              ).length,
+        ),
+      ).toBe(0);
+      await toggle.press("Enter");
+      await expect(fit).toContainText("Short content.");
+    });

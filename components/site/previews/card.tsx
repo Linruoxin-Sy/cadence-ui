@@ -13,74 +13,134 @@ import {
   CardTitle,
 } from "@/registry/cadence/card";
 import { PreviewStack } from "./shell";
-import { usePreviewVariant } from "./use-preview-variant";
 
-const previewVariantOptions = ["default", "sm"] as const;
+function CardHeaderAction() {
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Workspace setup</CardTitle>
+        <CardDescription>Connect your first project.</CardDescription>
+        <CardAction>
+          <Button size="sm" variant="outline" render={<a href="/docs/installation" />}>
+            Setup
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent>Install a component to get started.</CardContent>
+    </Card>
+  );
+}
 
-/**
- * The card's characteristics are its parts, not a `variant` prop: header with a
- * title, description and a corner action, then content and footer — and `size`,
- * which repoints `--card-spacing` for every part at once.
- *
- * A grid, not a row: two cards of different content must still read as one pair, so
- * the columns are equal and both cards stretch to the taller one.
- */
-export function CardPreview() {
-  const { control, choose } = usePreviewVariant("Card", previewVariantOptions);
+function CardSizes() {
+  return (
+    <div className="grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-2">
+      {(["default", "sm"] as const).map((size) => (
+        <Card key={size} size={size}>
+          <CardHeader>
+            <CardTitle>{size === "sm" ? "Compact" : "Default"}</CardTitle>
+            <CardDescription>Workspace summary</CardDescription>
+          </CardHeader>
+          <CardContent>Every part follows one spacing property.</CardContent>
+          <CardFooter>
+            <span className="text-xs text-muted-foreground">size=&quot;{size}&quot;</span>
+          </CardFooter>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+function ContentSizedCard() {
   const [expanded, setExpanded] = useState(false);
   const fitRef = useRef<HTMLDivElement>(null);
   return (
-    <>
-      {control}
-      <PreviewStack>
-        <div className="grid w-full max-w-lg grid-cols-1 sm:grid-cols-2 items-stretch gap-4">
-          <Card size={choose("default")}>
-            <CardHeader>
-              <CardTitle>Parity plan</CardTitle>
-              <CardDescription>58 components, ten batches.</CardDescription>
-              <CardAction>
-                <Badge variant="secondary">0.2.0</Badge>
-              </CardAction>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Batch B1 ships the eleven atoms.</p>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" size="sm">
-                Open plan
-              </Button>
-            </CardFooter>
-          </Card>
+    <div className="grid w-full max-w-lg grid-cols-1 items-stretch gap-4 sm:grid-cols-2">
+      <Card fit="content" ref={fitRef} data-testid="fit-card" className="max-w-sm">
+        <CardHeader>
+          <CardTitle>Content fit</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {expanded
+            ? "The surface follows its own content immediately. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows."
+            : "Short content."}
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
+            Toggle content
+          </Button>
+        </CardFooter>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Normal grid item</CardTitle>
+          <CardDescription>This card stretches with its row.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          A longer summary can fill more vertical space. The content-sized neighbour keeps its own measured height
+          rather than inheriting this card’s height.
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
-          <Card size={choose("sm")}>
-            <CardHeader>
-              <CardTitle>Compact</CardTitle>
-              <CardDescription>1.5rem of padding becomes 1rem.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Every part follows one property.</p>
-            </CardContent>
-            <CardFooter>
-              <span className="text-xs text-muted-foreground">size=&quot;sm&quot;</span>
-            </CardFooter>
-          </Card>
-        </div>
-        <Card fit="content" ref={fitRef} data-testid="fit-card" className="max-w-sm" size={choose("default")}>
-          <CardHeader>
-            <CardTitle>Content fit</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {expanded
-              ? "The surface follows its own content immediately. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows."
-              : "Short content."}
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
-              Toggle content
-            </Button>
-          </CardFooter>
-        </Card>
+function CardBoundaries() {
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader className="border-b">
+        <CardTitle>Release notes</CardTitle>
+        <CardDescription>Review the latest changes.</CardDescription>
+      </CardHeader>
+      <CardContent>Components, fixes and documentation updates.</CardContent>
+      <CardFooter className="border-t">
+        <Button variant="outline" render={<a href="/docs/changelog" />}>
+          Read changelog
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+function CardSpecimen() {
+  return (
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle>Workspace</CardTitle>
+        <CardDescription>A home for your component library.</CardDescription>
+        <CardAction>
+          <Badge variant="secondary">Team</Badge>
+        </CardAction>
+      </CardHeader>
+      <CardContent>Reusable components, shared tokens and clear documentation.</CardContent>
+      <CardFooter>
+        <Button variant="outline" render={<a href="/docs/installation" />}>
+          Open setup
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+const examples = {
+  "header-action": CardHeaderAction,
+  sizes: CardSizes,
+  "content-sized": ContentSizedCard,
+  boundaries: CardBoundaries,
+};
+
+export function CardPreview({ example }: { example?: string }) {
+  if (example !== undefined) {
+    const Example = examples[example as keyof typeof examples];
+    if (!Example) throw new Error(`Unknown Card example: ${example}`);
+    return (
+      <PreviewStack>
+        <Example />
       </PreviewStack>
-    </>
+    );
+  }
+  return (
+    <PreviewStack>
+      <CardSpecimen />
+    </PreviewStack>
   );
 }

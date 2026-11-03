@@ -9,5 +9,6 @@
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
   "toc": ["nested", "controlled", "scroll-tracking"],
   "input": ["invalid", "file", "controlled", "disabled-readonly"],
-  "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"]
+  "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"],
+  "card": ["header-action", "sizes", "content-sized", "boundaries"]
 }
