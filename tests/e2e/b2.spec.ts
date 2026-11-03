@@ -124,11 +124,19 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               expect(await responsive.evaluate((node) => getComputedStyle(node).flexDirection)).toBe("row");
             }
           }
-          if (["item", "breadcrumb", "pagination"].includes(id)) {
+          if (id === "item") {
+            const row = page.locator('[data-component-example="item/whole-row-link"]').getByRole("link");
+            await row.focus();
+            await row.press("Enter");
+            await expect(page).toHaveURL(/\/docs\/installation$/);
+            await page.goBack();
+            await page.waitForLoadState("networkidle");
+          }
+          if (["breadcrumb", "pagination"].includes(id)) {
             const link = p.locator("a[href]").first();
             await link.focus();
             await link.press("Enter");
-            await expect(page).toHaveURL(new RegExp(`#${id === "item" ? "item-link" : id}$`));
+            await expect(page).toHaveURL(new RegExp(`#${id}$`));
             if (id !== "item") await expect(p.locator('[aria-current="page"]').first()).toBeVisible();
           }
           const buttons = p.getByRole("button");

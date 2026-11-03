@@ -17,27 +17,16 @@ npx shadcn@latest add @cadence/item
 ## Usage
 
 ```tsx
-import { FileText } from "lucide-react";
-import {
-  Item,
-  ItemContent,
-  ItemDescription,
-  ItemGroup,
-  ItemMedia,
-  ItemTitle,
-} from "@/components/cadence/item";
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
 
 export function Files() {
   return (
-    <ItemGroup>
+    <ItemGroup aria-label="Files">
       <Item>
-        <ItemMedia variant="icon">
-          <FileText />
-        </ItemMedia>
-        <ItemContent>
-          <ItemTitle>parity-plan.md</ItemTitle>
-          <ItemDescription>Edited 4 minutes ago by you.</ItemDescription>
-        </ItemContent>
+        <ItemMedia variant="icon"><FileTextIcon aria-hidden="true" /></ItemMedia>
+        <ItemContent><ItemTitle>plan.md</ItemTitle><ItemDescription>Project notes.</ItemDescription></ItemContent>
       </Item>
     </ItemGroup>
   );
@@ -46,57 +35,138 @@ export function Files() {
 
 ## A whole-row link
 
-`render` replaces the wrapper element (Base UI `render`, not `asChild`). The anchor
-keeps `data-slot="item"`, so CSS and `group/item` selectors still work.
+Base UI `render` makes the row one real anchor while keeping `data-slot="item"`. Do not nest other links or buttons inside it. This guide link has a real destination.
+
+<ComponentExample name="whole-row-link" />
 
 ```tsx
-<Item render={<a href="/files/plan" />}>
-  <ItemContent>
-    <ItemTitle>plan.pdf</ItemTitle>
-    <ItemDescription>2.4 MB</ItemDescription>
-  </ItemContent>
-</Item>
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
+
+export function WholeRowLink() {
+  return (
+    <ItemGroup aria-label="Guides" className="w-full max-w-lg">
+      <Item render={<a href="/docs/installation" />} variant="outline">
+        <ItemContent><ItemTitle>Installation guide</ItemTitle><ItemDescription>Set up Cadence in your project.</ItemDescription></ItemContent>
+      </Item>
+    </ItemGroup>
+  );
+}
 ```
 
 ## Variants
 
-`default` is transparent, `outline` adds the border, `muted` fills the surface. The
-border is always present in the box model — only its colour changes — so switching
-variants never shifts the layout.
+`default` is transparent, `muted` fills the surface, and `outline` draws the border. All three keep the same border width and padding; compare this axis independently from size.
+
+<ComponentExample name="variants" />
 
 ```tsx
-<Item variant="outline" />
-<Item variant="muted" size="sm" />
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
+
+export function ItemVariants() {
+  return (
+    <ItemGroup aria-label="Row variants" className="w-full max-w-lg gap-2">
+      {(["default", "muted", "outline"] as const).map((variant) => (
+        <Item key={variant} variant={variant}><ItemContent><ItemTitle>{variant}</ItemTitle><ItemDescription>The same row at default density.</ItemDescription></ItemContent></Item>
+      ))}
+    </ItemGroup>
+  );
+}
+```
+
+## Sizes
+
+`default`, `sm`, and `xs` change padding and gaps, not text hierarchy. These outline rows keep their content fixed so density is directly comparable.
+
+<ComponentExample name="sizes" />
+
+```tsx
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
+
+export function ItemSizes() {
+  return (
+    <ItemGroup aria-label="Row sizes" className="w-full max-w-lg gap-2">
+      {(["default", "sm", "xs"] as const).map((size) => (
+        <Item key={size} size={size} variant="outline"><ItemMedia variant="icon"><FileTextIcon aria-hidden="true" /></ItemMedia><ItemContent><ItemTitle>{size}</ItemTitle><ItemDescription>Project notes.</ItemDescription></ItemContent></Item>
+      ))}
+    </ItemGroup>
+  );
+}
+```
+
+## Media
+
+`default` leaves media unframed; `icon` adds a compact icon tile; `image` clips an image into a 40px square. The illustration is decorative because the adjacent title identifies the row.
+
+<ComponentExample name="media" />
+
+```tsx
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
+
+export function ItemMediaStyles() {
+  const cover = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23334155'/%3E%3Cpath d='M10 10h20v20H10z' fill='%23e2e8f0'/%3E%3C/svg%3E";
+  return (
+    <ItemGroup aria-label="Media styles" className="w-full max-w-lg">
+      <Item><ItemMedia><FileTextIcon aria-hidden="true" className="size-5" /></ItemMedia><ItemContent><ItemTitle>Unframed icon</ItemTitle></ItemContent></Item>
+      <Item><ItemMedia variant="icon"><FolderIcon aria-hidden="true" /></ItemMedia><ItemContent><ItemTitle>Icon tile</ItemTitle></ItemContent></Item>
+      <Item><ItemMedia variant="image"><img src={cover} alt="" /></ItemMedia><ItemContent><ItemTitle>Cover image</ItemTitle></ItemContent></Item>
+    </ItemGroup>
+  );
+}
 ```
 
 ## Separators
 
-`ItemSeparator` is a horizontal `Separator` with the vertical margins removed, so it
-sits flush between rows.
+`ItemSeparator` is a horizontal Separator with no vertical margins, flush between two rows. The group remains a labelled group; it does not impose list-item roles on links.
+
+<ComponentExample name="separators" />
 
 ```tsx
-<ItemGroup>
-  <Item>…</Item>
-  <ItemSeparator />
-  <Item>…</Item>
-</ItemGroup>
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
+
+export function ItemRules() {
+  return (
+    <ItemGroup aria-label="Recent files" className="w-full max-w-lg">
+      <Item><ItemContent><ItemTitle>plan.md</ItemTitle></ItemContent></Item>
+      <ItemSeparator />
+      <Item><ItemContent><ItemTitle>notes.md</ItemTitle></ItemContent></Item>
+    </ItemGroup>
+  );
+}
 ```
 
 ## Header and footer
 
-`ItemHeader` and `ItemFooter` take a full row (`basis-full`), for metadata above the
-title or a progress line below the content.
+`ItemHeader` and `ItemFooter` occupy full rows. Place them as direct children of Item so metadata spans the row above and below the main content.
+
+<ComponentExample name="header-footer" />
 
 ```tsx
-<Item>
-  <ItemHeader>
-    <ItemTitle>Quarterly report</ItemTitle>
-    <Badge variant="outline">Draft</Badge>
-  </ItemHeader>
-  <ItemFooter>
-    <span className="text-xs text-muted-foreground">Updated 2h ago</span>
-  </ItemFooter>
-</Item>
+import { DownloadIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from "@/components/cadence/item";
+
+export function ItemMetadata() {
+  return (
+    <ItemGroup aria-label="Reports" className="w-full max-w-lg">
+      <Item variant="outline">
+        <ItemHeader><span className="text-xs text-muted-foreground">Quarterly report</span><span className="text-xs">Draft</span></ItemHeader>
+        <ItemMedia variant="icon"><FileTextIcon aria-hidden="true" /></ItemMedia>
+        <ItemContent><ItemTitle>Q4 project notes</ItemTitle><ItemDescription>Ready for the next review.</ItemDescription></ItemContent>
+        <ItemFooter><span className="text-xs text-muted-foreground">Updated 2 hours ago</span><span className="text-xs">2 pages</span></ItemFooter>
+      </Item>
+    </ItemGroup>
+  );
+}
 ```
 
 ## When to use
