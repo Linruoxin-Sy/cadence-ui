@@ -35,13 +35,22 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         page.on("pageerror", (e) => errors.push(e.message));
         await openComponent(page, "tabs", requested, "tabs-trigger", mode);
         const preview = page.locator('[data-preview="tabs"]');
-        const roots = preview.locator('[data-slot="tabs"]');
-        const project = roots.nth(0),
-          settings = roots.nth(1);
-        const overview = project.getByRole("tab", { name: "Overview" }),
-          activity = project.getByRole("tab", { name: "Activity" });
+        await expect(preview.getByRole("tab")).toHaveCount(2);
+        await expect(preview.locator("select")).toHaveCount(0);
+        await expect(
+          preview.getByRole("button", { name: /Toggle orientation|Resize list|Change selection/ }),
+        ).toHaveCount(0);
+        await preview.getByRole("tab", { name: "Activity" }).click();
         for (const vertical of [false, true]) {
-          if (vertical) await preview.getByRole("button", { name: "Toggle orientation" }).click();
+          const verticalCard = page.locator('[data-component-example="tabs/vertical"]');
+          const project = vertical
+            ? verticalCard.locator('[data-slot="tabs"]').nth(0)
+            : page.locator('[data-component-example="tabs/disabled"] [data-slot="tabs"]');
+          const settings = vertical
+            ? verticalCard.locator('[data-slot="tabs"]').nth(1)
+            : page.locator('[data-component-example="tabs/line-style"] [data-slot="tabs"]');
+          const overview = project.getByRole("tab", { name: "Overview" }),
+            activity = project.getByRole("tab", { name: "Activity" });
           await expect(project).toHaveAttribute("data-orientation", vertical ? "vertical" : "horizontal");
           if (vertical) await expect(project.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
           await overview.click();
@@ -89,14 +98,12 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(trace.points.every((p) => p.transform === "none")).toBe(true);
           }
           await expect(settings.getByRole("tab", { name: "Account" })).toHaveAttribute("aria-selected", "true");
-          await preview.getByRole("button", { name: "Resize list" }).click();
-          await aligned(activity);
           // Parent-only layout mutation bypasses React; the selected indicator stays attached.
           await project.evaluate((el) => {
             el.style.width = "285px";
           });
           await aligned(activity);
-          await preview.getByRole("button", { name: "Change selection" }).click();
+          await overview.click();
           await expect(overview).toHaveAttribute("aria-selected", "true");
           await aligned(overview);
           await overview.focus();
@@ -124,6 +131,41 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           expect(await project.locator('[data-slot="tabs-content"]').count()).toBe(1);
           expect(await settings.locator('[data-slot="tabs-content"]').count()).toBe(2);
         }
+        const sizing = page.locator('[data-component-example="tabs/list-sizing"]');
+        const sizingActivity = sizing.getByRole("tab", { name: "Activity" });
+        await sizingActivity.click();
+        const beforeWidth = (await sizing.getByRole("tablist").boundingBox())?.width;
+        await sizing.getByRole("button", { name: "Resize list" }).click();
+        expect((await sizing.getByRole("tablist").boundingBox())?.width).toBeGreaterThan(beforeWidth ?? 0);
+        await aligned(sizingActivity);
+        const controlled = page.locator('[data-component-example="tabs/controlled"]');
+        const controlledRoot = await controlled.locator('[data-slot="tabs"]').elementHandle();
+        await controlled.getByRole("button", { name: "Change selection" }).click();
+        await expect(controlled.getByRole("tab", { name: "Activity" })).toHaveAttribute("aria-selected", "true");
+        await controlled.getByRole("button", { name: "Change selection" }).click();
+        await expect(controlled.getByRole("tab", { name: "Overview" })).toHaveAttribute("aria-selected", "true");
+        expect(
+          await controlled.locator('[data-slot="tabs"]').evaluate((node, saved) => node === saved, controlledRoot),
+        ).toBe(true);
+        const persistent = page.locator('[data-component-example="tabs/persistent"]');
+        const draft = persistent.getByRole("textbox", { name: "Draft text" });
+        await draft.fill("A draft kept by its panel");
+        const draftNode = await draft.elementHandle();
+        await persistent.getByRole("tab", { name: "History" }).click();
+        await expect(draft).toBeHidden();
+        await persistent.getByRole("tab", { name: "Draft" }).click();
+        await expect(draft).toHaveValue("A draft kept by its panel");
+        await draft.focus();
+        await page
+          .getByRole("group", { name: "Motion mode" })
+          .getByRole("button", { name: "none", exact: true })
+          .evaluate((node) => (node as HTMLButtonElement).click());
+        await expect(draft).toBeFocused();
+        expect(await draft.evaluate((node, saved) => node === saved, draftNode)).toBe(true);
+        await expect(sizingActivity).toHaveAttribute("aria-selected", "true");
+        await expect(preview.getByRole("tab", { name: "Activity" })).toHaveAttribute("aria-selected", "true");
+        const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
+        expect(new Set(ids).size).toBe(ids.length);
         expect(errors).toEqual([]);
       });
     }
@@ -144,7 +186,7 @@ for (const colorScheme of ["light", "dark"] as const) {
         .poll(() => preview.getByRole("tab", { name: "Activity" }).evaluate((el) => el.getAnimations().length))
         .toBe(0);
       await page.screenshot({ path: testInfo.outputPath(`tabs-${colorScheme}-selected.png`) });
-      await preview.getByRole("button", { name: "Toggle orientation" }).click();
+      await page.locator('[data-component-example="tabs/vertical"]').scrollIntoViewIfNeeded();
       await page.screenshot({ path: testInfo.outputPath(`tabs-${colorScheme}-vertical.png`) });
       await page.setViewportSize({ width: 390, height: 844 });
       await aligned(preview.getByRole("tab", { name: "Activity" }));

@@ -176,7 +176,7 @@ for (const mode of ["full", "reduced", "none"] as const)
       expect(new URL(page.url()).searchParams.get("variant")).toBe("sm");
     });
 
-for (const id of ["select"])
+for (const id of ["select", "tabs"])
   for (const theme of ["light", "dark"])
     test(`${id}: named examples visual and accessible ${theme}`, async ({ page }) => {
       await page.addInitScript((value) => localStorage.setItem("cadence-theme", value), theme);

@@ -1,4 +1,5 @@
 {
   "button": ["variants", "sizes", "links", "composition", "disabled"],
-  "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid"]
+  "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid"],
+  "tabs": ["controlled", "vertical", "line-style", "persistent", "list-sizing", "disabled"]
 }

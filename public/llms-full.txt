@@ -7973,48 +7973,229 @@ export function Example() {
 
 ## Controlled
 
-```tsx
-const [value, setValue] = useState<string | null>("overview");
-<Tabs value={value} onValueChange={setValue}>{/* List and panels */}</Tabs>;
-```
+The caller owns `value` and `onValueChange`. Change selection updates this list externally while other examples keep their own selection. Values may be any Base UI tab value; `null` selects nothing. User change requests include cancellable event details.
 
-Import `useState` from React. Values may be any Base UI tab value; `null` selects nothing.
-The caller owns controlled state. User change requests include cancellable event details.
-
-## Vertical and line style
+<ComponentExample name="controlled" />
 
 ```tsx
-<Tabs defaultValue="account" orientation="vertical">
-  <TabsList variant="line" aria-label="Settings" activateOnFocus>
-    <TabsTrigger value="account">Account</TabsTrigger>
-    <TabsTrigger value="alerts">Alerts</TabsTrigger>
-    <TabsTrigger value="locked" disabled>Locked</TabsTrigger>
-  </TabsList>
-  <TabsContent value="account">Account settings</TabsContent>
-  <TabsContent value="alerts">Alert preferences</TabsContent>
-</Tabs>
+"use client";
+
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+import { Button } from "@/components/cadence/button";
+
+function ProjectTabs({ orientation = "horizontal", variant = "default", wide = false, disabled = false, value, onValueChange }: {
+  orientation?: "horizontal" | "vertical";
+  variant?: "default" | "line";
+  wide?: boolean;
+  disabled?: boolean;
+  value?: string | null;
+  onValueChange?: (value: string | null) => void;
+}) {
+  return (
+    <Tabs defaultValue="overview" value={value} onValueChange={onValueChange} orientation={orientation} className="w-full max-w-md">
+      <TabsList aria-label="Project views" variant={variant} className={wide ? "w-full" : undefined}>
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
+        {disabled && <TabsTrigger value="locked" disabled>Locked</TabsTrigger>}
+      </TabsList>
+      <TabsContent value="overview" className="rounded-lg border p-4 text-sm">Project overview. Peer views share one selection indicator.</TabsContent>
+      <TabsContent value="activity" className="rounded-lg border p-4 text-sm">Recent activity.</TabsContent>
+    </Tabs>
+  );
+}
+
+export function Controlled() {
+  const [value, setValue] = useState<string | null>("overview");
+  return (
+    <div className="flex w-full max-w-md flex-col gap-4">
+      <Button variant="outline" size="sm" className="self-start" onClick={() => setValue(value === "overview" ? "activity" : "overview")}>Change selection</Button>
+      <ProjectTabs value={value} onValueChange={setValue} />
+      <output className="text-sm" aria-live="polite">Selected: {value}</output>
+    </div>
+  );
+}
 ```
 
-`activateOnFocus` opts into selection on arrow focus. Its default is false; arrows move focus and
-Enter or Space selects. Up/Down replace Left/Right in vertical orientation.
+## Vertical
+
+Vertical lists use Up/Down for focus. Both filled and line lists below have fixed vertical orientation and independent selection; the line list opts into activation on focus.
+
+<ComponentExample name="vertical" />
+
+```tsx
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+
+function ProjectTabs({ orientation = "horizontal", variant = "default", wide = false, disabled = false, value, onValueChange }: {
+  orientation?: "horizontal" | "vertical";
+  variant?: "default" | "line";
+  wide?: boolean;
+  disabled?: boolean;
+  value?: string | null;
+  onValueChange?: (value: string | null) => void;
+}) {
+  return (
+    <Tabs defaultValue="overview" value={value} onValueChange={onValueChange} orientation={orientation} className="w-full max-w-md">
+      <TabsList aria-label="Project views" variant={variant} className={wide ? "w-full" : undefined}>
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
+        {disabled && <TabsTrigger value="locked" disabled>Locked</TabsTrigger>}
+      </TabsList>
+      <TabsContent value="overview" className="rounded-lg border p-4 text-sm">Project overview. Peer views share one selection indicator.</TabsContent>
+      <TabsContent value="activity" className="rounded-lg border p-4 text-sm">Recent activity.</TabsContent>
+    </Tabs>
+  );
+}
+
+function SettingsTabs({ vertical = false }: { vertical?: boolean }) {
+  return (
+    <Tabs defaultValue="account" orientation={vertical ? "vertical" : "horizontal"} className="w-full max-w-md">
+      <TabsList variant="line" aria-label="Settings views" activateOnFocus>
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="notifications">Notifications</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account" className="p-4 text-sm">Account settings</TabsContent>
+      <TabsContent value="notifications" className="p-4 text-sm" keepMounted>Notification preferences</TabsContent>
+    </Tabs>
+  );
+}
+
+export function Vertical() {
+  return <div className="flex w-full flex-col gap-6"><ProjectTabs orientation="vertical" disabled /><SettingsTabs vertical /></div>;
+}
+```
+
+## Line style
+
+`variant="line"` moves the shared indicator to the edge. `activateOnFocus` selects on arrow focus; the default is manual activation with Enter or Space.
+
+<ComponentExample name="line-style" />
+
+```tsx
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+
+function SettingsTabs({ vertical = false }: { vertical?: boolean }) {
+  return (
+    <Tabs defaultValue="account" orientation={vertical ? "vertical" : "horizontal"} className="w-full max-w-md">
+      <TabsList variant="line" aria-label="Settings views" activateOnFocus>
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="notifications">Notifications</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account" className="p-4 text-sm">Account settings</TabsContent>
+      <TabsContent value="notifications" className="p-4 text-sm" keepMounted>Notification preferences</TabsContent>
+    </Tabs>
+  );
+}
+
+export function LineStyle() {
+  return <SettingsTabs />;
+}
+```
 
 ## Custom elements and persistent panels
 
+`render` preserves the primitive semantics and refs on a custom element. Hidden panels unmount by default; `keepMounted` keeps the draft textarea and its value when History is selected. Render callbacks must spread merged props and retain children, including the indicator.
+
+<ComponentExample name="persistent" />
+
 ```tsx
-<Tabs defaultValue="draft">
-  <TabsList aria-label="Editor views">
-    <TabsTrigger value="draft" render={<button type="button" />}>Draft</TabsTrigger>
-    <TabsTrigger value="history">History</TabsTrigger>
-  </TabsList>
-  <TabsContent value="draft" keepMounted render={<section />}>
-    <textarea aria-label="Draft text" />
-  </TabsContent>
-  <TabsContent value="history">Previous revisions</TabsContent>
-</Tabs>
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+
+export function Persistent() {
+  return (
+    <Tabs defaultValue="draft" className="w-full max-w-md">
+      <TabsList aria-label="Editor views">
+        <TabsTrigger value="draft" render={<button type="button" />}>Draft</TabsTrigger>
+        <TabsTrigger value="history">History</TabsTrigger>
+      </TabsList>
+      <TabsContent value="draft" keepMounted render={<section />}>
+        <textarea aria-label="Draft text" className="min-h-24 w-full rounded-md border bg-background p-3 text-sm" defaultValue="Work in progress" />
+      </TabsContent>
+      <TabsContent value="history" className="p-4 text-sm">Previous revisions</TabsContent>
+    </Tabs>
+  );
+}
 ```
 
-Hidden panels unmount by default. `keepMounted` preserves local state. Render callbacks receive
-primitive state and merged props; spread those props and preserve children, including the indicator.
+## List sizing
+
+The caller sets the list width. Resize list switches between content width and full width; the selected indicator follows the same tab without resetting selection. A parent resize is also observed.
+
+<ComponentExample name="list-sizing" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+import { Button } from "@/components/cadence/button";
+
+function ProjectTabs({ orientation = "horizontal", variant = "default", wide = false, disabled = false, value, onValueChange }: {
+  orientation?: "horizontal" | "vertical";
+  variant?: "default" | "line";
+  wide?: boolean;
+  disabled?: boolean;
+  value?: string | null;
+  onValueChange?: (value: string | null) => void;
+}) {
+  return (
+    <Tabs defaultValue="overview" value={value} onValueChange={onValueChange} orientation={orientation} className="w-full max-w-md">
+      <TabsList aria-label="Project views" variant={variant} className={wide ? "w-full" : undefined}>
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
+        {disabled && <TabsTrigger value="locked" disabled>Locked</TabsTrigger>}
+      </TabsList>
+      <TabsContent value="overview" className="rounded-lg border p-4 text-sm">Project overview. Peer views share one selection indicator.</TabsContent>
+      <TabsContent value="activity" className="rounded-lg border p-4 text-sm">Recent activity.</TabsContent>
+    </Tabs>
+  );
+}
+
+export function ListSizing() {
+  const [wide, setWide] = useState(false);
+  return (
+    <div className="flex w-full max-w-md flex-col gap-4">
+      <Button variant="outline" size="sm" className="self-start" onClick={() => setWide((value) => !value)}>Resize list</Button>
+      <ProjectTabs wide={wide} />
+    </div>
+  );
+}
+```
+
+## Disabled
+
+Locked stays visible and cannot be selected. Base UI allows focus on this disabled tab; Enter and Space leave the current selection unchanged.
+
+<ComponentExample name="disabled" />
+
+```tsx
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+
+function ProjectTabs({ orientation = "horizontal", variant = "default", wide = false, disabled = false, value, onValueChange }: {
+  orientation?: "horizontal" | "vertical";
+  variant?: "default" | "line";
+  wide?: boolean;
+  disabled?: boolean;
+  value?: string | null;
+  onValueChange?: (value: string | null) => void;
+}) {
+  return (
+    <Tabs defaultValue="overview" value={value} onValueChange={onValueChange} orientation={orientation} className="w-full max-w-md">
+      <TabsList aria-label="Project views" variant={variant} className={wide ? "w-full" : undefined}>
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
+        {disabled && <TabsTrigger value="locked" disabled>Locked</TabsTrigger>}
+      </TabsList>
+      <TabsContent value="overview" className="rounded-lg border p-4 text-sm">Project overview. Peer views share one selection indicator.</TabsContent>
+      <TabsContent value="activity" className="rounded-lg border p-4 text-sm">Recent activity.</TabsContent>
+    </Tabs>
+  );
+}
+
+export function Disabled() {
+  return <ProjectTabs disabled />;
+}
+```
 
 ## When to use
 
