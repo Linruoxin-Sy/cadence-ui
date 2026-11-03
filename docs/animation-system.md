@@ -52,14 +52,6 @@ must update this design and the policy together; never alter motion to obtain a 
 The reduced tween multiplier is exported as `reducedDurationScale` from `lib/motion.ts`.
 CSS popup adapters and `transitionFor()` read that same token rather than repeating the multiplier.
 
-> An earlier draft shipped `--motion-intensity`, `--motion-distance-*`, and `--motion-scale-in` to
-> users while nothing read them: JS components resolve timing through `transitionFor()` from
-> `lib/motion.ts`, and CSS-only popups read `--motion-duration-*`. A token nobody reads is a promise
-> nobody keeps, so the unread ones were deleted. `--motion-scale-in` came back with the anchored
-> panels (`popover`, `tooltip`, `hover-card`), which do read it: their scale is now a token rather
-> than a number in a class. `--motion-intensity` and the distance tokens have no reader and stay
-> gone; an anchored panel grows out of its anchor instead of sliding towards it (§3.1).
-
 ### 2.2 Base tokens
 
 ```ts
@@ -212,7 +204,7 @@ A recipe is a "reusable motion formula", returned by `useCadenceMotion().transit
 | `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state                            | Indicator at full size, thumb jumps          |
 | `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                   | `animate()` on a motion value, or the Base UI disclosure CSS form below; measure content and clamp to the closed size | Instant size change, opacity kept            |
 | `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                        | inverse transform from `measureOrigin()` + physics spring                                                             | Cross-fade at the destination                |
-| `feedback.press`  | Press feedback                                                                          | `scale`                         | `whileTap`                                                                                                            | Colour change only                           |
+| `feedback.press`  | Press feedback                                                                          | `scale`                         | Native press ownership + committed controls                                                                           | Colour change only                           |
 
 Four recipes opt into `continuity: "velocity"`: `layout.move`, `layout.shared`, `geometry.resize`, and
 `handoff`. All four exist to be retargeted while they are still moving (a list reorders twice, a tab
@@ -288,309 +280,6 @@ providers restore their clock. Full/reduced both fade; none removes starting opa
 and sets zero duration, including live cancellation. Text chunks, variants, alignment,
 reactions and resize remain immediate on stable nodes. Static reaction offsets are
 positioning, not motion. Bubble has no streaming runtime or measured geometry.
-
-### 3.1 Code for the key recipes
-
-#### `popup.anchored` (anchored panels, CSS-only)
-
-```tsx
-const cm = useCadenceMotion();
-
-<Popover.Popup
-  data-motion={cm.mode}
-  className={cn(
-    "origin-(--transform-origin) transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast)",
-    "data-[starting-style]:opacity-0 data-[ending-style]:opacity-0",
-    !cm.reduced && "data-[starting-style]:scale-(--motion-scale-in) data-[ending-style]:scale-(--motion-scale-in)",
-  )}
-/>;
-```
-
-Every popup and backdrop owns token-derived local duration variables from its effective mode and
-`timeScale`; a portal must not inherit an ancestor's zero clock. Reduced removes scale/translate/
-transform from the transition list, cancelling running geometry while preserving opacity. None
-removes the transition and starting/ending opacity classes so even its first mounted frame is
-visible. Mode changes preserve the node, focus and Base UI lifecycle. Caller state callbacks are
-evaluated before merging, with caller classes/styles last. This CSS form uses the browser's native
-transition cancellation and reversal, without a second animation controller.
-
-Changing a positive CSS duration changes the clock used for a new or retargeted transition;
-it does not restart or retime an existing native CSSTransition. A zero computed duration
-alone likewise does not cancel an unchanged running target. Reduced geometry and all none
-transitions must be removed from the transition-property list (`transition-none` for none),
-including persistent Content and disclosure panels. Preserve the node and primitive lifecycle.
-
-Base UI writes `--transform-origin` on the popup from the positioner, so the scale grows out of the
-anchor rather than out of the element's centre. No distance is involved: a slide would need a distance
-token plus one class per side, and it moves the edge the positioner just lined up. `dialog` and
-`alert-dialog` use the same shape without the anchor: they keep their centre origin and read the same
-`--motion-scale-in` and duration tokens.
-
-#### `reveal`
-
-```tsx
-const cm = useCadenceMotion();
-<motion.div
-  initial={reduced ? { opacity: 0 } : { opacity: 0, y: distance.sm }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true, margin: "-10% 0px" }}
-  transition={cm.transition("reveal")}
-/>;
-```
-
-#### `geometry.resize` for Base UI disclosures (CSS form)
-
-Accordion and Collapsible panels use the CSS form of this recipe so Base UI can observe native
-transitions and finish its own mount, hidden-until-found, and close lifecycle. Measure the natural
-inner content in a layout effect and ResizeObserver (never the animated panel or during render),
-write a non-negative height target to a custom property, and transition the panel's height between
-zero and that target. Match the panel's box sizing: for border-box add its computed vertical padding
-and borders to the natural inner border-box height; for content-box use the inner height directly.
-Read those styles after commit, and remeasure when caller classes/styles or viewport sizing change.
-Do not observe the animated panel's size or animate padding/borders. CSS height zero still has the
-native padding/border minimum while closing; Base UI hides/unmounts the panel after completion.
-Callers needing a visually zero-height closing endpoint can put decoration on a content child.
-Initially open panels render at natural height before hydration, without an entrance animation.
-
-This form uses `duration.slow` / `ease.out` via `--motion-duration-slow` / `ease-cadence-out`.
-Each panel resolves that CSS clock locally from its effective mode and inherited or explicit
-`timeScale`, with caller styles last, so full inside none restores its own clock.
-Unlike the Motion form's velocity-preserving spring, a native CSS reversal retains current position
-and uses the browser's transition reversal rules; it does not promise spring velocity continuity.
-It must be browser-tested mid-transition in both directions. This deliberate form keeps Base UI's
-native unmount, `keepMounted`, `render`, and find-in-page semantics without a second lifecycle owner.
-ResizeObserver retargets when open content changes, without observing the animated height itself.
-Under reduced and none, remove the height transition with `duration-0`; geometry is instant in both.
-A static expanded/collapsed icon swap needs no additional recipe. Every panel carries `data-motion`.
-
-#### Site navigation disclosures (T3 composition, not registry Sidebar)
-
-The site sidebar uses the same measured/clamped native CSS `geometry.resize` form as disclosures:
-`duration.slow` / `ease.out`, zero-height closed endpoint, separate natural-flow inner measurement,
-ResizeObserver retargeting, initially open natural SSR height, instant reduced/none geometry.
-Panels remain mounted with stable unique IDs; closed panels become inert and aria-hidden immediately.
-Ancestor collapse does not reset nested state. Native reversal keeps current position, not spring velocity.
-The panel's opacity uses `reveal`, the chevron's orientation uses the CSS form of `state.morph`
-(`duration.base` / `ease.out`); reduced uses a static orientation and opacity only, none has no transition.
-Rows retain observer-triggered `reveal` entry, bounded by `distance.md`, `scale.in`, blur ≤4px and
-`duration.base`; first paint is visible. Native transition lists remove geometry under reduced and all
-properties under none, cancelling same-target running transitions without remounting. This replaces
-site-only exaggerated literals/auto-height Motion timing; it introduces no public recipe or token.
-
-#### `geometry.resize` for Base UI Navigation Menu (CSS form)
-
-Navigation Menu's shared Popup uses Base UI's `--popup-width` / `--popup-height` targets.
-Its Trigger measures after commit and on content mutation / viewport resize, snapshots the current
-interrupted size, and schedules the next target through animation frames. Keep that engine and its
-native transition completion / auto-size reset; do not add a second geometry observer or remount the viewport.
-Clamp the popup with non-negative minimum dimensions and the positioner's available width/height.
-Transition width/height with `duration.slow` / `ease.out` only in full mode; reduced and none remove
-both properties from the transition list, including during an active resize. Native CSS reversal
-keeps current position (not spring velocity). Initial open uses natural size without a resize reveal.
-The positioner's coordinates update instantly: transitioning top/left is outside the motion budget.
-Popup entrance uses `popup.anchored`, closing uses `exit.fade`; content switches cross-fade on the
-same fast clock without an extra scale or directional travel. Base UI retains exiting content inert,
-then unmounts it after native transitions. All animated parts carry their own effective `data-motion`. Popup and Content set token-derived local CSS clocks from that mode and timeScale so an explicit full subtree cannot inherit zero timings from a none ancestor.
-Caller state callback classes/styles and render/refs remain intact. Caller-authored animation must
-follow this same contract. This T3 form requires browser proof of switch/reverse/content resize and
-running mode downgrade, alongside the popup's keyboard/pointer lifecycle.
-
-#### `geometry.resize` (label/width morphing)
-
-```tsx
-const cm = useCadenceMotion();
-const width = useMotionValue<number | "auto">("auto");
-const slotRef = useRef<HTMLSpanElement>(null);
-
-useLayoutEffect(() => {
-  const el = slotRef.current;
-  if (!el) return;
-  const ro = new ResizeObserver(([entry]) => {
-    if (!entry) return;
-    if (reduced) return width.jump(entry.contentRect.width);
-    animate(width, entry.contentRect.width, cm.transition("geometry.resize"));
-  });
-  ro.observe(el);
-  return () => ro.disconnect();
-}, [cm, reduced, width]);
-
-<motion.span style={{ width }} className="inline-flex justify-center overflow-hidden">
-  <AnimatePresence mode="popLayout" initial={false}>
-    <motion.span
-      key={labelKey}
-      initial={reduced ? { opacity: 0 } : { opacity: 0, y: 4, filter: "blur(2px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      exit={reduced ? { opacity: 0 } : { opacity: 0, y: -3, filter: "blur(2px)" }}
-      transition={cm.transition("state.morph")}
-    >
-      {children}
-    </motion.span>
-  </AnimatePresence>
-</motion.span>;
-```
-
-> Detail: the outgoing element must leave the document flow via `popLayout`, otherwise it stretches the container back to the old width. `ResizeObserver` only fires when content size changes, so it does not fight the animation (the animation changes the outer slot's width). Clamp the _rendered_ width with `clampMeasuredSize(width, closedWidth)`: a physics-defined spring can cross its target once when it inherits velocity, and half a pixel under the new label is enough to ellipsize it.
-
-Select's portal handoff owns committed controls for its flight target and clock; a zero clock completes the handoff before paint, restoring value opacity and removing the clone. Unmount cancels its driver through the same control owner.
-The portal's placement follows the live destination in ResizeObserver callbacks while the value
-and trigger resize. A centered or right-aligned row can move the trigger during `geometry.resize`;
-freezing the initial viewport coordinates would leave the flight offset when the real label appears.
-This updates placement only; the token-backed inverse transform still owns the flight.
-
-CodeBlock clamps the rendered viewport height with `clampMeasuredSize` against its measured closed size. Zero-duration geometry jumps and synchronously writes the target; unmount stops the owned height MotionValue.
-
-Measured MotionValue owners subscribe to the effective recipe clock even when the measured target is unchanged. A zero clock jumps and writes the same terminal size before paint; observer and driver cleanup belong to the owner. Initial measurement stays static.
-
-#### `state.morph` (control indicators: tick, dot, thumb)
-
-State indicators must cancel an active animation when the effective mode or clock changes,
-even when the target value is unchanged. Updating a Motion `transition` prop alone does not
-retarget that animation. The control adapter stops its controls and applies the current target
-immediately for zero-duration transitions; other updates restart the declared recipe on the
-same node. Initial state is rendered at its target without an entrance.
-
-Form controls own the state, so the animation is driven by the primitive's render
-state rather than by props the consumer passes. Base UI hands the current state to
-a `render` callback; Motion takes over the element from there. The indicator must
-be `keepMounted`, otherwise it unmounts before it can animate out.
-
-```tsx
-<CheckboxPrimitive.Indicator
-  keepMounted
-  render={(props, state) => (
-    <motion.span
-      {...props}
-      initial={false}
-      animate={state.checked ? { opacity: 1, scale: 1 } : { opacity: 0, scale: reduced ? 1 : 0.96 }}
-      transition={cm.transition("state.morph")}
-    />
-  )}
-/>;
-```
-
-For a thumb whose end position is decided by layout (the switch), measure the
-travel instead of writing it down — `track.clientWidth - thumb.offsetWidth` — and
-re-measure from a `ResizeObserver`. Under `reduced` the thumb still moves to the
-new end, with `{ duration: 0 }`: position is information, the animation is not.
-
-#### `layout.shared` (Tabs and Toggle Group indicators)
-
-```tsx
-{
-  items.map((item) => {
-    const active = item.value === value;
-    return (
-      <button key={item.value} role="tab" aria-selected={active} className="relative">
-        {active && (
-          <motion.span
-            layoutId="cadence-tab-indicator"
-            className="absolute inset-0 -z-10 rounded-md bg-muted"
-            transition={cm.transition("layout.shared")}
-          />
-        )}
-        {item.label}
-      </button>
-    );
-  });
-}
-```
-
-> No manual DOM measurement needed: `layoutId` performs FLIP between renders automatically. Scope each
-> list with a unique `LayoutGroup` so independent tab sets never share an indicator. Preserve Base UI
-> active state and render/ref composition; selection and panel lifecycle remain primitive-owned. Both
-> horizontal and vertical lists, including the line variant, use the same recipe. Under reduced motion
-> do not render the animated indicator (apply the background via `className` or a static, aria-hidden
-> indicator instead). Handle the branch explicitly: MotionConfig's transform downgrade alone is not
-> the component contract.
-
-A zero recipe clock also uses the static decorative indicator branch. Removing a `layoutId` from an existing Motion element does not itself cancel its active projection; reduced/none must render the static branch, preserving the interactive tab and panel identities.
-
-Toggle Group is T3 when it offers a shared selection fill. Single selection uses
-this same per-instance `LayoutGroup` contract: only the decorative fill moves;
-the buttons keep their layout boxes. `variant="segmented"` gives the group a
-pill-shaped track and fill without adding another component or changing Base UI
-selection semantics. Multiple selection uses local `state.morph` opacity/scale
-fills instead of a shared identity. Adjacent pressed fills join through static
-corner styles when `spacing={0}`; corners and spacing never tween. Reduced keeps
-only the local opacity transition, none settles immediately. `feedback.press`
-scales only the item's content in every variant. Keep one isolated stacking
-context on the group: items must not isolate, gain a focus z-index, or transform
-their button box. The decorative fill belongs below every item's content, even
-while crossing an unselected item or reversing a held press. Content-only
-presses use the shared press adapter's native event/cancellation handling.
-Selection, callbacks, cancellation, refs, render composition and keyboard focus stay owned
-by Base UI; a required selection remains caller-owned.
-
-#### `gesture.drag` (bottom sheet)
-
-```tsx
-const y = useMotionValue(0);
-const opacity = useTransform(y, [0, 200], [1, 0.6]);
-
-<motion.div
-  drag="y"
-  style={{ y, opacity }}
-  dragConstraints={{ top: 0, bottom: 0 }}
-  dragElastic={{ top: 0, bottom: 0.5 }}
-  onDragEnd={(_, info) => {
-    const shouldClose = info.offset.y > 120 || info.velocity.y > 700;
-    if (shouldClose) setOpen(false);
-    else animate(y, 0, spring.snappy);
-  }}
-/>;
-```
-
-Key points: `dragConstraints` set to 0 makes dragging downward-only; after closing, `AnimatePresence` plays the exit; in `onDragEnd` do not call `setOpen(false)` without springing back, or a quick flick gets misread.
-
-#### `number.roll`
-
-```tsx
-const springValue = useSpring(value, { stiffness: 120, damping: 20 });
-useEffect(() => springValue.set(value), [value, springValue]);
-const text = useTransform(springValue, (v) =>
-  new Intl.NumberFormat(locale, { maximumFractionDigits: precision }).format(v)
-);
-return <motion.span aria-label={formatted}>{text}</motion.span>;
-```
-
-> Screen readers hear the final value (`aria-label`); intermediate frames never enter the accessibility tree. Use `aria-live="polite"` only for "result" numbers (e.g. checkout totals) to avoid announcing every frame.
-
-#### `scroll.progress`
-
-```tsx
-const { scrollYProgress } = useScroll();
-const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
-return <motion.div style={{ scaleX }} className="origin-left h-0.5 bg-primary" aria-hidden />;
-```
-
-#### `scroll.story` (GSAP, optional dependency)
-
-```tsx
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-export function ScrollStory({ children }: { children: React.ReactNode }) {
-  const scope = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-
-  useGSAP(
-    () => {
-      if (reduced) return; // show the end state directly
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: scope.current, start: "top 70%", end: "bottom 30%", scrub: 0.6 },
-      });
-      tl.from("[data-story-step]", { y: 48, opacity: 0, stagger: 0.12 });
-      return () => tl.scrollTrigger?.kill();
-    },
-    { scope, dependencies: [reduced] },
-  );
-
-  return <div ref={scope}>{children}</div>;
-}
-```
 
 ### 3.1.1 `data.transition` for Embla collections
 
@@ -725,7 +414,7 @@ compositor tax this section exists to prevent.
 
 ---
 
-## 4. Four ways to integrate Base UI with Motion
+## 4. Base UI integration
 
 ### Native event boundary for press controls
 
@@ -759,89 +448,21 @@ ControlDiv/ControlSpan consumers are not implicitly migrated or certified.
 
 A Base UI popup enters a "closing" phase before it unmounts, waiting for the animation to finish. Understanding these four patterns is what makes "rich animation" land in practice (official docs: [Base UI Animation](https://base-ui.com/react/handbook/animation.md)).
 
-### Pattern A: pure CSS transition (recommended for simple popups)
+### Supported animation owners
 
-```css
-.popup {
-  transform-origin: var(--transform-origin);
-  transition:
-    opacity 160ms var(--ease-cadence-out),
-    transform 160ms var(--ease-cadence-out);
-}
-.popup[data-starting-style],
-.popup[data-ending-style] {
-  opacity: 0;
-  transform: scale(0.96);
-}
-```
+| Owner                  | Contract                                                                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Base CSS popup         | Token-backed starting/ending classes; local portal clock; opacity-only reduced; visible first frame and zero duration under none |
+| Motion popup           | Base render + actual mount lifecycle; recipe timing; preserve focus/portal ownership through reversal and cancellation           |
+| Persistent layout host | One Motion value/controller owns the property; measured/clamped geometry and immediate reduced/none targets                      |
+| Exit teardown          | Keep the actual surface until exit completion; native callbacks and unmount cleanup must settle it deterministically             |
 
-Pros: interruptible, zero JS, the most robust. Cons: limited expressiveness for complex choreography (many elements, sequences).
-
-### Pattern B: Motion + `AnimatePresence` + `keepMounted`
-
-```tsx
-const [open, setOpen] = useState(false);
-
-<Popover.Root open={open} onOpenChange={setOpen}>
-  <Popover.Trigger className="…">Open</Popover.Trigger>
-  <AnimatePresence>
-    {open && (
-      <Popover.Portal keepMounted>
-        <Popover.Positioner sideOffset={8}>
-          <Popover.Popup
-            render={
-              <motion.div
-                initial={{ opacity: 0, scale: 0.96, y: 4 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98, y: 2 }}
-                transition={spring.snappy}
-              />
-            }
-          />
-        </Popover.Positioner>
-      </Popover.Portal>
-    )}
-  </AnimatePresence>
-</Popover.Root>;
-```
-
-### Pattern C: `keepMounted` always mounted, driven by `state.open`
-
-```tsx
-<Popover.Popup
-  render={(props, state) => (
-    <motion.div
-      {...(props as HTMLMotionProps<"div">)}
-      initial={false}
-      animate={{ opacity: state.open ? 1 : 0, scale: state.open ? 1 : 0.96 }}
-      transition={spring.snappy}
-    />
-  )}
-/>;
-```
-
-Suits popups that need "pre-rendered + zero first-frame delay".
-
-### Pattern D: manual teardown (when the animation has no opacity)
-
-```tsx
-const actionsRef = useRef<{ unmount: () => void }>(null);
-
-<Dialog.Root
-  open={open}
-  onOpenChange={(next, details) => {
-    if (!next) details.preventUnmountOnClose();
-    setOpen(next);
-  }}
-  actionsRef={actionsRef}
->
-  {/* custom-drawn animation; call actionsRef.current?.unmount() when it ends */}
-</Dialog.Root>;
-```
-
-> Selection rule: **use A whenever A suffices**; use B for multi-element choreography; use C when the first frame must have zero delay; use D for custom-drawn animations without opacity.
-
----
+Never add a second CSS/Motion/engine writer to the same property. Evaluate Base class/style callbacks
+before caller-last merging. Live downgrade cancels geometry before paint, retains permitted opacity
+under reduced and cancels every motion clock under none. Re-entry reverses the actual surface rather
+than remounting its focus owner. A portal resolves the local provider clock, including nested full
+under outer none subject to the OS preference. Native CSS clock changes do not promise in-flight
+retiming; mode downgrade/none cancellation remains mandatory.
 
 ## 5. Composition-layer API
 
@@ -916,15 +537,15 @@ Implementation notes:
 
 ## 7. Performance budgets and implementation rules
 
-| Metric                            | Budget                                                                                   | How it is checked                                           |
-| --------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Motion runtime (initial)          | ≤ 48 KB gzip (full `motion` ≈ 43 KB; the optional `LazyMotion` path brings it to ~30 KB) | Build analysis                                              |
-| Per-component added JS            | ≤ 8 KB gzip (shared runtime excluded)                                                    | Build script                                                |
-| Initial JS per page               | ≤ 120 KB gzip                                                                            | Production browser request audit (`site-js-budget.spec.ts`) |
-| Frame rate                        | ≥ 55 fps on a mid-range mobile device                                                    | Playwright trace / manual                                   |
-| CLS                               | < 0.02                                                                                   | Lighthouse / Playwright                                     |
-| Simultaneously animating elements | ≤ 20 (stagger scenarios)                                                                 | Code review                                                 |
-| Total stagger duration            | ≤ 400 ms                                                                                 | Code review                                                 |
+| Metric                            | Budget                                             | How it is checked                                           |
+| --------------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
+| Motion runtime (initial)          | ≤ 48 KB gzip (measure the actual required runtime) | Build analysis                                              |
+| Per-component added JS            | ≤ 8 KB gzip (shared runtime excluded)              | Build script                                                |
+| Initial JS per page               | ≤ 120 KB gzip                                      | Production browser request audit (`site-js-budget.spec.ts`) |
+| Frame rate                        | ≥ 55 fps on a mid-range mobile device              | Playwright trace / manual                                   |
+| CLS                               | < 0.02                                             | Lighthouse / Playwright                                     |
+| Simultaneously animating elements | ≤ 20 (stagger scenarios)                           | Code review                                                 |
+| Total stagger duration            | ≤ 400 ms                                           | Code review                                                 |
 
 Implementation rules:
 
@@ -944,6 +565,33 @@ Implementation rules:
    not the spring: the underlying physics stays continuous.
 
 ---
+
+### Measurement protocol
+
+KB is decimal: page initial JS ≤120000 bytes, Motion ≤48000, component addition ≤8000.
+Measure a production page in a fresh browser/context with CDP cache disabled and no storage,
+interaction, scrolling, request blocking or script exclusions. Wait for the page, load/networkidle,
+another 10 seconds, then networkidle. Count all automatic script/prefetch/async JS responses,
+deduplicate absolute URLs, gzip each decoded body separately at level 6 and sum. Do not concatenate
+chunks before compression or use transfer encoding/Content-Length as the gzip value. Preserve
+response status, SHA-256, initiators and build/root manifests; errors or missing responses fail.
+Existing inline theme bootstrap and serialized data are HTML, not external bundles; never move
+application code to inline/data/eval or beyond the observation window to evade the gate.
+
+Compiled component addition excludes a declared shared runtime baseline, retains dedicated dependencies
+and explicitly distinguishes initial versus reachable async output. Source tier gzip, local-only
+compiled code and full consumer addition are separate metrics. Mixed chunks cannot be assigned exact
+package gzip by proportional raw-byte allocation. A lean fixture never certifies a complete route.
+
+CLS uses the maximum session window (gap <1 second, total span <5 seconds), excluding recent-input
+shifts; keep raw entries and report routes/viewports/actions/window. Cold-load passing results do not
+prove untested interactions. FPS needs a real midrange device, environment/thermal/refresh metadata
+and presented-frame traces across actual motion windows; desktop emulation or rAF frequency is not
+equivalent. Repeat meaningful windows without averaging in idle time.
+
+Reusable collectors: scripts/site-js-budget.mjs, audit-site-pages-js.mjs, audit-w3-site.mjs,
+audit-w3-bundles.mjs and audit-w4-interaction-cls.mjs. Save results under .cache/audits; current
+gates and future work belong to [the plan](parity-plan.md#8-next-work).
 
 ## 8. SSR and hydration
 
@@ -1067,7 +715,7 @@ Stable application IDs key surviving rows. The installed controls own their
 existing motion contracts. Dropdown Menu now owns its portal's token clock just
 as Sheet does, resolves caller class/style callbacks last, and removes starting
 opacity in `none`; nested full, reduced, none and live downgrade are checked with
-the Data Table composition. This closes no other historical CSS-popup gate.
+the Data Table composition. Each composition must retain the installed controls' own contracts.
 
 ### Date Picker composition (B8)
 
@@ -1080,7 +728,6 @@ reducedDurationScale; caller callback classes/styles are evaluated and merged
 last. Full uses opacity and scale, reduced transitions opacity only, none uses
 transition-none/duration-0 and removes hidden starting/ending opacity. Removing
 the scale transition on downgrade cancels an active scale immediately. Nested
-full under outer none restores the local clock, subject to OS reduce. This local
-repair does not prove conformance of other historical CSS popups.
+full under outer none restores the local clock, subject to OS reduce. Other popups require their own applicable lifecycle proof.
 
 Site DocumentEntrance treats a consumed entrance as shown even when offscreen: restoring full mode after initial none must not re-hide or replay the same document host. SSR hidden, noscript and print restoration stay unchanged.

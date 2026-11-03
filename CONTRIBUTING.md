@@ -48,7 +48,7 @@ A pull request is ready when the component has:
    required membership/order, responsiveness/performance at every tier, a motion contract table,
    and input data ownership. Extra flat examples do not change template validity.
 4. **UI only**: no validation imports and no `schema` / `resolver` / `validate` props. Invalid state
-   comes from `aria-invalid` / `data-invalid`. See [validation](content/docs/validation.mdx).
+   comes from `aria-invalid` / `data-invalid`. See [API and data ownership](docs/overall-design.md#8-component-api-and-ownership).
 5. **Motion conformance**: the recipes declared in `meta.motion`, the MDX frontmatter, and the Motion contract
    table match what the source actually runs. `full` plays the recipe, `reduced` keeps opacity and drops
    transform/scale/layout, `none` is instant, and the branch is driven by `useCadenceMotion().reduced` plus
@@ -96,3 +96,11 @@ previously distributed snapshot. To prepare an explicit snapshot, build/check cu
 run `node scripts/freeze-registry.mjs`, review and commit its entire new hash directory separately.
 Do not freeze for ordinary docs/handoff commits. Verify production GET/HEAD/ETag/304/cache headers
 when changing distribution; static file existence is not HTTP evidence. See ADR-017 and the registry guide.
+
+
+## Internal documentation
+
+Read docs/README.md for the current design contracts and future work. Keep completed-task records
+and handoffs in Git history. Reusable tests read minimal inputs from tests/fixtures; generated
+audit output, traces and screenshots belong in ignored .cache/audits. Do not make tests depend on
+previous measurement reports or add generated report directories under docs.

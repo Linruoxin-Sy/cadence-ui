@@ -1,7 +1,9 @@
 /** Read-only source inventory. Evidence status is deliberately separate from syntax. */
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import ts from "typescript";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const delegates = {
   combobox: [
@@ -193,7 +195,7 @@ const shared = readdirSync("registry/cadence/lib")
   .filter((p) => /\.(ts|tsx)$/.test(p))
   .map((p) => scan(`registry/cadence/lib/${p}`));
 writeFileSync(
-  "docs/evidence/runtime-parts.json",
+  ".cache/audits/runtime-parts.json",
   `${JSON.stringify({ schema: 1, date: "2026-11-02 Asia/Shanghai", pin: "96da9cc7f1aa10580a3741664e2a77c721206c00", scope: "58 items, source slot/signal index plus explicit actual engine targets; syntax signals include static feedback and are not proof of playback. API ledger remains separate.", obligations: ["3 modes x 2 OS; insertion/reopen first paint; live same-target cancellation; inherited and explicit clock; nested full inside none; entry/exit/reversal/resize/lifecycle/focus as applicable", "CSS theme clocks are not recipe timeScale; native CSS transition clock changes use browser retargeting semantics, not a promised controller restart", "Motion WAAPI acceleration remains Motion-owned; getAnimations alone cannot classify engine"], items, site, shared }, null, 2)}\n`,
 );
 console.log(`Indexed ${items.length} items, ${site.length} site surfaces, ${shared.length} shared sources.`);

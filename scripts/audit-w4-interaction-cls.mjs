@@ -1,9 +1,11 @@
 // Bounded production interaction/scroll observation, not lifetime CLS certification.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import { summarizeLayoutShifts } from "./site-js-budget.mjs";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const base = process.argv[2] ?? "http://127.0.0.1:3183";
 const dist = process.env.CADENCE_DIST_DIR ?? ".next-motion-runtime";
@@ -134,7 +136,7 @@ try {
           cls,
           passed: cls < 0.02,
         });
-        writeFileSync("docs/evidence/w4-interaction-cls.json", `${JSON.stringify(report, null, 2)}\n`);
+        writeFileSync(".cache/audits/w4-interaction-cls.json", `${JSON.stringify(report, null, 2)}\n`);
         console.log(`${id} ${width}: CLS ${cls}`);
       } finally {
         await context.close();

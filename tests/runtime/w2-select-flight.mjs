@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
 import { readEvidence } from "./evidence-file.mjs";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const require = createRequire(import.meta.url);
 const { createServer, transformWithEsbuild } = await import(
@@ -18,7 +20,7 @@ for (const id of ["select", "code-block", "sidebar", "calendar", "tabs"]) {
   report.sources[id] = { text, sha256: createHash("sha256").update(text).digest("hex") };
 }
 const negative = process.argv.includes("--negative");
-if (negative) report.sources.select = readEvidence("docs/evidence/w2-select-flight-negative.json").sources.select;
+if (negative) report.sources.select = readEvidence("tests/fixtures/motion/select-flight.json").sources.select;
 const server = await createServer({
   plugins: negative
     ? [
@@ -123,7 +125,7 @@ try {
   await browser.close();
   await server.close();
   writeFileSync(
-    process.argv.find((a) => a.endsWith(".json")) || "docs/evidence/w2-select-flight.json",
+    process.argv.find((a) => a.endsWith(".json")) || ".cache/audits/w2-select-flight.json",
     JSON.stringify(report, null, 2) + "\n",
   );
 }

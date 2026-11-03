@@ -4,7 +4,7 @@ import { expect, type Page, test } from "@playwright/test";
 import { buttonVariants } from "../../registry/cadence/button";
 
 type Entry = { id: string; applicable: boolean; part?: string; prop?: string; options?: string[] };
-const matrix: Entry[] = JSON.parse(await readFile("docs/evidence/preview-variants-matrix.json", "utf8"));
+const matrix: Entry[] = JSON.parse(await readFile("tests/fixtures/preview-variants.json", "utf8"));
 const label = (id: string) =>
   id
     .split("-")

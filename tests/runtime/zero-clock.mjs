@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const require = createRequire(import.meta.url);
 const { createServer, transformWithEsbuild } = await import(
@@ -14,7 +16,7 @@ const config = (await import("./vite.config.mjs")).default;
 const negative = process.argv.includes("--negative");
 const currentSource = readFileSync("registry/cadence/lib/motion.ts", "utf8");
 const sourceText = negative
-  ? JSON.parse(readFileSync("docs/evidence/zero-clock-generator-negative.json", "utf8")).sourceText
+  ? JSON.parse(readFileSync("tests/fixtures/motion/zero-clock.json", "utf8")).sourceText
   : currentSource;
 const report = {
   sourceText,
@@ -151,7 +153,7 @@ try {
   await server.close();
 }
 writeFileSync(
-  `docs/evidence/zero-clock-${negative ? "negative" : "runtime"}.json`,
+  `.cache/audits/zero-clock-${negative ? "negative" : "runtime"}.json`,
   JSON.stringify(report, null, 2) + "\n",
 );
 console.log({ cases: report.cases.length, failures: report.failures.length, warnings: report.warnings.length });

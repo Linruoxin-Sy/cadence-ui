@@ -1,12 +1,14 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
 import { readEvidence } from "./evidence-file.mjs";
 import { observeAnimate } from "./observe-animate.mjs";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const require = createRequire(import.meta.url);
 const { createServer, transformWithEsbuild } = await import(
@@ -19,7 +21,7 @@ for (const id of ["select", "code-block", "sidebar", "calendar", "tabs"]) {
   report.sources[id] = { text, sha256: createHash("sha256").update(text).digest("hex") };
 }
 const negative = process.argv.includes("--negative");
-const old = negative ? readEvidence("docs/evidence/w2-geometry-initial.json").sources : null;
+const old = negative ? readEvidence("tests/fixtures/motion/geometry.json").sources : null;
 if (negative) report.sources = old;
 const server = await createServer({
   ...config,
@@ -74,7 +76,7 @@ try {
   await browser.close();
   await server.close();
   writeFileSync(
-    process.argv.find((a) => a.endsWith(".json")) || "docs/evidence/w2-viewport-clamp-negative.json",
+    process.argv.find((a) => a.endsWith(".json")) || ".cache/audits/w2-viewport-clamp-negative.json",
     JSON.stringify(report, null, 2) + "\n",
   );
 }

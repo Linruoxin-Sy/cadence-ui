@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const browser = await chromium.launch({ channel: "msedge", headless: true });
 const report = {
@@ -361,6 +363,6 @@ for (const os of ["no-preference", "reduce"])
     await page.close();
   }
 await browser.close();
-writeFileSync(process.argv[2] || "docs/evidence/basic-controls-runtime.json", `${JSON.stringify(report, null, 2)}\n`);
+writeFileSync(process.argv[2] || ".cache/audits/basic-controls-runtime.json", `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ checks: report.checks, failures: report.failures }, null, 2));
 process.exitCode = report.failures.length ? 1 : 0;

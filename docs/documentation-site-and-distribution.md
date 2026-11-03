@@ -21,8 +21,6 @@
   /components/button
   /components/dialog
   ...
-/blocks                        Composed examples (from v0.2)
-/lab                           Experimental components (no stability promise)
 ```
 
 **Catalogue filters**: search title/id/description and every actual `registry.json` `categories`
@@ -47,7 +45,7 @@ Every component page renders from MDX. The table describes content areas, not a 
 | --- | ----------------------------------- | ----------------------------------------------------------------------------- |
 | 1   | Title + use-case sentence           | Matches the registry `description`; see [parity-plan.md](parity-plan.md) §6.6 |
 | 2   | Preview                             | Interactive; motion mode and speed come from the site header                  |
-| 3   | Installation                        | CLI (4 package managers) + manual (file list)                                 |
+| 3   | Installation                        | CLI (pnpm, npm and yarn) + manual (file list)                                 |
 | 4   | Usage                               | Smallest runnable code                                                        |
 | 5   | Examples                            | Named examples as needed, each with code — see the flat-heading rule below    |
 | 6   | When to use                         | 3–5 concrete scenarios                                                        |
@@ -70,10 +68,8 @@ levels appear only inside `## API`, where a component with distinct parts groups
 
 ### Required body membership and order
 
-Title/description and Preview are site chrome, not MDX headings. The old “12 sections”
-label conflated these areas with body headings. Inventory of all 58 pages shows 20 T0
-structural pages, seven T1 pages, 29 T2–T5 UI pages and two T2 blocks. Examples vary in
-number; neither nine nor twelve is a required total.
+Title/description and Preview are site chrome, not MDX headings. Required body membership depends
+on tier and item type, not a fixed total heading count. Examples vary in number.
 
 All tiers require, in order: Installation, Usage, flat named examples (zero or more),
 When to use, When not to use, API, Motion contract, accessibility/keyboard coverage,
@@ -151,7 +147,7 @@ complements the implementation checks and three-mode tests; it does not prove li
 | Loading transition     | `components/site/measured-height.tsx` applies the measured height in the frame it changed (ADR-015); the specimen itself lands with a CSS `@starting-style` reveal in `previews/shell.tsx` | The card is always the size of its example, and the content arrives without moving layout |
 
 Variant switching uses each preview's real named shapes, recorded for all 58 pages in
-[the applicability matrix](evidence/preview-variants-matrix.json). The URL has one primary
+[the executable applicability fixture](../tests/fixtures/preview-variants.json). The URL has one primary
 shape axis per page: visual variant first; otherwise its named size, orientation, placement,
 or documented named composition. Own parts count (such as EmptyMedia and TabsList); a nested
 Button does not give its parent a variant API. Chart's four authored Recharts compositions and
@@ -423,23 +419,7 @@ See the registry guide for namespace pinning and self-hosting; a frozen index al
 | `/r/catalog.json`            | Structured catalog (name, category, deps, motion, since)                                            |
 | `/api/mcp` (planned, absent) | MCP: `list_components` / `search` / `get_component` / `get_install_command` / `get_motion_contract` |
 
-### 5.3 Planned MCP tool definitions (not implemented)
-
-| Tool                  | Input                     | Output                        |
-| --------------------- | ------------------------- | ----------------------------- |
-| `list_components`     | `category?`, `intensity?` | id/name/description           |
-| `search_components`   | `query`                   | Ranked matches + snippets     |
-| `get_component`       | `id`                      | Source + docs + deps + target |
-| `get_install_command` | `id`                      | `npx shadcn add …`            |
-| `get_motion_contract` | `id`                      | Contract table (JSON)         |
-
-> Compared with Arc's MCP, there is one extra tool, `get_motion_contract`: when an agent edits animation code it gets the allowed properties and durations directly.
-
-### 5.4 Planned Agent Skill (not distributed)
-
-Package "how to choose a component, how to change motion, how to keep a11y" as `SKILL.md` + 3 rule files, distributed to `~/.claude/skills/cadence/` through a `registry:file` item.
-
----
+MCP, additional llms endpoints and a distributed skill are unscheduled extensions; see the plan.
 
 ## 6. Versions, changes, and deprecation
 
@@ -458,44 +438,12 @@ Package "how to choose a component, how to change motion, how to keep a11y" as `
 
 ## 7. Contribution flow
 
-### 7.1 Entry points
-
-- Issue templates: `New component` (including job, motion, references), `Bug`, `Docs`.
-- A component proposal must answer: what problem it solves, what causality the motion explains, how the reduced branch works, and how it differs from existing components.
-
-### 7.2 PR checklist
-
-- [ ] `pnpm check` passes (typecheck + lint + registry + unit)
-- [ ] `pnpm test:e2e` passes (including the reduced-motion matrix)
-- [ ] The component page meets §2 tier-specific required membership/order, flat headings, and has an interactive preview
-- [ ] Registry `docs` / `meta.motion` / `meta.intensity` are complete
-- [ ] Within the size budget (computed by `registry:check`)
-- [ ] Dual-theme screenshots (pasted in the PR)
-- [ ] No `@/`, no `process.env`, no direct `window` reads
-
-### 7.3 Review flow
-
-1. Automated: CI + Vercel Preview (one deployment per PR, directly clickable).
-2. Human: motion review (per §11 of the Animation system document) + API review (naming/control/passthrough).
-3. Merge: squash merge, commit messages following conventional commits.
-4. Release automation and hosting remain future work; there is no `pnpm release` command today. A maintainer must separately authorize publication/tagging and retain frozen snapshots.
-
----
-
-## 8. Metrics
-
-| Metric               | Collection                              | Target (3 months)         |
-| -------------------- | --------------------------------------- | ------------------------- |
-| Registry downloads   | `/r/*.json` access logs (de-duplicated) | ≥ 1,000                   |
-| Component page views | Privacy-friendly analytics (Plausible)  | ≥ 5,000 PV                |
-| Install conversion   | Docs page → CLI copy event              | ≥ 8%                      |
-| GitHub stars         | Periodic API fetch                      | ≥ 300                     |
-| Docs coverage        | CI check                                | 100%                      |
-| a11y                 | axe                                     | 0 violations              |
-| Performance          | Lighthouse CI                           | Component page LCP < 2.5s |
-| Community            | First issue response                    | < 72h                     |
-
----
+CONTRIBUTING.md owns the scaffold and PR checklist. A proposal names its user task, upstream surface,
+motion cause, reduced/none behaviour and data ownership before implementation. Required checks,
+appropriate production interaction/keyboard/focus/axe tests, payload freshness and dual-theme visual
+review support approval. Rendering alone is insufficient. Follow the motion review checklist and
+retain caller API/event/ref semantics. Hosting, publication, release automation and release tags
+require separate authorization; do not assume a configured CDN or a release command exists.
 
 ## 9. Launch acceptance: one user's complete journey
 
@@ -514,16 +462,3 @@ pnpm dev                          # see the motion; toggle system reduced motion
 Any step that requires "reading the source to figure it out" counts as a documentation defect.
 
 ---
-
-## 10. Comparison with Arc's documentation system
-
-| Dimension         | Arc                                                  | Cadence                                                  |
-| ----------------- | ---------------------------------------------------- | -------------------------------------------------------- |
-| README            | Generated, 119-component table + per-category counts | Generated, but only flagships + links (avoids 700 lines) |
-| Component body    | On the site, payload only carries a URL              | Payload embeds `docs`                                    |
-| Markdown endpoint | Yes                                                  | Yes (`/r/<id>.md`)                                       |
-| llms              | Three files (txt/full/small)                         | Three files + catalog                                    |
-| MCP               | Yes (list/search/get/install/skill)                  | Planned; no Cadence MCP server ships today               |
-| Versions          | None                                                 | tag + `meta.since` + snapshot                            |
-| Tests             | None                                                 | unit + E2E + axe + visual                                |
-| Preview           | Private to the site                                  | Public, with mode and speed controls in the header       |

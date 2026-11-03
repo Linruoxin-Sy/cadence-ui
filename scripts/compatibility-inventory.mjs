@@ -1,7 +1,9 @@
 // Type evidence, never a runtime compatibility gate. Every row stays open until
 // its actual implementation/context and behavior have been audited.
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import ts from "typescript";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const config = ts.readConfigFile("tsconfig.json", ts.sys.readFile);
 const parsed = ts.parseJsonConfigFileContent(config.config, ts.sys, process.cwd());
@@ -74,7 +76,7 @@ const matrix = items.map((item) => {
   };
 });
 writeFileSync(
-  "docs/evidence/compatibility-inventory.json",
+  ".cache/audits/compatibility-inventory.json",
   `${JSON.stringify(
     {
       pin: upstream.pin.ref,

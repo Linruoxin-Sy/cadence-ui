@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import ts from "typescript";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 // Inventory is discovery, never proof. Keep individual private animated hosts.
 const paths = readdirSync("registry/cadence", { withFileTypes: true })
@@ -13,17 +15,6 @@ for (const path of paths) {
   const source = readFileSync(path, "utf8");
   const file = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const id = path.split("/")[2];
-  const basic = [
-    "button",
-    "toggle",
-    "toggle-group",
-    "slider",
-    "checkbox",
-    "radio-group",
-    "switch",
-    "progress",
-    "input-otp",
-  ].includes(id);
   const existing =
     id === "document-entrance.tsx"
       ? []
@@ -77,22 +68,13 @@ for (const path of paths) {
       sourceSha256: createHash("sha256").update(source).digest("hex"),
       source: node.getText(file),
       existingProofCandidates: existing,
-      applicableProof:
-        "docs/evidence/engine-runtime.md names the executed cases and precise missing conditions for this owner; initial filename matches are not closure",
-      status: basic
-        ? "BOUNDED browser proof: tests/runtime/controls.mjs actual hosts, six mode/OS cells, controlled commit/clock/reversal/cancellation/cleanup; see basic-controls-runtime.json and engine-runtime.md for limits"
-        : "OPEN: reconcile actual part against existing raw evidence; discovery does not close runtime obligations",
-      remaining: basic
-        ? [
-            "Real Next SSR/hydration initial-path proof reuses production cases only where they sample this actual host; no blanket full-library hydration claim",
-            "Switch resize first rAF precedes ResizeObserver delivery; second rAF endpoint is proven, not synchronous first-rAF measurement",
-            "Positive inherited/explicit clocks 8/4/2 exercised; zero/negative/nonfinite timeScale not certified",
-          ]
-        : [
-            "initial full/reduced/none × two OS; SSR/hydration where applicable",
-            "active same-target mode/clock, inherited/explicit clock and full inside none",
-            "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup",
-          ],
+      applicableProof: "docs/animation-system.md §9 defines runtime verification; discovery is not acceptance",
+      status: "DISCOVERED: inspect the actual host and applicable tests before making a runtime claim",
+      verification: [
+        "initial full/reduced/none × two OS; SSR/hydration where applicable",
+        "active same-target mode/clock, inherited/explicit clock and full inside none",
+        "nonempty partial frames, semantic target, reversal/resize/controlled updates and cleanup",
+      ],
     });
   function owner(node) {
     for (let p = node.parent; p; p = p.parent) if (ts.isFunctionDeclaration(p) && p.name) return p.name.text;
@@ -141,18 +123,8 @@ for (const [path, needle, writer, target] of [
     existingProofCandidates: [`tests/e2e/${path.split("/")[2]}.spec.ts`],
   });
 }
-const acceptancePath = "docs/evidence/engine-runtime-closure.json";
-const acceptance = existsSync(acceptancePath) ? JSON.parse(readFileSync(acceptancePath, "utf8")) : null;
-for (const record of records) {
-  if (acceptance?.status === "CLOSED_W2_FIXED_LEDGER" && acceptance.sourceHashes[record.path] === record.sourceSha256) {
-    record.status = "CLOSED W2 fixed ledger; bounded source/context proof, not universal caller certification";
-    record.remaining = [];
-    record.applicableProof =
-      "docs/evidence/engine-runtime-closure.md and engine-runtime-closure.json; actual host/phase and reuse rationale per fixed row";
-  }
-}
 writeFileSync(
-  "docs/evidence/engine-writers.json",
-  `${JSON.stringify({ scope: "Actual source discovery; CSS closure stays in css-lifecycle. Menubar and composite delegates inherit actual owners; no GSAP writer exists.", records }, null, 2)}\n`,
+  ".cache/audits/engine-writers.json",
+  `${JSON.stringify({ scope: "Actual source discovery; CSS lifecycle follows animation-system §4. Menubar and composite delegates inherit actual owners; no GSAP writer exists.", records }, null, 2)}\n`,
 );
 console.log(`${records.length} actual writer sites (private hosts included)`);

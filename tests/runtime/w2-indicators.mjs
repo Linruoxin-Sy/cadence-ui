@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const require = createRequire(import.meta.url);
 const { createServer } = await import(
@@ -139,7 +141,7 @@ try {
 } finally {
   await browser.close();
   await server.close();
-  writeFileSync(process.argv[2] || "docs/evidence/w2-indicators-initial.json", JSON.stringify(report, null, 2) + "\n");
+  writeFileSync(process.argv[2] || ".cache/audits/w2-indicators-initial.json", JSON.stringify(report, null, 2) + "\n");
 }
 console.log(JSON.stringify({ cases: report.cases.length, failures: report.failures, errors: report.errors }));
 if (report.failures.length || report.errors.length) process.exitCode = 1;

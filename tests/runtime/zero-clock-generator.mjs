@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { stripTypeScriptTypes } from "node:module";
 import { spring } from "motion";
 
-const sourceText = JSON.parse(readFileSync("docs/evidence/zero-clock-generator-negative.json", "utf8")).sourceText;
+ensureAuditDirectory(".cache/audits", { recursive: true });
+
+const sourceText = JSON.parse(readFileSync("tests/fixtures/motion/zero-clock.json", "utf8")).sourceText;
 const { transitionFor } = await import(
   `data:text/javascript;base64,${Buffer.from(stripTypeScriptTypes(sourceText)).toString("base64")}`
 );
@@ -22,7 +24,7 @@ for (const recipe of ["geometry.resize", "layout.shared", "handoff", "state.morp
   }
 
 writeFileSync(
-  "docs/evidence/zero-clock-generator-negative.json",
+  ".cache/audits/zero-clock-generator-negative.json",
   JSON.stringify(
     { sourceText, sourceSha256, reports },
     (_, v) => (typeof v === "number" && !Number.isFinite(v) ? String(v) : v),

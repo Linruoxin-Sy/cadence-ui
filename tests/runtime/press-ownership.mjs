@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 // Real CDP touch input: dispatchEvent cannot establish primary pointer ownership.
 const require = createRequire(import.meta.url);
@@ -264,7 +266,7 @@ try {
   await browser.close();
 }
 assert.equal(hash(), report.sourceSha256, "source unchanged during probe");
-const output = negative ? "docs/evidence/press-ownership-negative.json" : "docs/evidence/press-ownership-runtime.json";
+const output = negative ? ".cache/audits/press-ownership-negative.json" : ".cache/audits/press-ownership-runtime.json";
 writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
 console.log(JSON.stringify({ output, cases: report.cases.length, failures: report.failures }, null, 2));
 if (report.failures.length) process.exitCode = 1;

@@ -1,6 +1,7 @@
 // Isolated full-route research. No product source/config or registry forks.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { mkdirSync as ensureAuditDirectory } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { createRequire } from "node:module";
@@ -10,6 +11,8 @@ import { gzipSync } from "node:zlib";
 import { chromium } from "@playwright/test";
 import { measureInitialScripts, summarizeLayoutShifts } from "./site-js-budget.mjs";
 import { auditButtonPrototype } from "./verify-button-prototype.mjs";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const root = process.cwd();
 const dir = path.join(root, ".cache/button-route-prototype");
@@ -324,9 +327,9 @@ else {
       functionality,
     };
     await writeFile(path.join(dir, "raw.json.gz"), gzipSync(JSON.stringify(report), { level: 9 }));
-    await writeFile("docs/evidence/button-route-prototype.raw.json.gz", gzipSync(JSON.stringify(report), { level: 9 }));
+    await writeFile(".cache/audits/button-route-prototype.raw.json.gz", gzipSync(JSON.stringify(report), { level: 9 }));
     await writeFile(
-      "docs/evidence/button-route-prototype.json",
+      ".cache/audits/button-route-prototype.json",
       JSON.stringify(
         {
           ...report,

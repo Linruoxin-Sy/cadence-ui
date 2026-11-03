@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
+
+ensureAuditDirectory(".cache/audits", { recursive: true });
 
 const require = createRequire(import.meta.url);
 const { createServer } = await import(
@@ -144,7 +146,7 @@ try {
   await browser.close();
   await server.close();
   writeFileSync(
-    process.argv[2] || "docs/evidence/w2-code-actions-current.json",
+    process.argv[2] || ".cache/audits/w2-code-actions-current.json",
     JSON.stringify(report, null, 2) + "\n",
   );
 }

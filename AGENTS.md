@@ -7,16 +7,16 @@ package: they are distributed as shadcn registry items and copied into the consu
 under `registry/cadence/**` ships as-is and is constrained accordingly.
 
 The library is a **superset of shadcn's catalogue**: same ids, same exports, same props, same `data-slot`
-values, plus a motion contract. The build order, tiers, and scope live in
+values, plus a motion contract. The batch conventions, tiers, scope and future work live in
 [docs/parity-plan.md](docs/parity-plan.md).
 
 ## Read the design record first
 
-The `docs/` directory is the design record — reasoning for contributors and maintainers, not site content.
+The `docs/` directory contains current concepts, contracts and future work for contributors, not site content. Start at [docs/README.md](docs/README.md). Completed work and handoffs belong in Git history; generated reports go to `.cache/`, and executable regression inputs go to `tests/fixtures/`.
 
 | Document                                                                                   | Read it before                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [docs/parity-plan.md](docs/parity-plan.md)                                                 | Adding a component, choosing a motion tier, or changing the batch order.                                                                                                          |
+| [docs/parity-plan.md](docs/parity-plan.md)                                                 | Adding a component, choosing a motion tier/batch, or selecting future work.                                                                                                       |
 | [docs/overall-design.md](docs/overall-design.md)                                           | Changing the repo layout, registry model, install paths, theming, component API, or build pipeline.                                                                               |
 | [docs/animation-system.md](docs/animation-system.md)                                       | Writing or editing any animation: tokens, recipes, Base UI popup integration, reduced-motion strategy, performance budgets, motion tests.                                         |
 | [docs/documentation-site-and-distribution.md](docs/documentation-site-and-distribution.md) | Touching the docs site, the `public/r` endpoints, `llms.txt`, MCP, versioning, or the contribution flow.                                                                          |

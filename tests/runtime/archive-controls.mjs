@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync, gzipSync } from "node:zlib";
 
+ensureAuditDirectory(".cache/audits", { recursive: true });
+
 const input = process.argv[2];
-const output = process.argv[3] || "docs/evidence/basic-controls-runtime.json";
+const output = process.argv[3] || ".cache/audits/basic-controls-runtime.json";
 assert.ok(input, "pass the controls.mjs raw JSON output");
 const raw = readFileSync(input);
 const report = JSON.parse(raw);
