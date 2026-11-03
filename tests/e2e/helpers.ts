@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 
 export const MODES = ["full", "reduced", "none"] as const;
 export type Mode = (typeof MODES)[number];
@@ -117,4 +117,32 @@ export async function recordedScale(page: Page): Promise<{ min: number; max: num
     max: samples.length ? Math.max(...samples) : 0,
     frames: samples.length,
   };
+}
+
+/** T0 surfaces may animate color/shadow feedback, never authored motion or geometry. */
+export async function expectStaticSurface(surface: Locator) {
+  const observed = await surface.evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      motion: node.getAttribute("data-motion"),
+      properties: node
+        .getAnimations()
+        .map((animation) =>
+          animation instanceof CSSTransition ? animation.transitionProperty : animation.constructor.name,
+        ),
+    })),
+  );
+  for (const node of observed) {
+    expect(node.motion).toBeNull();
+    for (const property of node.properties)
+      expect([
+        "color",
+        "background-color",
+        "border-color",
+        "border-top-color",
+        "border-right-color",
+        "border-bottom-color",
+        "border-left-color",
+        "box-shadow",
+      ]).toContain(property);
+  }
 }

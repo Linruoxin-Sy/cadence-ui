@@ -18,5 +18,6 @@
   "empty": ["boundaries", "second-action", "media", "without-media"],
   "item": ["whole-row-link", "variants", "sizes", "media", "separators", "header-footer"],
   "field": ["orientation", "responsive", "caller-error", "fieldset", "choice-card"],
-  "button-group": ["vertical", "static-text", "separator"]
+  "button-group": ["vertical", "static-text", "separator"],
+  "input-group": ["alignments", "button", "textarea", "invalid"]
 }

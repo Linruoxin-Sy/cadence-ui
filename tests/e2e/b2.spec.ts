@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { effectiveMode, MODES, openComponent, pressScale } from "./helpers";
+import { effectiveMode, expectStaticSurface, MODES, openComponent, pressScale } from "./helpers";
 
 const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
 
@@ -111,7 +111,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             await expect(
               id === "field"
                 ? page.locator('[data-component-example="field/caller-error"] [aria-invalid="true"]')
-                : p.locator('[aria-invalid="true"]'),
+                : page.locator('[data-component-example="input-group/invalid"] [aria-invalid="true"]'),
             ).toHaveCount(1);
             if (id === "field") {
               const responsive = page
@@ -130,14 +130,6 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               await page.setViewportSize({ width: 1280, height: 1000 });
               expect(await responsive.evaluate((node) => getComputedStyle(node).flexDirection)).toBe("row");
             }
-          }
-          if (id === "item") {
-            const row = page.locator('[data-component-example="item/whole-row-link"]').getByRole("link");
-            await row.focus();
-            await row.press("Enter");
-            await expect(page).toHaveURL(/\/docs\/installation$/);
-            await page.goBack();
-            await page.waitForLoadState("networkidle");
           }
           if (["breadcrumb", "pagination"].includes(id)) {
             const link = p.locator("a[href]").first();
@@ -159,12 +151,23 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             await expect(button).toBeFocused();
             expect(await button.evaluate((node) => getComputedStyle(node).boxShadow)).not.toBe("none");
           }
-          expect(
-            await p
-              .locator(`[data-slot="${id}"]`)
-              .first()
-              .evaluate((node) => node.getAnimations().length),
-          ).toBe(0);
+          if (id === "input-group") await expectStaticSurface(p.locator('[data-slot="input-group"]'));
+          else {
+            expect(
+              await p
+                .locator(`[data-slot="${id}"]`)
+                .first()
+                .evaluate((node) => node.getAnimations().length),
+            ).toBe(0);
+          }
+          if (id === "item") {
+            const row = page.locator('[data-component-example="item/whole-row-link"]').getByRole("link");
+            await row.focus();
+            await row.press("Enter");
+            await expect(page).toHaveURL(/\/docs\/installation$/);
+            await page.goBack();
+            await page.waitForLoadState("networkidle");
+          }
           await page.setViewportSize({ width: 1280, height: 1000 });
         }
       });

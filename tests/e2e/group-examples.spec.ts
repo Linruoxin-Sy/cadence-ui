@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { effectiveMode, MODES, pressScale } from "./helpers";
+import { effectiveMode, expectStaticSurface, MODES, pressScale } from "./helpers";
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
@@ -281,4 +281,109 @@ for (const os of ["no-preference", "reduce"] as const)
       await text.getByRole("link", { name: "Registry", exact: true }).focus();
       await page.keyboard.press("Enter");
       await expect(page).toHaveURL(/\/docs\/registry$/);
+    });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Input Group examples: four alignments, real clearing, note submission and supplied invalid ${mode}/${os}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/input-group?motion=${mode}&variant=block-start`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="input-group"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.locator('[data-slot="input-group"]')).toHaveCount(1);
+      const search = top.getByRole("textbox", { name: "Search components" });
+      await top.locator('[data-slot="input-group-addon"]').first().click();
+      await expect(search).toBeFocused();
+      await search.fill("Independent search");
+      const alignments = page.locator('[data-component-example="input-group/alignments"] [data-slot="input-group"]');
+      for (const [index, align] of ["inline-start", "inline-end", "block-start", "block-end"].entries()) {
+        const frame = alignments.nth(index);
+        const addon = frame.locator('[data-slot="input-group-addon"]');
+        await expect(addon).toHaveAttribute("data-align", align);
+        await addon.click();
+        await expect(frame.getByRole("textbox")).toBeFocused();
+        await frame.getByRole("textbox").fill(align);
+        expect(
+          await frame.evaluate((node, align) => {
+            const addon = node.querySelector('[data-slot="input-group-addon"]')?.getBoundingClientRect();
+            const input = node.querySelector("input")?.getBoundingClientRect();
+            if (!addon || !input) return false;
+            if (align === "inline-start") return addon.right <= input.left + 1;
+            if (align === "inline-end") return input.right <= addon.left + 1;
+            if (align === "block-start") return addon.bottom <= input.top + 1;
+            return input.bottom <= addon.top + 1;
+          }, align),
+        ).toBe(true);
+      }
+      const buttons = page.locator('[data-component-example="input-group/button"]');
+      const buttonSizes = ["xs", "sm", "icon-xs", "icon-sm"];
+      for (const [index, size] of buttonSizes.entries()) {
+        const clear = buttons.getByRole("button", { name: `Clear domain ${size}`, exact: true });
+        await expect(clear).toHaveAttribute("data-size", size);
+        await expect(clear).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
+        expect(await clear.evaluate((node) => node.getBoundingClientRect().height)).toBe(size.endsWith("sm") ? 32 : 24);
+        if (size.startsWith("icon"))
+          expect(await clear.evaluate((node) => node.getBoundingClientRect().width)).toBe(size === "icon-xs" ? 24 : 32);
+        await clear.scrollIntoViewIfNeeded();
+        if (index === 0)
+          expect(await pressScale(page, '[data-component-example="input-group/button"] button')).toBeCloseTo(
+            effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
+            2,
+          );
+        else {
+          await clear.focus();
+          await clear.press(index % 2 === 0 ? " " : "Enter");
+        }
+        await expect(clear).toBeFocused();
+        await expect(buttons.getByRole("textbox", { name: `Domain ${size}`, exact: true })).toHaveValue("");
+        if (index < 3)
+          await expect(
+            buttons.getByRole("textbox", { name: `Domain ${buttonSizes[index + 1]}`, exact: true }),
+          ).toHaveValue("cadence.dev");
+      }
+      const composer = page.locator('[data-component-example="input-group/textarea"]');
+      const note = composer.getByRole("textbox", { name: "Note" });
+      const original = await note.elementHandle();
+      await expect(composer.getByRole("button", { name: "Send" })).toBeDisabled();
+      await note.fill("x".repeat(281));
+      await expect(note).toHaveValue("x".repeat(280));
+      await expect(composer).toContainText("280/280");
+      await note.fill("A retained review draft");
+      await expect(composer).toContainText("23/280");
+      await note.focus();
+      await note.press("Home");
+      await note.press("Shift+ArrowRight");
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button: HTMLButtonElement) => button.click());
+      await expect(note).toBeFocused();
+      expect(
+        await note.evaluate(
+          (node: HTMLTextAreaElement, original) => [node === original, node.selectionStart, node.selectionEnd],
+          original,
+        ),
+      ).toEqual([true, 0, 1]);
+      await expect(note).toHaveValue("A retained review draft");
+      await expect(search).toHaveValue("Independent search");
+      const send = composer.getByRole("button", { name: "Send" });
+      await expect(send).toHaveAttribute("data-motion", "none");
+      await send.focus();
+      await send.press("Enter");
+      await expect(composer.getByRole("status")).toHaveText("Sent: A retained review draft");
+      await expect(note).toHaveValue("");
+      await expect(send).toBeDisabled();
+      expect(await note.evaluate((node, original) => node === original, original)).toBe(true);
+      const invalid = page.locator('[data-component-example="input-group/invalid"]');
+      const email = invalid.getByRole("textbox", { name: "Email" });
+      await expect(email).toHaveAttribute("aria-invalid", "true");
+      await expect(email).toHaveAccessibleDescription("This email address is unavailable.");
+      await email.fill("changed@example.com");
+      await expect(email).toHaveAttribute("aria-invalid", "true");
+      const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
+      expect(new Set(ids).size).toBe(ids.length);
+      await expectStaticSurface(page.locator('[data-slot="input-group"]'));
     });
