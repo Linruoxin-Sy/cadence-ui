@@ -17,14 +17,23 @@ npx shadcn@latest add @cadence/checkbox
 ## Usage
 
 ```tsx
+"use client";
+
+import { useId } from "react";
 import { Checkbox } from "@/components/cadence/checkbox";
 import { Label } from "@/components/cadence/label";
 
-export function Terms() {
+export function CheckboxSettings() {
+  const id = useId();
   return (
     <div className="flex items-start gap-3">
-      <Checkbox id="terms" />
-      <Label htmlFor="terms">Accept the terms of service</Label>
+      <Checkbox id={id} aria-describedby={`${id}-help`} className="mt-0.5" />
+      <div className="grid gap-1">
+        <Label htmlFor={id}>Send the weekly digest</Label>
+        <p id={`${id}-help`} className="text-sm text-muted-foreground">
+          Every Monday, 09:00.
+        </p>
+      </div>
     </div>
   );
 }
@@ -35,45 +44,227 @@ clicking the label toggles it.
 
 ## Checked by default, and indeterminate
 
-```tsx
-<Checkbox defaultChecked />
-<Checkbox indeterminate />
-```
+`defaultChecked` initializes an uncontrolled choice. `indeterminate` announces a mixed selection; it does not make the field checked for form submission. Both controls below own their state independently.
 
-`indeterminate` is a visual third state; `aria-checked="mixed"` is what a screen
-reader hears. It never replaces the checked state — pass `checked` too if the
-form needs a value.
+<ComponentExample name="states" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
+
+export function CheckboxStates() {
+  const id = useId();
+  return (
+    <div className="grid gap-4">
+      <div className="flex items-center gap-3">
+        <Checkbox id={`${id}-checked`} defaultChecked />
+        <Label htmlFor={`${id}-checked`}>Checked by default</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Checkbox id={`${id}-mixed`} indeterminate />
+        <Label htmlFor={`${id}-mixed`}>Some projects selected</Label>
+      </div>
+    </div>
+  );
+}
+```
 
 ## Controlled
 
-```tsx
-const [accepted, setAccepted] = useState(false);
+The caller owns acceptance and its status. Reset acceptance is an external update to this example alone; it does not change the top specimen or any other checkbox.
 
-<Checkbox checked={accepted} onCheckedChange={setAccepted} />;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
+
+export function ControlledCheckbox() {
+  const id = useId();
+  const [accepted, setAccepted] = useState(false);
+  return (
+    <div className="grid gap-4">
+      <div className="flex items-center gap-3">
+        <Checkbox id={id} checked={accepted} onCheckedChange={setAccepted} />
+        <Label htmlFor={id}>Accept the terms</Label>
+      </div>
+      <p role="status" className="text-sm text-muted-foreground">
+        {accepted ? "Terms accepted" : "Terms not accepted"}
+      </p>
+      <Button variant="outline" size="sm" onClick={() => setAccepted(false)}>
+        Reset acceptance
+      </Button>
+    </div>
+  );
+}
 ```
 
 ## Invalid, with a described error
 
-```tsx
-<Checkbox id="terms" aria-invalid aria-describedby="terms-error" />
-<p id="terms-error" className="text-sm text-destructive">
-  You must accept the terms to continue.
-</p>
-```
+The caller supplies `aria-invalid` and the described error. Checking the box does not clear the error automatically: the application decides when it is resolved.
 
-The ring turns destructive because `aria-invalid` is set. The component does not
-decide that anything is wrong.
+<ComponentExample name="invalid" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
+
+export function InvalidCheckbox() {
+  const id = useId();
+  return (
+    <div className="grid gap-2">
+      <div className="flex items-center gap-3">
+        <Checkbox id={id} aria-invalid="true" aria-describedby={`${id}-error`} />
+        <Label htmlFor={id}>Accept the terms</Label>
+      </div>
+      <p id={`${id}-error`} className="text-sm text-destructive">
+        You must accept the terms to continue.
+      </p>
+    </div>
+  );
+}
+```
 
 ## In a row of settings
 
+Associate the visible label and help text with one unique control. The description remains available when the label wraps on a narrow screen.
+
+<ComponentExample name="settings" />
+
 ```tsx
-<div className="flex items-start gap-3">
-  <Checkbox id="digest" className="mt-0.5" />
-  <div className="grid gap-1">
-    <Label htmlFor="digest">Send the weekly digest</Label>
-    <p className="text-sm text-muted-foreground">Every Monday, 09:00.</p>
-  </div>
-</div>
+"use client";
+
+import { useId } from "react";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
+
+export function CheckboxSettings() {
+  const id = useId();
+  return (
+    <div className="flex items-start gap-3">
+      <Checkbox id={id} aria-describedby={`${id}-help`} className="mt-0.5" />
+      <div className="grid gap-1">
+        <Label htmlFor={id}>Send the weekly digest</Label>
+        <p id={`${id}-help`} className="text-sm text-muted-foreground">
+          Every Monday, 09:00.
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+## Disabled and read-only
+
+Disabled choices retain their checked or unchecked state and are skipped by keyboard navigation. A read-only choice stays focusable but cannot be changed. The group disabled marker also dims its label; Base UI does not use a native disabled button.
+
+<ComponentExample name="disabled" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
+
+export function DisabledCheckboxes() {
+  const id = useId();
+  return (
+    <div className="grid gap-4">
+      <div className="group flex items-center gap-3" data-disabled="true">
+        <Checkbox id={`${id}-off`} disabled />
+        <Label htmlFor={`${id}-off`}>Unavailable, unchecked</Label>
+      </div>
+      <div className="group flex items-center gap-3" data-disabled="true">
+        <Checkbox id={`${id}-on`} disabled defaultChecked />
+        <Label htmlFor={`${id}-on`}>Unavailable, checked</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Checkbox id={`${id}-readonly`} readOnly defaultChecked />
+        <Label htmlFor={`${id}-readonly`}>Read-only preference</Label>
+      </div>
+    </div>
+  );
+}
+```
+
+## Native form submission
+
+`name` and `value` define the native form entry. `required` uses browser constraint validation before this caller-owned submit handler runs. Server-side validation and persistence remain the application’s responsibility.
+
+<ComponentExample name="form-submission" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Label } from "@/components/cadence/label";
+
+export function CheckboxForm() {
+  const id = useId();
+  const [result, setResult] = useState("Not submitted");
+  return (
+    <form
+      className="grid gap-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setResult(`Submitted consent: ${data.get("consent")}`);
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <Checkbox id={id} name="consent" value="accepted" required />
+        <Label htmlFor={id}>Accept the terms (required)</Label>
+      </div>
+      <Button type="submit" size="sm">
+        Submit consent
+      </Button>
+      <p role="status" className="text-sm text-muted-foreground">
+        {result}
+      </p>
+    </form>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The checked control is explicitly `none` from its first render, so its tick appears immediately and still toggles. Its neighbour explicitly restores `full` inside that scope; the system reduced-motion preference still takes precedence. These are deliberate local overrides. Ordinary examples follow the site header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Checkbox } from "@/components/cadence/checkbox";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function StaticCheckbox() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex items-center gap-6">
+        <div data-testid="initial-none">
+          <Checkbox aria-label="Static checkbox" defaultChecked />
+        </div>
+        <CadenceProvider mode="full">
+          <Checkbox aria-label="Explicit full checkbox" />
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use

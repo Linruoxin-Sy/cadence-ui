@@ -1,7 +1,10 @@
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES, openComponent } from "./helpers";
 import { installInitialControlProbe } from "./initial-control-probe";
+
+const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
 
 const parts = {
   checkbox: ["checkbox", "checkbox-indicator"],
@@ -15,6 +18,14 @@ const parts = {
 } as const;
 type Id = keyof typeof parts;
 const ids = Object.keys(parts) as Id[];
+async function setMode(page: Page, id: Id, mode: "full" | "reduced" | "none") {
+  if (examples[id]) {
+    await page
+      .getByRole("group", { name: "Motion mode" })
+      .getByRole("button", { name: mode, exact: true })
+      .evaluate((button: HTMLButtonElement) => button.click());
+  } else await page.locator(`[data-preview="${id}"]`).getByLabel("Control motion").selectOption(mode);
+}
 type Frame = { scale: number; x: number; opacity: number; animations: number };
 async function record(page: Page, selector: string) {
   await page.evaluate((selector) => {
@@ -129,7 +140,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               ),
             ).toBe(true);
           }
-          const staticScope = p.getByTestId("initial-none");
+          const staticScope = page.getByTestId("initial-none");
           expect(await staticScope.evaluate((n) => n.getAnimations({ subtree: true }).length)).toBe(0);
           await node.evaluate((n) => {
             (window as unknown as { stable: Element }).stable = n;
@@ -186,7 +197,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(new Set(opacity).size > 1).toBe(actual !== "none");
           }
           // Cancel a running recipe on the same node, including a held press.
-          await p.getByLabel("Control motion").selectOption("full");
+          await setMode(page, id, "full");
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
           if (id === "input-otp") {
             const input = p.getByRole("textbox", { name: "Verification code", exact: true });
@@ -197,19 +208,19 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           }
           await record(page, selector);
           await act(page, id, true);
-          await p.getByLabel("Control motion").selectOption("none");
+          await setMode(page, id, "none");
           await expect(p.locator(`[data-slot="${parts[id][0]}"]`).first()).toHaveAttribute("data-motion", "none");
           await record(page, selector);
           const stopped = await frames(page);
           expect(stopped.every((s) => s.animations === 0)).toBe(true);
           expect(new Set(stopped.map((s) => `${s.scale}/${s.x}/${s.opacity}`)).size).toBe(1);
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
-          // Explicit local full restores the recipe under an outer none scope.
+          // Restore the same ordinary control via the header; legacy pages still use their local scope.
           await page
             .getByRole("group", { name: "Motion mode" })
             .getByRole("button", { name: "none", exact: true })
             .click();
-          await p.getByLabel("Control motion").selectOption("full");
+          await setMode(page, id, "full");
           await expect(p.locator(`[data-slot="${parts[id][0]}"]`).first()).toHaveAttribute(
             "data-motion",
             effectiveMode("full", reducedMotion === "reduce"),
@@ -232,6 +243,42 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(new Set(values.map((v) => v.toFixed(4))).size).toBeGreaterThan(2);
           }
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
+          if (examples[id]) {
+            await setMode(page, id, "none");
+            const nested = page.getByRole(
+              id === "checkbox" ? "checkbox" : id === "radio-group" ? "radio" : id === "switch" ? "switch" : "slider",
+              { name: `Explicit full ${id === "radio-group" ? "radio" : id}`, exact: true },
+            );
+            const nestedRoot = nested.locator(id === "slider" ? "xpath=../.." : "xpath=.");
+            const nestedPart = nestedRoot.locator(`[data-slot="${parts[id][1]}"]`).first();
+            await expect(nestedPart).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
+            await nested.scrollIntoViewIfNeeded();
+            const saved = await nestedPart.elementHandle();
+            const nestedSelector = `[data-component-example="${id}/without-motion"] [data-motion="${effectiveMode("full", reducedMotion === "reduce")}"][data-slot="${parts[id][1]}"]`;
+            await record(page, nestedSelector);
+            if (id === "slider") {
+              const box = await nestedPart.boundingBox();
+              if (!box) throw new Error("missing nested thumb");
+              await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+              await page.mouse.down();
+            } else await nested.click();
+            const nestedFrames = await frames(page);
+            if (id === "slider") await page.mouse.up();
+            expect(nestedFrames.length).toBeGreaterThan(4);
+            if (reducedMotion === "no-preference") {
+              const values = nestedFrames.map((s) => (id === "switch" ? s.x : id === "slider" ? s.scale : s.opacity));
+              expect(new Set(values.map((v) => v.toFixed(4))).size).toBeGreaterThan(2);
+            } else if (id === "checkbox" || id === "radio-group") {
+              expect(nestedFrames.every((s) => s.scale === 1)).toBe(true);
+              expect(nestedFrames.some((s) => s.opacity > 0 && s.opacity < 1)).toBe(true);
+            } else expect(new Set(nestedFrames.map((s) => `${s.scale}/${s.x}`)).size).toBeLessThanOrEqual(2);
+            expect(await nestedPart.evaluate((node, saved) => node === saved, saved)).toBe(true);
+            expect(
+              await staticScope.evaluate((node) => node.querySelector("[data-motion]")?.getAttribute("data-motion")),
+            ).toBe("none");
+            await setMode(page, id, "full");
+            await p.scrollIntoViewIfNeeded();
+          }
           // Keyboard semantics, focused node and selection survive resize/mode changes.
           if (id === "checkbox" || id === "switch") {
             const control = p.getByRole(id === "checkbox" ? "checkbox" : "switch").first();
@@ -301,7 +348,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             const control = p.locator(`[data-slot="${parts[id][0]}"]`).first();
             for (let i = 0; i < 4; i++) await control.click();
           }
-          for (let i = 0; i < 4; i++) await p.getByLabel("Control motion").selectOption(i % 2 ? "none" : "reduced");
+          for (let i = 0; i < 4; i++) await setMode(page, id, i % 2 ? "none" : "reduced");
           const focus =
             id === "slider"
               ? p.getByRole("slider", { name: "Volume", exact: true })
@@ -337,6 +384,11 @@ for (const colorScheme of ["light", "dark"] as const)
           await page
             .locator(`[data-preview="${id}"]`)
             .screenshot({ path: `.cache/b3-proof/${id}-${colorScheme}-${width}-preview.png` });
+        }
+        for (const name of examples[id] ?? []) {
+          await page
+            .locator(`[data-component-example="${id}/${name}"]`)
+            .screenshot({ path: `.cache/b3-proof/${id}-${colorScheme}-390-${name}.png` });
         }
         expect(errors).toEqual([]);
       });

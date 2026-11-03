@@ -22,5 +22,6 @@
   "input-group": ["alignments", "button", "textarea", "invalid"],
   "breadcrumb": ["collapsed", "separator", "router"],
   "pagination": ["collapsed", "labels", "local-state", "sizes", "boundary"],
-  "spinner": ["button", "sizes", "label", "without-motion"]
+  "spinner": ["button", "sizes", "label", "without-motion"],
+  "checkbox": ["states", "controlled", "invalid", "settings", "disabled", "form-submission", "without-motion"]
 }
