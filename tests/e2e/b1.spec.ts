@@ -200,8 +200,9 @@ for (const preference of ["no-preference", "reduce"] as const)
               })),
             ).toEqual({ same: true, start: 0, end: 1 });
             if (id === "input")
-              await p
-                .getByLabel("File", { exact: true })
+              await page
+                .locator('[data-component-example="input/file"]')
+                .getByLabel("Image", { exact: true })
                 .setInputFiles({ name: "proof.png", mimeType: "image/png", buffer: Buffer.from("file") });
             await expect(p.getByRole("textbox", { name: "Disabled", exact: true })).toBeDisabled();
           }

@@ -7,5 +7,6 @@
   "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid", "multiple", "placement"],
   "tabs": ["controlled", "vertical", "line-style", "persistent", "list-sizing", "disabled"],
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
-  "toc": ["nested", "controlled", "scroll-tracking"]
+  "toc": ["nested", "controlled", "scroll-tracking"],
+  "input": ["invalid", "file", "controlled", "disabled-readonly"]
 }

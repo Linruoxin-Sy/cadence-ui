@@ -32,31 +32,117 @@ export function WorkspaceName() {
 
 ## Invalid
 
-`aria-invalid` is the only switch. The component renders the destructive border and
-ring; it never decides that the value is wrong.
+The caller supplies `aria-invalid` and a described error. This fixed error state does not run validation or prevent editing.
+
+<ComponentExample name="invalid" />
 
 ```tsx
-<Input aria-invalid="true" aria-describedby="email-error" defaultValue="ada@" />
-<p id="email-error" className="text-sm text-destructive">
-  Enter a complete email address.
-</p>
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+
+export function InvalidInput() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-2">
+      <Label htmlFor={id}>Email</Label>
+      <Input id={id} type="email" aria-invalid="true" aria-describedby={`${id}-error`} defaultValue="ada@" />
+      <p id={`${id}-error`} className="text-sm text-destructive">Enter a complete email address.</p>
+    </div>
+  );
+}
 ```
 
 ## File input
 
-`file:` variants are already wired, so the native picker button picks up the
-tokens:
+Use the native file picker for caller-owned files. `accept` suggests file types; the browser and your application own selection, upload and checks.
+
+<ComponentExample name="file" />
 
 ```tsx
-<Input type="file" accept="image/png" />
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+
+export function FileInput() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-2">
+      <Label htmlFor={id}>Image</Label>
+      <Input id={id} type="file" accept="image/png,image/jpeg" aria-describedby={`${id}-hint`} />
+      <p id={`${id}-hint`} className="text-sm text-muted-foreground">Choose a PNG or JPEG image.</p>
+    </div>
+  );
+}
 ```
 
 ## Controlled, Base UI style
 
-```tsx
-const [value, setValue] = useState("");
+The caller owns `value` through Base UI’s `onValueChange`. The external action replaces only this example’s value; typing in another specimen remains independent.
 
-<Input value={value} onValueChange={setValue} />;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+
+export function ControlledInput() {
+  const id = useId();
+  const [value, setValue] = useState("");
+  return (
+    <div className="grid w-full max-w-sm gap-3">
+      <Label htmlFor={id}>Workspace name</Label>
+      <Input id={id} value={value} onValueChange={setValue} aria-describedby={`${id}-value`} />
+      <p id={`${id}-value`} role="status" className="text-sm text-muted-foreground">Value: {value || "(empty)"}</p>
+      <Button variant="outline" onClick={() => setValue("Cadence UI")}>Use workspace name</Button>
+    </div>
+  );
+}
+```
+
+## Disabled and read-only
+
+A disabled field cannot be edited or focused and is omitted from native form submission. A read-only field stays focusable and submits its value. A filled field is still editable unless you explicitly set `readOnly`.
+
+<ComponentExample name="disabled-readonly" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+
+export function InputAvailability() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-4">
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-filled`}>Filled</Label>
+        <Input id={`${id}-filled`} name="workspace" defaultValue="Cadence UI" />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-disabled`}>Disabled</Label>
+        <Input id={`${id}-disabled`} name="disabled" disabled defaultValue="cadence" />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-readonly`}>Read-only</Label>
+        <Input id={`${id}-readonly`} name="slug" readOnly defaultValue="cadence-ui" />
+      </div>
+    </div>
+  );
+}
 ```
 
 ## When to use
