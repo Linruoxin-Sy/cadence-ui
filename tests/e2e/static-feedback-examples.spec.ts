@@ -3,6 +3,71 @@ import { effectiveMode, MODES, pressScale } from "./helpers";
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
+    test(`Empty examples: boundaries, media and independent recovery actions ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/empty?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="empty"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.locator('[data-slot="empty"]')).toHaveCount(1);
+      await expect(top.locator('[data-slot="empty-icon"]')).toHaveAttribute("data-variant", "icon");
+      const boundaries = page.locator('[data-component-example="empty/boundaries"] [data-slot="empty"]');
+      expect(
+        await boundaries.evaluateAll((nodes) =>
+          nodes.map((node) => ({
+            width: getComputedStyle(node).borderTopWidth,
+            style: getComputedStyle(node).borderTopStyle,
+          })),
+        ),
+      ).toEqual([
+        { width: "1px", style: "dashed" },
+        { width: "0px", style: "solid" },
+      ]);
+      const media = page.locator('[data-component-example="empty/media"] [data-slot="empty-icon"]');
+      await expect(media).toHaveCount(2);
+      await expect(media.nth(0)).toHaveAttribute("data-variant", "icon");
+      await expect(media.nth(1)).toHaveAttribute("data-variant", "default");
+      expect(await media.nth(0).evaluate((node) => node.getBoundingClientRect().width)).toBe(40);
+      await expect(media.nth(1)).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      for (const svg of await media.locator("svg").all()) await expect(svg).toHaveAttribute("aria-hidden", "true");
+      const noMedia = page.locator('[data-component-example="empty/without-media"]');
+      await expect(noMedia.locator('[data-slot="empty-icon"]')).toHaveCount(0);
+      await expect(noMedia.getByRole("link")).toHaveAttribute("href", "/components");
+      const recovery = page.locator('[data-component-example="empty/second-action"]');
+      const empty = recovery.locator('[data-slot="empty"]');
+      const original = await empty.elementHandle();
+      const button = recovery.getByRole("button", { name: "Clear filters", exact: true });
+      await expect(button).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
+      await button.scrollIntoViewIfNeeded();
+      expect(await pressScale(page, '[data-component-example="empty/second-action"] [data-slot="button"]')).toBeCloseTo(
+        effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
+        2,
+      );
+      await expect(empty).toContainText("Filters cleared.");
+      await button.focus();
+      await button.press("Enter");
+      await button.press(" ");
+      await expect(button).toBeFocused();
+      expect(await button.evaluate((node) => getComputedStyle(node).boxShadow)).not.toBe("none");
+      await expect(top).toContainText("Browse the catalogue to find your first component.");
+      expect(await empty.evaluate((node, original) => node === original, original)).toBe(true);
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
+      await expect(empty).toContainText("Filters cleared.");
+      expect(await empty.evaluate((node, original) => node === original, original)).toBe(true);
+      expect(
+        await page
+          .locator('[data-slot="empty"]')
+          .evaluateAll((nodes) =>
+            nodes.every((node) => !node.hasAttribute("data-variant") && node.getAnimations().length === 0),
+          ),
+      ).toBe(true);
+      await recovery.getByRole("link", { name: "Browse components", exact: true }).focus();
+      await page.keyboard.press("Enter");
+      await expect(page).toHaveURL(/\/components$/);
+    });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
     test(`Alert examples: fixed variants, icon columns and caller-owned dismissal ${mode}/${os}`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: os });
       await page.goto(`/components/alert?motion=${mode}`);

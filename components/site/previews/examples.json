@@ -14,5 +14,6 @@
   "aspect-ratio": ["square", "video", "grid"],
   "avatar": ["sizes", "image-fallback", "presence", "group"],
   "skeleton": ["text-lines", "avatar-name", "swap-content", "without-motion"],
-  "alert": ["action", "without-icon", "destructive"]
+  "alert": ["action", "without-icon", "destructive"],
+  "empty": ["boundaries", "second-action", "media", "without-media"]
 }
