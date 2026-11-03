@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { expectMenuAccessibility } from "./menu-accessibility";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const ids = ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command", "toast"] as const;
@@ -123,7 +124,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await close(page, id);
           const exit = await samples(page, 40);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
-          if (id === "dropdown-menu") await openPopupMotionFixture(page, id, requested);
+          if (["dropdown-menu", "context-menu"].includes(id)) await openPopupMotionFixture(page, id, requested);
           await mode(page, "full");
           await start(page, id);
           await open(page, id);
@@ -159,9 +160,16 @@ for (const colorScheme of ["light", "dark"] as const)
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
           await open(page, id);
-          expect(
-            (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
-          ).toEqual([]);
+          if (id === "context-menu")
+            await expectMenuAccessibility(page, async () => {
+              await page.keyboard.press("Escape");
+              await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
+              await open(page, id);
+            });
+          else
+            expect(
+              (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
+            ).toEqual([]);
           await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}-open.png` });
           await close(page, id);
           if (id === "select") await expect(page.locator(`[data-slot="${slot(id)}"]`)).not.toBeVisible();
@@ -176,7 +184,7 @@ test.describe("B5 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      if (id === "dropdown-menu") await openPopupMotionFixture(page, id, "none", 4);
+      if (["dropdown-menu", "context-menu"].includes(id)) await openPopupMotionFixture(page, id, "none", 4);
       else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
@@ -496,7 +504,7 @@ test.describe("B5 native reversal", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command"] as const)
     test(`${id} reopens during exit on the same surface`, async ({ page }) => {
-      if (id === "dropdown-menu") await openPopupMotionFixture(page, id, "full", 4);
+      if (["dropdown-menu", "context-menu"].includes(id)) await openPopupMotionFixture(page, id, "full", 4);
       else await page.goto(`/components/${id}?motion=full&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await open(page, id);

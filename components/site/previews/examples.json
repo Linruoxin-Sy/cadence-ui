@@ -60,5 +60,16 @@
     "logical-sides",
     "modality",
     "without-motion"
+  ],
+  "context-menu": [
+    "sides",
+    "alignments",
+    "logical-sides",
+    "row-menu",
+    "selection",
+    "submenus",
+    "items",
+    "controlled",
+    "without-motion"
   ]
 }

@@ -19,23 +19,42 @@ npx shadcn@latest add @cadence/context-menu
 
 ## Usage
 
-```tsx
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/cadence/context-menu";
+Right-click the focusable file target, or focus it and press Shift+F10. Open is a real
+changelog link. Rename and Open with only update this local file label; application
+commands, storage and authorization belong to the caller. Interactive menus need hydration;
+the target, explanation and runnable code remain readable without JavaScript.
 
-export function FileContextMenu({ file }: { file: File }) {
+```tsx
+"use client";
+
+import { useState } from "react";
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function FileMenu() {
+  const [name, setName] = useState("Roadmap.md");
   return (
     <ContextMenu>
-      <ContextMenuTrigger tabIndex={0} className="flex h-32 items-center justify-center rounded-lg border border-dashed text-sm">
-        {file.name}
+      <ContextMenuTrigger
+        tabIndex={0}
+        className="flex h-24 w-56 flex-col items-center justify-center gap-1 rounded-lg border border-dashed text-sm"
+      >
+        <span className="font-medium">{name}</span>
+        <span className="text-xs text-muted-foreground">Right-click for actions</span>
       </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={() => open(file)}>Open</ContextMenuItem>
-        <ContextMenuItem onClick={() => rename(file)}>Rename</ContextMenuItem>
+      <ContextMenuContent aria-label="File actions">
+        <ContextMenuGroup>
+          <ContextMenuItem render={<a href="/docs/changelog" />}>Open</ContextMenuItem>
+          <ContextMenuItem onClick={() => setName("Roadmap (renamed).md")}>Rename</ContextMenuItem>
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>Open with</ContextMenuSubTrigger>
+            <ContextMenuSubContent>
+              <ContextMenuGroup>
+                <ContextMenuItem onClick={() => setName("Editor: Roadmap.md")}>Editor</ContextMenuItem>
+                <ContextMenuItem onClick={() => setName("Preview: Roadmap.md")}>Preview</ContextMenuItem>
+              </ContextMenuGroup>
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+        </ContextMenuGroup>
       </ContextMenuContent>
     </ContextMenu>
   );
@@ -44,62 +63,435 @@ export function FileContextMenu({ file }: { file: File }) {
 
 ## Where the panel opens
 
-The menu opens at the pointer, not under an edge of the trigger, so `side` and `align`
-describe the fallback used when the pointer is near a viewport edge. The defaults —
-`side="right"`, `alignOffset={4}` — place the panel just clear of the cursor.
+Right-click each fixed target. The panel is anchored to the cursor point, rather than to the target box. These four physical sides use an 8px gap and zero cross-axis offset so the difference is visible. Collision handling may flip the requested side near an edge; the default is right/start, with sideOffset=0 and alignOffset=4.
+
+<ComponentExample name="sides" />
 
 ```tsx
-<ContextMenuContent side="bottom" align="center" alignOffset={12}>
-  …
-</ContextMenuContent>
+"use client";
+
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function PointerSides() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["top", "right", "bottom", "left"] as const).map((side) => (
+        <ContextMenu key={side}>
+          <ContextMenuTrigger
+            tabIndex={0}
+            className="grid h-20 w-28 place-content-center rounded-md border border-dashed text-sm"
+          >
+            {side}
+          </ContextMenuTrigger>
+          <ContextMenuContent aria-label="File actions" side={side} sideOffset={8} alignOffset={0}>
+            <ContextMenuGroup>
+              <ContextMenuItem>Close menu</ContextMenuItem>
+            </ContextMenuGroup>
+          </ContextMenuContent>
+        </ContextMenu>
+      ))}
+    </div>
+  );
+}
+```
+
+## Pointer alignment
+
+Start, center and end align the panel against the cursor point along the cross axis. These are three separate bottom-side menus, not three configurations of a shared instance. Collision handling still shifts or flips the panel when space is limited.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function PointerAlignments() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["start", "center", "end"] as const).map((align) => (
+        <ContextMenu key={align}>
+          <ContextMenuTrigger
+            tabIndex={0}
+            className="grid h-20 w-28 place-content-center rounded-md border border-dashed text-sm"
+          >
+            {align}
+          </ContextMenuTrigger>
+          <ContextMenuContent aria-label="File actions" side="bottom" align={align} alignOffset={0} sideOffset={8}>
+            <ContextMenuGroup>
+              <ContextMenuItem>Close menu</ContextMenuItem>
+            </ContextMenuGroup>
+          </ContextMenuContent>
+        </ContextMenu>
+      ))}
+    </div>
+  );
+}
+```
+
+## Logical sides in RTL
+
+Logical inline-start and inline-end follow the direction provider. In this RTL example they request right and left respectively. The surrounding dir attribute also gives the native content its text direction. Install @base-ui/react alongside the component; it is already a Context Menu dependency.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function LogicalPointerSides() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl" className="flex flex-wrap gap-3">
+        {(["inline-start", "inline-end"] as const).map((side) => (
+          <ContextMenu key={side}>
+            <ContextMenuTrigger
+              tabIndex={0}
+              className="grid h-20 w-32 place-content-center rounded-md border border-dashed text-sm"
+            >
+              {side}
+            </ContextMenuTrigger>
+            <ContextMenuContent
+              aria-label="File actions"
+              side={side}
+              alignOffset={0}
+              sideOffset={8}
+              className="max-w-(--available-width)"
+            >
+              <ContextMenuGroup>
+                <ContextMenuItem>Close menu</ContextMenuItem>
+              </ContextMenuGroup>
+            </ContextMenuContent>
+          </ContextMenu>
+        ))}
+      </div>
+    </DirectionProvider>
+  );
+}
 ```
 
 ## Beside a row menu
 
-A context menu and a `dropdown-menu` on the same row answer the same question twice, and
-users expect the same entries in both. Render the item list once and pass it to both:
+A visible row menu makes the same actions discoverable for touch and keyboard users. Share action data and callbacks; render ContextMenuItem inside ContextMenu and DropdownMenuItem inside DropdownMenu. Both routes below update the same local result. Also install @cadence/dropdown-menu and @cadence/button for this composition; no file is opened or renamed on a server.
+
+<ComponentExample name="row-menu" />
 
 ```tsx
-const actions = (
-  <>
-    <ContextMenuItem onClick={() => open(file)}>Open</ContextMenuItem>
-    <ContextMenuItem onClick={() => rename(file)}>Rename</ContextMenuItem>
-  </>
-);
+"use client";
 
-<ContextMenu>
-  <ContextMenuTrigger>{file.name}</ContextMenuTrigger>
-  <ContextMenuContent>{actions}</ContextMenuContent>
-</ContextMenu>;
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/cadence/context-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/cadence/dropdown-menu";
+
+export function RowMenu() {
+  const [result, setResult] = useState("No row action yet");
+  const actions = ["Open", "Rename"];
+  return (
+    <div className="grid gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <ContextMenu>
+          <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-6 py-4 text-sm">
+            Roadmap.md
+          </ContextMenuTrigger>
+          <ContextMenuContent aria-label="File actions">
+            <ContextMenuGroup>
+              {actions.map((action) => (
+                <ContextMenuItem key={action} onClick={() => setResult(`${action} selected locally`)}>
+                  {action}
+                </ContextMenuItem>
+              ))}
+            </ContextMenuGroup>
+          </ContextMenuContent>
+        </ContextMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="outline" />}>Row actions</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              {actions.map((action) => (
+                <DropdownMenuItem key={action} onClick={() => setResult(`${action} selected locally`)}>
+                  {action}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <p role="status" className="text-sm">
+        {result}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Selection items
 
-`ContextMenuCheckboxItem` and `ContextMenuRadioGroup` / `ContextMenuRadioItem` keep the panel
-open, so a user can set options without reopening it. `ContextMenuShortcut` is a
-right-aligned hint; the component binds no keys.
+Checkbox and radio items stay open by default. Grid and sort belong to this example; Rulers demonstrates an uncontrolled default. Labels name the Show group and Sort radio group, while separators divide the sections. Inset keeps labels and plain text aligned with the reserved indicator space.
+
+<ComponentExample name="selection" />
 
 ```tsx
-<ContextMenuCheckboxItem defaultChecked onCheckedChange={setHidden}>
-  Hidden files
-</ContextMenuCheckboxItem>
+"use client";
 
-<ContextMenuRadioGroup value={sort} onValueChange={setSort}>
-  <ContextMenuRadioItem value="name">Name</ContextMenuRadioItem>
-  <ContextMenuRadioItem value="date">Date modified</ContextMenuRadioItem>
-</ContextMenuRadioGroup>
+import { useState } from "react";
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuGroup, ContextMenuLabel, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuSeparator, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function SelectionMenu() {
+  const [grid, setGrid] = useState(true);
+  const [sort, setSort] = useState("name");
+  return (
+    <div className="grid gap-3">
+      <ContextMenu>
+        <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-6 py-4 text-sm">
+          View options
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="File actions">
+          <ContextMenuGroup>
+            <ContextMenuLabel inset>Show</ContextMenuLabel>
+            <ContextMenuCheckboxItem checked={grid} onCheckedChange={setGrid} inset>
+              Grid
+            </ContextMenuCheckboxItem>
+            <ContextMenuCheckboxItem defaultChecked>Rulers</ContextMenuCheckboxItem>
+          </ContextMenuGroup>
+          <ContextMenuSeparator />
+          <ContextMenuRadioGroup aria-label="Sort" value={sort} onValueChange={setSort}>
+            <ContextMenuLabel>Sort</ContextMenuLabel>
+            <ContextMenuRadioItem value="name" inset>
+              Name
+            </ContextMenuRadioItem>
+            <ContextMenuRadioItem value="date">Date modified</ContextMenuRadioItem>
+          </ContextMenuRadioGroup>
+        </ContextMenuContent>
+      </ContextMenu>
+      <p role="status" className="text-sm">
+        Grid: {grid ? "shown" : "hidden"}; sort: {sort}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Submenus
 
+ArrowRight opens Open with; ArrowLeft returns to its parent trigger in LTR. The selected application is recorded locally and closes both panels. Each submenu owns its own portal; it is not a second root menu.
+
+<ComponentExample name="submenus" />
+
 ```tsx
-<ContextMenuSub>
-  <ContextMenuSubTrigger>Open with</ContextMenuSubTrigger>
-  <ContextMenuSubContent>
-    <ContextMenuItem onClick={() => openWith("editor")}>Editor</ContextMenuItem>
-    <ContextMenuItem onClick={() => openWith("preview")}>Preview</ContextMenuItem>
-  </ContextMenuSubContent>
-</ContextMenuSub>
+"use client";
+
+import { useState } from "react";
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function Submenu() {
+  const [result, setResult] = useState("Not opened");
+  return (
+    <div className="grid gap-3">
+      <ContextMenu>
+        <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-6 py-4 text-sm">
+          Open a file
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="File actions">
+          <ContextMenuGroup>
+            <ContextMenuItem onClick={() => setResult("Default app")}>Default app</ContextMenuItem>
+            <ContextMenuSub>
+              <ContextMenuSubTrigger inset>Open with</ContextMenuSubTrigger>
+              <ContextMenuSubContent>
+                <ContextMenuGroup>
+                  {["Editor", "Preview"].map((app) => (
+                    <ContextMenuItem key={app} onClick={() => setResult(app)}>
+                      {app}
+                    </ContextMenuItem>
+                  ))}
+                </ContextMenuGroup>
+              </ContextMenuSubContent>
+            </ContextMenuSub>
+          </ContextMenuGroup>
+        </ContextMenuContent>
+      </ContextMenu>
+      <p role="status" className="text-sm">
+        {result}
+      </p>
+    </div>
+  );
+}
+```
+
+## Destructive and disabled items
+
+Default and destructive commands are directly present in one menu. Rename and Keep open use inset; Keep open opts out of dismissal. F2 and the delete hint are text only: the component does not bind those shortcuts. Disabled command, checkbox, radio and submenu parts can receive keyboard focus but cannot activate. The second target disables the entire root: neither right-click nor Shift+F10 opens its Cadence menu. aria-disabled announces that state on the focusable div. Delete records a local result; production deletion and any confirmation belong to the caller.
+
+<ComponentExample name="items" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuLabel, ContextMenuRadioGroup, ContextMenuRadioItem, ContextMenuSeparator, ContextMenuShortcut, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function ItemStates() {
+  const [result, setResult] = useState("No command yet");
+  return (
+    <div className="grid gap-3">
+      <ContextMenu>
+        <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-6 py-4 text-sm">
+          File commands
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="File actions">
+          <ContextMenuGroup>
+            <ContextMenuLabel inset>File</ContextMenuLabel>
+            <ContextMenuItem inset onClick={() => setResult("Renamed locally")}>
+              Rename<ContextMenuShortcut>F2</ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuItem inset closeOnClick={false} onClick={() => setResult("Still open")}>
+              Keep open
+            </ContextMenuItem>
+            <ContextMenuItem disabled onClick={() => setResult("Incorrectly activated")}>
+              Locked command
+            </ContextMenuItem>
+            <ContextMenuCheckboxItem disabled defaultChecked>
+              Locked visibility
+            </ContextMenuCheckboxItem>
+          </ContextMenuGroup>
+          <ContextMenuRadioGroup defaultValue="locked">
+            <ContextMenuRadioItem disabled value="locked">
+              Locked sort
+            </ContextMenuRadioItem>
+          </ContextMenuRadioGroup>
+          <ContextMenuGroup>
+            <ContextMenuSub>
+              <ContextMenuSubTrigger disabled>Unavailable app</ContextMenuSubTrigger>
+              <ContextMenuSubContent>
+                <ContextMenuGroup>
+                  <ContextMenuItem>Never opened</ContextMenuItem>
+                </ContextMenuGroup>
+              </ContextMenuSubContent>
+            </ContextMenuSub>
+          </ContextMenuGroup>
+          <ContextMenuSeparator />
+          <ContextMenuGroup>
+            <ContextMenuItem variant="destructive" onClick={() => setResult("Deleted locally")}>
+              Delete<ContextMenuShortcut>⌘⌫</ContextMenuShortcut>
+            </ContextMenuItem>
+          </ContextMenuGroup>
+        </ContextMenuContent>
+      </ContextMenu>
+      <ContextMenu disabled>
+        <ContextMenuTrigger
+          tabIndex={0}
+          aria-disabled="true"
+          className="rounded-md border border-dashed px-6 py-4 text-sm opacity-50"
+        >
+          Disabled target
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="File actions">
+          <ContextMenuGroup>
+            <ContextMenuItem>Unavailable</ContextMenuItem>
+          </ContextMenuGroup>
+        </ContextMenuContent>
+      </ContextMenu>
+      <p role="status" className="text-sm">
+        {result}
+      </p>
+    </div>
+  );
+}
+```
+
+## Controlled open
+
+The caller owns open and observes Base UI change reasons. Open at the target with a right-click or Shift+F10, then close through a caller-owned action or Escape. ContextMenu has no modal or triggerId prop in this installed API. Use its real target event to establish the cursor anchor; setting open=true from an unrelated button does not supply that point.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuTrigger } from "@/components/cadence/context-menu";
+
+export function ControlledMenu() {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("Not opened");
+  return (
+    <div className="grid gap-3">
+      <ContextMenu
+        open={open}
+        onOpenChange={(value, details) => {
+          setOpen(value);
+          setReason(details.reason);
+        }}
+      >
+        <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-6 py-4 text-sm">
+          Controlled target
+        </ContextMenuTrigger>
+        <ContextMenuContent aria-label="File actions">
+          <ContextMenuGroup>
+            <ContextMenuItem
+              closeOnClick={false}
+              onClick={() => {
+                setReason("Caller closed");
+                setOpen(false);
+              }}
+            >
+              Close from caller
+            </ContextMenuItem>
+          </ContextMenuGroup>
+        </ContextMenuContent>
+      </ContextMenu>
+      <p role="status" className="text-sm">
+        {open ? "Open" : "Closed"}: {reason}
+      </p>
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+Ordinary examples inherit the site header. This exception mounts the first menu in none from its first frame and overrides the second back to full. The OS reduced-motion preference still wins over full. Install the cadence-provider dependency to import CadenceProvider from its installed lib/provider path. Right-click each target to compare; neither changes the global mode.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { ContextMenu, ContextMenuCheckboxItem, ContextMenuContent, ContextMenuGroup, ContextMenuTrigger } from "@/components/cadence/context-menu";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MenuMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <ContextMenu>
+          <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-4 py-4 text-sm">
+            Open without motion
+          </ContextMenuTrigger>
+          <ContextMenuContent aria-label="File actions" data-testid="initial-none">
+            <ContextMenuGroup>
+              <ContextMenuCheckboxItem>Grid</ContextMenuCheckboxItem>
+            </ContextMenuGroup>
+          </ContextMenuContent>
+        </ContextMenu>
+        <CadenceProvider mode="full">
+          <ContextMenu>
+            <ContextMenuTrigger tabIndex={0} className="rounded-md border border-dashed px-4 py-4 text-sm">
+              Open nested full
+            </ContextMenuTrigger>
+            <ContextMenuContent aria-label="File actions" data-testid="nested-full">
+              <ContextMenuGroup>
+                <ContextMenuCheckboxItem>Grid</ContextMenuCheckboxItem>
+              </ContextMenuGroup>
+            </ContextMenuContent>
+          </ContextMenu>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -120,7 +512,11 @@ right-aligned hint; the component binds no keys.
 
 ### `ContextMenu`
 
-`open`, `defaultOpen`, `onOpenChange`, `modal` (default `true`).
+`open`, `defaultOpen`, `onOpenChange` and the remaining Base UI Context Menu root props.
+The installed API omits `modal` and `triggerId`; it retains the underlying modal menu behavior.
+Outside pointer interaction is blocked while open and desktop scrolling is locked.
+The Context Menu primitive contains Tab focus in its open panel. Use Escape or activate a
+command to dismiss it; do not assume the Tab dismissal behavior of Dropdown Menu.
 
 ### `ContextMenuTrigger`
 
@@ -131,7 +527,7 @@ long-press; it renders a `div` by default, so give it the box you want to be rig
 
 | Prop          | Type                                     | Default     | Description                                   |
 | ------------- | ---------------------------------------- | ----------- | --------------------------------------------- |
-| `side`        | `"top" \| "bottom" \| "left" \| "right"` | `"right"`   | Fallback side when the pointer is at an edge. |
+| `side`        | `"top" \| "bottom" \| "left" \| "right" \| "inline-start" \| "inline-end"` | `"right"`   | Requested side from the cursor; collisions may flip it. |
 | `align`       | `"start" \| "center" \| "end"`            | `"start"`   | Alignment along that side.                    |
 | `sideOffset`  | `number`                                 | `0`         | Gap from the pointer.                         |
 | `alignOffset` | `number`                                 | `4`         | Shift along the alignment axis.               |
@@ -166,8 +562,9 @@ scale from the pointer says so without moving the panel.
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
 geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The preview's **Popup motion** selector changes the local mode on the
-same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+first mounted frame. The site header changes inherited mode without remounting the target or clearing caller-owned
+selection. A real header press may dismiss an open menu through normal outside interaction;
+the explicit motion-scope example demonstrates local overrides. Base UI `className(state)` and `style(state)` callbacks are evaluated
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
 remain owned by the primitive.
 
@@ -181,6 +578,7 @@ remain owned by the primitive.
 | `Enter` / `Space`         | Runs the highlighted item.                                    |
 | `ArrowRight` / `ArrowLeft` | Opens or closes a submenu.                                   |
 | `Escape`                  | Closes the menu and returns focus to the trigger.             |
+| `Tab` / `Shift+Tab`        | Keeps focus in the open context menu; Escape dismisses it.     |
 
 ## Accessibility
 
@@ -190,18 +588,22 @@ remain owned by the primitive.
   `menuitemradio`, so "right-click for options" is announced as a menu, not as a tooltip.
 - On touch, Base UI opens the menu on a long press and cancels it if the finger moves —
   which is why the same actions must also be reachable from a visible control.
-- Focus returns to the trigger on close, so a keyboard user does not lose their place.
+- Escape restores focus to the target. The installed Context Menu uses a modal focus manager
+  internally, so Tab and Shift+Tab remain within the open menu. Unlike Dropdown Menu, it
+  does not expose a modal prop. Keep Escape and visible command paths available.
 
 ## Responsive behavior
 
 The panel flips to the side with room and shifts along the cross axis to stay inside the
 viewport, so a right-click near the bottom-right corner opens up and to the left. On a
-narrow screen it caps at `--available-height` and scrolls rather than overflowing.
+narrow screen it caps its height at `--available-height` and scrolls. The caller must
+contain unusually wide content; the RTL example caps width at `--available-width`.
 
 ## Performance
 
-- One portal while open, one CSS transition on `opacity` and `scale`, no per-frame work.
-- The trigger adds one listener, not one per item: Base UI handles the event at the root.
+- One portal per open panel, including an additional portal for a submenu. CSS transitions
+  animate `opacity` and `scale`; placement and interaction remain owned by Base UI.
+- Base UI owns target and item event handling; the example adds no per-frame positioning loop.
 - Budget: T2 (10 KB gzip). The item and submenu parts share their classes with
   `dropdown-menu` but not its file, so the two install independently.
 

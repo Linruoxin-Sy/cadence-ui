@@ -11,6 +11,17 @@ import {
 } from "../../registry/cadence/alert-dialog";
 import { Button } from "../../registry/cadence/button";
 import {
+  ContextMenu,
+  ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "../../registry/cadence/context-menu";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -176,6 +187,25 @@ function PopupMotionFixture({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+          )}
+          {component === "context-menu" && (
+            <ContextMenu>
+              <ContextMenuTrigger tabIndex={0}>Context target</ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuGroup>
+                  <ContextMenuCheckboxItem defaultChecked>Comments</ContextMenuCheckboxItem>
+                  <ContextMenuSub>
+                    <ContextMenuSubTrigger>Move to</ContextMenuSubTrigger>
+                    <ContextMenuSubContent>
+                      <ContextMenuGroup>
+                        <ContextMenuItem>Backlog</ContextMenuItem>
+                      </ContextMenuGroup>
+                    </ContextMenuSubContent>
+                  </ContextMenuSub>
+                  <ContextMenuItem>Done</ContextMenuItem>
+                </ContextMenuGroup>
+              </ContextMenuContent>
+            </ContextMenu>
           )}
           {component === "hover-card" && (
             <HoverCard>

@@ -5,9 +5,17 @@ import { effectiveMode, MODES } from "./helpers";
 import { expectMenuAccessibility } from "./menu-accessibility";
 
 const catalog: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
-const ids = ["dialog", "alert-dialog", "popover", "tooltip", "hover-card", "sheet", "drawer", "dropdown-menu"].filter(
-  (id) => catalog[id],
-);
+const ids = [
+  "dialog",
+  "alert-dialog",
+  "popover",
+  "tooltip",
+  "hover-card",
+  "sheet",
+  "drawer",
+  "dropdown-menu",
+  "context-menu",
+].filter((id) => catalog[id]);
 const card = (page: Page, id: string, name: string) => page.locator(`[data-component-example="${id}/${name}"]`);
 const popup = (page: Page, id: string) =>
   page.locator(`[data-slot="${id === "drawer" ? "drawer-popup" : `${id}-content`}"]`);
@@ -37,10 +45,10 @@ for (const id of ids) {
           const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
           const openers = (await triggers.count()) ? triggers : specimen.getByRole("button").first();
           for (const opener of await openers.all()) {
-            if (await opener.isDisabled()) continue;
+            if ((await opener.isDisabled()) || (await opener.getAttribute("aria-disabled")) === "true") continue;
             await opener.scrollIntoViewIfNeeded();
             if (id === "tooltip" || id === "hover-card") await opener.focus();
-            else await opener.click();
+            else await opener.click(id === "context-menu" ? { button: "right" } : {});
             const surface = popup(page, id);
             await expect(surface).toBeVisible();
             await expect(surface).toHaveAttribute("data-motion", effectiveMode(mode, os));
@@ -48,7 +56,8 @@ for (const id of ids) {
             const reference = await (id === "tooltip" ? opener : surface).getAttribute(
               id === "tooltip" ? "aria-describedby" : "aria-labelledby",
             );
-            if (id !== "hover-card") expect(reference).toBeTruthy();
+            if (id === "context-menu") await expect(surface).toHaveAccessibleName("File actions");
+            else if (id !== "hover-card") expect(reference).toBeTruthy();
             expect(
               await page.evaluate(
                 (value) =>
@@ -106,7 +115,7 @@ for (const id of ids) {
       const scopes = card(page, id, "without-motion");
       const none = scopes.getByText("Open without motion", { exact: true });
       if (id === "tooltip" || id === "hover-card") await none.focus();
-      else await none.click();
+      else await none.click(id === "context-menu" ? { button: "right" } : {});
       await expect(page.getByTestId("initial-none")).toBeVisible();
       await page.waitForTimeout(180);
       const frames = await page.evaluate(() => {
@@ -138,7 +147,7 @@ for (const id of ids) {
       });
       if (id === "hover-card") await full.hover();
       else if (id === "tooltip") await full.focus();
-      else await full.click();
+      else await full.click(id === "context-menu" ? { button: "right" } : {});
       const surface = page.getByTestId("nested-full");
       await expect(surface).toHaveAttribute("data-motion", effectiveMode("full", os));
       await expect
@@ -155,11 +164,13 @@ for (const id of ids) {
     });
 
   const visualNames = (catalog[id] ?? []).filter((name) => name !== "without-motion");
-  const visualCases = id === "dropdown-menu" ? visualNames.map((name) => [name]) : [visualNames];
+  const visualCases = ["dropdown-menu", "context-menu"].includes(id)
+    ? visualNames.map((name) => [name])
+    : [visualNames];
   for (const names of visualCases)
     for (const theme of ["light", "dark"])
       for (const width of [1280, 390])
-        test(`${id} body popup visual and accessible ${theme}/${width}${id === "dropdown-menu" ? ` ${names[0]}` : ""}`, async ({
+        test(`${id} body popup visual and accessible ${theme}/${width}${["dropdown-menu", "context-menu"].includes(id) ? ` ${names[0]}` : ""}`, async ({
           page,
         }) => {
           await page.setViewportSize({ width, height: 900 });
@@ -175,25 +186,26 @@ for (const id of ids) {
               ? specimen.locator(`[data-slot="${id}-trigger"]:not([disabled])`).first()
               : specimen.getByRole("button").first();
             if (id === "tooltip" || id === "hover-card") await trigger.focus();
-            else await trigger.click();
+            else await trigger.click(id === "context-menu" ? { button: "right" } : {});
             const surface = popup(page, id);
             await expect(surface).toBeVisible();
             const reopenMenu = async (child = false) => {
-              if (await page.locator('[data-slot="dropdown-menu-sub-content"]').count())
-                await page.keyboard.press("Escape");
+              if (await page.locator(`[data-slot="${id}-sub-content"]`).count()) await page.keyboard.press("Escape");
               if (await surface.count()) {
                 await page.keyboard.press("Escape");
                 await expect(surface).toHaveCount(0);
               }
-              await trigger.click();
+              await trigger.click(id === "context-menu" ? { button: "right" } : {});
               await expect(surface).toBeVisible();
               if (child) {
-                await surface.getByRole("menuitem", { name: "Move to", exact: true }).focus();
+                await surface
+                  .getByRole("menuitem", { name: id === "context-menu" ? "Open with" : "Move to", exact: true })
+                  .focus();
                 await page.keyboard.press("ArrowRight");
-                await expect(page.locator('[data-slot="dropdown-menu-sub-content"]')).toBeVisible();
+                await expect(page.locator(`[data-slot="${id}-sub-content"]`)).toBeVisible();
               }
             };
-            if (id === "dropdown-menu") await expectMenuAccessibility(page, () => reopenMenu());
+            if (["dropdown-menu", "context-menu"].includes(id)) await expectMenuAccessibility(page, () => reopenMenu());
             else
               expect(
                 (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
@@ -203,14 +215,18 @@ for (const id of ids) {
             expect(box.x).toBeGreaterThanOrEqual(0);
             expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
             await page.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}-open.png` });
-            if (id === "dropdown-menu" && name === "submenus") {
-              await surface.getByRole("menuitem", { name: "Move to", exact: true }).focus();
+            if (["dropdown-menu", "context-menu"].includes(id) && name === "submenus") {
+              await surface
+                .getByRole("menuitem", { name: id === "context-menu" ? "Open with" : "Move to", exact: true })
+                .focus();
               await page.keyboard.press("ArrowRight");
-              await expect(page.locator('[data-slot="dropdown-menu-sub-content"]')).toBeVisible();
+              await expect(page.locator(`[data-slot="${id}-sub-content"]`)).toBeVisible();
               await expectMenuAccessibility(page, () => reopenMenu(true));
               await page.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}-submenu-open.png` });
               await page.keyboard.press("ArrowLeft");
-              await expect(surface.getByRole("menuitem", { name: "Move to", exact: true })).toBeFocused();
+              await expect(
+                surface.getByRole("menuitem", { name: id === "context-menu" ? "Open with" : "Move to", exact: true }),
+              ).toBeFocused();
             }
 
             await dismiss(page, id);
