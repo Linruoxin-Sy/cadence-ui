@@ -66,6 +66,8 @@ const docPath = path.join(root, "content", "components", `${id}.mdx`);
 const previewPath = path.join(root, "components", "site", "previews", `${id}.tsx`);
 const testPath = path.join(root, "tests", "components", `${id}.test.tsx`);
 const previewIndexPath = path.join(root, "components", "site", "previews", "index.tsx");
+const exampleCatalogPath = path.join(root, "components", "site", "previews", "examples.json");
+const exampleCatalog = JSON.parse(await readFile(exampleCatalogPath, "utf8"));
 const registryPath = path.join(root, "registry.json");
 
 const exists = async (file) => {
@@ -142,6 +144,20 @@ export function Example() {
 }
 \`\`\`
 
+## Composition
+
+TODO: explain this composition and when it is useful. Keep the top card focused on common usage.
+
+<ComponentExample name="composition" />
+
+\`\`\`tsx
+import { ${pascal} } from "@/components/cadence/${id}";
+
+export function CompositionExample() {
+  return <${pascal}>Hello</${pascal}>;
+}
+\`\`\`
+
 ## When to use
 
 - TODO: three to five concrete scenarios.
@@ -193,14 +209,22 @@ and source budget. T0 has no authored animation/interpolation; this does not mea
 - TODO: when to pick this component and which mistake to avoid.
 `;
 
-const templateProblems = validateDocTemplate(matter(docs).content, { name: id, meta: { tier }, input }, docPath);
+exampleCatalog[id] = ["composition"];
+const templateProblems = validateDocTemplate(
+  matter(docs).content,
+  { name: id, meta: { tier }, input },
+  docPath,
+  exampleCatalog,
+);
 if (templateProblems.length) fail(templateProblems.join("\n"));
 
 const preview = `"use client";
 
 import { ${pascal} } from "@/registry/cadence/${id}";
 
-export function ${pascal}Preview() {
+export function ${pascal}Preview({ example }: { example?: string }) {
+  // TODO: give each named example its fixed, source-backed composition.
+  if (example === "composition") return <${pascal}>Hello</${pascal}>;
   return (
     <${pascal}>
       TODO: show the component's main shape.
@@ -252,6 +276,7 @@ const previewKey = /^[a-z][a-zA-Z0-9]*$/.test(id) ? id : JSON.stringify(id);
 const previewEntry = `  ${previewKey}: dynamic(() => import("./${id}").then((mod) => ({ default: mod.${pascal}Preview }))),`;
 const updatedIndex = indexSource.replace(/\n\};/, `\n${previewEntry}\n};`);
 await writeFile(previewIndexPath, updatedIndex);
+await writeFile(exampleCatalogPath, `${JSON.stringify(exampleCatalog, null, 2)}\n`);
 
 const registry = JSON.parse(await readFile(registryPath, "utf8"));
 registry.items.push({

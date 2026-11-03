@@ -197,6 +197,21 @@ keep the explanation and runnable code in the distributed body.
 
 #### Shared site capabilities
 
+Author body specimens as a standalone `<ComponentExample name="example-id" />` in their named
+section. Register the page's complete set in `components/site/previews/examples.json`; its existing
+per-page preview module accepts an optional `example` prop and renders the fixed named specimen.
+The document binds the component id, so references cannot select another page or an arbitrary module.
+The shared frame keeps the original top-level `data-preview` marker separate from body
+`data-component-example="component/example-id"` markers, and opts specimens out of prose typography.
+The explanation and runnable code stay beside the reference in MDX, including in distributed docs.
+
+During migration, registration opts the entire page into the example-card gate. `registry:build` and
+`registry:check` reject unknown/malformed references, missing or duplicate registered specimens,
+examples outside the example region, and named sections without a card, explanation or TSX code
+with imports. Unregistered legacy pages retain the existing section gate until migrated; passing
+that gate does not certify the new preview contract. Code/example equivalence and the distinction
+between real interactions and configuration controls still require source and browser review.
+
 | Capability             | Implementation                                                                                                                                                                             | Value                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | Named example previews | Fixed specimens in the top card and flat example sections after Usage; section anchors identify examples                                                                                   | Differences are visible and explained without configuring a playground                    |

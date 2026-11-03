@@ -1,8 +1,10 @@
 import { compileMDX } from "next-mdx-remote/rsc";
 import type { ComponentProps } from "react";
 import remarkGfm from "remark-gfm";
+import { assertComponentExample } from "@/lib/component-examples";
 import type { TocEntry } from "@/registry/cadence/toc";
 import { MdxCodeFence } from "./code-fence";
+import { PreviewFrame } from "./preview";
 
 /**
  * Renders the markdown body of a component or guide.
@@ -60,12 +62,22 @@ export function headingPlugin(headings: TocEntry[]) {
   };
 }
 
-export async function compileDocument(source: string) {
+function DocumentExample(componentId: string | undefined, { name }: { name: string }) {
+  assertComponentExample(componentId, name);
+  return (
+    <div data-not-typeset className="my-6">
+      <PreviewFrame id={componentId} example={name} />
+    </div>
+  );
+}
+
+export async function compileDocument(source: string, componentId?: string) {
   const headings: TocEntry[] = [];
   const { content } = await compileMDX({
     source,
     options: { mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [headingPlugin(headings)] } },
     components: {
+      ComponentExample: DocumentExample.bind(null, componentId),
       table: ({ children, ...props }: ComponentProps<"table">) => (
         <div className="overflow-x-auto">
           {/* biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard scroll target for wide documentation tables. */}

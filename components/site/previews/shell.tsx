@@ -8,10 +8,10 @@ import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 /**
  * Layout shell shared by every component preview.
  *
- * A preview is a specimen, not a lesson: it shows the component's own range —
- * variants, sizes, states, the compositions that change its shape — and nothing
- * else. There are no group captions, because a caption is a second thing to read
- * before the thing you came for, and the components already name themselves.
+ * The top specimen shows a compact range or the component's common usage.
+ * Named body specimens demonstrate one section's state, variant or feature.
+ * Configuration toolbars do not belong in the top specimen; explanations and
+ * example headings live in MDX outside the cards. Component interactions stay usable.
  *
  * The frame does the centring (`PreviewFrame` places this stack in the middle of a
  * card with a minimum height), so a preview only decides its rows. `PreviewRow`

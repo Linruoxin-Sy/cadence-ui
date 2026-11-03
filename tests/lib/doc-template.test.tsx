@@ -159,6 +159,10 @@ describe("real new-item entry", () => {
       const file = path.join(temp, "content/components/fixture.mdx");
       const doc = readFileSync(file, "utf8");
       expect(doc).toContain("## Validation and data ownership");
+      expect(doc).toContain('<ComponentExample name="composition" />');
+      expect(
+        JSON.parse(readFileSync(path.join(temp, "components/site/previews/examples.json"), "utf8")).fixture,
+      ).toEqual(["composition"]);
       writeFileSync(file, without(doc, "Responsiveness and performance"));
       const rejected = run();
       expect(rejected.status).toBe(1);
@@ -169,11 +173,18 @@ describe("real new-item entry", () => {
   });
 });
 
+function ExampleFixture() {
+  return <div data-example-fixture />;
+}
+
 it("renders representative real MDX bodies with the site compiler and GFM", async () => {
   for (const name of ["card", "input", "resizable", "button", "dialog", "data-table", "attachment"]) {
     const source = readFileSync(`content/components/${name}.mdx`, "utf8");
     const result = await compileMDX({
       source,
+      // Actual specimen rendering is covered through the production route; this
+      // isolated Markdown structure check supplies the site's custom MDX name.
+      components: { ComponentExample: ExampleFixture },
       options: { parseFrontmatter: true, mdxOptions: { remarkPlugins: [remarkGfm] } },
     });
     const html = renderToStaticMarkup(result.content);

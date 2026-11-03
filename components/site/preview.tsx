@@ -1,15 +1,23 @@
 "use client";
 
+import { assertComponentExample } from "@/lib/component-examples";
+import { cn } from "@/registry/cadence/lib/cn";
 import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 import { MeasuredHeight } from "./measured-height";
 import { previews } from "./previews";
 
-export function Preview({ id }: { id: string }) {
+export interface PreviewProps {
+  id: string;
+  example?: string;
+}
+
+export function Preview({ id, example }: PreviewProps) {
+  if (example !== undefined) assertComponentExample(id, example);
   const Component = previews[id];
   if (!Component) {
     return <p className="text-sm text-muted-foreground">Preview coming soon.</p>;
   }
-  return <Component />;
+  return <Component example={example} />;
 }
 
 /**
@@ -26,11 +34,16 @@ export function Preview({ id }: { id: string }) {
  * provider that re-derived the mode from the media query was a second place for
  * the answer to disagree, and it did.
  */
-export function PreviewFrame({ id }: { id: string }) {
+export function PreviewFrame({ id, example }: PreviewProps) {
   const resolved = useCadenceMotion().mode;
 
   return (
-    <div data-preview={id} data-preview-motion={resolved} className="rounded-xl border border-border bg-background">
+    <div
+      data-preview={example === undefined ? id : undefined}
+      data-component-example={example === undefined ? undefined : `${id}/${example}`}
+      data-preview-motion={resolved}
+      className="rounded-xl border border-border bg-background"
+    >
       {/* The body owns its height so the card around the preview is the size of
           what is inside it, measured on every change and applied at once: the
           preview's own motion is the motion, and a second tween on top of it
@@ -47,10 +60,10 @@ export function PreviewFrame({ id }: { id: string }) {
           catalogue does not feel like a column of ragged boxes. `place-items-center`
           centres the specimen on both axes — the previews themselves are laid out to
           sit in the middle rather than to fill the card. */}
-      <MeasuredHeight className="grid min-h-80 place-items-center p-6">
+      <MeasuredHeight className={cn("grid place-items-center p-6", example === undefined ? "min-h-80" : "min-h-40")}>
         {/* Let the route await the SSR preview. A local streaming fallback leaves
             the actual specimen in a hidden segment when JavaScript is disabled. */}
-        <Preview id={id} />
+        <Preview id={id} example={example} />
       </MeasuredHeight>
     </div>
   );

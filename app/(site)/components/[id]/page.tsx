@@ -38,7 +38,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
   const previous = components[index - 1];
   const next = components[index + 1];
   const files = await getComponentSource(id);
-  const { headings, content } = await compileDocument(doc.body);
+  const { headings, content } = await compileDocument(doc.body, id);
 
   return (
     <div className="mx-auto w-full max-w-3xl xl:grid xl:max-w-none xl:grid-cols-[minmax(0,1fr)_14rem] xl:gap-8">

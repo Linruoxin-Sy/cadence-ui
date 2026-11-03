@@ -24,7 +24,7 @@ export const INPUT_DOCS = new Set([
   "attachment",
 ]);
 
-export function validateDocTemplate(body, item, label) {
+export function validateDocTemplate(body, item, label, exampleCatalog = {}) {
   const problems = [];
   const fail = (message) => problems.push(`${label}: ${message}`);
   const lines = visibleLines(body);
@@ -45,6 +45,27 @@ export function validateDocTemplate(body, item, label) {
     return match ? [{ depth: match[1].length, title: match[2], index }] : [];
   });
   const sections = headings.filter((heading) => heading.depth === 2);
+  const registered = Object.hasOwn(exampleCatalog, item.name) ? exampleCatalog[item.name] : undefined;
+  const references = [];
+  for (const [index, line] of lines.entries()) {
+    if (!/<\/?ComponentExample\b/.test(line)) continue;
+    const match = line.match(/^\s*<ComponentExample name="([a-z][a-z0-9-]*)"\s*\/>\s*$/);
+    if (!match) {
+      fail(`line ${index + 1}: use a standalone <ComponentExample name="example-id" /> reference`);
+      continue;
+    }
+    references.push({ name: match[1], index });
+    if (!registered?.includes(match[1])) fail(`unknown component example ${item.name}/${match[1]}`);
+    const owner = sections.findLast((section) => section.index < index);
+    const usage = sections.find((section) => section.title === "Usage")?.index ?? -1;
+    const rationale = sections.find((section) => section.title === "When to use")?.index ?? -1;
+    if (!owner || owner.index <= usage || owner.index >= rationale)
+      fail(`line ${index + 1}: component examples belong in named sections after Usage and before When to use`);
+  }
+  for (const name of registered ?? []) {
+    const count = references.filter((reference) => reference.name === name).length;
+    if (count !== 1) fail(`expected one reference to component example ${item.name}/${name}, found ${count}`);
+  }
   if (sections[0]?.title !== "Installation" || sections[1]?.title !== "Usage") {
     fail("body must open with ## Installation then ## Usage");
   }
@@ -114,6 +135,21 @@ export function validateDocTemplate(body, item, label) {
       fail(`## ${title} is out of template order (examples belong after Usage and before When to use)`);
     previous = Math.max(previous, order);
     const next = sections.find((entry) => entry.index > section.index)?.index ?? lines.length;
+    // Only opted-in pages are gated during migration. Registering a page opts in
+    // every named example, rather than allowing one token card to certify the body.
+    if (registered && order === 2 && title !== "Validation and data ownership") {
+      const prose = lines.slice(section.index + 1, next);
+      const specimen = references.some((reference) => reference.index > section.index && reference.index < next);
+      if (!specimen) fail(`## ${title} needs a ComponentExample preview card`);
+      if (!prose.some((line) => line.trim() && !/^\s*(?:<ComponentExample|\|)/.test(line)))
+        fail(`## ${title} needs an explanation outside its preview and code`);
+      const raw = body
+        .split(/\r?\n/)
+        .slice(section.index + 1, next)
+        .join("\n");
+      if (!/^```tsx\s*\n(?:(?!^```)[\s\S])*?\bimport\s[\s\S]*?^```\s*$/m.test(raw))
+        fail(`## ${title} needs runnable tsx example code with imports`);
+    }
     if (
       !lines.slice(section.index + 1, next).some((line) => line.trim()) &&
       !body
@@ -129,12 +165,28 @@ export function validateDocTemplate(body, item, label) {
 
 export async function checkDocTemplates(root, registry) {
   const problems = [];
+  const exampleCatalog = JSON.parse(await readFile(path.join(root, "components/site/previews/examples.json"), "utf8"));
+  const components = new Set(
+    registry.items.filter((item) => ["registry:ui", "registry:block"].includes(item.type)).map((item) => item.name),
+  );
+  for (const [id, examples] of Object.entries(exampleCatalog)) {
+    if (!components.has(id)) problems.push(`examples.json: unknown component ${id}`);
+    if (
+      !Array.isArray(examples) ||
+      !examples.length ||
+      examples.some((name) => typeof name !== "string" || !/^[a-z][a-z0-9-]*$/.test(name)) ||
+      new Set(examples).size !== examples.length
+    ) {
+      problems.push(`examples.json: ${id} needs a nonempty list of unique example ids`);
+      return problems;
+    }
+  }
   for (const item of registry.items) {
     if (!["registry:ui", "registry:block"].includes(item.type)) continue;
     const label = `content/components/${item.name}.mdx`;
     try {
       const { content } = matter(await readFile(path.join(root, label), "utf8"));
-      problems.push(...validateDocTemplate(content, item, label));
+      problems.push(...validateDocTemplate(content, item, label, exampleCatalog));
     } catch (error) {
       problems.push(`${label}: cannot read component docs: ${error.message}`);
     }

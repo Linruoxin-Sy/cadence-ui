@@ -11,7 +11,7 @@ import type { ComponentType } from "react";
  * static one, so a component page downloads its own preview (and the component it renders)
  * instead of every preview and the whole library in the initial client bundle.
  */
-export const previews: Record<string, ComponentType> = {
+export const previews: Record<string, ComponentType<{ example?: string }>> = {
   button: dynamic(() => import("./button").then((mod) => ({ default: mod.ButtonPreview }))),
   badge: dynamic(() => import("./badge").then((mod) => ({ default: mod.BadgePreview }))),
   kbd: dynamic(() => import("./kbd").then((mod) => ({ default: mod.KbdPreview }))),
