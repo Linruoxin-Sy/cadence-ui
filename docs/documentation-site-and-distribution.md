@@ -247,6 +247,9 @@ keeps that height explicit — written in the frame the content changed, from a 
 rather than on the wrapper — so the card around a preview is always the size of its example and never lags
 behind it.
 
+A hash targeting content inside `DocumentEntrance` also triggers its entrance. A cold deep link
+must not leave a long document behind its initial clip while waiting for an intersection delivery.
+
 It does not tween, and that is a correction rather than a simplification. The first version animated the
 measurement with `geometry.resize`, and the trace showed why that could not work: the content it watches is
 itself animated (the code block folds on the same recipe), so the target changed on every delivery — about 95

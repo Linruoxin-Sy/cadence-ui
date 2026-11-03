@@ -81,7 +81,27 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
   const cm = useCadenceMotion();
   const ref = useRef<HTMLElement>(null);
   const [settled, setSettled] = useState(false);
+  const [anchored, setAnchored] = useState(false);
   const inView = useInView(ref, { once: true, amount: "some" });
+
+  useEffect(() => {
+    // A cold hash can scroll past the article's zero-height initial clip before
+    // IntersectionObserver sees it. An explicit destination inside this document
+    // is also an entrance trigger, otherwise the clipped body can stay hidden.
+    const readAnchor = () => {
+      let id: string;
+      try {
+        id = decodeURIComponent(window.location.hash.slice(1));
+      } catch {
+        return;
+      }
+      const target = id ? document.getElementById(id) : null;
+      if (target && ref.current?.contains(target)) setAnchored(true);
+    };
+    readAnchor();
+    window.addEventListener("hashchange", readAnchor);
+    return () => window.removeEventListener("hashchange", readAnchor);
+  }, []);
 
   /**
    * `reduced` names the neutral values instead of omitting them. The element may
@@ -116,7 +136,7 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
       }
     : { ...entrance, clipPath: clip };
 
-  const show = settled || cm.disabled || inView;
+  const show = settled || cm.disabled || inView || anchored;
   const instant = cm.disabled || cm.timeScale === 0;
   const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
   useCommittedEffect(() => {

@@ -2,6 +2,7 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { DocumentEntrance } from "@/components/site/document-entrance";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { controlSamples } from "../motion-observer";
 
 describe("DocumentEntrance server state", () => {
   for (const as of ["article", "section", "div"] as const) {
@@ -21,4 +22,50 @@ describe("DocumentEntrance server state", () => {
       expect(host?.style.clipPath).toBe(mode === "full" ? "inset(0% 0% 100% 0%)" : "none");
     });
   }
+});
+
+import { act, render } from "@testing-library/react";
+
+describe("DocumentEntrance hash destinations without an intersection delivery", () => {
+  it.each(["full", "reduced", "none"] as const)("reveals a cold deep link in %s", (mode) => {
+    window.history.replaceState(null, "", "#entrance-target");
+    try {
+      render(
+        <CadenceProvider mode={mode}>
+          <DocumentEntrance as="article">
+            <h2 id="entrance-target">Example</h2>
+          </DocumentEntrance>
+        </CadenceProvider>,
+      );
+      const targets = [...controlSamples.values()].map((sample) => sample.target);
+      expect(targets.some((target) => target.opacity === 1 && target.clipPath !== "inset(0% 0% 100% 0%)")).toBe(true);
+    } finally {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  });
+
+  it("ignores unrelated and malformed hashes, then responds to an in-document destination", () => {
+    window.history.replaceState(null, "", "#outside");
+    try {
+      render(
+        <DocumentEntrance as="article">
+          <h2 id="entrance-target">Example</h2>
+        </DocumentEntrance>,
+      );
+      const opacity = () => [...controlSamples.values()].at(-1)?.target.opacity;
+      expect(opacity()).toBe(0);
+      act(() => {
+        window.history.replaceState(null, "", "#%bad");
+        window.dispatchEvent(new HashChangeEvent("hashchange"));
+      });
+      expect(opacity()).toBe(0);
+      act(() => {
+        window.history.replaceState(null, "", "#entrance-target");
+        window.dispatchEvent(new HashChangeEvent("hashchange"));
+      });
+      expect(opacity()).toBe(1);
+    } finally {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  });
 });
