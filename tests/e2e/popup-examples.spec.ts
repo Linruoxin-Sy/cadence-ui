@@ -15,6 +15,7 @@ const ids = [
   "drawer",
   "dropdown-menu",
   "context-menu",
+  "menubar",
 ].filter((id) => catalog[id]);
 const card = (page: Page, id: string, name: string) => page.locator(`[data-component-example="${id}/${name}"]`);
 const popup = (page: Page, id: string) =>
@@ -164,13 +165,13 @@ for (const id of ids) {
     });
 
   const visualNames = (catalog[id] ?? []).filter((name) => name !== "without-motion");
-  const visualCases = ["dropdown-menu", "context-menu"].includes(id)
+  const visualCases = ["dropdown-menu", "context-menu", "menubar"].includes(id)
     ? visualNames.map((name) => [name])
     : [visualNames];
   for (const names of visualCases)
     for (const theme of ["light", "dark"])
       for (const width of [1280, 390])
-        test(`${id} body popup visual and accessible ${theme}/${width}${["dropdown-menu", "context-menu"].includes(id) ? ` ${names[0]}` : ""}`, async ({
+        test(`${id} body popup visual and accessible ${theme}/${width}${["dropdown-menu", "context-menu", "menubar"].includes(id) ? ` ${names[0]}` : ""}`, async ({
           page,
         }) => {
           await page.setViewportSize({ width, height: 900 });
@@ -183,7 +184,7 @@ for (const id of ids) {
             await specimen.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}.png` });
             const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
             const trigger = (await triggers.count())
-              ? specimen.locator(`[data-slot="${id}-trigger"]:not([disabled])`).first()
+              ? specimen.locator(`[data-slot="${id}-trigger"]:not([disabled]):not([aria-disabled="true"])`).first()
               : specimen.getByRole("button").first();
             if (id === "tooltip" || id === "hover-card") await trigger.focus();
             else await trigger.click(id === "context-menu" ? { button: "right" } : {});
@@ -205,7 +206,8 @@ for (const id of ids) {
                 await expect(page.locator(`[data-slot="${id}-sub-content"]`)).toBeVisible();
               }
             };
-            if (["dropdown-menu", "context-menu"].includes(id)) await expectMenuAccessibility(page, () => reopenMenu());
+            if (["dropdown-menu", "context-menu", "menubar"].includes(id))
+              await expectMenuAccessibility(page, () => reopenMenu());
             else
               expect(
                 (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
@@ -215,7 +217,7 @@ for (const id of ids) {
             expect(box.x).toBeGreaterThanOrEqual(0);
             expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
             await page.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}-open.png` });
-            if (["dropdown-menu", "context-menu"].includes(id) && name === "submenus") {
+            if (["dropdown-menu", "context-menu", "menubar"].includes(id) && name === "submenus") {
               await surface
                 .getByRole("menuitem", { name: id === "context-menu" ? "Open with" : "Move to", exact: true })
                 .focus();

@@ -124,7 +124,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await close(page, id);
           const exit = await samples(page, 40);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
-          if (["dropdown-menu", "context-menu"].includes(id)) await openPopupMotionFixture(page, id, requested);
+          if (["dropdown-menu", "context-menu", "menubar"].includes(id))
+            await openPopupMotionFixture(page, id, requested);
           await mode(page, "full");
           await start(page, id);
           await open(page, id);
@@ -160,7 +161,7 @@ for (const colorScheme of ["light", "dark"] as const)
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
           await open(page, id);
-          if (id === "context-menu")
+          if (id === "context-menu" || id === "menubar")
             await expectMenuAccessibility(page, async () => {
               await page.keyboard.press("Escape");
               await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
@@ -184,7 +185,7 @@ test.describe("B5 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu"].includes(id)) await openPopupMotionFixture(page, id, "none", 4);
+      if (["dropdown-menu", "context-menu", "menubar"].includes(id)) await openPopupMotionFixture(page, id, "none", 4);
       else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
@@ -229,13 +230,13 @@ test.describe("B5 active transition interruption", () => {
         ),
       ).toBe(true);
       expect(await popup.evaluate((n) => n === (window as unknown as { saved: Element }).saved)).toBe(true);
-      if (id === "dropdown-menu") {
+      if (id === "dropdown-menu" || id === "menubar") {
         await mode(page, "full");
         await page.keyboard.press("Escape");
         await expect(popup).toHaveAttribute("data-ending-style", "");
-        await page
-          .locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`)
-          .evaluate((node) => (node as HTMLElement).click());
+        const trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`);
+        if (id === "menubar") await trigger.press("ArrowDown");
+        else await trigger.evaluate((node) => (node as HTMLElement).click());
         await expect(popup).not.toHaveAttribute("data-ending-style", "");
         expect(await popup.evaluate((node) => node === (window as unknown as { saved: Element }).saved)).toBe(true);
         await mode(page, "none");
@@ -264,8 +265,13 @@ test("menus keyboard, typeahead, submenus, roving focus and disabled triggers", 
     await expect(trigger).toBeFocused();
     if (id === "menubar") {
       await trigger.press("ArrowRight");
-      await expect(page.getByRole("menuitem", { name: "Edit", exact: true })).toBeFocused();
+      await expect(
+        page.locator('[data-preview="menubar"]').getByRole("menuitem", { name: "Edit", exact: true }),
+      ).toBeFocused();
       await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("Escape");
+      await expect(popup).toHaveCount(0);
+      await page.locator('[data-component-example="menubar/submenus"] [data-slot="menubar-trigger"]').click();
     } else await open(page, id);
     const sub = page.locator(`[data-slot="${id}-sub-trigger"]`).first();
     await sub.focus();
@@ -504,7 +510,7 @@ test.describe("B5 native reversal", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command"] as const)
     test(`${id} reopens during exit on the same surface`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu"].includes(id)) await openPopupMotionFixture(page, id, "full", 4);
+      if (["dropdown-menu", "context-menu", "menubar"].includes(id)) await openPopupMotionFixture(page, id, "full", 4);
       else await page.goto(`/components/${id}?motion=full&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await open(page, id);

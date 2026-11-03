@@ -79,9 +79,13 @@ for (const id of ["dropdown-menu", "context-menu", "menubar"])
         await page.emulateMedia({ reducedMotion: os });
         await page.goto(`/components/${id}?motion=${mode}&speed=0.25`);
         await page.waitForLoadState("networkidle");
-        const trigger = page
-          .locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`)
-          .nth(id === "menubar" ? 1 : 0);
+        let trigger = page
+          .locator(
+            id === "menubar"
+              ? '[data-component-example="menubar/submenus"] [data-slot="menubar-trigger"]'
+              : `[data-preview="${id}"] [data-slot="${id}-trigger"]`,
+          )
+          .first();
         await trigger.click(id === "context-menu" ? { button: "right" } : {});
         const sub = page.locator(`[data-slot="${id}-sub-trigger"]`).first();
         await sub.focus();
@@ -135,8 +139,9 @@ for (const id of ["dropdown-menu", "context-menu", "menubar"])
         if (actual === "none") expect(frames.every((f) => f.opacity === 1 && f.animations.length === 0)).toBe(true);
         else expect(frames.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
         if (actual !== "full") expect(frames.every((f) => f.scale === "none")).toBe(true);
-        if (["dropdown-menu", "context-menu"].includes(id)) {
+        if (["dropdown-menu", "context-menu", "menubar"].includes(id)) {
           await openPopupMotionFixture(page, id, mode, 4);
+          trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`).first();
           await trigger.click(id === "context-menu" ? { button: "right" } : {});
           await sub.focus();
           await page.keyboard.press("ArrowRight");
@@ -144,7 +149,7 @@ for (const id of ["dropdown-menu", "context-menu", "menubar"])
         }
         const saved = await popup.elementHandle();
         await page
-          .getByLabel(["dropdown-menu", "context-menu"].includes(id) ? "Fixture motion" : "Popup motion", {
+          .getByLabel(["dropdown-menu", "context-menu", "menubar"].includes(id) ? "Fixture motion" : "Popup motion", {
             exact: true,
           })
           .evaluate((node) => {

@@ -54,6 +54,18 @@ import { Input } from "../../registry/cadence/input";
 import type { CadenceMode } from "../../registry/cadence/lib/motion";
 import { CadenceProvider } from "../../registry/cadence/lib/provider";
 import {
+  Menubar,
+  MenubarCheckboxItem,
+  MenubarContent,
+  MenubarGroup,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSub,
+  MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
+} from "../../registry/cadence/menubar";
+import {
   Popover,
   PopoverContent,
   PopoverDescription,
@@ -187,6 +199,27 @@ function PopupMotionFixture({
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+          )}
+          {component === "menubar" && (
+            <Menubar aria-label="Fixture menus">
+              <MenubarMenu>
+                <MenubarTrigger>File</MenubarTrigger>
+                <MenubarContent>
+                  <MenubarGroup>
+                    <MenubarCheckboxItem defaultChecked>Comments</MenubarCheckboxItem>
+                    <MenubarSub>
+                      <MenubarSubTrigger>Move to</MenubarSubTrigger>
+                      <MenubarSubContent>
+                        <MenubarGroup>
+                          <MenubarItem>Backlog</MenubarItem>
+                        </MenubarGroup>
+                      </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarItem>Done</MenubarItem>
+                  </MenubarGroup>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
           )}
           {component === "context-menu" && (
             <ContextMenu>

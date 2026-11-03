@@ -12593,90 +12593,496 @@ Application menus along the top of a window.
 npx shadcn@latest add @cadence/menubar
 ```
 
+The Controlled opening example also composes `@cadence/button`; install that item alongside Menubar when copying it.
+
 ## Usage
 
 ```tsx
-import {
-  Menubar,
-  MenubarContent,
-  MenubarItem,
-  MenubarMenu,
-  MenubarTrigger,
-} from "@/components/cadence/menubar";
+"use client";
+
+import { useState } from "react";
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
 
 export function EditorMenubar() {
+  const [result, setResult] = useState("No command yet");
   return (
-    <Menubar>
-      <MenubarMenu>
-        <MenubarTrigger>File</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem onClick={() => save()}>Save</MenubarItem>
-          <MenubarItem onClick={() => publish()}>Publish…</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-      <MenubarMenu>
-        <MenubarTrigger>Edit</MenubarTrigger>
-        <MenubarContent>
-          <MenubarItem onClick={() => undo()}>Undo</MenubarItem>
-        </MenubarContent>
-      </MenubarMenu>
-    </Menubar>
+    <div className="flex flex-wrap items-center gap-3">
+      <Menubar aria-label="Editor">
+        <MenubarMenu>
+          <MenubarTrigger>File</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarItem onClick={() => setResult("New local document")}>New</MenubarItem>
+              <MenubarItem onClick={() => setResult("Saved locally")}>Save</MenubarItem>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>Edit</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarItem onClick={() => setResult("Undo selected locally")}>Undo</MenubarItem>
+              <MenubarItem onClick={() => setResult("Redo selected locally")}>Redo</MenubarItem>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+          <MenubarTrigger>Help</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarItem render={<a href="/docs/changelog" />}>Changelog</MenubarItem>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p role="status" className="text-sm text-muted-foreground">{result}</p>
+    </div>
   );
 }
 ```
 
 ## Moving between menus
 
-Once a menu is open, `ArrowRight` and `ArrowLeft` switch to the neighbouring top-level menu
-without closing the bar. That traversal is the reason to use `menubar` over three
-`dropdown-menu`s: the menus know about each other.
+The bar coordinates sibling menus. Use Left/Right to move between horizontal triggers and between open menus. The first fixed bar uses the default looping focus; the second sets `loopFocus={false}` so traversal stops at either end.
+
+<ComponentExample name="traversal" />
 
 ```tsx
-<Menubar>
-  <MenubarMenu>…</MenubarMenu>
-  <MenubarMenu>…</MenubarMenu>
-  <MenubarMenu>…</MenubarMenu>
-</Menubar>
+"use client";
+
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuTraversal() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {[true, false].map((loopFocus) => (
+        <Menubar key={String(loopFocus)} loopFocus={loopFocus} aria-label={loopFocus ? "Looping menus" : "Bounded menus"}>
+          {["File", "Edit", "View"].map((label) => (
+            <MenubarMenu key={label}>
+              <MenubarTrigger>{label}</MenubarTrigger>
+              <MenubarContent>
+                <MenubarGroup><MenubarItem>{label} command</MenubarItem></MenubarGroup>
+              </MenubarContent>
+            </MenubarMenu>
+          ))}
+        </Menubar>
+      ))}
+    </div>
+  );
+}
+```
+
+## Horizontal and vertical
+
+Orientation changes roving-focus keys, not layout classes. The vertical bar supplies `h-auto flex-col items-stretch` and places its panels on the right; the horizontal bar keeps the defaults. Up/Down traverses vertical triggers before a menu opens.
+
+<ComponentExample name="orientation" />
+
+```tsx
+"use client";
+
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuOrientations() {
+  return (
+    <div className="flex flex-wrap items-start gap-4">
+      {(["horizontal", "vertical"] as const).map((orientation) => (
+        <Menubar key={orientation} orientation={orientation} aria-label={`${orientation} menus`}
+          className={orientation === "vertical" ? "h-auto flex-col items-stretch" : undefined}>
+          {["File", "Edit"].map((label) => (
+            <MenubarMenu key={label}>
+              <MenubarTrigger>{label}</MenubarTrigger>
+              <MenubarContent side={orientation === "vertical" ? "right" : "bottom"}>
+                <MenubarGroup><MenubarItem>{label} command</MenubarItem></MenubarGroup>
+              </MenubarContent>
+            </MenubarMenu>
+          ))}
+        </Menubar>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## Shortcuts and groups
 
-`MenubarShortcut` right-aligns a key hint, and `MenubarGroup` with `MenubarLabel` splits a
-long menu into named sections.
+A `MenubarLabel` inside its `MenubarGroup` names that group. `inset` aligns labels and commands with selection marks. `MenubarShortcut` is a text hint only: this local example does not register a global shortcut or export a file. The Changelog item is a real link.
+
+<ComponentExample name="grouping" />
 
 ```tsx
-<MenubarGroup>
-  <MenubarLabel>Export</MenubarLabel>
-  <MenubarItem onClick={() => exportAs("pdf")}>
-    PDF
-    <MenubarShortcut>⇧⌘P</MenubarShortcut>
-  </MenubarItem>
-  <MenubarItem onClick={() => exportAs("png")}>
-    PNG
-    <MenubarShortcut>⇧⌘E</MenubarShortcut>
-  </MenubarItem>
-</MenubarGroup>
+"use client";
+
+import { useState } from "react";
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarLabel, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function GroupedCommands() {
+  const [result, setResult] = useState("No export yet");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Menubar aria-label="Export commands">
+        <MenubarMenu>
+          <MenubarTrigger>Export</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarLabel inset>Document</MenubarLabel>
+              <MenubarItem inset onClick={() => setResult("PDF selected locally")}>
+                PDF<MenubarShortcut>⇧⌘P</MenubarShortcut>
+              </MenubarItem>
+              <MenubarItem inset onClick={() => setResult("PNG selected locally")}>PNG</MenubarItem>
+            </MenubarGroup>
+            <MenubarSeparator />
+            <MenubarGroup>
+              <MenubarLabel>Help</MenubarLabel>
+              <MenubarItem render={<a href="/docs/changelog" />}>Changelog</MenubarItem>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p role="status" className="text-sm">{result}</p>
+    </div>
+  );
+}
 ```
 
-## Selection items and submenus
+## Selection items
 
-The selection parts are the menu's: a checkbox item keeps the panel open while the state
-changes, and a submenu opens to the right of the item it belongs to.
+Checkboxes and radios keep the panel open by default. Sidebar and density are caller-owned values; Line numbers demonstrates independent uncontrolled state. Sidebar and density persist across panel lifetimes. Line numbers is an uncontrolled item: closing the panel unmounts it, so reopening restores its default.
+
+<ComponentExample name="selection" />
 
 ```tsx
-<MenubarCheckboxItem defaultChecked onCheckedChange={setSidebar}>
-  Sidebar
-</MenubarCheckboxItem>
+"use client";
 
-<MenubarSub>
-  <MenubarSubTrigger>Theme</MenubarSubTrigger>
-  <MenubarSubContent>
-    <MenubarRadioGroup value={theme} onValueChange={setTheme}>
-      <MenubarRadioItem value="light">Light</MenubarRadioItem>
-      <MenubarRadioItem value="dark">Dark</MenubarRadioItem>
-    </MenubarRadioGroup>
-  </MenubarSubContent>
-</MenubarSub>
+import { useState } from "react";
+import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarGroup, MenubarLabel, MenubarMenu, MenubarRadioGroup, MenubarRadioItem, MenubarSeparator, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuSelection() {
+  const [sidebar, setSidebar] = useState(true);
+  const [density, setDensity] = useState("comfortable");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Menubar aria-label="View settings">
+        <MenubarMenu>
+          <MenubarTrigger>View</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarLabel inset>Show</MenubarLabel>
+              <MenubarCheckboxItem checked={sidebar} onCheckedChange={setSidebar}>Sidebar</MenubarCheckboxItem>
+              <MenubarCheckboxItem defaultChecked inset>Line numbers</MenubarCheckboxItem>
+            </MenubarGroup>
+            <MenubarSeparator />
+            <MenubarRadioGroup aria-label="Density" value={density} onValueChange={setDensity}>
+              <MenubarLabel>Density</MenubarLabel>
+              <MenubarRadioItem value="compact" inset>Compact</MenubarRadioItem>
+              <MenubarRadioItem value="comfortable">Comfortable</MenubarRadioItem>
+            </MenubarRadioGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p role="status" className="text-sm">Sidebar: {sidebar ? "shown" : "hidden"}; density: {density}</p>
+    </div>
+  );
+}
+```
+
+## Nested commands
+
+A submenu belongs to its trigger, not to a neighbouring top-level menu. Right opens it and Left returns to its trigger in LTR. Selecting a destination updates only this local result and closes the menu tree.
+
+<ComponentExample name="submenus" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function NestedCommands() {
+  const [result, setResult] = useState("Not moved");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Menubar aria-label="Organize document">
+        <MenubarMenu>
+          <MenubarTrigger>Organize</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarItem onClick={() => setResult("Kept here")}>Keep here</MenubarItem>
+              <MenubarSub>
+                <MenubarSubTrigger inset>Move to</MenubarSubTrigger>
+                <MenubarSubContent>
+                  <MenubarGroup>
+                    {["Backlog", "Review"].map((value) => (
+                      <MenubarItem key={value} onClick={() => setResult(value)}>{value}</MenubarItem>
+                    ))}
+                  </MenubarGroup>
+                </MenubarSubContent>
+              </MenubarSub>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p role="status" className="text-sm">{result}</p>
+    </div>
+  );
+}
+```
+
+## Item variants and closing
+
+Default and destructive are item variants. `closeOnClick={false}` keeps the panel open for the middle action; it is separate from the visual `inset` choice. These handlers record local results and do not mutate a server document.
+
+<ComponentExample name="items" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function ItemBehaviors() {
+  const [result, setResult] = useState("No item action yet");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Menubar aria-label="Item commands">
+        <MenubarMenu>
+          <MenubarTrigger>Actions</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarItem onClick={() => setResult("Renamed locally")}>Rename</MenubarItem>
+              <MenubarItem inset closeOnClick={false} onClick={() => setResult("Still open")}>Keep open</MenubarItem>
+              <MenubarItem variant="destructive" onClick={() => setResult("Deleted locally")}>Delete</MenubarItem>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p role="status" className="text-sm">{result}</p>
+    </div>
+  );
+}
+```
+
+## Disabled bars and commands
+
+Disable the entire bar, an individual trigger, or each item part independently. Disabled menu items may receive arrow-key focus, but cannot activate or change selection. The disabled submenu cannot open. Do not make disabled commands disappear from the keyboard model.
+
+<ComponentExample name="disabled" />
+
+```tsx
+"use client";
+
+import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarRadioGroup, MenubarRadioItem, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function DisabledCommands() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      <Menubar disabled aria-label="Disabled bar">
+        <MenubarMenu><MenubarTrigger>Disabled bar</MenubarTrigger>
+          <MenubarContent><MenubarGroup><MenubarItem>Unavailable</MenubarItem></MenubarGroup></MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <Menubar aria-label="Disabled commands">
+        <MenubarMenu><MenubarTrigger disabled>Disabled trigger</MenubarTrigger>
+          <MenubarContent><MenubarGroup><MenubarItem>Unavailable</MenubarItem></MenubarGroup></MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu><MenubarTrigger>Unavailable commands</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup>
+              <MenubarItem disabled>Delete locked document</MenubarItem>
+              <MenubarCheckboxItem disabled defaultChecked>Locked sidebar</MenubarCheckboxItem>
+            </MenubarGroup>
+            <MenubarRadioGroup defaultValue="locked">
+              <MenubarRadioItem disabled value="locked">Locked density</MenubarRadioItem>
+            </MenubarRadioGroup>
+            <MenubarGroup>
+              <MenubarSub>
+                <MenubarSubTrigger disabled>Unavailable destination</MenubarSubTrigger>
+                <MenubarSubContent><MenubarGroup><MenubarItem>Never opened</MenubarItem></MenubarGroup></MenubarSubContent>
+              </MenubarSub>
+              <MenubarItem>Done</MenubarItem>
+            </MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+    </div>
+  );
+}
+```
+
+## Controlled opening
+
+Control an individual `MenubarMenu` with `open`/`onOpenChange`. The external action is part of this focused behavior example; `useId` and `triggerId` preserve its real File anchor. The bar itself has no shared `open` prop. Escape and selecting Save close through the same callback.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function ControlledMenu() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [result, setResult] = useState("No controlled action");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>Open externally</Button>
+      <Menubar aria-label="Controlled menu">
+        <MenubarMenu open={open} onOpenChange={setOpen} triggerId={id}>
+          <MenubarTrigger id={id}>File</MenubarTrigger>
+          <MenubarContent>
+            <MenubarGroup><MenubarItem onClick={() => setResult("Saved locally")}>Save</MenubarItem></MenubarGroup>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+      <p role="status" className="text-sm">{result}</p>
+    </div>
+  );
+}
+```
+
+## Panel sides
+
+These four fixed menus demonstrate physical sides without a placement selector. `sideOffset` defaults to 8px. Base UI may flip or shift to avoid the viewport; a requested side is not a guarantee on a narrow screen.
+
+<ComponentExample name="sides" />
+
+```tsx
+"use client";
+
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuSides() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["top", "right", "bottom", "left"] as const).map((side) => (
+        <Menubar key={side} aria-label={`${side} placement`}>
+          <MenubarMenu><MenubarTrigger>{side}</MenubarTrigger>
+            <MenubarContent side={side}><MenubarGroup><MenubarItem>Done</MenubarItem></MenubarGroup></MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+      ))}
+    </div>
+  );
+}
+```
+
+## Panel alignment
+
+Start, center and end compare the panel with its trigger on the cross axis. These examples explicitly set `alignOffset={0}` for exact alignment; the component default is -4px. Alignment is independent of side.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuAlignments() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["start", "center", "end"] as const).map((align) => (
+        <Menubar key={align} aria-label={`${align} alignment`}>
+          <MenubarMenu><MenubarTrigger>{align}</MenubarTrigger>
+            <MenubarContent align={align} alignOffset={0}><MenubarGroup><MenubarItem>Done</MenubarItem></MenubarGroup></MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+      ))}
+    </div>
+  );
+}
+```
+
+## Right-to-left menus
+
+Set both Base UI direction context and DOM direction, including portal content. In RTL, inline-start resolves to the right and inline-end to the left; horizontal trigger traversal reverses. Panels remain constrained to available viewport width.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function RtlMenus() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl" className="flex flex-wrap gap-3">
+        {(["inline-start", "inline-end"] as const).map((side) => (
+          <Menubar key={side} aria-label={`${side} RTL`}>
+            <MenubarMenu><MenubarTrigger>{side}</MenubarTrigger>
+              <MenubarContent side={side} className="min-w-0 w-48 max-w-(--available-width)">
+                <MenubarGroup><MenubarItem>Done</MenubarItem></MenubarGroup>
+              </MenubarContent>
+            </MenubarMenu>
+            <MenubarMenu><MenubarTrigger>Help</MenubarTrigger>
+              <MenubarContent><MenubarGroup><MenubarItem>About</MenubarItem></MenubarGroup></MenubarContent>
+            </MenubarMenu>
+          </Menubar>
+        ))}
+      </div>
+    </DirectionProvider>
+  );
+}
+```
+
+## Modal and non-modal menus
+
+The default `modal={true}` limits outside pointer interactions and locks desktop page scrolling while a click-opened menu is present. `false` allows the rest of the document to remain interactive. These are menu semantics: Forward Tab leaves the bar and closes the panel. From a panel item, Shift+Tab first returns to the bar trigger with its panel still open; a second Shift+Tab leaves the bar and closes it. Escape closes directly and returns to the trigger.
+
+<ComponentExample name="modality" />
+
+```tsx
+"use client";
+
+import { Menubar, MenubarContent, MenubarGroup, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuModality() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {[true, false].map((modal) => (
+        <Menubar key={String(modal)} modal={modal} aria-label={`modal ${modal}`}>
+          <MenubarMenu><MenubarTrigger>{String(modal)}</MenubarTrigger>
+            <MenubarContent><MenubarGroup><MenubarItem>Done</MenubarItem></MenubarGroup></MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+      ))}
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+Only this named example overrides the header. The first panel mounts under `none`, with no animated first frame. The second nests `full` inside `none`; system reduced motion still wins. Ordinary examples inherit header mode and speed.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Menubar, MenubarCheckboxItem, MenubarContent, MenubarGroup, MenubarMenu, MenubarTrigger } from "@/components/cadence/menubar";
+
+export function MenuMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <Menubar aria-label="Instant menu"><MenubarMenu><MenubarTrigger>Open without motion</MenubarTrigger>
+          <MenubarContent data-testid="initial-none"><MenubarGroup><MenubarCheckboxItem>Sidebar</MenubarCheckboxItem></MenubarGroup></MenubarContent>
+        </MenubarMenu></Menubar>
+        <CadenceProvider mode="full">
+          <Menubar aria-label="Nested full menu"><MenubarMenu><MenubarTrigger>Open nested full</MenubarTrigger>
+            <MenubarContent data-testid="nested-full"><MenubarGroup><MenubarCheckboxItem>Sidebar</MenubarCheckboxItem></MenubarGroup></MenubarContent>
+          </MenubarMenu></Menubar>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -12695,7 +13101,7 @@ changes, and a submenu opens to the right of the item it belongs to.
 ## API
 
 `Menubar` takes `modal` (default `true`), `disabled`, and `orientation` (default
-`"horizontal"`). Every other part mirrors `dropdown-menu` under menubar slots:
+`"horizontal"`), and `loopFocus` (default `true`). Vertical orientation needs caller layout classes. Each `MenubarMenu` accepts the menu root state props (`open`, `defaultOpen`, `onOpenChange`, `triggerId`); these do not belong on the bar. Every other part mirrors `dropdown-menu` under menubar slots:
 
 | Part                                                                                  | Notes                                                    |
 | ------------------------------------------------------------------------------------- | -------------------------------------------------------- |
@@ -12724,8 +13130,9 @@ would suggest a continuity the markup does not have.
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
 geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The preview's **Popup motion** selector changes the local mode on the
-same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+first mounted frame. Ordinary specimens inherit the header mode and speed; only the explicit
+motion-scopes example overrides them. Header pointer interaction may close a menu normally. The
+independent runtime fixture verifies live mode changes without an outside press. Base UI `className(state)` and `style(state)` callbacks are evaluated
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
 remain owned by the primitive.
 
@@ -12733,12 +13140,13 @@ remain owned by the primitive.
 
 | Keys                        | Action                                                        |
 | --------------------------- | ------------------------------------------------------------- |
-| `ArrowLeft` / `ArrowRight`  | Moves between top-level menus; while open, opens the neighbour. |
-| `ArrowDown` / `Enter`       | Opens the focused menu and highlights its first item.          |
+| `ArrowLeft` / `ArrowRight`  | Traverses horizontal top-level menus (reversed in RTL); while open, opens the neighbour unless entering a submenu. |
+| `ArrowDown` / `Enter` / `Space` | Opens a horizontal menu; Up/Down traverses closed vertical triggers. |
 | `ArrowUp` / `ArrowDown`     | Moves the highlight inside an open menu.                       |
 | `Home` / `End`              | First and last item.                                           |
 | `Escape`                    | Closes the menu and returns focus to its trigger.              |
-| `Tab`                       | Leaves the bar for the next control in the page.               |
+| `Tab`                       | Leaves the open menu/bar for the next page control and closes the panel. |
+| `Shift+Tab`                 | From a panel item, returns to its trigger and keeps the panel open; another Shift+Tab leaves the bar and closes it. |
 
 ## Accessibility
 
@@ -12753,8 +13161,9 @@ remain owned by the primitive.
 
 ## Responsive behavior
 
-A menubar is a desktop pattern: on a narrow viewport the triggers wrap inside the bordered
-bar rather than scrolling horizontally. For touch, prefer `dropdown-menu` behind a single
+A menubar is a desktop pattern. Its default bar is a single fixed-height flex row; it does not
+automatically wrap triggers. Keep labels short, constrain panels to the available width, and
+supply layout classes if wrapping or vertical presentation is required. For touch, prefer `dropdown-menu` behind a single
 trigger, or a `navigation-menu`; long-pressing a menu bar is not a gesture anyone expects.
 
 ## Performance

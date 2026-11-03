@@ -71,5 +71,20 @@
     "items",
     "controlled",
     "without-motion"
+  ],
+  "menubar": [
+    "traversal",
+    "orientation",
+    "grouping",
+    "selection",
+    "submenus",
+    "items",
+    "disabled",
+    "controlled",
+    "sides",
+    "alignments",
+    "logical-sides",
+    "modality",
+    "without-motion"
   ]
 }
