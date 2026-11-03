@@ -15,10 +15,17 @@ npx shadcn@latest add @cadence/sheet
 ```
 
 This also installs `button`, which the sheet uses for its close control and its footer actions.
+Install `@cadence/checkbox` and `@cadence/field` for the filter composition, and `@cadence/input` for the controlled form.
 
 ## Usage
 
 ```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Checkbox } from "@/components/cadence/checkbox";
+import { Field, FieldGroup, FieldLabel } from "@/components/cadence/field";
 import {
   Sheet,
   SheetClose,
@@ -29,21 +36,120 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/cadence/sheet";
-import { Button } from "@/components/cadence/button";
 
 export function FiltersSheet() {
+  const id = useId();
+  const [openOnly, setOpenOnly] = useState(true);
+  const [applied, setApplied] = useState("Open only");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Sheet>
+        <SheetTrigger render={<Button variant="outline" />}>Open filters</SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Filters</SheetTitle>
+            <SheetDescription>Choose filters for this local view.</SheetDescription>
+          </SheetHeader>
+          <FieldGroup className="px-4">
+            <Field orientation="horizontal">
+              <Checkbox id={id} checked={openOnly} onCheckedChange={setOpenOnly} />
+              <FieldLabel htmlFor={id}>Open only</FieldLabel>
+            </Field>
+          </FieldGroup>
+          <SheetFooter>
+            <Button variant="outline" onClick={() => setOpenOnly(false)}>
+              Clear selection
+            </Button>
+            <SheetClose render={<Button onClick={() => setApplied(openOnly ? "Open only" : "All items")} />}>
+              Apply filters
+            </SheetClose>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+      <p role="status" className="text-sm text-muted-foreground">
+        {applied}
+      </p>
+    </div>
+  );
+}
+```
+
+## The four edges
+
+Each trigger opens an independent sheet at a fixed edge. Right is the default. Side panels use three quarters of the viewport with a desktop width cap; top and bottom panels span the width and size to content.
+
+<ComponentExample name="edges" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet";
+
+export function SheetEdges() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["right", "left", "top", "bottom"] as const).map((side) => (
+        <Sheet key={side}>
+          <SheetTrigger render={<Button variant="outline" />}>{side}</SheetTrigger>
+          <SheetContent side={side}>
+            <SheetHeader>
+              <SheetTitle>{side} sheet</SheetTitle>
+              <SheetDescription>A fixed {side} edge.</SheetDescription>
+            </SheetHeader>
+            <SheetFooter>
+              <SheetClose render={<Button variant="outline" />}>Done</SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ))}
+    </div>
+  );
+}
+```
+
+## Without the built-in close button
+
+showCloseButton=false removes only the corner control. Keep a clear footer close action, Escape and outside dismissal. This example provides an explicit Done action.
+
+<ComponentExample name="footer-close" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet";
+
+export function FooterCloseSheet() {
   return (
     <Sheet>
-      <SheetTrigger render={<Button variant="outline" />}>Open filters</SheetTrigger>
-      <SheetContent>
+      <SheetTrigger render={<Button variant="outline" />}>Open footer close</SheetTrigger>
+      <SheetContent showCloseButton={false}>
         <SheetHeader>
-          <SheetTitle>Filters</SheetTitle>
-          <SheetDescription>Applied to this view only. Nothing is saved.</SheetDescription>
+          <SheetTitle>View details</SheetTitle>
+          <SheetDescription>The footer provides the visible close action.</SheetDescription>
         </SheetHeader>
-        {/* the filter controls */}
+        <p className="px-4 text-sm">A short details panel.</p>
         <SheetFooter>
-          <SheetClose render={<Button variant="outline" />}>Reset</SheetClose>
-          <SheetClose render={<Button />}>Apply filters</SheetClose>
+          <SheetClose render={<Button />}>Done</SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>
@@ -51,46 +157,214 @@ export function FiltersSheet() {
 }
 ```
 
-## The four edges
-
-`side` is `"right"` by default; the panel takes its placement classes and its slide direction from it.
-
-```tsx
-<SheetContent side="left">…</SheetContent>
-<SheetContent side="top">…</SheetContent>
-<SheetContent side="bottom">…</SheetContent>
-```
-
-## Without the built-in close button
-
-The close button is a real control with a screen-reader-only label. Drop it when the footer already
-carries an obvious way out, but keep one of the two.
-
-```tsx
-<SheetContent showCloseButton={false}>…</SheetContent>
-```
-
 ## A long list
 
-The panel is a flex column, so a scroll container goes around the part that overflows rather than on
-the close button's positioning context:
+Keep the header, close button and footer outside the scrolling body. A min-height of zero lets the middle flex child shrink. Initial focus on the title opens the list at its beginning without jumping to a footer control. The entries link to the changelog, so Tab reaches the scrolling body and PageDown scrolls it without requiring a pointer.
+
+<ComponentExample name="long-list" />
 
 ```tsx
-<SheetContent>
-  <SheetHeader>…</SheetHeader>
-  <div className="flex-1 overflow-y-auto px-4">…</div>
-  <SheetFooter>…</SheetFooter>
-</SheetContent>
+"use client";
+
+import { useRef } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet";
+
+export function LongSheet() {
+  const title = useRef<HTMLHeadingElement>(null);
+  return (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" />}>Browse activity</SheetTrigger>
+      <SheetContent initialFocus={title}>
+        <SheetHeader>
+          <SheetTitle ref={title} tabIndex={-1}>
+            Activity
+          </SheetTitle>
+          <SheetDescription>Scroll the list while the footer stays in view.</SheetDescription>
+        </SheetHeader>
+        <section aria-label="Activity entries"  className="min-h-0 flex-1 overflow-y-auto px-4 outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"><ol className="flex flex-col gap-4">
+          {Array.from({ length: 30 }, (_, index) => (
+            <li key={index.toString()} className="rounded-md border p-3 text-sm">
+              <a href="/docs/changelog" className="underline underline-offset-4">Activity {index + 1}: documentation updated.</a>
+            </li>
+          ))}
+        </ol></section>
+        <SheetFooter>
+          <SheetClose render={<Button variant="outline" />}>Done</SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
 ```
 
-## Controlled
+## Controlled form
+
+The caller owns open, draft and saved values. Save updates local state and closes; Cancel leaves the saved value unchanged and preserves the draft for reopening. No request or validation is performed. Each form owns its label ID.
+
+<ComponentExample name="controlled" />
 
 ```tsx
-const [open, setOpen] = useState(false);
+"use client";
 
-<Sheet open={open} onOpenChange={setOpen}>
-  <SheetContent>…</SheetContent>
-</Sheet>;
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Field, FieldGroup, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet";
+
+export function ControlledSheet() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState("Weekly digest");
+  const [saved, setSaved] = useState("Weekly digest");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger render={<Button variant="outline" />}>Edit title</SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Edit title</SheetTitle>
+            <SheetDescription>Save changes to this local example.</SheetDescription>
+          </SheetHeader>
+          <form
+            className="flex min-h-0 flex-1 flex-col"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSaved(draft);
+              setOpen(false);
+            }}
+          >
+            <FieldGroup className="px-4">
+              <Field>
+                <FieldLabel htmlFor={id}>Title draft</FieldLabel>
+                <Input id={id} value={draft} onValueChange={setDraft} />
+              </Field>
+            </FieldGroup>
+            <SheetFooter>
+              <SheetClose render={<Button type="button" variant="outline" />}>Cancel</SheetClose>
+              <Button type="submit">Save title</Button>
+            </SheetFooter>
+          </form>
+        </SheetContent>
+      </Sheet>
+      <p role="status" className="text-sm">
+        Saved: {saved}
+      </p>
+    </div>
+  );
+}
+```
+
+## Modal behavior
+
+Compare modal=true (scroll lock and focus trap), false (page interaction remains available), and trap-focus (focus trap without scroll lock). SheetContent always renders its backdrop, including false and trap-focus; use a suitable composition when the page must remain visually unobscured.
+
+<ComponentExample name="modality" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet";
+
+export function SheetModality() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {([true, false, "trap-focus"] as const).map((modal) => (
+        <Sheet key={String(modal)} modal={modal}>
+          <SheetTrigger render={<Button variant="outline" />}>{String(modal)}</SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Mode: {String(modal)}</SheetTitle>
+              <SheetDescription>Focus and scrolling follow the root modal setting.</SheetDescription>
+            </SheetHeader>
+            <SheetFooter>
+              <SheetClose render={<Button variant="outline" />}>Done</SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      ))}
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+Ordinary sheets inherit the header clock. This comparison alone fixes none and then restores full in a nested scope. The OS reduced-motion preference still wins. Both the panel and its backdrop resolve the local clock.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/cadence/sheet";
+
+export function SheetMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <Sheet>
+          <SheetTrigger render={<Button variant="outline" />}>Open without motion</SheetTrigger>
+          <SheetContent data-testid="initial-none">
+            <SheetHeader>
+              <SheetTitle>Immediate sheet</SheetTitle>
+              <SheetDescription>No entering motion.</SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+        <CadenceProvider mode="full">
+          <Sheet>
+            <SheetTrigger render={<Button variant="outline" />}>Open nested full</SheetTrigger>
+            <SheetContent data-testid="nested-full">
+              <SheetHeader>
+                <SheetTitle>Nested full sheet</SheetTitle>
+                <SheetDescription>The OS preference still wins.</SheetDescription>
+              </SheetHeader>
+            </SheetContent>
+          </Sheet>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use

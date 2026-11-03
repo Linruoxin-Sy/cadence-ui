@@ -29,6 +29,14 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../../registry/cadence/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetTitle,
+  SheetTrigger,
+} from "../../registry/cadence/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/tooltip";
 
 // A dedicated browser regression input. Changing a native select emits change,
@@ -105,6 +113,17 @@ function PopupMotionFixture({
               <TooltipTrigger render={<Button />}>Open tooltip</TooltipTrigger>
               <TooltipContent>Actual registry tooltip</TooltipContent>
             </Tooltip>
+          )}
+          {component === "sheet" && (
+            <Sheet>
+              <SheetTrigger render={<Button />}>Open sheet</SheetTrigger>
+              <SheetContent>
+                <SheetTitle>Sheet fixture</SheetTitle>
+                <SheetDescription>Actual registry panel with a separate mode input.</SheetDescription>
+                {field}
+                <SheetFooter />
+              </SheetContent>
+            </Sheet>
           )}
           {component === "hover-card" && (
             <HoverCard>
