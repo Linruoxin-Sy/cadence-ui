@@ -1,6 +1,7 @@
 import { compileMDX } from "next-mdx-remote/rsc";
 import type { ComponentProps } from "react";
 import remarkGfm from "remark-gfm";
+import type { TocEntry } from "@/registry/cadence/toc";
 import { MdxCodeFence } from "./code-fence";
 
 /**
@@ -33,7 +34,7 @@ interface HeadingNode {
 }
 
 /** Assign anchors from actual rendered heading nodes, including inline code. */
-export function headingPlugin(headings: Array<{ id: string; title: string }>) {
+export function headingPlugin(headings: TocEntry[]) {
   return () => (tree: HeadingNode) => {
     const used = new Set<string>();
     const text = (node: HeadingNode): string => node.value ?? node.children?.map(text).join("") ?? "";
@@ -51,7 +52,7 @@ export function headingPlugin(headings: Array<{ id: string; title: string }>) {
         while (used.has(id)) id = `${base}-${suffix++}`;
         used.add(id);
         node.properties = { ...node.properties, id, className: ["scroll-mt-24"] };
-        headings.push({ id, title });
+        headings.push({ id, title, depth: node.tagName === "h3" ? 3 : 2 });
       }
       node.children?.forEach(walk);
     };
@@ -59,8 +60,8 @@ export function headingPlugin(headings: Array<{ id: string; title: string }>) {
   };
 }
 
-export async function Mdx({ source, toc = false }: { source: string; toc?: boolean }) {
-  const headings: Array<{ id: string; title: string }> = [];
+export async function compileDocument(source: string) {
+  const headings: TocEntry[] = [];
   const { content } = await compileMDX({
     source,
     options: { mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [headingPlugin(headings)] } },
@@ -76,23 +77,9 @@ export async function Mdx({ source, toc = false }: { source: string; toc?: boole
       pre: ({ children }: ComponentProps<"pre">) => <MdxCodeFence>{children}</MdxCodeFence>,
     },
   });
-  return (
-    <>
-      {toc && (
-        <nav aria-label="On this page" className="my-8 rounded-lg border border-border p-4 text-sm">
-          <p className="font-medium">On this page</p>
-          <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
-            {headings.map(({ id, title }) => (
-              <li key={id}>
-                <a className="text-muted-foreground underline underline-offset-4 hover:text-foreground" href={`#${id}`}>
-                  {title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )}
-      <div className="typeset typeset-docs">{content}</div>
-    </>
-  );
+  return { headings, content: <div className="typeset typeset-docs">{content}</div> };
+}
+
+export async function Mdx({ source }: { source: string }) {
+  return (await compileDocument(source)).content;
 }

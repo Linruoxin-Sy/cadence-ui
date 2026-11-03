@@ -304,6 +304,23 @@ and the component catalogue retain their independent `max-w-3xl` (48rem) reading
 centred in the remaining content area. Below `md`, the existing Browse disclosure replaces
 the sidebar and the content uses the available width within the shared padding.
 
+Component pages add a 192px Toc rail at `xl` with a 40px gap, within a `max-w-5xl` wrapper.
+The article retains its own centred `max-w-3xl` measure in the reading column; guide pages retain
+their existing measure.
+The rail starts at the document's upper right and sticks 80px below the viewport top. Its list
+scrolls independently when longer than the available viewport. Below `xl`, a native disclosure
+aligned to the right below the title exposes the same links, including without JavaScript.
+Its list is an absolutely positioned panel, so expanding it does not move the document or
+invalidate the browser's restored fragment position when the disclosure closes on reload.
+The Toc sits outside DocumentEntrance on desktop so the article's transform and clip do not
+affect its sticky position. Heading text, nesting depth and collision-safe ids come from the
+same MDX compilation that renders the body; there is no second Markdown heading parser.
+The site imports the registry's T3 `toc` directly. Scroll tracking enhances native anchors and
+marks the current section with `aria-current="location"`. One persistent `layout.shared` indicator
+slides and scales along the rail in full; reduced/none place it immediately. Section link activation
+uses the token-backed `scroll.navigate` recipe in full; reduced/none navigate immediately.
+Fragment history, focus and no-JS navigation remain available.
+
 ---
 
 ## 3. Data flow: one MDX drives every output

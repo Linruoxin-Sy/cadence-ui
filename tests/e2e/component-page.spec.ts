@@ -79,7 +79,7 @@ for (const mode of ["full", "reduced", "none"] as const)
       );
       await page.goForward();
       await expect(selector).toHaveValue("secondary");
-      const details = page.locator("article details");
+      const details = page.locator("article details:not([data-mobile-toc])");
       await details.locator("summary").focus();
       await page.keyboard.press("Enter");
       const source = details.locator('[data-slot="code-block-content"]').first();
@@ -96,6 +96,8 @@ for (const mode of ["full", "reduced", "none"] as const)
         ).toEqual([]);
         await details.screenshot({ path: ".cache/component-page-proof/source-open.png" });
       }
+      const mobileToc = page.locator("[data-mobile-toc]");
+      if (await mobileToc.isVisible()) await mobileToc.locator("summary").click();
       await page
         .getByRole("navigation", { name: "On this page" })
         .getByRole("link", { name: "API", exact: true })
