@@ -136,7 +136,8 @@ for (const id of ids) {
           const specimen = card(page, id, name);
           await specimen.scrollIntoViewIfNeeded();
           await specimen.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}.png` });
-          const trigger = specimen.getByRole("button").first();
+          const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
+          const trigger = (await triggers.count()) ? triggers.first() : specimen.getByRole("button").first();
           if (id === "tooltip") await trigger.focus();
           else await trigger.click();
           const surface = popup(page, id);
@@ -220,6 +221,106 @@ if (catalog.dialog)
         ),
       ).toBe(value === "true");
       await dismiss(page, "dialog");
+    }
+  });
+
+if (catalog.popover)
+  test("popover placement axes, columns, retained form, controlled anchor and modal close parts", async ({ page }) => {
+    await page.goto("/components/popover?motion=none");
+    await page.waitForLoadState("networkidle");
+    const surface = popup(page, "popover");
+    const columns = card(page, "popover", "columns");
+    await columns.getByRole("button").click();
+    await surface.getByRole("checkbox", { name: "Updated", exact: true }).check();
+    await expect(surface.locator('[data-slot="popover-description"]')).toHaveText("4 of four columns are shown.");
+    await dismiss(page, "popover");
+    await page.locator('[data-preview="popover"]').getByRole("button").click();
+    await expect(surface.getByRole("checkbox", { name: "Updated", exact: true })).not.toBeChecked();
+    await dismiss(page, "popover");
+    for (const side of ["top", "right", "bottom", "left"]) {
+      const trigger = card(page, "popover", "sides").getByRole("button", { name: side, exact: true });
+      await trigger.scrollIntoViewIfNeeded();
+      await trigger.click();
+      await expect(surface).toHaveAttribute("data-side", side);
+      const anchor = await trigger.boundingBox();
+      const panel = await surface.boundingBox();
+      if (!anchor || !panel) throw new Error("missing anchored geometry");
+      if (side === "top") expect(panel.y + panel.height).toBeLessThan(anchor.y);
+      if (side === "bottom") expect(panel.y).toBeGreaterThan(anchor.y + anchor.height);
+      if (side === "left") expect(panel.x + panel.width).toBeLessThan(anchor.x);
+      if (side === "right") expect(panel.x).toBeGreaterThan(anchor.x + anchor.width);
+      await dismiss(page, "popover");
+    }
+    for (const align of ["start", "center", "end"]) {
+      const trigger = card(page, "popover", "alignments").getByRole("button", { name: align, exact: true });
+      await trigger.click();
+      const anchor = await trigger.boundingBox();
+      const panel = await surface.boundingBox();
+      if (!anchor || !panel) throw new Error("missing alignment geometry");
+      const fraction = { start: 0, center: 0.5, end: 1 }[align] ?? 0;
+      expect(Math.abs(panel.x + panel.width * fraction - anchor.x - anchor.width * fraction)).toBeLessThan(1);
+      await dismiss(page, "popover");
+    }
+    for (const side of ["inline-start", "inline-end"]) {
+      const trigger = card(page, "popover", "logical-sides").getByRole("button", { name: side, exact: true });
+      await trigger.click();
+      const anchor = await trigger.boundingBox();
+      const panel = await surface.boundingBox();
+      if (!anchor || !panel) throw new Error("missing logical geometry");
+      if (side === "inline-start") expect(panel.x).toBeGreaterThan(anchor.x + anchor.width);
+      else expect(panel.x + panel.width).toBeLessThan(anchor.x);
+      await dismiss(page, "popover");
+    }
+    const form = card(page, "popover", "form");
+    await setMode(page, "full");
+    await form.getByRole("button").click();
+    const input = surface.getByLabel("View name");
+    await input.fill("Release review");
+    const saved = await input.elementHandle();
+    await input.focus();
+    for (const reducedMotion of ["reduce", "no-preference"] as const) {
+      await page.emulateMedia({ reducedMotion });
+      await expect(input).toHaveValue("Release review");
+      await expect(input).toBeFocused();
+      expect(await input.evaluate((node, saved) => node === saved, saved)).toBe(true);
+    }
+    const triggerNode = await form.getByRole("button").elementHandle();
+    for (const mode of ["reduced", "none", "full"]) {
+      // A real header press is also an outside press: preserve that dismissal.
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: mode, exact: true }).click();
+      await expect(surface).toHaveCount(0);
+      expect(await form.getByRole("button").evaluate((node, saved) => node === saved, triggerNode)).toBe(true);
+      await form.getByRole("button").click();
+      await expect(input).toHaveValue("Release review");
+    }
+    await dismiss(page, "popover");
+    await expect(form.getByRole("status")).toHaveText("View: Open PRs");
+    await form.getByRole("button").click();
+    await expect(input).toHaveValue("Release review");
+    await input.press("Enter");
+    await expect(form.getByRole("status")).toHaveText("View: Release review");
+    const controlled = card(page, "popover", "controlled");
+    await controlled.getByRole("button", { name: "Open from application state" }).click();
+    await expect(controlled.getByRole("button", { name: "View options" })).toHaveAttribute("aria-expanded", "true");
+    await surface.getByRole("button", { name: "Finish editing" }).click();
+    await expect(controlled.getByRole("button", { name: "Open from application state" })).toBeFocused();
+    for (const value of ["false", "true", "trap-focus"]) {
+      await card(page, "popover", "modal").getByRole("button", { name: value, exact: true }).click();
+      await expect(surface.getByRole("button", { name: "Close options" })).toBeFocused();
+      if (value !== "false")
+        for (let i = 0; i < 4; i++) {
+          await page.keyboard.press("Tab");
+          expect(await surface.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+        }
+      expect(
+        await page.evaluate(
+          () =>
+            getComputedStyle(document.body).overflow === "hidden" ||
+            getComputedStyle(document.documentElement).overflow === "hidden",
+        ),
+      ).toBe(value === "true");
+      await surface.getByRole("button", { name: "Close options" }).click();
+      await expect(surface).toHaveCount(0);
     }
   });
 

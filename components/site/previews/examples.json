@@ -42,5 +42,6 @@
   "input-otp": ["controlled", "invalid", "disabled", "without-separator", "paste", "without-motion"],
   "progress": ["labelled", "indeterminate", "complete", "range", "composed", "caller-progress", "without-motion"],
   "dialog": ["editing", "controlled", "without-close", "footer-close", "long-content", "modality", "without-motion"],
-  "alert-dialog": ["sizes", "icon", "controlled", "pending", "without-motion"]
+  "alert-dialog": ["sizes", "icon", "controlled", "pending", "without-motion"],
+  "popover": ["columns", "sides", "alignments", "logical-sides", "form", "controlled", "modal", "without-motion"]
 }

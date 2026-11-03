@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const ids = ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", "hover-card"] as const;
 type Id = (typeof ids)[number];
@@ -15,6 +16,13 @@ async function open(page: Page, id: Id) {
   await expect(page.locator(`[data-slot="${slot(id)}"]`)).toBeVisible();
 }
 async function mode(page: Page, value: string) {
+  if (new URL(page.url()).pathname === "/__fixtures/popup-motion") {
+    await page.getByLabel("Fixture motion", { exact: true }).evaluate((node, value) => {
+      (node as HTMLSelectElement).value = value;
+      node.dispatchEvent(new Event("change", { bubbles: true }));
+    }, value);
+    return;
+  }
   const id = new URL(page.url()).pathname.split("/").at(-1) ?? "";
   if (examples[id]) {
     await page
@@ -133,6 +141,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
           await page.mouse.move(0, 0);
           await page.setViewportSize({ width: 1280, height: 900 });
+          if (examples[id]) await openPopupMotionFixture(page, id, requested);
           // Restore the inherited clock. Explicit nested scopes are exercised separately below.
           await mode(page, "full");
           await start(page, id);
@@ -208,7 +217,8 @@ test.describe("B4 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      await page.goto(`/components/${id}?motion=none&speed=0.25`);
+      if (examples[id]) await openPopupMotionFixture(page, id, "none", 4);
+      else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
       await open(page, id);
@@ -217,6 +227,9 @@ test.describe("B4 active transition interruption", () => {
       await popup.evaluate((n) => {
         (window as unknown as { saved: Element }).saved = n;
       });
+      const draft = popup.getByLabel("Fixture draft", { exact: true });
+      const draftNode = (await draft.count()) ? await draft.elementHandle() : null;
+      if (draftNode) await draft.fill("Typed while animating");
       await mode(page, "reduced");
       await expect(popup).toHaveAttribute("data-motion", "reduced");
       expect(
@@ -252,6 +265,11 @@ test.describe("B4 active transition interruption", () => {
         ),
       ).toBe(true);
       expect(await popup.evaluate((n) => n === (window as unknown as { saved: Element }).saved)).toBe(true);
+      if (draftNode) {
+        await expect(draft).toHaveValue("Typed while animating");
+        await expect(draft).toBeFocused();
+        expect(await draft.evaluate((node, saved) => node === saved, draftNode)).toBe(true);
+      }
       await mode(page, "full");
       const trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`).first();
       if (!hover(id)) {

@@ -17,9 +17,20 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 npx shadcn@latest add @cadence/popover
 ```
 
+The examples compose `@cadence/button`, `@cadence/checkbox`, `@cadence/label`, `@cadence/field`,
+and `@cadence/input` as needed. Install those items when copying their corresponding examples.
+
 ## Usage
 
 ```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Checkbox } from "@/components/cadence/checkbox";
+
+import { Label } from "@/components/cadence/label";
+
 import {
   Popover,
   PopoverContent,
@@ -28,18 +39,95 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/cadence/popover";
-import { Button } from "@/components/cadence/button";
 
-export function SharePopover() {
+export function ColumnPopover() {
+  const id = useId();
+  const [columns, setColumns] = useState(["Name", "Status", "Owner"]);
   return (
     <Popover>
-      <PopoverTrigger render={<Button variant="outline" />}>Share</PopoverTrigger>
-      <PopoverContent>
+      <PopoverTrigger render={<Button variant="outline" />}>Visible columns</PopoverTrigger>
+      <PopoverContent align="start">
         <PopoverHeader>
-          <PopoverTitle>Share this project</PopoverTitle>
-          <PopoverDescription>Anyone with the link can read it, nobody can edit it.</PopoverDescription>
+          <PopoverTitle>Visible columns</PopoverTitle>
+          <PopoverDescription>{columns.length} of four columns are shown.</PopoverDescription>
         </PopoverHeader>
-        <p className="text-sm">cadence.dev/p/cadence-ui</p>
+        <div className="mt-3 flex flex-col gap-2">
+          {["Name", "Status", "Owner", "Updated"].map((column) => (
+            <div key={column} className="flex items-center gap-2">
+              <Checkbox
+                id={`${id}-${column}`}
+                checked={columns.includes(column)}
+                onCheckedChange={(checked) =>
+                  setColumns((previous) =>
+                    checked ? [...previous, column] : previous.filter((value) => value !== column),
+                  )
+                }
+              />
+              <Label htmlFor={`${id}-${column}`} className="font-normal">
+                {column}
+              </Label>
+            </div>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+```
+
+## Column visibility
+
+The panel contains real checkboxes with independent caller-owned selection and unique label IDs. Its description follows the visible column count. This is the same common composition used above; ordinary examples inherit the site header.
+
+<ComponentExample name="columns" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Checkbox } from "@/components/cadence/checkbox";
+
+import { Label } from "@/components/cadence/label";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function ColumnPopover() {
+  const id = useId();
+  const [columns, setColumns] = useState(["Name", "Status", "Owner"]);
+  return (
+    <Popover>
+      <PopoverTrigger render={<Button variant="outline" />}>Visible columns</PopoverTrigger>
+      <PopoverContent align="start">
+        <PopoverHeader>
+          <PopoverTitle>Visible columns</PopoverTitle>
+          <PopoverDescription>{columns.length} of four columns are shown.</PopoverDescription>
+        </PopoverHeader>
+        <div className="mt-3 flex flex-col gap-2">
+          {["Name", "Status", "Owner", "Updated"].map((column) => (
+            <div key={column} className="flex items-center gap-2">
+              <Checkbox
+                id={`${id}-${column}`}
+                checked={columns.includes(column)}
+                onCheckedChange={(checked) =>
+                  setColumns((previous) =>
+                    checked ? [...previous, column] : previous.filter((value) => value !== column),
+                  )
+                }
+              />
+              <Label htmlFor={`${id}-${column}`} className="font-normal">
+                {column}
+              </Label>
+            </div>
+          ))}
+        </div>
       </PopoverContent>
     </Popover>
   );
@@ -48,53 +136,331 @@ export function SharePopover() {
 
 ## Positioned by side
 
-`side` and `align` choose the placement, and the panel flips when there is no room. The motion follows
-the anchor, not the side: the panel grows from `--transform-origin`, which Base UI points at the
-trigger.
+The four physical sides are separate fixed instances. Base UI flips a panel when space is insufficient, so the requested side is a preference rather than a guarantee. sideOffset controls the gap, not an animation distance.
+
+<ComponentExample name="sides" />
 
 ```tsx
-<PopoverContent side="top" align="start" sideOffset={8}>
-  …
-</PopoverContent>
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function PopoverSides() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["top", "right", "bottom", "left"] as const).map((side) => (
+        <Popover key={side}>
+          <PopoverTrigger render={<Button variant="outline" />}>{side}</PopoverTrigger>
+          <PopoverContent side={side} sideOffset={8} className="w-48">
+            <PopoverHeader>
+              <PopoverTitle>{side} placement</PopoverTitle>
+              <PopoverDescription>Base UI can flip this panel to avoid a collision.</PopoverDescription>
+            </PopoverHeader>
+          </PopoverContent>
+        </Popover>
+      ))}
+    </div>
+  );
+}
+```
+
+## Aligned to the trigger
+
+Start, center, and end alignments are fixed instances on the bottom side. alignOffset is zero here; the caller can change the numeric offset without changing the motion recipe. Collision handling can shift the final position.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function PopoverAlignments() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["start", "center", "end"] as const).map((align) => (
+        <Popover key={align}>
+          <PopoverTrigger render={<Button variant="outline" />}>{align}</PopoverTrigger>
+          <PopoverContent align={align} alignOffset={0} className="w-48">
+            <PopoverHeader>
+              <PopoverTitle>{align} alignment</PopoverTitle>
+              <PopoverDescription>Aligned to this trigger along the cross axis.</PopoverDescription>
+            </PopoverHeader>
+          </PopoverContent>
+        </Popover>
+      ))}
+    </div>
+  );
+}
+```
+
+## Logical sides and RTL
+
+inline-start and inline-end follow reading direction. This RTL example supplies Base UI DirectionProvider as well as the DOM dir attribute; setting DOM direction alone does not configure Base UI positioning. Each logical side has its own trigger.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+
+import { Button } from "@/components/cadence/button";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function LogicalPopovers() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl" className="flex flex-wrap gap-3">
+        {(["inline-start", "inline-end"] as const).map((side) => (
+          <Popover key={side}>
+            <PopoverTrigger render={<Button variant="outline" />}>{side}</PopoverTrigger>
+            <PopoverContent side={side} className="w-48">
+              <PopoverHeader>
+                <PopoverTitle>{side}</PopoverTitle>
+                <PopoverDescription>Logical placement follows right-to-left direction.</PopoverDescription>
+              </PopoverHeader>
+            </PopoverContent>
+          </Popover>
+        ))}
+      </div>
+    </DirectionProvider>
+  );
+}
 ```
 
 ## With a form
 
-The panel is a normal container, so `Field` and `Input` work inside it. Nothing traps focus: a popover
-is non-modal by default.
+This form owns its draft and saved name. Save submits and explicitly closes; dismissing does not save. Reopening retains the draft in caller state. The non-modal default allows focus to leave the panel.
+
+<ComponentExample name="form" />
 
 ```tsx
-<PopoverContent>
-  <PopoverHeader>
-    <PopoverTitle>Rename this view</PopoverTitle>
-  </PopoverHeader>
-  <Field>
-    <FieldLabel htmlFor="view-name">Name</FieldLabel>
-    <Input id="view-name" defaultValue="Open PRs" />
-  </Field>
-</PopoverContent>
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function FormPopover() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("Open PRs");
+  const [saved, setSaved] = useState("Open PRs");
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger render={<Button variant="outline" />}>Rename view</PopoverTrigger>
+        <PopoverContent>
+          <form
+            className="grid gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSaved(name);
+              setOpen(false);
+            }}
+          >
+            <PopoverHeader>
+              <PopoverTitle>Rename this view</PopoverTitle>
+              <PopoverDescription>The caller owns this draft and the saved name.</PopoverDescription>
+            </PopoverHeader>
+            <Field>
+              <FieldLabel htmlFor={id}>View name</FieldLabel>
+              <Input id={id} value={name} onValueChange={setName} required />
+            </Field>
+            <Button type="submit">Save view</Button>
+          </form>
+        </PopoverContent>
+      </Popover>
+      <p role="status" className="text-sm text-muted-foreground">
+        View: {saved}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Controlled
 
-```tsx
-const [open, setOpen] = useState(false);
+The external application opener changes open without clicking the trigger. A unique triggerId and matching trigger id keep that controlled update anchored. Finish editing closes explicitly; the trigger and Escape also report open changes.
 
-<Popover open={open} onOpenChange={setOpen}>
-  <PopoverContent>…</PopoverContent>
-</Popover>;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function ControlledPopover() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open from application state
+      </Button>
+      <Popover open={open} onOpenChange={setOpen} triggerId={id}>
+        <PopoverTrigger id={id} render={<Button variant="outline" />}>
+          View options
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeader>
+            <PopoverTitle>Application-owned panel</PopoverTitle>
+            <PopoverDescription>The trigger ID anchors external open updates to the same trigger.</PopoverDescription>
+          </PopoverHeader>
+          <Button className="mt-3" onClick={() => setOpen(false)}>
+            Finish editing
+          </Button>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
 ```
 
 ## Modal when it has to be
 
-A popover that holds a destructive control can trap focus and block the page behind it without becoming
-a dialog:
+False, true, and trap-focus are fixed instances. True blocks outside interactions and locks desktop page scrolling; trap-focus keeps focus inside without scroll locking. On touch devices Base UI may keep the page scrollable. Cadence does not export PopoverClose: compose Base UI Popover.Close through Button so Base UI registers the close part and enables the modal=true focus trap. It also gives touch screen readers an exit.
+
+<ComponentExample name="modal" />
 
 ```tsx
-<Popover modal>
-  <PopoverTrigger render={<Button variant="outline" />}>Danger zone</PopoverTrigger>
-  <PopoverContent>…</PopoverContent>
-</Popover>
+"use client";
+
+import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
+
+import { Button } from "@/components/cadence/button";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function ModalPopovers() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {([false, true, "trap-focus"] as const).map((modal) => (
+        <Popover key={String(modal)} modal={modal}>
+          <PopoverTrigger render={<Button variant="outline" />}>{String(modal)}</PopoverTrigger>
+          <PopoverContent>
+            <PopoverHeader>
+              <PopoverTitle>Modal: {String(modal)}</PopoverTitle>
+              <PopoverDescription>
+                False allows page interaction. True blocks outside interaction and locks desktop page scrolling.
+                Trap-focus keeps focus inside without scroll locking.
+              </PopoverDescription>
+            </PopoverHeader>
+            <PopoverPrimitive.Close render={<Button variant="outline" className="mt-3" />}>
+              Close options
+            </PopoverPrimitive.Close>
+          </PopoverContent>
+        </Popover>
+      ))}
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The first fixed scope uses none from portal insertion. The second restores full within that none provider; the OS reduced preference still wins. These explicit mode examples are separate from ordinary instances that inherit the header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/cadence/popover";
+
+export function PopoverMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <Popover>
+          <PopoverTrigger render={<Button variant="outline" />}>Open without motion</PopoverTrigger>
+          <PopoverContent data-testid="initial-none">
+            <PopoverHeader>
+              <PopoverTitle>Immediate popover</PopoverTitle>
+              <PopoverDescription>This portal starts at zero duration.</PopoverDescription>
+            </PopoverHeader>
+          </PopoverContent>
+        </Popover>
+        <CadenceProvider mode="full">
+          <Popover>
+            <PopoverTrigger render={<Button variant="outline" />}>Open nested full</PopoverTrigger>
+            <PopoverContent data-testid="nested-full">
+              <PopoverHeader>
+                <PopoverTitle>Nested full popover</PopoverTitle>
+                <PopoverDescription>The OS preference still wins over explicit full.</PopoverDescription>
+              </PopoverHeader>
+            </PopoverContent>
+          </Popover>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -114,9 +480,9 @@ a dialog:
 
 | Part | Props | Notes |
 | --- | --- | --- |
-| `Popover` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root. Non-modal by default. |
+| `Popover` | `open`, `defaultOpen`, `onOpenChange`, `triggerId`, `modal` | Base UI root; `modal=false` by default, also accepts `true` and `"trap-focus"`. |
 | `PopoverTrigger` | native button props, `render` | The anchor and the toggle. |
-| `PopoverContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal and positioner; `sideOffset` defaults to `4`. |
+| `PopoverContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Portal and positioner; side=`bottom`, align=`center`, sideOffset=`4`, alignOffset=`0`. Sides include physical and logical values. |
 | `PopoverHeader` | `className` | Stacked title and description. |
 | `PopoverTitle` | `className` | Base UI heading; the panel's accessible name. |
 | `PopoverDescription` | `className` | Muted supporting text; becomes `aria-describedby`. |
@@ -145,7 +511,7 @@ the class list carries a token and not a number.
 | Keys | Action |
 | --- | --- |
 | Enter / Space | Opens the popover from its trigger. |
-| Tab / Shift+Tab | Moves through the panel's controls and then out of it; focus is not trapped unless `modal`. |
+| Tab / Shift+Tab | Moves through the panel's controls and then out; modal focus trapping also needs a registered Base UI Close part, as in the modal example. |
 | Escape | Closes the popover and returns focus to the trigger. |
 
 Pressing outside closes it, which is the difference between a popover and an alert dialog.
@@ -177,11 +543,11 @@ default.
 
 ## Notes for AI
 
-- Use `popover` for anchored, dismissible content; use `alert-dialog` when the answer must be explicit.
+- Use `popover` for anchored, dismissible content; use `alert-dialog` for a deliberate confirmation.
 - Pass the trigger through `render`, not a wrapper: the trigger is what the positioner anchors to and
   what gets `aria-expanded`.
-- Do not simulate a modal confirmation with `modal`; it blocks outside interaction but still closes on
-  Escape, which is not what a confirmation promises.
+- Modal popovers still dismiss on Escape and outside presses. Alert Dialog blocks outside dismissal;
+  Escape can still cancel that confirmation.
 
 Popover resolves its local token clock inside the portal, including timeScale and
 reducedDurationScale. Callback classes/styles are evaluated with Base UI state and
