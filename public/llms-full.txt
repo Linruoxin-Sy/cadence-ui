@@ -5777,10 +5777,22 @@ npx shadcn@latest add @cadence/slider
 ## Usage
 
 ```tsx
+"use client";
+
+import { useState } from "react";
 import { Slider } from "@/components/cadence/slider";
 
-export function Volume() {
-  return <Slider defaultValue={[60]} max={100} aria-label="Volume" />;
+export function VolumeSlider() {
+  const [volume, setVolume] = useState(68);
+  return (
+    <div className="grid w-full max-w-72 gap-3">
+      <p className="flex items-center justify-between gap-4 text-sm">
+        <span>Volume</span>
+        <span className="text-muted-foreground tabular-nums">{volume}%</span>
+      </p>
+      <Slider aria-label="Volume" value={volume} onValueChange={setVolume} />
+    </div>
+  );
 }
 ```
 
@@ -5792,33 +5804,182 @@ are indistinguishable.
 
 ## Controlled
 
-```tsx
-const [volume, setVolume] = useState([60]);
+The caller owns the numeric value. `onValueChange` updates it during a gesture; `onValueCommitted` records the completed user change. Reset volume is an external value update, so it does not invent a new user commit or change any other example.
 
-<Slider value={volume} onValueChange={setVolume} aria-label="Volume" />;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Slider } from "@/components/cadence/slider";
+
+export function ControlledSlider() {
+  const [volume, setVolume] = useState(60);
+  const [committed, setCommitted] = useState<number | null>(null);
+  return (
+    <div className="grid w-full max-w-72 gap-4">
+      <Slider value={volume} onValueChange={setVolume} onValueCommitted={setCommitted} aria-label="Controlled volume" />
+      <p role="status" className="text-sm text-muted-foreground tabular-nums">
+        Volume: {volume}%; last committed: {committed === null ? "not changed" : `${committed}%`}
+      </p>
+      <Button variant="outline" size="sm" onClick={() => setVolume(60)}>
+        Reset volume
+      </Button>
+    </div>
+  );
+}
 ```
 
 ## Range
 
-```tsx
-<Slider defaultValue={[120, 480]} min={0} max={600} step={10} aria-label="Price" />
-```
+An array creates one thumb per entry. This price band steps by 10 and keeps two steps between values. Each thumb gets a distinct accessible name; `format` and `locale` provide currency value text without changing the stored numbers.
 
-Two entries in the array give two thumbs; `minStepsBetweenValues` keeps them from
-crossing.
+<ComponentExample name="range" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Slider } from "@/components/cadence/slider";
+
+export function PriceRange() {
+  const [price, setPrice] = useState([120, 480]);
+  return (
+    <div className="grid w-full max-w-72 gap-3">
+      <p className="text-sm tabular-nums">
+        Price: ${price[0]} – ${price[1]}
+      </p>
+      <Slider
+        value={price}
+        onValueChange={setPrice}
+        min={0}
+        max={600}
+        step={10}
+        minStepsBetweenValues={2}
+        format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
+        locale="en-US"
+        aria-label="Price"
+      />
+    </div>
+  );
+}
+```
 
 ## Vertical
 
-```tsx
-<Slider orientation="vertical" defaultValue={[40]} className="h-56" aria-label="Level" />
-```
+Give a vertical slider a height. This independent slider starts at 64 and uses the same native keyboard steps as the horizontal control; its track fills the supplied 10rem height.
 
-Give the vertical slider a height; the track fills it.
+<ComponentExample name="vertical" />
+
+```tsx
+"use client";
+
+import { Slider } from "@/components/cadence/slider";
+
+export function VerticalSlider() {
+  return <Slider orientation="vertical" defaultValue={64} className="h-40" aria-label="Level" />;
+}
+```
 
 ## Disabled
 
+The disabled slider stays visible at 40, but ignores pointer and keyboard changes. Explain the unavailable setting in nearby text rather than relying on a dimmed track alone.
+
+<ComponentExample name="disabled" />
+
 ```tsx
-<Slider defaultValue={[40]} disabled aria-label="Volume" />
+"use client";
+
+import { Slider } from "@/components/cadence/slider";
+
+export function DisabledSlider() {
+  return (
+    <div className="grid w-full max-w-72 gap-3">
+      <p className="text-sm text-muted-foreground">Volume unavailable: 40%</p>
+      <Slider defaultValue={40} disabled aria-label="Unavailable volume" />
+    </div>
+  );
+}
+```
+
+## Thumb collisions
+
+Each range has a fixed collision policy. While dragging, `push` moves the neighbouring thumb, `swap` hands the active thumb across the other value, and `none` clamps at the other thumb. These are independent ranges with the same starting values, not a policy selector. Keyboard bounds still respect the ordered values.
+
+<ComponentExample name="collisions" />
+
+```tsx
+"use client";
+
+import { Slider } from "@/components/cadence/slider";
+
+export function SliderCollisions() {
+  return (
+    <div className="grid w-full max-w-72 gap-6">
+      {(["push", "swap", "none"] as const).map((behavior) => (
+        <div key={behavior} className="grid gap-3">
+          <p className="text-sm">{behavior === "none" ? "Clamped" : behavior === "push" ? "Push" : "Swap"}</p>
+          <Slider defaultValue={[30, 60]} thumbCollisionBehavior={behavior} aria-label={`${behavior} range`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## Thumb alignment
+
+Cadence defaults to `edge`, placing the whole thumb inside the track endpoints. `center` places its centre on the endpoint. `edge-client-only` uses the edge geometry after hydration and omits its thumb from server markup; the track and this explanation remain readable without JavaScript. The other two provide server-rendered thumbs.
+
+<ComponentExample name="alignment" />
+
+```tsx
+"use client";
+
+import { Slider } from "@/components/cadence/slider";
+
+export function SliderAlignment() {
+  return (
+    <div className="grid w-full max-w-72 gap-6">
+      {(["edge", "center", "edge-client-only"] as const).map((alignment) => (
+        <div key={alignment} className="grid gap-3">
+          <p className="text-sm">{alignment}</p>
+          <Slider defaultValue={0} thumbAlignment={alignment} aria-label={`${alignment} alignment`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The first slider is explicitly `none` from its first render. Its value still follows pointer and keyboard input immediately, with no press scale. The second explicitly restores `full` inside that scope, subject to the system reduced-motion preference. Ordinary examples inherit the site header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Slider } from "@/components/cadence/slider";
+
+export function StaticSlider() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="grid w-full max-w-72 gap-6">
+        <div data-testid="initial-none">
+          <Slider defaultValue={50} aria-label="Static slider" />
+        </div>
+        <CadenceProvider mode="full">
+          <Slider defaultValue={50} aria-label="Explicit full slider" />
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -5850,6 +6011,15 @@ Give the vertical slider a height; the track fills it.
 | `className`          | `string` / state callback                          | –              | Merged last.                                    |
 
 Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchanged.
+
+| Additional prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `onValueCommitted` | `(value, details) => void` | – | Reports a completed user change. |
+| `largeStep` | `number` | `10` | Page and Shift+arrow increment. |
+| `minStepsBetweenValues` | `number` | `0` | Minimum separation, in steps. |
+| `thumbCollisionBehavior` | `"push" \| "swap" \| "none"` | `"push"` | Pointer collision policy. |
+| `thumbAlignment` | `"edge" \| "center" \| "edge-client-only"` | `"edge"` | Thumb position at endpoints. |
+| `name`, `form` | `string` | – | Native form identity and owner. |
 
 ## Motion contract
 
@@ -5883,14 +6053,14 @@ transition would make it trail the thumb by one frame per move.
 - Always pass `aria-label` (or `aria-labelledby`) — the fill has no text.
 - Show the current value as text next to the slider when the number matters.
   Dragging is not a way to read a value.
-- `aria-invalid` styles the control; validation is the caller's job (P11).
+- Supplied `aria-invalid` stays on the root; this wrapper does not add destructive colours or per-thumb error descriptions. The caller owns error text and native thumb associations (P11).
 
 ## Validation and data ownership
 
 | The component does                                | You do                                              |
 | ------------------------------------------------- | --------------------------------------------------- |
 | Reports the value through `onValueChange`         | Deciding whether the range is acceptable            |
-| Styles `aria-invalid`                             | Writing the error text and its `aria-describedby` id |
+| Forwards supplied `aria-invalid` on the root                             | Writing the error text and its `aria-describedby` id |
 | Steps and clamps the value to `min`/`max`         | Server-side bounds and business rules               |
 
 [Field](/components/field) shows how the invalid state and its message are wired.

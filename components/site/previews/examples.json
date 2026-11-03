@@ -25,5 +25,6 @@
   "spinner": ["button", "sizes", "label", "without-motion"],
   "checkbox": ["states", "controlled", "invalid", "settings", "disabled", "form-submission", "without-motion"],
   "radio-group": ["controlled", "invalid", "disabled", "locked", "horizontal", "form-submission", "without-motion"],
-  "switch": ["sizes", "controlled", "settings", "disabled", "without-motion"]
+  "switch": ["sizes", "controlled", "settings", "disabled", "without-motion"],
+  "slider": ["controlled", "range", "vertical", "disabled", "collisions", "alignment", "without-motion"]
 }

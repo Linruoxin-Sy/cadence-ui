@@ -296,3 +296,134 @@ for (const os of ["no-preference", "reduce"] as const)
         .evaluateAll((nodes) => nodes.map((node) => node.id));
       expect(new Set(ids).size).toBe(ids.length);
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Slider examples: native events, ranges, axes, alignment and collisions ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/slider?motion=${mode}&variant=vertical`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="slider"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.getByRole("slider")).toHaveCount(1);
+      const volume = top.getByRole("slider", { name: "Volume", exact: true });
+      await expect(top.locator('[data-slot="slider"]')).toHaveAttribute("data-orientation", "horizontal");
+      expect(
+        await page
+          .locator('[data-component-example^="slider/"]:not([data-component-example$="/without-motion"]) [data-motion]')
+          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await volume.focus();
+      await volume.press("Home");
+      await expect(volume).toHaveValue("0");
+      await volume.press("ArrowRight");
+      await expect(volume).toHaveValue("1");
+      await volume.press("PageUp");
+      await expect(volume).toHaveValue("11");
+      await volume.press("PageDown");
+      await expect(volume).toHaveValue("1");
+      const controlled = page.locator('[data-component-example="slider/controlled"]');
+      const input = controlled.getByRole("slider");
+      const saved = await input.elementHandle();
+      await input.focus();
+      await input.press("ArrowRight");
+      await expect(controlled.getByRole("status")).toHaveText("Volume: 61%; last committed: 61%");
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button: HTMLButtonElement) => button.click());
+      await expect(input).toBeFocused();
+      await expect(input).toHaveValue("61");
+      expect(await input.evaluate((node, saved) => node === saved, saved)).toBe(true);
+      await controlled.getByRole("button", { name: "Reset volume" }).click();
+      await expect(controlled.getByRole("status")).toHaveText("Volume: 60%; last committed: 61%");
+      await expect(volume).toHaveValue("1");
+      await top.scrollIntoViewIfNeeded();
+      const thumb = top.locator('[data-slot="slider-thumb"]');
+      const thumbBox = await thumb.boundingBox();
+      const trackBox = await top.locator('[data-slot="slider-track"]').boundingBox();
+      if (!thumbBox || !trackBox) throw new Error("missing volume geometry");
+      await page.mouse.move(thumbBox.x + thumbBox.width / 2, thumbBox.y + thumbBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(trackBox.x + trackBox.width * 0.7, thumbBox.y + thumbBox.height / 2, { steps: 5 });
+      await page.mouse.up();
+      expect(Number(await volume.inputValue())).toBeGreaterThan(50);
+      const range = page.locator('[data-component-example="slider/range"]');
+      const low = range.getByRole("slider", { name: "Price (minimum)", exact: true });
+      const high = range.getByRole("slider", { name: "Price (maximum)", exact: true });
+      await expect(low).toHaveAttribute("aria-valuetext", "$120 start range");
+      await expect(high).toHaveAttribute("aria-valuetext", "$480 end range");
+      await low.focus();
+      await low.press("Home");
+      await expect(low).toHaveValue("0");
+      await low.press("ArrowRight");
+      await expect(low).toHaveValue("10");
+      await low.press("End");
+      expect(Number(await high.inputValue()) - Number(await low.inputValue())).toBeGreaterThanOrEqual(20);
+      await high.focus();
+      await high.press("End");
+      await expect(high).toHaveValue("600");
+      const vertical = page.locator('[data-component-example="slider/vertical"]');
+      const level = vertical.getByRole("slider");
+      await expect(vertical.locator('[data-slot="slider"]')).toHaveAttribute("data-orientation", "vertical");
+      const verticalTrack = await vertical.locator('[data-slot="slider-track"]').boundingBox();
+      expect(verticalTrack?.height).toBe(160);
+      expect(verticalTrack?.width).toBe(6);
+      await level.focus();
+      await level.press("ArrowUp");
+      await expect(level).toHaveValue("65");
+      await level.press("Home");
+      await expect(level).toHaveValue("0");
+      await level.press("End");
+      await expect(level).toHaveValue("100");
+      const verticalThumb = await vertical.locator('[data-slot="slider-thumb"]').boundingBox();
+      if (!verticalThumb) throw new Error("missing vertical thumb");
+      await page.mouse.move(verticalThumb.x + verticalThumb.width / 2, verticalThumb.y + verticalThumb.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(verticalThumb.x + verticalThumb.width / 2, verticalThumb.y + 80, { steps: 5 });
+      await page.mouse.up();
+      expect(Number(await level.inputValue())).toBeLessThan(100);
+      const disabled = page.locator('[data-component-example="slider/disabled"]');
+      await expect(disabled.getByRole("slider")).toBeDisabled();
+      await disabled.scrollIntoViewIfNeeded();
+      const disabledTrack = await disabled.locator('[data-slot="slider-track"]').boundingBox();
+      if (!disabledTrack) throw new Error("missing disabled track");
+      await page.mouse.click(disabledTrack.x + disabledTrack.width * 0.8, disabledTrack.y + 3);
+      await expect(disabled.getByRole("slider")).toHaveValue("40");
+      for (const behavior of ["push", "swap", "none"] as const) {
+        const min = page.getByRole("slider", { name: `${behavior} range (minimum)`, exact: true });
+        const parent = min.locator('xpath=ancestor::*[@data-slot="slider"]');
+        await parent.scrollIntoViewIfNeeded();
+        const first = await parent.locator('[data-slot="slider-thumb"]').first().boundingBox();
+        const track = await parent.locator('[data-slot="slider-track"]').boundingBox();
+        if (!first || !track) throw new Error("missing collision geometry");
+        await page.mouse.move(first.x + first.width / 2, first.y + first.height / 2);
+        await page.mouse.down();
+        await page.mouse.move(track.x + track.width * 0.9, first.y + first.height / 2, { steps: 8 });
+        await page.mouse.up();
+        const values = await parent
+          .getByRole("slider")
+          .evaluateAll((nodes) => nodes.map((node) => Number((node as HTMLInputElement).value)));
+        if (behavior === "push") expect(values.every((value) => value > 80)).toBe(true);
+        else if (behavior === "swap") {
+          expect(values[0]).toBe(60);
+          expect(values[1]).toBeGreaterThan(80);
+        } else expect(values).toEqual([60, 60]);
+      }
+      const alignment = page.locator('[data-component-example="slider/alignment"]');
+      for (const name of ["edge", "center", "edge-client-only"]) {
+        const native = alignment.getByRole("slider", { name: `${name} alignment`, exact: true });
+        const parent = native.locator('xpath=ancestor::*[@data-slot="slider"]');
+        await parent.scrollIntoViewIfNeeded();
+        const left = await parent.evaluate((node) => {
+          const thumb = node.querySelector('[data-slot="slider-thumb"]')?.getBoundingClientRect();
+          const track = node.querySelector('[data-slot="slider-track"]')?.getBoundingClientRect();
+          if (!thumb || !track) throw new Error("missing alignment geometry");
+          return thumb.x - track.x;
+        });
+        expect(left).toBeCloseTo(name === "center" ? -8 : 0, 0);
+        await native.focus();
+        await native.press("End");
+        await expect(native).toHaveValue("100");
+      }
+    });
