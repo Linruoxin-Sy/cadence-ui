@@ -8,6 +8,13 @@ for (const os of ["no-preference", "reduce"] as const)
       await page.goto(`/components/checkbox?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const top = page.locator('[data-preview="checkbox"]');
+      expect(
+        await page
+          .locator(
+            '[data-component-example^="checkbox/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+          )
+          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+      ).toEqual([effectiveMode(mode, os === "reduce")]);
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.getByRole("checkbox")).toHaveCount(5);
       await expect(top.getByRole("checkbox", { name: "Indeterminate", exact: true })).toHaveAttribute(
@@ -89,6 +96,13 @@ for (const os of ["no-preference", "reduce"] as const)
       await page.goto(`/components/radio-group?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const top = page.locator('[data-preview="radio-group"]');
+      expect(
+        await page
+          .locator(
+            '[data-component-example^="radio-group/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+          )
+          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+      ).toEqual([effectiveMode(mode, os === "reduce")]);
       await expect(top.getByRole("combobox")).toHaveCount(0);
       await expect(top.getByRole("radio")).toHaveCount(3);
       await expect(top.getByRole("radio", { name: "Team", exact: true })).toBeChecked();
@@ -171,6 +185,114 @@ for (const os of ["no-preference", "reduce"] as const)
       await expect(form.getByRole("status")).toHaveText("Shipping: express");
       const ids = await page
         .locator('[data-component-example] [id], [data-preview="radio-group"] [id]')
+        .evaluateAll((nodes) => nodes.map((node) => node.id));
+      expect(new Set(ids).size).toBe(ids.length);
+    });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Switch examples: fixed sizes, immediate state and read-only settings ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/switch?motion=${mode}&variant=sm`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="switch"]');
+      expect(
+        await page
+          .locator('[data-component-example^="switch/"]:not([data-component-example$="/without-motion"]) [data-motion]')
+          .evaluateAll((nodes) => [...new Set(nodes.map((node) => node.getAttribute("data-motion")))]),
+      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.getByRole("switch")).toHaveCount(5);
+      await expect(top.getByRole("switch").first()).toHaveAttribute(
+        "data-motion",
+        effectiveMode(mode, os === "reduce"),
+      );
+      const sizes = page.locator('[data-component-example="switch/sizes"]');
+      const switches = sizes.getByRole("switch");
+      expect(await switches.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-size")))).toEqual([
+        "default",
+        "default",
+        "sm",
+        "sm",
+      ]);
+      for (let i = 0; i < 4; i++) {
+        const control = switches.nth(i);
+        const thumb = control.locator('[data-slot="switch-thumb"]');
+        const geometry = await control.evaluate((node) => {
+          const thumb = node.querySelector('[data-slot="switch-thumb"]');
+          if (!thumb) throw new Error("missing thumb");
+          return {
+            width: node.getBoundingClientRect().width,
+            thumb: thumb.getBoundingClientRect().width,
+            travel: node.clientWidth - (thumb as HTMLElement).offsetWidth,
+            x: new DOMMatrixReadOnly(getComputedStyle(thumb).transform).m41,
+          };
+        });
+        expect(geometry.width).toBe(i < 2 ? 32 : 24);
+        expect(geometry.thumb).toBe(i < 2 ? 16 : 12);
+        expect(geometry.x).toBeCloseTo(i % 2 ? geometry.travel : 0, 1);
+        await control.focus();
+        await control.press(" ");
+        await expect(control).toHaveAttribute("aria-checked", i % 2 ? "false" : "true");
+        await expect
+          .poll(() => thumb.evaluate((node) => new DOMMatrixReadOnly(getComputedStyle(node).transform).m41))
+          .toBeCloseTo(i % 2 ? 0 : geometry.travel, 1);
+      }
+      const controlled = page.locator('[data-component-example="switch/controlled"]');
+      const control = controlled.getByRole("switch");
+      const saved = await control.elementHandle();
+      await controlled.locator("label").click();
+      await expect(control).toBeChecked();
+      await expect(controlled.getByRole("status")).toHaveText("Alerts on in this example");
+      await control.focus();
+      await control.press("Enter");
+      await expect(control).not.toBeChecked();
+      await control.press(" ");
+      await expect(control).toBeChecked();
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button: HTMLButtonElement) => button.click());
+      await expect(control).toBeFocused();
+      await expect(control).toBeChecked();
+      expect(await control.evaluate((node, saved) => node === saved, saved)).toBe(true);
+      await controlled.getByRole("button", { name: "Turn alerts off" }).click();
+      await expect(control).not.toBeChecked();
+      await expect(top.getByRole("switch", { name: "Off", exact: true })).not.toBeChecked();
+      const disabled = page.locator('[data-component-example="switch/disabled"]');
+      await expect(disabled.getByRole("switch").nth(0)).toBeDisabled();
+      await expect(disabled.getByRole("switch").nth(1)).toBeDisabled();
+      await expect(disabled.getByRole("switch").nth(0)).not.toBeChecked();
+      await expect(disabled.getByRole("switch").nth(1)).toBeChecked();
+      await expect(disabled.locator("label").first()).toHaveCSS("opacity", "0.5");
+      const readonly = disabled.getByRole("switch", { name: "Read-only setting", exact: true });
+      await expect(readonly).toHaveAttribute("aria-readonly", "true");
+      await readonly.focus();
+      await readonly.press(" ");
+      await expect(readonly).toBeFocused();
+      await expect(readonly).toBeChecked();
+      await readonly.click();
+      await expect(readonly).toBeChecked();
+      const inputs = disabled.locator('input[type="checkbox"]');
+      expect(
+        await inputs.evaluateAll((nodes) =>
+          nodes.map((node) => ({
+            disabled: (node as HTMLInputElement).disabled,
+            checked: (node as HTMLInputElement).checked,
+            readonly: (node as HTMLInputElement).readOnly,
+          })),
+        ),
+      ).toEqual([
+        { disabled: true, checked: false, readonly: false },
+        { disabled: true, checked: true, readonly: false },
+        { disabled: false, checked: true, readonly: false },
+      ]);
+      const settings = page.locator('[data-component-example="switch/settings"]');
+      await expect(settings.getByRole("switch")).toHaveAccessibleDescription("A notification for every failed build.");
+      await settings.locator("label").click();
+      await expect(settings.getByRole("switch")).toBeChecked();
+      const ids = await page
+        .locator('[data-component-example] [id], [data-preview="switch"] [id]')
         .evaluateAll((nodes) => nodes.map((node) => node.id));
       expect(new Set(ids).size).toBe(ids.length);
     });

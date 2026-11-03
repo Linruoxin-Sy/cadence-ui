@@ -5485,14 +5485,23 @@ npx shadcn@latest add @cadence/switch
 ## Usage
 
 ```tsx
-import { Switch } from "@/components/cadence/switch";
-import { Label } from "@/components/cadence/label";
+"use client";
 
-export function Public() {
+import { useId } from "react";
+import { Label } from "@/components/cadence/label";
+import { Switch } from "@/components/cadence/switch";
+
+export function SwitchSettings() {
+  const id = useId();
   return (
-    <div className="flex items-center justify-between gap-4">
-      <Label htmlFor="public">Public workspace</Label>
-      <Switch id="public" defaultChecked />
+    <div className="flex w-full max-w-md items-center justify-between gap-4">
+      <div className="grid gap-1">
+        <Label htmlFor={id}>Deploy alerts</Label>
+        <p id={`${id}-help`} className="text-sm text-muted-foreground">
+          A notification for every failed build.
+        </p>
+      </div>
+      <Switch id={id} aria-describedby={`${id}-help`} />
     </div>
   );
 }
@@ -5500,42 +5509,166 @@ export function Public() {
 
 ## Sizes
 
-```tsx
-<Switch defaultChecked />
-<Switch size="sm" defaultChecked />
-```
+Both `default` and `sm` are fixed here, each initially off and on. Travel is measured from the track and thumb, so either size lands at its own endpoint. Each switch remains independently interactive.
 
-`size="sm"` keeps the same travel logic: the distance is measured from the track
-and the thumb, so restyling either keeps the end position correct.
+<ComponentExample name="sizes" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Label } from "@/components/cadence/label";
+import { Switch } from "@/components/cadence/switch";
+
+export function SwitchSizes() {
+  const id = useId();
+  return (
+    <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+      <div className="flex items-center gap-3">
+        <Switch id={`${id}-off`} />
+        <Label htmlFor={`${id}-off`}>Off</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Switch id={`${id}-on`} defaultChecked />
+        <Label htmlFor={`${id}-on`}>On</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Switch id={`${id}-small-off`} size="sm" />
+        <Label htmlFor={`${id}-small-off`}>Small</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Switch id={`${id}-small-on`} size="sm" defaultChecked />
+        <Label htmlFor={`${id}-small-on`}>Small, on</Label>
+      </div>
+    </div>
+  );
+}
+```
 
 ## Controlled
 
-```tsx
-const [on, setOn] = useState(false);
+The caller owns this immediate preference and status. Turn alerts off demonstrates an external update, separate from the other examples. This example keeps state locally; a real application persists the preference and reports save failures.
 
-<Switch checked={on} onCheckedChange={setOn} aria-label="Alerts" />;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Switch } from "@/components/cadence/switch";
+
+export function ControlledSwitch() {
+  const id = useId();
+  const [on, setOn] = useState(false);
+  return (
+    <div className="grid gap-4">
+      <div className="flex items-center gap-3">
+        <Switch id={id} checked={on} onCheckedChange={setOn} />
+        <Label htmlFor={id}>Alerts</Label>
+      </div>
+      <p role="status" className="text-sm text-muted-foreground">
+        Alerts {on ? "on" : "off"} in this example
+      </p>
+      <Button variant="outline" size="sm" onClick={() => setOn(false)}>
+        Turn alerts off
+      </Button>
+    </div>
+  );
+}
 ```
 
 ## In a settings row
 
-```tsx
-<div className="flex items-center justify-between gap-4">
-  <div className="grid gap-1">
-    <Label htmlFor="alerts">Deploy alerts</Label>
-    <p className="text-sm text-muted-foreground">A notification for every failed build.</p>
-  </div>
-  <Switch id="alerts" />
-</div>
-```
+The label names the setting and the description explains its effect. The switch keeps its size while the caller’s row lets the text wrap.
 
-## Disabled
+<ComponentExample name="settings" />
 
 ```tsx
-<Switch disabled defaultChecked />
+"use client";
+
+import { useId } from "react";
+import { Label } from "@/components/cadence/label";
+import { Switch } from "@/components/cadence/switch";
+
+export function SwitchSettings() {
+  const id = useId();
+  return (
+    <div className="flex w-full max-w-md items-center justify-between gap-4">
+      <div className="grid gap-1">
+        <Label htmlFor={id}>Deploy alerts</Label>
+        <p id={`${id}-help`} className="text-sm text-muted-foreground">
+          A notification for every failed build.
+        </p>
+      </div>
+      <Switch id={id} aria-describedby={`${id}-help`} />
+    </div>
+  );
+}
 ```
 
-Disabled switches stay visible and announced; hiding them loses the information
-that the setting exists.
+## Disabled and read-only
+
+Disabled switches retain their state and leave the tab order. Read-only stays focusable but cannot change. The disabled row marker also dims the label; neither state is a substitute for explaining why a setting is unavailable.
+
+<ComponentExample name="disabled" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Label } from "@/components/cadence/label";
+import { Switch } from "@/components/cadence/switch";
+
+export function DisabledSwitches() {
+  const id = useId();
+  return (
+    <div className="grid gap-4">
+      <div className="group flex items-center gap-3" data-disabled="true">
+        <Switch id={`${id}-off`} disabled />
+        <Label htmlFor={`${id}-off`}>Unavailable, off</Label>
+      </div>
+      <div className="group flex items-center gap-3" data-disabled="true">
+        <Switch id={`${id}-on`} disabled defaultChecked />
+        <Label htmlFor={`${id}-on`}>Unavailable, on</Label>
+      </div>
+      <div className="flex items-center gap-3">
+        <Switch id={`${id}-readonly`} readOnly defaultChecked />
+        <Label htmlFor={`${id}-readonly`}>Read-only setting</Label>
+      </div>
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The checked switch is explicitly `none` from its first render. Its thumb still reaches the measured checked endpoint, then jumps immediately when toggled. The neighbour explicitly restores `full` inside that scope, subject to system reduced-motion preferences. Ordinary switches follow the site header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Switch } from "@/components/cadence/switch";
+
+export function StaticSwitch() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex items-center gap-6">
+        <div data-testid="initial-none">
+          <Switch aria-label="Static switch" defaultChecked />
+        </div>
+        <CadenceProvider mode="full">
+          <Switch aria-label="Explicit full switch" />
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
+```
 
 ## When to use
 
@@ -5588,7 +5721,7 @@ decoration. What is dropped is the animation, so the movement is instant.
 | ------- | --------------------------------------- |
 | `Tab`   | Moves focus to the switch.              |
 | `Space` | Toggles the switch, unless `readOnly`.  |
-| `Enter` | Does not toggle — that is native button behaviour, and a switch is not a button. |
+| `Enter` | Toggles with the default Base UI keyboard handling, unless `readOnly`. |
 
 ## Accessibility
 
@@ -5605,9 +5738,10 @@ decoration. What is dropped is the animation, so the movement is instant.
 | The component does                              | You do                                          |
 | ------------------------------------------------ | ----------------------------------------------- |
 | Forwards `name`, `value`, `disabled`, `required` | Persisting the setting and handling failures     |
-| Exposes `aria-invalid` styling                   | Deciding whether the switch needs one at all     |
+| Forwards supplied `aria-invalid`                   | Deciding whether the switch needs one at all     |
 | Renders the on/off state                         | Announcing that the change was saved             |
 
+Invalid semantics do not add a destructive track style; supply a visible error message when needed.
 There is no `validate` or `schema` prop. [Field](/components/field) shows how the invalid state
 and its message are wired.
 
