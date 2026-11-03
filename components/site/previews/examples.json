@@ -1,6 +1,6 @@
 {
   "button": ["variants", "sizes", "links", "composition", "disabled"],
-  "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid"],
+  "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid", "multiple", "placement"],
   "tabs": ["controlled", "vertical", "line-style", "persistent", "list-sizing", "disabled"],
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
   "toc": ["nested", "controlled", "scroll-tracking"]

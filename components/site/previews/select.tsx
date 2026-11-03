@@ -172,8 +172,77 @@ function DisabledInvalid() {
   );
 }
 
+function Multiple() {
+  return (
+    <Select items={frameworks} multiple defaultValue={["next", "astro"]}>
+      <SelectTrigger aria-label="Multiple frameworks">
+        <SelectValue placeholder="Choose frameworks" />
+      </SelectTrigger>
+      <SelectContent>
+        {frameworks.map(({ value, label }) => (
+          <SelectItem key={value} value={value}>
+            {label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function Placement() {
+  const id = useId();
+  return (
+    <PreviewStack>
+      <PreviewRow>
+        {(["top", "right", "bottom", "left"] as const).map((side) => (
+          <div key={side} className="grid gap-2">
+            <label htmlFor={`${id}-${side}`} className="text-xs capitalize">
+              {side} panel
+            </label>
+            <Select items={frameworks} defaultValue="next">
+              <SelectTrigger id={`${id}-${side}`} aria-label={`Framework, ${side} panel`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent side={side} alignItemWithTrigger={false}>
+                {frameworks.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
+      </PreviewRow>
+      <PreviewRow>
+        {(["start", "center", "end"] as const).map((align) => (
+          <div key={align} className="grid gap-2">
+            <label htmlFor={`${id}-${align}`} className="text-xs capitalize">
+              {align} alignment
+            </label>
+            <Select items={frameworks} defaultValue="next">
+              <SelectTrigger id={`${id}-${align}`} aria-label={`Framework, ${align} alignment`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align={align} alignItemWithTrigger={false}>
+                {frameworks.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
+      </PreviewRow>
+    </PreviewStack>
+  );
+}
+
 const examples = {
   sizes: Sizes,
+  multiple: Multiple,
+  placement: Placement,
   groups: Groups,
   controlled: Controlled,
   "form-submission": FormSubmission,

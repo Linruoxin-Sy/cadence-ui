@@ -257,6 +257,108 @@ export function DisabledInvalid() {
 }
 ```
 
+## Multiple values
+
+`multiple` keeps an array of values and leaves the list open while options are toggled. The trigger lists the selected labels; Escape closes the list and restores focus. Use Combobox for a searchable multi-select or chips.
+
+<ComponentExample name="multiple" />
+
+```tsx
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/cadence/select";
+
+const frameworks = [
+  { value: "next", label: "Next.js" },
+  { value: "remix", label: "Remix" },
+  { value: "astro", label: "Astro" },
+];
+
+export function Multiple() {
+  return (
+    <Select items={frameworks} multiple defaultValue={["next", "astro"]}>
+      <SelectTrigger aria-label="Multiple frameworks">
+        <SelectValue placeholder="Choose frameworks" />
+      </SelectTrigger>
+      <SelectContent>
+        {frameworks.map(({ value, label }) => (
+          <SelectItem key={value} value={value}>
+            {label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+```
+
+## Panel placement
+
+The first row fixes the four sides; the second fixes start, center and end alignment. These examples disable `alignItemWithTrigger` so the popup uses the requested anchored placement instead of overlaying the selected item. Viewport collision handling may flip the effective side. Each trigger keeps its own value and associated label.
+
+<ComponentExample name="placement" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/cadence/select";
+
+const frameworks = [
+  { value: "next", label: "Next.js" },
+  { value: "remix", label: "Remix" },
+  { value: "astro", label: "Astro" },
+];
+
+export function Placement() {
+  const id = useId();
+  return (
+    <div className="flex w-full flex-col items-center gap-5">
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {(["top", "right", "bottom", "left"] as const).map((side) => (
+          <div key={side} className="grid gap-2">
+            <label htmlFor={`${id}-${side}`} className="text-xs capitalize">
+              {side} panel
+            </label>
+            <Select items={frameworks} defaultValue="next">
+              <SelectTrigger id={`${id}-${side}`} aria-label={`Framework, ${side} panel`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent side={side} alignItemWithTrigger={false}>
+                {frameworks.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {(["start", "center", "end"] as const).map((align) => (
+          <div key={align} className="grid gap-2">
+            <label htmlFor={`${id}-${align}`} className="text-xs capitalize">
+              {align} alignment
+            </label>
+            <Select items={frameworks} defaultValue="next">
+              <SelectTrigger id={`${id}-${align}`} aria-label={`Framework, ${align} alignment`}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align={align} alignItemWithTrigger={false}>
+                {frameworks.map(({ value, label }) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
 ## When to use
 
 - Choosing one value from a list that is too long for radios but too short to need search.
