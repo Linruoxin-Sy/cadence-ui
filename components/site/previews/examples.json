@@ -19,5 +19,6 @@
   "item": ["whole-row-link", "variants", "sizes", "media", "separators", "header-footer"],
   "field": ["orientation", "responsive", "caller-error", "fieldset", "choice-card"],
   "button-group": ["vertical", "static-text", "separator"],
-  "input-group": ["alignments", "button", "textarea", "invalid"]
+  "input-group": ["alignments", "button", "textarea", "invalid"],
+  "breadcrumb": ["collapsed", "separator", "router"]
 }

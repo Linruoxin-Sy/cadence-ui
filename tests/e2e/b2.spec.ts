@@ -135,10 +135,14 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             const link = p.locator("a[href]").first();
             await link.focus();
             await link.press("Enter");
-            await expect(page).toHaveURL(new RegExp(`#${id}$`));
+            if (id === "breadcrumb") {
+              await expect(page).toHaveURL(/\/$/);
+              await page.goBack();
+              await page.waitForLoadState("networkidle");
+            } else await expect(page).toHaveURL(new RegExp(`#${id}$`));
             if (id !== "item") await expect(p.locator('[aria-current="page"]').first()).toBeVisible();
           }
-          const buttons = p.getByRole("button");
+          const buttons = p.getByRole("button").and(p.locator('[data-slot="button"]'));
           if (await buttons.count()) {
             await buttons.first().scrollIntoViewIfNeeded();
             const scale = await pressScale(page, `[data-preview="${id}"] [data-slot="button"]`);
@@ -228,6 +232,16 @@ for (const colorScheme of ["light", "dark"] as const) {
             await page.locator(`[data-component-example="${id}/${name}"]`).screenshot({
               path: `.cache/b2-proof/${id}-${colorScheme}-${width}-${name}.png`,
             });
+          if (id === "breadcrumb") {
+            const collapsed = page.locator('[data-component-example="breadcrumb/collapsed"]');
+            await collapsed.locator("summary").click();
+            await expect(collapsed.getByRole("link", { name: "Documentation", exact: true })).toBeVisible();
+            expect(
+              (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
+            ).toEqual([]);
+            await collapsed.screenshot({ path: `.cache/b2-proof/${id}-${colorScheme}-${width}-expanded.png` });
+            await collapsed.locator("summary").click();
+          }
         }
         expect(errors).toEqual([]);
       });

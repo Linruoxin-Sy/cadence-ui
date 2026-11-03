@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -11,56 +12,113 @@ import {
 } from "@/registry/cadence/breadcrumb";
 import { PreviewStack } from "./shell";
 
-/**
- * The trail, then the same trail collapsed: an ellipsis in the middle and a
- * separator that accepts any child, so a chevron can become a slash without a new
- * component. The last crumb is `BreadcrumbPage`, which is the current page and not a
- * link.
- */
-export function BreadcrumbPreview() {
+export function CollapsedTrail() {
+  return (
+    <Breadcrumb aria-label="Collapsed guide trail">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <details className="relative">
+            <summary
+              aria-label="Show ancestors"
+              className="cursor-pointer list-none rounded-sm focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden"
+            >
+              <BreadcrumbEllipsis />
+            </summary>
+            <div className="absolute top-full left-0 rounded-md border bg-popover p-3 text-popover-foreground shadow-md">
+              <BreadcrumbLink href="/docs" className="whitespace-nowrap">
+                Documentation
+              </BreadcrumbLink>
+            </div>
+          </details>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Motion modes</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+export function CustomSeparator() {
+  return (
+    <Breadcrumb aria-label="Slash trail">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>/</BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>/</BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+export function RouterTrail() {
+  return (
+    <Breadcrumb aria-label="Router trail">
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink render={<Link href="/components" />}>Components</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}
+
+function Specimen() {
+  return (
+    <div className="grid gap-4">
+      <Breadcrumb aria-label="Component trail">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <CollapsedTrail />
+    </div>
+  );
+}
+
+export function BreadcrumbPreview({ example }: { example?: string }) {
   return (
     <PreviewStack>
-      <div className="grid gap-4">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#breadcrumb">Workspace</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#breadcrumb">Projects</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>cadence-ui</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#breadcrumb">Workspace</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbEllipsis />
-            </BreadcrumbItem>
-            <BreadcrumbSeparator>
-              <span className="text-muted-foreground/60">/</span>
-            </BreadcrumbSeparator>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="#breadcrumb">registry</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator>
-              <span className="text-muted-foreground/60">/</span>
-            </BreadcrumbSeparator>
-            <BreadcrumbItem>
-              <BreadcrumbPage>dialog.tsx</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
+      {example === "collapsed" ? (
+        <CollapsedTrail />
+      ) : example === "separator" ? (
+        <CustomSeparator />
+      ) : example === "router" ? (
+        <RouterTrail />
+      ) : (
+        <Specimen />
+      )}
     </PreviewStack>
   );
 }
