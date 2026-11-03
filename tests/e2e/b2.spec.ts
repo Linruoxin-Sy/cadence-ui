@@ -108,18 +108,25 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
                 node.selectionEnd,
               ]),
             ).toEqual([true, 0, 1]);
-            await expect(p.locator('[aria-invalid="true"]')).toHaveCount(1);
+            await expect(
+              id === "field"
+                ? page.locator('[data-component-example="field/caller-error"] [aria-invalid="true"]')
+                : p.locator('[aria-invalid="true"]'),
+            ).toHaveCount(1);
             if (id === "field") {
-              const responsive = p.locator('[data-orientation="responsive"]');
+              const responsive = page
+                .locator('[data-component-example="field/responsive"] [data-orientation="responsive"]')
+                .first();
               expect(await responsive.evaluate((node) => getComputedStyle(node).flexDirection)).toBe("column");
-              const vat = p.getByRole("textbox", { name: "VAT number" });
+              const error = page.locator('[data-component-example="field/caller-error"]');
+              const vat = error.getByRole("textbox", { name: "VAT number" });
               await vat.fill("supplied-value");
               for (let i = 0; i < 4; i++) {
-                await p.getByRole("button", { name: "Toggle supplied error" }).click();
+                await error.getByRole("button", { name: "Toggle supplied error" }).click();
                 await expect(vat).toHaveAttribute("aria-invalid", i % 2 === 0 ? "false" : "true");
               }
               await expect(vat).toHaveValue("supplied-value");
-              await expect(p.locator('[data-slot="field-error"]')).toBeVisible();
+              await expect(error.locator('[data-slot="field-error"]')).toBeVisible();
               await page.setViewportSize({ width: 1280, height: 1000 });
               expect(await responsive.evaluate((node) => getComputedStyle(node).flexDirection)).toBe("row");
             }
@@ -141,6 +148,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           }
           const buttons = p.getByRole("button");
           if (await buttons.count()) {
+            await buttons.first().scrollIntoViewIfNeeded();
             const scale = await pressScale(page, `[data-preview="${id}"] [data-slot="button"]`);
             if (effectiveMode(mode, reducedMotion === "reduce") === "full") expect(scale).toBeLessThan(0.99);
             else expect(scale).toBe(1);

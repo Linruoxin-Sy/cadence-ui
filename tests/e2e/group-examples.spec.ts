@@ -96,3 +96,97 @@ for (const os of ["no-preference", "reduce"] as const)
       await row.press("Enter");
       await expect(page).toHaveURL(/\/docs\/installation$/);
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Field examples: real associations, responsive containers and caller-owned errors ${mode}/${os}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/field?motion=${mode}&variant=horizontal`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="field"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.locator('[data-slot="field"]')).toHaveCount(1);
+      const initialCheckbox = page.locator('[data-component-example="field/choice-card"]').getByRole("checkbox");
+      await expect(initialCheckbox).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
+      const company = top.getByRole("textbox", { name: "Company", exact: true });
+      await top.getByText("Company", { exact: true }).click();
+      await expect(company).toBeFocused();
+      await company.fill("Independent top draft");
+      const orientations = page.locator('[data-component-example="field/orientation"]');
+      await expect(orientations.locator('[data-orientation="vertical"]')).toHaveCSS("flex-direction", "column");
+      await expect(orientations.locator('[data-orientation="horizontal"]')).toHaveCSS("flex-direction", "row");
+      const responsive = page.locator('[data-component-example="field/responsive"] [data-slot="field"]');
+      await page.setViewportSize({ width: 1280, height: 1000 });
+      await expect(responsive.nth(0)).toHaveCSS("flex-direction", "row");
+      await expect(responsive.nth(1)).toHaveCSS("flex-direction", "column");
+      await page.setViewportSize({ width: 390, height: 1000 });
+      await expect(responsive.nth(0)).toHaveCSS("flex-direction", "column");
+      await expect(responsive.nth(1)).toHaveCSS("flex-direction", "column");
+      await page.setViewportSize({ width: 1280, height: 1000 });
+      const errors = page.locator('[data-component-example="field/caller-error"]');
+      const vat = errors.getByRole("textbox", { name: "VAT number" });
+      await expect(vat).toHaveAccessibleDescription(
+        "That VAT number has the wrong number of digits. Include the country prefix.",
+      );
+      await expect(errors.getByRole("listitem")).toHaveCount(2);
+      const original = await vat.elementHandle();
+      await vat.fill("supplied-value");
+      const toggle = errors.getByRole("button", { name: "Toggle supplied error" });
+      await toggle.scrollIntoViewIfNeeded();
+      expect(await pressScale(page, '[data-component-example="field/caller-error"] [data-slot="button"]')).toBeCloseTo(
+        effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
+        2,
+      );
+      await expect(errors.getByRole("alert")).toHaveCount(0);
+      await expect(vat).toHaveAttribute("aria-invalid", "false");
+      await expect(vat).toHaveAccessibleDescription("Use the number on your invoice.");
+      for (let i = 0; i < 3; i++) await toggle.click();
+      await expect(errors.getByRole("listitem")).toHaveCount(2);
+      await expect(vat).toHaveValue("supplied-value");
+      await vat.focus();
+      await vat.press("Home");
+      await vat.press("Shift+ArrowRight");
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button: HTMLButtonElement) => button.click());
+      await expect(vat).toBeFocused();
+      expect(
+        await vat.evaluate(
+          (node: HTMLInputElement, original) => [node === original, node.selectionStart, node.selectionEnd],
+          original,
+        ),
+      ).toEqual([true, 0, 1]);
+      await expect(company).toHaveValue("Independent top draft");
+      const set = page.locator('[data-component-example="field/fieldset"]');
+      await expect(set.locator("fieldset")).toHaveCount(2);
+      await expect(set.getByRole("group", { name: "Billing details", exact: true })).toBeVisible();
+      await expect(set.locator('legend[data-variant="label"]')).toHaveText("Invoice contact");
+      expect(
+        await set
+          .locator('[data-slot="field-separator"]')
+          .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-content"))),
+      ).toEqual(["true", "false"]);
+      const choice = page.locator('[data-component-example="field/choice-card"]');
+      const checkbox = choice.getByRole("checkbox");
+      await expect(checkbox).toBeChecked();
+      await expect(checkbox).toHaveAccessibleName(/Team plan/);
+      await expect(checkbox).toHaveAccessibleDescription("Unlimited projects for your team.");
+      await choice.getByText("Team plan", { exact: true }).click();
+      await expect(checkbox).not.toBeChecked();
+      await checkbox.focus();
+      await checkbox.press(" ");
+      await expect(checkbox).toBeChecked();
+      await expect(checkbox).toHaveAttribute("data-motion", "none");
+      const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(
+        await page
+          .locator('[data-slot="field"]')
+          .evaluateAll((nodes) =>
+            nodes.every((node) => !node.hasAttribute("data-motion") && node.getAnimations().length === 0),
+          ),
+      ).toBe(true);
+    });

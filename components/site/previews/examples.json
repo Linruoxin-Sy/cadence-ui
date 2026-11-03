@@ -16,5 +16,6 @@
   "skeleton": ["text-lines", "avatar-name", "swap-content", "without-motion"],
   "alert": ["action", "without-icon", "destructive"],
   "empty": ["boundaries", "second-action", "media", "without-media"],
-  "item": ["whole-row-link", "variants", "sizes", "media", "separators", "header-footer"]
+  "item": ["whole-row-link", "variants", "sizes", "media", "separators", "header-footer"],
+  "field": ["orientation", "responsive", "caller-error", "fieldset", "choice-card"]
 }
