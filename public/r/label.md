@@ -17,14 +17,18 @@ npx shadcn@latest add @cadence/label
 ## Usage
 
 ```tsx
+"use client";
+
+import { useId } from "react";
 import { Input } from "@/components/cadence/input";
 import { Label } from "@/components/cadence/label";
 
 export function EmailField() {
+  const id = useId();
   return (
     <div className="grid gap-2">
-      <Label htmlFor="email">Email</Label>
-      <Input id="email" type="email" autoComplete="email" />
+      <Label htmlFor={id}>Email</Label>
+      <Input id={id} type="email" autoComplete="email" />
     </div>
   );
 }
@@ -34,24 +38,55 @@ export function EmailField() {
 
 Either association works: `htmlFor` + `id`, or wrapping the control. Pick one per
 field and keep it consistent.
+This example wraps a native checkbox and needs no `id` or `htmlFor`. Clicking the
+words toggles that checkbox; it does not affect the separate checkbox above.
+
+<ComponentExample name="wrapping" />
 
 ```tsx
-<Label>
-  <input type="checkbox" />
-  Email me about releases
-</Label>
+import { Label } from "@/components/cadence/label";
+
+export function WrappedPreference() {
+  return (
+    <Label>
+      <input type="checkbox" defaultChecked />
+      Email me about releases
+    </Label>
+  );
+}
 ```
 
 ## Disabled
 
 The label follows the control without any prop: `peer-disabled:` handles a sibling
 control placed before the label; `group-data-[disabled=true]:` handles a disabled group.
+These two arrangements show both relationships. Set `disabled` on the actual
+control; styling a label never disables an input. `useId` keeps repeated fields independent.
+
+<ComponentExample name="disabled" />
 
 ```tsx
-<div className="group grid gap-2" data-disabled="true">
-  <Label htmlFor="slug">Slug</Label>
-  <Input id="slug" disabled defaultValue="cadence" />
-</div>
+"use client";
+
+import { useId } from "react";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+
+export function DisabledFields() {
+  const id = useId();
+  return (
+    <div className="flex flex-wrap items-start gap-4">
+      <div className="group grid w-56 gap-2" data-disabled="true">
+        <Label htmlFor={`${id}-slug`}>Slug</Label>
+        <Input id={`${id}-slug`} disabled defaultValue="cadence" />
+      </div>
+      <div className="grid w-56 gap-2">
+        <Input id={`${id}-workspace`} className="peer" disabled defaultValue="Cadence UI" />
+        <Label htmlFor={`${id}-workspace`}>Workspace</Label>
+      </div>
+    </div>
+  );
+}
 ```
 
 ## When to use
