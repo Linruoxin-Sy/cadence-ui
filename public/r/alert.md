@@ -68,10 +68,7 @@ When there is no direct icon child, the icon column collapses to zero and the te
 <ComponentExample name="without-icon" />
 
 ```tsx
-import { useState } from "react";
-import { CircleAlertIcon, TriangleAlertIcon } from "lucide-react";
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/cadence/alert";
-import { Button } from "@/components/cadence/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/cadence/alert";
 
 export function AlertWithoutIcon() {
   return (
@@ -90,10 +87,8 @@ export function AlertWithoutIcon() {
 <ComponentExample name="destructive" />
 
 ```tsx
-import { useState } from "react";
-import { CircleAlertIcon, TriangleAlertIcon } from "lucide-react";
-import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/cadence/alert";
-import { Button } from "@/components/cadence/button";
+import { TriangleAlertIcon } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/cadence/alert";
 
 export function DestructiveAlert() {
   return (
