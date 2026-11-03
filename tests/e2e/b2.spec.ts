@@ -11,18 +11,29 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     for (const mode of MODES) {
       test(`spinner real rotation and live mode ${mode}`, async ({ page }) => {
         await page.addInitScript(() => {
-          const store = window as unknown as { firstStatic: { transform: string; animations: number }[] };
+          const store = window as unknown as {
+            firstStatic: { mode: string | null; transform: string; animations: number }[];
+          };
           store.firstStatic = [];
-          const observer = new MutationObserver(() => {
-            const node = document.querySelector('[data-testid="static-spinner"]');
-            if (node && store.firstStatic.length === 0) {
+          const sample = () => {
+            const node = document.querySelector(
+              '[data-component-example="spinner/without-motion"] [data-testid="static-spinner"]',
+            );
+            if (node) {
               store.firstStatic.push({
+                mode: node.getAttribute("data-motion"),
                 transform: getComputedStyle(node).transform,
                 animations: node.getAnimations().length,
               });
             }
-          });
-          observer.observe(document, { childList: true, subtree: true });
+          };
+          new MutationObserver(sample).observe(document, { childList: true, subtree: true });
+          let remaining = 120;
+          const tick = () => {
+            sample();
+            if (--remaining) requestAnimationFrame(tick);
+          };
+          tick();
         });
         const actual = effectiveMode(mode, reducedMotion === "reduce");
         await openComponent(page, "spinner", mode, "spinner", actual);
@@ -30,7 +41,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         const sample = () =>
           spinner.evaluate(async (node) => {
             const frames: { transform: string; opacity: string; animations: number }[] = [];
-            const end = performance.now() + 250;
+            // The default theme spin is one second: observe more than a full cycle.
+            const end = performance.now() + 1100;
             while (performance.now() < end) {
               await new Promise(requestAnimationFrame);
               const s = getComputedStyle(node);
@@ -39,30 +51,82 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             return frames;
           });
         const frames = await sample();
-        expect(await page.evaluate(() => (window as unknown as { firstStatic: unknown[] }).firstStatic)).toEqual([
-          { transform: "none", animations: 0 },
-        ]);
+        const firstStatic = await page.evaluate(
+          () =>
+            (window as unknown as { firstStatic: { mode: string | null; transform: string; animations: number }[] })
+              .firstStatic,
+        );
+        expect(firstStatic.length).toBeGreaterThan(1);
+        expect(
+          firstStatic.every((frame) => frame.mode === "none" && frame.transform === "none" && frame.animations === 0),
+        ).toBe(true);
         expect(frames.every((s) => s.opacity === "1")).toBe(true);
         if (actual === "none") expect(frames.every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
         else {
           expect(new Set(frames.map((s) => s.transform)).size).toBeGreaterThan(3);
           expect(frames.every((s) => s.animations === 1)).toBe(true);
+          const rotation = frames.reduce(
+            (state, frame) => {
+              const matrix = frame.transform
+                .match(/matrix\(([^)]+)\)/)?.[1]
+                ?.split(",")
+                .map(Number);
+              const angle = matrix ? (Math.atan2(matrix[1] ?? 0, matrix[0] ?? 1) * 180) / Math.PI : 0;
+              let delta = state.last === null ? 0 : angle - state.last;
+              if (delta < -180) delta += 360;
+              if (delta > 180) delta -= 360;
+              return { last: angle, degrees: state.degrees + delta };
+            },
+            { last: null as number | null, degrees: 0 },
+          );
+          expect(rotation.degrees).toBeGreaterThan(350);
         }
+        const top = page.locator('[data-preview="spinner"]');
+        await expect(top.getByRole("combobox")).toHaveCount(0);
+        const sizes = page.locator('[data-component-example="spinner/sizes"] [data-slot="spinner"]');
+        // A rotating square's projected bounding rectangle changes; its layout size does not.
+        expect(
+          await sizes.evaluateAll((nodes) => nodes.map((node) => Number.parseFloat(getComputedStyle(node).width))),
+        ).toEqual([12, 16, 24, 32]);
+        if (actual === "none")
+          expect(await sizes.evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().width))).toEqual([
+            12, 16, 24, 32,
+          ]);
+        expect(await sizes.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-motion")))).toEqual([
+          actual,
+          actual,
+          actual,
+          actual,
+        ]);
+        await expect(
+          page.locator('[data-component-example="spinner/label"]').getByRole("status", { name: "Saving invoice" }),
+        ).toBeVisible();
+        const saving = page
+          .locator('[data-component-example="spinner/button"]')
+          .getByRole("button", { name: "Saving", exact: true });
+        await expect(saving).toBeDisabled();
+        await expect(saving).toHaveAttribute("aria-busy", "true");
+        expect(await saving.evaluate((node) => node.getBoundingClientRect().height)).toBe(32);
         await spinner.evaluate((node) => {
           (window as unknown as { spinner: Element }).spinner = node;
         });
-        const select = page.getByLabel("Spinner motion");
-        await select.selectOption("none");
-        expect((await sample()).every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
         await page
           .getByRole("group", { name: "Motion mode" })
           .getByRole("button", { name: "none", exact: true })
           .click();
-        await select.selectOption("full");
+        expect((await sample()).every((s) => s.transform === "none" && s.animations === 0)).toBe(true);
+        await page
+          .getByRole("group", { name: "Motion mode" })
+          .getByRole("button", { name: "full", exact: true })
+          .click();
         await expect(spinner).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
         expect(new Set((await sample()).map((s) => s.transform)).size).toBeGreaterThan(3);
         await page.emulateMedia({ reducedMotion: "reduce" });
         await expect(spinner).toHaveAttribute("data-motion", "reduced");
+        expect(new Set((await sample()).map((s) => s.transform)).size).toBeGreaterThan(3);
+        await expect(
+          page.locator('[data-component-example="spinner/without-motion"] [data-slot="spinner"]'),
+        ).toHaveAttribute("data-motion", "none");
         expect(await spinner.evaluate((node) => node === (window as unknown as { spinner: Element }).spinner)).toBe(
           true,
         );

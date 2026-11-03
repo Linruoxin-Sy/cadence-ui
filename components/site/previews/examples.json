@@ -21,5 +21,6 @@
   "button-group": ["vertical", "static-text", "separator"],
   "input-group": ["alignments", "button", "textarea", "invalid"],
   "breadcrumb": ["collapsed", "separator", "router"],
-  "pagination": ["collapsed", "labels", "local-state", "sizes", "boundary"]
+  "pagination": ["collapsed", "labels", "local-state", "sizes", "boundary"],
+  "spinner": ["button", "sizes", "label", "without-motion"]
 }

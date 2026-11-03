@@ -31,42 +31,89 @@ export function LoadingRegistry() {
 
 ## Inside a button
 
-The button keeps its width because the spinner replaces nothing: keep the label and
-put the spinner in front of it, or reserve the label's space with `aria-live`.
+Keep the button’s written label and disable it while work is pending. `aria-busy` names the
+button’s busy state; hide the redundant spinner glyph from assistive technology here so it does
+not duplicate that label. This fixed pending state does not start a request or own its lifetime.
+If switching from an idle label changes the width, reserve that width in the caller’s layout.
+
+<ComponentExample name="button" />
 
 ```tsx
-<Button disabled size="sm">
-  <Spinner />
-  Saving
-</Button>
+import { Button } from "@/components/cadence/button";
+import { Spinner } from "@/components/cadence/spinner";
+
+export function SavingButton() {
+  return (
+    <Button disabled size="sm" aria-busy="true">
+      <Spinner aria-hidden="true" />
+      Saving
+    </Button>
+  );
+}
 ```
 
 ## Sized by the caller
 
-The icon is `size-4` by default and inherits `currentColor`, so one class resizes and
-recolours it.
+The icon is `size-4` by default and inherits `currentColor`. The fixed 12, 16, 24 and 32 pixel
+specimens show caller classes rather than a finite `size` prop. Muted text colour belongs to the
+first specimen only; each glyph keeps its own accessible loading status and inherits header motion.
+
+<ComponentExample name="sizes" />
 
 ```tsx
-<Spinner className="size-3 text-muted-foreground" />
+import { Spinner } from "@/components/cadence/spinner";
+
+export function SpinnerSizes() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-4">
+      <Spinner className="size-3 text-muted-foreground" />
+      <Spinner />
+      <Spinner className="size-6" />
+      <Spinner className="size-8" />
+    </div>
+  );
+}
 ```
 
 ## A specific label
 
-"Loading" is the default. Say what is loading when the surrounding text does not.
+“Loading” is the default accessible name. Say what is loading when surrounding text does not: this
+standalone status announces “Saving invoice” without adding a focus stop. The caller decides when
+to mount it and must expose completion or an error through its own result UI.
+
+<ComponentExample name="label" />
 
 ```tsx
-<Spinner aria-label="Saving invoice" />
+import { Spinner } from "@/components/cadence/spinner";
+
+export function SavingInvoice() {
+  return <Spinner aria-label="Saving invoice" />;
+}
 ```
 
 ## Under `data-motion="none"`
 
-The rotation stops; the icon stays and the label still says "Loading". A stopped
-spinner is still a state, which is why `none` does not remove it from the tree.
+This example explicitly fixes its provider to `none` from the first render, independently of the
+header. The spinner stays visible and named, with no rotation or running animation; it is not a
+post-mount mode switch. Other examples inherit the header. Both full and reduced keep Spinner’s
+single-glyph rotation, the animation system’s specific reduced-motion exception.
+
+<ComponentExample name="without-motion" />
 
 ```tsx
-<CadenceProvider mode="none">
-  <Spinner />
-</CadenceProvider>
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Spinner } from "@/components/cadence/spinner";
+
+export function StaticSpinner() {
+  return (
+    <CadenceProvider mode="none">
+      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <Spinner aria-label="Static loading" data-testid="static-spinner" />
+        Loading the registry…
+      </span>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
