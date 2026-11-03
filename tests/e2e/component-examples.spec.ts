@@ -21,7 +21,7 @@ for (const [id, examples] of Object.entries(catalog)) {
       const md = await request.get(`/r/${id}.md`);
       expect(md.status()).toBe(200);
       const distributed = await md.text();
-      expect(distributed.match(/```tsx\n/g)?.length).toBeGreaterThanOrEqual(examples.length + 1);
+      expect(distributed.match(/```tsx\r?\n/g)?.length).toBeGreaterThanOrEqual(examples.length + 1);
       expect(distributed).toContain(`@/components/cadence/${id}`);
       const payload = await request.get(`/r/${id}.json`);
       expect((await payload.json()).docs).toContain("## Usage");
@@ -113,4 +113,89 @@ for (const theme of ["light", "dark"])
       await page
         .locator('[data-component-example="button/variants"]')
         .screenshot({ path: `.cache/component-examples-proof/button-variants-${theme}-${width}.png` });
+    });
+
+for (const mode of ["full", "reduced", "none"] as const)
+  for (const os of [false, true])
+    test(`Select examples: fixed shapes, independent selection and form ownership ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
+      await page.goto(`/components/select?motion=${mode}&variant=sm#sizes`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="select"]');
+      await expect(top.getByRole("combobox")).toHaveCount(2);
+      await expect(top.locator("select")).toHaveCount(0);
+      for (const scope of [top, page.locator('[data-component-example="select/sizes"]')]) {
+        await expect(scope.locator('[data-size="default"]').first()).toBeVisible();
+        await expect(scope.locator('[data-size="sm"]')).toBeVisible();
+      }
+      const sizes = page.locator('[data-component-example="select/sizes"]');
+      await expect(sizes.getByRole("combobox", { name: "Framework, empty", exact: true })).toContainText(
+        "Choose a framework",
+      );
+      const controlled = page.locator('[data-component-example="select/controlled"]');
+      const trigger = controlled.getByRole("combobox");
+      await expect(trigger).toHaveAttribute("data-motion", effectiveMode(mode, os));
+      await controlled.getByRole("button", { name: "Choose Astro externally" }).click();
+      await expect(trigger).toContainText("Astro");
+      await expect(top.getByRole("combobox", { name: "Framework", exact: true })).toContainText("Next.js");
+      const node = await trigger.elementHandle();
+      await trigger.focus();
+      await trigger.press("ArrowDown");
+      await page.keyboard.press("r");
+      await page.keyboard.press("Enter");
+      await expect(controlled.getByRole("status")).toHaveText("Value: remix");
+      await expect(trigger).toBeFocused();
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button) => (button as HTMLButtonElement).click());
+      await expect(trigger).toBeFocused();
+      await expect(trigger).toHaveAttribute("data-motion", "none");
+      expect(await trigger.evaluate((element, saved) => element === saved, node)).toBe(true);
+      await expect(trigger).toContainText("Remix");
+      const groups = page.locator('[data-component-example="select/groups"]');
+      await groups.getByRole("combobox").click();
+      await expect(page.getByRole("group", { name: "Fruits" })).toBeVisible();
+      await expect(page.getByRole("option", { name: "Orange", exact: true })).toHaveAttribute("aria-disabled", "true");
+      await page.getByRole("option", { name: "Carrot", exact: true }).click();
+      await expect(groups.getByRole("combobox")).toContainText("Carrot");
+      const form = page.locator('[data-component-example="select/form-submission"]');
+      await form.getByRole("button", { name: "Submit framework" }).click();
+      await expect(form.getByRole("status")).toHaveText("No submission yet");
+      await form.getByRole("combobox").click();
+      await page.getByRole("option", { name: "Astro", exact: true }).click();
+      await form.getByRole("button", { name: "Submit framework" }).click();
+      await expect(form.getByRole("status")).toHaveText("Submitted: astro");
+      const states = page.locator('[data-component-example="select/disabled-invalid"]');
+      await expect(states.getByRole("combobox", { name: "Framework, disabled", exact: true })).toBeDisabled();
+      const invalid = states.getByRole("combobox", { name: "Framework, invalid", exact: true });
+      await expect(invalid).toHaveAttribute("aria-invalid", "true");
+      await expect(invalid).toHaveAccessibleDescription("This framework is unavailable for your project.");
+      const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(new URL(page.url()).searchParams.get("variant")).toBe("sm");
+    });
+
+for (const id of ["select"])
+  for (const theme of ["light", "dark"])
+    test(`${id}: named examples visual and accessible ${theme}`, async ({ page }) => {
+      await page.addInitScript((value) => localStorage.setItem("cadence-theme", value), theme);
+      await page.goto(`/components/${id}?motion=none&variant=unknown`);
+      await page.waitForLoadState("networkidle");
+      await mkdir(".cache/component-examples-proof", { recursive: true });
+      for (const width of [1280, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        expect(
+          (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
+        ).toEqual([]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        await page
+          .locator(`[data-preview="${id}"]`)
+          .screenshot({ path: `.cache/component-examples-proof/${id}-top-${theme}-${width}.png` });
+        for (const name of catalog[id] ?? []) {
+          await page
+            .locator(`[data-component-example="${id}/${name}"]`)
+            .screenshot({ path: `.cache/component-examples-proof/${id}-${name}-${theme}-${width}.png` });
+        }
+      }
     });

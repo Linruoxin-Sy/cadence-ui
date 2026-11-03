@@ -40,7 +40,7 @@ for (const theme of ["light", "dark"] as const) {
       });
 
       for (const name of ["Framework", "Framework, small"]) {
-        const trigger = page.getByRole("combobox", { name, exact: true });
+        const trigger = page.locator('[data-preview="select"]').getByRole("combobox", { name, exact: true });
         // Both directions matter: the new label may be wider than the measured
         // destination when Base UI has not committed its Value label yet.
         for (const label of ["Astro", "Next.js", "Remix"]) {

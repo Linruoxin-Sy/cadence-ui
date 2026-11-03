@@ -1,3 +1,4 @@
 {
-  "button": ["variants", "sizes", "links", "composition", "disabled"]
+  "button": ["variants", "sizes", "links", "composition", "disabled"],
+  "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid"]
 }

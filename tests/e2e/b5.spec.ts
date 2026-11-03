@@ -22,6 +22,13 @@ async function close(page: Page, id: Id) {
   else await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
 }
 async function mode(page: Page, value: string) {
+  if (new URL(page.url()).pathname === "/components/select") {
+    await page
+      .getByRole("group", { name: "Motion mode" })
+      .getByRole("button", { name: value, exact: true })
+      .evaluate((node) => (node as HTMLButtonElement).click());
+    return;
+  }
   await page.getByLabel("Popup motion", { exact: true }).evaluate((node, value) => {
     (node as HTMLSelectElement).value = value;
     node.dispatchEvent(new Event("change", { bubbles: true }));
@@ -253,7 +260,9 @@ for (const preference of ["no-preference", "reduce"] as const)
       test(`pointer and keyboard selection, morph, geometry and typing ${requested}`, async ({ page }) => {
         await page.goto(`/components/select?motion=${requested}`);
         await page.waitForLoadState("networkidle");
-        const trigger = page.getByRole("combobox", { name: "Framework", exact: true });
+        const trigger = page
+          .locator('[data-preview="select"]')
+          .getByRole("combobox", { name: "Framework", exact: true });
         await trigger.click();
         await page.getByRole("option", { name: "Remix", exact: true }).click();
         await expect(trigger.locator('[data-slot="select-value"]')).toHaveText("Remix");
@@ -389,7 +398,9 @@ for (const preference of ["no-preference", "reduce"] as const)
       test(`handoff and measured width frames, resize and live cancellation ${requested}`, async ({ page }, info) => {
         await page.goto(`/components/select?motion=${requested}&speed=0.25`);
         await page.waitForLoadState("networkidle");
-        const trigger = page.getByRole("combobox", { name: "Framework", exact: true });
+        const trigger = page
+          .locator('[data-preview="select"]')
+          .getByRole("combobox", { name: "Framework", exact: true });
         await page.evaluate(() => {
           const w = window as unknown as {
             selectFrames: { width: number; natural: number; flight: boolean; moving: boolean }[];
