@@ -139,7 +139,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               await expect(page).toHaveURL(/\/$/);
               await page.goBack();
               await page.waitForLoadState("networkidle");
-            } else await expect(page).toHaveURL(new RegExp(`#${id}$`));
+            } else {
+              await expect(page).toHaveURL(/page=1#usage$/);
+              await page.goBack();
+              await page.waitForLoadState("networkidle");
+            }
             if (id !== "item") await expect(p.locator('[aria-current="page"]').first()).toBeVisible();
           }
           const buttons = p.getByRole("button").and(p.locator('[data-slot="button"]'));
