@@ -138,4 +138,59 @@ if (catalog.drawer)
     await popup.getByRole("button", { name: "Peek", exact: true }).click();
     await expect(popup.getByRole("status")).toHaveText("Snap: 0.5");
     expect((await popup.boundingBox())?.y).toBeCloseTo(peek.y, 0);
+    const handle = await popup.locator('[data-slot="drawer-swipe-handle"]').boundingBox();
+    if (!handle) throw new Error("missing snap gesture handle");
+    const cdp = await page.context().newCDPSession(page);
+    try {
+      const x = handle.x + handle.width / 2;
+      const y = handle.y + handle.height / 2;
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+      for (let step = 1; step <= 8; step++) {
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y: y - step * 40 }] });
+        await page.waitForTimeout(16);
+      }
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await expect(popup.getByRole("status")).toHaveText("Snap: 1");
+      expect((await popup.boundingBox())?.y).toBeCloseTo(expanded.y, 0);
+    } finally {
+      await cdp.detach();
+    }
+  });
+
+if (catalog.drawer)
+  test("drawer all four directions track actual touch and dismiss", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto("/components/drawer?motion=none");
+    await page.waitForLoadState("networkidle");
+    const card = page.locator('[data-component-example="drawer/directions"]');
+    const popup = page.locator('[data-slot="drawer-popup"]');
+    const cdp = await page.context().newCDPSession(page);
+    try {
+      for (const direction of ["down", "up", "left", "right"]) {
+        await card.getByRole("button", { name: direction, exact: true }).click();
+        await expect(popup).toBeVisible();
+        const before = await popup.boundingBox();
+        const handle = await popup.locator('[data-slot="drawer-swipe-handle"]').boundingBox();
+        if (!before || !handle) throw new Error("missing touch target");
+        const x = handle.x + handle.width / 2;
+        const y = handle.y + handle.height / 2;
+        const dx = direction === "left" ? -1 : direction === "right" ? 1 : 0;
+        const dy = direction === "up" ? -1 : direction === "down" ? 1 : 0;
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
+        for (let step = 1; step <= 8; step++) {
+          await cdp.send("Input.dispatchTouchEvent", {
+            type: "touchMove",
+            touchPoints: [{ x: x + dx * step * 30, y: y + dy * step * 30 }],
+          });
+          await page.waitForTimeout(16);
+        }
+        const moved = await popup.boundingBox();
+        if (!moved) throw new Error("drawer vanished before touch release");
+        expect(dx ? (moved.x - before.x) * dx : (moved.y - before.y) * dy).toBeGreaterThan(20);
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+        await expect(popup).toHaveCount(0);
+      }
+    } finally {
+      await cdp.detach();
+    }
   });

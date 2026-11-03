@@ -18,6 +18,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../registry/cadence/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../../registry/cadence/drawer";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../../registry/cadence/hover-card";
 import { Input } from "../../registry/cadence/input";
 import type { CadenceMode } from "../../registry/cadence/lib/motion";
@@ -124,6 +133,19 @@ function PopupMotionFixture({
                 <SheetFooter />
               </SheetContent>
             </Sheet>
+          )}
+          {component === "drawer" && (
+            <Drawer showSwipeHandle>
+              <DrawerTrigger render={<Button />}>Open drawer</DrawerTrigger>
+              <DrawerContent>
+                <DrawerTitle>Drawer fixture</DrawerTitle>
+                <DrawerDescription>Actual registry panel with a separate mode input.</DrawerDescription>
+                {field}
+                <DrawerFooter>
+                  <DrawerClose render={<Button />}>Close</DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
           )}
           {component === "hover-card" && (
             <HoverCard>
