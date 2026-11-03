@@ -190,3 +190,95 @@ for (const os of ["no-preference", "reduce"] as const)
           ),
       ).toBe(true);
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Button Group examples: independent fixed orientations, text and separator geometry ${mode}/${os}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/button-group?motion=${mode}&variant=vertical`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="button-group"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      const horizontal = top.getByRole("group", { name: "Zoom", exact: true });
+      const vertical = top.getByRole("group", { name: "Vertical zoom", exact: true });
+      await expect(horizontal).toHaveCSS("flex-direction", "row");
+      await expect(vertical).toHaveCSS("flex-direction", "column");
+      expect(
+        await vertical
+          .locator(":scope > *")
+          .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().width)),
+      ).toEqual([64, 64, 64]);
+      const body = page.locator('[data-component-example="button-group/vertical"]');
+      await expect(body.getByRole("status")).toHaveText("100%");
+      await body.getByRole("button", { name: "Zoom in" }).click();
+      await expect(body.getByRole("status")).toHaveText("125%");
+      await expect(horizontal.getByRole("status")).toHaveText("100%");
+      await expect(vertical.getByRole("status")).toHaveText("100%");
+      const plus = horizontal.getByRole("button", { name: "Zoom in" });
+      await plus.scrollIntoViewIfNeeded();
+      expect(await pressScale(page, '[data-preview="button-group"] [aria-label="Zoom in"]')).toBeCloseTo(
+        effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
+        2,
+      );
+      await expect(horizontal.getByRole("status")).toHaveText("125%");
+      await plus.focus();
+      await plus.press("Enter");
+      await plus.press(" ");
+      await expect(horizontal.getByRole("status")).toHaveText("175%");
+      const original = await plus.elementHandle();
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button: HTMLButtonElement) => button.click());
+      await expect(plus).toBeFocused();
+      await expect(plus).toHaveAttribute("data-motion", "none");
+      expect(await plus.evaluate((node, original) => node === original, original)).toBe(true);
+      await expect(horizontal.getByRole("status")).toHaveText("175%");
+      await expect(body.getByRole("status")).toHaveText("125%");
+      const corners = await horizontal.locator(":scope > *").evaluateAll((nodes) =>
+        nodes.map((node) => {
+          const css = getComputedStyle(node);
+          return {
+            tl: parseFloat(css.borderTopLeftRadius),
+            tr: parseFloat(css.borderTopRightRadius),
+            bl: parseFloat(css.borderBottomLeftRadius),
+            br: parseFloat(css.borderBottomRightRadius),
+          };
+        }),
+      );
+      expect(corners[0]?.tl).toBeGreaterThan(0);
+      expect(corners[0]?.tr).toBe(0);
+      expect(corners[1]).toEqual({ tl: 0, tr: 0, bl: 0, br: 0 });
+      expect(corners[2]?.tr).toBeGreaterThan(0);
+      expect(corners[2]?.tl).toBe(0);
+      const rules = page.locator(
+        '[data-component-example="button-group/separator"] [data-slot="button-group-separator"]',
+      );
+      expect(
+        await rules.evaluateAll((nodes) =>
+          nodes.map((node) => {
+            const rect = node.getBoundingClientRect();
+            return { orientation: node.getAttribute("data-orientation"), width: rect.width, height: rect.height };
+          }),
+        ),
+      ).toEqual([
+        { orientation: "vertical", width: 1, height: 32 },
+        { orientation: "horizontal", width: expect.any(Number), height: 1 },
+      ]);
+      expect(await rules.nth(1).evaluate((node) => node.getBoundingClientRect().width)).toBeGreaterThan(50);
+      const text = page.locator('[data-component-example="button-group/static-text"]');
+      await expect(text.locator('[data-slot="button-group-text"]')).toHaveJSProperty("tagName", "SPAN");
+      await expect(text.locator('[data-slot="button-group-text"]')).not.toHaveAttribute("tabindex");
+      expect(
+        await page
+          .locator('[data-slot="button-group"]')
+          .evaluateAll((nodes) =>
+            nodes.every((node) => !node.hasAttribute("data-motion") && node.getAnimations().length === 0),
+          ),
+      ).toBe(true);
+      await text.getByRole("link", { name: "Registry", exact: true }).focus();
+      await page.keyboard.press("Enter");
+      await expect(page).toHaveURL(/\/docs\/registry$/);
+    });

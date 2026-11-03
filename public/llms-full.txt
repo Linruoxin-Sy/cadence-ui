@@ -3168,17 +3168,33 @@ npx shadcn@latest add @cadence/button-group
 ## Usage
 
 ```tsx
-import { Button } from "@/components/cadence/button";
-import { ButtonGroup } from "@/components/cadence/button-group";
+"use client";
 
-export function TextStyle() {
+import { useState } from "react";
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { ButtonGroup, ButtonGroupText } from "@/components/cadence/button-group";
+
+export function ZoomControls() {
+  const [zoom, setZoom] = useState(100);
   return (
-    <ButtonGroup aria-label="Text style">
-      <Button variant="outline" size="icon-sm" aria-label="Bold">
-        <Bold />
+    <ButtonGroup aria-label="Zoom">
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom out"
+        onClick={() => setZoom((value) => Math.max(25, value - 25))}
+      >
+        <MinusIcon aria-hidden="true" />
       </Button>
-      <Button variant="outline" size="icon-sm" aria-label="Italic">
-        <Italic />
+      <ButtonGroupText render={<output aria-live="polite" />}>{zoom}%</ButtonGroupText>
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom in"
+        onClick={() => setZoom((value) => Math.min(200, value + 25))}
+      >
+        <PlusIcon aria-hidden="true" />
       </Button>
     </ButtonGroup>
   );
@@ -3187,41 +3203,100 @@ export function TextStyle() {
 
 ## Vertical
 
-`orientation="vertical"` stacks the same rules: only the outer corners are rounded,
-and the shared borders collapse.
+The vertical group stacks controls and keeps only the outer corners rounded. It does not create a toolbar keyboard model: Tab still follows DOM order. This zoom value is owned by this instance.
+
+<ComponentExample name="vertical" />
 
 ```tsx
-<ButtonGroup orientation="vertical" aria-label="Order">
-  <Button variant="outline" size="sm">Move up</Button>
-  <Button variant="outline" size="sm">Move down</Button>
-</ButtonGroup>
+"use client";
+
+import { useState } from "react";
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+import { ButtonGroup, ButtonGroupText } from "@/components/cadence/button-group";
+
+export function VerticalControls() {
+  const [zoom, setZoom] = useState(100);
+  return (
+    <ButtonGroup orientation="vertical" aria-label="Vertical zoom" className="w-16 [&>*]:w-full">
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom out"
+        onClick={() => setZoom((value) => Math.max(25, value - 25))}
+      >
+        <MinusIcon aria-hidden="true" />
+      </Button>
+      <ButtonGroupText render={<output aria-live="polite" />}>{zoom}%</ButtonGroupText>
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom in"
+        onClick={() => setZoom((value) => Math.min(200, value + 25))}
+      >
+        <PlusIcon aria-hidden="true" />
+      </Button>
+    </ButtonGroup>
+  );
+}
 ```
 
 ## Static text inside the group
 
-`ButtonGroupText` takes `render`, so the label can be a `label`, a `span`, or the
-router's own element without extra wrappers.
+ButtonGroupText joins a non-interactive label or readout to controls. `render` changes its element without extra wrappers. This label is a span, and the adjacent link opens the actual registry guide.
+
+<ComponentExample name="static-text" />
 
 ```tsx
-<ButtonGroup aria-label="Zoom">
-  <ButtonGroupText>-</ButtonGroupText>
-  <Button variant="outline" size="sm">100%</Button>
-  <ButtonGroupSeparator />
-  <ButtonGroupText>+</ButtonGroupText>
-</ButtonGroup>
+import { buttonVariants } from "@/components/cadence/button";
+import { ButtonGroup, ButtonGroupText } from "@/components/cadence/button-group";
+
+export function GroupWithText() {
+  return (
+    <ButtonGroup aria-label="Registry reference">
+      <ButtonGroupText render={<span />}>Guide</ButtonGroupText>
+      <a className={buttonVariants({ variant: "outline", size: "sm" })} href="/docs/registry">
+        Registry
+      </a>
+    </ButtonGroup>
+  );
+}
 ```
 
 ## A rule between two controls
 
-`ButtonGroupSeparator` stretches to the cross axis, so one component works in both
-orientations.
+Specify the separator orientation separately from the group: a horizontal group needs a vertical rule; a vertical group needs a horizontal rule. Each separator stretches across the group, and the real navigation links keep their native link semantics.
+
+<ComponentExample name="separator" />
 
 ```tsx
-<ButtonGroup>
-  <Button>Cut</Button>
-  <ButtonGroupSeparator />
-  <Button>Copy</Button>
-</ButtonGroup>
+import { buttonVariants } from "@/components/cadence/button";
+import { ButtonGroup, ButtonGroupSeparator } from "@/components/cadence/button-group";
+
+export function GroupRules() {
+  return (
+    <div className="flex flex-wrap items-start gap-8">
+      <ButtonGroup aria-label="Setup guides">
+        <a className={buttonVariants({ size: "sm" })} href="/docs/installation">
+          Install
+        </a>
+        <ButtonGroupSeparator />
+        <a className={buttonVariants({ size: "sm" })} href="/docs/theming">
+          Theme
+        </a>
+      </ButtonGroup>
+      <ButtonGroup orientation="vertical" aria-label="Motion guides">
+        <a className={buttonVariants({ size: "sm" })} href="/docs/motion">
+          Motion
+        </a>
+        <ButtonGroupSeparator orientation="horizontal" />
+        <a className={buttonVariants({ size: "sm" })} href="/docs/motion-modes">
+          Modes
+        </a>
+      </ButtonGroup>
+    </div>
+  );
+}
 ```
 
 ## When to use

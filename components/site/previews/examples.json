@@ -17,5 +17,6 @@
   "alert": ["action", "without-icon", "destructive"],
   "empty": ["boundaries", "second-action", "media", "without-media"],
   "item": ["whole-row-link", "variants", "sizes", "media", "separators", "header-footer"],
-  "field": ["orientation", "responsive", "caller-error", "fieldset", "choice-card"]
+  "field": ["orientation", "responsive", "caller-error", "fieldset", "choice-card"],
+  "button-group": ["vertical", "static-text", "separator"]
 }

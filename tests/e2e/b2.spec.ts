@@ -212,7 +212,8 @@ for (const colorScheme of ["light", "dark"] as const) {
           if (id === "button-group") {
             expect(
               await page
-                .locator('[data-preview="button-group"] [data-slot="button-group-separator"]')
+                .locator('[data-component-example="button-group/separator"] [data-slot="button-group-separator"]')
+                .first()
                 .evaluate((node) => node.getBoundingClientRect().height),
             ).toBeGreaterThan(0);
           }

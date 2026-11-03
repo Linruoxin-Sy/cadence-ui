@@ -1,61 +1,121 @@
 "use client";
 
-import { BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
-import { Button } from "@/registry/cadence/button";
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { useState } from "react";
+import { Button, buttonVariants } from "@/registry/cadence/button";
 import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from "@/registry/cadence/button-group";
-import { PreviewRow, PreviewStack } from "./shell";
-import { usePreviewVariant } from "./use-preview-variant";
+import { PreviewStack } from "./shell";
 
-const previewVariantOptions = ["horizontal", "vertical"] as const;
-
-/**
- * Two orientations, and the two ways a group holds non-buttons: `ButtonGroupText` for
- * a readout, `ButtonGroupSeparator` for the rule between segments. A group only
- * removes the inner radii — everything else is still a `Button`.
- */
-export function ButtonGroupPreview() {
-  const { control, choose } = usePreviewVariant("ButtonGroup", previewVariantOptions);
+function HorizontalControls() {
+  const [zoom, setZoom] = useState(100);
   return (
-    <>
-      {control}
-      <PreviewStack>
-        <PreviewRow className="gap-4">
-          <ButtonGroup aria-label="Text style" orientation={choose("horizontal")}>
-            <Button variant="outline" size="icon-sm" aria-label="Bold">
-              <BoldIcon />
-            </Button>
-            <Button variant="outline" size="icon-sm" aria-label="Italic">
-              <ItalicIcon />
-            </Button>
-            <Button variant="outline" size="icon-sm" aria-label="Underline">
-              <UnderlineIcon />
-            </Button>
-          </ButtonGroup>
+    <ButtonGroup aria-label="Zoom">
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom out"
+        onClick={() => setZoom((value) => Math.max(25, value - 25))}
+      >
+        <MinusIcon aria-hidden="true" />
+      </Button>
+      <ButtonGroupText render={<output aria-live="polite" />}>{zoom}%</ButtonGroupText>
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom in"
+        onClick={() => setZoom((value) => Math.min(200, value + 25))}
+      >
+        <PlusIcon aria-hidden="true" />
+      </Button>
+    </ButtonGroup>
+  );
+}
 
-          <ButtonGroup aria-label="Zoom" orientation={choose("horizontal")}>
-            <ButtonGroupText>-</ButtonGroupText>
-            <Button variant="outline" size="sm">
-              100%
-            </Button>
-            <ButtonGroupSeparator />
-            <ButtonGroupText>+</ButtonGroupText>
-          </ButtonGroup>
-        </PreviewRow>
+function Specimen() {
+  return (
+    <div className="flex flex-wrap items-start justify-center gap-8">
+      <HorizontalControls />
+      <VerticalControls />
+    </div>
+  );
+}
 
-        <PreviewRow>
-          <ButtonGroup orientation={choose("vertical")} aria-label="Order">
-            <Button variant="outline" size="sm">
-              Move up
-            </Button>
-            <Button variant="outline" size="sm">
-              Move down
-            </Button>
-            <Button variant="outline" size="sm">
-              Duplicate
-            </Button>
-          </ButtonGroup>
-        </PreviewRow>
-      </PreviewStack>
-    </>
+export function VerticalControls() {
+  const [zoom, setZoom] = useState(100);
+  return (
+    <ButtonGroup orientation="vertical" aria-label="Vertical zoom" className="w-16 [&>*]:w-full">
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom out"
+        onClick={() => setZoom((value) => Math.max(25, value - 25))}
+      >
+        <MinusIcon aria-hidden="true" />
+      </Button>
+      <ButtonGroupText render={<output aria-live="polite" />}>{zoom}%</ButtonGroupText>
+      <Button
+        variant="outline"
+        size="icon-sm"
+        aria-label="Zoom in"
+        onClick={() => setZoom((value) => Math.min(200, value + 25))}
+      >
+        <PlusIcon aria-hidden="true" />
+      </Button>
+    </ButtonGroup>
+  );
+}
+
+export function GroupWithText() {
+  return (
+    <ButtonGroup aria-label="Registry reference">
+      <ButtonGroupText render={<span />}>Guide</ButtonGroupText>
+      <a className={buttonVariants({ variant: "outline", size: "sm" })} href="/docs/registry">
+        Registry
+      </a>
+    </ButtonGroup>
+  );
+}
+
+export function GroupRules() {
+  return (
+    <div className="flex flex-wrap items-start gap-8">
+      <ButtonGroup aria-label="Setup guides">
+        <a className={buttonVariants({ size: "sm" })} href="/docs/installation">
+          Install
+        </a>
+        <ButtonGroupSeparator />
+        <a className={buttonVariants({ size: "sm" })} href="/docs/theming">
+          Theme
+        </a>
+      </ButtonGroup>
+      <ButtonGroup orientation="vertical" aria-label="Motion guides">
+        <a className={buttonVariants({ size: "sm" })} href="/docs/motion">
+          Motion
+        </a>
+        <ButtonGroupSeparator orientation="horizontal" />
+        <a className={buttonVariants({ size: "sm" })} href="/docs/motion-modes">
+          Modes
+        </a>
+      </ButtonGroup>
+    </div>
+  );
+}
+
+const examples = {
+  vertical: VerticalControls,
+  "static-text": GroupWithText,
+  separator: GroupRules,
+};
+
+export function ButtonGroupPreview({ example }: { example?: string }) {
+  if (example !== undefined) {
+    const Example = examples[example as keyof typeof examples];
+    if (!Example) throw new Error(`Unknown ButtonGroup example: ${example}`);
+    return <Example />;
+  }
+  return (
+    <PreviewStack>
+      <Specimen />
+    </PreviewStack>
   );
 }
