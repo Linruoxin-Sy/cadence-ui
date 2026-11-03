@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
@@ -6,6 +7,7 @@ const ids = ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", 
 type Id = (typeof ids)[number];
 const slot = (id: Id) => (id === "drawer" ? "drawer-popup" : `${id}-content`);
 const hover = (id: Id) => id === "tooltip" || id === "hover-card";
+const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
 async function open(page: Page, id: Id) {
   const trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`).first();
   if (hover(id)) await trigger.hover();
@@ -13,6 +15,14 @@ async function open(page: Page, id: Id) {
   await expect(page.locator(`[data-slot="${slot(id)}"]`)).toBeVisible();
 }
 async function mode(page: Page, value: string) {
+  const id = new URL(page.url()).pathname.split("/").at(-1) ?? "";
+  if (examples[id]) {
+    await page
+      .locator('[role=group][aria-label="Motion mode"] button')
+      .filter({ hasText: new RegExp(`^${value}$`) })
+      .evaluate((node) => (node as HTMLButtonElement).click());
+    return;
+  }
   await page.getByLabel("Popup motion", { exact: true }).evaluate((node, value) => {
     (node as HTMLSelectElement).value = value;
     node.dispatchEvent(new Event("change", { bubbles: true }));
@@ -122,7 +132,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
             expect(exit.some((f) => f.backdrop !== null && f.backdrop > 0 && f.backdrop < 1)).toBe(true);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
           await page.mouse.move(0, 0);
-          // Outer none with a local full popup must restore its clock (OS still wins).
+          await page.setViewportSize({ width: 1280, height: 900 });
+          // Restore the inherited clock. Explicit nested scopes are exercised separately below.
           await mode(page, "full");
           await start(page, id);
           await open(page, id);
@@ -313,7 +324,8 @@ test.describe("B4 keyboard placements", () => {
         await page.keyboard.press("Escape");
         await expect(popup).toHaveCount(0);
         if (!hover(id)) await expect(trigger).toBeFocused();
-        await page.getByLabel("Popup motion", { exact: true }).focus();
+        if (examples[id]) await page.getByRole("group", { name: "Motion mode" }).getByRole("button").first().focus();
+        else await page.getByLabel("Popup motion", { exact: true }).focus();
       }
     });
 });

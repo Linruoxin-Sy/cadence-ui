@@ -40,5 +40,6 @@
     "without-motion"
   ],
   "input-otp": ["controlled", "invalid", "disabled", "without-separator", "paste", "without-motion"],
-  "progress": ["labelled", "indeterminate", "complete", "range", "composed", "caller-progress", "without-motion"]
+  "progress": ["labelled", "indeterminate", "complete", "range", "composed", "caller-progress", "without-motion"],
+  "dialog": ["editing", "controlled", "without-close", "footer-close", "long-content", "modality", "without-motion"]
 }

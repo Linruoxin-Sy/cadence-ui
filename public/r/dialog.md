@@ -15,10 +15,15 @@ npx shadcn@latest add @cadence/dialog
 ```
 
 This also installs `button`, which the dialog uses for its close control.
+The editing example additionally uses `@cadence/field` and `@cadence/input`.
 
 ## Usage
 
 ```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
 import {
   Dialog,
   DialogClose,
@@ -29,20 +34,206 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/cadence/dialog";
-import { Button } from "@/components/cadence/button";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
 
-export function DeleteProject() {
+export function EditingDialog() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("cadence-ui");
+  const [saved, setSaved] = useState("cadence-ui");
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger render={<Button variant="outline" />}>Rename project</DialogTrigger>
+        <DialogContent>
+          <form
+            className="grid gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSaved(name);
+              setOpen(false);
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Rename project</DialogTitle>
+              <DialogDescription>The URL stays the same. Existing links keep working.</DialogDescription>
+            </DialogHeader>
+            <Field>
+              <FieldLabel htmlFor={id}>Project name</FieldLabel>
+              <Input id={id} value={name} onValueChange={setName} required />
+            </Field>
+            <DialogFooter>
+              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+              <Button type="submit">Save name</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <p className="text-sm text-muted-foreground" role="status">
+        Project: {saved}
+      </p>
+    </div>
+  );
+}
+```
+
+## Editing a project
+
+The form owns its draft and saved name. Save submits the form and closes it; Cancel dismisses without saving. Reopening keeps the caller-owned draft. Each instance uses its own ID and state.
+
+<ComponentExample name="editing" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function EditingDialog() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("cadence-ui");
+  const [saved, setSaved] = useState("cadence-ui");
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger render={<Button variant="outline" />}>Rename project</DialogTrigger>
+        <DialogContent>
+          <form
+            className="grid gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setSaved(name);
+              setOpen(false);
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Rename project</DialogTitle>
+              <DialogDescription>The URL stays the same. Existing links keep working.</DialogDescription>
+            </DialogHeader>
+            <Field>
+              <FieldLabel htmlFor={id}>Project name</FieldLabel>
+              <Input id={id} value={name} onValueChange={setName} required />
+            </Field>
+            <DialogFooter>
+              <DialogClose render={<Button type="button" variant="outline" />}>Cancel</DialogClose>
+              <Button type="submit">Save name</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <p className="text-sm text-muted-foreground" role="status">
+        Project: {saved}
+      </p>
+    </div>
+  );
+}
+```
+
+## Controlled
+
+An external application action can open the dialog without a DialogTrigger. The root reports Escape and outside dismissal through onOpenChange; the caller closes after finishing. Base UI restores focus to the previously focused opener when there is no trigger.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function ControlledDialog() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open from application state
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Application-owned dialog</DialogTitle>
+            <DialogDescription>
+              The caller owns open. Escape and outside presses still report changes.
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => setOpen(false)}>Finish task</Button>
+        </DialogContent>
+      </Dialog>
+      <p role="status" className="text-sm text-muted-foreground">
+        Dialog {open ? "open" : "closed"}
+      </p>
+    </div>
+  );
+}
+```
+
+## Without the built-in close button
+
+showCloseButton=false removes only the corner control. Supply a visible DialogClose; Escape and outside dismissal still work.
+
+<ComponentExample name="without-close" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function WithoutCloseDialog() {
   return (
     <Dialog>
-      <DialogTrigger render={<Button variant="outline" />}>Delete project</DialogTrigger>
-      <DialogContent>
+      <DialogTrigger render={<Button variant="outline" />}>Review changes</DialogTrigger>
+      <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Delete this project?</DialogTitle>
-          <DialogDescription>This removes every deployment and cannot be undone.</DialogDescription>
+          <DialogTitle>Review changes</DialogTitle>
+          <DialogDescription>
+            The corner button is hidden. This visible action and Escape still close the dialog.
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
-          <Button variant="destructive">Delete project</Button>
+          <DialogClose render={<Button />}>Done reviewing</DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -50,28 +241,207 @@ export function DeleteProject() {
 }
 ```
 
-## Controlled
-
-```tsx
-const [open, setOpen] = useState(false);
-
-<Dialog open={open} onOpenChange={setOpen}>
-  <DialogContent>…</DialogContent>
-</Dialog>;
-```
-
-## Without the built-in close button
-
-```tsx
-<DialogContent showCloseButton={false}>…</DialogContent>
-```
-
 ## Footer with a close action
 
+DialogFooter showCloseButton adds a Close action. Preparing the export updates caller state and keeps the panel open; closing remains a separate action.
+
+<ComponentExample name="footer-close" />
+
 ```tsx
-<DialogFooter showCloseButton>
-  <Button>Save</Button>
-</DialogFooter>
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function FooterCloseDialog() {
+  const [prepared, setPrepared] = useState(false);
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="outline" />}>Export details</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Export details</DialogTitle>
+          <DialogDescription>Prepare the export without dismissing the panel.</DialogDescription>
+        </DialogHeader>
+        <p role="status" className="text-sm">
+          {prepared ? "Export prepared" : "Ready to export"}
+        </p>
+        <DialogFooter showCloseButton>
+          <Button onClick={() => setPrepared(true)}>Prepare export</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Long content
+
+Constrain the panel height and enable overflow-y-auto when its body is long. The panel scrolls independently and the final Close action remains reachable. The component does not impose a scrolling height for every consumer.
+
+<ComponentExample name="long-content" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function LongContentDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="outline" />}>Read the changelog</DialogTrigger>
+      <DialogContent className="max-h-[70vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Release notes</DialogTitle>
+          <DialogDescription>Scroll this panel to read every change.</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 text-sm text-muted-foreground">
+          {Array.from({ length: 16 }, (_, index) => index + 1).map((change) => (
+            <p key={change}>
+              Change {change}: Components keep their native semantics, caller-owned data, and documented full, reduced,
+              and none motion behavior.
+            </p>
+          ))}
+        </div>
+        <DialogFooter showCloseButton />
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Modal and non-modal behavior
+
+The fixed triggers cover modal=true (the default), false, and trap-focus. True traps focus and locks page scrolling; false allows outside interaction; trap-focus retains the focus trap without locking page scrolling. Every form still has a named panel and close action.
+
+<ComponentExample name="modality" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function DialogModality() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {([true, false, "trap-focus"] as const).map((modal) => (
+        <Dialog key={String(modal)} modal={modal}>
+          <DialogTrigger render={<Button variant="outline" />}>{String(modal)}</DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Modal: {String(modal)}</DialogTitle>
+              <DialogDescription>
+                True traps focus and locks page scrolling; false allows page interaction; trap-focus keeps the focus
+                trap without scroll locking.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter showCloseButton />
+          </DialogContent>
+        </Dialog>
+      ))}
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+These are explicit overrides: the first dialog starts under none, so both its portal overlay and panel have zero duration from insertion. The second restores full inside that none scope; the system reduced-motion preference still wins. Ordinary examples inherit the site header instead.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/cadence/dialog";
+import { Field, FieldLabel } from "@/components/cadence/field";
+import { Input } from "@/components/cadence/input";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function DialogMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <Dialog>
+          <DialogTrigger render={<Button variant="outline" />}>Open without motion</DialogTrigger>
+          <DialogContent data-testid="initial-none">
+            <DialogHeader>
+              <DialogTitle>Immediate dialog</DialogTitle>
+              <DialogDescription>Both overlay and panel start with zero duration.</DialogDescription>
+            </DialogHeader>
+            <DialogFooter showCloseButton />
+          </DialogContent>
+        </Dialog>
+        <CadenceProvider mode="full">
+          <Dialog>
+            <DialogTrigger render={<Button variant="outline" />}>Open nested full</DialogTrigger>
+            <DialogContent data-testid="nested-full">
+              <DialogHeader>
+                <DialogTitle>Nested full dialog</DialogTitle>
+                <DialogDescription>
+                  This explicit scope restores timing; the system reduced preference still wins.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter showCloseButton />
+            </DialogContent>
+          </Dialog>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -90,12 +460,12 @@ const [open, setOpen] = useState(false);
 
 | Part | Props | Notes |
 | --- | --- | --- |
-| `Dialog` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root. |
+| `Dialog` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root; `modal` defaults to `true`, also accepts `false` or `"trap-focus"`. |
 | `DialogTrigger` | native button props, `render` | Opens the dialog. |
 | `DialogContent` | `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
 | `DialogOverlay` | `className` | Only needed when replacing `DialogContent`. |
 | `DialogClose` | native button props, `render` | Closes the dialog. |
-| `DialogHeader` / `DialogFooter` | `className` | Layout only. |
+| `DialogHeader` / `DialogFooter` | `className`; footer `showCloseButton=false` | Layout; footer can add a Close action. |
 | `DialogTitle` | `className` | Required accessible name. |
 | `DialogDescription` | `className` | Optional supporting text. |
 
@@ -132,7 +502,8 @@ transition ends, so reopening mid-exit reverses cleanly.
 ## Responsive behavior
 
 The panel is centred and capped at `max-w-lg`; on narrow viewports it keeps a 1rem gutter.
-Long content scrolls inside the popup rather than the page.
+For long content, the caller adds a maximum height and `overflow-y-auto`, as in Long content above,
+so the popup scrolls independently. Hydrated open/close interactions require JavaScript; no-JS retains the triggers and readable examples.
 
 ## Performance
 
