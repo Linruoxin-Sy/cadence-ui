@@ -16,59 +16,259 @@ npx shadcn@latest add @cadence/tooltip
 
 Optionally wrap the app in `TooltipProvider` once to set one delay for every tooltip; Base UI does not
 require it.
+These examples also use `@cadence/button`; the icon example uses `lucide-react`.
 
 ## Usage
 
 ```tsx
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/cadence/tooltip";
+"use client";
+
+import { BoldIcon } from "lucide-react";
+
 import { Button } from "@/components/cadence/button";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
 
 export function BoldTooltip() {
   return (
-    <TooltipProvider delay={200}>
-      <Tooltip>
-        <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Bold">
-          <Bold />
-        </TooltipTrigger>
-        <TooltipContent>Bold (⌘B)</TooltipContent>
-      </Tooltip>
+    <Tooltip>
+      <TooltipTrigger render={<Button variant="ghost" size="icon-sm" />} aria-label="Bold">
+        <BoldIcon aria-hidden="true" />
+      </TooltipTrigger>
+      <TooltipContent>Bold (⌘B)</TooltipContent>
+    </Tooltip>
+  );
+}
+```
+
+## Positioned by side
+
+The four physical sides have separate fixed triggers. Base UI flips and shifts the label when space runs out. sideOffset changes the gap; the scale still grows from the anchor origin.
+
+<ComponentExample name="sides" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function TooltipSides() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["top", "right", "bottom", "left"] as const).map((side) => (
+        <Tooltip key={side}>
+          <TooltipTrigger render={<Button variant="outline" />}>{side}</TooltipTrigger>
+          <TooltipContent side={side} sideOffset={8}>
+            {side} placement
+          </TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}
+```
+
+## Aligned to the trigger
+
+Start, center, and end are fixed cross-axis alignments on the default top side. alignOffset is zero here; numeric offsets remain caller choices. The content and arrow follow collision handling.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function TooltipAlignments() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["start", "center", "end"] as const).map((align) => (
+        <Tooltip key={align}>
+          <TooltipTrigger render={<Button variant="outline" />}>{align}</TooltipTrigger>
+          <TooltipContent align={align} alignOffset={0}>
+            {align} alignment with this trigger
+          </TooltipContent>
+        </Tooltip>
+      ))}
+    </div>
+  );
+}
+```
+
+## Logical sides and RTL
+
+inline-start and inline-end follow Base UI DirectionProvider. This example also sets DOM dir=rtl for text. The two independent triggers cover logical placement without a side selector.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+
+import { Button } from "@/components/cadence/button";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function LogicalTooltips() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl" className="flex flex-wrap gap-3">
+        {(["inline-start", "inline-end"] as const).map((side) => (
+          <Tooltip key={side}>
+            <TooltipTrigger render={<Button variant="outline" />}>{side}</TooltipTrigger>
+            <TooltipContent side={side}>{side} follows RTL</TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
+    </DirectionProvider>
+  );
+}
+```
+
+## A delay for the whole app
+
+Place TooltipProvider around the application once to give all its tooltips the same 300ms hover delay. These two hints stand in for that application scope. Adjacent hints can open instantly while the provider group is active. Keyboard focus opens immediately. Without a provider or trigger override, Base UI uses its default 600ms; Cadence TooltipProvider itself defaults delay to zero.
+
+<ComponentExample name="delay" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/cadence/tooltip";
+
+export function AppTooltipDelay() {
+  return (
+    <TooltipProvider delay={300}>
+      <div className="flex flex-wrap gap-3">
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="outline" />}>Upload help</TooltipTrigger>
+          <TooltipContent>Upload files up to 10 MB</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="outline" />}>Share help</TooltipTrigger>
+          <TooltipContent>Only invited people can read this project</TooltipContent>
+        </Tooltip>
+      </div>
     </TooltipProvider>
   );
 }
 ```
 
-## Side and alignment
-
-`side` defaults to `top` and the label flips when there is no room. The arrow moves with it; the panel
-grows out of `--transform-origin`, so the scale starts where the trigger meets the label.
-
-```tsx
-<TooltipContent side="right" align="start">
-  Right, aligned to the start
-</TooltipContent>
-```
-
-## A delay for the whole app
-
-`TooltipProvider` sets the delay once. Without it, Base UI's own default applies.
-
-```tsx
-<TooltipProvider delay={300}>
-  <App />
-</TooltipProvider>
-```
-
 ## Disabled controls
 
-A disabled button does not emit pointer events, so wrap it and put the hint on the wrapper:
+A native disabled button cannot receive keyboard focus. The outer Button renders a span through nativeButton=false and uses disabled plus focusableWhenDisabled: it provides button semantics, a focus ring, and blocked activation while remaining focusable. It wraps the truly disabled native Deploy button. pointer-events-none sends pointer targeting to the wrapper, so both hover and keyboard focus reveal the explanation.
+
+<ComponentExample name="disabled" />
 
 ```tsx
-<Tooltip>
-  <TooltipTrigger render={<span className="inline-flex" />}>
-    <Button disabled>Deploy</Button>
-  </TooltipTrigger>
-  <TooltipContent>Finish the required fields first</TooltipContent>
-</Tooltip>
+"use client";
+
+import { Button } from "@/components/cadence/button";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function DisabledControlTooltip() {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            render={<span />}
+            nativeButton={false}
+            disabled
+            focusableWhenDisabled
+            variant="ghost"
+            className="h-auto p-0"
+          />
+        }
+        aria-label="Why Deploy is unavailable"
+      >
+        <Button disabled className="pointer-events-none">
+          Deploy
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Finish the required fields first</TooltipContent>
+    </Tooltip>
+  );
+}
+```
+
+## Controlled
+
+The external Show shortcut action owns open state. A unique triggerId anchors that update to Keyboard help; normal focus, hover, and Escape still report changes through onOpenChange. The popup carries only explanatory text.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function ControlledTooltip() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="outline" onClick={() => setOpen((value) => !value)}>
+        {open ? "Hide shortcut" : "Show shortcut"}
+      </Button>
+      <Tooltip open={open} onOpenChange={setOpen} triggerId={id}>
+        <TooltipTrigger id={id} render={<Button variant="outline" />}>
+          Keyboard help
+        </TooltipTrigger>
+        <TooltipContent>Press ⌘K to search</TooltipContent>
+      </Tooltip>
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+These explicit overrides show none from insertion and full restored within that none scope, subject to OS reduction. Other examples inherit the site header. The tooltip delay is interaction timing and is independent of its motion mode.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function TooltipMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="outline" />}>Open without motion</TooltipTrigger>
+          <TooltipContent data-testid="initial-none">Immediate tooltip</TooltipContent>
+        </Tooltip>
+        <CadenceProvider mode="full">
+          <Tooltip>
+            <TooltipTrigger render={<Button variant="outline" />}>Open nested full</TooltipTrigger>
+            <TooltipContent data-testid="nested-full">The OS preference still wins</TooltipContent>
+          </Tooltip>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -89,8 +289,8 @@ A disabled button does not emit pointer events, so wrap it and put the hint on t
 | Part | Props | Notes |
 | --- | --- | --- |
 | `TooltipProvider` | `delay` | Optional. One delay for every tooltip inside. |
-| `Tooltip` | `open`, `defaultOpen`, `onOpenChange` | Base UI root. |
-| `TooltipTrigger` | native button props, `render` | Hover or focus target; carries `aria-describedby`. |
+| `Tooltip` | `open`, `defaultOpen`, `onOpenChange`, `triggerId`, `disabled` | Base UI root; `triggerId` anchors external open updates. |
+| `TooltipTrigger` | native button props, `render`, `delay`, `closeDelay`, `disabled` | Hover/focus target; carries `aria-describedby`. Trigger `disabled` suppresses the hint; disable the rendered Button separately to block its action. |
 | `TooltipContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Renders portal, positioner, popup, and arrow. `side` defaults to `top`, `sideOffset` to `4`. |
 
 ## Motion contract
@@ -116,8 +316,8 @@ separately.
 | Escape | Hides the label and leaves focus on the trigger. |
 | Enter / Space | Activates the trigger. The tooltip does not swallow the press. |
 
-Hover alone is never the only path: the tooltip opens on keyboard focus too, which is what makes it
-usable on touch and from a screen reader.
+Keyboard focus provides an additional route to the same explanation. Keep essential instructions
+visible on the page, including for touch users.
 
 ## Accessibility
 
