@@ -49,6 +49,19 @@ for (const colorScheme of ["light", "dark"] as const) {
             await page.locator(`[data-component-example="${id}/${name}"]`).screenshot({
               path: `.cache/b1-proof/${id}-${colorScheme}-${width}-${name}.png`,
             });
+          if (id === "kbd") {
+            const trigger = page.locator('[data-component-example="kbd/tooltip"] button');
+            await trigger.focus();
+            await expect(page.getByRole("tooltip")).toBeVisible();
+            expect(
+              (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
+            ).toEqual([]);
+            await page
+              .getByRole("tooltip")
+              .screenshot({ path: `.cache/b1-proof/kbd-${colorScheme}-${width}-tooltip-open.png` });
+            await trigger.press("Escape");
+            await trigger.blur();
+          }
         }
         expect(errors).toEqual([]);
       });

@@ -33,8 +33,16 @@ export function ShortcutHint() {
 
 ## Single key
 
+Use one `Kbd` for one physical key. It is a hint, with no focus stop or keyboard handler.
+
+<ComponentExample name="single" />
+
 ```tsx
-<Kbd>Esc</Kbd>
+import { Kbd } from "@/components/cadence/kbd";
+
+export function EscapeHint() {
+  return <Kbd>Esc</Kbd>;
+}
 ```
 
 ## A combination
@@ -42,23 +50,47 @@ export function ShortcutHint() {
 `KbdGroup` renders the keys with one gap between them and keeps the sequence
 together for screen readers.
 
+<ComponentExample name="combination" />
+
 ```tsx
-<KbdGroup>
-  <Kbd>Ctrl</Kbd>
-  <Kbd>Shift</Kbd>
-  <Kbd>P</Kbd>
-</KbdGroup>
+import { Kbd, KbdGroup } from "@/components/cadence/kbd";
+
+export function CommandHint() {
+  return (
+    <KbdGroup>
+      <Kbd>Ctrl</Kbd>
+      <Kbd>Shift</Kbd>
+      <Kbd>P</Kbd>
+    </KbdGroup>
+  );
+}
 ```
 
 ## Inside a tooltip
 
 A `Kbd` inside `data-slot="tooltip-content"` inverts its colours automatically, so
 the hint stays legible on the tooltip surface.
+Focus or hover the trigger to see it. Install `@cadence/tooltip` and `@cadence/button`
+for this composition; the application owns any save action or shortcut handler.
+Tooltip and Button keep their own motion contracts and inherit the site's motion settings.
+
+<ComponentExample name="tooltip" />
 
 ```tsx
-<TooltipContent>
-  Save <Kbd>⌘S</Kbd>
-</TooltipContent>
+import { Button } from "@/components/cadence/button";
+import { Kbd, KbdGroup } from "@/components/cadence/kbd";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/cadence/tooltip";
+
+export function SaveHint() {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<Button variant="outline" />}>Save changes</TooltipTrigger>
+      <TooltipContent>
+        Save <KbdGroup><Kbd>⌘</Kbd><Kbd>S</Kbd></KbdGroup>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
 ```
 
 ## When to use

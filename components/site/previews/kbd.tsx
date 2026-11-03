@@ -1,40 +1,54 @@
 "use client";
 
+import { Button } from "@/registry/cadence/button";
 import { Kbd, KbdGroup } from "@/registry/cadence/kbd";
-import { PreviewRow, PreviewStack } from "./shell";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/registry/cadence/tooltip";
+import { PreviewRow } from "./shell";
 
-/**
- * A single key, then the combinations `KbdGroup` exists for: modifiers and letters
- * that must read as one shortcut. A hint is a label, not a control — nothing here is
- * focusable or animated.
- */
-export function KbdPreview() {
+function SingleKey() {
+  return <Kbd>Esc</Kbd>;
+}
+
+function Combination() {
   return (
-    <PreviewStack>
-      <PreviewRow>
-        <Kbd>K</Kbd>
-        <Kbd>Esc</Kbd>
-        <Kbd>Enter</Kbd>
-        <Kbd>Tab</Kbd>
-        <Kbd>⌘</Kbd>
-        <Kbd>⇧</Kbd>
-      </PreviewRow>
+    <KbdGroup>
+      <Kbd>Ctrl</Kbd>
+      <Kbd>Shift</Kbd>
+      <Kbd>P</Kbd>
+    </KbdGroup>
+  );
+}
 
-      <PreviewRow className="gap-5">
+function InsideTooltip() {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<Button variant="outline" />}>Save changes</TooltipTrigger>
+      <TooltipContent>
+        Save{" "}
         <KbdGroup>
           <Kbd>⌘</Kbd>
-          <Kbd>K</Kbd>
+          <Kbd>S</Kbd>
         </KbdGroup>
-        <KbdGroup>
-          <Kbd>Ctrl</Kbd>
-          <Kbd>Shift</Kbd>
-          <Kbd>P</Kbd>
-        </KbdGroup>
-        <KbdGroup>
-          <Kbd>↑</Kbd>
-          <Kbd>↓</Kbd>
-        </KbdGroup>
-      </PreviewRow>
-    </PreviewStack>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+const examples = { single: SingleKey, combination: Combination, tooltip: InsideTooltip };
+
+export function KbdPreview({ example }: { example?: string }) {
+  if (example !== undefined) {
+    const Example = examples[example as keyof typeof examples];
+    if (!Example) throw new Error(`Unknown Kbd example: ${example}`);
+    return <Example />;
+  }
+  return (
+    <PreviewRow className="gap-5">
+      <Kbd>Esc</Kbd>
+      <KbdGroup>
+        <Kbd>⌘</Kbd>
+        <Kbd>K</Kbd>
+      </KbdGroup>
+    </PreviewRow>
   );
 }
