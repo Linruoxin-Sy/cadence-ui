@@ -218,3 +218,76 @@ for (const os of ["no-preference", "reduce"] as const)
       const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((n) => n.id));
       expect(new Set(ids).size).toBe(ids.length);
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Progress examples: labelled fractions, caller values and independent tracks ${mode}/${os}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/progress?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="progress"]');
+      await expect(top.getByRole("slider")).toHaveCount(0);
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.getByRole("progressbar")).toHaveCount(3);
+      expect(
+        await page
+          .locator(
+            '[data-component-example^="progress/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+          )
+          .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
+      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      const label = page.locator('[data-component-example="progress/labelled"]');
+      await expect(label.getByRole("progressbar")).toHaveAccessibleName("Uploading assets");
+      await expect(label.locator('[data-slot="progress-value"]')).toHaveText("62%");
+      const complete = page.locator('[data-component-example="progress/complete"]');
+      await expect(complete.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
+      await expect(complete.getByRole("status")).toHaveText("All files uploaded.");
+      const custom = page.locator('[data-component-example="progress/range"]').getByRole("progressbar");
+      await expect(custom).toHaveAttribute("aria-valuenow", "3");
+      await expect(custom).toHaveAttribute("aria-valuemax", "5");
+      await expect(custom).toHaveAttribute("aria-valuetext", "Step 3 of 5");
+      await expect(custom.locator('[data-slot="progress-value"]')).toHaveText("60%");
+      const composed = page.locator('[data-component-example="progress/composed"]');
+      await expect(composed.locator('[data-slot="progress-track"]')).toHaveCount(2);
+      expect(
+        await composed
+          .locator('[data-slot="progress-track"]')
+          .evaluateAll((nodes) => nodes.map((n) => getComputedStyle(n).height)),
+      ).toEqual(["6px", "8px"]);
+      expect(
+        await composed
+          .locator('[data-slot="progress-indicator"]')
+          .evaluateAll((nodes) => nodes.map((n) => new DOMMatrixReadOnly(getComputedStyle(n).transform).a)),
+      ).toEqual([0.72, 0.72]);
+      const pending = page.locator('[data-component-example="progress/indeterminate"]').getByRole("progressbar");
+      await expect(pending).not.toHaveAttribute("aria-valuenow");
+      const caller = page.locator('[data-component-example="progress/caller-progress"]');
+      const range = caller.getByRole("slider", { name: "Upload progress", exact: true });
+      const indicator = caller.locator('[data-slot="progress-indicator"]');
+      const saved = await indicator.elementHandle();
+      await range.fill("20");
+      await range.focus();
+      await expect(caller.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "20");
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((n: HTMLButtonElement) => n.click());
+      await expect(range).toBeFocused();
+      expect(await indicator.evaluate((n, saved) => n === saved, saved)).toBe(true);
+      expect(await indicator.evaluate((n) => new DOMMatrixReadOnly(getComputedStyle(n).transform).a)).toBeCloseTo(
+        0.2,
+        3,
+      );
+      await range.press("ArrowRight");
+      await expect(caller.getByRole("status")).toHaveText("Uploaded 21%");
+      await caller.getByRole("button", { name: "Complete upload" }).click();
+      await expect(caller.getByRole("status")).toHaveText("Upload complete");
+      await expect(caller.locator('[data-slot="progress-value"]')).toHaveText("100%");
+      await expect(top.getByRole("progressbar", { name: "Uploading assets", exact: true })).toHaveAttribute(
+        "aria-valuenow",
+        "62",
+      );
+      await expect(caller.getByRole("progressbar")).not.toHaveAttribute("tabindex");
+    });

@@ -7214,52 +7214,205 @@ children.
 
 ## Labelled, with the number
 
-```tsx
-<Progress value={uploaded} aria-label="Uploading assets">
-  <div className="flex w-full items-center justify-between">
-    <ProgressLabel>Uploading assets</ProgressLabel>
-    <ProgressValue />
-  </div>
-</Progress>
-```
+ProgressLabel supplies the accessible name and ProgressValue formats the same value as a percentage. The label and number remain readable above the default track. Pass format or locale to the root to configure number formatting.
 
-`ProgressValue` formats the value with `Intl.NumberFormat`; pass `format` or
-`locale` to the root to change it.
+<ComponentExample name="labelled" />
+
+```tsx
+import { Progress, ProgressLabel, ProgressValue } from "@/components/cadence/progress";
+
+export function LabelledProgress() {
+  return (
+    <Progress value={62} className="max-w-sm">
+      <div className="flex w-full items-center justify-between">
+        <ProgressLabel>Uploading assets</ProgressLabel>
+        <ProgressValue />
+      </div>
+    </Progress>
+  );
+}
+```
 
 ## Indeterminate
 
+A null value omits aria-valuenow and pulses the full track using opacity. This loop remains under reduced motion, stops under none and follows the theme animation token rather than the provider speed.
+
+<ComponentExample name="indeterminate" />
+
 ```tsx
-<Progress value={null} aria-label="Preparing preview" />
+import { Progress, ProgressLabel } from "@/components/cadence/progress";
+
+export function IndeterminateProgress() {
+  return (
+    <Progress value={null} aria-label="Preparing preview" className="max-w-sm">
+      <ProgressLabel>Preparing preview</ProgressLabel>
+    </Progress>
+  );
+}
 ```
 
-The fill fills the track and pulses. There is no sweep: a moving gradient says
-"indeterminate" with motion alone, which is exactly the anti-pattern in the motion
-system.
+## Complete
+
+A fixed completed task shows 100% and a separate status message. The caller supplies the completion announcement; a filled progressbar alone is not a live notification.
+
+<ComponentExample name="complete" />
+
+```tsx
+import { Progress, ProgressLabel, ProgressValue } from "@/components/cadence/progress";
+
+export function CompleteProgress() {
+  return (
+    <div className="grid w-full max-w-sm gap-3">
+      <Progress value={100}>
+        <div className="flex w-full items-center justify-between">
+          <ProgressLabel>Upload complete</ProgressLabel>
+          <ProgressValue />
+        </div>
+      </Progress>
+      <p role="status" className="text-sm text-muted-foreground">
+        All files uploaded.
+      </p>
+    </div>
+  );
+}
+```
 
 ## Custom range
 
-```tsx
-<Progress value={3} min={0} max={5} aria-label="Step 3 of 5">
-  <ProgressValue />
-</Progress>
-```
+Three completed steps in a five-step range render a 60% fill. The caller provides a more specific accessible value text without changing the numeric fraction.
 
-`ProgressValue` renders `60%` for `3/5`; use `getAriaValueText` if you want "step 3
-of 5" announced instead.
+<ComponentExample name="range" />
+
+```tsx
+"use client";
+
+import { Progress, ProgressValue } from "@/components/cadence/progress";
+
+export function CustomProgressRange() {
+  return (
+    <Progress
+      value={3}
+      min={0}
+      max={5}
+      aria-label="Build steps"
+      getAriaValueText={() => "Step 3 of 5"}
+      className="max-w-sm"
+    >
+      <ProgressValue />
+    </Progress>
+  );
+}
+```
 
 ## Composed track
 
+A custom track is added alongside the default track, matching the root composition. Both indicators read the same fraction. This example compares a six-pixel custom track with the default eight-pixel track; it does not replace the default.
+
+<ComponentExample name="composed" />
+
 ```tsx
-<Progress value={72} aria-label="Storage">
-  <ProgressTrack className="h-1.5 bg-muted">
-    <ProgressIndicator className="bg-emerald-500" />
-  </ProgressTrack>
-</Progress>
+import { Progress, ProgressIndicator, ProgressTrack } from "@/components/cadence/progress";
+
+export function ComposedProgress() {
+  return (
+    <Progress value={72} aria-label="Storage" className="max-w-sm">
+      <ProgressTrack className="h-1.5 bg-muted">
+        <ProgressIndicator className="bg-foreground" />
+      </ProgressTrack>
+    </Progress>
+  );
+}
 ```
 
-This adds a composed track alongside the default track, matching the upstream
-root composition. The indicator still reads the value from the root, so it keeps
-animating.
+## Caller-owned progress
+
+The slider represents external upload reports; Complete upload supplies a final value. The caller owns updates and completion text. No timer invents progress, and none of these updates changes another example.
+
+<ComponentExample name="caller-progress" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Progress, ProgressLabel, ProgressValue } from "@/components/cadence/progress";
+
+export function CallerProgress() {
+  const id = useId();
+  const [value, setValue] = useState(62);
+  return (
+    <div className="grid w-full max-w-sm gap-4">
+      <label htmlFor={id} className="grid gap-2 text-sm">
+        Upload progress
+        <input
+          id={id}
+          type="range"
+          min={0}
+          max={100}
+          value={value}
+          onChange={(event) => setValue(Number(event.target.value))}
+        />
+      </label>
+      <Progress value={value} aria-label="Uploading assets">
+        <div className="flex w-full items-center justify-between">
+          <ProgressLabel>Uploading assets</ProgressLabel>
+          <ProgressValue />
+        </div>
+      </Progress>
+      <p role="status" className="text-sm text-muted-foreground">
+        {value === 100 ? "Upload complete" : `Uploaded ${value}%`}
+      </p>
+      <Button variant="outline" size="sm" onClick={() => setValue(100)}>
+        Complete upload
+      </Button>
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The first indeterminate indicator is fixed to none from its first DOM appearance, with no opacity loop. The second bar explicitly requests full within that outer none scope; its external slider changes only that value, and system reduced motion still wins. Ordinary bars inherit the header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Progress } from "@/components/cadence/progress";
+
+export function StaticProgress() {
+  const id = useId();
+  const [value, setValue] = useState(20);
+  return (
+    <CadenceProvider mode="none">
+      <div className="grid w-full max-w-sm gap-4">
+        <div data-testid="initial-none">
+          <Progress value={null} aria-label="Static progress" />
+        </div>
+        <CadenceProvider mode="full">
+          <div data-testid="explicit-full" className="grid gap-3">
+            <label htmlFor={id} className="grid gap-2 text-sm">
+              Explicit full progress
+              <input
+                id={id}
+                type="range"
+                min={0}
+                max={100}
+                value={value}
+                onChange={(event) => setValue(Number(event.target.value))}
+              />
+            </label>
+            <Progress value={value} aria-label="Explicit full progress" />
+          </div>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
+```
 
 ## When to use
 
@@ -7285,7 +7438,7 @@ animating.
 | `value`           | `number \| null`                      | –       | Required. `null` means indeterminate.        |
 | `min`, `max`      | `number`                              | `0`, `100` | Range.                                    |
 | `format`          | `Intl.NumberFormatOptions`            | –       | How `ProgressValue` formats the number.      |
-| `getAriaValueText`| `(value, raw) => string`              | –       | Human-readable value for assistive tech.     |
+| `getAriaValueText`| `(formatted: string, raw: number | null) => string`              | –       | Human-readable value for assistive tech.     |
 | `className`       | `string` / state callback                              | –       | Merged last; the default is a wrap layout.   |
 
 ### `ProgressTrack`, `ProgressIndicator`, `ProgressLabel`, `ProgressValue`
@@ -7333,9 +7486,7 @@ line — the default `flex-wrap` layout does this without extra classes.
 
 ## Performance
 
-One Motion element. A determinate update animates a transform; an indeterminate bar
-runs a CSS opacity loop that the compositor owns, so a page with several bars does
-not schedule main-thread frames. Avoid driving `value` from `requestAnimationFrame`
+One animated indicator per track. A determinate update uses a native transform animation; an indeterminate bar runs a CSS opacity loop. These do not animate layout, but whole-page frame performance still needs measurement. Avoid driving `value` from `requestAnimationFrame`
 yourself; pass the real value and let the transition smooth it.
 
 ## Notes for AI

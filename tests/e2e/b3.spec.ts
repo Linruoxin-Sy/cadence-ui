@@ -66,8 +66,13 @@ async function frames(page: Page) {
     return store.frames;
   });
 }
+function controlScope(id: Id) {
+  return id === "progress" && examples[id]
+    ? '[data-component-example="progress/caller-progress"]'
+    : `[data-preview="${id}"]`;
+}
 async function act(page: Page, id: Id, held = false) {
-  const p = page.locator(`[data-preview="${id}"]`);
+  const p = page.locator(controlScope(id));
   if (id === "checkbox") await p.getByRole("checkbox", { name: "Unchecked", exact: true }).click();
   if (id === "radio-group")
     await p
@@ -105,11 +110,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     for (const mode of MODES)
       for (const id of ids)
         test(`${id} recipe frames, cancellation and stable controls ${mode}`, async ({ page }, testInfo) => {
-          const selector = `[data-preview="${id}"] [data-slot="${parts[id][1]}"]${id === "input-otp" ? " > span" : ""}`;
+          const selector = `${controlScope(id)} [data-slot="${parts[id][1]}"]${id === "input-otp" ? " > span" : ""}`;
           await installInitialControlProbe(page);
           const actual = effectiveMode(mode, reducedMotion === "reduce");
           await openComponent(page, id, mode, parts[id][0], actual);
-          const p = page.locator(`[data-preview="${id}"]`);
+          const p = page.locator(controlScope(id));
           const node = page.locator(selector).first();
           expect(
             await page.evaluate(
@@ -182,7 +187,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(samples.at(-1)?.scale).toBeCloseTo(0.2, 2);
             if (actual === "full") expect(new Set(samples.map((s) => s.scale.toFixed(3))).size).toBeGreaterThan(3);
             else expect(new Set(samples.map((s) => s.scale.toFixed(3))).size).toBeLessThanOrEqual(2);
-            const pulse = p
+            const pulse = page
+              .locator('[data-preview="progress"]')
               .getByRole("progressbar", { name: "Preparing preview" })
               .locator('[data-slot="progress-indicator"]');
             const opacity = await pulse.evaluate(async (n) => {
