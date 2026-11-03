@@ -17,14 +17,16 @@ npx shadcn@latest add @cadence/hover-card
 ## Usage
 
 ```tsx
+"use client";
+
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
 
 export function ReviewerCard() {
   return (
-    <p>
+    <p className="text-sm">
       Reviewed by{" "}
       <HoverCard>
-        <HoverCardTrigger render={<a href="/u/linruoxin" />}>@linruoxin</HoverCardTrigger>
+        <HoverCardTrigger render={<a className="underline underline-offset-4" href="/docs/changelog" />}>@linruoxin</HoverCardTrigger>
         <HoverCardContent>
           <p className="text-sm font-medium">Lin Ruoxin</p>
           <p className="text-sm text-muted-foreground">Maintains the motion layer and the registry.</p>
@@ -37,38 +39,188 @@ export function ReviewerCard() {
 
 ## With an action inside
 
-The card is not modal and does not trap focus, so a link or a button inside it works normally. Base UI
-keeps the card open while the pointer or focus is inside it, which is what makes the action reachable.
+A real local Follow action belongs to this example alone. The supplementary card stays open while its pointer or focus is inside; the profile link remains useful without opening it. Nothing is sent to a server. Once keyboard focus opens this card, ArrowDown moves to Follow using a caller-owned ref. The portal does not itself insert that action immediately after the trigger in the page Tab order.
+
+<ComponentExample name="action" />
 
 ```tsx
-<HoverCardContent>
-  <p className="text-sm font-medium">Lin Ruoxin</p>
-  <Button size="xs" variant="secondary">
-    Follow
-  </Button>
-</HoverCardContent>
+"use client";
+
+import { useRef, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+
+export function FollowReviewer() {
+  const follow = useRef<HTMLButtonElement>(null);
+  const [following, setFollowing] = useState(false);
+  return (
+    <HoverCard>
+      <HoverCardTrigger onKeyDown={(event) => { if (event.key === "ArrowDown") { event.preventDefault(); follow.current?.focus(); } }} render={<a href="/docs/changelog" className="text-sm underline" />}>Reviewer profile</HoverCardTrigger>
+      <HoverCardContent>
+        <p className="text-sm font-medium">Lin Ruoxin</p>
+        <p className="mb-3 text-sm text-muted-foreground">Maintains the motion layer.</p>
+        <Button size="xs" variant="secondary" ref={follow} aria-pressed={following} onClick={() => setFollowing((value) => !value)}>
+          {following ? "Following" : "Follow"}
+        </Button>
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
 ```
 
 ## Placement
 
-`side` defaults to `bottom` — unlike a tooltip, which defaults to `top` — because the card is larger and
-reads better below the link. `alignOffset` defaults to `4` for the same reason.
+The preferred side defaults to bottom. Each trigger has its own fixed side and portal. Base UI can flip or shift a card near the viewport edge; these are placement preferences, not a promise to overflow.
+
+<ComponentExample name="sides" />
 
 ```tsx
-<HoverCardContent side="right" align="start">
-  …
-</HoverCardContent>
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+
+export function HoverCardSides() {
+  return (<div className="flex flex-wrap gap-3">
+      {(["top","right","bottom","left"] as const).map((value) => (
+        <HoverCard key={value}>
+          <HoverCardTrigger render={<Button variant="outline" />}>{value}</HoverCardTrigger>
+          <HoverCardContent side={value} alignOffset={0}>Preview: {value}</HoverCardContent>
+        </HoverCard>
+      ))}
+    </div>);
+}
+```
+
+## Alignment
+
+Compare all three alignments below their triggers. This example sets alignOffset to zero so the edge or centre is visible; the component default remains 4px.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+
+export function HoverCardAlignments() {
+  return (<div className="flex flex-wrap gap-3">
+      {(["start","center","end"] as const).map((value) => (
+        <HoverCard key={value}>
+          <HoverCardTrigger render={<Button variant="outline" />}>{value}</HoverCardTrigger>
+          <HoverCardContent align={value} alignOffset={0}>Preview: {value}</HoverCardContent>
+        </HoverCard>
+      ))}
+    </div>);
+}
+```
+
+## Logical placement
+
+Logical sides follow the direction provider. In RTL, inline-start prefers the right and inline-end prefers the left; physical sides keep their meaning.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { Button } from "@/components/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+
+export function LogicalHoverCards() {
+  return (<DirectionProvider direction="rtl"><div dir="rtl"><div className="flex flex-wrap gap-3">
+      {(["inline-start","inline-end"] as const).map((value) => (
+        <HoverCard key={value}>
+          <HoverCardTrigger render={<Button variant="outline" />}>{value}</HoverCardTrigger>
+          <HoverCardContent side={value} alignOffset={0}>Preview: {value}</HoverCardContent>
+        </HoverCard>
+      ))}
+    </div></div></DirectionProvider>);
+}
 ```
 
 ## Trigger delay
 
-`HoverCardTrigger` owns `delay` and `closeDelay`, defaulting to 600ms and 300ms in the installed Base UI. The root owns open state.
+The trigger owns delay and closeDelay. This card waits 400ms on pointer entry and 300ms on pointer leave, giving time to cross into the card. The installed Base UI defaults are 600ms and 300ms. Focus also makes the preview reachable.
+
+<ComponentExample name="delay" />
 
 ```tsx
-<HoverCard>
-  <HoverCardTrigger delay={400} closeDelay={300} render={<a href="/profile" />}>Profile</HoverCardTrigger>
-  <HoverCardContent>Profile preview</HoverCardContent>
-</HoverCard>
+"use client";
+
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+
+export function DelayedReviewer() {
+  return (
+    <HoverCard>
+      <HoverCardTrigger delay={400} closeDelay={300} render={<a href="/docs/changelog" className="text-sm underline" />}>Delayed profile</HoverCardTrigger>
+      <HoverCardContent>Preview after a short pointer pause.</HoverCardContent>
+    </HoverCard>
+  );
+}
+```
+
+## Controlled preview
+
+The caller owns open state. The external action targets a unique triggerId so the preview has a real anchor even when opened externally. It remains supplementary and can still close through the normal pointer, focus and Escape paths.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+
+export function ControlledReviewer() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="outline" onClick={() => setOpen((value) => !value)}>{open ? "Hide preview" : "Show preview"}</Button>
+      <HoverCard open={open} onOpenChange={setOpen} triggerId={id}>
+        <HoverCardTrigger id={id} render={<a href="/docs/changelog" className="text-sm underline" />}>Controlled profile</HoverCardTrigger>
+        <HoverCardContent>Caller-owned profile preview.</HoverCardContent>
+      </HoverCard>
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+Ordinary examples inherit the site header. Only this comparison sets a fixed none provider, with a nested full override. The system reduced-motion preference still takes precedence over full.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/cadence/hover-card";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function HoverCardMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <HoverCard>
+          <HoverCardTrigger render={<Button variant="outline" />}>Open without motion</HoverCardTrigger>
+          <HoverCardContent data-testid="initial-none">Immediate preview</HoverCardContent>
+        </HoverCard>
+        <CadenceProvider mode="full">
+          <HoverCard>
+            <HoverCardTrigger render={<Button variant="outline" />}>Open nested full</HoverCardTrigger>
+            <HoverCardContent data-testid="nested-full">The OS preference still wins</HoverCardContent>
+          </HoverCard>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -117,7 +269,7 @@ the anchored-surface duration the three share.
 
 | Keys | Action |
 | --- | --- |
-| Tab / Shift+Tab | Focusing the trigger opens the card; moving focus into it keeps it open. |
+| Tab / Shift+Tab | Focusing the trigger opens the card. In the action example, ArrowDown moves to Follow; Tab otherwise follows the page order. |
 | Escape | Closes the card and returns focus to the trigger. |
 | Enter / Space | Follows the trigger link, or activates a control inside the card. |
 
@@ -130,8 +282,8 @@ exist only for pointer users.
   the popup `role="dialog"` or wire it as the trigger's description: a panel that may hold several
   paragraphs and a button is neither a name nor a description, and a screen reader reading it on every
   focus would be noise.
-- Interactive content inside the card is reachable in order: Tab moves from the trigger into the card's
-  links and buttons, and the card stays open while focus is inside it.
+- The action example supplies an explicit ArrowDown focus bridge into its portal. Do not assume the
+  portal puts actions directly after the trigger in page Tab order; use a popover for a deliberate task.
 - Hover is never the only path: focus opens it too, and Escape closes it, so the card never traps a
   keyboard user.
 - If the card is the only place a piece of information exists, it is in the wrong component — move it

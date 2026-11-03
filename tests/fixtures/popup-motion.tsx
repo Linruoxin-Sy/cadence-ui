@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../registry/cadence/dialog";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "../../registry/cadence/hover-card";
 import { Input } from "../../registry/cadence/input";
 import type { CadenceMode } from "../../registry/cadence/lib/motion";
 import { CadenceProvider } from "../../registry/cadence/lib/provider";
@@ -104,6 +105,12 @@ function PopupMotionFixture({
               <TooltipTrigger render={<Button />}>Open tooltip</TooltipTrigger>
               <TooltipContent>Actual registry tooltip</TooltipContent>
             </Tooltip>
+          )}
+          {component === "hover-card" && (
+            <HoverCard>
+              <HoverCardTrigger render={<Button />}>Open hover card</HoverCardTrigger>
+              <HoverCardContent>{field}</HoverCardContent>
+            </HoverCard>
           )}
         </div>
       </main>

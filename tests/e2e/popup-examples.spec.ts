@@ -4,9 +4,12 @@ import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
 
 const catalog: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
-const ids = ["dialog", "alert-dialog", "popover", "tooltip"].filter((id) => catalog[id]);
+const ids = ["dialog", "alert-dialog", "popover", "tooltip", "hover-card", "sheet", "drawer"].filter(
+  (id) => catalog[id],
+);
 const card = (page: Page, id: string, name: string) => page.locator(`[data-component-example="${id}/${name}"]`);
-const popup = (page: Page, id: string) => page.locator(`[data-slot="${id}-content"]`);
+const popup = (page: Page, id: string) =>
+  page.locator(`[data-slot="${id === "drawer" ? "drawer-popup" : `${id}-content`}"]`);
 async function setMode(page: Page, value: string) {
   await page
     .locator('[role=group][aria-label="Motion mode"] button')
@@ -34,7 +37,7 @@ for (const id of ids) {
           const openers = (await triggers.count()) ? triggers : specimen.getByRole("button").first();
           for (const opener of await openers.all()) {
             await opener.scrollIntoViewIfNeeded();
-            if (id === "tooltip") await opener.focus();
+            if (id === "tooltip" || id === "hover-card") await opener.focus();
             else await opener.click();
             const surface = popup(page, id);
             await expect(surface).toBeVisible();
@@ -43,16 +46,17 @@ for (const id of ids) {
             const reference = await (id === "tooltip" ? opener : surface).getAttribute(
               id === "tooltip" ? "aria-describedby" : "aria-labelledby",
             );
-            expect(reference).toBeTruthy();
+            if (id !== "hover-card") expect(reference).toBeTruthy();
             expect(
               await page.evaluate(
                 (value) =>
                   value
                     ?.split(" ")
+                    .filter(Boolean)
                     .every(
                       (id) => [...document.querySelectorAll("[id]")].filter((node) => node.id === id).length === 1,
                     ),
-                reference,
+                reference ?? "",
               ),
             ).toBe(true);
             if (effectiveMode(mode, os) !== "full")
@@ -97,7 +101,7 @@ for (const id of ids) {
       await page.waitForLoadState("networkidle");
       const scopes = card(page, id, "without-motion");
       const none = scopes.getByText("Open without motion", { exact: true });
-      if (id === "tooltip") await none.focus();
+      if (id === "tooltip" || id === "hover-card") await none.focus();
       else await none.click();
       await expect(page.getByTestId("initial-none")).toBeVisible();
       await page.waitForTimeout(180);
@@ -117,11 +121,32 @@ for (const id of ids) {
       ).toBe(true);
       await dismiss(page, id);
       const full = scopes.getByText("Open nested full", { exact: true });
-      if (id === "tooltip") await full.focus();
+      await page.evaluate(() => {
+        const state = window as unknown as { nestedAnimations: number[]; nestedRecording: boolean };
+        state.nestedAnimations = [];
+        state.nestedRecording = true;
+        const tick = () => {
+          const node = document.querySelector('[data-testid="nested-full"]');
+          if (node) state.nestedAnimations.push(node.getAnimations().length);
+          if (state.nestedRecording) requestAnimationFrame(tick);
+        };
+        tick();
+      });
+      if (id === "hover-card") await full.hover();
+      else if (id === "tooltip") await full.focus();
       else await full.click();
       const surface = page.getByTestId("nested-full");
       await expect(surface).toHaveAttribute("data-motion", effectiveMode("full", os));
-      await expect.poll(() => surface.evaluate((node) => node.getAnimations().length)).toBeGreaterThan(0);
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            (window as unknown as { nestedAnimations: number[] }).nestedAnimations.some((count) => count > 0),
+          ),
+        )
+        .toBe(true);
+      await page.evaluate(() => {
+        (window as unknown as { nestedRecording: boolean }).nestedRecording = false;
+      });
       await dismiss(page, id);
     });
 
@@ -138,7 +163,7 @@ for (const id of ids) {
           await specimen.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}.png` });
           const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
           const trigger = (await triggers.count()) ? triggers.first() : specimen.getByRole("button").first();
-          if (id === "tooltip") await trigger.focus();
+          if (id === "tooltip" || id === "hover-card") await trigger.focus();
           else await trigger.click();
           const surface = popup(page, id);
           await expect(surface).toBeVisible();
