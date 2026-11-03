@@ -13,5 +13,6 @@
   "card": ["header-action", "sizes", "content-sized", "boundaries"],
   "aspect-ratio": ["square", "video", "grid"],
   "avatar": ["sizes", "image-fallback", "presence", "group"],
-  "skeleton": ["text-lines", "avatar-name", "swap-content", "without-motion"]
+  "skeleton": ["text-lines", "avatar-name", "swap-content", "without-motion"],
+  "alert": ["action", "without-icon", "destructive"]
 }

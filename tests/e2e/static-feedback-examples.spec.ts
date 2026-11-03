@@ -1,5 +1,69 @@
 import { expect, test } from "@playwright/test";
-import { effectiveMode, MODES } from "./helpers";
+import { effectiveMode, MODES, pressScale } from "./helpers";
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Alert examples: fixed variants, icon columns and caller-owned dismissal ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/alert?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="alert"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.getByRole("alert")).toHaveCount(2);
+      const colors = await top.getByRole("alert").evaluateAll((nodes) =>
+        nodes.map((node) => ({
+          color: getComputedStyle(node).color,
+          background: getComputedStyle(node).backgroundColor,
+        })),
+      );
+      expect(colors[0]?.color).not.toBe(colors[1]?.color);
+      expect(colors[0]?.background).toBe(colors[1]?.background);
+      const plain = page.locator('[data-component-example="alert/without-icon"] [data-slot="alert"]');
+      await expect(plain.locator("svg")).toHaveCount(0);
+      expect(await plain.evaluate((node) => Number.parseFloat(getComputedStyle(node).gridTemplateColumns))).toBe(0);
+      const destructive = page.locator('[data-component-example="alert/destructive"]');
+      await expect(destructive.getByRole("alert")).toContainText("Payment declined");
+      const action = page.locator('[data-component-example="alert/action"]');
+      const button = action.getByRole("button", { name: "Dismiss", exact: true });
+      await expect(button).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
+      await button.scrollIntoViewIfNeeded();
+      expect(await pressScale(page, '[data-component-example="alert/action"] [data-slot="button"]')).toBeCloseTo(
+        effectiveMode(mode, os === "reduce") === "full" ? 0.97 : 1,
+        2,
+      );
+      // Releasing the pointer in pressScale also activates the native button.
+      await expect(action.getByRole("alert")).toHaveCount(0);
+      await action.getByRole("button", { name: "Show alert" }).focus();
+      await page.keyboard.press("Enter");
+      await expect(button).toBeVisible();
+      await button.focus();
+      await expect(button).toBeFocused();
+      await button.press(" ");
+      await expect(action.getByRole("alert")).toHaveCount(0);
+      await expect(top.getByRole("alert")).toHaveCount(2);
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
+      await expect(action.getByRole("button", { name: "Show alert" })).toBeVisible();
+      await action.getByRole("button", { name: "Show alert" }).click();
+      await expect(button).toHaveAttribute("data-motion", "none");
+      for (const width of [390, 1280]) {
+        await page.setViewportSize({ width, height: 1000 });
+        const slot = action.locator('[data-slot="alert-action"]');
+        expect(
+          await slot.evaluate((node) => {
+            const left = node.getBoundingClientRect().left;
+            return [
+              ...(node.parentElement?.querySelectorAll('[data-slot="alert-title"], [data-slot="alert-description"]') ??
+                []),
+            ].every((text) => text.getBoundingClientRect().right <= left);
+          }),
+        ).toBe(true);
+      }
+      expect(
+        await page
+          .locator('[data-slot="alert"]')
+          .evaluateAll((nodes) => nodes.every((node) => node.getAnimations().length === 0)),
+      ).toBe(true);
+    });
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)

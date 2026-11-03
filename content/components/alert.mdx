@@ -36,39 +36,77 @@ export function QuotaNotice() {
 
 ## With an action
 
-`AlertAction` spans both grid rows, so it stays on the first line when the
-description wraps.
+`AlertAction` occupies a separate column spanning both text rows. Dismiss clears the caller-owned message; Show alert mounts it again. Alert does not own dismissal state or provide an `onClose` prop. The composed Button inherits the header motion settings.
+
+<ComponentExample name="action" />
 
 ```tsx
-<Alert variant="destructive">
-  <TriangleAlert />
-  <AlertTitle>Deploy failed</AlertTitle>
-  <AlertDescription>Build 42 exited with code 1.</AlertDescription>
-  <AlertAction>
-    <Button variant="outline" size="sm">Retry</Button>
-  </AlertAction>
-</Alert>
+"use client";
+
+import { useState } from "react";
+import { CircleAlertIcon, TriangleAlertIcon } from "lucide-react";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/cadence/alert";
+import { Button } from "@/components/cadence/button";
+
+export function AlertWithAction() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return <Button variant="outline" size="sm" onClick={() => setVisible(true)}>Show alert</Button>;
+  return (
+    <Alert variant="destructive">
+      <TriangleAlertIcon aria-hidden="true" />
+      <AlertTitle>Deploy failed</AlertTitle>
+      <AlertDescription>Build 42 exited with code 1. The previous release is still live.</AlertDescription>
+      <AlertAction>
+        <Button variant="outline" size="sm" onClick={() => setVisible(false)}>Dismiss</Button>
+      </AlertAction>
+    </Alert>
+  );
+}
 ```
 
 ## Without an icon
 
-The icon column collapses to zero, so title and description sit flush left. Add an
-icon only when it tells the user something the title does not.
+When there is no direct icon child, the icon column collapses to zero and the text uses the available width. The title and description still carry the complete message.
+
+<ComponentExample name="without-icon" />
 
 ```tsx
-<Alert>
-  <AlertTitle>Read-only mode</AlertTitle>
-  <AlertDescription>Billing needs attention before you can edit.</AlertDescription>
-</Alert>
+import { useState } from "react";
+import { CircleAlertIcon, TriangleAlertIcon } from "lucide-react";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/cadence/alert";
+import { Button } from "@/components/cadence/button";
+
+export function AlertWithoutIcon() {
+  return (
+    <Alert>
+      <AlertTitle>Read-only mode</AlertTitle>
+      <AlertDescription>Billing needs attention before you can edit.</AlertDescription>
+    </Alert>
+  );
+}
 ```
 
 ## Destructive
 
-`variant="destructive"` colours the text and leaves the surface as a card. A red
-block is harder to read and competes with the page it sits on.
+`variant="destructive"` changes the text and icon colour while retaining the card surface. Describe the failure in words so colour is not the only signal. The default neutral form appears in Usage and beside it in the top specimen.
+
+<ComponentExample name="destructive" />
 
 ```tsx
-<Alert variant="destructive">Payment declined</Alert>
+import { useState } from "react";
+import { CircleAlertIcon, TriangleAlertIcon } from "lucide-react";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/cadence/alert";
+import { Button } from "@/components/cadence/button";
+
+export function DestructiveAlert() {
+  return (
+    <Alert variant="destructive">
+      <TriangleAlertIcon aria-hidden="true" />
+      <AlertTitle>Payment declined</AlertTitle>
+      <AlertDescription>Update your payment method before the next invoice.</AlertDescription>
+    </Alert>
+  );
+}
 ```
 
 ## When to use

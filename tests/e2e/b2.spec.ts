@@ -1,6 +1,9 @@
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode, MODES, openComponent, pressScale } from "./helpers";
+
+const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
 
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`B2 ${reducedMotion}`, () => {
@@ -178,7 +181,7 @@ for (const colorScheme of ["light", "dark"] as const) {
           ).toEqual([]);
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
           if (id === "alert") {
-            const action = page.locator('[data-preview="alert"] [data-slot="alert-action"]');
+            const action = page.locator('[data-component-example="alert/action"] [data-slot="alert-action"]');
             expect(
               await action.evaluate((node) => {
                 const left = node.getBoundingClientRect().left;
@@ -201,6 +204,10 @@ for (const colorScheme of ["light", "dark"] as const) {
           await page
             .locator(`[data-preview="${id}"]`)
             .screenshot({ path: `.cache/b2-proof/${id}-${colorScheme}-${width}-preview.png` });
+          for (const name of examples[id] ?? [])
+            await page.locator(`[data-component-example="${id}/${name}"]`).screenshot({
+              path: `.cache/b2-proof/${id}-${colorScheme}-${width}-${name}.png`,
+            });
         }
         expect(errors).toEqual([]);
       });
