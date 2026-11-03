@@ -41,7 +41,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
   const { headings, content } = await compileDocument(doc.body);
 
   return (
-    <div className="mx-auto max-w-3xl xl:grid xl:max-w-5xl xl:grid-cols-[minmax(0,1fr)_12rem] xl:gap-10">
+    <div className="mx-auto w-full max-w-3xl xl:grid xl:max-w-none xl:grid-cols-[minmax(0,1fr)_14rem] xl:gap-8">
       <DocumentEntrance as="article" className="mx-auto w-full min-w-0 max-w-3xl py-12">
         <Breadcrumb>
           <BreadcrumbList>

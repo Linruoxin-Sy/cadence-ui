@@ -251,6 +251,31 @@ for (const theme of ["light", "dark"] as const) {
     const body = await article.boundingBox();
     expect(rail && body && rail.x > body.x + body.width).toBeTruthy();
     expect(rail?.y).toBeLessThan(140);
+    await mkdir(".cache/toc-proof", { recursive: true });
+    for (const width of [1440, 1920]) {
+      await page.setViewportSize({ width, height: 900 });
+      const alignment = await page.evaluate(() => {
+        const header = document.querySelector("header > .max-w-site");
+        const toc = document.querySelector("[data-document-toc]");
+        const article = document.querySelector("article");
+        if (!header || !toc || !article) throw new Error("Missing documentation columns");
+        const sidebar = toc.getBoundingClientRect();
+        const reading = article.getBoundingClientRect();
+        return {
+          right: sidebar.right,
+          siteRight: header.getBoundingClientRect().right - Number.parseFloat(getComputedStyle(header).paddingRight),
+          width: sidebar.width,
+          articleWidth: reading.width,
+          gap: sidebar.left - reading.right,
+        };
+      });
+      expect(alignment.right).toBeCloseTo(alignment.siteRight, 0);
+      expect(alignment.width).toBe(224);
+      expect(alignment.articleWidth).toBeLessThanOrEqual(768);
+      expect(alignment.gap).toBeGreaterThanOrEqual(64);
+      await page.screenshot({ path: `.cache/toc-proof/right-sidebar-${theme}-${width}.png` });
+    }
+    await page.setViewportSize({ width: 1440, height: 900 });
     const api = toc.getByRole("link", { name: "API", exact: true });
     await api.focus();
     await api.press("Enter");

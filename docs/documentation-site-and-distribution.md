@@ -304,9 +304,11 @@ and the component catalogue retain their independent `max-w-3xl` (48rem) reading
 centred in the remaining content area. Below `md`, the existing Browse disclosure replaces
 the sidebar and the content uses the available width within the shared padding.
 
-Component pages add a 192px Toc rail at `xl` with a 40px gap, within a `max-w-5xl` wrapper.
-The article retains its own centred `max-w-3xl` measure in the reading column; guide pages retain
-their existing measure.
+Component pages add an independent 224px Toc sidebar at `xl`, matching the left navigation's
+width. The page fills the remaining documentation shell rather than centring a bounded article/Toc
+group. A 32px grid gap separates the right sidebar from the reading region; the article retains its
+own centred `max-w-3xl` measure inside that region. The Toc's right edge aligns with the site
+container's inner right edge, including on wide screens. Guide pages retain their existing measure.
 The rail starts at the document's upper right and sticks 80px below the viewport top. Its list
 scrolls independently when longer than the available viewport. Below `xl`, a native disclosure
 aligned to the right below the title exposes the same links, including without JavaScript.
