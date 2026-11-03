@@ -203,7 +203,7 @@ export function MotionSpeedSelect({ className }: { className?: string }) {
         title="Playback speed for the whole site"
         className={className}
       >
-        <SelectValue />
+        <SelectValue className="text-popover-foreground" />
       </SelectTrigger>
       <SelectContent align="end" sideOffset={6} alignItemWithTrigger={false}>
         <SelectGroup>
