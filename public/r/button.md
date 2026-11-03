@@ -20,7 +20,7 @@ npx shadcn@latest add @cadence/button
 import { Button } from "@/components/cadence/button";
 
 export function Save() {
-  return <Button onClick={save}>Save changes</Button>;
+  return <Button>Save changes</Button>;
 }
 ```
 
@@ -38,13 +38,23 @@ the surface it sits on; reach for a different weight only when the hierarchy ask
 | `destructive` | An action that removes or overwrites data. |
 | `link` | An in-flow action that reads as text. |
 
+<ComponentExample name="variants" />
+
 ```tsx
-<Button>Save changes</Button>
-<Button variant="secondary">Preview</Button>
-<Button variant="outline">Cancel</Button>
-<Button variant="ghost">Skip</Button>
-<Button variant="destructive">Delete project</Button>
-<Button variant="link">Read the changelog</Button>
+import { Button } from "@/components/cadence/button";
+
+export function Variants() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <Button>Default</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  );
+}
 ```
 
 ## Sizes
@@ -63,24 +73,30 @@ calls to action; four square sizes cover icon-only buttons.
 | `icon` | 36px | Icon only, default. |
 | `icon-lg` | 40px | Icon only, prominent. |
 
-```tsx
-<Button size="xs">Extra small</Button>
-<Button size="sm">Small</Button>
-<Button size="default">Default</Button>
-<Button size="lg">Large</Button>
+<ComponentExample name="sizes" />
 
-<Button size="icon-xs" variant="ghost" aria-label="More">
-  <MoreHorizontal />
-</Button>
-<Button size="icon-sm" variant="outline" aria-label="Search">
-  <Search />
-</Button>
-<Button size="icon" variant="outline" aria-label="Add item">
-  <Plus />
-</Button>
-<Button size="icon-lg" aria-label="Open settings">
-  <Settings />
-</Button>
+```tsx
+import { MoreHorizontalIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { Button } from "@/components/cadence/button";
+
+export function Sizes() {
+  return (
+    <div className="grid justify-items-center gap-6">
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Button size="xs">Extra small</Button>
+        <Button size="sm">Small</Button>
+        <Button>Default</Button>
+        <Button size="lg">Large</Button>
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        <Button size="icon-xs" variant="ghost" aria-label="More"><MoreHorizontalIcon /></Button>
+        <Button size="icon-sm" variant="outline" aria-label="Search"><SearchIcon /></Button>
+        <Button size="icon" variant="outline" aria-label="Add item"><PlusIcon /></Button>
+        <Button size="icon-lg" aria-label="Open settings"><SettingsIcon /></Button>
+      </div>
+    </div>
+  );
+}
 ```
 
 Icon-only buttons always need an `aria-label`: the glyph is not a name.
@@ -90,13 +106,14 @@ Icon-only buttons always need an `aria-label`: the glyph is not a name.
 For navigation, keep the link and take the styles: this preserves link semantics and
 middle-click.
 
+<ComponentExample name="links" />
+
 ```tsx
-import Link from "next/link";
 import { buttonVariants } from "@/components/cadence/button";
 
-<Link href="/pricing" className={buttonVariants({ variant: "outline" })}>
-  Pricing
-</Link>;
+export function Links() {
+  return <a href="/components" className={buttonVariants({ variant: "outline" })}>Browse components</a>;
+}
 ```
 
 ## Composition
@@ -107,8 +124,46 @@ The default button forwards native React events, including CSS `onAnimationStart
 and HTML `onDrag` / `onDragStart` / `onDragEnd`. These handlers receive native
 React events; press feedback does not call them as animation lifecycle hooks.
 
+<ComponentExample name="composition" />
+
 ```tsx
-<Button render={<CopyButton />}>Copy</Button>
+"use client";
+
+import { type ComponentProps, useState } from "react";
+import { Button } from "@/components/cadence/button";
+
+function CustomButton(props: ComponentProps<"button">) {
+  return <button type="button" {...props} />;
+}
+
+export function Composition() {
+  const [count, setCount] = useState(0);
+  return (
+    <Button render={<CustomButton />} onClick={() => setCount((value) => value + 1)}>
+      Count: {count}
+    </Button>
+  );
+}
+```
+
+## Disabled
+
+Use `disabled` while an action is unavailable. Keep the reason or current task in the label;
+the component does not manage loading or application state for you.
+
+<ComponentExample name="disabled" />
+
+```tsx
+import { Button } from "@/components/cadence/button";
+
+export function Disabled() {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <Button disabled>Saving changes</Button>
+      <Button variant="outline" disabled>Unavailable</Button>
+    </div>
+  );
+}
 ```
 
 ## When to use

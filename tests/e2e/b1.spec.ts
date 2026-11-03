@@ -109,7 +109,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
         await page.keyboard.press(" ");
         await expect(button).toBeFocused();
         expect(await button.evaluate((node) => getComputedStyle(node).boxShadow)).not.toBe("none");
-        await page.getByLabel("Button motion").selectOption("full");
+        const modeSwitch = page.getByRole("group", { name: "Motion mode" });
+        await modeSwitch.getByRole("button", { name: "full", exact: true }).click();
         await button.evaluate((node) => {
           (window as unknown as { original: Element }).original = node;
         });
@@ -119,10 +120,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
         await page.mouse.down();
         await page.waitForTimeout(80);
         // Change the provider without releasing the held pointer first.
-        await page.getByLabel("Button motion").evaluate((node: HTMLSelectElement) => {
-          node.value = "none";
-          node.dispatchEvent(new Event("change", { bubbles: true }));
-        });
+        await modeSwitch
+          .getByRole("button", { name: "none", exact: true })
+          .evaluate((node: HTMLButtonElement) => node.click());
         await expect(button).toHaveAttribute("data-motion", "none");
         await expect
           .poll(() => button.evaluate((node) => getComputedStyle(node).transform))
@@ -135,7 +135,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           .getByRole("group", { name: "Motion mode" })
           .getByRole("button", { name: "none", exact: true })
           .click();
-        await page.getByLabel("Button motion").selectOption("full");
+        await modeSwitch.getByRole("button", { name: "full", exact: true }).click();
         const restored = await pressScale(page, selector);
         if (reducedMotion === "no-preference") expect(restored).toBeLessThan(0.99);
         else expect(restored).toBe(1);

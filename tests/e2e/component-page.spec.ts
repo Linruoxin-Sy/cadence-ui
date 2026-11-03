@@ -50,35 +50,30 @@ test("all 59 SSR routes expose real headings, registry source, ordered navigatio
 
 for (const mode of ["full", "reduced", "none"] as const)
   for (const os of [false, true]) {
-    test(`variant and source preserve nodes, mode and clipboard: ${mode}/${os}`, async ({ page, context }) => {
+    test(`examples and source preserve nodes, mode and clipboard: ${mode}/${os}`, async ({ page, context }) => {
       await context.grantPermissions(["clipboard-read", "clipboard-write"]);
       await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
       await page.goto(`/components/button?motion=${mode}&variant=outline#usage`);
       await page.waitForLoadState("networkidle");
       const preview = page.locator('[data-preview="button"]');
       await expect(preview).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
-      const selector = preview.getByRole("combobox", { name: "Button variant" });
-      await expect(selector).toHaveValue("outline");
-      const button = preview.getByRole("button", { name: "Outline", exact: true });
+      await expect(preview.getByRole("combobox")).toHaveCount(0);
+      const button = preview.getByRole("button", { name: "Cancel", exact: true });
+      const composition = page.locator('[data-component-example="button/composition"]');
+      const counter = composition.getByRole("button");
+      await counter.click();
+      await expect(counter).toHaveText("Count: 1");
       await button.evaluate((node) => {
         (window as unknown as { specimen: Element }).specimen = node;
       });
       await button.scrollIntoViewIfNeeded();
       await button.click();
-      const scale = await pressScale(page, '[data-preview="button"] button:has-text("Outline")');
+      const scale = await pressScale(page, '[data-preview="button"] button:has-text("Cancel")');
       expect(scale).toBeCloseTo(effectiveMode(mode, os) === "full" ? 0.97 : 1, 2);
-      await selector.focus();
-      await selector.selectOption("secondary");
-      await expect(preview.getByRole("button", { name: "Secondary", exact: true })).toBeVisible();
-      await expect(selector).toBeFocused();
       expect(new URL(page.url()).hash).toBe("#usage");
-      await page.goBack();
-      await expect(selector).toHaveValue("outline");
       expect(await button.evaluate((node) => node === (window as unknown as { specimen: Element }).specimen)).toBe(
         true,
       );
-      await page.goForward();
-      await expect(selector).toHaveValue("secondary");
       const details = page.locator("article details:not([data-mobile-toc])");
       await details.locator("summary").focus();
       await page.keyboard.press("Enter");
@@ -89,6 +84,7 @@ for (const mode of ["full", "reduced", "none"] as const)
       expect((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, "\n")).toBe(
         payload.files[0].content.replace(/\r\n/g, "\n"),
       );
+      await expect(counter).toHaveText("Count: 1");
       if (mode === "none" && !os) {
         await mkdir(".cache/component-page-proof", { recursive: true });
         expect(

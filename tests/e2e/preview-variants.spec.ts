@@ -5,6 +5,10 @@ import { buttonVariants } from "../../registry/cadence/button";
 
 type Entry = { id: string; applicable: boolean; part?: string; prop?: string; options?: string[] };
 const matrix: Entry[] = JSON.parse(await readFile("tests/fixtures/preview-variants.json", "utf8"));
+const exampleCatalog: Record<string, string[]> = JSON.parse(
+  await readFile("components/site/previews/examples.json", "utf8"),
+);
+const legacySelector = (entry: Entry) => entry.applicable && !Object.hasOwn(exampleCatalog, entry.id);
 const label = (id: string) =>
   id
     .split("-")
@@ -33,13 +37,17 @@ test("59 route SSR applicability agrees with the reviewed matrix", async ({ page
           present: !!preview,
           value: selector?.value,
           options: selector ? [...selector.options].map((o) => o.value) : [],
+          examples: [...doc.querySelectorAll("[data-component-example]")].map((node) =>
+            node.getAttribute("data-component-example"),
+          ),
         };
       },
       { html: await response.text(), id: entry.id },
     );
     expect(result.present).toBe(true);
-    expect(result.options).toEqual(entry.applicable ? ["all", ...(entry.options ?? [])] : []);
-    expect(result.value).toBe(entry.applicable ? "all" : undefined);
+    expect(result.options).toEqual(legacySelector(entry) ? ["all", ...(entry.options ?? [])] : []);
+    expect(result.value).toBe(legacySelector(entry) ? "all" : undefined);
+    expect(result.examples).toEqual((exampleCatalog[entry.id] ?? []).map((name) => `${entry.id}/${name}`));
   }
   const context = await browser.newContext({ javaScriptEnabled: false });
   try {
@@ -50,7 +58,7 @@ test("59 route SSR applicability agrees with the reviewed matrix", async ({ page
       );
       const preview = native.locator(`[data-preview="${entry.id}"]`);
       await expect(preview).toBeVisible();
-      if (entry.applicable)
+      if (legacySelector(entry))
         await expect(preview.getByRole("combobox", { name: `${label(entry.id)} variant`, exact: true })).toHaveValue(
           "all",
         );
@@ -180,7 +188,7 @@ async function shape(page: Page, entry: Entry, value: string) {
   }
 }
 
-for (const entry of matrix.filter((e) => e.applicable)) {
+for (const entry of matrix.filter(legacySelector)) {
   test(`${entry.id}: every real option, cold URL, fallback, history and retained node`, async ({ page }) => {
     test.setTimeout(120_000);
     const options = entry.options ?? [];
@@ -239,7 +247,7 @@ for (const entry of matrix.filter((e) => e.applicable)) {
 }
 
 test("history hiding a focused specimen restores focus to its selector", async ({ page }) => {
-  for (const id of ["button", "scroll-area"]) {
+  for (const id of ["button", "scroll-area"].filter((id) => !Object.hasOwn(exampleCatalog, id))) {
     await page.goto(`/components/${id}?motion=none`);
     await page.waitForLoadState("networkidle");
     const preview = page.locator(`[data-preview="${id}"]`);
