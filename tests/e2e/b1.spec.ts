@@ -96,8 +96,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
         await el.evaluate((node) => {
           (window as unknown as { original: Element }).original = node;
         });
-        const select = page.getByLabel("Skeleton motion");
-        await select.selectOption("none");
+        const modes = page.getByRole("group", { name: "Motion mode" });
+        await modes.getByRole("button", { name: "none", exact: true }).click();
         expect(
           await el.evaluate((node) => ({
             same: node === (window as unknown as { original: Element }).original,
@@ -105,12 +105,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
             animations: node.getAnimations().length,
           })),
         ).toEqual({ same: true, opacity: "1", animations: 0 });
-        // Explicit full restores this subtree inside an outer none scope.
-        await page
-          .getByRole("group", { name: "Motion mode" })
-          .getByRole("button", { name: "none", exact: true })
-          .click();
-        await select.selectOption("full");
+        // Restoring the inherited clock resumes the same CSS loop on the same node.
+        await modes.getByRole("button", { name: "full", exact: true }).click();
         await expect(el).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
         expect(await el.evaluate((node) => node.getAnimations().length)).toBe(1);
         await page.emulateMedia({ reducedMotion: "reduce" });

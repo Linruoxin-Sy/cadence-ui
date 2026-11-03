@@ -164,7 +164,7 @@ for (const os of ["no-preference", "reduce"] as const)
       await page.goto(`/components/skeleton?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const expected = effectiveMode(mode, os === "reduce");
-      await expect(page.locator("[data-preview-motion]")).toHaveAttribute("data-preview-motion", expected);
+      await expect(page.locator('[data-preview="skeleton"]')).toHaveAttribute("data-preview-motion", expected);
       // Reinsert the actual authored CSS surface, without descendants' independent engines.
       // This isolates @starting-style from the article's Motion entrance and hydration timing.
       const frames = await page

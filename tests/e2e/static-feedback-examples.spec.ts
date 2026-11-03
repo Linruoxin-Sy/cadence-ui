@@ -3,6 +3,80 @@ import { effectiveMode, MODES } from "./helpers";
 
 for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
+    test(`Skeleton examples: inherit pulse, replace content and retain region ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.addInitScript(() => {
+        const state = window as unknown as { staticSkeletonFrames: unknown[] };
+        state.staticSkeletonFrames = [];
+        const sample = () => {
+          const node = document.querySelector(
+            '[data-component-example="skeleton/without-motion"] [data-slot="skeleton"]',
+          );
+          if (node)
+            state.staticSkeletonFrames.push({
+              mode: node.getAttribute("data-motion"),
+              opacity: getComputedStyle(node).opacity,
+              animations: node.getAnimations().length,
+            });
+        };
+        new MutationObserver(sample).observe(document, { childList: true, subtree: true });
+        let remaining = 120;
+        const tick = () => {
+          sample();
+          if (--remaining) requestAnimationFrame(tick);
+        };
+        tick();
+      });
+      await page.goto(`/components/skeleton?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="skeleton"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      for (const name of ["text-lines", "avatar-name", "swap-content"]) {
+        const card = page.locator(`[data-component-example="skeleton/${name}"]`);
+        await expect(card).toHaveAttribute("data-preview-motion", effectiveMode(mode, os === "reduce"));
+        for (const shape of await card.locator('[data-slot="skeleton"]').all()) {
+          await expect(shape).toHaveAttribute("data-motion", effectiveMode(mode, os === "reduce"));
+          await expect(shape).toHaveCSS("animation-name", mode === "none" ? "none" : "pulse");
+        }
+      }
+      const frames = await page.evaluate(
+        () =>
+          (window as unknown as { staticSkeletonFrames: { mode: string; opacity: string; animations: number }[] })
+            .staticSkeletonFrames,
+      );
+      expect(frames.length).toBeGreaterThan(0);
+      expect(frames.every((frame) => frame.mode === "none" && frame.opacity === "1" && frame.animations === 0)).toBe(
+        true,
+      );
+      const swap = page.locator('[data-component-example="skeleton/swap-content"]');
+      const region = swap.getByRole("region", { name: "Profile", exact: true });
+      const original = await region.elementHandle();
+      const before = await region.boundingBox();
+      const button = swap.getByRole("button");
+      await button.focus();
+      await button.press("Enter");
+      await expect(region).toHaveAttribute("aria-busy", "false");
+      await expect(region).toContainText("Ada Lovelace");
+      await expect(region.locator('[data-slot="skeleton"]')).toHaveCount(0);
+      await expect(button).toBeFocused();
+      expect(await region.evaluate((node, original) => node === original, original)).toBe(true);
+      expect((await region.boundingBox())?.height).toBe(before?.height);
+      await expect(top.locator('[data-slot="skeleton"]')).toHaveCount(6);
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
+      await expect(region).toContainText("Ada Lovelace");
+      expect(await region.evaluate((node, original) => node === original, original)).toBe(true);
+      await button.focus();
+      await button.press(" ");
+      await expect(region).toHaveAttribute("aria-busy", "true");
+      await expect(region.locator('[data-slot="skeleton"]')).toHaveCount(3);
+      for (const shape of await region.locator('[data-slot="skeleton"]').all()) {
+        await expect(shape).toHaveAttribute("data-motion", "none");
+        expect(await shape.evaluate((node) => node.getAnimations().length)).toBe(0);
+      }
+    });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
     test(`Avatar examples: sizes, loading, fallback, presence and groups ${mode}/${os}`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: os });
       let release: () => void = () => {};

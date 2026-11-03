@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/cadence/skeleton";
 
 export function CardPlaceholder() {
   return (
-    <div className="w-full max-w-sm space-y-3" aria-busy="true" aria-live="polite">
+    <div className="grid w-full max-w-sm gap-3" aria-busy="true" aria-live="polite">
       <Skeleton className="h-40 w-full rounded-xl" />
       <Skeleton className="h-4 w-2/3" />
       <Skeleton className="h-4 w-1/2" />
@@ -35,34 +35,106 @@ export function CardPlaceholder() {
 
 ## Text lines
 
+Match line lengths to the incoming paragraph and put the busy state on the containing region. These blocks are decorative and do not receive focus.
+
+<ComponentExample name="text-lines" />
+
 ```tsx
-<div className="space-y-2">
-  <Skeleton className="h-4 w-full" />
-  <Skeleton className="h-4 w-11/12" />
-  <Skeleton className="h-4 w-3/5" />
-</div>
+import { Skeleton } from "@/components/cadence/skeleton";
+
+export function TextLines() {
+  return (
+    <div className="grid w-full max-w-sm gap-2" role="status" aria-busy="true" aria-label="Loading paragraph">
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-11/12" />
+      <Skeleton className="h-4 w-3/5" />
+    </div>
+  );
+}
 ```
 
 ## Avatar and name
 
+A circular block and two short lines reserve the shape of a person row. The caller chooses sizes; Skeleton has no size or shape variants.
+
+<ComponentExample name="avatar-name" />
+
 ```tsx
-<div className="flex items-center gap-3">
-  <Skeleton className="size-10 rounded-full" />
-  <div className="space-y-2">
-    <Skeleton className="h-3 w-32" />
-    <Skeleton className="h-3 w-20" />
-  </div>
-</div>
+import { Skeleton } from "@/components/cadence/skeleton";
+
+export function AvatarAndName() {
+  return (
+    <div className="flex w-full max-w-sm items-center gap-3" role="status" aria-busy="true" aria-label="Loading person">
+      <Skeleton className="size-10 shrink-0 rounded-full" />
+      <div className="grid gap-2">
+        <Skeleton className="h-3 w-32" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+    </div>
+  );
+}
 ```
 
 ## Swapping in the real content
 
-Keep the container mounted so the height is continuous; only the children change.
+The application owns loading and the response. Load profile simulates that response; Reload profile returns to the placeholder. Keep the region mounted and reserve its height while only its children change. The action remains outside the busy region so it stays available.
+
+<ComponentExample name="swap-content" />
 
 ```tsx
-<section aria-busy={loading}>
-  {loading ? <CardPlaceholder /> : <Card>…</Card>}
-</section>
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Skeleton } from "@/components/cadence/skeleton";
+
+export function SwappingContent() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <div className="grid w-full max-w-sm gap-4">
+      <section aria-label="Profile" aria-busy={loading} aria-live="polite" className="flex min-h-14 items-center gap-3">
+        {loading ? (
+          <>
+            <Skeleton className="size-10 shrink-0 rounded-full" />
+            <div className="grid gap-2">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm">AL</div>
+            <div className="grid text-sm"><strong>Ada Lovelace</strong><span>Engineer</span></div>
+          </>
+        )}
+      </section>
+      <Button variant="outline" size="sm" onClick={() => setLoading((value) => !value)}>
+        {loading ? "Load profile" : "Reload profile"}
+      </Button>
+    </div>
+  );
+}
+```
+
+## Without motion
+
+This one example explicitly fixes its provider to `none`, including the server render and first paint. The shape stays at full opacity with no animation even when the header is full. All other examples inherit the header; reduced keeps their opacity pulse.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Skeleton } from "@/components/cadence/skeleton";
+
+export function StaticSkeleton() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="w-full max-w-sm" role="status" aria-busy="true" aria-label="Loading without motion">
+        <Skeleton className="h-4 w-full" />
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
