@@ -222,3 +222,64 @@ if (catalog.dialog)
       await dismiss(page, "dialog");
     }
   });
+
+if (catalog["alert-dialog"])
+  test("alert-dialog sizes, outside protection, focus, confirmation and caller-owned pending", async ({ page }) => {
+    await page.goto("/components/alert-dialog?motion=none");
+    await page.waitForLoadState("networkidle");
+    const surface = popup(page, "alert-dialog");
+    const sizes = card(page, "alert-dialog", "sizes");
+    for (const size of ["default", "sm"]) {
+      const trigger = sizes.getByRole("button", { name: size === "sm" ? "Archive" : "Delete project", exact: true });
+      await trigger.click();
+      await expect(surface).toHaveAttribute("data-size", size);
+      expect((await surface.boundingBox())?.width).toBe(size === "sm" ? 320 : 512);
+      await expect(surface.locator('[data-slot="alert-dialog-cancel"]')).toBeFocused();
+      await page.mouse.click(8, 300);
+      await expect(surface).toBeVisible();
+      await surface.locator('[data-slot="alert-dialog-cancel"]').press("Enter");
+      await expect(surface).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+      await trigger.click();
+      await surface.locator('[data-slot="alert-dialog-action"]').click();
+      await expect(surface).toHaveCount(0);
+      await expect(sizes.getByRole("status").nth(size === "sm" ? 1 : 0)).toContainText(
+        size === "sm" ? "archived" : "deleted",
+      );
+    }
+    const icon = card(page, "alert-dialog", "icon");
+    await icon.getByRole("button").click();
+    await expect(surface.locator('[data-slot="alert-dialog-media"] svg')).toHaveAttribute("aria-hidden", "true");
+    await dismiss(page, "alert-dialog");
+    const controlled = card(page, "alert-dialog", "controlled");
+    await controlled.getByRole("button").click();
+    await surface.getByRole("button", { name: "Revoke key", exact: true }).click();
+    await expect(controlled.getByRole("status")).toHaveText("Key revoked locally");
+    await expect(controlled.getByRole("button")).toBeFocused();
+    const pending = card(page, "alert-dialog", "pending");
+    await pending.getByRole("button").click();
+    await surface.getByRole("button", { name: "Delete draft", exact: true }).click();
+    await expect(surface.getByRole("status")).toHaveText("Deletion pending");
+    await expect(surface.getByRole("button", { name: "Deleting…", exact: true })).toBeDisabled();
+    await expect(surface.getByRole("button", { name: "Keep draft", exact: true })).toBeDisabled();
+    await page.keyboard.press("Escape");
+    await expect(surface).toBeVisible();
+    const saved = await surface.elementHandle();
+    for (const mode of ["full", "reduced", "none"]) {
+      await setMode(page, mode);
+      await expect(surface.getByRole("status")).toHaveText("Deletion pending");
+      expect(await surface.evaluate((node, saved) => node === saved, saved)).toBe(true);
+    }
+    await surface.getByRole("button", { name: "Complete request", exact: true }).click();
+    await expect(surface).toHaveCount(0);
+    await expect(pending.getByRole("status")).toHaveText("Draft deleted locally");
+    await expect(pending.getByRole("button")).toBeFocused();
+    await page.setViewportSize({ width: 390, height: 900 });
+    await sizes.getByRole("button", { name: "Archive", exact: true }).click();
+    expect((await surface.boundingBox())?.width).toBe(320);
+    await expect(surface.locator('[data-slot="alert-dialog-footer"]')).toHaveCSS(
+      "grid-template-columns",
+      "131px 131px",
+    );
+    await dismiss(page, "alert-dialog");
+  });

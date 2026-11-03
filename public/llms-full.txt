@@ -7881,6 +7881,290 @@ This also installs `button`, which the two actions render through.
 ## Usage
 
 ```tsx
+"use client";
+
+import { Trash2Icon } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
+
+export function Confirmation({ size = "default", withIcon = false }: { size?: "default" | "sm"; withIcon?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger render={<Button variant="outline" />}>
+          {size === "sm" ? "Archive" : "Delete project"}
+        </AlertDialogTrigger>
+        <AlertDialogContent size={size}>
+          <AlertDialogHeader>
+            {withIcon && (
+              <AlertDialogMedia>
+                <Trash2Icon aria-hidden="true" />
+              </AlertDialogMedia>
+            )}
+            <AlertDialogTitle>{size === "sm" ? "Archive this project?" : "Delete this project?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {size === "sm"
+                ? "It stops deploying. You can unarchive it later."
+                : "Every deployment and its logs go with it. This cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{size === "sm" ? "Cancel" : "Keep project"}</AlertDialogCancel>
+            <AlertDialogAction
+              variant={size === "sm" ? "default" : "destructive"}
+              onClick={() => {
+                setDeleted(true);
+                setOpen(false);
+              }}
+            >
+              {size === "sm" ? "Archive" : "Delete project"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <p role="status" className="text-sm text-muted-foreground">
+        {deleted ? (size === "sm" ? "Project archived locally" : "Project deleted locally") : "No changes"}
+      </p>
+    </div>
+  );
+}
+```
+
+## Confirmation sizes
+
+Default and sm are separate fixed confirmations. The compact panel uses two equal footer columns; default uses the responsive footer. Cancel closes automatically. Confirm is an ordinary Button: the caller records the local result and closes its controlled root.
+
+<ComponentExample name="sizes" />
+
+```tsx
+"use client";
+
+import { Trash2Icon } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
+
+export function ConfirmationSizes() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      <Confirmation />
+      <Confirmation size="sm" />
+    </div>
+  );
+}
+
+function Confirmation({ size = "default", withIcon = false }: { size?: "default" | "sm"; withIcon?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger render={<Button variant="outline" />}>
+          {size === "sm" ? "Archive" : "Delete project"}
+        </AlertDialogTrigger>
+        <AlertDialogContent size={size}>
+          <AlertDialogHeader>
+            {withIcon && (
+              <AlertDialogMedia>
+                <Trash2Icon aria-hidden="true" />
+              </AlertDialogMedia>
+            )}
+            <AlertDialogTitle>{size === "sm" ? "Archive this project?" : "Delete this project?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {size === "sm"
+                ? "It stops deploying. You can unarchive it later."
+                : "Every deployment and its logs go with it. This cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{size === "sm" ? "Cancel" : "Keep project"}</AlertDialogCancel>
+            <AlertDialogAction
+              variant={size === "sm" ? "default" : "destructive"}
+              onClick={() => {
+                setDeleted(true);
+                setOpen(false);
+              }}
+            >
+              {size === "sm" ? "Archive" : "Delete project"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <p role="status" className="text-sm text-muted-foreground">
+        {deleted ? (size === "sm" ? "Project archived locally" : "Project deleted locally") : "No changes"}
+      </p>
+    </div>
+  );
+}
+```
+
+## With an icon
+
+AlertDialogMedia adds the icon-first header layout at the default size. The decorative icon is hidden from assistive technology; the title and consequence still name the decision. This local example sends no request.
+
+<ComponentExample name="icon" />
+
+```tsx
+"use client";
+
+import { Trash2Icon } from "lucide-react";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
+
+export function IconConfirmation() {
+  return <Confirmation withIcon />;
+}
+
+function Confirmation({ size = "default", withIcon = false }: { size?: "default" | "sm"; withIcon?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger render={<Button variant="outline" />}>
+          {size === "sm" ? "Archive" : "Delete project"}
+        </AlertDialogTrigger>
+        <AlertDialogContent size={size}>
+          <AlertDialogHeader>
+            {withIcon && (
+              <AlertDialogMedia>
+                <Trash2Icon aria-hidden="true" />
+              </AlertDialogMedia>
+            )}
+            <AlertDialogTitle>{size === "sm" ? "Archive this project?" : "Delete this project?"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {size === "sm"
+                ? "It stops deploying. You can unarchive it later."
+                : "Every deployment and its logs go with it. This cannot be undone."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{size === "sm" ? "Cancel" : "Keep project"}</AlertDialogCancel>
+            <AlertDialogAction
+              variant={size === "sm" ? "default" : "destructive"}
+              onClick={() => {
+                setDeleted(true);
+                setOpen(false);
+              }}
+            >
+              {size === "sm" ? "Archive" : "Delete project"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <p role="status" className="text-sm text-muted-foreground">
+        {deleted ? (size === "sm" ? "Project archived locally" : "Project deleted locally") : "No changes"}
+      </p>
+    </div>
+  );
+}
+```
+
+## Controlled
+
+The external opener sets caller-owned open state. Revoke key records a local result and closes explicitly. A production caller would close when its own operation completes; AlertDialogAction does not close automatically.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
+
+export function ControlledConfirmation() {
+  const [open, setOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Request key revocation
+      </Button>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke this key?</AlertDialogTitle>
+            <AlertDialogDescription>Services using it lose access. Create a replacement first.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep key</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                setConfirmed(true);
+                setOpen(false);
+              }}
+            >
+              Revoke key
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <p role="status" className="text-sm text-muted-foreground">
+        {confirmed ? "Key revoked locally" : "Key active"}
+      </p>
+    </div>
+  );
+}
+```
+
+## A confirmation that is still working
+
+The caller owns pending and disables both decision buttons while working. This example deliberately has no request: Complete request resolves the local simulation. The controlled root rejects Escape while pending; before pending, Escape and Cancel work normally. Keep this policy and an error/retry path in application code.
+
+<ComponentExample name="pending" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -7894,79 +8178,123 @@ import {
 } from "@/components/cadence/alert-dialog";
 import { Button } from "@/components/cadence/button";
 
-export function DeleteProject() {
+export function PendingConfirmation() {
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [complete, setComplete] = useState(false);
   return (
-    <AlertDialog>
-      <AlertDialogTrigger render={<Button variant="outline" />}>Delete project</AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete this project?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Every deployment and its logs go with it. This cannot be undone.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Keep project</AlertDialogCancel>
-          <AlertDialogAction variant="destructive">Delete project</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <div className="flex flex-col items-start gap-3">
+      <AlertDialog
+        open={open}
+        onOpenChange={(next) => {
+          if (!pending) setOpen(next);
+        }}
+      >
+        <AlertDialogTrigger render={<Button variant="outline" />}>Delete draft</AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this draft?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This local example models a caller-owned request. Complete request resolves it without sending data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <p role="status" className="text-sm">
+            {pending ? "Deletion pending" : "Ready to delete"}
+          </p>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>Keep draft</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={pending}
+              aria-busy={pending}
+              onClick={() => setPending(true)}
+            >
+              {pending ? "Deleting…" : "Delete draft"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+          {pending && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setPending(false);
+                setComplete(true);
+                setOpen(false);
+              }}
+            >
+              Complete request
+            </Button>
+          )}
+        </AlertDialogContent>
+      </AlertDialog>
+      <p role="status" className="text-sm text-muted-foreground">
+        {complete ? "Draft deleted locally" : "Draft retained"}
+      </p>
+    </div>
   );
 }
 ```
 
-## A compact confirmation
+## Explicit motion scopes
 
-`size="sm"` caps the panel at `max-w-xs` and turns the footer into a two-column grid, which is what a
-yes/no question looks like. The dialog is centred and its header is centred with it.
+These fixed overrides demonstrate none from portal insertion and explicit full nested within none. The OS reduced preference still wins over full. Request deletion deliberately leaves these uncontrolled panels open, matching AlertDialogAction; use Cancel or Escape to dismiss. Ordinary examples inherit the site header.
 
-```tsx
-<AlertDialogContent size="sm">
-  <AlertDialogHeader>
-    <AlertDialogTitle>Archive this project?</AlertDialogTitle>
-    <AlertDialogDescription>It stops deploying. You can unarchive it later.</AlertDialogDescription>
-  </AlertDialogHeader>
-  <AlertDialogFooter>
-    <AlertDialogCancel>Cancel</AlertDialogCancel>
-    <AlertDialogAction>Archive</AlertDialogAction>
-  </AlertDialogFooter>
-</AlertDialogContent>
-```
-
-## With an icon
-
-`AlertDialogMedia` is a slot, not a decoration: put an icon in it and the header switches to the
-left-aligned, icon-first layout on `size="default"`.
+<ComponentExample name="without-motion" />
 
 ```tsx
-<AlertDialogHeader>
-  <AlertDialogMedia>
-    <Trash2 aria-hidden="true" />
-  </AlertDialogMedia>
-  <AlertDialogTitle>Delete this project?</AlertDialogTitle>
-  <AlertDialogDescription>Every deployment goes with it.</AlertDialogDescription>
-</AlertDialogHeader>
-```
+"use client";
 
-## Controlled
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/cadence/alert-dialog";
+import { Button } from "@/components/cadence/button";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
 
-```tsx
-const [open, setOpen] = useState(false);
-
-<AlertDialog open={open} onOpenChange={setOpen}>
-  <AlertDialogContent>…</AlertDialogContent>
-</AlertDialog>;
-```
-
-## A confirmation that is still working
-
-The component never owns a request. The caller passes the in-flight state, and the library keeps the
-button a button:
-
-```tsx
-<AlertDialogAction disabled={isDeleting} onClick={() => mutate()}>
-  {isDeleting ? "Deleting…" : "Delete project"}
-</AlertDialogAction>
+export function AlertMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <AlertDialog>
+          <AlertDialogTrigger render={<Button variant="outline" />}>Open without motion</AlertDialogTrigger>
+          <AlertDialogContent data-testid="initial-none">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Immediate confirmation</AlertDialogTitle>
+              <AlertDialogDescription>No transition runs on this panel or its overlay.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Keep project</AlertDialogCancel>
+              <AlertDialogAction>Request deletion</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+        <CadenceProvider mode="full">
+          <AlertDialog>
+            <AlertDialogTrigger render={<Button variant="outline" />}>Open nested full</AlertDialogTrigger>
+            <AlertDialogContent data-testid="nested-full">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Nested full confirmation</AlertDialogTitle>
+                <AlertDialogDescription>
+                  The OS preference can still reduce this explicit full scope.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep project</AlertDialogCancel>
+                <AlertDialogAction>Request deletion</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
