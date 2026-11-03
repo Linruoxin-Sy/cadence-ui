@@ -23,9 +23,13 @@ export function Example() {
   return (
     <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_12rem]">
       <article>
-        <h2 id="overview" className="scroll-mt-24">Overview</h2>
+        <h2 id="overview" className="scroll-mt-24">
+          Overview
+        </h2>
         <p>Introduce the topic here.</p>
-        <h2 id="details" className="scroll-mt-24">Details</h2>
+        <h2 id="details" className="scroll-mt-24">
+          Details
+        </h2>
         <p>Explain the details here.</p>
       </article>
       <aside>
@@ -44,30 +48,163 @@ export function Example() {
 
 ## Nested sections
 
-Pass `depth: 3` for a subsection. Entries stay in document order and indent one level.
-The caller supplies unique heading ids and human-readable labels; Toc does not parse Markdown.
+Pass `depth: 3` for a subsection. Entries stay in document order and indent one level. The caller supplies unique heading ids and readable labels; Toc does not parse Markdown. Each card uses its own id prefix so its links cannot target the surrounding documentation.
+
+<ComponentExample name="nested" />
 
 ```tsx
-<Toc items={[
-  { id: "api", title: "API" },
-  { id: "toc-props", title: "Toc", depth: 3 },
-]} />
+"use client";
+
+import { useId } from "react";
+import { Toc } from "@/components/cadence/toc";
+
+export function Nested() {
+  const id = useId();
+  const items = [
+    { id: `${id}-api`, title: "API" },
+    { id: `${id}-props`, title: "Props", depth: 3 },
+    { id: `${id}-keyboard`, title: "Keyboard" },
+  ] as const;
+  return (
+    <div className="grid w-full gap-6 sm:grid-cols-2">
+      <Toc items={items} label="Reference sections" />
+      <div className="grid gap-4 text-sm">
+        <section>
+          <h3 id={items[0].id} className="scroll-mt-24 font-medium">
+            API
+          </h3>
+          <p className="mt-1 text-muted-foreground">Component reference.</p>
+          <h4 id={items[1].id} className="mt-3 scroll-mt-24 font-medium">
+            Props
+          </h4>
+          <p className="mt-1 text-muted-foreground">Caller-supplied options.</p>
+        </section>
+        <section>
+          <h3 id={items[2].id} className="scroll-mt-24 font-medium">
+            Keyboard
+          </h3>
+          <p className="mt-1 text-muted-foreground">Use Tab and Enter on native links.</p>
+        </section>
+      </div>
+    </div>
+  );
+}
 ```
 
 ## Controlled active section
 
-Supply `activeId` when a router, a custom scroll container, or your own observer owns the current
-section. An empty string clears the highlight. This disables Toc's window scroll tracking.
+Supply `activeId` when a router or your observer owns the current section; an empty string clears the highlight. This disables automatic window tracking. The external Mark actions update only this instance, while its delegated link handler keeps caller state in sync with link activation.
+
+<ComponentExample name="controlled" />
 
 ```tsx
-<Toc
-  label="Article sections"
-  activeId="details"
-  items={[
-    { id: "overview", title: "Overview" },
-    { id: "details", title: "Details" },
-  ]}
-/>
+"use client";
+
+import { useId, useState } from "react";
+import { Toc } from "@/components/cadence/toc";
+import { Button } from "@/components/cadence/button";
+
+export function Controlled() {
+  const id = useId();
+  const items = [
+    { id: `${id}-overview`, title: "Overview" },
+    { id: `${id}-details`, title: "Details" },
+  ] as const;
+  const [activeId, setActiveId] = useState<string>(items[0].id);
+  return (
+    <div className="grid w-full gap-5">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setActiveId(items[0].id)}>
+          Mark Overview
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setActiveId(items[1].id)}>
+          Mark Details
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setActiveId("")}>
+          Clear highlight
+        </Button>
+      </div>
+      <Toc
+        items={items}
+        activeId={activeId}
+        label="Controlled sections"
+        onClick={(event) => {
+          const link =
+            event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[data-toc-id]") : null;
+          if (link) setActiveId(link.dataset.tocId ?? "");
+        }}
+      />
+      <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
+        {items.map((item) => (
+          <h3 key={item.id} id={item.id} className="scroll-mt-24 font-normal">
+            {item.title}
+          </h3>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## Scroll tracking
+
+Without `activeId`, Toc follows headings on window scroll, resize and initial layout. For a bounded article, the caller tracks that scrolling host and supplies `activeId`, as in this example. Scroll the complete article or activate its links: navigation uses the real scroll container and the wrapped label determines the indicator height. The caller keeps entries and heading ids aligned; it does not add another smooth-scroll clock.
+
+<ComponentExample name="scroll-tracking" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Toc } from "@/components/cadence/toc";
+
+export function ScrollTracking() {
+  const id = useId();
+  const items = [
+    { id: `${id}-overview`, title: "Overview" },
+    { id: `${id}-installation`, title: "Installation" },
+    { id: `${id}-usage`, title: "Usage with longer section titles that wrap across lines" },
+    { id: `${id}-api`, title: "API" },
+  ] as const;
+  const [activeId, setActiveId] = useState<string>(items[0].id);
+  const paragraphs = [
+    "Choose a section link or scroll this article. Its reading indicator follows the section nearest the top of this scrolling region.",
+    "Install the component, then supply the same stable heading ids to both the article and the navigation. Each example here owns a separate id prefix.",
+    "Long section titles wrap without widening the navigation rail. The indicator follows the full label height. The article keeps its native keyboard and pointer scrolling.",
+    "The caller owns the entries, labels and scroll container. Toc supplies the links, current-section semantics and motion-aware navigation to their real targets.",
+  ] as const;
+  return (
+    <div className="grid w-full min-w-0 gap-5 sm:grid-cols-[minmax(0,1fr)_10rem]">
+      <section
+        aria-label="Example article"
+        tabIndex={0}
+        className="h-80 min-w-0 overflow-y-auto overscroll-contain rounded-md border p-4 text-sm outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+        onScroll={(event) => {
+          const host = event.currentTarget;
+          const top =
+            host.getBoundingClientRect().top + host.clientTop + Number.parseFloat(getComputedStyle(host).paddingTop);
+          let current: string = items[0].id;
+          for (const item of items) {
+            const heading = document.getElementById(item.id);
+            if (heading && heading.getBoundingClientRect().top <= top + 1) current = item.id;
+          }
+          if (host.scrollTop + host.clientHeight >= host.scrollHeight - 1) current = items.at(-1)?.id ?? items[0].id;
+          setActiveId(current);
+        }}
+      >
+        {items.map((item, index) => (
+          <section key={item.id} className="min-h-64 pb-6">
+            <h3 id={item.id} className="scroll-mt-4 font-medium">
+              {item.title}
+            </h3>
+            <p className="mt-3 leading-relaxed text-muted-foreground">{paragraphs[index]}</p>
+          </section>
+        ))}
+      </section>
+      <Toc items={items} activeId={activeId} label="Article sections" />
+    </div>
+  );
+}
 ```
 
 ## When to use
