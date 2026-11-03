@@ -11,5 +11,6 @@
   "input": ["invalid", "file", "controlled", "disabled-readonly"],
   "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"],
   "card": ["header-action", "sizes", "content-sized", "boundaries"],
-  "aspect-ratio": ["square", "video", "grid"]
+  "aspect-ratio": ["square", "video", "grid"],
+  "avatar": ["sizes", "image-fallback", "presence", "group"]
 }

@@ -34,32 +34,121 @@ export function Author() {
 
 ## Sizes
 
-`size` sets `data-size` on the root; every child reads it through `group/avatar`.
+`size` sets `data-size` on each root. Small, default and large are 24, 32 and 40 CSS pixels; children follow their own root rather than a shared page setting.
+
+<ComponentExample name="sizes" />
 
 ```tsx
-<Avatar size="sm">…</Avatar>
-<Avatar>…</Avatar>
-<Avatar size="lg">…</Avatar>
+import {
+  Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage,
+} from "@/components/cadence/avatar";
+
+export function AvatarSizes() {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      {(["sm", "default", "lg"] as const).map((size) => (
+        <Avatar key={size} size={size} aria-label={`Ada Lovelace, ${size}`}>
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+      ))}
+    </div>
+  );
+}
+```
+
+## Image and fallback
+
+Always include a fallback. The first avatar shows initials while its image loads, then the image replaces them. The second deliberately supplies invalid image bytes to demonstrate an error; the third has no image at all. Base UI owns this loading state and swaps content without a cross-fade.
+
+<ComponentExample name="image-fallback" />
+
+```tsx
+import {
+  Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage,
+} from "@/components/cadence/avatar";
+
+export function AvatarImageAndFallback() {
+  return (
+    <div className="flex flex-wrap items-start gap-6">
+      <div className="grid justify-items-center gap-2 text-sm">
+        <Avatar aria-label="shadcn">
+          <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
+          <AvatarFallback>SC</AvatarFallback>
+        </Avatar>
+        <span>Image</span>
+      </div>
+      <div className="grid justify-items-center gap-2 text-sm">
+        <Avatar aria-label="Grace Hopper">
+          <AvatarImage src="data:image/png;base64,invalid" alt="Grace Hopper" />
+          <AvatarFallback>GH</AvatarFallback>
+        </Avatar>
+        <span>Failed image</span>
+      </div>
+      <div className="grid justify-items-center gap-2 text-sm">
+        <Avatar aria-label="Ada Lovelace">
+          <AvatarFallback>AL</AvatarFallback>
+        </Avatar>
+        <span>No image</span>
+      </div>
+    </div>
+  );
+}
 ```
 
 ## Presence
 
+A badge is static presence feedback, not a loading pulse. Its dot follows the root size; a supplied icon is hidden at the smallest size. Keep a text alternative even when the icon disappears.
+
+<ComponentExample name="presence" />
+
 ```tsx
-<Avatar>
-  <AvatarImage src="/ada.png" alt="Ada Lovelace" />
-  <AvatarFallback>AL</AvatarFallback>
-  <AvatarBadge className="bg-emerald-600" />
-</Avatar>
+import { CheckIcon } from "lucide-react";
+import {
+  Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage,
+} from "@/components/cadence/avatar";
+
+export function AvatarPresence() {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      {(["sm", "default", "lg"] as const).map((size) => (
+        <Avatar key={size} size={size} aria-label={`Ada Lovelace, ${size}`}>
+          <AvatarFallback>AL</AvatarFallback>
+          <AvatarBadge>
+            <CheckIcon aria-hidden="true" />
+            <span className="sr-only">Online</span>
+          </AvatarBadge>
+        </Avatar>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## Group
 
+Group overlaps a short list and leaves overflow counting to the caller. Give all members of a group the same size; the count tile follows that group. These three independent groups show the supported sizes without linking their state.
+
+<ComponentExample name="group" />
+
 ```tsx
-<AvatarGroup>
-  <Avatar><AvatarImage src="/ada.png" alt="Ada Lovelace" /><AvatarFallback>AL</AvatarFallback></Avatar>
-  <Avatar><AvatarFallback>GH</AvatarFallback></Avatar>
-  <AvatarGroupCount>+3</AvatarGroupCount>
-</AvatarGroup>
+import {
+  Avatar, AvatarBadge, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage,
+} from "@/components/cadence/avatar";
+
+export function AvatarGroups() {
+  return (
+    <div className="flex flex-wrap items-center gap-6">
+      {(["sm", "default", "lg"] as const).map((size) => (
+        <AvatarGroup key={size} aria-label={`Reviewers, ${size}`}>
+          <Avatar size={size} aria-label="Ada Lovelace"><AvatarFallback>AL</AvatarFallback></Avatar>
+          <Avatar size={size} aria-label="Grace Hopper"><AvatarFallback>GH</AvatarFallback></Avatar>
+          <Avatar size={size} aria-label="Katherine Johnson"><AvatarFallback>KJ</AvatarFallback></Avatar>
+          <AvatarGroupCount aria-label="3 more reviewers">+3</AvatarGroupCount>
+        </AvatarGroup>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## When to use

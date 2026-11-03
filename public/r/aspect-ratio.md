@@ -30,35 +30,78 @@ export function Cover() {
 
 ## Square
 
+Use a ratio of `1` for a square crop. The image fills the reserved frame with `object-cover`; the ratio box owns layout, while the child owns its crop and accessible name. This self-contained illustration can be replaced by your own image.
+
+<ComponentExample name="square" />
+
 ```tsx
-<AspectRatio ratio={1} className="overflow-hidden rounded-full">
-  <img src="/avatar.jpg" alt="" className="size-full object-cover" />
-</AspectRatio>
+"use client";
+
+import { AspectRatio } from "@/components/cadence/aspect-ratio";
+
+export function SquareImage() {
+  return (
+    <div className="w-full max-w-48">
+      <AspectRatio ratio={1} className="overflow-hidden rounded-full">
+        <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 240%22%3E%3Crect width=%22320%22 height=%22240%22 fill=%22%23334155%22/%3E%3Ccircle cx=%22240%22 cy=%2264%22 r=%2228%22 fill=%22%23fbbf24%22/%3E%3Cpath d=%22M0 240V180L100 80L240 240ZM120 240L240 120L320 200V240Z%22 fill=%22%2394a3b8%22/%3E%3C/svg%3E" alt="Illustrated mountains under a golden sun" className="size-full object-cover" />
+      </AspectRatio>
+    </div>
+  );
+}
 ```
 
 ## Video
 
+A `16 / 9` frame reserves room for video before it loads. Native controls belong to the media itself and stay usable; there is no autoplay. This silent sample loads from MDN only when requested. Replace its source with your own clip and supply captions when it contains speech.
+
+<ComponentExample name="video" />
+
 ```tsx
-<AspectRatio ratio={16 / 9}>
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/…"
-    title="Walkthrough"
-    className="size-full"
-    allowFullScreen
-  />
-</AspectRatio>
+"use client";
+
+import { AspectRatio } from "@/components/cadence/aspect-ratio";
+
+export function VideoFrame() {
+  return (
+    <div className="w-full max-w-md">
+      <AspectRatio ratio={16 / 9} className="overflow-hidden rounded-lg bg-muted">
+        <video controls preload="none" aria-label="Silent flower video" poster="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 240%22%3E%3Crect width=%22320%22 height=%22240%22 fill=%22%23334155%22/%3E%3Ccircle cx=%22240%22 cy=%2264%22 r=%2228%22 fill=%22%23fbbf24%22/%3E%3Cpath d=%22M0 240V180L100 80L240 240ZM120 240L240 120L320 200V240Z%22 fill=%22%2394a3b8%22/%3E%3C/svg%3E" className="size-full object-cover">
+          <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+          <track kind="captions" label="No spoken audio" srcLang="en" src="data:text/vtt,WEBVTT%0A%0A" default />
+          Your browser does not support video playback.
+        </video>
+      </AspectRatio>
+    </div>
+  );
+}
 ```
 
 ## Multiple ratios in one grid
 
-Each box keeps its own ratio, so the grid stays stable while media loads:
+`ratio` accepts a positive numeric width divided by height, rather than a finite list of variants. Here `4 / 3`, `1`, and `3 / 4` reserve different shapes at the same column width. The parent chooses columns and narrow-screen wrapping; media loading does not determine the frame heights.
+
+<ComponentExample name="grid" />
 
 ```tsx
-<div className="grid grid-cols-3 gap-4">
-  <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
-  <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
-  <AspectRatio ratio={4 / 3} className="overflow-hidden rounded-md"><img … /></AspectRatio>
-</div>
+"use client";
+
+import { AspectRatio } from "@/components/cadence/aspect-ratio";
+
+export function RatioGrid() {
+  const image = "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 240%22%3E%3Crect width=%22320%22 height=%22240%22 fill=%22%23334155%22/%3E%3Ccircle cx=%22240%22 cy=%2264%22 r=%2228%22 fill=%22%23fbbf24%22/%3E%3Cpath d=%22M0 240V180L100 80L240 240ZM120 240L240 120L320 200V240Z%22 fill=%22%2394a3b8%22/%3E%3C/svg%3E";
+  return (
+    <div className="grid w-full max-w-lg grid-cols-1 items-start gap-4 sm:grid-cols-3">
+      {[{ ratio: 4 / 3, label: "4 : 3" }, { ratio: 1, label: "1 : 1" }, { ratio: 3 / 4, label: "3 : 4" }].map(({ ratio, label }) => (
+        <figure key={label} className="grid gap-2">
+          <AspectRatio ratio={ratio} className="overflow-hidden rounded-md">
+            <img src={image} alt="Illustrated mountains and sun" className="size-full object-cover" />
+          </AspectRatio>
+          <figcaption className="text-center text-xs text-muted-foreground">{label}</figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## When to use
