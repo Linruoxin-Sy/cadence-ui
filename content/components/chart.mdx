@@ -24,11 +24,14 @@ import { Bar, BarChart, XAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/cadence/chart";
 
 const config = { visits: { label: "Visits", color: "var(--primary)" } };
-const data = [{ month: "Jan", visits: 186 }, { month: "Feb", visits: 305 }];
+const data = [
+  { month: "Jan", visits: 186 },
+  { month: "Feb", visits: 305 },
+];
 
 export function Example() {
   return (
-    <ChartContainer config={config} className="min-h-48 w-full" aria-label="Monthly visits">
+    <ChartContainer role="group" config={config} className="min-h-48 w-full" aria-label="Monthly visits">
       <BarChart accessibilityLayer data={data}>
         <XAxis dataKey="month" />
         <ChartTooltip content={<ChartTooltipContent />} />
@@ -39,44 +42,610 @@ export function Example() {
 }
 ```
 
-## Legends and theme colours
+## Bar chart
+
+Use bars to compare categories. Each series shares labels and colours with the tooltip and legend; the data table preserves exact values without relying on colour.
+
+<ComponentExample name="bar" />
 
 ```tsx
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/cadence/chart";
+
 const config = {
-  visits: { label: "Visits", theme: { light: "#334155", dark: "#cbd5e1" } },
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+  mobile: { label: "Mobile", color: "var(--muted-foreground)" },
 };
-// Inside your Recharts chart:
-<ChartLegend content={<ChartLegendContent />} />
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+export function BarExample() {
+  const data = baseline;
+  return (
+    <figure className="grid w-full min-w-0 gap-3">
+      <figcaption className="text-sm font-medium">Monthly visits · bar</figcaption>
+      <ChartContainer role="group" config={config} className="h-64 w-full min-w-0" aria-label="Monthly visits, bar chart">
+        <BarChart accessibilityLayer data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="month" tickLine={false} axisLine={false} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartLegend content={<ChartLegendContent hideIcon={false} />} />
+          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} isAnimationActive />
+          <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} isAnimationActive />
+        </BarChart>
+      </ChartContainer>
+      <DataTable data={data} />
+    </figure>
+  );
+}
 ```
 
-ChartStyle writes scoped `--color-<key>` variables for both themes. Config labels and optional
-icons are shared by tooltip and legend; use the same data keys in the series and config.
+## Line chart
+
+A line emphasizes the trend across ordered months. The series and axis belong to Recharts; ChartContainer supplies theme and motion context.
+
+<ComponentExample name="line" />
+
+```tsx
+import { Line, LineChart, XAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/cadence/chart";
+
+const config = {
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+  mobile: { label: "Mobile", color: "var(--muted-foreground)" },
+};
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+export function LineExample() {
+  const data = baseline;
+  return (
+    <figure className="grid w-full min-w-0 gap-3">
+      <figcaption className="text-sm font-medium">Monthly visits · line</figcaption>
+      <ChartContainer role="group" config={config} className="h-64 w-full min-w-0" aria-label="Monthly visits, line chart">
+        <LineChart accessibilityLayer data={data}>
+          <XAxis dataKey="month" />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Line dataKey="desktop" stroke="var(--color-desktop)" isAnimationActive />
+        </LineChart>
+      </ChartContainer>
+      <DataTable data={data} />
+    </figure>
+  );
+}
+```
+
+## Area chart
+
+An area adds a filled region under a trend. Keep the fill and outline distinguishable in both themes and use the table for exact values.
+
+<ComponentExample name="area" />
+
+```tsx
+import { Area, AreaChart, XAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/cadence/chart";
+
+const config = {
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+  mobile: { label: "Mobile", color: "var(--muted-foreground)" },
+};
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+export function AreaExample() {
+  const data = baseline;
+  return (
+    <figure className="grid w-full min-w-0 gap-3">
+      <figcaption className="text-sm font-medium">Monthly visits · area</figcaption>
+      <ChartContainer role="group" config={config} className="h-64 w-full min-w-0" aria-label="Monthly visits, area chart">
+        <AreaChart accessibilityLayer data={data}>
+          <XAxis dataKey="month" />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Area dataKey="desktop" fill="var(--color-mobile)" stroke="var(--color-desktop)" isAnimationActive />
+        </AreaChart>
+      </ChartContainer>
+      <DataTable data={data} />
+    </figure>
+  );
+}
+```
+
+## Pie chart
+
+A pie compares the Desktop contribution of each month. `nameKey="month"` gives the tooltip meaningful category names; the adjacent data table supplies exact values.
+
+<ComponentExample name="pie" />
+
+```tsx
+import { Pie, PieChart } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/cadence/chart";
+
+const config = {
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+  mobile: { label: "Mobile", color: "var(--muted-foreground)" },
+};
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+export function PieExample() {
+  const data = baseline;
+  return (
+    <figure className="grid w-full min-w-0 gap-3">
+      <figcaption className="text-sm font-medium">Monthly visits · pie</figcaption>
+      <ChartContainer role="group" config={config} className="h-64 w-full min-w-0" aria-label="Monthly visits, pie chart">
+        <PieChart accessibilityLayer>
+          <ChartTooltip content={<ChartTooltipContent nameKey="month" />} />
+          <Pie data={data} dataKey="desktop" nameKey="month" fill="var(--color-desktop)" isAnimationActive />
+        </PieChart>
+      </ChartContainer>
+      <DataTable data={data} />
+    </figure>
+  );
+}
+```
+
+## Legends and theme colours
+
+ChartStyle scopes the config colour variables to each chart. The first legend uses config icons; the second fixes `hideIcon` to show a text-only legend. Light and dark theme mappings apply independently of neighbouring examples.
+
+<ComponentExample name="legends" />
+
+```tsx
+import { MonitorIcon, SmartphoneIcon } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/cadence/chart";
+
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+const themeConfig = {
+  desktop: { label: "Desktop", icon: MonitorIcon, theme: { light: "var(--chart-1)", dark: "var(--chart-2)" } },
+  mobile: { label: "Mobile", icon: SmartphoneIcon, theme: { light: "var(--chart-3)", dark: "var(--chart-4)" } },
+};
+function ThemedChart({ hideLegendIcons = false }: { hideLegendIcons?: boolean }) {
+  const data = baseline;
+  return (
+    <figure className="grid w-full min-w-0 gap-3">
+      <figcaption className="text-sm font-medium">Monthly visits · bar</figcaption>
+      <ChartContainer role="group" config={themeConfig} className="h-64 w-full min-w-0" aria-label="Monthly visits, bar chart">
+        <BarChart accessibilityLayer data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="month" tickLine={false} axisLine={false} />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartLegend content={<ChartLegendContent hideIcon={hideLegendIcons} />} />
+          <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} isAnimationActive animationDuration={5000} />
+          <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} isAnimationActive animationBegin={5000} />
+        </BarChart>
+      </ChartContainer>
+      <DataTable data={data} />
+    </figure>
+  );
+}
+export function Legends() {
+  return (
+    <div className="grid w-full min-w-0 gap-6">
+      <ThemedChart />
+      <ThemedChart hideLegendIcons />
+    </div>
+  );
+}
+```
 
 ## Tooltip indicators and formatting
 
-```tsx
-<ChartTooltip content={<ChartTooltipContent indicator="dashed" hideLabel />} />
-<ChartTooltip content={<ChartTooltipContent indicator="line" nameKey="category" labelKey="month" />} />
-```
+Compare dot, line, dashed and hidden indicators directly. Each real tooltip starts at February and remains available from the chart keyboard surface. The last chart formats its heading and value rows; `hideLabel` removes the heading in the hidden-indicator example. A config icon takes precedence over a marker, and entries with `type="none"` are omitted.
 
-Use `formatter` for custom value rows and `labelFormatter` for the heading. `hideIndicator`
-hides the colour marker; an explicit config icon retains upstream precedence. Entries with
-`type="none"` are omitted. A single line/dashed row nests its label beside its value.
+<ComponentExample name="tooltips" />
+
+```tsx
+import { Bar, BarChart, XAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/cadence/chart";
+
+const config = {
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+  mobile: { label: "Mobile", color: "var(--muted-foreground)" },
+};
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+function TooltipExample({
+  indicator = "dot",
+  hidden = false,
+  formatted = false,
+}: {
+  indicator?: "dot" | "line" | "dashed";
+  hidden?: boolean;
+  formatted?: boolean;
+}) {
+  return (
+    <figure className="grid min-w-0 gap-2">
+      <figcaption className="text-sm font-medium">
+        {formatted ? "Formatted values" : hidden ? "Without an indicator or heading" : `${indicator} indicator`}
+      </figcaption>
+      <ChartContainer role="group"
+        config={config}
+        className="h-48 w-full min-w-0"
+        aria-label={`Visits, ${formatted ? "formatted" : hidden ? "no indicator" : indicator} tooltip`}
+      >
+        <BarChart accessibilityLayer data={baseline}>
+          <XAxis dataKey="month" />
+          <ChartTooltip
+            defaultIndex={1}
+            active
+            content={
+              <ChartTooltipContent
+                indicator={indicator}
+                hideIndicator={hidden}
+                hideLabel={hidden}
+                labelFormatter={formatted ? (label) => `Month: ${label}` : undefined}
+                formatter={
+                  formatted
+                    ? (value, name) => (
+                        <span>
+                          {name}: {Number(value).toLocaleString()} visits
+                        </span>
+                      )
+                    : undefined
+                }
+              />
+            }
+          />
+          <Bar dataKey="desktop" fill="var(--color-desktop)" />
+        </BarChart>
+      </ChartContainer>
+    </figure>
+  );
+}
+
+export function Tooltips() {
+  return (
+    <div className="grid w-full min-w-0 gap-6">
+      <TooltipExample />
+      <TooltipExample indicator="line" />
+      <TooltipExample indicator="dashed" />
+      <TooltipExample hidden />
+      <TooltipExample formatted />
+      <DataTable data={baseline} />
+    </div>
+  );
+}
+```
 
 ## Live data and motion ownership
 
-```tsx
-// Replacing data interpolates the existing series under full motion.
-<BarChart accessibilityLayer data={latestData}>
-  <Bar dataKey="visits" fill="var(--color-visits)" />
-</BarChart>
-```
+Each Update action replaces only its own chart data. Recharts owns interpolation and the data model; Cadence owns the `data.transition` clock. The deliberately explicit series timing below cannot override the inherited clock. `isAnimationActive={false}` opts a series out. Reduced and none settle geometry immediately, including a running transition when the header mode changes. Custom shapes, nested controllers and independent CSS/WAAPI must honour the same modes. Tooltip position changes stay immediate.
 
-Recharts owns the data model, chart type, axes, series and current interpolation state. Cadence
-owns the `data.transition` clock via the public Recharts controller. Series `isAnimationActive={false}`
-opts out; explicit true, duration, delay or easing cannot override the Cadence clock. Tooltip
-position changes are immediate, including when `isAnimationActive` is supplied on ChartTooltip.
-Custom shapes, nested animation controllers and independent CSS/WAAPI must honour the same modes.
+<ComponentExample name="live-data" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, XAxis } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/cadence/chart";
+import { Button } from "@/components/cadence/button";
+
+type ChartKind = "bar" | "line" | "area" | "pie";
+const config = {
+  desktop: { label: "Desktop", color: "var(--foreground)" },
+  mobile: { label: "Mobile", color: "var(--muted-foreground)" },
+};
+const baseline = [
+  { month: "Jan", desktop: 186, mobile: 80 },
+  { month: "Feb", desktop: 305, mobile: 200 },
+  { month: "Mar", desktop: 237, mobile: 120 },
+  { month: "Apr", desktop: 73, mobile: 190 },
+];
+
+function DataTable({ data }: { data: typeof baseline }) {
+  return (
+    <details className="text-sm">
+      <summary className="cursor-pointer">View data table</summary>
+      <table className="mt-2 w-full text-left">
+        <caption className="sr-only">Monthly visits</caption>
+        <thead>
+          <tr>
+            <th scope="col">Month</th>
+            <th scope="col">Desktop</th>
+            <th scope="col">Mobile</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row) => (
+            <tr key={row.month}>
+              <th scope="row">{row.month}</th>
+              <td>{row.desktop}</td>
+              <td>{row.mobile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}
+
+function VisitChart({
+  kind = "bar",
+  data = baseline,
+  chartConfig = config,
+  hideLegendIcons = false,
+}: {
+  kind?: ChartKind;
+  data?: typeof baseline;
+  chartConfig?: ChartConfig;
+  hideLegendIcons?: boolean;
+}) {
+  return (
+    <figure className="grid w-full min-w-0 gap-3">
+      <figcaption className="text-sm font-medium">Monthly visits · {kind}</figcaption>
+      <ChartContainer role="group" config={chartConfig} className="h-64 w-full min-w-0" aria-label={`Monthly visits, ${kind} chart`}>
+        {kind === "bar" ? (
+          <BarChart accessibilityLayer data={data}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey="month" tickLine={false} axisLine={false} />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <ChartLegend content={<ChartLegendContent hideIcon={hideLegendIcons} />} />
+            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} isAnimationActive animationDuration={5000} />
+            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} isAnimationActive animationBegin={5000} />
+          </BarChart>
+        ) : kind === "line" ? (
+          <LineChart accessibilityLayer data={data}>
+            <XAxis dataKey="month" />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Line dataKey="desktop" stroke="var(--color-desktop)" isAnimationActive animationDuration={5000} />
+          </LineChart>
+        ) : kind === "area" ? (
+          <AreaChart accessibilityLayer data={data}>
+            <XAxis dataKey="month" />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Area dataKey="desktop" fill="var(--color-mobile)" stroke="var(--color-desktop)" isAnimationActive />
+          </AreaChart>
+        ) : (
+          <PieChart accessibilityLayer>
+            <ChartTooltip content={<ChartTooltipContent nameKey="month" />} />
+            <Pie data={data} dataKey="desktop" nameKey="month" fill="var(--color-desktop)" isAnimationActive />
+          </PieChart>
+        )}
+      </ChartContainer>
+      <DataTable data={data} />
+    </figure>
+  );
+}
+
+function UpdatingChart({ kind }: { kind: ChartKind }) {
+  const [updated, setUpdated] = useState(false);
+  const data = updated
+    ? baseline.map((row) => ({ ...row, desktop: 350 - row.desktop, mobile: row.mobile + 40 }))
+    : baseline;
+  return (
+    <div className="grid min-w-0 gap-3">
+      <Button variant="outline" className="justify-self-start" onClick={() => setUpdated((value) => !value)}>
+        Update {kind} data
+      </Button>
+      <output className="text-sm" aria-live="polite">
+        {updated ? "Updated" : "Baseline"}
+      </output>
+      <VisitChart kind={kind} data={data} />
+    </div>
+  );
+}
+
+export function LiveData() {
+  return (
+    <div className="grid w-full min-w-0 gap-8">
+      <UpdatingChart kind="bar" />
+      <UpdatingChart kind="line" />
+      <UpdatingChart kind="area" />
+      <UpdatingChart kind="pie" />
+    </div>
+  );
+}
+```
 
 ## When to use
 
