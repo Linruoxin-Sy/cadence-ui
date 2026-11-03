@@ -17,7 +17,8 @@ beforeAll(() => {
   cpSync("tests", path.join(fixture, "tests"), { recursive: true });
   cpSync("registry.json", path.join(fixture, "registry.json"));
   cpSync("registry-snapshots.json", path.join(fixture, "registry-snapshots.json"));
-  for (const dir of ["registry", "public", "docs", "app", "components"]) {
+  cpSync("components", path.join(fixture, "components"), { recursive: true });
+  for (const dir of ["registry", "public", "docs", "app"]) {
     symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
   }
 });
@@ -112,13 +113,23 @@ describe("real registry template entry", () => {
     }
   });
   it("allows extra examples, API parts, fences and comments", () => {
+    const catalogPath = path.join(fixture, "components/site/previews/examples.json");
+    const catalogSource = readFileSync(catalogPath, "utf8");
+    const catalog = JSON.parse(catalogSource);
+    catalog.badge.push("extra");
+    writeFileSync(catalogPath, JSON.stringify(catalog));
     const source = badge
       .replace(
         "## When to use",
-        "## Extra example\n\n```md\n# ignored\n### ignored\n```\n<!-- ## Examples -->\n\n## When to use",
+        '## Extra example\n\nA further named composition.\n\n<ComponentExample name="extra" />\n\n```tsx\nimport { Badge } from "@/components/cadence/badge";\nexport function Extra() { return <Badge>Extra</Badge>; }\n```\n\n```md\n# ignored\n### ignored\n```\n<!-- ## Examples -->\n\n## When to use',
       )
       .replace("## API", "## API\n\n### `Badge` and `BadgeIcon`");
-    expect(entry(badgePath, source).status).toBe(0);
+    try {
+      const result = entry(badgePath, source);
+      expect(result.status, result.output).toBe(0);
+    } finally {
+      writeFileSync(catalogPath, catalogSource);
+    }
   });
 });
 

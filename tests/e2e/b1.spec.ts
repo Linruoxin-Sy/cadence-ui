@@ -1,6 +1,9 @@
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode, MODES, openComponent, pressScale, scoped } from "./helpers";
+
+const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
 
 const IDS = [
   "button",
@@ -42,6 +45,10 @@ for (const colorScheme of ["light", "dark"] as const) {
           await page
             .locator(`[data-preview="${id}"]`)
             .screenshot({ path: `.cache/b1-proof/${id}-${colorScheme}-${width}-preview.png` });
+          for (const name of examples[id] ?? [])
+            await page.locator(`[data-component-example="${id}/${name}"]`).screenshot({
+              path: `.cache/b1-proof/${id}-${colorScheme}-${width}-${name}.png`,
+            });
         }
         expect(errors).toEqual([]);
       });
@@ -196,10 +203,13 @@ for (const preference of ["no-preference", "reduce"] as const)
             await expect(box).toBeChecked();
           }
           if (id === "badge") {
-            const link = p.getByRole("link", { name: "3 releases" });
+            const link = page
+              .locator('[data-component-example="badge/link"]')
+              .getByRole("link", { name: "3 releases" });
             await link.focus();
             await link.press("Enter");
-            await expect(page).toHaveURL(/#badge-releases$/);
+            await expect(page).toHaveURL(/\/docs\/changelog$/);
+            await page.goBack();
           }
           if (id === "separator") {
             await expect(p.getByRole("separator")).toHaveCount(3);

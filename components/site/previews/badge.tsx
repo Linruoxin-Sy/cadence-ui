@@ -2,10 +2,9 @@
 
 import { CheckIcon, ClockIcon, GitBranchIcon } from "lucide-react";
 import { Badge } from "@/registry/cadence/badge";
-import { PreviewRow, PreviewStack } from "./shell";
-import { usePreviewVariant } from "./use-preview-variant";
+import { PreviewRow } from "./shell";
 
-const previewVariantOptions = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
+const variants = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
 
 /**
  * Six variants, then the two things a badge does that a plain span cannot: carry an
@@ -13,42 +12,58 @@ const previewVariantOptions = ["default", "secondary", "destructive", "outline",
  * a badge, the element under it becomes an anchor, and the `[a&]:hover` styles from
  * `badgeVariants` start applying.
  */
-export function BadgePreview() {
-  const { control, choose } = usePreviewVariant("Badge", previewVariantOptions);
+function Variants() {
   return (
-    <>
-      {control}
-      <PreviewStack>
-        <PreviewRow>
-          <Badge variant={choose("default")}>Default</Badge>
-          <Badge variant={choose("secondary")}>Secondary</Badge>
-          <Badge variant={choose("destructive")}>Destructive</Badge>
-          <Badge variant={choose("outline")}>Outline</Badge>
-          <Badge variant={choose("ghost")}>Ghost</Badge>
-          <Badge variant={choose("link")}>Link</Badge>
-        </PreviewRow>
-
-        <PreviewRow>
-          <Badge variant={choose("default")}>
-            <CheckIcon />
-            Verified
-          </Badge>
-          <Badge variant={choose("secondary")}>
-            <ClockIcon />
-            Pending
-          </Badge>
-          <Badge variant={choose("outline")}>
-            <GitBranchIcon />
-            main
-          </Badge>
-          <Badge variant={choose("outline")} render={<a href="#badge-releases" />}>
-            3 releases
-          </Badge>
-          <Badge variant={choose("ghost")} render={<a href="#badge-changelog" />}>
-            Changelog
-          </Badge>
-        </PreviewRow>
-      </PreviewStack>
-    </>
+    <PreviewRow>
+      {variants.map((variant) => (
+        <Badge key={variant} variant={variant}>
+          {variant[0]?.toUpperCase()}
+          {variant.slice(1)}
+        </Badge>
+      ))}
+    </PreviewRow>
   );
+}
+
+function WithIcon() {
+  return (
+    <PreviewRow>
+      <Badge>
+        <CheckIcon />
+        Verified
+      </Badge>
+      <Badge variant="secondary">
+        <ClockIcon />
+        Pending
+      </Badge>
+      <Badge variant="outline">
+        <GitBranchIcon />
+        main
+      </Badge>
+    </PreviewRow>
+  );
+}
+
+function AsLink() {
+  return (
+    <PreviewRow>
+      <Badge variant="outline" render={<a href="/docs/changelog" />}>
+        3 releases
+      </Badge>
+      <Badge variant="ghost" render={<a href="/docs/changelog" />}>
+        Changelog
+      </Badge>
+    </PreviewRow>
+  );
+}
+
+const examples = { variants: Variants, icon: WithIcon, link: AsLink };
+
+export function BadgePreview({ example }: { example?: string }) {
+  if (example !== undefined) {
+    const Example = examples[example as keyof typeof examples];
+    if (!Example) throw new Error(`Unknown Badge example: ${example}`);
+    return <Example />;
+  }
+  return <Variants />;
 }

@@ -34,35 +34,69 @@ export function Release() {
 
 ## Variants
 
+Choose one of six visual weights for a status or category. The `link` variant is
+only a style; use `render` when the badge should navigate.
+
+<ComponentExample name="variants" />
+
 ```tsx
-<Badge>Default</Badge>
-<Badge variant="secondary">Secondary</Badge>
-<Badge variant="outline">Outline</Badge>
-<Badge variant="ghost">Ghost</Badge>
-<Badge variant="destructive">Failed</Badge>
-<Badge variant="link">Changelog</Badge>
+import { Badge } from "@/components/cadence/badge";
+
+export function BadgeVariants() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge>Default</Badge>
+      <Badge variant="secondary">Secondary</Badge>
+      <Badge variant="destructive">Destructive</Badge>
+      <Badge variant="outline">Outline</Badge>
+      <Badge variant="ghost">Ghost</Badge>
+      <Badge variant="link">Link</Badge>
+    </div>
+  );
+}
 ```
 
 ## With an icon
 
-```tsx
-import { Check } from "lucide-react";
+Pair a short label with an icon; the text still communicates the status without
+depending on the icon or colour.
 
-<Badge variant="outline">
-  <Check />
-  Verified
-</Badge>;
+<ComponentExample name="icon" />
+
+```tsx
+import { CheckIcon, ClockIcon, GitBranchIcon } from "lucide-react";
+import { Badge } from "@/components/cadence/badge";
+
+export function BadgeIcons() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge><CheckIcon />Verified</Badge>
+      <Badge variant="secondary"><ClockIcon />Pending</Badge>
+      <Badge variant="outline"><GitBranchIcon />main</Badge>
+    </div>
+  );
+}
 ```
 
 ## As a link
 
 `render` replaces the element, so a badge stays a `span` unless you ask for
 something else. The `[a&]` selectors only switch on hover when it really is a link.
+These anchors use native focus and Enter navigation to the changelog.
+
+<ComponentExample name="link" />
 
 ```tsx
-<Badge variant="outline" render={<a href="/releases" />}>
-  3 releases
-</Badge>
+import { Badge } from "@/components/cadence/badge";
+
+export function BadgeLinks() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Badge variant="outline" render={<a href="/docs/changelog" />}>3 releases</Badge>
+      <Badge variant="ghost" render={<a href="/docs/changelog" />}>Changelog</Badge>
+    </div>
+  );
+}
 ```
 
 ## When to use
