@@ -34,45 +34,199 @@ export function BoldToggle() {
 
 An icon-only toggle needs `aria-label`; the glyph is not a name.
 
-## Variants and sizes
+## Variants
+
+Default and outline each show an off and an initially pressed button. Outline adds a border on busy toolbar surfaces; every button still toggles independently.
+
+<ComponentExample name="variants" />
 
 ```tsx
-<Toggle>Default</Toggle>
-<Toggle variant="outline">Outline</Toggle>
+import { Toggle } from "@/components/cadence/toggle";
 
-<Toggle size="sm">Small</Toggle>
-<Toggle size="lg">Large</Toggle>
+export function ToggleVariants() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      <Toggle>Default</Toggle>
+      <Toggle defaultPressed>Default on</Toggle>
+      <Toggle variant="outline">Outline</Toggle>
+      <Toggle variant="outline" defaultPressed>
+        Outline on
+      </Toggle>
+    </div>
+  );
+}
 ```
 
-`outline` gives the toggle a border, for toolbars that sit on a busy surface.
+## Sizes
+
+Small, default and large use fixed 32, 36 and 40px heights. Choose one for the surrounding toolbar rather than scaling its hit target.
+
+<ComponentExample name="sizes" />
+
+```tsx
+import { Toggle } from "@/components/cadence/toggle";
+
+export function ToggleSizes() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Toggle variant="outline" size="sm">
+        Small
+      </Toggle>
+      <Toggle variant="outline" size="default">
+        Default
+      </Toggle>
+      <Toggle variant="outline" size="lg">
+        Large
+      </Toggle>
+    </div>
+  );
+}
+```
 
 ## With a label
 
-```tsx
-<Toggle variant="outline">
-  <Bold />
-  Bold
-</Toggle>
-```
+Text supplies the accessible name; the icon is decorative. An icon-only toggle, as in Usage, needs its own aria-label.
 
-`gap-2` is already in the base classes, so an icon and a label space themselves.
+<ComponentExample name="label" />
+
+```tsx
+import { BoldIcon } from "lucide-react";
+import { Toggle } from "@/components/cadence/toggle";
+
+export function LabelledToggle() {
+  return (
+    <Toggle variant="outline">
+      <BoldIcon />
+      Bold
+    </Toggle>
+  );
+}
+```
 
 ## Controlled
 
-```tsx
-const [on, setOn] = useState(false);
+The caller owns the italic command. Clear italic updates this instance externally; it leaves all other examples alone.
 
-<Toggle pressed={on} onPressedChange={setOn} aria-label="Bold" />;
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { ItalicIcon } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Toggle } from "@/components/cadence/toggle";
+
+export function ControlledToggle() {
+  const [on, setOn] = useState(false);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <Toggle pressed={on} onPressedChange={setOn}>
+        <ItalicIcon />
+        Italic
+      </Toggle>
+      <p role="status" className="text-sm text-muted-foreground">
+        {on ? "Italic enabled" : "Italic disabled"}
+      </p>
+      <Button variant="outline" size="sm" onClick={() => setOn(false)}>
+        Clear italic
+      </Button>
+    </div>
+  );
+}
+```
+
+## Disabled
+
+Disabled off and on commands retain their pressed state and ignore pointer and keyboard input.
+
+<ComponentExample name="disabled" />
+
+```tsx
+import { Toggle } from "@/components/cadence/toggle";
+
+export function DisabledToggles() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      <Toggle disabled>Unavailable off</Toggle>
+      <Toggle disabled defaultPressed variant="outline">
+        Unavailable on
+      </Toggle>
+    </div>
+  );
+}
 ```
 
 ## Inside a form
 
+Toggle renders a type="button", so its pressed state does not submit a form field. The caller explicitly maps state to a hidden input here; Save formatting reads real FormData. Use Checkbox for a native checked form value.
+
+<ComponentExample name="form-submission" />
+
 ```tsx
-<Toggle name="bold" defaultPressed value="bold" />
+"use client";
+
+import { BoldIcon } from "lucide-react";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Toggle } from "@/components/cadence/toggle";
+
+export function ToggleForm() {
+  const [bold, setBold] = useState(false);
+  const [result, setResult] = useState("Not submitted");
+  return (
+    <form
+      className="grid justify-items-start gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setResult(`Submitted bold: ${new FormData(event.currentTarget).get("bold") ?? "absent"}`);
+      }}
+    >
+      <Toggle pressed={bold} onPressedChange={setBold}>
+        <BoldIcon />
+        Bold
+      </Toggle>
+      {bold && <input type="hidden" name="bold" value="enabled" />}
+      <Button type="submit" size="sm">
+        Save formatting
+      </Button>
+      <p role="status" className="text-sm text-muted-foreground">
+        {result}
+      </p>
+    </form>
+  );
+}
 ```
 
-A pressed toggle submits its `value`; an unpressed one submits nothing, like a
-checkbox.
+## Explicit motion scopes
+
+The first toggle is inside a fixed none provider from its first DOM appearance. The second explicitly overrides that outer scope with full; the system reduced-motion preference still wins. Ordinary examples inherit the site header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Toggle } from "@/components/cadence/toggle";
+
+export function StaticToggle() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-4">
+        <div data-testid="initial-none">
+          <Toggle aria-label="Static toggle" defaultPressed>
+            On
+          </Toggle>
+        </div>
+        <CadenceProvider mode="full">
+          <div data-testid="explicit-full">
+            <Toggle aria-label="Explicit full toggle">Press</Toggle>
+          </div>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
+```
 
 ## When to use
 
@@ -144,7 +298,7 @@ in every mode — otherwise a `none` user could not see the state.
 
 | The component does                            | You do                                     |
 | --------------------------------------------- | ------------------------------------------ |
-| Forwards `name`, `value`, `disabled`          | Deciding what a pressed toggle means       |
+| Forwards native button props and `disabled`          | Deciding what a pressed toggle means       |
 | Exposes `aria-invalid` styling                | Validation and error text                  |
 | Keeps the pressed state in `aria-pressed`     | Persisting it                              |
 

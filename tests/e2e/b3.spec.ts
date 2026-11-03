@@ -243,7 +243,40 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(new Set(values.map((v) => v.toFixed(4))).size).toBeGreaterThan(2);
           }
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
-          if (examples[id]) {
+          if (examples[id] && ["toggle", "toggle-group", "input-otp", "progress"].includes(id)) {
+            await setMode(page, id, "none");
+            const scope = page.locator(`[data-component-example="${id}/without-motion"] [data-testid="explicit-full"]`);
+            const part = scope.locator(`[data-slot="${parts[id][1]}"]${id === "input-otp" ? " > span" : ""}`).first();
+            await expect(part).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
+            await scope.scrollIntoViewIfNeeded();
+            const saved = await part.elementHandle();
+            const nestedSelector = `[data-component-example="${id}/without-motion"] [data-testid="explicit-full"] [data-slot="${parts[id][1]}"]${id === "input-otp" ? " > span" : ""}`;
+            await record(page, nestedSelector);
+            if (id === "toggle" || id === "toggle-group") {
+              const box = await part.boundingBox();
+              if (!box) throw Error("missing explicit full control");
+              await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+              await page.mouse.down();
+            } else if (id === "input-otp") await scope.getByRole("textbox").pressSequentially("7");
+            else await scope.getByRole("slider").fill("80");
+            const samples = await frames(page);
+            if (id === "toggle" || id === "toggle-group") await page.mouse.up();
+            expect(samples.length).toBeGreaterThan(4);
+            if (reducedMotion === "no-preference")
+              expect(
+                new Set(samples.map((s) => (id === "input-otp" ? s.opacity : s.scale).toFixed(4))).size,
+              ).toBeGreaterThan(2);
+            else if (id === "input-otp") {
+              expect(samples.every((s) => s.scale === 1)).toBe(true);
+              expect(samples.some((s) => s.opacity > 0 && s.opacity < 1)).toBe(true);
+            } else expect(new Set(samples.map((s) => s.scale.toFixed(4))).size).toBeLessThanOrEqual(2);
+            expect(await part.evaluate((n, saved) => n === saved, saved)).toBe(true);
+            expect(
+              await staticScope.evaluate((n) => n.querySelector("[data-motion]")?.getAttribute("data-motion")),
+            ).toBe("none");
+            await setMode(page, id, "full");
+            await p.scrollIntoViewIfNeeded();
+          } else if (examples[id]) {
             await setMode(page, id, "none");
             const nested = page.getByRole(
               id === "checkbox" ? "checkbox" : id === "radio-group" ? "radio" : id === "switch" ? "switch" : "slider",
