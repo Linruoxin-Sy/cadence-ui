@@ -225,11 +225,15 @@ for (const preference of ["no-preference", "reduce"] as const)
             await page.goBack();
           }
           if (id === "separator") {
-            await expect(p.getByRole("separator")).toHaveCount(3);
+            await expect(p.getByRole("separator")).toHaveCount(2);
             for (const rule of await p.locator('[data-orientation="vertical"]').all()) {
               expect(await rule.evaluate((node) => node.getBoundingClientRect().height)).toBeGreaterThan(0);
             }
-            await expect(p.locator('[aria-hidden="true"][data-slot="separator"]')).toHaveCount(1);
+            await expect(
+              page.locator(
+                '[data-component-example="separator/decorative"] [aria-hidden="true"][data-slot="separator"]',
+              ),
+            ).toHaveCount(1);
           }
           if (id === "avatar") await expect(p.getByText("GH", { exact: true }).first()).toBeVisible();
           if (id === "aspect-ratio") {

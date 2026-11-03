@@ -1,43 +1,50 @@
 "use client";
 
 import { Separator } from "@/registry/cadence/separator";
-import { PreviewRow, PreviewStack } from "./shell";
-import { usePreviewVariant } from "./use-preview-variant";
+import { PreviewStack } from "./shell";
 
-const previewVariantOptions = ["horizontal", "vertical"] as const;
-
-/**
- * Two orientations, and the two roles a rule can play: a real boundary that screen
- * readers announce, and `decorative`, which is a line and nothing else. The vertical
- * pair sits in a `h-6` row because a vertical separator takes its height from the
- * box it divides.
- */
-export function SeparatorPreview() {
-  const { control, choose } = usePreviewVariant("Separator", previewVariantOptions);
+function Horizontal() {
   return (
-    <>
-      {control}
-      <PreviewStack>
-        <PreviewRow>
-          <div className="grid w-72 gap-3 text-sm">
-            <span>Signed in as ada@example.com.</span>
-            <Separator className="data-[orientation=vertical]:h-6" orientation={choose("horizontal")} />
-            <span className="text-muted-foreground">Billing is handled by finance.</span>
-            <Separator decorative orientation={choose("horizontal")} />
-            <span className="text-muted-foreground">This second rule is decorative.</span>
-          </div>
-        </PreviewRow>
+    <div className="grid w-full max-w-72 gap-3 text-sm">
+      <span>Signed in as ada@example.com.</span>
+      <Separator />
+      <span className="text-muted-foreground">Billing is handled by finance.</span>
+    </div>
+  );
+}
 
-        <PreviewRow>
-          <div className="flex min-h-6 flex-wrap items-center gap-3 text-sm">
-            <span>Draft</span>
-            <Separator orientation={choose("vertical")} className="data-[orientation=vertical]:h-6" />
-            <span className="text-muted-foreground">Edited 2 minutes ago</span>
-            <Separator orientation={choose("vertical")} className="data-[orientation=vertical]:h-6" />
-            <span className="text-muted-foreground">ada@example.com</span>
-          </div>
-        </PreviewRow>
-      </PreviewStack>
-    </>
+function Vertical() {
+  return (
+    <div className="flex h-6 items-center gap-3 text-sm">
+      <span>Draft</span>
+      <Separator orientation="vertical" />
+      <span className="text-muted-foreground">Edited 2 minutes ago</span>
+    </div>
+  );
+}
+
+function Decorative() {
+  return (
+    <div className="grid w-full max-w-72 gap-3 text-sm">
+      <span>Cadence UI</span>
+      <Separator decorative />
+      <span className="text-muted-foreground">Made for your next project.</span>
+    </div>
+  );
+}
+
+const examples = { horizontal: Horizontal, vertical: Vertical, decorative: Decorative };
+
+export function SeparatorPreview({ example }: { example?: string }) {
+  if (example !== undefined) {
+    const Example = examples[example as keyof typeof examples];
+    if (!Example) throw new Error(`Unknown Separator example: ${example}`);
+    return <Example />;
+  }
+  return (
+    <PreviewStack>
+      <Horizontal />
+      <Vertical />
+    </PreviewStack>
   );
 }

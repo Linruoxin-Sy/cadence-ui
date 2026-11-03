@@ -33,17 +33,46 @@ export function Account() {
 }
 ```
 
-## Vertical
+## Horizontal
 
-A vertical rule needs a height from its container. `self-stretch` in a flex row
-gives it one for free.
+The default horizontal separator fills the available width and announces a
+boundary between groups. Its parent controls the width and spacing.
+
+<ComponentExample name="horizontal" />
 
 ```tsx
-<div className="flex h-6 items-center gap-3">
-  <span className="text-sm">Draft</span>
-  <Separator orientation="vertical" />
-  <span className="text-sm text-muted-foreground">Edited 2 minutes ago</span>
-</div>
+import { Separator } from "@/components/cadence/separator";
+
+export function AccountBoundary() {
+  return (
+    <div className="grid w-full max-w-72 gap-3 text-sm">
+      <span>Signed in as ada@example.com.</span>
+      <Separator />
+      <span className="text-muted-foreground">Billing is handled by finance.</span>
+    </div>
+  );
+}
+```
+
+## Vertical
+
+A vertical rule needs a height from its container. Here its full height comes
+from the explicitly sized row; it keeps the vertical orientation in the accessibility tree.
+
+<ComponentExample name="vertical" />
+
+```tsx
+import { Separator } from "@/components/cadence/separator";
+
+export function DraftBoundary() {
+  return (
+    <div className="flex h-6 items-center gap-3 text-sm">
+      <span>Draft</span>
+      <Separator orientation="vertical" />
+      <span className="text-muted-foreground">Edited 2 minutes ago</span>
+    </div>
+  );
+}
 ```
 
 ## Decorative
@@ -51,8 +80,20 @@ gives it one for free.
 Upstream's Base UI separator is always announced. Mark a purely visual rule as
 decorative so screen readers skip it:
 
+<ComponentExample name="decorative" />
+
 ```tsx
-<Separator decorative />
+import { Separator } from "@/components/cadence/separator";
+
+export function VisualRule() {
+  return (
+    <div className="grid w-full max-w-72 gap-3 text-sm">
+      <span>Cadence UI</span>
+      <Separator decorative />
+      <span className="text-muted-foreground">Made for your next project.</span>
+    </div>
+  );
+}
 ```
 
 ## When to use

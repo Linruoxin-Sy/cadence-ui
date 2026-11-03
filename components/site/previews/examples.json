@@ -2,6 +2,7 @@
   "button": ["variants", "sizes", "links", "composition", "disabled"],
   "badge": ["variants", "icon", "link"],
   "kbd": ["single", "combination", "tooltip"],
+  "separator": ["horizontal", "vertical", "decorative"],
   "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid", "multiple", "placement"],
   "tabs": ["controlled", "vertical", "line-style", "persistent", "list-sizing", "disabled"],
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
