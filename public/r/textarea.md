@@ -32,26 +32,137 @@ export function Comment() {
 
 ## Auto-growing
 
-`field-sizing-content` lets the browser grow the box as the text gets longer. No
-JavaScript, no `ResizeObserver`, no layout read during render.
+`field-sizing-content` lets a supporting browser grow the box as you type. This example caps growth at `max-h-48`, then scrolls its contents. There is no JavaScript resize fallback or height animation.
+
+<ComponentExample name="auto-growing" />
 
 ```tsx
-<Textarea className="min-h-16 max-h-48" placeholder="Type and watch the box grow" />
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
+
+export function GrowingTextarea() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-2">
+      <Label htmlFor={id}>Growing note</Label>
+      <Textarea id={id} className="min-h-16 max-h-48" placeholder="Type another line…" />
+    </div>
+  );
+}
 ```
 
 ## Resizable by the user
 
+`field-sizing-fixed` opts out of content-driven sizing so the browser’s vertical resize handle controls the height. `resize-y` preserves the parent’s width; the minimum and maximum keep resizing bounded.
+
+<ComponentExample name="resizable" />
+
 ```tsx
-<Textarea className="resize-y" rows={3} />
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
+
+export function ResizableTextarea() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-2">
+      <Label htmlFor={id}>Resizable note</Label>
+      <Textarea id={id} rows={3} className="field-sizing-fixed resize-y min-h-24 max-h-64" defaultValue="Drag the lower corner to make more room." />
+    </div>
+  );
+}
 ```
 
 ## Invalid
 
+The caller supplies the invalid attribute and error text. Editing keeps the supplied error state until the caller changes it; Textarea does not evaluate the message.
+
+<ComponentExample name="invalid" />
+
 ```tsx
-<Textarea aria-invalid="true" aria-describedby="bio-error" />
-<p id="bio-error" className="text-sm text-destructive">
-  Keep it under 280 characters.
-</p>
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
+
+export function InvalidTextarea() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-2">
+      <Label htmlFor={id}>Biography</Label>
+      <Textarea id={id} aria-invalid="true" aria-describedby={`${id}-error`} defaultValue="I build design systems that…" />
+      <p id={`${id}-error`} className="text-sm text-destructive">Keep it under 280 characters.</p>
+    </div>
+  );
+}
+```
+
+## Disabled and read-only
+
+Disabled fields cannot be edited or focused and are omitted from native form submission. Read-only text stays focusable and selectable and remains part of submission.
+
+<ComponentExample name="disabled-readonly" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
+
+export function TextareaAvailability() {
+  const id = useId();
+  return (
+    <div className="grid w-full max-w-sm gap-4">
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-disabled`}>Disabled</Label>
+        <Textarea id={`${id}-disabled`} name="disabled" disabled defaultValue="Editing is unavailable." />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-readonly`}>Read-only</Label>
+        <Textarea id={`${id}-readonly`} name="summary" readOnly defaultValue="The release notes are ready for review." />
+      </div>
+    </div>
+  );
+}
+```
+
+## Controlled value and character count
+
+The caller owns the text, native `maxLength` and its described character count. The external action replaces only this draft. This counter communicates the limit without adding a validation API.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
+
+export function ControlledTextarea() {
+  const id = useId();
+  const [value, setValue] = useState("");
+  return (
+    <div className="grid w-full max-w-sm gap-3">
+      <Label htmlFor={id}>Review note</Label>
+      <Textarea id={id} value={value} onChange={(event) => setValue(event.target.value)} maxLength={280} aria-describedby={`${id}-count`} />
+      <p id={`${id}-count`} role="status" className="text-sm text-muted-foreground">{value.length} / 280 characters</p>
+      <Button variant="outline" onClick={() => setValue("Ready for review.")}>Use review note</Button>
+    </div>
+  );
+}
 ```
 
 ## When to use

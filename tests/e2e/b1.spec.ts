@@ -204,7 +204,12 @@ for (const preference of ["no-preference", "reduce"] as const)
                 .locator('[data-component-example="input/file"]')
                 .getByLabel("Image", { exact: true })
                 .setInputFiles({ name: "proof.png", mimeType: "image/png", buffer: Buffer.from("file") });
-            await expect(p.getByRole("textbox", { name: "Disabled", exact: true })).toBeDisabled();
+            await expect(
+              (id === "textarea" ? page.locator('[data-component-example="textarea/disabled-readonly"]') : p).getByRole(
+                "textbox",
+                { name: "Disabled", exact: true },
+              ),
+            ).toBeDisabled();
           }
           if (id === "label") {
             await p.getByText("Email", { exact: true }).click();

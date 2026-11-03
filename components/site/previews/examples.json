@@ -8,5 +8,6 @@
   "tabs": ["controlled", "vertical", "line-style", "persistent", "list-sizing", "disabled"],
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
   "toc": ["nested", "controlled", "scroll-tracking"],
-  "input": ["invalid", "file", "controlled", "disabled-readonly"]
+  "input": ["invalid", "file", "controlled", "disabled-readonly"],
+  "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"]
 }

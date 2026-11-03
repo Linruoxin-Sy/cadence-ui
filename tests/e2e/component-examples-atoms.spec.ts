@@ -71,3 +71,79 @@ for (const mode of ["full", "reduced", "none"] as const)
       await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: mode, exact: true }).click();
       await expect(controlled).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
     });
+
+for (const mode of ["full", "reduced", "none"] as const)
+  for (const os of [false, true])
+    test(`Textarea examples: CSS growth, native resize and independent drafts ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
+      await page.goto(`/components/textarea?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="textarea"]');
+      await expect(top.getByRole("textbox")).toHaveCount(1);
+      await top.getByRole("textbox").fill("Independent comment");
+      const growing = page.locator('[data-component-example="textarea/auto-growing"] textarea');
+      const before = await growing.evaluate((el) => el.getBoundingClientRect().height);
+      await growing.fill(Array.from({ length: 25 }, (_, i) => `Line ${i}`).join("\n"));
+      expect(await growing.evaluate((el) => el.getBoundingClientRect().height)).toBeGreaterThan(before);
+      expect(await growing.evaluate((el) => el.getBoundingClientRect().height)).toBeLessThanOrEqual(192);
+      expect(await growing.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+      await growing.fill("Short");
+      expect(await growing.evaluate((el) => el.getBoundingClientRect().height)).toBeCloseTo(before, 0);
+      const resize = page.locator('[data-component-example="textarea/resizable"] textarea');
+      expect(
+        await resize.evaluate((el) => ({
+          sizing: getComputedStyle(el).getPropertyValue("field-sizing"),
+          resize: getComputedStyle(el).resize,
+        })),
+      ).toEqual({ sizing: "fixed", resize: "vertical" });
+      await resize.scrollIntoViewIfNeeded();
+      const box = await resize.boundingBox();
+      expect(box).not.toBeNull();
+      if (!box) throw new Error("Missing resize handle");
+      await page.mouse.move(box.x + box.width - 4, box.y + box.height - 4);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width - 4, box.y + box.height + 40, { steps: 5 });
+      await page.mouse.up();
+      expect(await resize.evaluate((el) => el.getBoundingClientRect().height)).toBeGreaterThan(box.height + 20);
+      expect(await resize.evaluate((el) => el.getBoundingClientRect().width)).toBeCloseTo(box.width, 0);
+      const controlled = page.locator('[data-component-example="textarea/controlled"]');
+      await expect(controlled).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
+      await controlled.getByRole("button", { name: "Use review note" }).click();
+      const field = controlled.getByRole("textbox");
+      await expect(field).toHaveValue("Ready for review.");
+      await field.fill("Two\nlines");
+      await expect(field).toHaveAccessibleDescription("9 / 280 characters");
+      await field.press("Home");
+      const node = await field.elementHandle();
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((button) => (button as HTMLButtonElement).click());
+      await expect(field).toBeFocused();
+      expect(await field.evaluate((el, saved) => el === saved, node)).toBe(true);
+      await expect(field).toHaveValue("Two\nlines");
+      await expect(top.getByRole("textbox")).toHaveValue("Independent comment");
+      const invalid = page.locator('[data-component-example="textarea/invalid"] textarea');
+      await expect(invalid).toHaveAttribute("aria-invalid", "true");
+      await expect(invalid).toHaveAccessibleDescription("Keep it under 280 characters.");
+      const states = page.locator('[data-component-example="textarea/disabled-readonly"]');
+      await expect(states.getByRole("textbox", { name: "Disabled", exact: true })).toBeDisabled();
+      const readonly = states.getByRole("textbox", { name: "Read-only", exact: true });
+      await readonly.focus();
+      await readonly.press("x");
+      await expect(readonly).toBeFocused();
+      await expect(readonly).toHaveValue("The release notes are ready for review.");
+      for (const textarea of await page.locator('[data-component-example^="textarea/"] textarea').all())
+        expect(
+          await textarea.evaluate(
+            (el) =>
+              el
+                .getAnimations()
+                .filter(
+                  (a) =>
+                    a.effect instanceof KeyframeEffect &&
+                    a.effect.getKeyframes().some((k) => "height" in k || "transform" in k || "opacity" in k),
+                ).length,
+          ),
+        ).toBe(0);
+    });
