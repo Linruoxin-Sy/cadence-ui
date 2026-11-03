@@ -41,20 +41,20 @@ Dependencies remain a future catalogue dimension; no optional GSAP entries curre
 
 Every component page renders from MDX. The table describes content areas, not a total heading count:
 
-| #   | Section                             | Content requirements                                                          |
-| --- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| 1   | Title + use-case sentence           | Matches the registry `description`; see [parity-plan.md](parity-plan.md) §6.6 |
-| 2   | Preview                             | Interactive; motion mode and speed come from the site header                  |
-| 3   | Installation                        | CLI (pnpm, npm and yarn) + manual (file list)                                 |
-| 4   | Usage                               | Smallest runnable code                                                        |
-| 5   | Examples                            | Named examples as needed, each with code — see the flat-heading rule below    |
-| 6   | When to use                         | 3–5 concrete scenarios                                                        |
-| 7   | When not to use                     | Point to the alternative component (prevents misuse)                          |
-| 8   | API                                 | Props table: type, default, description                                       |
-| 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)                          |
-| 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy                          |
-| 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                                       |
-| 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                                     |
+| #   | Section                             | Content requirements                                                                                                  |
+| --- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1   | Title + use-case sentence           | Matches the registry `description`; see [parity-plan.md](parity-plan.md) §6.6                                         |
+| 2   | Preview                             | Component-only specimen; compact range or common usage, without demo configuration controls                           |
+| 3   | Installation                        | CLI (pnpm, npm and yarn) + manual (file list)                                                                         |
+| 4   | Usage                               | Smallest runnable code                                                                                                |
+| 5   | Examples                            | Flat named sections after Usage; each explains a state, variant or feature with a live preview card and matching code |
+| 6   | When to use                         | 3–5 concrete scenarios                                                                                                |
+| 7   | When not to use                     | Point to the alternative component (prevents misuse)                                                                  |
+| 8   | API                                 | Props table: type, default, description                                                                               |
+| 9   | **Motion contract**                 | Enter/exit/interaction/reduced, itemised (see below)                                                                  |
+| 10  | Keyboard and accessibility          | Key table + screen-reader behaviour + focus strategy                                                                  |
+| 11  | Responsiveness and performance      | Breakpoint behaviour, size, SSR caveats                                                                               |
+| 12  | AI usage notes + related components | Trade-off advice for agents + cross-links                                                                             |
 
 The two sections a reader arrives for come first: `## Installation` opens every body, `## Usage`
 follows it. Someone who lands on the page to install the component never scrolls past a rationale
@@ -71,13 +71,15 @@ levels appear only inside `## API`, where a component with distinct parts groups
 Title/description and Preview are site chrome, not MDX headings. Required body membership depends
 on tier and item type, not a fixed total heading count. Examples vary in number.
 
-All tiers require, in order: Installation, Usage, flat named examples (zero or more),
+All tiers require, in order: Installation, Usage, flat named examples (as needed under §2.2),
 When to use, When not to use, API, Motion contract, accessibility/keyboard coverage,
 responsiveness/performance coverage, and AI advice. Related components may follow.
 Each required section appears once and has content. No `Examples` wrapper is allowed.
 Headings use ATX Markdown (`##`), not Setext or HTML. Only API permits `###` headings, naming one or more parts in inline code; no other
 nested headings or body `#` headings are allowed. Fenced code and comments do not
 contribute headings. Additional examples belong between Usage and When to use.
+Examples may be omitted only when there is no additional state, variant, composition or feature to
+explain beyond Usage. A compact top preview does not replace the explanation of those differences.
 
 - **Compact T0–T1:** `Accessibility` may include the native keyboard/focus story;
   a separate `Keyboard interactions` is optional. Both responsiveness and performance
@@ -136,43 +138,82 @@ complements the implementation checks and three-mode tests; it does not prove li
 
 ### 2.2 Preview capabilities
 
+#### Top preview: the component itself
+
+The first preview card is a concise specimen, not a configuration playground. Its body contains only
+the documented component, its meaningful content, and the minimum composition needed to use it
+(such as an input label, an overlay trigger, or content separated by a Separator). Do not place demo
+configuration buttons, selects, switches, sliders or toolbars in this card, including controls for
+variant, size, orientation, placement, invalid/disabled state, sample data, locale, or motion mode.
+Do not move the same playground toolbar immediately outside the card to preserve the old structure.
+Explanations and example headings belong in the MDX body, not inside the top specimen.
+
+The component's own interactions remain usable: Select selects a value, Tabs changes panels, a
+Dialog trigger opens its dialog, and Carousel's previous/next controls move its slides. A button
+labelled “Toggle orientation” changes demo configuration; a TabsTrigger changes component state.
+Judge the control by its purpose, not by whether it happens to be a Button or Select. Similarly,
+CodeBlock's own content tabs are part of CodeBlock, not a generic demo variant selector.
+
+Show as much of the component's range directly as remains clear and compact. A small set of shapes
+can sit side by side or in wrapping rows without a selector. When the component has many states,
+variants, sizes, placements or compositions, show its most common usage in the top card and explain
+the remaining range after Usage. Do not render a Cartesian product of every prop, or force an
+exhaustive matrix into a tall, crowded card. Review both desktop and narrow screens when making
+this editorial choice; a finite set of representative shapes is not every possible content value.
+
+Global motion mode, playback speed and theme stay in the site header. Top specimens and ordinary
+body examples inherit those settings; they do not silently force a local mode. A specifically named
+motion-mode example may use an explicit provider and must describe that override outside its card.
+
+#### After Usage: explain each difference with its own specimen
+
+Use flat named `##` sections between `## Usage` and `## When to use`, for example `## Sizes`,
+`## Disabled`, `## Controlled`, or `## Vertical`. Each example section contains:
+
+1. A short explanation of the specific state, variant, composition or feature and when it matters.
+2. A live component preview card showing that exact form, with a fixed configuration where possible.
+3. Matching runnable example code, with imports and caller-owned state when needed, rendered through
+   the existing code-fence system. Registry implementation source is not a substitute for example code.
+
+Closely related forms may share one section/card when the comparison remains clear (for example
+all sizes in a row); independent features get separate sibling sections. Reuse and improve existing
+named sections before adding new ones. Do not introduce an `## Examples` wrapper or a fixed count.
+All meaningful states, variants and features need coverage here, including forms omitted from the
+top card. Coverage follows the real component API and documented compositions, not a nested
+component's unrelated variant API.
+
+State/variant comparisons show the forms directly rather than hiding them exclusively behind a
+selector. A focused behavioral example may include the action needed to exercise its named feature,
+such as an external value update in Controlled or appending text in Updating text. Explain such
+actions in the section; do not recreate an all-purpose playground in every example. Give repeated
+examples independent state and unique IDs so labels, focus, portals and ARIA references stay correct.
+
+Preview cards use the shared site frame and the actual registry components. Keep per-component
+loading boundaries, server-rendered specimens, keyboard access, responsive containment and
+full/reduced/none behavior. No-JS must retain readable specimens, explanations and code; hydrated
+component interactions still require JavaScript. Custom MDX preview references must not make
+registry `docs`, `/r/<id>.md` or llms output depend on a site runtime to understand an example:
+keep the explanation and runnable code in the distributed body.
+
+#### Shared site capabilities
+
 | Capability             | Implementation                                                                                                                                                                             | Value                                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| Variant switching      | `?variant=` + client state                                                                                                                                                                 | One component, several shapes                                                             |
+| Named example previews | Fixed specimens in the top card and flat example sections after Usage; section anchors identify examples                                                                                   | Differences are visible and explained without configuring a playground                    |
 | Playback speed gear    | One `Select` in the site header (`2×` / `1×` / `0.5×` / `0.25×`); `CadenceProvider timeScale={1 / speed}`, never a token edit                                                              | Lets people see the details                                                               |
 | Reduced-motion preview | One switch in the site header (`full` / `reduced` / `none`), mirrored in `?motion=`; the provider resolves it once for the whole site                                                      | A mode is a setting; 29 copies of the switch would be 29 chances to disagree              |
 | Theme switching        | `data-theme` / `class="dark"`                                                                                                                                                              | Both themes                                                                               |
-| Code copy              | Reads the registry `content`, never hand-written snippets                                                                                                                                  | Docs and source never drift                                                               |
+| Component source copy  | Reads the registry `content`; separate from the runnable code accompanying each example                                                                                                    | Installable source stays current; example code explains usage                             |
 | Install copy           | `npx shadcn add @cadence/<id>`                                                                                                                                                             | Lowers the conversion barrier                                                             |
 | Loading transition     | `components/site/measured-height.tsx` applies the measured height in the frame it changed (ADR-015); the specimen itself lands with a CSS `@starting-style` reveal in `previews/shell.tsx` | The card is always the size of its example, and the content arrives without moving layout |
 
-Variant switching uses each preview's real named shapes, recorded for all 58 pages in
-[the executable applicability fixture](../tests/fixtures/preview-variants.json). The URL has one primary
-shape axis per page: visual variant first; otherwise its named size, orientation, placement,
-or documented named composition. Own parts count (such as EmptyMedia and TabsList); a nested
-Button does not give its parent a variant API. Chart's four authored Recharts compositions and
-Toast's five explicitly rendered icon types are named shapes. Arbitrary numeric geometry,
-selection values, open/invalid/disabled state, and motion modes are not variants.
-
-There are 37 applicable pages and 21 explicit non-applicable pages. The matrix records each
-primary axis, complete option set, owning part/prop and source/API paths. Other axes keep their
-existing examples and controls; this single URL parameter is not a serialization of all demo state.
-Missing or explicit `all` preserves the original authored specimens and settings. SSR/no-JS always
-renders that complete original catalogue; hydration applies a valid cold URL to the same nodes.
-The route awaits its lazy preview instead of streaming a local Skeleton fallback: the old local
-Suspense left the specimen in a hidden server segment without JavaScript. Per-page dynamic imports,
-measured frame sizing and specimen entrance styling remain; navigation waits for the ready route.
-Unknown values resolve to all and announce the fallback in a status region without rewriting the URL.
-Changing the selector pushes history while preserving unrelated query parameters, history state
-and hash; back/forward restores the selection. Selecting all removes only `variant`.
-
-Most pages override only their owning real prop on the existing specimens. Button and ScrollArea
-filter the existing specimens with hidden, retaining their nodes; history that hides the focused
-specimen moves focus to the variant selector. Other changes keep focus where it is. Chart's inner
-graph composition changes as its original Chart type control did, with the same ChartContainer and
-preview state. No preview is keyed by variant. Existing controls in the selected dimension return
-to all before applying their native local setting, so they remain operational; mode, size and other
-independent controls are unchanged. No registry component acquires a generic variant prop.
+The former `?variant=` playground is superseded by the specimen/section structure above. During
+migration, its existing hook, applicability fixture and tests describe the old implementation,
+not the new authoring contract. Retire the selector and migrate its shape coverage to the named
+examples together; do not discard behavioral, focus or motion assertions merely to remove controls.
+Legacy `?variant=` links must still render a valid page without a selector or URL-driven specimen
+filtering. Leave unrelated query parameters, history state and hashes intact; use section anchors
+for new example links. No registry component acquires a generic variant prop.
 
 The source view is a native disclosure next to the live preview, so opening code does not replace
 or reset an example. Every file is read on the server from the built registry payload and rendered
@@ -181,10 +222,12 @@ section remains the runnable example. TOC anchors are assigned from the compiled
 prev/next follows `listComponents()` registry order, and editing targets the component MDX on main.
 Tables retain readable minimum column widths and native keyboard horizontal scrolling on phones.
 
-> The preview's code block comes straight from `public/r/<id>.json`'s `content`, not from a hand-copied duplicate in the MDX — that is the key to preventing "stale docs code".
+The Component source disclosure reads `public/r/<id>.json`'s `content`. Usage and named example
+sections carry their own runnable usage code; they explain how to compose the component rather
+than duplicating its implementation source.
 
-The preview body is the one place the _site_ owns geometry: the frame mounts a `Skeleton` while a page's
-`dynamic()` import resolves, and the example that replaces it is usually a different height. `MeasuredHeight`
+The preview body is the one place the _site_ owns geometry. The route awaits its lazy preview so
+SSR/no-JS retains a visible specimen rather than a hidden streamed segment. `MeasuredHeight`
 keeps that height explicit — written in the frame the content changed, from a `ResizeObserver` on the content
 rather than on the wrapper — so the card around a preview is always the size of its example and never lags
 behind it.
@@ -219,10 +262,9 @@ removes travel before hydration can resolve the effective React mode. One limit 
 worth knowing: on a cold load with `?motion=none` in the URL, the mode is only resolved after hydration, so
 that first landing still plays once — the frame cannot know a client preference before the client runs.
 
-**Built today:** the speed gear, the single `full` / `reduced` / `none` switch with `?motion=`, theme switching,
-and per-page dynamic loading of previews. Variant switching of previews is **not** built yet. The gap between
-this table and the site is tracked in [parity-plan.md](parity-plan.md) §8, not here; this section describes
-the target.
+This section defines the authoring target. Migrating the existing component pages, shared preview
+infrastructure and regression coverage is separate implementation work; changing this definition
+alone does not establish that the live site conforms.
 
 ### 2.3 Body typography
 

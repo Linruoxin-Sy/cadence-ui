@@ -46,7 +46,10 @@ A pull request is ready when the component has:
 3. **Docs** in `content/components/<id>.mdx` with frontmatter that matches `registry.json`
    (title, description, deps, registryDeps, motion, intensity, complexity, since, tier). Follow the [tier-specific template](docs/documentation-site-and-distribution.md#2-component-page-templates-tier-specific-membership):
    required membership/order, responsiveness/performance at every tier, a motion contract table,
-   and input data ownership. Extra flat examples do not change template validity.
+   and input data ownership. Follow the [preview authoring contract](docs/documentation-site-and-distribution.md#22-preview-capabilities):
+   keep the top card focused on the component itself, with no demo configuration controls; show a compact
+   range or its common usage. Explain states, variants and features in flat sections after Usage, each
+   with a live preview card and matching runnable code. Extra flat examples do not change template validity.
 4. **UI only**: no validation imports and no `schema` / `resolver` / `validate` props. Invalid state
    comes from `aria-invalid` / `data-invalid`. See [API and data ownership](docs/overall-design.md#8-component-api-and-ownership).
 5. **Motion conformance**: the recipes declared in `meta.motion`, the MDX frontmatter, and the Motion contract
