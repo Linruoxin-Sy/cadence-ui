@@ -352,7 +352,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           }
           if (id === "input-otp") {
             const input = p.getByRole("textbox", { name: "Verification code", exact: true });
-            await input.fill("123456");
+            await input.press("ControlOrMeta+A");
+            await input.press("Backspace");
+            await expect(input).toHaveValue("");
+            await input.pressSequentially("123456");
+            await expect(input).toHaveValue("123456");
             await input.press("Backspace");
             await expect(input).toHaveValue("12345");
             await input.evaluate((n: HTMLInputElement) => n.setSelectionRange(1, 3));
@@ -367,6 +371,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             await input.press("ControlOrMeta+A");
             await input.press("ControlOrMeta+V");
             await expect(input).toHaveValue("654321");
+            // Header mode controls are intentionally hidden at 390px.
+            await page.setViewportSize({ width: 1280, height: 900 });
+            await expect(input).toBeFocused();
           }
           if (id === "slider") {
             const input = p.getByRole("slider", { name: "Volume", exact: true });

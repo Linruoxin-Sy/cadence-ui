@@ -38,5 +38,6 @@
     "controlled",
     "disabled",
     "without-motion"
-  ]
+  ],
+  "input-otp": ["controlled", "invalid", "disabled", "without-separator", "paste", "without-motion"]
 }

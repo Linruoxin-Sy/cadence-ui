@@ -6831,12 +6831,7 @@ which owns the single hidden input, paste handling, and the caret position.
 ## Usage
 
 ```tsx
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/cadence/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/cadence/input-otp";
 
 export function Code() {
   return (
@@ -6861,50 +6856,225 @@ export function Code() {
 
 ## Controlled, with completion
 
+The caller owns the six-character draft and the completed-code message. Completion records a value; it does not authenticate it. Clear login code resets only this example and its message.
+
+<ComponentExample name="controlled" />
+
 ```tsx
-const [code, setCode] = useState("");
+"use client";
 
-<InputOTP maxLength={6} value={code} onChange={setCode} onComplete={verify}>
-  …
-</InputOTP>;
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/cadence/input-otp";
+import { Label } from "@/components/cadence/label";
+
+export function ControlledCode() {
+  const id = useId();
+  const [code, setCode] = useState("");
+  const [completed, setCompleted] = useState("Not completed");
+  return (
+    <div className="grid justify-items-start gap-3">
+      <Label htmlFor={id}>Login code</Label>
+      <InputOTP
+        id={id}
+        maxLength={6}
+        value={code}
+        onChange={setCode}
+        onComplete={(value) => setCompleted(`Completed: ${value}`)}
+      >
+        <InputOTPGroup>
+          {[0, 1, 2, 3, 4, 5].map((index) => (
+            <InputOTPSlot key={index} index={index} />
+          ))}
+        </InputOTPGroup>
+      </InputOTP>
+      <p role="status" className="text-sm text-muted-foreground">
+        {completed}
+      </p>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          setCode("");
+          setCompleted("Not completed");
+        }}
+      >
+        Clear login code
+      </Button>
+    </div>
+  );
+}
 ```
-
-`onComplete` fires once the last slot is filled. It is the right place to submit
-the code, not an effect that watches `code.length`.
 
 ## Invalid
 
+The caller supplies the expired-code error and aria-describedby on the real input. Each visual slot also gets aria-invalid for its destructive border. Editing does not independently clear the server error.
+
+<ComponentExample name="invalid" />
+
 ```tsx
-<InputOTP maxLength={4} aria-label="Code" aria-invalid>
-  <InputOTPGroup>
-    <InputOTPSlot index={0} aria-invalid />
-    …
-  </InputOTPGroup>
-</InputOTP>
+"use client";
+
+import { useId } from "react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/cadence/input-otp";
+import { Label } from "@/components/cadence/label";
+
+export function InvalidCode() {
+  const id = useId();
+  return (
+    <div className="grid gap-3">
+      <Label htmlFor={id}>Expired code</Label>
+      <InputOTP id={id} maxLength={4} defaultValue="0000" aria-invalid="true" aria-describedby={`${id}-error`}>
+        <InputOTPGroup>
+          {[0, 1, 2, 3].map((index) => (
+            <InputOTPSlot key={index} index={index} aria-invalid />
+          ))}
+        </InputOTPGroup>
+      </InputOTP>
+      <p id={`${id}-error`} className="text-sm text-destructive">
+        This code has expired. Request another code.
+      </p>
+    </div>
+  );
+}
 ```
 
-`aria-invalid` on a slot styles its border; the text beside the field carries the
-message.
+## Disabled and read-only
 
-## Disabled
+Disabled prevents focus and editing. Read-only retains a focusable input and a copyable code, while rejecting edits. The values are fixed independently.
+
+<ComponentExample name="disabled" />
 
 ```tsx
-<InputOTP maxLength={6} disabled aria-label="Code">
-  …
-</InputOTP>
+"use client";
+
+import { useId } from "react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/cadence/input-otp";
+import { Label } from "@/components/cadence/label";
+
+export function DisabledCodes() {
+  const id = useId();
+  return (
+    <div className="grid gap-4">
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-disabled`}>Unavailable code</Label>
+        <InputOTP id={`${id}-disabled`} maxLength={4} disabled value="1234">
+          <InputOTPGroup>
+            {[0, 1, 2, 3].map((index) => (
+              <InputOTPSlot key={index} index={index} />
+            ))}
+          </InputOTPGroup>
+        </InputOTP>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor={`${id}-readonly`}>Read-only code</Label>
+        <InputOTP id={`${id}-readonly`} maxLength={4} readOnly value="5678">
+          <InputOTPGroup>
+            {[0, 1, 2, 3].map((index) => (
+              <InputOTPSlot key={index} index={index} />
+            ))}
+          </InputOTPGroup>
+        </InputOTP>
+      </div>
+    </div>
+  );
+}
 ```
 
 ## Without a separator
 
+A four-character PIN needs one group and four indexed slots. maxLength must match the slot count; it is a code string and can retain leading zeros.
+
+<ComponentExample name="without-separator" />
+
 ```tsx
-<InputOTP maxLength={4} aria-label="PIN" containerClassName="justify-center">
-  <InputOTPGroup>
-    <InputOTPSlot index={0} />
-    <InputOTPSlot index={1} />
-    <InputOTPSlot index={2} />
-    <InputOTPSlot index={3} />
-  </InputOTPGroup>
-</InputOTP>
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/cadence/input-otp";
+
+export function ShortCode() {
+  return (
+    <InputOTP maxLength={4} aria-label="PIN" containerClassName="justify-center">
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+        <InputOTPSlot index={2} />
+        <InputOTPSlot index={3} />
+      </InputOTPGroup>
+    </InputOTP>
+  );
+}
+```
+
+## Grouped numeric codes and paste
+
+Two three-slot groups share one real input. The numeric pattern accepts digits, while the caller strips hyphens from pasted codes such as 123-456. Paste replaces the current selection, so select all first when replacing a full code. Pattern checks characters, not server validity.
+
+<ComponentExample name="paste" />
+
+```tsx
+"use client";
+
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/components/cadence/input-otp";
+
+export function PasteCode() {
+  return (
+    <InputOTP
+      maxLength={6}
+      aria-label="Pasted numeric code"
+      inputMode="numeric"
+      pattern={REGEXP_ONLY_DIGITS}
+      pasteTransformer={(text) => text.replaceAll("-", "")}
+    >
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+        <InputOTPSlot index={2} />
+      </InputOTPGroup>
+      <InputOTPSeparator />
+      <InputOTPGroup>
+        <InputOTPSlot index={3} />
+        <InputOTPSlot index={4} />
+        <InputOTPSlot index={5} />
+      </InputOTPGroup>
+    </InputOTP>
+  );
+}
+```
+
+## Explicit motion scopes
+
+The filled first code is fixed to none from the moment its DOM appears. The second input explicitly requests full inside that none provider, subject to the system reduced-motion preference. Ordinary inputs inherit the header; the caret never blinks.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/cadence/input-otp";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function StaticCode() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="grid gap-4">
+        <div data-testid="initial-none">
+          <InputOTP maxLength={1} value="1" aria-label="Static code">
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
+        <CadenceProvider mode="full">
+          <div data-testid="explicit-full">
+            <InputOTP maxLength={1} aria-label="Explicit full input-otp">
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -6932,6 +7102,10 @@ message.
 | `defaultValue`     | `string`                    | –       | Uncontrolled initial value.                    |
 | `onChange`         | `(value: string) => void`   | –       | Fired on every change, including paste.        |
 | `onComplete`       | `(value: string) => void`   | –       | Fired when the code is full.                   |
+| `readOnly`         | `boolean` | `false` | Allows focus and selection, rejects edits. |
+| `pattern` | `string` | – | Accepted characters, not server verification. |
+| `inputMode` | native input mode | `"numeric"` | Keyboard hint. |
+| `pasteTransformer` | `(text: string) => string` | – | Caller normalization before paste filtering. |
 | `disabled`         | `boolean`                   | `false` | Ignores input.                                 |
 | `containerClassName` | `string`                  | –       | Classes for the wrapper that positions the slots. |
 | `className`        | `string`                    | –       | Classes for the input itself.                  |
@@ -6969,17 +7143,17 @@ where the next character goes, so the loop buys nothing.
 
 | Keys              | Action                                                    |
 | ----------------- | --------------------------------------------------------- |
-| Any character     | Fills the active slot and advances.                       |
+| Allowed character | Fills the active slot and advances.                       |
 | `Backspace`       | Clears the current slot, then moves back.                 |
 | `Arrow Left/Right`| Moves the active slot without changing the value.         |
-| `Cmd/Ctrl + V`    | Pastes the whole code, filling every slot from the start. |
+| `Cmd/Ctrl + V`    | Pastes at the current selection; select all to replace a code. |
 
 ## Accessibility
 
 - `input-otp` renders a single real input with `aria-label` and
   `autocomplete="one-time-code"`, so assistive technology sees one field, not six.
 - The slots are visual mirrors; they are not focusable and carry no role.
-- `onComplete` is where the code is judged. The component never decides that a
+- `onComplete` reports a filled code for the caller to judge. The component never decides that a
   code is wrong.
 - Keep the field visible while verifying and announce the result next to it, not
   through the slots' animation.

@@ -139,3 +139,82 @@ for (const os of ["no-preference", "reduce"] as const)
         "true",
       );
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`Input OTP examples: independent drafts, completion, paste and locked fields ${mode}/${os}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await page.goto(`/components/input-otp?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="input-otp"]');
+      await expect(top.getByRole("textbox")).toHaveCount(1);
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.locator('[data-slot="input-otp-slot"]')).toHaveCount(6);
+      await expect(top.locator('[data-slot="input-otp-separator"]')).toHaveCount(1);
+      expect(
+        await page
+          .locator(
+            '[data-component-example^="input-otp/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+          )
+          .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
+      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      const controlled = page.locator('[data-component-example="input-otp/controlled"]');
+      const input = controlled.getByRole("textbox", { name: "Login code", exact: true });
+      await input.fill("012345");
+      await expect(controlled.getByRole("status")).toHaveText("Completed: 012345");
+      await expect(top.getByRole("textbox")).toHaveValue("");
+      const saved = await input.elementHandle();
+      const chars = await controlled.locator('[data-slot="input-otp-slot"] > span').elementHandles();
+      await input.focus();
+      await input.evaluate((n: HTMLInputElement) => n.setSelectionRange(1, 3));
+      await page
+        .getByRole("group", { name: "Motion mode" })
+        .getByRole("button", { name: "none", exact: true })
+        .evaluate((n: HTMLButtonElement) => n.click());
+      await expect(input).toBeFocused();
+      await expect(input).toHaveValue("012345");
+      expect(await input.evaluate((n: HTMLInputElement) => [n.selectionStart, n.selectionEnd])).toEqual([1, 3]);
+      expect(await input.evaluate((n, saved) => n === saved, saved)).toBe(true);
+      expect(
+        await controlled
+          .locator('[data-slot="input-otp-slot"] > span')
+          .first()
+          .evaluate((n, saved) => n === saved, chars[0]),
+      ).toBe(true);
+      await input.press("9");
+      await expect(input).toHaveValue("09345");
+      await controlled.getByRole("button", { name: "Clear login code" }).click();
+      await expect(input).toHaveValue("");
+      await expect(controlled.getByRole("status")).toHaveText("Not completed");
+      const invalid = page.locator('[data-component-example="input-otp/invalid"]');
+      const expired = invalid.getByRole("textbox", { name: "Expired code" });
+      await expect(expired).toHaveAttribute("aria-invalid", "true");
+      await expect(expired).toHaveAccessibleDescription("This code has expired. Request another code.");
+      await expired.fill("1111");
+      await expect(expired).toHaveAttribute("aria-invalid", "true");
+      await expect(invalid.locator('[data-slot="input-otp-slot"][aria-invalid="true"]')).toHaveCount(4);
+      const disabled = page.locator('[data-component-example="input-otp/disabled"]');
+      await expect(disabled.getByRole("textbox", { name: "Unavailable code" })).toBeDisabled();
+      const readOnly = disabled.getByRole("textbox", { name: "Read-only code" });
+      await readOnly.focus();
+      await readOnly.press("7");
+      await expect(readOnly).toHaveValue("5678");
+      const short = page.locator('[data-component-example="input-otp/without-separator"]');
+      await expect(short.locator('[data-slot="input-otp-separator"]')).toHaveCount(0);
+      await short.getByRole("textbox").fill("0012");
+      await expect(short.getByRole("textbox")).toHaveValue("0012");
+      await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+      await page.evaluate(() => navigator.clipboard.writeText("123-456"));
+      const paste = page.locator('[data-component-example="input-otp/paste"]').getByRole("textbox");
+      await paste.focus();
+      await paste.press("ControlOrMeta+V");
+      await expect(paste).toHaveValue("123456");
+      await paste.press("ControlOrMeta+A");
+      await paste.press("Backspace");
+      await paste.pressSequentially("a7");
+      await expect(paste).toHaveValue("7");
+      const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((n) => n.id));
+      expect(new Set(ids).size).toBe(ids.length);
+    });
