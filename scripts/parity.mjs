@@ -52,6 +52,7 @@ if (mode === "write") {
   const items = {};
   const unreadable = [];
   for (const item of components) {
+    if (item.meta?.upstream?.registry === "cadence") continue;
     const source = await readOrNull(path.join(cacheDir, `${item.name}.tsx`));
     if (source === null) {
       unreadable.push(`${item.name}: nothing in .cache/shadcn/base — run \`pnpm upstream:sync\``);
@@ -104,6 +105,17 @@ function recordedDeviations(item) {
 
 for (const item of components) {
   const upstream = manifest.items[item.name];
+  if (item.meta?.upstream?.registry === "cadence") {
+    if (upstream) problems.push(`${item.name}: a pinned shadcn item cannot be reclassified as a Cadence original`);
+    if (
+      item.meta.upstream.style !== "native" ||
+      !item.meta.upstream.reason ||
+      item.meta.upstream.version !== item.meta.since
+    ) {
+      problems.push(`${item.name}: invalid Cadence original origin metadata`);
+    }
+    continue;
+  }
   if (!upstream) {
     problems.push(`${item.name}: not pinned — run \`pnpm upstream:sync\``);
     continue;

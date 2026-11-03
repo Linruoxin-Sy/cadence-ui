@@ -71,3 +71,12 @@ Investigation; ADR-009 remains accepted. Research retains all content, site cont
 ## ADR-017 · Revalidated aliases and immutable retained snapshots
 
 Accepted. Latest /r aliases revalidate with exact-byte SHA-256 ETags and GET/HEAD/304; errors are no-store. A production beforeFiles rewrite owns public/r requests. Explicit freeze-registry creates tracked tree-hash directories and per-file manifests; normal builds verify and preserve every snapshot and the retention inventory. Never rewrite/delete distributed snapshots. Pin the @cadence namespace to the snapshot URL so transitive dependencies are pinned; package lockfiles still own package versions. Static/CDN hosting needs equivalent security/cache/conditional rules and separate validation.
+
+## ADR-018 · Explicit origin for Cadence originals
+
+Accepted for the requested Toc addition. A source-distributed original without a counterpart in the pinned
+shadcn catalogue records `meta.upstream` with registry `cadence`, style `native`, version equal to `since`,
+and a nonempty origin reason. Registry validation still enforces the same docs, source, dependency,
+budget and applicable motion rules. Parity reports only actual shadcn comparisons; it rejects reclassifying
+a pinned shadcn item as an original. Upstream sync and manifest writing omit original components rather
+than inventing external sources. Future catalogue expansion still requires explicit scope.

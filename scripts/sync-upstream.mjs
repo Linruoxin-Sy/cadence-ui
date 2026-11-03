@@ -80,6 +80,7 @@ const items = {};
 const missing = [];
 
 for (const item of components) {
+  if (item.meta?.upstream?.registry === "cadence") continue;
   const id = item.name;
   const upstreamPath = item.meta?.upstream?.path ?? `${SOURCE_PREFIX}/ui/${id}.tsx`;
   let source;

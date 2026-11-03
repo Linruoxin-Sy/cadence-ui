@@ -76,6 +76,8 @@ build/deployment; never regenerate or delete distributed snapshots during normal
 ## 6. Metadata and docs
 
 Every component records tier, batch, recipes, intensity, complexity, since and pinned upstream.
+An explicitly scoped Cadence original instead records `meta.upstream.registry: "cadence"`,
+`style: "native"`, its `since` as version, and an origin reason (ADR-018). It cannot replace a pinned item.
 The MDX frontmatter matches registry metadata; the body is injected into registry payloads.
 Categories are layout/form/navigation/overlay/feedback/data/ai/utility. Recipe, intensity and
 complexity describe different things; intensity is authored behaviour, not a runtime multiplier.

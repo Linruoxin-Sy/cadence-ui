@@ -115,8 +115,17 @@ for (const item of registry.items) {
     if (!/^B[1-9]$/.test(item.meta?.batch ?? "")) {
       problems.push(`${item.name}: meta.batch must be a batch id (B1–B9) from docs/parity-plan.md §7`);
     }
-    if (item.meta?.upstream?.registry !== "shadcn") {
-      problems.push(`${item.name}: meta.upstream.registry must be "shadcn"`);
+    if (!["shadcn", "cadence"].includes(item.meta?.upstream?.registry)) {
+      problems.push(`${item.name}: meta.upstream.registry must be "shadcn" or "cadence"`);
+    }
+    if (item.meta?.upstream?.registry === "cadence") {
+      if (
+        item.meta.upstream.style !== "native" ||
+        !item.meta.upstream.reason ||
+        item.meta.upstream.version !== item.meta.since
+      ) {
+        problems.push(`${item.name}: Cadence originals need native style, an origin reason and version equal to since`);
+      }
     }
     if (!item.meta?.upstream?.style) problems.push(`${item.name}: missing meta.upstream.style`);
 
