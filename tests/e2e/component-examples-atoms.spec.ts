@@ -231,3 +231,66 @@ for (const mode of ["full", "reduced", "none"] as const)
       await toggle.press("Enter");
       await expect(fit).toContainText("Short content.");
     });
+
+for (const mode of ["full", "reduced", "none"] as const)
+  for (const os of [false, true])
+    test(`Aspect Ratio examples: real media and reserved geometry ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
+      await page.goto(`/components/aspect-ratio?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const top = page.locator('[data-preview="aspect-ratio"]');
+      await expect(top.getByRole("combobox")).toHaveCount(0);
+      await expect(top.locator('[data-slot="aspect-ratio"]')).toHaveCount(3);
+      const square = page.locator('[data-component-example="aspect-ratio/square"]');
+      const video = page.locator('[data-component-example="aspect-ratio/video"] video');
+      await expect(square.getByRole("img", { name: "Illustrated mountains under a golden sun" })).toBeVisible();
+      await expect(video).toHaveAttribute("controls", "");
+      expect(
+        await video.evaluate((el: HTMLVideoElement) => ({
+          paused: el.paused,
+          autoplay: el.autoplay,
+          preload: el.preload,
+        })),
+      ).toEqual({ paused: true, autoplay: false, preload: "none" });
+      const grid = page.locator('[data-component-example="aspect-ratio/grid"]');
+      await expect(grid.locator("figure")).toHaveCount(3);
+      await expect(grid.locator("figcaption")).toHaveText(["4 : 3", "1 : 1", "3 : 4"]);
+      await expect(grid).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
+      for (const width of [1280, 390]) {
+        await page.setViewportSize({ width, height: 1000 });
+        const ratios: number[] = [];
+        for (const frame of await page.locator('[data-slot="aspect-ratio"]').all()) {
+          const geometry = await frame.evaluate((el) => {
+            const box = el.getBoundingClientRect();
+            return {
+              width: box.width,
+              height: box.height,
+              ratio: Number(getComputedStyle(el).getPropertyValue("--ratio")),
+              animations: el.getAnimations().length,
+            };
+          });
+          expect(geometry.width).toBeGreaterThan(0);
+          expect(geometry.height).toBeGreaterThan(0);
+          expect(geometry.width / geometry.height).toBeCloseTo(geometry.ratio, 1);
+          expect(geometry.animations).toBe(0);
+          ratios.push(geometry.ratio);
+        }
+        expect(ratios).toEqual([16 / 9, 1, 3 / 4, 1, 16 / 9, 4 / 3, 1, 3 / 4]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      }
+      const frame = grid.locator('[data-slot="aspect-ratio"]').first();
+      const node = await frame.elementHandle();
+      await page.setViewportSize({ width: 1280, height: 1000 });
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
+      await expect(grid).toHaveAttribute("data-preview-motion", "none");
+      expect(await frame.evaluate((el, saved) => el === saved, node)).toBe(true);
+      expect(await video.evaluate((el: HTMLVideoElement) => el.paused)).toBe(true);
+      if (mode === "none" && !os) {
+        await video.scrollIntoViewIfNeeded();
+        await video.focus();
+        await video.press(" ");
+        await expect.poll(() => video.evaluate((el: HTMLVideoElement) => !el.paused && el.currentTime > 0)).toBe(true);
+        await video.press(" ");
+        expect(await video.evaluate((el: HTMLVideoElement) => el.paused)).toBe(true);
+      }
+    });

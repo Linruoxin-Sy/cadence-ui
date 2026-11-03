@@ -10,5 +10,6 @@
   "toc": ["nested", "controlled", "scroll-tracking"],
   "input": ["invalid", "file", "controlled", "disabled-readonly"],
   "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"],
-  "card": ["header-action", "sizes", "content-sized", "boundaries"]
+  "card": ["header-action", "sizes", "content-sized", "boundaries"],
+  "aspect-ratio": ["square", "video", "grid"]
 }
