@@ -515,5 +515,11 @@
     "default": "all",
     "source": "components/site/previews/bubble.tsx",
     "api": "registry/cadence/bubble/index.tsx"
+  },
+  {
+    "id": "toc",
+    "applicable": false,
+    "source": "components/site/previews/toc.tsx",
+    "api": "registry/cadence/toc/index.tsx"
   }
 ]

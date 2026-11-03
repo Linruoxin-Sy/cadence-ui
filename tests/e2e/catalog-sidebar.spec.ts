@@ -14,7 +14,7 @@ test("catalogue composes real metadata, search, empty, clear and history without
   const main = page.locator("main");
   const results = main.locator("[data-catalog-results]");
   const visible = () => results.locator("a:visible");
-  await expect(visible()).toHaveCount(58);
+  await expect(visible()).toHaveCount(items.length);
   for (const category of [...new Set<string>(items.flatMap((item: { categories: string[] }) => item.categories))]) {
     await main.getByRole("combobox", { name: "Category", exact: true }).selectOption(category);
     await expect(visible()).toHaveCount(
@@ -45,7 +45,7 @@ test("catalogue composes real metadata, search, empty, clear and history without
   await page.goForward();
   await expect(visible()).toHaveCount(0);
   await main.getByRole("button", { name: "Clear filters" }).click();
-  await expect(visible()).toHaveCount(58);
+  await expect(visible()).toHaveCount(items.length);
   expect(new URL(page.url()).search).toBe("?keep=yes");
   expect(new URL(page.url()).hash).toBe("#catalog");
   const button = results.locator('a[href="/components/button"]');
@@ -161,10 +161,10 @@ test("no-JS directory and mobile native Browse preserve all navigation", async (
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(`${baseURL}/components`);
-  await expect(page.locator("[data-catalog-results] a:visible")).toHaveCount(58);
+  await expect(page.locator("[data-catalog-results] a:visible")).toHaveCount(items.length);
   await page.locator("summary").first().click();
   const navigation = page.getByRole("navigation", { name: "Documentation", exact: true });
-  await expect(navigation.locator('a[href^="/components/"]')).toHaveCount(58);
+  await expect(navigation.locator('a[href^="/components/"]')).toHaveCount(items.length);
   await navigation.getByRole("link", { name: "Button", exact: true }).click();
   await expect(page).toHaveURL(/\/components\/button$/);
   await context.close();

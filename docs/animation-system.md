@@ -192,10 +192,11 @@ A recipe is a "reusable motion formula", returned by `useCadenceMotion().transit
 | `exit.shrink`     | Closing a popover                                                                       | `scale`                         | scale to 0.96 + opacity                                                                                               | Fade only                                    |
 | `popup.anchored`  | Base UI popups                                                                          | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                                          | No scale, pure cross-fade                    |
 | `layout.move`     | List/grid reordering                                                                    | `spring`                        | `layout` prop + `LayoutGroup` + physics-defined spring                                                                | Layout disabled, instant jump                |
-| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId`                      | `layoutId` + physics-defined `spring.morph`                                                                           | Disabled, immediate switch                   |
+| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId` / measured targets   | `layoutId` or a persistent measured indicator (§3.1.4) + physics-defined `spring.morph`                               | Disabled, immediate switch                   |
 | `list.stagger`    | Items appearing one by one                                                              | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                                          | All fade in together (no stagger)            |
 | `gesture.drag`    | Drag / swipe to dismiss                                                                 | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                                                     | Dragging disabled, use a button              |
 | `scroll.progress` | Reading progress, parallax                                                              | `offset`                        | `useScroll` + `useSpring`                                                                                             | Static value (no smoothing)                  |
+| `scroll.navigate` | Navigate to a document section after an explicit link activation                        | measured destination            | Motion number tween writes native scroll offsets; `duration.page` + `ease.inOut` (§3.1.5)                             | Immediate destination                        |
 | `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                                              | End state shown directly                     |
 | `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                 | variants + child spans                                                                                                | Whole block fades in                         |
 | `text.split`      | Character by character (GSAP)                                                           | `type`                          | GSAP SplitText (optional)                                                                                             | Shown as a whole                             |
@@ -355,6 +356,44 @@ stylesheet; Cadence does not import that stylesheet or activate a second animati
 Day buttons retain native button semantics and static selection/range styling, using buttonVariants
 without Button's independent press recipe. Navigation uses the same static variants.
 
+### 3.1.4 `layout.shared` for the Toc reading indicator
+
+Toc is T3. One persistent decorative indicator follows the active link using the
+`layout.shared` physics spring. A ResizeObserver caches link offsets/heights, including
+wrapped labels; committed target changes read that cache, not layout. Two Motion values
+represent its top/bottom edges, preserving velocity when retargeted. One native style
+writer converts those edges to translateY/scaleY on a one-pixel base; it clamps both
+edges to the measured rail. No width/height interpolation or list reflow is authored.
+
+Initial placement, reappearance after a cleared selection, reduced, none and zero
+clock all jump. Reduced/none use instant native top/height placement and no transform;
+live downgrades synchronously stop both springs before paint without replacing the
+indicator or links. Restoring full starts at the settled position. Clock changes
+retarget the existing values. The server uses the active link's static border until
+the first measurement, so no-JS navigation retains a visible current section.
+Text/aria-current follow the current section immediately. Click navigation follows
+§3.1.5; the site's mobile disclosure remains instant. There is no scroll.progress or popup recipe.
+
+### 3.1.5 `scroll.navigate` for explicit section navigation
+
+T3 Toc links animate the actual scrolling host's offset with `duration.page` and
+`ease.inOut`, scaled by the provider clock. This is an explicit exception to the
+transform/opacity/filter property rule: moving the native scroll offset preserves
+sticky layout, focus, history and scroll tracking. Never translate the article to
+simulate scrolling, use a second native smooth-scroll clock, or read layout per frame.
+Measure the target, scroll margins/padding and host bounds in the click handler,
+clamp the destination, and use instant native scroll writes from one Motion tween.
+
+Reduced, none and zero clock navigate immediately. A live downgrade completes the
+current destination before paint; positive clock changes retime from the current
+offset. Repeated links cancel the old writer and start from the current position.
+Wheel, touch, pointer, scrolling keys, resize, history traversal, external hash changes
+and unmount cancel it, with no later snap to the abandoned destination. Completion
+focuses the heading without another scroll, preserving any caller tabindex. Modified
+clicks, caller-cancelled events and missing targets retain native link behavior.
+Keep URL query/history state and hashchange notifications. Initial hashes, reload,
+back/forward and no-JS links remain native and never replay the click animation.
+
 ### 3.2 Continuous recipes run in CSS
 
 Some recipes do not end: a placeholder pulse, a shimmer, a marquee. A page can
@@ -479,6 +518,7 @@ export type Recipe =
   | "list.stagger"
   | "gesture.drag"
   | "scroll.progress"
+  | "scroll.navigate"
   | "scroll.story"
   | "text.reveal"
   | "text.split"
@@ -549,7 +589,7 @@ Implementation notes:
 
 Implementation rules:
 
-1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px. The documented exceptions are chart SVG data geometry (§3.1.2), disclosure height and `geometry.resize`. The latter two are measured, clamped to the closed size, confined to T3 continuity components, and resolve to zero duration under reduced/none.
+1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px. The documented exceptions are chart SVG data geometry (§3.1.2), native scroll offsets through `scroll.navigate` (§3.1.5), disclosure height and `geometry.resize`. The latter two are measured, clamped to the closed size, confined to T3 continuity components, and resolve to zero duration under reduced/none.
 2. **No layout-read loops**: `getBoundingClientRect` and `offsetWidth` are read inside event/`ResizeObserver` callbacks only, and reads precede writes.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
 4. **`layout` animations trigger layout measurement**: for lists over 50 items, switch to manual transform or paginate.

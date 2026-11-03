@@ -12,7 +12,7 @@ const label = (id: string) =>
     .join("");
 const slot = (name: string) => name.replace(/[A-Z]/g, (s, i) => `${i ? "-" : ""}${s.toLowerCase()}`);
 
-test("58 route SSR applicability agrees with the reviewed matrix", async ({ page, request, browser }) => {
+test("59 route SSR applicability agrees with the reviewed matrix", async ({ page, request, browser }) => {
   test.setTimeout(120_000);
   const registry = JSON.parse(await readFile("registry.json", "utf8"));
   expect(matrix.map((e) => e.id)).toEqual(

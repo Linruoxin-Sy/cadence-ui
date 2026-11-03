@@ -70,4 +70,5 @@ export const previews: Record<string, ComponentType> = {
   "date-picker": dynamic(() => import("./date-picker").then((mod) => ({ default: mod.DatePickerPreview }))),
   attachment: dynamic(() => import("./attachment").then((mod) => ({ default: mod.AttachmentPreview }))),
   bubble: dynamic(() => import("./bubble").then((mod) => ({ default: mod.BubblePreview }))),
+  toc: dynamic(() => import("./toc").then((mod) => ({ default: mod.TocPreview }))),
 };

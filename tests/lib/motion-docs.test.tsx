@@ -54,10 +54,10 @@ describe("registry:check motion docs entry", () => {
     }
   });
 
-  it("accepts all 58 real contracts, including T0, composed, continuous, CSS and engine forms", async () => {
+  it("accepts all 59 real contracts, including T0, composed, continuous, CSS and engine forms", async () => {
     expect(
       registry.items.filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type)),
-    ).toHaveLength(58);
+    ).toHaveLength(59);
     expect(await checkMotionDocs(root, registry, catalogue)).toEqual([]);
     expect(entry(buttonPath, button).status).toBe(0);
   });

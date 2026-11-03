@@ -7,6 +7,11 @@ import { duration, physicalSpring, type Recipe, spring, transitionFor } from "@/
  * place a regression is cheapest to catch: every component trusts these values.
  */
 describe("transitionFor", () => {
+  it("uses the page clock for section navigation and removes travel under reduced", () => {
+    expect(transitionFor("scroll.navigate", "full", { timeScale: 4 })).toMatchObject({ duration: duration.page * 4 });
+    expect(transitionFor("scroll.navigate", "reduced", { delay: 1 })).toEqual({ duration: 0, delay: 0 });
+    expect(transitionFor("scroll.navigate", "none")).toEqual({ duration: 0 });
+  });
   it("returns the authored spring in full mode", () => {
     expect(transitionFor("feedback.press", "full")).toMatchObject({
       visualDuration: spring.press.visualDuration,
@@ -147,6 +152,7 @@ const allRecipes: Recipe[] = [
   "list.stagger",
   "gesture.drag",
   "scroll.progress",
+  "scroll.navigate",
   "scroll.story",
   "text.reveal",
   "text.split",

@@ -2004,6 +2004,36 @@
           "version": "2026-10"
         }
       }
+    },
+    {
+      "name": "toc",
+      "type": "registry:ui",
+      "title": "Table of Contents",
+      "description": "Section navigation for documentation, guides, and long articles.",
+      "categories": ["navigation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/toc/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/toc/index.tsx"
+        }
+      ],
+      "meta": {
+        "since": "0.5.0",
+        "tier": "T3",
+        "batch": "B7",
+        "motion": ["layout.shared", "scroll.navigate"],
+        "intensity": "medium",
+        "complexity": "M",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.5.0",
+          "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
+        }
+      }
     }
   ]
 }

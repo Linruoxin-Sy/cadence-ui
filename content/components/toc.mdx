@@ -1,0 +1,175 @@
+---
+title: Table of Contents
+description: Section navigation for documentation, guides, and long articles.
+category: navigation
+motion: [layout.shared, scroll.navigate]
+intensity: medium
+complexity: M
+tier: T3
+since: 0.5.0
+deps: ["motion"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider"]
+---
+
+## Installation
+
+```install
+npx shadcn@latest add @cadence/toc
+```
+
+## Usage
+
+```tsx
+import { Toc } from "@/components/cadence/toc";
+
+export function Example() {
+  return (
+    <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_12rem]">
+      <article>
+        <h2 id="overview" className="scroll-mt-24">Overview</h2>
+        <p>Introduce the topic here.</p>
+        <h2 id="details" className="scroll-mt-24">Details</h2>
+        <p>Explain the details here.</p>
+      </article>
+      <aside>
+        <Toc
+          className="sticky top-24"
+          items={[
+            { id: "overview", title: "Overview" },
+            { id: "details", title: "Details" },
+          ]}
+        />
+      </aside>
+    </div>
+  );
+}
+```
+
+## Nested sections
+
+Pass `depth: 3` for a subsection. Entries stay in document order and indent one level.
+The caller supplies unique heading ids and human-readable labels; Toc does not parse Markdown.
+
+```tsx
+<Toc items={[
+  { id: "api", title: "API" },
+  { id: "toc-props", title: "Toc", depth: 3 },
+]} />
+```
+
+## Controlled active section
+
+Supply `activeId` when a router, a custom scroll container, or your own observer owns the current
+section. An empty string clears the highlight. This disables Toc's window scroll tracking.
+
+```tsx
+<Toc
+  label="Article sections"
+  activeId="details"
+  items={[
+    { id: "overview", title: "Overview" },
+    { id: "details", title: "Details" },
+  ]}
+/>
+```
+
+## When to use
+
+- Component reference pages with installation, usage, and API sections.
+- Long guides whose sections need direct links.
+- Articles with nested headings and a reading position indicator.
+
+## When not to use
+
+- Page hierarchy: use Breadcrumb.
+- Navigation between different pages: use Sidebar or Navigation Menu.
+- Switching panels that hide other content: use Tabs.
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `readonly TocEntry[]` | required | Entries in document order; empty arrays render nothing. |
+| `label` | `string` | `"On this page"` | Visible title and accessible navigation label. |
+| `activeId` | `string` | automatic | Controlled current heading id; disables automatic tracking. |
+| `scrollOffset` | `number` | `96` | Pixels below the viewport top for automatic tracking. |
+| `className` | `string` | – | Merged last. |
+| native nav props | `ComponentProps<"nav">` | – | Includes ref, style, aria attributes, and event handlers. |
+
+`TocEntry` has `id: string`, `title: string`, and optional `depth: 2 | 3` (default `2`).
+Slots are `toc`, `toc-title`, `toc-track`, `toc-rail`, `toc-indicator`, `toc-list`, `toc-item`, and `toc-link`.
+
+## Motion contract
+
+One persistent indicator follows the active entry. Its top and bottom edges use the shared physics
+spring, then render as translation and vertical scale on a one-pixel base. Wrapped labels determine
+the destination's length. Edges stay inside the rail, and interrupted movement preserves velocity.
+Text and `aria-current` follow the current section immediately. Activating a link smoothly scrolls
+the actual scrolling host to its heading in full mode. The destination respects the heading's scroll
+margin and the host's scroll padding; movement stays within the host's scroll bounds.
+
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| Active section or label size changes | Indicator translateY / scaleY | `layout.shared` / `spring.morph` | Yes; the existing indicator follows the latest target. |
+| Section link activation | Native scroll offset | `scroll.navigate` / `duration.page` / `ease.inOut` | Yes; another link retargets from the current position. |
+| Initial measurement / restored selection | Instant placement, no entrance | — | — |
+| reduced | Instant indicator placement and section navigation | — | Stops springs; completes an active navigation before paint. |
+| none | Instant placement and navigation, no animation clock | — | Stops springs; completes an active navigation before paint. |
+
+Zero provider timeScale also places the indicator immediately. Restoring full motion keeps the
+settled position until the next section or size change. A ResizeObserver supplies geometry; no
+layout is read during render. Navigation uses one token-backed tween, with no separate CSS/native
+smooth-scroll clock. Wheel, touch, pointer input, scrolling keys, resizing, history traversal and
+external hash changes cancel it at the current position. Positive clock changes retime the current
+trip; reduced/none or zero clock complete it immediately. No interrupted trip restarts later.
+The site's mobile disclosure stays instant. Initial hashes, reload, history traversal and no-JS
+links keep native behavior; only an explicit unmodified section link activation starts the recipe.
+
+## Accessibility
+
+- A labelled `nav` contains an ordered list of native links.
+- Tab and Shift+Tab move between links; Enter activates the same navigation as a primary click.
+- The active link has `aria-current="location"` and a stronger text weight. The decorative indicator is hidden from assistive technology.
+- Heading targets need matching, unique ids. Offset their scroll margin to account for sticky headers.
+- Native anchors remain usable before hydration and without JavaScript. Automatic tracking requires JavaScript.
+- Navigation preserves unrelated URL parameters and history state, pushes the new fragment and notifies hashchange listeners. Back/forward use native scroll restoration.
+- Completion focuses the heading without scrolling a second time. A temporary `tabindex="-1"` is removed on blur/unmount; caller-supplied tabindex is preserved. Interrupted navigation never steals focus.
+- Modified/new-tab clicks and caller-cancelled clicks retain native behavior.
+
+## Keyboard interactions
+
+| Keys | Action |
+| --- | --- |
+| Tab / Shift+Tab | Move between native section links. |
+| Enter | Scroll to the focused link's heading, update the fragment and focus the heading on completion. |
+| Scrolling keys / Tab / Escape | Interrupt an ongoing smooth navigation. |
+
+The indicator never receives focus or replaces a link when its destination changes.
+
+## Responsiveness and performance
+
+The component fills its parent and wraps long labels. The caller owns placement, sticky position,
+height limits, and overflow. For documentation layouts, place it in a sticky right column with an
+independently scrollable list. Smaller viewports can use a native disclosure near the title; a
+floating disclosure list avoids moving the article when opened.
+
+Automatic tracking uses passive window scroll events,
+resize events, and a ResizeObserver, with cleanup on unmount. It reads heading positions in those callbacks,
+updates state only when the active id changes, and selects the final heading at the page bottom.
+It tracks headings present when mounted; remount after dynamically replacing the document or pass new items.
+The server renders the first entry as current; hydration corrects it for a deep link or restored scroll position.
+Before measurement, a static border marks the current link, including without JavaScript. The first
+measured position is immediate. The indicator remains mounted through selection and mode changes.
+The indicator's two edge values animate; the list's layout does not interpolate. Section navigation
+measures its destination once on activation, then writes native offsets without per-frame layout reads.
+A ResizeObserver tracks
+wrapped labels, font changes, and a mobile disclosure becoming visible. Motion and the shared
+Cadence provider/runtime are installed dependencies; a provider is optional and system reduced
+motion is respected standalone. The T3 source budget is 12 KB gzip; dependency and page budgets
+are measured separately.
+
+## Notes for AI
+
+- Build the list from the same heading tree that renders the article so links and ids cannot drift.
+- Use this Cadence original for document navigation; it has no pinned shadcn counterpart.
+- Do not use a component instance to generate heading ids or to own application routing.

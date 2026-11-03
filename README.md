@@ -47,6 +47,7 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `input` — single-line field           | T0   | none                                                                 |
 | `textarea` — multi-line field         | T0   | none                                                                 |
 | `card` — grouped surface              | T0   | none                                                                 |
+| `toc` — document section navigation   | T3   | `layout.shared`, `scroll.navigate`                                   |
 | `aspect-ratio` — reserved media box   | T0   | none                                                                 |
 | `avatar` — image with fallback        | T0   | none                                                                 |
 | `skeleton` — loading placeholder      | T4   | `data.transition`                                                    |

@@ -42,7 +42,7 @@ const without = (source: string, title: string) =>
   source.replace(new RegExp(`## ${title}\\n[\\s\\S]*?(?=\\n## |$)`), "");
 
 describe("real registry template entry", () => {
-  it("accepts all 58 real tier/block bodies", async () => {
+  it("accepts all 59 real tier/block bodies", async () => {
     expect(await checkDocTemplates(root, registry)).toEqual([]);
     expect(entry(badgePath, badge).status).toBe(0);
   });

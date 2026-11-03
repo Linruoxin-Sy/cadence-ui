@@ -12,9 +12,12 @@ semantics, accessibility, controlled state or source ownership.
 
 ## 2. Scope
 
-The formal catalogue is 58 components: 56 registry:ui and two registry:block compositions
+The formal catalogue is 59 components: 57 registry:ui and two registry:block compositions
 (Data Table and Date Picker). registry.json is the item inventory; upstream/manifest.json pins the
 comparison surface. This scope does not imply every future upstream or AI component is scheduled.
+Toc is a Cadence original, explicitly requested for document navigation. Its origin metadata is
+`meta.upstream: { registry: "cadence", style: "native", version: <since>, reason: <why original> }`.
+It has no fabricated upstream surface; the other 58 items retain their pinned shadcn parity requirements.
 
 ## 3. Compatibility and ownership
 
@@ -53,14 +56,14 @@ independent of runtime mode. Recipes and three-mode behaviour follow animation-s
 
 ### 6.3 Motion tiers
 
-| Tier | Definition                  | Examples                                                             | Allowed recipes                                                   |
-| ---- | --------------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge           | none (colour/focus transitions only)                              |
-| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp                  | `feedback.press`, `state.morph`                                   |
-| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast                        | `enter.pop`, `exit.fade`, `popup.anchored`                        |
-| T3   | Continuity / shared element | tabs, toggle-group, accordion, collapsible, sidebar, navigation-menu | `layout.shared`, `layout.move`, `list.stagger`, `geometry.resize` |
-| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar               | `number.roll`, `scroll.progress`, `data.transition`               |
-| T5   | AI / composite              | attachment, bubble (later message, trace)                            | reuse T1–T4                                                       |
+| Tier | Definition                  | Examples                                                                  | Allowed recipes                                                                      |
+| ---- | --------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge                | none (colour/focus transitions only)                                                 |
+| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp                       | `feedback.press`, `state.morph`                                                      |
+| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast                             | `enter.pop`, `exit.fade`, `popup.anchored`                                           |
+| T3   | Continuity / shared element | tabs, toggle-group, accordion, collapsible, sidebar, navigation-menu, toc | `layout.shared`, `layout.move`, `list.stagger`, `geometry.resize`, `scroll.navigate` |
+| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar                    | `number.roll`, `scroll.progress`, `data.transition`                                  |
+| T5   | AI / composite              | attachment, bubble (later message, trace)                                 | reuse T1–T4                                                                          |
 
 Disclosure height uses the measured, clamped `geometry.resize` recipe (including its documented
 Base UI CSS form); there is no separate `disclosure.height` recipe. `data.transition` is also

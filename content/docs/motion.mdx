@@ -57,6 +57,7 @@ writing durations inline.
 | `list.stagger` | staggered lists | 0.22s + stagger |
 | `gesture.drag` | carousel, sheet | snappy spring |
 | `scroll.progress` | scroll bar | smooth spring |
+| `scroll.navigate` | Toc section links | 0.45s ease-in-out; immediate under reduced/none |
 | `scroll.story` | scroll narratives (optional GSAP) | 0.32s |
 | `text.reveal` | per-word reveals | 0.32s |
 | `text.split` | per-character reveals (optional GSAP) | 0.32s |
@@ -108,6 +109,7 @@ Five rules for new components:
 1. Import presets from `../lib/motion`; never hard-code a duration.
 2. Animate transform, opacity, or filter only. Height is allowed for disclosures, and measured
    width/height only through `geometry.resize` (clamped to the closed size, instant under reduced).
+   Explicit section navigation may animate native scroll offsets through `scroll.navigate`.
 3. Give every animation a reduced branch (opacity only, or none).
 4. Use `data-slot` on each part so consumers can target it with CSS.
 5. Add a Motion contract table to the component's docs.

@@ -83,6 +83,7 @@ export type Recipe =
   | "list.stagger"
   | "gesture.drag"
   | "scroll.progress"
+  | "scroll.navigate"
   | "scroll.story"
   | "text.reveal"
   | "text.split"
@@ -107,7 +108,7 @@ export interface MotionOptions {
 }
 
 type RecipeSpec =
-  | { kind: "tween"; duration: number; ease: readonly number[] }
+  | { kind: "tween"; duration: number; ease: readonly number[]; reduced?: "jump" }
   | {
       kind: "spring";
       spring: keyof typeof spring;
@@ -138,6 +139,7 @@ const recipes: Record<Recipe, RecipeSpec> = {
   "list.stagger": { kind: "tween", duration: duration.base, ease: ease.out },
   "gesture.drag": { kind: "spring", spring: "snappy" },
   "scroll.progress": { kind: "spring", spring: "smooth" },
+  "scroll.navigate": { kind: "tween", duration: duration.page, ease: ease.inOut, reduced: "jump" },
   "scroll.story": { kind: "tween", duration: duration.slow, ease: ease.out },
   "text.reveal": { kind: "tween", duration: duration.slow, ease: ease.out },
   "text.split": { kind: "tween", duration: duration.slow, ease: ease.out },
@@ -176,6 +178,7 @@ export function transitionFor(recipe: Recipe, mode: CadenceMode, options: Motion
     return { ...token, visualDuration, delay };
   }
 
+  if (mode === "reduced" && spec.reduced === "jump") return { duration: 0, delay: 0 };
   const scaleFactor = mode === "reduced" ? reducedDurationScale : 1;
   return {
     duration: (options.duration ?? spec.duration * scaleFactor) * timeScale,
