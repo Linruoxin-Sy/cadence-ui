@@ -14,6 +14,8 @@
 npx shadcn@latest add @cadence/hover-card
 ```
 
+The action, placement and scope examples compose `@cadence/button`. Install that item when copying those examples.
+
 ## Usage
 
 ```tsx
@@ -271,7 +273,9 @@ the anchored-surface duration the three share.
 | --- | --- |
 | Tab / Shift+Tab | Focusing the trigger opens the card. In the action example, ArrowDown moves to Follow; Tab otherwise follows the page order. |
 | Escape | Closes the card and returns focus to the trigger. |
-| Enter / Space | Follows the trigger link, or activates a control inside the card. |
+| Enter | Follows the trigger link, or activates the focused button. |
+| Space | Activates a focused button; native links keep their normal Space scrolling behavior. |
+| ArrowDown | In the action example, moves from the open trigger to Follow through the caller-owned ref. |
 
 Keyboard focus opens the card for the same reason it does in a tooltip: without it, the content would
 exist only for pointer users.

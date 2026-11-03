@@ -27,6 +27,17 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "../../registry/cadence/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "../../registry/cadence/dropdown-menu";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "../../registry/cadence/hover-card";
 import { Input } from "../../registry/cadence/input";
 import type { CadenceMode } from "../../registry/cadence/lib/motion";
@@ -146,6 +157,25 @@ function PopupMotionFixture({
                 </DrawerFooter>
               </DrawerContent>
             </Drawer>
+          )}
+          {component === "dropdown-menu" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger render={<Button />}>View</DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuCheckboxItem defaultChecked>Comments</DropdownMenuCheckboxItem>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>Move to</DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem>Backlog</DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  <DropdownMenuItem>Done</DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           {component === "hover-card" && (
             <HoverCard>

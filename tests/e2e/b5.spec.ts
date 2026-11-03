@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const ids = ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command", "toast"] as const;
 type Id = (typeof ids)[number];
@@ -22,6 +23,13 @@ async function close(page: Page, id: Id) {
   else await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
 }
 async function mode(page: Page, value: string) {
+  if (new URL(page.url()).pathname === "/__fixtures/popup-motion") {
+    await page.getByLabel("Fixture motion", { exact: true }).evaluate((node, value) => {
+      (node as HTMLSelectElement).value = value;
+      node.dispatchEvent(new Event("change", { bubbles: true }));
+    }, value);
+    return;
+  }
   if (new URL(page.url()).pathname === "/components/select") {
     await page
       .getByRole("group", { name: "Motion mode" })
@@ -115,6 +123,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await close(page, id);
           const exit = await samples(page, 40);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
+          if (id === "dropdown-menu") await openPopupMotionFixture(page, id, requested);
           await mode(page, "full");
           await start(page, id);
           await open(page, id);
@@ -167,7 +176,8 @@ test.describe("B5 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      await page.goto(`/components/${id}?motion=none&speed=0.25`);
+      if (id === "dropdown-menu") await openPopupMotionFixture(page, id, "none", 4);
+      else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
       await open(page, id);
@@ -211,6 +221,17 @@ test.describe("B5 active transition interruption", () => {
         ),
       ).toBe(true);
       expect(await popup.evaluate((n) => n === (window as unknown as { saved: Element }).saved)).toBe(true);
+      if (id === "dropdown-menu") {
+        await mode(page, "full");
+        await page.keyboard.press("Escape");
+        await expect(popup).toHaveAttribute("data-ending-style", "");
+        await page
+          .locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`)
+          .evaluate((node) => (node as HTMLElement).click());
+        await expect(popup).not.toHaveAttribute("data-ending-style", "");
+        expect(await popup.evaluate((node) => node === (window as unknown as { saved: Element }).saved)).toBe(true);
+        await mode(page, "none");
+      }
       await close(page, id);
     });
 });
@@ -368,6 +389,8 @@ for (const preference of ["no-preference", "reduce"] as const)
         else expect(frames.every((f) => f.scale === 1)).toBe(true);
         if (expected !== "none") expect(frames.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
         else expect(frames.every((f) => f.opacity === 0 || f.opacity === 1)).toBe(true);
+        await openPopupMotionFixture(page, "dropdown-menu", requested, 4);
+        await open(page, "dropdown-menu");
         await mode(page, "full");
         await item.click();
         await page.waitForTimeout(30);
@@ -473,7 +496,8 @@ test.describe("B5 native reversal", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command"] as const)
     test(`${id} reopens during exit on the same surface`, async ({ page }) => {
-      await page.goto(`/components/${id}?motion=full&speed=0.25`);
+      if (id === "dropdown-menu") await openPopupMotionFixture(page, id, "full", 4);
+      else await page.goto(`/components/${id}?motion=full&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await open(page, id);
       const popup = page.locator(`[data-slot="${slot(id)}"]`);

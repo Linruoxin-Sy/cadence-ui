@@ -17,108 +17,592 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 npx shadcn@latest add @cadence/dropdown-menu
 ```
 
+The examples compose `@cadence/button`; install that item alongside the menu when copying them.
+
 ## Usage
 
 ```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/cadence/dropdown-menu";
-import { Button } from "@/components/cadence/button";
 
 export function RowActions() {
+  const [result, setResult] = useState("No action yet");
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>Actions</DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        <DropdownMenuItem onClick={() => rename()}>Rename</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => duplicate()}>Duplicate</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex flex-wrap items-center gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" />}>Actions</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => setResult("Renamed locally")}>Rename</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setResult("Duplicated locally")}>Duplicate</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Move to</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuGroup>
+                  {["Backlog", "In review", "Done"].map((value) => (
+                    <DropdownMenuItem key={value} onClick={() => setResult(`Moved to ${value}`)}>
+                      {value}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem variant="destructive" onClick={() => setResult("Deleted locally")}>
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p role="status" className="text-sm text-muted-foreground">
+        {result}
+      </p>
+    </div>
   );
 }
 ```
 
 ## Items, shortcuts, and destructive actions
 
-An item is a `menuitem`: it runs, then the menu closes. `DropdownMenuShortcut` is a
-right-aligned hint only — the component binds no keys, so register the shortcut yourself.
-`variant="destructive"` colours the label and its icons; `inset` indents an item to line up
-with one that has a check mark.
+Default and destructive items are directly visible in one menu. inset aligns text with state indicators. Shortcut text is a visual hint, not a registered binding. closeOnClick=false keeps the local Keep open action available; other commands record a local result and close. No resource is deleted.
+
+<ComponentExample name="items" />
 
 ```tsx
-<DropdownMenuItem onClick={() => edit()}>
-  Edit
-  <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-</DropdownMenuItem>
-<DropdownMenuSeparator />
-<DropdownMenuItem variant="destructive" onClick={() => remove()}>
-  Delete
-  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-</DropdownMenuItem>
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function MenuCommands() {
+  const [result, setResult] = useState("No command yet");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" />}>Commands</DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => setResult("Edit selected")}>
+              Edit<DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem inset closeOnClick={false} onClick={() => setResult("Still open")}>
+              Keep open
+            </DropdownMenuItem>
+            <DropdownMenuItem variant="destructive" onClick={() => setResult("Delete selected locally")}>
+              Delete<DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p role="status" className="text-sm">
+        {result}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Checkbox and radio items
 
-Both keep the menu open, so a user can set several options in one visit. The mark is the
-item's state, not a second control: `aria-checked` carries it for assistive technology, and
-the mark scales in as confirmation.
+The caller owns Comments and Density; Description is an independent uncontrolled item. Choosing these keeps the menu open so several settings can change in one visit. Their indicators expose aria-checked and inherit the header mode. The status reads back local values only.
+
+<ComponentExample name="selection" />
 
 ```tsx
-<DropdownMenuCheckboxItem defaultChecked onCheckedChange={setDescription}>
-  Description
-</DropdownMenuCheckboxItem>
+"use client";
 
-<DropdownMenuRadioGroup value={density} onValueChange={setDensity}>
-  <DropdownMenuRadioItem value="compact">Compact</DropdownMenuRadioItem>
-  <DropdownMenuRadioItem value="comfortable">Comfortable</DropdownMenuRadioItem>
-</DropdownMenuRadioGroup>
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function ViewMenu() {
+  const [comments, setComments] = useState(false);
+  const [density, setDensity] = useState("comfortable");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" />}>View</DropdownMenuTrigger>
+        <DropdownMenuContent className="w-52">
+          <DropdownMenuGroup>
+            <DropdownMenuLabel inset>Show</DropdownMenuLabel>
+            <DropdownMenuCheckboxItem defaultChecked inset>
+              Description
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem checked={comments} onCheckedChange={setComments}>
+              Comments
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup aria-label="Density" value={density} onValueChange={setDensity}>
+            <DropdownMenuLabel>Density</DropdownMenuLabel>
+            <DropdownMenuRadioItem value="compact" inset>
+              Compact
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="comfortable">Comfortable</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p role="status" className="text-sm">
+        Comments: {comments ? "shown" : "hidden"}; density: {density}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Submenus
 
-A submenu is a menu anchored to its trigger item. It opens on hover after the pointer rests,
-on `ArrowRight`, and on click; `DropdownMenuSubContent` takes the same placement props as the
-top-level panel, with `side="right"` as the default.
+The submenu has its own portal and shares the surface motion contract. ArrowRight opens it and ArrowLeft returns to the parent trigger; hover also opens it. The parent also offers a direct Keep here command. The inset submenu records a different local destination when an item runs.
+
+<ComponentExample name="submenus" />
 
 ```tsx
-<DropdownMenuSub>
-  <DropdownMenuSubTrigger>Move to</DropdownMenuSubTrigger>
-  <DropdownMenuSubContent>
-    <DropdownMenuItem onClick={() => move("backlog")}>Backlog</DropdownMenuItem>
-    <DropdownMenuItem onClick={() => move("review")}>In review</DropdownMenuItem>
-  </DropdownMenuSubContent>
-</DropdownMenuSub>
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function MoveMenu() {
+  const [destination, setDestination] = useState("Not moved");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" />}>Move item</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => setDestination("Current group")}>Keep here</DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger inset>Move to</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuGroup>
+                  {["Backlog", "Review"].map((value) => (
+                    <DropdownMenuItem key={value} onClick={() => setDestination(value)}>
+                      {value}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p role="status" className="text-sm">
+        {destination}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Grouping
 
-`DropdownMenuGroup` binds a `DropdownMenuLabel` to the items it holds: the group is labelled
-by it, so a screen reader announces "Pull request, group". A label outside a group is a
-plain caption above the items, which is what most toolbars want.
+A label inside DropdownMenuGroup gives that group its accessible name. A label outside a group is only a visible caption, as Density is in the preceding radio example. Use separators between distinct command groups.
+
+<ComponentExample name="grouping" />
 
 ```tsx
-<DropdownMenuGroup>
-  <DropdownMenuLabel>Pull request</DropdownMenuLabel>
-  <DropdownMenuItem onClick={() => edit()}>Edit</DropdownMenuItem>
-  <DropdownMenuItem onClick={() => duplicate()}>Duplicate</DropdownMenuItem>
-</DropdownMenuGroup>
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function GroupedMenu() {
+  const [result, setResult] = useState("No grouped action yet");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" />}>Grouped actions</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Project commands</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel inset>Pull request</DropdownMenuLabel>
+            <DropdownMenuItem inset onClick={() => setResult("Review selected locally")}>
+              Review
+            </DropdownMenuItem>
+            <DropdownMenuItem inset onClick={() => setResult("Summary selected locally")}>
+              Copy summary
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>History</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setResult("Activity selected locally")}>View activity</DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p role="status" className="text-sm">
+        {result}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Controlled open
 
-`open` and `onOpenChange` make the menu controlled, which is how a menu is opened from
-outside its trigger — a keyboard shortcut, a row's context, a tour step.
+The external action opens the same controlled menu. A unique triggerId preserves the actual anchor. The caller owns the open flag and records local actions; native Escape and outside dismissal still work.
+
+<ComponentExample name="controlled" />
 
 ```tsx
-const [open, setOpen] = useState(false);
+"use client";
 
-<DropdownMenu open={open} onOpenChange={setOpen}>
-  <DropdownMenuTrigger render={<Button variant="outline" />}>Actions</DropdownMenuTrigger>
-  <DropdownMenuContent>…</DropdownMenuContent>
-</DropdownMenu>;
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function ControlledMenu() {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [result, setResult] = useState("No action");
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        Open externally
+      </Button>
+      <DropdownMenu open={open} onOpenChange={setOpen} triggerId={id}>
+        <DropdownMenuTrigger id={id} render={<Button variant="outline" />}>
+          Controlled actions
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => setResult("Copied locally")}>Copy</DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p role="status" className="text-sm">
+        {result}
+      </p>
+    </div>
+  );
+}
+```
+
+## Disabled controls
+
+The disabled trigger cannot open a menu. In the second menu, disabled commands, checkbox, radio and submenu triggers stay visible but cannot run. Base UI keeps disabled items keyboard-focusable so their unavailable state can be discovered. The enabled Done item remains available.
+
+<ComponentExample name="disabled" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function DisabledMenus() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      <DropdownMenu>
+        <DropdownMenuTrigger disabled render={<Button variant="outline" />}>
+          Disabled trigger
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuItem>Unavailable</DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu>
+        <DropdownMenuTrigger render={<Button variant="outline" />}>Unavailable commands</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuGroup>
+            <DropdownMenuItem disabled>Delete locked item</DropdownMenuItem>
+            <DropdownMenuCheckboxItem disabled defaultChecked>
+              Locked visibility
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuGroup>
+          <DropdownMenuRadioGroup defaultValue="locked">
+            <DropdownMenuRadioItem value="locked" disabled>
+              Locked density
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger disabled>Unavailable destination</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Never opened</DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+            <DropdownMenuItem>Done</DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
+```
+
+## Placement
+
+Each menu prefers a fixed physical side. Collision detection may flip or shift it inside the viewport. The default is bottom with a 4px gap.
+
+<ComponentExample name="sides" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function MenuSides() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["top", "right", "bottom", "left"] as const).map((value) => (
+        <DropdownMenu key={value}>
+          <DropdownMenuTrigger render={<Button variant="outline" />}>{value}</DropdownMenuTrigger>
+          <DropdownMenuContent side={value} className="w-52">
+            <DropdownMenuGroup>
+              <DropdownMenuItem>Close menu</DropdownMenuItem>
+              <DropdownMenuItem>Done</DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ))}
+    </div>
+  );
+}
+```
+
+## Alignment
+
+Compare the three alignments independently of the placement side. Alignment is relative to the trigger; default align is start and alignOffset is zero.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function MenuAlignments() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {(["start", "center", "end"] as const).map((value) => (
+        <DropdownMenu key={value}>
+          <DropdownMenuTrigger render={<Button variant="outline" />}>{value}</DropdownMenuTrigger>
+          <DropdownMenuContent align={value} className="w-52">
+            <DropdownMenuGroup>
+              <DropdownMenuItem>Close menu</DropdownMenuItem>
+              <DropdownMenuItem>Done</DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ))}
+    </div>
+  );
+}
+```
+
+## Logical placement
+
+Logical placement follows the direction provider: RTL inline-start prefers right and inline-end prefers left. Physical sides remain physical. The width cap follows Base UI's available-width variable so the panel fits the chosen side on a narrow viewport.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function LogicalMenus() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl">
+        <div className="flex flex-wrap gap-3">
+          {(["inline-start", "inline-end"] as const).map((value) => (
+            <DropdownMenu key={value}>
+              <DropdownMenuTrigger render={<Button variant="outline" />}>{value}</DropdownMenuTrigger>
+              <DropdownMenuContent side={value} className="w-52 max-w-(--available-width)">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Close menu</DropdownMenuItem>
+                  <DropdownMenuItem>Done</DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ))}
+        </div>
+      </div>
+    </DirectionProvider>
+  );
+}
+```
+
+## Non-modal menu
+
+Compare modal true and false. Both keep the usual command keyboard path and dismiss on Escape; false permits outside pointer interaction while the menu is open. Use a popover when the panel contains a task form.
+
+<ComponentExample name="modality" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function MenuModality() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      {[true, false].map((modal) => (
+        <DropdownMenu key={String(modal)} modal={modal}>
+          <DropdownMenuTrigger render={<Button variant="outline" />}>{String(modal)}</DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <DropdownMenuItem>Copy</DropdownMenuItem>
+              <DropdownMenuItem>Done</DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ))}
+    </div>
+  );
+}
+```
+
+## Explicit motion scopes
+
+Ordinary menus inherit the header. Only this example sets none and restores full in a nested provider; the OS reduced preference still wins. Popup and checkbox indicator both use that local clock.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuTrigger,
+} from "@/components/cadence/dropdown-menu";
+
+export function MenuMotionScopes() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="outline" />}>Open without motion</DropdownMenuTrigger>
+          <DropdownMenuContent data-testid="initial-none">
+            <DropdownMenuGroup>
+              <DropdownMenuCheckboxItem>Comments</DropdownMenuCheckboxItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <CadenceProvider mode="full">
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="outline" />}>Open nested full</DropdownMenuTrigger>
+            <DropdownMenuContent data-testid="nested-full">
+              <DropdownMenuGroup>
+                <DropdownMenuCheckboxItem>Comments</DropdownMenuCheckboxItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -145,7 +629,7 @@ const [open, setOpen] = useState(false);
 | `open`         | `boolean`                  | –       | Controlled open state.                          |
 | `defaultOpen`  | `boolean`                  | `false` | Uncontrolled initial state.                     |
 | `onOpenChange` | `(open: boolean) => void`  | –       | Fires on every open and close, including Escape. |
-| `modal`        | `boolean`                  | `true`  | Traps focus and makes the page inert while open. |
+| `modal`        | `boolean`                  | `true`  | Limits outside pointer interaction and locks desktop scrolling. Tab dismisses the menu. |
 
 ### `DropdownMenuTrigger`
 
@@ -202,8 +686,8 @@ which belongs to `tabs` and `toggle-group`, not to a menu that can be entered at
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
 geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The preview's **Popup motion** selector changes the local mode on the
-same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+first mounted frame. The site header changes the inherited mode on the same component tree; the named
+Explicit motion scopes example demonstrates fixed local overrides. Base UI `className(state)` and `style(state)` callbacks are evaluated
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
 remain owned by the primitive.
 
@@ -230,8 +714,8 @@ remain owned by the primitive.
   group it is a caption: visible to sighted users, not announced as a label.
 - `DropdownMenuShortcut` is text, not a binding. Announce the shortcut in the item's label
   only when it is registered, or the reader is told about a key that does nothing.
-- The menu is modal by default: the page behind it is inert while it is open, so a stray
-  `Tab` cannot reach a control the user cannot see.
+- The default modal mode limits outside pointer interaction and locks desktop scrolling. `Tab`
+  still dismisses the menu and continues the page order; this is not a dialog focus trap.
 
 ## Responsive behavior
 

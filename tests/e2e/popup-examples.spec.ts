@@ -2,9 +2,10 @@ import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { expectMenuAccessibility } from "./menu-accessibility";
 
 const catalog: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
-const ids = ["dialog", "alert-dialog", "popover", "tooltip", "hover-card", "sheet", "drawer"].filter(
+const ids = ["dialog", "alert-dialog", "popover", "tooltip", "hover-card", "sheet", "drawer", "dropdown-menu"].filter(
   (id) => catalog[id],
 );
 const card = (page: Page, id: string, name: string) => page.locator(`[data-component-example="${id}/${name}"]`);
@@ -36,6 +37,7 @@ for (const id of ids) {
           const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
           const openers = (await triggers.count()) ? triggers : specimen.getByRole("button").first();
           for (const opener of await openers.all()) {
+            if (await opener.isDisabled()) continue;
             await opener.scrollIntoViewIfNeeded();
             if (id === "tooltip" || id === "hover-card") await opener.focus();
             else await opener.click();
@@ -59,6 +61,8 @@ for (const id of ids) {
                 reference ?? "",
               ),
             ).toBe(true);
+            const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));
+            expect(new Set(ids).size).toBe(ids.length);
             if (effectiveMode(mode, os) !== "full")
               expect(await surface.evaluate((node) => getComputedStyle(node).scale)).toBe("none");
             if (mode === "none") expect(await surface.evaluate((node) => node.getAnimations().length)).toBe(0);
@@ -150,35 +154,69 @@ for (const id of ids) {
       await dismiss(page, id);
     });
 
-  for (const theme of ["light", "dark"])
-    for (const width of [1280, 390])
-      test(`${id} body popup visual and accessible ${theme}/${width}`, async ({ page }) => {
-        await page.setViewportSize({ width, height: 900 });
-        await page.addInitScript((theme) => localStorage.setItem("cadence-theme", theme), theme);
-        await page.goto(`/components/${id}?motion=none`);
-        await page.waitForLoadState("networkidle");
-        for (const name of (catalog[id] ?? []).filter((name) => name !== "without-motion")) {
-          const specimen = card(page, id, name);
-          await specimen.scrollIntoViewIfNeeded();
-          await specimen.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}.png` });
-          const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
-          const trigger = (await triggers.count()) ? triggers.first() : specimen.getByRole("button").first();
-          if (id === "tooltip" || id === "hover-card") await trigger.focus();
-          else await trigger.click();
-          const surface = popup(page, id);
-          await expect(surface).toBeVisible();
-          expect(
-            (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
-          ).toEqual([]);
-          const box = await surface.boundingBox();
-          if (!box) throw new Error("missing popup bounds");
-          expect(box.x).toBeGreaterThanOrEqual(0);
-          expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
-          await page.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}-open.png` });
-          await dismiss(page, id);
-        }
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      });
+  const visualNames = (catalog[id] ?? []).filter((name) => name !== "without-motion");
+  const visualCases = id === "dropdown-menu" ? visualNames.map((name) => [name]) : [visualNames];
+  for (const names of visualCases)
+    for (const theme of ["light", "dark"])
+      for (const width of [1280, 390])
+        test(`${id} body popup visual and accessible ${theme}/${width}${id === "dropdown-menu" ? ` ${names[0]}` : ""}`, async ({
+          page,
+        }) => {
+          await page.setViewportSize({ width, height: 900 });
+          await page.addInitScript((theme) => localStorage.setItem("cadence-theme", theme), theme);
+          await page.goto(`/components/${id}?motion=none`);
+          await page.waitForLoadState("networkidle");
+          for (const name of names) {
+            const specimen = card(page, id, name);
+            await specimen.scrollIntoViewIfNeeded();
+            await specimen.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}.png` });
+            const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
+            const trigger = (await triggers.count())
+              ? specimen.locator(`[data-slot="${id}-trigger"]:not([disabled])`).first()
+              : specimen.getByRole("button").first();
+            if (id === "tooltip" || id === "hover-card") await trigger.focus();
+            else await trigger.click();
+            const surface = popup(page, id);
+            await expect(surface).toBeVisible();
+            const reopenMenu = async (child = false) => {
+              if (await page.locator('[data-slot="dropdown-menu-sub-content"]').count())
+                await page.keyboard.press("Escape");
+              if (await surface.count()) {
+                await page.keyboard.press("Escape");
+                await expect(surface).toHaveCount(0);
+              }
+              await trigger.click();
+              await expect(surface).toBeVisible();
+              if (child) {
+                await surface.getByRole("menuitem", { name: "Move to", exact: true }).focus();
+                await page.keyboard.press("ArrowRight");
+                await expect(page.locator('[data-slot="dropdown-menu-sub-content"]')).toBeVisible();
+              }
+            };
+            if (id === "dropdown-menu") await expectMenuAccessibility(page, () => reopenMenu());
+            else
+              expect(
+                (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
+              ).toEqual([]);
+            const box = await surface.boundingBox();
+            if (!box) throw new Error("missing popup bounds");
+            expect(box.x).toBeGreaterThanOrEqual(0);
+            expect(box.x + box.width).toBeLessThanOrEqual(width + 1);
+            await page.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}-open.png` });
+            if (id === "dropdown-menu" && name === "submenus") {
+              await surface.getByRole("menuitem", { name: "Move to", exact: true }).focus();
+              await page.keyboard.press("ArrowRight");
+              await expect(page.locator('[data-slot="dropdown-menu-sub-content"]')).toBeVisible();
+              await expectMenuAccessibility(page, () => reopenMenu(true));
+              await page.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}-submenu-open.png` });
+              await page.keyboard.press("ArrowLeft");
+              await expect(surface.getByRole("menuitem", { name: "Move to", exact: true })).toBeFocused();
+            }
+
+            await dismiss(page, id);
+          }
+          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        });
 }
 
 if (catalog.dialog)

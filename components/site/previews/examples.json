@@ -47,5 +47,18 @@
   "tooltip": ["sides", "alignments", "logical-sides", "delay", "disabled", "controlled", "without-motion"],
   "hover-card": ["action", "sides", "alignments", "logical-sides", "delay", "controlled", "without-motion"],
   "sheet": ["edges", "footer-close", "long-list", "controlled", "modality", "without-motion"],
-  "drawer": ["handle", "directions", "snap-points", "modality", "controlled", "without-motion"]
+  "drawer": ["handle", "directions", "snap-points", "modality", "controlled", "without-motion"],
+  "dropdown-menu": [
+    "items",
+    "selection",
+    "submenus",
+    "grouping",
+    "controlled",
+    "disabled",
+    "sides",
+    "alignments",
+    "logical-sides",
+    "modality",
+    "without-motion"
+  ]
 }
