@@ -131,5 +131,16 @@
     "controlled-tabs",
     "updating-text",
     "without-motion"
+  ],
+  "accordion": [
+    "controlled",
+    "multiple",
+    "disabled",
+    "persistent",
+    "searchable",
+    "changing-content",
+    "custom-render",
+    "orientation",
+    "without-motion"
   ]
 }

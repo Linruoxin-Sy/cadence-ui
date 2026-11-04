@@ -11,13 +11,15 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await openComponent(page, "accordion", requested, "accordion-content", mode);
         const preview = page.locator('[data-preview="accordion"]');
         const first = preview.getByRole("button", { name: "How do I install a component?" });
-        const second = preview.getByRole("button", { name: "Can I reduce the motion?" });
+        const changing = page.locator('[data-component-example="accordion/changing-content"]');
+        const second = changing.getByRole("button", { name: "Can I reduce the motion?" });
+        await second.press("Enter");
         await second.focus();
         await page.keyboard.press("Enter");
-        const panel = preview.getByRole("region", { name: "Can I reduce the motion?" });
+        const panel = changing.getByRole("region", { name: "Can I reduce the motion?" });
         await expect(panel).toHaveAttribute("data-motion", mode);
         await expect(second).toBeFocused();
-        await expect(first).toHaveAttribute("aria-expanded", "false");
+        await expect(first).toHaveAttribute("aria-expanded", "true");
         await expect
           .poll(() =>
             panel.evaluate((el) =>
@@ -30,7 +32,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         );
         expect(await panel.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
         const before = (await panel.boundingBox())?.height ?? 0;
-        await preview.getByRole("button", { name: "Toggle details" }).click();
+        await changing.getByRole("button", { name: "Toggle details" }).click();
         await expect.poll(async () => (await panel.boundingBox())?.height ?? 0).toBeGreaterThan(before + 10);
         await expect
           .poll(() =>
@@ -67,7 +69,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(panel).toHaveCount(0);
         await first.focus();
         await page.keyboard.press("Tab");
-        await expect(second).toBeFocused();
+        await expect(preview.getByRole("button", { name: "Can I reduce the motion?" })).toBeFocused();
+        await second.focus();
         await page.keyboard.press(" ");
         await expect(second).toHaveAttribute("aria-expanded", "true");
       });

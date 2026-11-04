@@ -36,46 +36,216 @@ export function Example() {
 
 ## Controlled
 
-Base UI uses arrays for both single and multiple selection. Keep the value in caller state.
+Base UI uses arrays for both single and multiple selection. The caller owns the value; these external actions open or close the account section without resetting other examples.
+
+<ComponentExample name="controlled" />
 
 ```tsx
-const [value, setValue] = useState<string[]>([]);
-<Accordion value={value} onValueChange={setValue}>
-  <AccordionItem value="account">
-    <AccordionTrigger>Account settings</AccordionTrigger>
-    <AccordionContent>Your account details.</AccordionContent>
-  </AccordionItem>
-</Accordion>;
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function ControlledExample() {
+  const [value, setValue] = useState<string[]>([]);
+  return <div className="grid gap-4">
+    <div className="flex flex-wrap gap-2">
+      <Button variant="outline" onClick={() => setValue(["account"])}>Open account from outside</Button>
+      <Button variant="outline" onClick={() => setValue([])}>Close from outside</Button>
+    </div>
+    <Accordion value={value} onValueChange={setValue}>
+      <AccordionItem value="account">
+        <AccordionTrigger>Account settings</AccordionTrigger>
+        <AccordionContent>Your account details stay with the caller.</AccordionContent>
+      </AccordionItem>
+    </Accordion>
+    <p role="status">Open sections: {value.join(", ") || "none"}</p>
+  </div>;
+}
 ```
 
 ## Multiple sections
 
-```tsx
-<Accordion multiple defaultValue={["one", "two"]}>
-  <AccordionItem value="one">
-    <AccordionTrigger>Delivery</AccordionTrigger>
-    <AccordionContent>Track your delivery.</AccordionContent>
-  </AccordionItem>
-  <AccordionItem value="two">
-    <AccordionTrigger>Returns</AccordionTrigger>
-    <AccordionContent>Start a return.</AccordionContent>
-  </AccordionItem>
-</Accordion>
-```
+Set multiple to keep several answers open. Both start open here; closing Delivery leaves Returns unchanged.
 
-## Disabled and persistent content
+<ComponentExample name="multiple" />
 
 ```tsx
-<Accordion keepMounted>
-  <AccordionItem value="locked" disabled>
-    <AccordionTrigger>Unavailable section</AccordionTrigger>
-    <AccordionContent>This content remains mounted while closed.</AccordionContent>
-  </AccordionItem>
-</Accordion>
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function MultipleExample() {
+  return <Accordion multiple defaultValue={["delivery", "returns"]}>
+    <AccordionItem value="delivery"><AccordionTrigger>Delivery</AccordionTrigger><AccordionContent>Track your delivery from your order history.</AccordionContent></AccordionItem>
+    <AccordionItem value="returns"><AccordionTrigger>Returns</AccordionTrigger><AccordionContent>Start a return within thirty days.</AccordionContent></AccordionItem>
+  </Accordion>;
+}
 ```
 
-`keepMounted`, `hiddenUntilFound`, `render`, orientation, refs, and Base UI event details pass through.
-A custom panel render must preserve the supplied children and props so measurement and lifecycle work.
+## Disabled
+
+An item can be unavailable while its neighbours remain usable. Root disabled applies to every trigger. Disabled triggers cannot activate and are skipped by Tab; initially open information can still be read.
+
+<ComponentExample name="disabled" />
+
+```tsx
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function DisabledExample() {
+  return <div className="grid gap-4">
+    <Accordion defaultValue={["available"]}>
+      <AccordionItem value="available"><AccordionTrigger>Available settings</AccordionTrigger><AccordionContent>You can edit these settings.</AccordionContent></AccordionItem>
+      <AccordionItem value="locked" disabled><AccordionTrigger>Unavailable section</AccordionTrigger><AccordionContent>Not available yet.</AccordionContent></AccordionItem>
+      <AccordionItem value="help"><AccordionTrigger>Settings help</AccordionTrigger><AccordionContent>Contact the workspace owner.</AccordionContent></AccordionItem>
+    </Accordion>
+    <Accordion disabled defaultValue={["readable"]}>
+      <AccordionItem value="readable"><AccordionTrigger>Read-only summary</AccordionTrigger><AccordionContent>The whole group is disabled; this initial summary remains readable.</AccordionContent></AccordionItem>
+      <AccordionItem value="later"><AccordionTrigger>Locked next step</AccordionTrigger><AccordionContent>Unavailable.</AccordionContent></AccordionItem>
+    </Accordion>
+  </div>;
+}
+```
+
+## Persistent content
+
+Closed panels normally unmount. Root keepMounted preserves the native input and its draft while hidden; the second group applies keepMounted to one panel instead. Each input has an independent label and ID. Hidden controls leave the tab order.
+
+<ComponentExample name="persistent" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function PersistentExample() {
+  const rootId = useId();
+  const panelId = useId();
+  return <div className="grid gap-4">
+    <Accordion keepMounted defaultValue={["draft"]}>
+      <AccordionItem value="draft"><AccordionTrigger>Workspace draft</AccordionTrigger><AccordionContent>
+        <Label htmlFor={rootId}>Workspace note</Label><Input id={rootId} defaultValue="Keep this draft" />
+      </AccordionContent></AccordionItem>
+    </Accordion>
+    <Accordion defaultValue={["local"]}>
+      <AccordionItem value="local"><AccordionTrigger>Panel draft</AccordionTrigger><AccordionContent keepMounted>
+        <Label htmlFor={panelId}>Panel note</Label><Input id={panelId} defaultValue="Keep this panel" />
+      </AccordionContent></AccordionItem>
+    </Accordion>
+  </div>;
+}
+```
+
+## Searchable content
+
+hiddenUntilFound keeps a closed panel in the DOM with hidden="until-found", overriding keepMounted. In supporting browsers, search for “Cobalt delivery reference” using the browser’s Find command to reveal it. The second group applies the same option to one panel. Browser support and native find behavior remain browser responsibilities.
+
+<ComponentExample name="searchable" />
+
+```tsx
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function SearchableExample() {
+  return <div className="grid gap-4">
+    <Accordion hiddenUntilFound>
+      <AccordionItem value="reference"><AccordionTrigger>Delivery reference</AccordionTrigger><AccordionContent>Cobalt delivery reference: use your order number when contacting support.</AccordionContent></AccordionItem>
+    </Accordion>
+    <Accordion>
+      <AccordionItem value="policy"><AccordionTrigger>Searchable policy</AccordionTrigger><AccordionContent hiddenUntilFound>Indigo returns reference: keep your receipt for a return.</AccordionContent></AccordionItem>
+    </Accordion>
+  </div>;
+}
+```
+
+## Changing content
+
+This caller-owned action inserts real detail into an open answer. Full mode follows the measured height and can reverse while opening or closing; reduced and none update height immediately. The section’s own trigger still controls disclosure.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function ChangingContentExample() {
+  const [expanded, setExpanded] = useState(false);
+  return <Accordion defaultValue={["motion"]}>
+    <AccordionItem value="motion">
+      <AccordionTrigger>Can I reduce the motion?</AccordionTrigger>
+      <AccordionContent>
+        <p>Yes. Your system preference is respected, and the provider can disable motion entirely.</p>
+        <Button variant="outline" size="sm" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}>Toggle details</Button>
+        {expanded && <p className="mt-4">Disclosure heights update instantly in reduced and none modes. Full mode follows the measured content height and can reverse while moving.</p>}
+      </AccordionContent>
+    </AccordionItem>
+  </Accordion>;
+}
+```
+
+## Custom panel rendering
+
+Use render to change the panel’s element while preserving the supplied children, props and ref. className styles the inner content; style applies to the outer measured panel. The existing trigger and heading remain native accessible controls.
+
+<ComponentExample name="custom-render" />
+
+```tsx
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function CustomRenderExample() {
+  return <Accordion defaultValue={["support"]}>
+    <AccordionItem value="support">
+      <AccordionTrigger>Where can I get help?</AccordionTrigger>
+      <AccordionContent render={<section />} className="text-muted-foreground" style={{ scrollMarginTop: "6rem" }}>
+        <a href="/docs/installation">Read the installation guide</a> before adding your first component.
+      </AccordionContent>
+    </AccordionItem>
+  </Accordion>;
+}
+```
+
+## Legacy orientation
+
+vertical and horizontal are deprecated Base UI state values, shown separately below. Cadence retains a vertical layout for both; these props and loopFocus do not enable arrow-key roving focus. Use Tab and Shift+Tab to move between triggers.
+
+<ComponentExample name="orientation" />
+
+```tsx
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function OrientationExample() {
+  return <div className="grid gap-4">
+    {(["vertical", "horizontal"] as const).map(orientation => <Accordion key={orientation} orientation={orientation} loopFocus defaultValue={["state"]}>
+      <AccordionItem value="state"><AccordionTrigger>{orientation} state</AccordionTrigger><AccordionContent>Orientation is retained as state; keyboard navigation follows normal Tab order.</AccordionContent></AccordionItem>
+      <AccordionItem value="next"><AccordionTrigger>Next {orientation} section</AccordionTrigger><AccordionContent>This is still a vertically stacked section.</AccordionContent></AccordionItem>
+    </Accordion>)}
+  </div>;
+}
+```
+
+## Without motion
+
+The first accordion has an explicit none provider from its first render. A nested full provider opts the second accordion back into the normal geometry recipe. The operating system’s reduced-motion preference still takes priority over full.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/cadence/accordion";
+
+export function WithoutMotionExample() {
+  return <CadenceProvider mode="none"><div className="grid gap-4">
+    <Accordion defaultValue={["instant"]}><AccordionItem value="instant"><AccordionTrigger>Instant disclosure</AccordionTrigger><AccordionContent>No height transition runs here.</AccordionContent></AccordionItem></Accordion>
+    <CadenceProvider mode="full"><Accordion defaultValue={["nested"]}><AccordionItem value="nested"><AccordionTrigger>Nested full disclosure</AccordionTrigger><AccordionContent>The operating system can still reduce this transition.</AccordionContent></AccordionItem></Accordion></CadenceProvider>
+  </div></CadenceProvider>;
+}
+```
 
 ## When to use
 
