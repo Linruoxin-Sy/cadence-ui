@@ -248,5 +248,19 @@
     "updating-rows",
     "native-container",
     "without-motion"
+  ],
+  "date-picker": [
+    "initial-values",
+    "controlled-date-and-clearing",
+    "range-and-presets",
+    "disabled-dates",
+    "birth-dates",
+    "locale",
+    "date-input",
+    "time",
+    "controlled-month-and-open",
+    "caller-errors",
+    "custom-parts",
+    "without-motion"
   ]
 }

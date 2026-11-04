@@ -382,15 +382,14 @@ test("CSS inherited running native clock identity and reversal", async ({ page }
 for (const os of ["no-preference", "reduce"] as const)
   test(`CSS explicit nested clock under outer none ${os}`, async ({ page }, info) => {
     await page.emulateMedia({ reducedMotion: os });
-    await page.goto("/components/date-picker?motion=none&speed=1");
-    await page.waitForLoadState("networkidle");
+    await openPopupMotionFixture(page, "date-picker", "full", 4);
     await record(page, '[data-slot="popover-content"]');
     await page
       .locator('[data-preview="date-picker"]')
-      .getByRole("button", { name: /Appointment:/ })
+      .getByRole("button", { name: /Fixture appointment:/ })
       .click();
     await page.waitForTimeout(100);
-    const popup = page.getByRole("dialog", { name: "Appointment" });
+    const popup = page.getByRole("dialog", { name: "Fixture appointment" });
     await expect(popup).toHaveAttribute("data-motion", os === "reduce" ? "reduced" : "full");
     await expect(popup).toHaveCSS("transition-duration", os === "reduce" ? "0.384s" : "0.64s");
     const f = await finish(page, info);

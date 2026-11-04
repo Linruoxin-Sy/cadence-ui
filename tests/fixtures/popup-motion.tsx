@@ -42,6 +42,7 @@ import {
   ContextMenuTrigger,
 } from "../../registry/cadence/context-menu";
 import { DataTableDemo } from "../../registry/cadence/data-table";
+import { DatePickerDemo } from "../../registry/cadence/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -129,6 +130,26 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/
 // A dedicated browser regression input. Changing a native select emits change,
 // so mode updates do not also perform an outside press or steal popup focus.
 // Production examples keep the header and normal outside-dismissal semantics.
+function DatePickerMotionFixture() {
+  const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
+  return (
+    <DatePickerDemo
+      label="Fixture appointment"
+      value={date}
+      onValueChange={setDate}
+      calendarProps={{ defaultMonth: new Date(2026, 10, 1), today: new Date(2026, 10, 1) }}
+      contentProps={{
+        onKeyDown: (event) => {
+          if (event.key === "F2") {
+            event.preventDefault();
+            setDate(new Date(2026, 10, 20));
+          }
+        },
+      }}
+    />
+  );
+}
+
 function NavigationMenuFixture() {
   const [value, setValue] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -371,6 +392,7 @@ function PopupMotionFixture({
           )}
           {component === "sidebar" && <SidebarMotionFixture />}
           {component === "data-table" && <DataTableDemo />}
+          {component === "date-picker" && <DatePickerMotionFixture />}
           {component === "drawer" && (
             <Drawer showSwipeHandle>
               <DrawerTrigger render={<Button />}>Open drawer</DrawerTrigger>
@@ -458,10 +480,13 @@ function PopupMotionFixture({
 const params = new URL(location.href).searchParams;
 const root = document.getElementById("root");
 if (!root) throw new Error("missing fixture root");
-createRoot(root).render(
+const fixture = (
   <PopupMotionFixture
     component={params.get("component") ?? "popover"}
     initialMode={(params.get("motion") ?? "none") as CadenceMode}
     timeScale={Number(params.get("timeScale") ?? 1)}
-  />,
+  />
+);
+createRoot(root).render(
+  params.get("component") === "date-picker" ? <CadenceProvider mode="none">{fixture}</CadenceProvider> : fixture,
 );
