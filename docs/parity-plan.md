@@ -88,6 +88,12 @@ applicable actual browser/engine paths, SSR/noJS, keyboard/focus/axe and dual-th
 support the change. Source-tier checks do not prove the separate compiled/runtime/page budgets.
 Known failures and unmeasured requirements block overall acceptance.
 
+For preview-route or provider-boundary changes, exercise actual client navigation and browser history
+with a pending timer, an active portal and an exercised engine. The bounded regression in
+`tests/e2e/component-route-lifecycle.spec.ts` checks departed-node writes, modal ownership cleanup,
+new-page input focus and shared layout/settings continuity; it does not certify heap use or every
+component lifecycle.
+
 ### 6.6 Documentation subtitles
 
 The subtitle is the `description` in `content/components/<id>.mdx` — mirrored in `registry.json`, rendered
