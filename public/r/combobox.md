@@ -14,9 +14,13 @@
 npx shadcn@latest add @cadence/combobox
 ```
 
+Combobox examples that use external actions also require `@cadence/button`.
+
 ## Usage
 
 ```tsx
+"use client";
+
 import {
   Combobox,
   ComboboxContent,
@@ -27,15 +31,14 @@ import {
 } from "@/components/cadence/combobox";
 
 const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
-
 export function FrameworkPicker() {
   return (
     <Combobox items={frameworks}>
-      <ComboboxInput placeholder="Select a framework" aria-label="Framework" />
+      <ComboboxInput aria-label="Framework" placeholder="Select a framework" />
       <ComboboxContent>
         <ComboboxEmpty>No framework found.</ComboboxEmpty>
         <ComboboxList>
-          {(item) => (
+          {(item: string) => (
             <ComboboxItem key={item} value={item}>
               {item}
             </ComboboxItem>
@@ -47,118 +50,1013 @@ export function FrameworkPicker() {
 }
 ```
 
-`ComboboxList` takes a render function, so the list is data, not markup: `items` on the root is what the
-popup filters and what the render callback receives.
+`items` is the catalogue. Typing filters it; selection commits a catalogue value.
 
 ## Groups and separators
 
-Long catalogues read better in labelled groups. Give each `ComboboxGroup` its own `items` so filtering
-can drop a group as a whole.
+Pass each group its own items so filtering can remove empty groups. Collection renders the filtered children; the separator belongs between the two catalogues, not between every row.
+
+<ComponentExample name="groups" />
 
 ```tsx
-<Combobox items={groups}>
-  <ComboboxInput placeholder="Assign reviewer" aria-label="Reviewer" />
-  <ComboboxContent>
-    <ComboboxEmpty>No reviewer found.</ComboboxEmpty>
-    <ComboboxList>
-      {(group) => (
-        <ComboboxGroup key={group.value} items={group.items}>
-          <ComboboxLabel>{group.value}</ComboboxLabel>
-          {group.items.map((item) => (
-            <ComboboxItem key={item.value} value={item}>
-              {item.label}
-            </ComboboxItem>
-          ))}
-        </ComboboxGroup>
-      )}
-    </ComboboxList>
-  </ComboboxContent>
-</Combobox>
+"use client";
+
+import * as React from "react";
+import {
+  Combobox,
+  ComboboxCollection,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxLabel,
+  ComboboxList,
+  ComboboxSeparator,
+} from "@/components/cadence/combobox";
+
+export function GroupedPicker() {
+  const groups = [
+    { value: "Frontend", items: ["React", "Vue", "Svelte"] },
+    { value: "Backend", items: ["Go", "Rust", "Elixir"] },
+  ];
+  return (
+    <Combobox items={groups}>
+      <ComboboxInput className="w-56 max-w-full" aria-label="Stack" placeholder="Choose a stack" />
+      <ComboboxContent>
+        <ComboboxEmpty>No stack found.</ComboboxEmpty>
+        <ComboboxList>
+          {(group: (typeof groups)[number], index: number) => (
+            <React.Fragment key={group.value}>
+              {index > 0 && <ComboboxSeparator />}
+              <ComboboxGroup items={group.items}>
+                <ComboboxLabel>{group.value}</ComboboxLabel>
+                <ComboboxCollection>
+                  {(item: string) => (
+                    <ComboboxItem key={item} value={item}>
+                      {item}
+                    </ComboboxItem>
+                  )}
+                </ComboboxCollection>
+              </ComboboxGroup>
+            </React.Fragment>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
 ```
 
 ## Clear and trigger controls
 
-`showClear` adds the undo affordance once a value is set; the chevron steps aside while both would be
-fighting for the same 24px. Turn the chevron off entirely with `showTrigger={false}` when the field is
-inside a form that submits on Enter.
+The four fixed fields compare both flags independently. Clear removes a selected value; its presence hides the built-in chevron. Hiding the trigger does not disable keyboard opening or turn Enter into form submission.
+
+<ComponentExample name="controls" />
 
 ```tsx
-<Combobox items={frameworks} defaultValue="Astro">
-  <ComboboxInput showClear placeholder="Select a framework" aria-label="Framework" />
-  <ComboboxContent>
-    <ComboboxList>
-      {(item) => (
-        <ComboboxItem key={item} value={item}>
-          {item}
-        </ComboboxItem>
-      )}
-    </ComboboxList>
-  </ComboboxContent>
-</Combobox>
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function _Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function PickerControls() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {[
+        { label: "Trigger only", showTrigger: true, showClear: false },
+        { label: "Clear and trigger", showTrigger: true, showClear: true },
+        { label: "Clear only", showTrigger: false, showClear: true },
+        { label: "Input only", showTrigger: false, showClear: false },
+      ].map((props) => (
+        <Combobox key={props.label} items={frameworks} defaultValue="Astro">
+          <ComboboxInput
+            className="w-48 max-w-full"
+            aria-label={props.label}
+            showTrigger={props.showTrigger}
+            showClear={props.showClear}
+          />
+          <ComboboxContent>
+            <Options />
+          </ComboboxContent>
+        </Combobox>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## Multiple values
 
-`multiple` turns the field into a tag editor: `ComboboxChips` is the frame, each `ComboboxChip` is a
-value, and `ComboboxChipsInput` is the caret. Anchor the popup to the chips container so it lines up with
-the field rather than with the input inside it.
+Each editor owns its selection and anchor. The first allows chip removal; the second hides remove buttons with showRemove=false. This is an affordance choice: Backspace can still remove a value. Use readOnly on the root when editing must be forbidden.
+
+<ComponentExample name="multiple" />
 
 ```tsx
-const anchor = useComboboxAnchor();
+"use client";
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
+} from "@/components/cadence/combobox";
 
-<Combobox multiple items={topics} defaultValue={["design"]}>
-  <ComboboxChips ref={anchor}>
-    <ComboboxValue>
-      {(value: string[]) => (
-        <React.Fragment>
-          {value.map((topic) => (
-            <ComboboxChip key={topic}>{topic}</ComboboxChip>
-          ))}
-          <ComboboxChipsInput placeholder="Add topic" aria-label="Topics" />
-        </React.Fragment>
-      )}
-    </ComboboxValue>
-  </ComboboxChips>
-  <ComboboxContent anchor={anchor}>
-    <ComboboxEmpty>No topic found.</ComboboxEmpty>
-    <ComboboxList>
-      {(item) => (
-        <ComboboxItem key={item} value={item}>
-          {item}
-        </ComboboxItem>
-      )}
-    </ComboboxList>
-  </ComboboxContent>
-</Combobox>;
+function TopicEditor({ removable }: { removable: boolean }) {
+  const anchor = useComboboxAnchor();
+  const topics = ["Design", "Docs", "Testing", "Release"];
+  return (
+    <Combobox multiple items={topics} defaultValue={["Design", "Docs"]}>
+      <ComboboxChips ref={anchor} className="w-64 max-w-full">
+        <ComboboxValue>
+          {(value: string[]) => (
+            <>
+              {value.map((topic) => (
+                <ComboboxChip key={topic} showRemove={removable}>
+                  {topic}
+                </ComboboxChip>
+              ))}
+              <ComboboxChipsInput
+                aria-label={removable ? "Editable topics" : "Topics without remove buttons"}
+                placeholder="Add topic"
+              />
+            </>
+          )}
+        </ComboboxValue>
+      </ComboboxChips>
+      <ComboboxContent anchor={anchor}>
+        <ComboboxEmpty>No topic found.</ComboboxEmpty>
+        <ComboboxList>
+          {(item: string) => (
+            <ComboboxItem key={item} value={item}>
+              {item}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+export function TopicPickers() {
+  return (
+    <div className="flex flex-wrap items-start gap-4">
+      <TopicEditor removable />
+      <TopicEditor removable={false} />
+    </div>
+  );
+}
 ```
 
-## Filtering a server list
+## Disabled, read-only and invalid
 
-For a remote catalogue, keep the list the server returned and hand it to `items`; Base UI filters what it
-is given, so a new response replaces the list without the component deciding what to fetch.
+Disabled fields cannot be edited or opened. Read-only keeps a selected value available for focus and submission; the popup can still be opened and browsed, but choosing another row does not change that value. The caller supplies the invalid attribute and associated error; an unavailable item stays visible but cannot be selected.
+
+<ComponentExample name="states" />
 
 ```tsx
-const [results, setResults] = useState<string[]>([]);
+"use client";
 
-<Combobox items={results} onInputValueChange={(query) => search(query).then(setResults)}>
-  <ComboboxInput placeholder="Search a city" aria-label="City" />
-  <ComboboxContent>
-    <ComboboxEmpty>No city found.</ComboboxEmpty>
-    <ComboboxList>
-      {(item) => (
-        <ComboboxItem key={item} value={item}>
-          {item}
-        </ComboboxItem>
-      )}
-    </ComboboxList>
-  </ComboboxContent>
-</Combobox>;
+import * as React from "react";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function _Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function PickerStates() {
+  const error = React.useId();
+  return (
+    <div className="flex flex-wrap items-start gap-4">
+      <Combobox items={frameworks} disabled defaultValue="Remix">
+        <ComboboxInput className="w-48 max-w-full" disabled aria-label="Disabled framework" />
+        <ComboboxContent>
+          <Options />
+        </ComboboxContent>
+      </Combobox>
+      <Combobox items={frameworks} readOnly defaultValue="Astro">
+        <ComboboxInput className="w-48 max-w-full" aria-label="Read-only framework" />
+        <ComboboxContent>
+          <Options />
+        </ComboboxContent>
+      </Combobox>
+      <div className="grid gap-2">
+        <Combobox items={frameworks}>
+          <ComboboxInput
+            className="w-56 max-w-full"
+            aria-label="Required framework"
+            aria-invalid="true"
+            aria-describedby={error}
+            placeholder="Choose an available framework"
+          />
+          <ComboboxContent>
+            <ComboboxEmpty>No framework found.</ComboboxEmpty>
+            <ComboboxList>
+              {(item: string) => (
+                <ComboboxItem key={item} value={item} disabled={item === "Nuxt.js"}>
+                  {item}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+        <p id={error} className="text-sm text-destructive">
+          Choose an available framework.
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+## Controlled values and submission
+
+The caller owns the selected value, input query, open state and submitted result. Use the external action to set Astro, then edit independently. The native FormData entry comes from name; typing a query alone does not commit it as a selection. This example uses noValidate so validation remains with the caller.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import * as React from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function _Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function ControlledPicker() {
+  const [value, setValue] = React.useState<string | null>("Remix");
+  const [query, setQuery] = React.useState("Remix");
+  const [open, setOpen] = React.useState(false);
+  const [submitted, setSubmitted] = React.useState("Not submitted");
+  return (
+    <form
+      noValidate
+      className="grid justify-items-start gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setSubmitted(String(new FormData(event.currentTarget).get("framework") ?? ""));
+      }}
+    >
+      <Combobox
+        items={frameworks}
+        name="framework"
+        value={value}
+        onValueChange={setValue}
+        inputValue={query}
+        onInputValueChange={setQuery}
+        open={open}
+        onOpenChange={setOpen}
+      >
+        <ComboboxInput className="w-56 max-w-full" aria-label="Controlled framework" showClear />
+        <ComboboxContent>
+          <Options />
+        </ComboboxContent>
+      </Combobox>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            setValue("Astro");
+            setQuery("Astro");
+          }}
+        >
+          Set Astro externally
+        </Button>
+        <Button type="submit">Submit selection</Button>
+      </div>
+      <p role="status" className="text-sm text-muted-foreground">
+        Selected: {value ?? "none"}; submitted: {submitted}
+      </p>
+    </form>
+  );
+}
+```
+
+## Object values
+
+Convert object labels and submitted values explicitly. Compare stable ids when an application recreates option objects; object identity need not be the selection identity.
+
+<ComponentExample name="objects" />
+
+```tsx
+"use client";
+
+import * as React from "react";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+export function ObjectPicker() {
+  const people = [
+    { id: "ada", name: "Ada Lovelace" },
+    { id: "grace", name: "Grace Hopper" },
+    { id: "margaret", name: "Margaret Hamilton" },
+  ];
+  const [value, setValue] = React.useState<(typeof people)[number] | null>({ id: "ada", name: "Ada Lovelace" });
+  return (
+    <div className="grid gap-3">
+      <Combobox
+        items={people}
+        value={value}
+        onValueChange={setValue}
+        itemToStringLabel={(person) => person.name}
+        itemToStringValue={(person) => person.id}
+        isItemEqualToValue={(a, b) => a.id === b.id}
+      >
+        <ComboboxInput className="w-64 max-w-full" aria-label="Assignee" showClear />
+        <ComboboxContent>
+          <ComboboxEmpty>No person found.</ComboboxEmpty>
+          <ComboboxList>
+            {(person: (typeof people)[number]) => (
+              <ComboboxItem key={person.id} value={person}>
+                {person.name}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+      <p role="status" className="text-sm text-muted-foreground">
+        Assignee id: {value?.id ?? "none"}
+      </p>
+    </div>
+  );
+}
+```
+
+## Caller-owned results
+
+The caller filters this local catalogue asynchronously and passes filter=null to avoid a second client filter. The microtask stands in for an application search function, not a network request. Replace it with your own service; keep cancellation, pending/error feedback and result ordering in the caller. Cleanup rejects stale completions; an empty result and a pending request are different states.
+
+<ComponentExample name="results" />
+
+```tsx
+"use client";
+
+import * as React from "react";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+export function ResultPicker() {
+  const [query, setQuery] = React.useState("");
+  const [results, setResults] = React.useState<string[]>(["London", "Paris", "Tokyo"]);
+  const [pending, setPending] = React.useState(false);
+  React.useEffect(() => {
+    let active = true;
+    setPending(true);
+    Promise.resolve(
+      ["London", "Paris", "Tokyo"].filter((city) => city.toLowerCase().includes(query.toLowerCase())),
+    ).then((next) => {
+      if (active) {
+        setResults(next);
+        setPending(false);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [query]);
+  return (
+    <div className="grid gap-2">
+      <Combobox items={results} filter={null} onInputValueChange={setQuery}>
+        <ComboboxInput className="w-56 max-w-full" aria-label="City" placeholder="Search a city" />
+        <ComboboxContent>
+          {pending ? (
+            <p role="status" className="p-2 text-sm">
+              Searching cities…
+            </p>
+          ) : (
+            <ComboboxEmpty>No city found.</ComboboxEmpty>
+          )}
+          <ComboboxList>
+            {(city: string) => (
+              <ComboboxItem key={city} value={city}>
+                {city}
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      </Combobox>
+      <p role="status" className="text-sm text-muted-foreground">
+        {pending ? "Searching" : `${results.length} cities returned`}
+      </p>
+    </div>
+  );
+}
+```
+
+## Highlight and loop boundaries
+
+Compare the default manual highlight and wrapping navigation with autoHighlight and loopFocus=false. Filtering updates rows immediately; autoHighlight chooses a highlighted suggestion, while Enter commits it. Moving the highlight alone does not change the selected value.
+
+<ComponentExample name="highlight" />
+
+```tsx
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function _Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function HighlightPickers() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {[false, true].map((automatic) => (
+        <Combobox key={String(automatic)} items={frameworks} autoHighlight={automatic} loopFocus={!automatic}>
+          <ComboboxInput
+            className="w-56 max-w-full"
+            aria-label={automatic ? "Automatic bounded highlight" : "Manual looping highlight"}
+            placeholder={automatic ? "Automatic, bounded" : "Manual, looping"}
+          />
+          <ComboboxContent>
+            <Options />
+          </ComboboxContent>
+        </Combobox>
+      ))}
+    </div>
+  );
+}
+```
+
+## Physical sides
+
+These fixed fields request top, bottom, left and right independently. Base UI can flip or shift a popup to keep it inside the viewport; a requested side is not a guarantee on narrow screens.
+
+<ComponentExample name="sides" />
+
+```tsx
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function PickerSides() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {(["top", "bottom", "left", "right"] as const).map((side) => (
+        <Picker key={side} label={`Side ${side}`} side={side} />
+      ))}
+    </div>
+  );
+}
+```
+
+## Alignment
+
+Start, center and end align the popup against the field. The single-value popup is anchored to the native input, with a minimum width 28px larger than that input (not the surrounding input-group frame). This makes the three alignments visible. Chips use the container width instead.
+
+<ComponentExample name="alignments" />
+
+```tsx
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function PickerAlignments() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {(["start", "center", "end"] as const).map((align) => (
+        <Picker key={align} label={`Align ${align}`} align={align} />
+      ))}
+    </div>
+  );
+}
+```
+
+## Logical sides
+
+Logical inline-start and inline-end follow the reading direction. This fixed RTL scope supplies both Base UI direction and the DOM dir attribute; the rest of the page stays independent.
+
+<ComponentExample name="logical-sides" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function LogicalPickers() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl" className="flex flex-wrap gap-4">
+        {(["inline-start", "inline-end"] as const).map((side) => (
+          <Picker key={side} label={`RTL ${side}`} side={side} />
+        ))}
+      </div>
+    </DirectionProvider>
+  );
+}
+```
+
+## Modal and non-modal fields
+
+The default modal=false permits outside pointer interaction. modal=true limits outside interaction while open and locks desktop document scrolling. Both use the same typeable input and native Tab dismissal; modal does not turn a combobox into a dialog.
+
+<ComponentExample name="modality" />
+
+```tsx
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function _Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function PickerModality() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      {[false, true].map((modal) => (
+        <Combobox key={String(modal)} items={frameworks} modal={modal}>
+          <ComboboxInput
+            className="w-56 max-w-full"
+            aria-label={modal ? "Modal framework" : "Non-modal framework"}
+            placeholder={modal ? "Modal" : "Non-modal"}
+          />
+          <ComboboxContent>
+            <Options />
+          </ComboboxContent>
+        </Combobox>
+      ))}
+    </div>
+  );
+}
+```
+
+## Separate trigger
+
+A separate named ComboboxTrigger can open the same input. Hide the built-in chevron to avoid duplicating it. This is still a typeable field; the button does not replace the input or its accessible name.
+
+<ComponentExample name="custom-trigger" />
+
+```tsx
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxTrigger,
+} from "@/components/cadence/combobox";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function _Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function SeparateTrigger() {
+  return (
+    <Combobox items={frameworks}>
+      <div className="flex items-center gap-2">
+        <ComboboxInput
+          className="w-48 max-w-full"
+          aria-label="Separate-trigger framework"
+          showTrigger={false}
+          placeholder="Choose a framework"
+        />
+        <ComboboxTrigger aria-label="Browse frameworks" />
+      </div>
+      <ComboboxContent>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+```
+
+## Without motion
+
+The first fixed provider disables panel and indicator motion from the first mounted frame. The nested full provider restores its local clock, subject to the system reduced-motion preference. Ordinary examples inherit the site header.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/cadence/combobox";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+const frameworks = ["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"];
+function Options() {
+  return (
+    <>
+      <ComboboxEmpty>No framework found.</ComboboxEmpty>
+      <ComboboxList>
+        {(item: string) => (
+          <ComboboxItem key={item} value={item}>
+            {item}
+          </ComboboxItem>
+        )}
+      </ComboboxList>
+    </>
+  );
+}
+function Picker({
+  label,
+  side = "bottom",
+  align = "start",
+}: {
+  label: string;
+  side?: "top" | "bottom" | "left" | "right" | "inline-start" | "inline-end";
+  align?: "start" | "center" | "end";
+}) {
+  return (
+    <Combobox items={frameworks}>
+      <ComboboxInput className="w-56 max-w-full" aria-label={label} placeholder={label} />
+      <ComboboxContent side={side} align={align}>
+        <Options />
+      </ComboboxContent>
+    </Combobox>
+  );
+}
+
+export function PickerMotion() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex flex-wrap gap-4">
+        <Picker label="Instant framework" />
+        <CadenceProvider mode="full">
+          <Picker label="Nested full framework" />
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
 
 - Choosing one value from a list too long to scan: countries, assignees, repositories.
-- A search field that should also accept a typed value, for example a tag the catalogue does not list.
+- A search field that filters a catalogue while keeping typed queries separate from committed values.
 - Several values from the same catalogue, where each choice should stay visible as a chip.
 - A picker whose options arrive from a search endpoint rather than from a constant.
 
@@ -210,8 +1108,7 @@ chase.
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
 geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The preview's **Popup motion** selector changes the local mode on the
-same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+first mounted frame. Ordinary examples inherit the site header on the same component tree; the named Without motion example demonstrates explicit local overrides. Base UI `className(state)` and `style(state)` callbacks are evaluated
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
 remain owned by the primitive. Base UI 1.9's typeable focus manager hides background
 nodes from assistive technology while leaving their tab stops enabled. Cadence adds native
@@ -222,9 +1119,9 @@ state callback classes style the native input with its real Base UI input state.
 ## Keyboard interactions
 
 - `ArrowDown` or `Alt+ArrowDown` opens the popup; with it open, `ArrowDown`/`ArrowUp` move the highlight.
-- Typing filters the list and moves the highlight to the first match.
+- Typing filters the list. `autoHighlight` (default `false`) optionally highlights the first match.
 - `Enter` selects the highlighted item and closes the popup.
-- `Escape` closes the popup without choosing anything; the typed query stays in the field.
+- With the popup open, `Escape` dismisses it. With it already closed, `Escape` clears the query and selected values.
 - `Tab` closes the popup and moves focus to the next control.
 - `Backspace` in the chips layout deletes the last chip when the input is empty.
 
@@ -235,8 +1132,7 @@ state callback classes style the native input with its real Base UI input state.
 - Name the field: `aria-label` on `ComboboxInput`, or a `Field`/`Label` pair around it. The placeholder is
   not a name.
 - The selected row keeps `aria-selected="true"`; the tick is a visual duplicate, never the only signal.
-- The empty state is a row inside the list, so it is reachable in the reading order and not a modal
-  interruption.
+- The empty state is a sibling of the list inside the popup; it is readable feedback, not a selectable option.
 - Under reduced motion nothing is conveyed by the panel's scale: the list is there, the tick is at full
   size, and `aria-selected` carries the state.
 
@@ -248,8 +1144,8 @@ errors; this component does not validate or install a form-state library.
 
 ## Responsive behavior
 
-The popup is exactly `--anchor-width` wide and at least `--spacing(7)` wider than the field, so a narrow
-trigger still shows a readable row. It flips above the field near the viewport edge, and the list — not the
+The single-value popup anchors to the native input, not the input-group frame, and has a minimum width
+`--spacing(7)` larger than that input, clamped to available viewport width. It flips above the field near the viewport edge, and the list — not the
 popup — scrolls inside `--available-height`. In the chips layout the frame wraps to a second line instead
 of scrolling horizontally, and the popup widens to the chips container.
 
@@ -257,8 +1153,8 @@ of scrolling horizontally, and the popup widens to the chips container.
 
 - One CSS transition on `opacity` and `scale` per open and per close; no JS animation loop, and no layout
   read.
-- One spring per selected row. The indicator is mounted once and animated in place, so filtering does not
-  create and destroy an animation per item.
+- Each mounted row keeps its indicator and uses the token spring for selection changes. Filtering replaces
+  rendered rows immediately instead of animating the list layout.
 - The filter is synchronous over whatever `items` holds; a remote list is a debounce in the caller, not a
   behaviour of this component.
 - Budget: T2 (10 KB gzip).

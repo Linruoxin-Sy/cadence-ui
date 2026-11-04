@@ -86,5 +86,21 @@
     "logical-sides",
     "modality",
     "without-motion"
+  ],
+  "combobox": [
+    "groups",
+    "controls",
+    "multiple",
+    "states",
+    "controlled",
+    "objects",
+    "results",
+    "highlight",
+    "sides",
+    "alignments",
+    "logical-sides",
+    "modality",
+    "custom-trigger",
+    "without-motion"
   ]
 }

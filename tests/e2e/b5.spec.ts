@@ -124,7 +124,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await close(page, id);
           const exit = await samples(page, 40);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
-          if (["dropdown-menu", "context-menu", "menubar"].includes(id))
+          if (["dropdown-menu", "context-menu", "menubar", "combobox"].includes(id))
             await openPopupMotionFixture(page, id, requested);
           await mode(page, "full");
           await start(page, id);
@@ -142,50 +142,52 @@ for (const colorScheme of ["light", "dark"] as const)
   test.describe(`B5 visual ${colorScheme}`, () => {
     test.use({ colorScheme });
     for (const id of ids)
-      test(`${id} full page and open surface axe`, async ({ page }) => {
-        const errors: string[] = [];
-        page.on("pageerror", (e) => errors.push(e.message));
-        await page.route("https://github.com/shadcn.png", (r) =>
-          r.fulfill({
-            contentType: "image/svg+xml",
-            body: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#334155"/></svg>',
-          }),
-        );
-        await page.goto(`/components/${id}?motion=none`);
-        await page.waitForLoadState("networkidle");
-        for (const width of [1280, 390]) {
-          await page.setViewportSize({ width, height: 1000 });
-          expect(
-            (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
-          ).toEqual([]);
-          expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-          await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
-          await open(page, id);
-          if (id === "context-menu" || id === "menubar")
-            await expectMenuAccessibility(page, async () => {
-              await page.keyboard.press("Escape");
-              await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
-              await open(page, id);
-            });
-          else
+      for (const viewportWidth of id === "combobox" ? [1280, 390] : [undefined])
+        test(`${id} full page and open surface axe${viewportWidth ? ` ${viewportWidth}` : ""}`, async ({ page }) => {
+          const errors: string[] = [];
+          page.on("pageerror", (e) => errors.push(e.message));
+          await page.route("https://github.com/shadcn.png", (r) =>
+            r.fulfill({
+              contentType: "image/svg+xml",
+              body: '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#334155"/></svg>',
+            }),
+          );
+          await page.goto(`/components/${id}?motion=none`);
+          await page.waitForLoadState("networkidle");
+          for (const width of viewportWidth ? [viewportWidth] : [1280, 390]) {
+            await page.setViewportSize({ width, height: 1000 });
             expect(
               (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
             ).toEqual([]);
-          await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}-open.png` });
-          await close(page, id);
-          if (id === "select") await expect(page.locator(`[data-slot="${slot(id)}"]`)).not.toBeVisible();
-          else await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
-          await page.mouse.move(0, 0);
-        }
-        expect(errors).toEqual([]);
-      });
+            expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+            await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
+            await open(page, id);
+            if (id === "context-menu" || id === "menubar")
+              await expectMenuAccessibility(page, async () => {
+                await page.keyboard.press("Escape");
+                await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
+                await open(page, id);
+              });
+            else
+              expect(
+                (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
+              ).toEqual([]);
+            await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}-open.png` });
+            await close(page, id);
+            if (id === "select") await expect(page.locator(`[data-slot="${slot(id)}"]`)).not.toBeVisible();
+            else await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
+            await page.mouse.move(0, 0);
+          }
+          expect(errors).toEqual([]);
+        });
   });
 
 test.describe("B5 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu", "menubar"].includes(id)) await openPopupMotionFixture(page, id, "none", 4);
+      if (["dropdown-menu", "context-menu", "menubar", "combobox"].includes(id))
+        await openPopupMotionFixture(page, id, "none", 4);
       else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
@@ -510,7 +512,8 @@ test.describe("B5 native reversal", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command"] as const)
     test(`${id} reopens during exit on the same surface`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu", "menubar"].includes(id)) await openPopupMotionFixture(page, id, "full", 4);
+      if (["dropdown-menu", "context-menu", "menubar", "combobox"].includes(id))
+        await openPopupMotionFixture(page, id, "full", 4);
       else await page.goto(`/components/${id}?motion=full&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await open(page, id);

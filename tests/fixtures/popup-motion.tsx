@@ -11,6 +11,18 @@ import {
 } from "../../registry/cadence/alert-dialog";
 import { Button } from "../../registry/cadence/button";
 import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
+} from "../../registry/cadence/combobox";
+import {
   ContextMenu,
   ContextMenuCheckboxItem,
   ContextMenuContent,
@@ -96,6 +108,7 @@ function PopupMotionFixture({
 }) {
   const [mode, setMode] = useState(initialMode);
   const inputId = useId();
+  const comboAnchor = useComboboxAnchor();
   const field = (
     <label htmlFor={inputId}>
       Fixture draft
@@ -118,6 +131,32 @@ function PopupMotionFixture({
           </select>
         </label>
         <div data-preview={component}>
+          {component === "combobox" && (
+            <Combobox multiple items={["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"]} defaultValue={["Next.js"]}>
+              <ComboboxChips ref={comboAnchor}>
+                <ComboboxValue>
+                  {(value: string[]) => (
+                    <>
+                      {value.map((item) => (
+                        <ComboboxChip key={item}>{item}</ComboboxChip>
+                      ))}
+                      <ComboboxChipsInput aria-label="Framework" />
+                    </>
+                  )}
+                </ComboboxValue>
+              </ComboboxChips>
+              <ComboboxContent anchor={comboAnchor}>
+                <ComboboxEmpty>No framework found.</ComboboxEmpty>
+                <ComboboxList>
+                  {(item: string) => (
+                    <ComboboxItem key={item} value={item}>
+                      {item}
+                    </ComboboxItem>
+                  )}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+          )}
           {component === "dialog" && (
             <Dialog>
               <DialogTrigger render={<Button />}>Open dialog</DialogTrigger>
