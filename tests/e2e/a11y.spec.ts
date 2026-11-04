@@ -50,6 +50,20 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
 }
 
+for (const id of ["breadcrumb", "pagination", "toggle"])
+  for (const width of [1440, 390])
+    for (const colorScheme of ["light", "dark"] as const)
+      test(`complete ${id} document retains visible names and unique landmarks ${width}/${colorScheme}`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.emulateMedia({ colorScheme });
+        await page.goto(`/components/${id}?motion=none`);
+        await page.waitForLoadState("networkidle");
+        const results = await new AxeBuilder({ page }).analyze();
+        expect(results.violations).toEqual([]);
+      });
+
 // Both visible desktop asides need distinct names; WCAG-only scans omit landmark-unique.
 for (const width of [1440, 390])
   for (const colorScheme of ["light", "dark"] as const)

@@ -12,9 +12,9 @@ import {
 } from "@/registry/cadence/breadcrumb";
 import { PreviewStack } from "./shell";
 
-export function CollapsedTrail() {
+export function CollapsedTrail({ label = "Collapsed guide trail" }: { label?: string }) {
   return (
-    <Breadcrumb aria-label="Collapsed guide trail">
+    <Breadcrumb aria-label={label}>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
@@ -102,7 +102,7 @@ function Specimen() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <CollapsedTrail />
+      <CollapsedTrail label="Preview collapsed guide trail" />
     </div>
   );
 }

@@ -210,13 +210,13 @@ export function StaticToggle() {
     <CadenceProvider mode="none">
       <div className="flex flex-wrap gap-4">
         <div data-testid="initial-none">
-          <Toggle aria-label="Static toggle" defaultPressed>
+          <Toggle aria-label="Static toggle On" defaultPressed>
             On
           </Toggle>
         </div>
         <CadenceProvider mode="full">
           <div data-testid="explicit-full">
-            <Toggle aria-label="Explicit full toggle">Press</Toggle>
+            <Toggle aria-label="Explicit full toggle Press">Press</Toggle>
           </div>
         </CadenceProvider>
       </div>

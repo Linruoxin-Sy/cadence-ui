@@ -112,8 +112,9 @@ export function CollapsedPages() {
 ## Custom labels
 
 `PaginationPrevious` and `PaginationNext` accept `text`. Back and Forward are visible from `sm`
-up; below it only the chevrons are visible. Their accessible names remain “Go to previous page”
-and “Go to next page”. The compact composition has its own real anchor destinations.
+up; below it only the chevrons are visible. When changing the visible text, supply an
+`aria-label` that includes that text: “Back to previous page” and “Forward to next page”
+keep the direction clear at either width. The compact composition has its own real anchor destinations.
 
 <ComponentExample name="labels" />
 
@@ -132,7 +133,7 @@ export function CustomLabels() {
     <Pagination aria-label="Custom-labelled result pages">
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="?page=1#usage" text="Back" />
+          <PaginationPrevious href="?page=1#usage" text="Back" aria-label="Back to previous page" />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink href="?page=2#usage" isActive>
@@ -140,7 +141,7 @@ export function CustomLabels() {
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href="?page=3#usage" text="Forward" />
+          <PaginationNext href="?page=3#usage" text="Forward" aria-label="Forward to next page" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

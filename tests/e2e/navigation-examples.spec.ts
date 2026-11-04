@@ -82,7 +82,8 @@ for (const os of ["no-preference", "reduce"] as const)
       const labels = page.locator('[data-component-example="pagination/labels"]');
       await page.setViewportSize({ width: 390, height: 1000 });
       await expect(labels.getByText("Back", { exact: true })).not.toBeVisible();
-      await expect(labels.getByRole("link", { name: "Go to previous page" })).toBeVisible();
+      await expect(labels.getByRole("link", { name: "Back to previous page" })).toBeVisible();
+      await expect(labels.getByRole("link", { name: "Forward to next page" })).toBeVisible();
       await page.setViewportSize({ width: 1280, height: 1000 });
       await expect(labels.getByText("Back", { exact: true })).toBeVisible();
       expect(

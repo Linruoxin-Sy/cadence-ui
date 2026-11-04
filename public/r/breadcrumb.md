@@ -199,8 +199,8 @@ stable thing on the page move.
 
 ## Accessibility
 
-- The `nav` is labelled "breadcrumb", so it becomes its own landmark; a page may have
-  several `nav`s and this is how they are told apart.
+- The `nav` is labelled "breadcrumb" by default. Give each trail a distinct
+  `aria-label` when several appear on one page, so readers can tell its landmarks apart.
 - Order matters: `<ol>`/`<li>` gives the trail a length and a sequence, which is what
   a screen reader announces ("list, 3 items").
 - The last item is `BreadcrumbPage`: `aria-current="page"`, `aria-disabled="true"`, and

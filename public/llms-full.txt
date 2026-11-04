@@ -3987,8 +3987,8 @@ stable thing on the page move.
 
 ## Accessibility
 
-- The `nav` is labelled "breadcrumb", so it becomes its own landmark; a page may have
-  several `nav`s and this is how they are told apart.
+- The `nav` is labelled "breadcrumb" by default. Give each trail a distinct
+  `aria-label` when several appear on one page, so readers can tell its landmarks apart.
 - Order matters: `<ol>`/`<li>` gives the trail a length and a sequence, which is what
   a screen reader announces ("list, 3 items").
 - The last item is `BreadcrumbPage`: `aria-current="page"`, `aria-disabled="true"`, and
@@ -4124,8 +4124,9 @@ export function CollapsedPages() {
 ## Custom labels
 
 `PaginationPrevious` and `PaginationNext` accept `text`. Back and Forward are visible from `sm`
-up; below it only the chevrons are visible. Their accessible names remain “Go to previous page”
-and “Go to next page”. The compact composition has its own real anchor destinations.
+up; below it only the chevrons are visible. When changing the visible text, supply an
+`aria-label` that includes that text: “Back to previous page” and “Forward to next page”
+keep the direction clear at either width. The compact composition has its own real anchor destinations.
 
 <ComponentExample name="labels" />
 
@@ -4144,7 +4145,7 @@ export function CustomLabels() {
     <Pagination aria-label="Custom-labelled result pages">
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="?page=1#usage" text="Back" />
+          <PaginationPrevious href="?page=1#usage" text="Back" aria-label="Back to previous page" />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink href="?page=2#usage" isActive>
@@ -4152,7 +4153,7 @@ export function CustomLabels() {
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href="?page=3#usage" text="Forward" />
+          <PaginationNext href="?page=3#usage" text="Forward" aria-label="Forward to next page" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
@@ -6652,13 +6653,13 @@ export function StaticToggle() {
     <CadenceProvider mode="none">
       <div className="flex flex-wrap gap-4">
         <div data-testid="initial-none">
-          <Toggle aria-label="Static toggle" defaultPressed>
+          <Toggle aria-label="Static toggle On" defaultPressed>
             On
           </Toggle>
         </div>
         <CadenceProvider mode="full">
           <div data-testid="explicit-full">
-            <Toggle aria-label="Explicit full toggle">Press</Toggle>
+            <Toggle aria-label="Explicit full toggle Press">Press</Toggle>
           </div>
         </CadenceProvider>
       </div>

@@ -75,7 +75,7 @@ export function CustomLabels() {
     <Pagination aria-label="Custom-labelled result pages">
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="?page=1#usage" text="Back" />
+          <PaginationPrevious href="?page=1#usage" text="Back" aria-label="Back to previous page" />
         </PaginationItem>
         <PaginationItem>
           <PaginationLink href="?page=2#usage" isActive>
@@ -83,7 +83,7 @@ export function CustomLabels() {
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href="?page=3#usage" text="Forward" />
+          <PaginationNext href="?page=3#usage" text="Forward" aria-label="Forward to next page" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
