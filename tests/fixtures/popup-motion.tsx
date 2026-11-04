@@ -108,6 +108,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../registry/cadence/sheet";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarInput,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+  useSidebar,
+} from "../../registry/cadence/sidebar";
 import { createToastManager, Toaster } from "../../registry/cadence/toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/tooltip";
 
@@ -169,6 +183,52 @@ function NavigationMenuFixture() {
         </NavigationMenuList>
       </NavigationMenu>
     </div>
+  );
+}
+
+function SidebarFixtureControls() {
+  const { state, openMobile, setOpen, setOpenMobile } = useSidebar();
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Expand desktop
+      </button>
+      <button type="button" onClick={() => setOpen(false)}>
+        Collapse desktop
+      </button>
+      <button type="button" onClick={() => setOpenMobile(false)}>
+        Close mobile
+      </button>
+      <output>
+        {state} / {openMobile ? "mobile open" : "mobile closed"}
+      </output>
+    </>
+  );
+}
+function SidebarMotionFixture() {
+  return (
+    <SidebarProvider className="relative isolate h-96 min-h-96 overflow-hidden [transform:translateZ(0)]">
+      <Sidebar className="md:absolute md:h-full">
+        <SidebarHeader>
+          <SidebarInput aria-label="Sidebar fixture draft" />
+        </SidebarHeader>
+        <SidebarContent>
+          <nav aria-label="Fixture workspace">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton render={<a href="#destination" />}>Overview</SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </nav>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+      <SidebarInset role="region" aria-label="Fixture content">
+        <SidebarTrigger />
+        <SidebarFixtureControls />
+        <p id="destination">Destination</p>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 
@@ -308,6 +368,7 @@ function PopupMotionFixture({
               </SheetContent>
             </Sheet>
           )}
+          {component === "sidebar" && <SidebarMotionFixture />}
           {component === "drawer" && (
             <Drawer showSwipeHandle>
               <DrawerTrigger render={<Button />}>Open drawer</DrawerTrigger>

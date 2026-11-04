@@ -222,5 +222,20 @@
     "container-resize",
     "nested-panels",
     "custom-parts"
+  ],
+  "sidebar": [
+    "icon-navigation",
+    "controlled-navigation",
+    "variants",
+    "right-side",
+    "collapse-modes",
+    "mobile-behavior",
+    "menu-styles",
+    "groups-and-actions",
+    "sub-navigation",
+    "loading-navigation",
+    "caller-updates",
+    "custom-parts",
+    "without-motion"
   ]
 }

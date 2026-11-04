@@ -1,157 +1,573 @@
 "use client";
 
-import { Home, Inbox, Settings } from "lucide-react";
-import { useState } from "react";
-import type { CadenceMode } from "@/registry/cadence/lib/motion";
+import { Home, Inbox, MoreHorizontal, Plus, Settings, X } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useRef, useState } from "react";
+import { Button } from "@/registry/cadence/button";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   SidebarInput,
+  SidebarInset,
   SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
+  SidebarSeparator,
   SidebarTrigger,
   useSidebar,
 } from "@/registry/cadence/sidebar";
-import { usePreviewVariant } from "./use-preview-variant";
+import { PreviewStack } from "./shell";
 
-const previewVariantOptions = ["sidebar", "floating", "inset"] as const;
-
-function Controls() {
-  const { state, openMobile, setOpen, setOpenMobile } = useSidebar();
+// The transform contains desktop fixed panels inside this embedded application shell.
+// SidebarInset is a region here because the documentation already has a main landmark.
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <SidebarTrigger />
-      <button className="rounded-md border px-2 py-1 text-sm" type="button" onClick={() => setOpen(true)}>
-        Expand
-      </button>
-      <button className="rounded-md border px-2 py-1 text-sm" type="button" onClick={() => setOpen(false)}>
-        Collapse
-      </button>
-      <button className="rounded-md border px-2 py-1 text-sm" type="button" onClick={() => setOpenMobile(false)}>
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden"
+          aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function HookControls() {
+  const { state, openMobile, isMobile, setOpen, setOpenMobile, toggleSidebar } = useSidebar();
+  return (
+    <div className="flex flex-col items-start gap-2 text-xs">
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+        Expand desktop
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setOpen(false)}>
+        Collapse desktop
+      </Button>
+      <Button size="sm" variant="outline" onClick={toggleSidebar}>
+        Toggle navigation
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setOpenMobile(true)}>
+        Open mobile
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setOpenMobile(false)}>
         Close mobile
-      </button>
-      <output data-testid="sidebar-state">
-        {state} / {openMobile ? "mobile open" : "mobile closed"}
+      </Button>
+      <output data-sidebar-state>
+        {state} / {openMobile ? "mobile open" : "mobile closed"} / {isMobile ? "mobile" : "desktop"}
       </output>
     </div>
   );
 }
-export function SidebarPreview() {
-  const { control, choose, select: selectPreviewVariant } = usePreviewVariant("Sidebar", previewVariantOptions);
-  const [mode, setMode] = useState<CadenceMode>("full");
+
+function ControlledNavigation() {
   const [open, setOpen] = useState(true);
-  const [side, setSide] = useState<"left" | "right">("left");
-  const [collapsible, setCollapsible] = useState<"offcanvas" | "icon" | "none">("offcanvas");
-  const [variant, setVariant] = useState<"sidebar" | "floating" | "inset">("sidebar");
+  const [changes, setChanges] = useState(0);
   return (
-    <>
-      {control}
-      <div className="grid w-full min-w-0 gap-4">
-        <div className="flex flex-wrap gap-3 text-sm">
-          <label>
-            Panel motion{" "}
-            <select aria-label="Panel motion" value={mode} onChange={(e) => setMode(e.target.value as CadenceMode)}>
-              {["full", "reduced", "none"].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Side{" "}
-            <select value={side} onChange={(e) => setSide(e.target.value as typeof side)}>
-              <option>left</option>
-              <option>right</option>
-            </select>
-          </label>
-          <label>
-            Collapse mode{" "}
-            <select value={collapsible} onChange={(e) => setCollapsible(e.target.value as typeof collapsible)}>
-              {["offcanvas", "icon", "none"].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Variant{" "}
-            <select
-              value={choose(variant)}
-              onChange={(e) => {
-                selectPreviewVariant("all");
-                setVariant(e.target.value as typeof variant);
-              }}
-            >
-              {["sidebar", "floating", "inset"].map((v) => (
-                <option key={v}>{v}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <CadenceProvider mode={mode}>
-          <SidebarProvider
-            open={open}
-            onOpenChange={setOpen}
-            className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
-          >
-            <Sidebar side={side} collapsible={collapsible} variant={choose(variant)} className="absolute h-full">
-              <SidebarHeader>
-                <strong>Acme workspace</strong>
-                <SidebarInput aria-label="Search workspace" placeholder="Search workspace" />
-              </SidebarHeader>
-              <SidebarContent>
-                <nav aria-label="Workspace">
-                  <SidebarGroup>
-                    <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-                    <SidebarMenu>
-                      {(
-                        [
-                          [Home, "Overview"],
-                          [Inbox, "Inbox"],
-                          [Settings, "Settings"],
-                        ] as const
-                      ).map(([Icon, label]) => (
-                        <SidebarMenuItem key={String(label)}>
-                          <SidebarMenuButton
-                            render={<a href="#workspace-content" />}
-                            tooltip={String(label)}
-                            isActive={label === "Overview"}
-                          >
-                            {typeof Icon !== "string" && <Icon aria-hidden="true" />}
-                            <span>{String(label)}</span>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroup>
-                </nav>
-              </SidebarContent>
-              <SidebarFooter>
-                <span className="truncate text-xs">Acme team</span>
-              </SidebarFooter>
-              <SidebarRail />
-            </Sidebar>
-            <div id="workspace-content" className="flex min-w-0 flex-1 flex-col gap-4 p-4">
-              <Controls />
-              <h3 className="font-medium">Project overview</h3>
-              <p className="text-sm text-muted-foreground">
-                Use the toggle or Ctrl/Cmd+B. On small screens, navigation opens in a sheet.
-              </p>
-              <input
-                className="min-w-0 rounded border p-2"
-                aria-label="Workspace draft"
-                placeholder="Draft stays during desktop toggles"
-              />
-            </div>
-          </SidebarProvider>
-        </CadenceProvider>
-      </div>
-    </>
+    <Frame
+      label="Controlled navigation"
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        setChanges((n) => n + 1);
+      }}
+      content={
+        <>
+          <HookControls />
+          <output aria-label="Desktop changes">Desktop changes: {changes}</output>
+        </>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full">
+        <Navigation label="Controlled navigation" />
+      </Sidebar>
+    </Frame>
   );
+}
+
+function MobileClose() {
+  const { isMobile, setOpenMobile } = useSidebar();
+  return isMobile ? (
+    <Button variant="ghost" size="sm" onClick={() => setOpenMobile(false)}>
+      <X aria-hidden="true" />
+      Close navigation
+    </Button>
+  ) : null;
+}
+function MobileBehavior() {
+  const [draft, setDraft] = useState("");
+  return (
+    <Frame
+      label="Mobile workspace"
+      side="right"
+      content={<p className="text-xs">Navigation becomes a Sheet below 768px.</p>}
+    >
+      <Sidebar side="right" className="md:absolute md:h-full">
+        <SidebarHeader>
+          <MobileClose />
+          <SidebarInput
+            aria-label="Persistent mobile draft"
+            placeholder="Caller-owned draft"
+            value={draft}
+            onValueChange={setDraft}
+          />
+        </SidebarHeader>
+        <SidebarContent>
+          <Navigation label="Mobile workspace" />
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function MenuStyles() {
+  return (
+    <Frame label="Menu styles">
+      <Sidebar collapsible="none" className="h-full">
+        <SidebarContent>
+          <nav aria-label="Menu styles">
+            <SidebarGroup>
+              <SidebarGroupLabel>Commands</SidebarGroupLabel>
+              <SidebarMenu>
+                {(["sm", "default", "lg"] as const).map((size) => (
+                  <SidebarMenuItem key={size}>
+                    <SidebarMenuButton size={size}>
+                      <Home aria-hidden="true" />
+                      <span>{size} command</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton variant="outline">
+                    <Inbox aria-hidden="true" />
+                    <span>Outline command</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton isActive aria-pressed="true">
+                    Active command
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton disabled>Disabled command</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function GroupsAndActions() {
+  const [projects, setProjects] = useState(["Website"]);
+  const [action, setAction] = useState("No project action");
+  return (
+    <Frame label="Project actions" content={<output>{action}</output>}>
+      <Sidebar className="md:absolute md:h-full" collapsible="icon">
+        <SidebarHeader>
+          <span className="truncate text-sm font-medium">Acme projects</span>
+        </SidebarHeader>
+        <SidebarSeparator />
+        <SidebarContent>
+          <nav aria-label="Project actions">
+            <SidebarGroup>
+              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>Projects</SidebarGroupLabel>
+              <SidebarGroupAction
+                aria-label="Add project"
+                onClick={() => setProjects((rows) => [...rows, `Project ${rows.length + 1}`])}
+              >
+                <Plus aria-hidden="true" />
+              </SidebarGroupAction>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {projects.map((name, i) => (
+                    <SidebarMenuItem key={name}>
+                      <SidebarMenuButton onClick={() => setAction(`Opened ${name}`)}>
+                        <Home aria-hidden="true" />
+                        <span>{name}</span>
+                      </SidebarMenuButton>
+                      {i === 0 ? (
+                        <SidebarMenuBadge aria-label="3 updates">3</SidebarMenuBadge>
+                      ) : (
+                        <SidebarMenuAction
+                          showOnHover
+                          aria-label={`Options for ${name}`}
+                          onClick={() => setAction(`Options for ${name}`)}
+                        >
+                          <MoreHorizontal aria-hidden="true" />
+                        </SidebarMenuAction>
+                      )}
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+        <SidebarSeparator />
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => setAction("Opened settings")}>
+                <Settings aria-hidden="true" />
+                <span>Settings</span>
+              </SidebarMenuButton>
+              <SidebarMenuAction aria-label="Settings options" onClick={() => setAction("Settings options")}>
+                <MoreHorizontal aria-hidden="true" />
+              </SidebarMenuAction>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function SubNavigation() {
+  const id = useId();
+  return (
+    <Frame label="Nested navigation">
+      <Sidebar collapsible="icon" className="md:absolute md:h-full">
+        <SidebarContent>
+          <nav aria-label="Nested navigation">
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Home aria-hidden="true" />
+                    <span>Projects</span>
+                  </SidebarMenuButton>
+                  <SidebarMenuSub>
+                    {(["md", "sm"] as const).map((size) => (
+                      <SidebarMenuSubItem key={size}>
+                        <SidebarMenuSubButton
+                          size={size}
+                          href={`#${id}`}
+                          isActive={size === "md"}
+                          aria-current={size === "md" ? "page" : undefined}
+                        >
+                          {size} project
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton aria-disabled="true" tabIndex={-1}>
+                        Unavailable project
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+          <span id={id} className="sr-only">
+            Project destination
+          </span>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function LoadingNavigation() {
+  const [ready, setReady] = useState(false);
+  return (
+    <Frame
+      label="Loading navigation"
+      content={
+        <Button size="sm" variant="outline" onClick={() => setReady((value) => !value)}>
+          {ready ? "Reload navigation" : "Show navigation"}
+        </Button>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full">
+        <SidebarContent>
+          <SidebarGroup>
+            {ready ? (
+              <nav aria-label="Loaded projects">
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>Website</SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </nav>
+            ) : (
+              <div role="status" aria-label="Loading projects">
+                <SidebarMenuSkeleton />
+                <SidebarMenuSkeleton showIcon />
+              </div>
+            )}
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function CallerUpdates() {
+  const [projects, setProjects] = useState(["Website", "Mobile app"]);
+  const [draft, setDraft] = useState("");
+  return (
+    <Frame
+      label="Caller updates"
+      content={
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setProjects((rows) => (rows.length === 2 ? [...rows, "Desktop app"] : rows.slice(0, 2)))}
+        >
+          {projects.length === 2 ? "Add project" : "Remove project"}
+        </Button>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full">
+        <SidebarHeader>
+          <SidebarInput
+            aria-label="Project draft"
+            value={draft}
+            onValueChange={setDraft}
+            placeholder="Caller-owned draft"
+          />
+        </SidebarHeader>
+        <SidebarContent>
+          <nav aria-label="Caller updates">
+            <SidebarGroup>
+              <SidebarMenu>
+                {projects.map((name) => (
+                  <SidebarMenuItem key={name}>
+                    <SidebarMenuButton>{name}</SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function CustomParts() {
+  const link = useRef<HTMLAnchorElement>(null);
+  const id = useId();
+  const [clicks, setClicks] = useState(0);
+  return (
+    <Frame
+      label="Custom parts"
+      side="right"
+      content={
+        <>
+          <Button className="hidden md:inline-flex" size="sm" variant="outline" onClick={() => link.current?.focus()}>
+            Focus project link
+          </Button>
+          <output>Native clicks: {clicks}</output>
+        </>
+      }
+    >
+      <Sidebar side="right" dir="rtl" style={{ transform: "none" }} className="md:absolute md:h-full">
+        <SidebarContent>
+          <nav aria-label="Custom parts">
+            <SidebarGroup>
+              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>المشاريع</SidebarGroupLabel>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    render={<a ref={link} href={`#${id}`} lang="ar" />}
+                    onClick={() => setClicks((n) => n + 1)}
+                    tooltip={{ children: "Website", side: "left" }}
+                  >
+                    <Home aria-hidden="true" />
+                    <span>الموقع</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+          <span id={id} className="sr-only">
+            Custom project destination
+          </span>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function SidebarPreview({ example }: { example?: string }) {
+  let content: ReactNode;
+  switch (example) {
+    case "icon-navigation":
+      content = <Workspace label="Icon navigation" collapsible="icon" defaultOpen={false} />;
+      break;
+    case "controlled-navigation":
+      content = <ControlledNavigation />;
+      break;
+    case "variants":
+      content = (["sidebar", "floating", "inset"] as const).map((variant) => (
+        <Workspace key={variant} label={`${variant} navigation`} variant={variant} />
+      ));
+      break;
+    case "right-side":
+      content = <Workspace label="Right navigation" side="right" />;
+      break;
+    case "collapse-modes":
+      content = (["offcanvas", "icon", "none"] as const).map((collapsible) => (
+        <Workspace
+          key={collapsible}
+          label={`${collapsible} navigation`}
+          collapsible={collapsible}
+          defaultOpen={false}
+        />
+      ));
+      break;
+    case "mobile-behavior":
+      content = <MobileBehavior />;
+      break;
+    case "menu-styles":
+      content = <MenuStyles />;
+      break;
+    case "groups-and-actions":
+      content = <GroupsAndActions />;
+      break;
+    case "sub-navigation":
+      content = <SubNavigation />;
+      break;
+    case "loading-navigation":
+      content = <LoadingNavigation />;
+      break;
+    case "caller-updates":
+      content = <CallerUpdates />;
+      break;
+    case "custom-parts":
+      content = <CustomParts />;
+      break;
+    case "without-motion":
+      content = (
+        <CadenceProvider mode="none">
+          <Workspace label="Instant navigation" />
+        </CadenceProvider>
+      );
+      break;
+    default:
+      content = <Workspace label="Workspace navigation" />;
+  }
+  return <PreviewStack>{content}</PreviewStack>;
 }

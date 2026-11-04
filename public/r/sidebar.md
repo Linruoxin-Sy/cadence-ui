@@ -16,39 +16,1731 @@ npx shadcn@latest add @cadence/sidebar
 
 ## Usage
 
-```tsx
-import { Sidebar, SidebarProvider, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/cadence/sidebar";
+A minimal embedded application shell with real search and links. At the application root, use the default main semantics of SidebarInset; the region role below is for embedding in this documentation.
 
-export function Workspace() {
-  return <SidebarProvider>
-    <Sidebar><SidebarContent><nav aria-label="Workspace"><SidebarMenu>
-      <SidebarMenuItem><SidebarMenuButton render={<a href="/projects" />}>Projects</SidebarMenuButton></SidebarMenuItem>
-    </SidebarMenu></nav></SidebarContent></Sidebar>
-    <main><SidebarTrigger />Your content</main>
-  </SidebarProvider>;
+```tsx
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <Workspace label="Workspace navigation" />;
 }
 ```
 
 ## Icon navigation
 
-Use `collapsible="icon"` with an icon and text inside each `SidebarMenuButton`. A `tooltip` string
-labels the collapsed icon. Keep an accessible name on rendered links. Widths update immediately;
-menu children stay mounted on desktop.
+The fixed icon rail starts collapsed on desktop. Keep icon and text in each button; the text still names the link, and the string tooltip appears on focus or hover. Rail widths and labels change immediately; only offcanvas travel uses the Sidebar recipe. Search remains a real filter when expanded; the compact rail hides its header text, search and footer text.
+
+<ComponentExample name="icon-navigation" />
+
+```tsx
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <Workspace label="Icon navigation" collapsible="icon" defaultOpen={false} />;
+}
+```
 
 ## Controlled navigation
 
+The caller owns desktop open and observes every requested change. Only this behavior example adds external controls. useSidebar exposes state, open, setOpen, openMobile, setOpenMobile, isMobile and toggleSidebar. Desktop open does not control the mobile Sheet; opening mobile while on desktop only records that separate state. The setter writes sidebar_state for seven days at path / but never reads it. Read a cookie on the server and supply defaultOpen to restore an uncontrolled shell.
+
+<ComponentExample name="controlled-navigation" />
+
 ```tsx
-const [open, setOpen] = React.useState(true);
-return <SidebarProvider open={open} onOpenChange={setOpen}>
-  <Sidebar collapsible="offcanvas">Navigation</Sidebar>
-  <SidebarTrigger />
-</SidebarProvider>;
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function HookControls() {
+  const { state, openMobile, isMobile, setOpen, setOpenMobile, toggleSidebar } = useSidebar();
+  return (
+    <div className="flex flex-col items-start gap-2 text-xs">
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+        Expand desktop
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setOpen(false)}>
+        Collapse desktop
+      </Button>
+      <Button size="sm" variant="outline" onClick={toggleSidebar}>
+        Toggle navigation
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setOpenMobile(true)}>
+        Open mobile
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setOpenMobile(false)}>
+        Close mobile
+      </Button>
+      <output data-sidebar-state>
+        {state} / {openMobile ? "mobile open" : "mobile closed"} / {isMobile ? "mobile" : "desktop"}
+      </output>
+    </div>
+  );
+}
+
+function ControlledNavigation() {
+  const [open, setOpen] = useState(true);
+  const [changes, setChanges] = useState(0);
+  return (
+    <Frame
+      label="Controlled navigation"
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        setChanges((n) => n + 1);
+      }}
+      content={
+        <>
+          <HookControls />
+          <output aria-label="Desktop changes">Desktop changes: {changes}</output>
+        </>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full">
+        <Navigation label="Controlled navigation" />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <ControlledNavigation />;
+}
 ```
 
-The desktop setter writes `sidebar_state=true|false`, path `/`, max-age seven days. It does not read
-that cookie. Read it on the server and pass `defaultOpen` when persistence is needed. Supplying
-`onOpenChange` delegates state changes to that callback, as upstream does. Mobile state is separate;
-`useSidebar()` exposes `openMobile`, `setOpenMobile`, `isMobile`, and `toggleSidebar`.
+## Variants
+
+These fixed shells compare sidebar, floating and inset separately. Floating adds a padded rounded panel; inset styles its sibling SidebarInset. In this embedded documentation each inset uses role="region" because the page already has a main; use its default main landmark at your application root. The containing transform and absolute panel keep each desktop specimen inside its own card. The local 12rem desktop width is an embedding choice, not a library default.
+
+<ComponentExample name="variants" />
+
+```tsx
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <div className="grid gap-5">{(["sidebar", "floating", "inset"] as const).map(variant => <Workspace key={variant} label={`${variant} navigation`} variant={variant} />)}</div>;
+}
+```
+
+## Right side
+
+side="right" chooses the physical desktop and mobile edge. Reverse the provider row so its gap and application content match that edge. This fixed example does not change the document reading direction.
+
+<ComponentExample name="right-side" />
+
+```tsx
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <Workspace label="Right navigation" side="right" />;
+}
+```
+
+## Collapse modes
+
+The three shells start with desktop defaultOpen=false. Offcanvas removes its gap and makes hidden navigation inert; icon retains a compact rail; none stays static and visible on every viewport. A none sidebar still receives provider state, but its trigger cannot visually hide it. On small screens offcanvas and icon both become a Sheet; none remains in the document.
+
+<ComponentExample name="collapse-modes" />
+
+```tsx
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <div className="grid gap-5">{(["offcanvas", "icon", "none"] as const).map(collapsible => <Workspace key={collapsible} label={`${collapsible} navigation`} collapsible={collapsible} defaultOpen={false} />)}</div>;
+}
+```
+
+## Mobile behavior
+
+Below 768px the real trigger opens a right-edge Sheet. The explicit close control calls setOpenMobile(false); Escape and backdrop dismissal also close it. Desktop and mobile trees can remount, and closing the default Sheet unmounts its children. Keep a draft above Sidebar, as here, to survive close/reopen and viewport changes. Search inside Navigation is intentionally local and resets when its tree remounts.
+
+<ComponentExample name="mobile-behavior" />
+
+```tsx
+"use client";
+
+import { Home, Inbox, Settings, X } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger, useSidebar } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+function MobileClose() {
+  const { isMobile, setOpenMobile } = useSidebar();
+  return isMobile ? (
+    <Button variant="ghost" size="sm" onClick={() => setOpenMobile(false)}>
+      <X aria-hidden="true" />
+      Close navigation
+    </Button>
+  ) : null;
+}
+
+function MobileBehavior() {
+  const [draft, setDraft] = useState("");
+  return (
+    <Frame label="Mobile workspace" side="right" content={<p className="text-xs">Navigation becomes a Sheet below 768px.</p>}>
+      <Sidebar side="right" className="md:absolute md:h-full">
+        <SidebarHeader>
+          <MobileClose />
+          <SidebarInput
+            aria-label="Persistent mobile draft"
+            placeholder="Caller-owned draft"
+            value={draft}
+            onValueChange={setDraft}
+          />
+        </SidebarHeader>
+        <SidebarContent>
+          <Navigation label="Mobile workspace" />
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <MobileBehavior />;
+}
+```
+
+## Menu styles
+
+Compare the default and outline menu-button variants and the sm/default/lg size axis without multiplying every combination. isActive controls styling; aria-pressed belongs to the caller for a command. Use aria-current on a real navigation link. Native disabled prevents command activation. These are ordinary controls and links, with normal Tab order rather than menu arrow navigation.
+
+<ComponentExample name="menu-styles" />
+
+```tsx
+"use client";
+
+import { Home, Inbox } from "lucide-react";
+import { type CSSProperties, type ReactNode } from "react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function MenuStyles() {
+  return (
+    <Frame label="Menu styles">
+      <Sidebar collapsible="none" className="h-full">
+        <SidebarContent>
+          <nav aria-label="Menu styles">
+            <SidebarGroup>
+              <SidebarGroupLabel>Commands</SidebarGroupLabel>
+              <SidebarMenu>
+                {(["sm", "default", "lg"] as const).map((size) => (
+                  <SidebarMenuItem key={size}>
+                    <SidebarMenuButton size={size}>
+                      <Home aria-hidden="true" />
+                      <span>{size} command</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton variant="outline">
+                    <Inbox aria-hidden="true" />
+                    <span>Outline command</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton isActive aria-pressed="true">
+                    Active command
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton disabled>Disabled command</SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <MenuStyles />;
+}
+```
+
+## Groups and actions
+
+Header, footer, separator, group label and group content organize navigation. Add project is a real caller-owned action; each new stable name receives its own menu action. The badge is a non-interactive count. The fixed footer action is always visible, while showOnHover reveals row actions on hover or keyboard focus. Icon collapse hides group labels, badges and actions. A group label may render as a heading.
+
+<ComponentExample name="groups-and-actions" />
+
+```tsx
+"use client";
+
+import { Home, MoreHorizontal, Plus, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useState } from "react";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuAction, SidebarMenuBadge, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarSeparator, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function GroupsAndActions() {
+  const [projects, setProjects] = useState(["Website"]);
+  const [action, setAction] = useState("No project action");
+  return (
+    <Frame label="Project actions" content={<output>{action}</output>}>
+      <Sidebar className="md:absolute md:h-full" collapsible="icon">
+        <SidebarHeader>
+          <span className="truncate text-sm font-medium">Acme projects</span>
+        </SidebarHeader>
+        <SidebarSeparator />
+        <SidebarContent>
+          <nav aria-label="Project actions">
+            <SidebarGroup>
+              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>Projects</SidebarGroupLabel>
+              <SidebarGroupAction
+                aria-label="Add project"
+                onClick={() => setProjects((rows) => [...rows, `Project ${rows.length + 1}`])}
+              >
+                <Plus aria-hidden="true" />
+              </SidebarGroupAction>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {projects.map((name, i) => (
+                    <SidebarMenuItem key={name}>
+                      <SidebarMenuButton onClick={() => setAction(`Opened ${name}`)}>
+                        <Home aria-hidden="true" />
+                        <span>{name}</span>
+                      </SidebarMenuButton>
+                      {i === 0 ? (
+                        <SidebarMenuBadge aria-label="3 updates">3</SidebarMenuBadge>
+                      ) : (
+                        <SidebarMenuAction
+                          showOnHover
+                          aria-label={`Options for ${name}`}
+                          onClick={() => setAction(`Options for ${name}`)}
+                        >
+                          <MoreHorizontal aria-hidden="true" />
+                        </SidebarMenuAction>
+                      )}
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+        <SidebarSeparator />
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={() => setAction("Opened settings")}>
+                <Settings aria-hidden="true" />
+                <span>Settings</span>
+              </SidebarMenuButton>
+              <SidebarMenuAction aria-label="Settings options" onClick={() => setAction("Settings options")}>
+                <MoreHorizontal aria-hidden="true" />
+              </SidebarMenuAction>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <GroupsAndActions />;
+}
+```
+
+## Sub-navigation
+
+Sub lists remain semantic ul/li navigation. Compare md and sm sub-buttons; the active link supplies aria-current. The unavailable link has no href and leaves the Tab order. Icon collapse hides the sublist immediately. Compose Collapsible separately when disclosure behavior is needed; this list does not invent a disclosure or animate its height.
+
+<ComponentExample name="sub-navigation" />
+
+```tsx
+"use client";
+
+import { Home } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId } from "react";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function SubNavigation() {
+  const id = useId();
+  return (
+    <Frame label="Nested navigation">
+      <Sidebar collapsible="icon" className="md:absolute md:h-full">
+        <SidebarContent>
+          <nav aria-label="Nested navigation">
+            <SidebarGroup>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton>
+                    <Home aria-hidden="true" />
+                    <span>Projects</span>
+                  </SidebarMenuButton>
+                  <SidebarMenuSub>
+                    {(["md", "sm"] as const).map((size) => (
+                      <SidebarMenuSubItem key={size}>
+                        <SidebarMenuSubButton
+                          size={size}
+                          href={`#${id}`}
+                          isActive={size === "md"}
+                          aria-current={size === "md" ? "page" : undefined}
+                        >
+                          {size} project
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton aria-disabled="true" tabIndex={-1}>
+                        Unavailable project
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+          <span id={id} className="sr-only">
+            Project destination
+          </span>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <SubNavigation />;
+}
+```
+
+## Loading navigation
+
+The caller swaps two deterministic skeleton rows for a real navigation row. showIcon adds a skeleton glyph. The loading status supplies an accessible label; skeleton widths are stable between server and client. Pulse follows Skeleton's own inherited motion contract and stops in none.
+
+<ComponentExample name="loading-navigation" />
+
+```tsx
+"use client";
+
+import { type CSSProperties, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSkeleton, SidebarProvider, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function LoadingNavigation() {
+  const [ready, setReady] = useState(false);
+  return (
+    <Frame
+      label="Loading navigation"
+      content={
+        <Button size="sm" variant="outline" onClick={() => setReady((value) => !value)}>
+          {ready ? "Reload navigation" : "Show navigation"}
+        </Button>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full">
+        <SidebarContent>
+          <SidebarGroup>
+            {ready ? (
+              <nav aria-label="Loaded projects">
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton>Website</SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </nav>
+            ) : (
+              <div role="status" aria-label="Loading projects">
+                <SidebarMenuSkeleton />
+                <SidebarMenuSkeleton showIcon />
+              </div>
+            )}
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <LoadingNavigation />;
+}
+```
+
+## Caller updates
+
+Only this named behavior example adds and removes application data. Stable keys preserve surviving menu nodes. The input value lives above Sidebar and survives desktop toggles, header mode changes and mobile remounts. Sidebar does not fetch data, own permissions, validate the draft or animate row insertion.
+
+<ComponentExample name="caller-updates" />
+
+```tsx
+"use client";
+
+import { type CSSProperties, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function CallerUpdates() {
+  const [projects, setProjects] = useState(["Website", "Mobile app"]);
+  const [draft, setDraft] = useState("");
+  return (
+    <Frame
+      label="Caller updates"
+      content={
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setProjects((rows) => (rows.length === 2 ? [...rows, "Desktop app"] : rows.slice(0, 2)))}
+        >
+          {projects.length === 2 ? "Add project" : "Remove project"}
+        </Button>
+      }
+    >
+      <Sidebar className="md:absolute md:h-full">
+        <SidebarHeader>
+          <SidebarInput
+            aria-label="Project draft"
+            value={draft}
+            onValueChange={setDraft}
+            placeholder="Caller-owned draft"
+          />
+        </SidebarHeader>
+        <SidebarContent>
+          <nav aria-label="Caller updates">
+            <SidebarGroup>
+              <SidebarMenu>
+                {projects.map((name) => (
+                  <SidebarMenuItem key={name}>
+                    <SidebarMenuButton>{name}</SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+        </SidebarContent>
+        <SidebarRail />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <CallerUpdates />;
+}
+```
+
+## Custom parts
+
+Base UI render accepts a native element; the anchor ref, native event and hash destination stay usable. The external focus action is desktop-only, where the link stays mounted. dir="rtl" follows the panel through its mobile portal. A tooltip props object configures the collapsed tooltip. This example deliberately supplies style.transform="none": caller ownership suppresses desktop offcanvas travel, so collapsing makes content inert without moving that caller-positioned surface. Manage its position yourself or omit transform for standard offcanvas behavior.
+
+<ComponentExample name="custom-parts" />
+
+```tsx
+"use client";
+
+import { Home } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useRef, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function CustomParts() {
+  const link = useRef<HTMLAnchorElement>(null);
+  const id = useId();
+  const [clicks, setClicks] = useState(0);
+  return (
+    <Frame
+      label="Custom parts"
+      side="right"
+      content={
+        <>
+          <Button className="hidden md:inline-flex" size="sm" variant="outline" onClick={() => link.current?.focus()}>
+            Focus project link
+          </Button>
+          <output>Native clicks: {clicks}</output>
+        </>
+      }
+    >
+      <Sidebar side="right" dir="rtl" style={{ transform: "none" }} className="md:absolute md:h-full">
+        <SidebarContent>
+          <nav aria-label="Custom parts">
+            <SidebarGroup>
+              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>المشاريع</SidebarGroupLabel>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    render={<a ref={link} href={`#${id}`} lang="ar" />}
+                    onClick={() => setClicks((n) => n + 1)}
+                    tooltip={{ children: "Website", side: "left" }}
+                  >
+                    <Home aria-hidden="true" />
+                    <span>الموقع</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+          </nav>
+          <span id={id} className="sr-only">
+            Custom project destination
+          </span>
+        </SidebarContent>
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <CustomParts />;
+}
+```
+
+## Without motion
+
+This explicit local provider is fixed to none from the first render. Desktop positions and gaps update immediately; mobile Sheet, composed buttons and tooltips also inherit none. Other examples inherit the site header and system preference. This override does not configure neighboring examples.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Home, Inbox, Settings } from "lucide-react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInput, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, SidebarTrigger } from "@/components/cadence/sidebar";
+
+function Frame({
+  label,
+  children,
+  content,
+  side = "left",
+  defaultOpen = true,
+  open,
+  onOpenChange,
+}: {
+  label: string;
+  children: ReactNode;
+  content?: ReactNode;
+  side?: "left" | "right";
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  return (
+    <SidebarProvider
+      defaultOpen={defaultOpen}
+      open={open}
+      onOpenChange={onOpenChange}
+      style={{ "--sidebar-width": "12rem" } as CSSProperties}
+      className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
+    >
+      {children}
+      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+        <SidebarTrigger aria-label={`Toggle ${label}`} />
+        <h3 className="text-sm font-medium">Project overview</h3>
+        {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
+
+function Navigation({ label }: { label: string }) {
+  const target = useId();
+  const [query, setQuery] = useState("");
+  return (
+    <>
+      <SidebarHeader>
+        <strong className="truncate text-sm group-data-[collapsible=icon]:hidden">Acme workspace</strong>
+        <SidebarInput
+          className="group-data-[collapsible=icon]:hidden" aria-label={`Search ${label}`}
+          placeholder="Search workspace"
+          value={query}
+          onValueChange={setQuery}
+        />
+      </SidebarHeader>
+      <SidebarContent>
+        <nav aria-label={label}>
+          <SidebarGroup>
+            <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {(
+                  [
+                    [Home, "Overview"],
+                    [Inbox, "Inbox"],
+                    [Settings, "Settings"],
+                  ] as const
+                )
+                  .filter(([, text]) => text.toLowerCase().includes(query.toLowerCase()))
+                  .map(([Icon, text]) => (
+                    <SidebarMenuItem key={text}>
+                      <SidebarMenuButton
+                        render={<a href={`#${target}`} aria-current={text === "Overview" ? "page" : undefined} />}
+                        isActive={text === "Overview"}
+                        tooltip={text}
+                      >
+                        <Icon aria-hidden="true" />
+                        <span>{text}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+            <p id={target} className="sr-only">
+              Workspace navigation destination
+            </p>
+          </SidebarGroup>
+        </nav>
+      </SidebarContent>
+      <SidebarFooter>
+        <span className="truncate text-xs group-data-[collapsible=icon]:hidden">Acme team</span>
+      </SidebarFooter>
+      <SidebarRail />
+    </>
+  );
+}
+
+function Workspace({
+  label,
+  side = "left",
+  variant = "sidebar",
+  collapsible = "offcanvas",
+  defaultOpen = true,
+}: {
+  label: string;
+  side?: "left" | "right";
+  variant?: "sidebar" | "floating" | "inset";
+  collapsible?: "offcanvas" | "icon" | "none";
+  defaultOpen?: boolean;
+}) {
+  return (
+    <Frame label={label} side={side} defaultOpen={defaultOpen}>
+      <Sidebar side={side} variant={variant} collapsible={collapsible} className="md:absolute md:h-full">
+        <Navigation label={label} />
+      </Sidebar>
+    </Frame>
+  );
+}
+
+export function Example() {
+  return <CadenceProvider mode="none"><Workspace label="Instant navigation" /></CadenceProvider>;
+}
+```
 
 ## When to use
 
@@ -119,13 +1811,13 @@ are owned by those dependencies, not extra Sidebar recipes. Their effective mode
 Wrap navigation links in a named nav landmark. `isActive` styles the item; add `aria-current="page"`
 to the active link yourself. Offcanvas desktop contents are inert while closed. The mobile Sheet
 has a hidden title and description, traps focus, dismisses with Escape/outside click and restores
-focus. Place a visible close control inside long mobile navigation when needed.
+focus. Place a visible close control inside long mobile navigation when needed. Each example here has a separate provider and unique targets. The window shortcut broadcasts to every mounted provider, so use the individual triggers when comparing several shells on one page.
 
 ## Keyboard interactions
 
 | Keys | Action |
 | --- | --- |
-| Ctrl+B / Cmd+B | Toggle desktop state or mobile sheet. Also applies inside inputs, matching upstream. |
+| Ctrl+B / Cmd+B | Toggle desktop state or mobile sheet. Also applies inside inputs, matching upstream. Every mounted provider listens on window; multiple independent shells all respond. |
 | Tab / Shift+Tab | Normal links and controls; no menu-style arrow navigation. |
 | Enter / Space | Activate the trigger. |
 | Escape | Dismiss the mobile sheet. |
