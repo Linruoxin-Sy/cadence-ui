@@ -69,7 +69,7 @@ export function EditorMenubar() {
 
 The bar coordinates sibling menus. Use Left/Right to move between horizontal triggers and between open menus. The first fixed bar uses the default looping focus; the second sets `loopFocus={false}` so traversal stops at either end.
 
-Current limitation: after opening menus with the pointer and dismissing them with Escape, moving to a previously dismissed neighbour can focus its trigger while leaving the earlier panel open. Press Enter on the focused trigger to open that menu. This pointer-history case is recorded as an unresolved keyboard regression; fresh keyboard traversal is shown below.
+Current limitation: after opening menus with the pointer and dismissing them with Escape, moving to a previously dismissed neighbour can focus its trigger while leaving the earlier panel open. Press Enter on the focused trigger to open that menu. This also occurs with unstyled Base UI primitives and with motion set to none. This pointer-history case remains an unresolved keyboard regression; fresh keyboard traversal is shown below.
 
 <ComponentExample name="traversal" />
 

@@ -13541,7 +13541,7 @@ export function EditorMenubar() {
 
 The bar coordinates sibling menus. Use Left/Right to move between horizontal triggers and between open menus. The first fixed bar uses the default looping focus; the second sets `loopFocus={false}` so traversal stops at either end.
 
-Current limitation: after opening menus with the pointer and dismissing them with Escape, moving to a previously dismissed neighbour can focus its trigger while leaving the earlier panel open. Press Enter on the focused trigger to open that menu. This pointer-history case is recorded as an unresolved keyboard regression; fresh keyboard traversal is shown below.
+Current limitation: after opening menus with the pointer and dismissing them with Escape, moving to a previously dismissed neighbour can focus its trigger while leaving the earlier panel open. Press Enter on the focused trigger to open that menu. This also occurs with unstyled Base UI primitives and with motion set to none. This pointer-history case remains an unresolved keyboard regression; fresh keyboard traversal is shown below.
 
 <ComponentExample name="traversal" />
 
@@ -23085,6 +23085,12 @@ and use arrow keys to scroll, or use touch/pointer scrolling. The composition is
 SSR-compatible with deterministic example data. Keep caller arrays stable where
 possible; TanStack recomputes client row models when data/state change. This
 block is intended for paginated collections, not an unbounded dataset benchmark.
+
+The result region follows the visible row count. Filtering or changing application
+data can therefore move content below the table, even with motion set to none.
+Updates without recent user input can contribute to CLS; the absence of row
+animation does not guarantee layout stability. Reserve space in the surrounding
+application layout when background updates must keep neighbouring content still.
 
 ## Notes for AI
 

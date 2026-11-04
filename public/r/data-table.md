@@ -435,6 +435,12 @@ SSR-compatible with deterministic example data. Keep caller arrays stable where
 possible; TanStack recomputes client row models when data/state change. This
 block is intended for paginated collections, not an unbounded dataset benchmark.
 
+The result region follows the visible row count. Filtering or changing application
+data can therefore move content below the table, even with motion set to none.
+Updates without recent user input can contribute to CLS; the absence of row
+animation does not guarantee layout stability. Reserve space in the surrounding
+application layout when background updates must keep neighbouring content still.
+
 ## Notes for AI
 
 - Keep Base UI `render`, Dropdown Menu groups, native table markup and stable row IDs.
