@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
@@ -8,7 +7,6 @@ const ids = ["dialog", "alert-dialog", "sheet", "drawer", "popover", "tooltip", 
 type Id = (typeof ids)[number];
 const slot = (id: Id) => (id === "drawer" ? "drawer-popup" : `${id}-content`);
 const hover = (id: Id) => id === "tooltip" || id === "hover-card";
-const examples: Record<string, string[]> = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"));
 async function open(page: Page, id: Id) {
   const trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`).first();
   if (hover(id)) await trigger.hover();
@@ -23,18 +21,10 @@ async function mode(page: Page, value: string) {
     }, value);
     return;
   }
-  const id = new URL(page.url()).pathname.split("/").at(-1) ?? "";
-  if (examples[id]) {
-    await page
-      .locator('[role=group][aria-label="Motion mode"] button')
-      .filter({ hasText: new RegExp(`^${value}$`) })
-      .evaluate((node) => (node as HTMLButtonElement).click());
-    return;
-  }
-  await page.getByLabel("Popup motion", { exact: true }).evaluate((node, value) => {
-    (node as HTMLSelectElement).value = value;
-    node.dispatchEvent(new Event("change", { bubbles: true }));
-  }, value);
+  await page
+    .getByRole("group", { name: "Motion mode" })
+    .getByRole("button", { name: value, exact: true })
+    .evaluate((node) => (node as HTMLButtonElement).click());
 }
 async function start(page: Page, id: Id) {
   await page.evaluate((slot) => {
@@ -141,7 +131,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
           await page.mouse.move(0, 0);
           await page.setViewportSize({ width: 1280, height: 900 });
-          if (examples[id]) await openPopupMotionFixture(page, id, requested);
+          await openPopupMotionFixture(page, id, requested);
           // Restore the inherited clock. Explicit nested scopes are exercised separately below.
           await mode(page, "full");
           await start(page, id);
@@ -199,12 +189,15 @@ for (const colorScheme of ["light", "dark"] as const)
             (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
           ).toEqual([]);
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-          await page.screenshot({ path: `.cache/b4-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
+          await page.screenshot({
+            path: `.cache/shared-cleanup-proof/b4/${id}-${colorScheme}-${width}.png`,
+            fullPage: true,
+          });
           await open(page, id);
           expect(
             (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
           ).toEqual([]);
-          await page.screenshot({ path: `.cache/b4-proof/${id}-${colorScheme}-${width}-open.png` });
+          await page.screenshot({ path: `.cache/shared-cleanup-proof/b4/${id}-${colorScheme}-${width}-open.png` });
           await page.keyboard.press("Escape");
           await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
           await page.mouse.move(0, 0);
@@ -217,8 +210,7 @@ test.describe("B4 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      if (examples[id]) await openPopupMotionFixture(page, id, "none", 4);
-      else await page.goto(`/components/${id}?motion=none&speed=0.25`);
+      await openPopupMotionFixture(page, id, "none", 4);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
       await open(page, id);
@@ -342,8 +334,7 @@ test.describe("B4 keyboard placements", () => {
         await page.keyboard.press("Escape");
         await expect(popup).toHaveCount(0);
         if (!hover(id)) await expect(trigger).toBeFocused();
-        if (examples[id]) await page.getByRole("group", { name: "Motion mode" }).getByRole("button").first().focus();
-        else await page.getByLabel("Popup motion", { exact: true }).focus();
+        await page.getByRole("group", { name: "Motion mode" }).getByRole("button").first().focus();
       }
     });
 });

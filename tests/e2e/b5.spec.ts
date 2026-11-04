@@ -3,6 +3,7 @@ import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
 import { expectMenuAccessibility } from "./menu-accessibility";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
+import { installSelectCancellationProbe, selectCancellationProof } from "./select-live-cancellation";
 
 const ids = ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command", "toast"] as const;
 type Id = (typeof ids)[number];
@@ -31,17 +32,10 @@ async function mode(page: Page, value: string) {
     }, value);
     return;
   }
-  if (new URL(page.url()).pathname === "/components/select") {
-    await page
-      .getByRole("group", { name: "Motion mode" })
-      .getByRole("button", { name: value, exact: true })
-      .evaluate((node) => (node as HTMLButtonElement).click());
-    return;
-  }
-  await page.getByLabel("Popup motion", { exact: true }).evaluate((node, value) => {
-    (node as HTMLSelectElement).value = value;
-    node.dispatchEvent(new Event("change", { bubbles: true }));
-  }, value);
+  await page
+    .getByRole("group", { name: "Motion mode" })
+    .getByRole("button", { name: value, exact: true })
+    .evaluate((node) => (node as HTMLButtonElement).click());
 }
 async function start(page: Page, id: Id) {
   await page.evaluate((slot) => {
@@ -124,8 +118,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await close(page, id);
           const exit = await samples(page, 40);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
-          if (["dropdown-menu", "context-menu", "menubar", "combobox", "command", "toast"].includes(id))
-            await openPopupMotionFixture(page, id, requested);
+          if (id !== "select") await openPopupMotionFixture(page, id, requested);
           await mode(page, "full");
           await start(page, id);
           await open(page, id);
@@ -160,7 +153,10 @@ for (const colorScheme of ["light", "dark"] as const)
               (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
             ).toEqual([]);
             expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-            await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
+            await page.screenshot({
+              path: `.cache/shared-cleanup-proof/b5/${id}-${colorScheme}-${width}.png`,
+              fullPage: true,
+            });
             await open(page, id);
             if (id === "context-menu" || id === "menubar")
               await expectMenuAccessibility(page, async () => {
@@ -172,7 +168,7 @@ for (const colorScheme of ["light", "dark"] as const)
               expect(
                 (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
               ).toEqual([]);
-            await page.screenshot({ path: `.cache/b5-proof/${id}-${colorScheme}-${width}-open.png` });
+            await page.screenshot({ path: `.cache/shared-cleanup-proof/b5/${id}-${colorScheme}-${width}-open.png` });
             await close(page, id);
             if (id === "select") await expect(page.locator(`[data-slot="${slot(id)}"]`)).not.toBeVisible();
             else await expect(page.locator(`[data-slot="${slot(id)}"]`)).toHaveCount(0);
@@ -186,11 +182,40 @@ test.describe("B5 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu", "menubar", "combobox", "command", "toast"].includes(id))
-        await openPopupMotionFixture(page, id, "none", 4);
+      if (id !== "select") await openPopupMotionFixture(page, id, "none", 4);
       else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
+      if (id === "select") {
+        await installSelectCancellationProbe(page);
+        await open(page, id);
+        const proof = await selectCancellationProof(page);
+        await test.info().attach("native-select-live-cancellation", {
+          body: JSON.stringify(proof),
+          contentType: "application/json",
+        });
+        expect(proof.error).toBeUndefined();
+        expect(proof.frames.some((frame) => frame.mode === "full" && frame.properties.includes("scale"))).toBe(true);
+        const reduced = proof.frames.filter((frame) => frame.mode === "reduced");
+        expect(reduced).toHaveLength(1);
+        expect(reduced[0]?.same).toBe(true);
+        expect(reduced[0]?.scale).toBe("none");
+        expect(reduced[0]?.properties.every((property) => property === "opacity")).toBe(true);
+        const stopped = proof.frames.filter((frame) => frame.mode === "none");
+        expect(stopped).toHaveLength(16);
+        expect(
+          stopped.every(
+            (frame) =>
+              frame.same &&
+              frame.opacity === 1 &&
+              frame.scale === "none" &&
+              frame.duration === "0s" &&
+              frame.properties.length === 0,
+          ),
+        ).toBe(true);
+        await close(page, id);
+        return;
+      }
       await open(page, id);
       const popup = page.locator(`[data-slot="${slot(id)}"]`);
       await expect.poll(() => popup.evaluate((n) => n.getAnimations().length)).toBeGreaterThan(0);
@@ -512,8 +537,7 @@ test.describe("B5 native reversal", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command"] as const)
     test(`${id} reopens during exit on the same surface`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu", "menubar", "combobox", "command", "toast"].includes(id))
-        await openPopupMotionFixture(page, id, "full", 4);
+      if (id !== "select") await openPopupMotionFixture(page, id, "full", 4);
       else await page.goto(`/components/${id}?motion=full&speed=0.25`);
       await page.waitForLoadState("networkidle");
       await open(page, id);

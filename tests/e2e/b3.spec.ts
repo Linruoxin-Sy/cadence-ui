@@ -18,14 +18,13 @@ const parts = {
 } as const;
 type Id = keyof typeof parts;
 const ids = Object.keys(parts) as Id[];
-async function setMode(page: Page, id: Id, mode: "full" | "reduced" | "none") {
-  if (examples[id]) {
-    await page
-      .getByRole("group", { name: "Motion mode" })
-      .getByRole("button", { name: mode, exact: true })
-      .evaluate((button: HTMLButtonElement) => button.click());
-  } else await page.locator(`[data-preview="${id}"]`).getByLabel("Control motion").selectOption(mode);
+async function setMode(page: Page, mode: "full" | "reduced" | "none") {
+  await page
+    .getByRole("group", { name: "Motion mode" })
+    .getByRole("button", { name: mode, exact: true })
+    .evaluate((button: HTMLButtonElement) => button.click());
 }
+
 type Frame = { scale: number; x: number; opacity: number; animations: number };
 async function record(page: Page, selector: string) {
   await page.evaluate((selector) => {
@@ -67,9 +66,7 @@ async function frames(page: Page) {
   });
 }
 function controlScope(id: Id) {
-  return id === "progress" && examples[id]
-    ? '[data-component-example="progress/caller-progress"]'
-    : `[data-preview="${id}"]`;
+  return id === "progress" ? '[data-component-example="progress/caller-progress"]' : `[data-preview="${id}"]`;
 }
 async function act(page: Page, id: Id, held = false) {
   const p = page.locator(controlScope(id));
@@ -203,7 +200,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(new Set(opacity).size > 1).toBe(actual !== "none");
           }
           // Cancel a running recipe on the same node, including a held press.
-          await setMode(page, id, "full");
+          await setMode(page, "full");
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
           if (id === "input-otp") {
             const input = p.getByRole("textbox", { name: "Verification code", exact: true });
@@ -214,19 +211,19 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           }
           await record(page, selector);
           await act(page, id, true);
-          await setMode(page, id, "none");
+          await setMode(page, "none");
           await expect(p.locator(`[data-slot="${parts[id][0]}"]`).first()).toHaveAttribute("data-motion", "none");
           await record(page, selector);
           const stopped = await frames(page);
           expect(stopped.every((s) => s.animations === 0)).toBe(true);
           expect(new Set(stopped.map((s) => `${s.scale}/${s.x}/${s.opacity}`)).size).toBe(1);
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
-          // Restore the same ordinary control via the header; legacy pages still use their local scope.
+          // Restore the same ordinary control via the header.
           await page
             .getByRole("group", { name: "Motion mode" })
             .getByRole("button", { name: "none", exact: true })
             .click();
-          await setMode(page, id, "full");
+          await setMode(page, "full");
           await expect(p.locator(`[data-slot="${parts[id][0]}"]`).first()).toHaveAttribute(
             "data-motion",
             effectiveMode("full", reducedMotion === "reduce"),
@@ -249,8 +246,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(new Set(values.map((v) => v.toFixed(4))).size).toBeGreaterThan(2);
           }
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
-          if (examples[id] && ["toggle", "toggle-group", "input-otp", "progress"].includes(id)) {
-            await setMode(page, id, "none");
+          if (["toggle", "toggle-group", "input-otp", "progress"].includes(id)) {
+            await setMode(page, "none");
             const scope = page.locator(`[data-component-example="${id}/without-motion"] [data-testid="explicit-full"]`);
             const part = scope.locator(`[data-slot="${parts[id][1]}"]${id === "input-otp" ? " > span" : ""}`).first();
             await expect(part).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
@@ -280,10 +277,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(
               await staticScope.evaluate((n) => n.querySelector("[data-motion]")?.getAttribute("data-motion")),
             ).toBe("none");
-            await setMode(page, id, "full");
+            await setMode(page, "full");
             await p.scrollIntoViewIfNeeded();
-          } else if (examples[id]) {
-            await setMode(page, id, "none");
+          } else {
+            await setMode(page, "none");
             const nested = page.getByRole(
               id === "checkbox" ? "checkbox" : id === "radio-group" ? "radio" : id === "switch" ? "switch" : "slider",
               { name: `Explicit full ${id === "radio-group" ? "radio" : id}`, exact: true },
@@ -315,7 +312,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             expect(
               await staticScope.evaluate((node) => node.querySelector("[data-motion]")?.getAttribute("data-motion")),
             ).toBe("none");
-            await setMode(page, id, "full");
+            await setMode(page, "full");
             await p.scrollIntoViewIfNeeded();
           }
           // Keyboard semantics, focused node and selection survive resize/mode changes.
@@ -396,7 +393,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             const control = p.locator(`[data-slot="${parts[id][0]}"]`).first();
             for (let i = 0; i < 4; i++) await control.click();
           }
-          for (let i = 0; i < 4; i++) await setMode(page, id, i % 2 ? "none" : "reduced");
+          for (let i = 0; i < 4; i++) await setMode(page, i % 2 ? "none" : "reduced");
           const focus =
             id === "slider"
               ? p.getByRole("slider", { name: "Volume", exact: true })
@@ -428,15 +425,20 @@ for (const colorScheme of ["light", "dark"] as const)
             (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
           ).toEqual([]);
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-          await page.screenshot({ path: `.cache/b3-proof/${id}-${colorScheme}-${width}.png`, fullPage: true });
+          await page.screenshot({
+            path: `.cache/shared-cleanup-proof/b3/${id}-${colorScheme}-${width}.png`,
+            fullPage: true,
+          });
           await page
             .locator(`[data-preview="${id}"]`)
-            .screenshot({ path: `.cache/b3-proof/${id}-${colorScheme}-${width}-preview.png` });
+            .screenshot({ path: `.cache/shared-cleanup-proof/b3/${id}-${colorScheme}-${width}-preview.png` });
         }
-        for (const name of examples[id] ?? []) {
+        const names = examples[id];
+        if (!names?.length) throw new Error(`Missing ${id} examples`);
+        for (const name of names) {
           await page
             .locator(`[data-component-example="${id}/${name}"]`)
-            .screenshot({ path: `.cache/b3-proof/${id}-${colorScheme}-390-${name}.png` });
+            .screenshot({ path: `.cache/shared-cleanup-proof/b3/${id}-${colorScheme}-390-${name}.png` });
         }
         expect(errors).toEqual([]);
       });

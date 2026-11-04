@@ -139,23 +139,17 @@ for (const id of ["dropdown-menu", "context-menu", "menubar"])
         if (actual === "none") expect(frames.every((f) => f.opacity === 1 && f.animations.length === 0)).toBe(true);
         else expect(frames.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
         if (actual !== "full") expect(frames.every((f) => f.scale === "none")).toBe(true);
-        if (["dropdown-menu", "context-menu", "menubar"].includes(id)) {
-          await openPopupMotionFixture(page, id, mode, 4);
-          trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`).first();
-          await trigger.click(id === "context-menu" ? { button: "right" } : {});
-          await sub.focus();
-          await page.keyboard.press("ArrowRight");
-          await expect(popup).toBeVisible();
-        }
+        await openPopupMotionFixture(page, id, mode, 4);
+        trigger = page.locator(`[data-preview="${id}"] [data-slot="${id}-trigger"]`).first();
+        await trigger.click(id === "context-menu" ? { button: "right" } : {});
+        await sub.focus();
+        await page.keyboard.press("ArrowRight");
+        await expect(popup).toBeVisible();
         const saved = await popup.elementHandle();
-        await page
-          .getByLabel(["dropdown-menu", "context-menu", "menubar"].includes(id) ? "Fixture motion" : "Popup motion", {
-            exact: true,
-          })
-          .evaluate((node) => {
-            (node as HTMLSelectElement).value = "none";
-            node.dispatchEvent(new Event("change", { bubbles: true }));
-          });
+        await page.getByLabel("Fixture motion", { exact: true }).evaluate((node) => {
+          (node as HTMLSelectElement).value = "none";
+          node.dispatchEvent(new Event("change", { bubbles: true }));
+        });
         await expect(popup).toHaveAttribute("data-motion", "none");
         expect(await popup.evaluate((node, saved) => node === saved && node.getAnimations().length === 0, saved)).toBe(
           true,
