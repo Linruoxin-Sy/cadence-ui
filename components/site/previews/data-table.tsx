@@ -217,7 +217,10 @@ function WithoutMotion() {
 }
 
 export function DataTablePreview({ example }: { example?: string }) {
-  let specimen = <DataTableDemo data={payments} />;
+  // Reserve the default header and ten rows in this caller's layout. A minimum
+  // keeps asynchronous filtering stable while allowing taller content to grow.
+  const top = <DataTableDemo data={payments} className="[&_[data-slot=table-container]]:min-h-112.5" />;
+  let specimen = top;
   switch (example) {
     case "application-data":
       specimen = <ApplicationData />;
@@ -247,7 +250,7 @@ export function DataTablePreview({ example }: { example?: string }) {
       specimen = <WithoutMotion />;
       break;
     default:
-      specimen = <DataTableDemo data={payments} />;
+      specimen = top;
   }
   return <PreviewStack className="min-w-0">{specimen}</PreviewStack>;
 }

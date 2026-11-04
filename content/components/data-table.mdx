@@ -29,9 +29,16 @@ Keep the relative imports and sibling install tree.
 import { DataTableDemo } from "@/components/cadence/data-table";
 
 export function Payments() {
-  return <DataTableDemo />;
+  return <DataTableDemo className="[&_[data-slot=table-container]]:min-h-112.5" />;
 }
 ```
+
+The top specimen reserves room for the default header and ten rows with a caller-owned
+minimum height on the scroll container. Filtering, including updates without recent
+keyboard or pointer input, keeps the pagination controls and following content still.
+This is a minimum, so taller content can grow and horizontal scrolling remains available.
+Retune the reserve when changing page size, row typography or cell padding; omit it when
+the surrounding layout should follow the number of visible rows.
 
 This is an editable payments **composition**, not a universal table primitive.
 It starts from the [pinned Base example](https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/examples/base/data-table-demo.tsx)
@@ -438,7 +445,7 @@ SSR-compatible with deterministic example data. Keep caller arrays stable where
 possible; TanStack recomputes client row models when data/state change. This
 block is intended for paginated collections, not an unbounded dataset benchmark.
 
-The result region follows the visible row count. Filtering or changing application
+Without a caller-owned minimum, the result region follows the visible row count. Filtering or changing application
 data can therefore move content below the table, even with motion set to none.
 Updates without recent user input can contribute to CLS; the absence of row
 animation does not guarantee layout stability. Reserve space in the surrounding

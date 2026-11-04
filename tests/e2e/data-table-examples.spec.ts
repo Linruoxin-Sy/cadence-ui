@@ -298,8 +298,13 @@ for (const os of [false, true])
 
 test("Data Table fixed none production menu is visible on its first inserted frame", async ({ page }, info) => {
   await open(page, "full");
+  // Keep the full document's entrance at the initial viewport until it settles.
+  // Jumping to the last specimen during the initial clip can strand the target
+  // outside the visible/hittable portion of the article.
+  await expect(page.locator("article[data-document-entrance]")).toHaveCSS("clip-path", "none");
   const fixed = card(page, "without-motion"),
     trigger = fixed.getByRole("button", { name: "Columns", exact: true });
+  await trigger.evaluate((node) => node.scrollIntoView({ block: "center" }));
   await page.evaluate(() => {
     const state = window as unknown as {
       noneFrames: { opacity: string; scale: string; duration: string; animations: number }[];
