@@ -761,8 +761,24 @@ function CodeBlockContent({
       ref={viewportRef}
       data-slot="code-block-viewport"
       data-motion={cm.mode}
-      style={measured ? { height: renderedHeight } : undefined}
-      className="min-h-0 overflow-hidden"
+      style={
+        measured
+          ? { height: renderedHeight }
+          : folded
+            ? ({ "--code-block-max-lines": maxLines } as React.CSSProperties)
+            : undefined
+      }
+      className={cn(
+        "min-h-0 overflow-hidden",
+        // Reserve the initial fold before hydration can move a fragment target.
+        // Use the same theme metrics as the pre; measurement takes over before
+        // paint. Without scripting the full source remains readable.
+        !measured &&
+          folded && [
+            "[@media(scripting:enabled)]:max-h-[calc(round(down,var(--code-block-max-lines)*1em*var(--leading-relaxed),1px)+--spacing(3))]",
+            "[@media(scripting:enabled)]:group-data-[size=sm]/code-block:max-h-[calc(round(down,var(--code-block-max-lines)*1em*var(--leading-relaxed),1px)+--spacing(2))]",
+          ],
+      )}
     >
       <pre
         ref={preRef}

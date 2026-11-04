@@ -51,187 +51,576 @@ export function Install() {
 
 ## Line numbers
 
-`lineNumbers` splits a string child into lines and numbers them from `startLine`. The gutter is a `::before` on
-each line, so the numbers are not part of a selection and do not travel with copied text.
+`lineNumbers` numbers each line from `startLine`. This excerpt begins at 42 and preserves the blank line. The gutter is generated content, excluded from selection and copied text.
+
+<ComponentExample name="line-numbers" />
 
 ```tsx
-<CodeBlockContent lineNumbers startLine={42}>
-  {snippetFromTheMiddleOfAFile}
-</CodeBlockContent>
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+export function LineNumbersExample() {
+  const source = "const response = await fetch(url);\n\nreturn response.json();";
+  return (
+    <CodeBlock>
+      <CodeBlockHeader>
+        <CodeBlockTitle>Lines 42–44</CodeBlockTitle>
+        <CodeBlockActions><CodeBlockCopyButton value={source} /></CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockContent lineNumbers startLine={42}>{source}</CodeBlockContent>
+    </CodeBlock>
+  );
+}
+
 ```
 
 ## Diff
 
-Map each line to a `CodeBlockLine` and pick its variant. `added` and `removed` carry a `+` / `−` marker as well as
-a tint, so the diff survives a monochrome screen and a colour-blind reader.
+Show `default`, `added`, `removed`, and `highlighted` lines directly. Added and removed rows carry + / − markers as well as colour. Highlighted calls attention without claiming a change. Here Copy deliberately returns the resulting source, excluding the removed row and all diff markers.
+
+<ComponentExample name="diff" />
 
 ```tsx
-<CodeBlockContent lineNumbers>
-  <CodeBlockLine variant="removed">const chunks = await reader.read();</CodeBlockLine>
-  <CodeBlockLine variant="added">for await (const chunk of reader) {"{"}</CodeBlockLine>
-  <CodeBlockLine>{"  controller.enqueue(chunk);"}</CodeBlockLine>
-  <CodeBlockLine variant="added">{"}"}</CodeBlockLine>
-</CodeBlockContent>
-```
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockLine,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
 
-`highlighted` marks a line to call out without claiming it changed.
+export function DiffExample() {
+  const result = "for await (const chunk of reader) {\n  controller.enqueue(chunk);\n}";
+  return (
+    <CodeBlock>
+      <CodeBlockHeader>
+        <CodeBlockTitle>Stream change</CodeBlockTitle>
+        <CodeBlockActions><CodeBlockCopyButton value={result} /></CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockContent lineNumbers>
+        <CodeBlockLine variant="removed">const chunks = await reader.read();</CodeBlockLine>
+        <CodeBlockLine variant="added">{"for await (const chunk of reader) {"}</CodeBlockLine>
+        <CodeBlockLine variant="highlighted">{"  controller.enqueue(chunk);"}</CodeBlockLine>
+        <CodeBlockLine>{"}"}</CodeBlockLine>
+      </CodeBlockContent>
+    </CodeBlock>
+  );
+}
+
+```
 
 ## Folding a long file
 
-`maxLines` on `CodeBlock` caps the block; `CodeBlockExpandButton` unfolds it. Both are additive props — upstream
-shadcn leaves the fold to the consumer, and that composition still works if you would rather wire your own
-control to `expanded` / `onExpandedChange`.
+`maxLines` measures and clamps a fold without cropping the string. The footer reserves room for its measured toggle to avoid moving later sections during hydration. The first file starts collapsed, the second uses `defaultExpanded`, and the short file has no dead toggle. Copy still returns the entire source. Use the footer button to expand, collapse, or reverse the fold mid-flight.
+
+<ComponentExample name="folding" />
 
 ```tsx
-<CodeBlock maxLines={12}>
-  <CodeBlockHeader>
-    <CodeBlockTitle>app/api/chat/route.ts</CodeBlockTitle>
-    <CodeBlockActions>
-      <CodeBlockCopyButton value={source} />
-    </CodeBlockActions>
-  </CodeBlockHeader>
-  <CodeBlockContent lineNumbers>{source}</CodeBlockContent>
-  <CodeBlockFooter className="justify-center">
-    <CodeBlockExpandButton />
-  </CodeBlockFooter>
-</CodeBlock>
-```
+import { FileCode2Icon } from "lucide-react";
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockExpandButton,
+  CodeBlockFooter,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
 
-The button renders nothing while the content fits, so a short file never grows a dead control. The fold is
-measured from the rendered content, so it follows wrapped lines and whatever font size the page sets.
+const SOURCE = `export async function stream({ prompt, signal }: StreamOptions) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
+    signal,
+  });
+
+  if (!response.ok) throw new Error(await response.text());
+
+  const reader = response.body?.pipeThrough(new TextDecoderStream());
+
+  for await (const chunk of reader) {
+    controller.enqueue(chunk);
+    if (signal.aborted) break;
+  }
+};`;
+
+export function SourceExample() {
+  return (
+    <CodeBlock maxLines={6} language="tsx">
+      <CodeBlockHeader>
+        <CodeBlockTitle><FileCode2Icon />app/api/chat/route.ts</CodeBlockTitle>
+        <CodeBlockActions><CodeBlockCopyButton value={SOURCE} /></CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockContent lineNumbers>{SOURCE}</CodeBlockContent>
+      <CodeBlockFooter className="min-h-[calc(--spacing(12)+1px)] justify-center"><CodeBlockExpandButton /></CodeBlockFooter>
+    </CodeBlock>
+  );
+}
+
+
+export function FoldingExample() {
+  return (
+    <div className="grid gap-4">
+      <SourceExample />
+      <CodeBlock maxLines={3} defaultExpanded>
+        <CodeBlockHeader><CodeBlockTitle>Initially expanded</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{SOURCE}</CodeBlockContent>
+        <CodeBlockFooter className="min-h-[calc(--spacing(12)+1px)]"><CodeBlockExpandButton /></CodeBlockFooter>
+      </CodeBlock>
+      <CodeBlock maxLines={3}>
+        <CodeBlockHeader><CodeBlockTitle>A short file needs no toggle</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{"export const ready = true;"}</CodeBlockContent>
+        <CodeBlockFooter className="min-h-[calc(--spacing(12)+1px)]"><CodeBlockExpandButton /></CodeBlockFooter>
+      </CodeBlock>
+    </div>
+  );
+}
+
+```
 
 ## Tool output
 
-Output is not source: it wraps instead of scrolling sideways, and it is smaller. Use `variant="destructive"` when
-the run failed rather than recolouring the text yourself.
+Output uses `size="sm"`, `wrap`, and a bounded scrolling source. This fixed error uses `variant="destructive"`; the caller supplies the error text. No tokenizer or request is needed for plain tool output.
+
+<ComponentExample name="tool-output" />
 
 ```tsx
-<CodeBlock variant="destructive" size="sm">
-  <CodeBlockHeader>
-    <CodeBlockTitle>run_shell</CodeBlockTitle>
-  </CodeBlockHeader>
-  <CodeBlockContent wrap className="max-h-64">
-    {stderr}
-  </CodeBlockContent>
-</CodeBlock>
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+export function ToolOutputExample() {
+  const stderr = "Error: Unable to write the generated report because the destination directory is read-only. Choose a writable destination and run the command again.\n\nNo files were changed.";
+  return (
+    <CodeBlock variant="destructive" size="sm">
+      <CodeBlockHeader><CodeBlockTitle>run_shell · exit 1</CodeBlockTitle></CodeBlockHeader>
+      <CodeBlockContent wrap className="max-h-48">{stderr}</CodeBlockContent>
+    </CodeBlock>
+  );
+}
+
 ```
 
 ## Floating actions
 
-Put `CodeBlockActions` directly inside `CodeBlock`, with no header, and it floats over the top-end corner. It is
-revealed on hover and on focus, and it is permanently visible on a device that cannot hover.
+Place `CodeBlockActions` directly inside the block, without a header. Hover or keyboard focus reveals Copy; a device without hover keeps it visible. The invisible action remains in the tab order so it can reveal itself on focus.
+
+<ComponentExample name="floating-actions" />
 
 ```tsx
-<CodeBlock>
-  <CodeBlockActions>
-    <CodeBlockCopyButton value={output} />
-  </CodeBlockActions>
-  <CodeBlockContent>{output}</CodeBlockContent>
-</CodeBlock>
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+} from "@/components/cadence/code-block";
+
+export function FloatingActionsExample() {
+  const output = "Build complete.\nGenerated 74 routes.\nNo deployment was requested.";
+  return (
+    <CodeBlock>
+      <CodeBlockActions><CodeBlockCopyButton value={output} /></CodeBlockActions>
+      <CodeBlockContent>{output}</CodeBlockContent>
+    </CodeBlock>
+  );
+}
+
 ```
 
-## Switching between variants
+## Content tabs
 
-A snippet often has more than one right form: the same install for three package managers, a source file and
-its compiled output, a component and its test. `CodeBlockTabs` is the tab list over the source, `CodeBlockTab`
-is one tab, and `CodeBlockPanel` is the source that tab shows.
+These are content tabs for the same install command, separate from the block’s visual `variant`. Arrow keys and Home/End select a panel. `values` makes Copy follow the current tab. Inactive panels remain mounted and hidden, retaining their source nodes and scroll position; only the active source is in the tab order.
 
-The selection lives on `CodeBlock`, not on the tab list, because the header's copy button has to follow it: give
-`CodeBlockCopyButton` `values` instead of `value` and it copies whichever variant is on screen — a switcher whose
-copy button still copies the first command is worse than no switcher.
+<ComponentExample name="content-tabs" />
 
 ```tsx
-const install = {
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockPanel,
+  CodeBlockTab,
+  CodeBlockTabs,
+} from "@/components/cadence/code-block";
+
+const INSTALL = {
   pnpm: "pnpm dlx shadcn@latest add @cadence/code-block",
   npm: "npx shadcn@latest add @cadence/code-block",
   yarn: "yarn dlx shadcn@latest add @cadence/code-block",
 };
 
-<CodeBlock defaultTab="pnpm">
-  <CodeBlockHeader>
-    <CodeBlockTabs label="Package manager">
-      <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
-      <CodeBlockTab value="npm">npm</CodeBlockTab>
-      <CodeBlockTab value="yarn">yarn</CodeBlockTab>
-    </CodeBlockTabs>
-    <CodeBlockActions>
-      <CodeBlockCopyButton values={install} />
-    </CodeBlockActions>
-  </CodeBlockHeader>
-  <CodeBlockPanel value="pnpm">{install.pnpm}</CodeBlockPanel>
-  <CodeBlockPanel value="npm">{install.npm}</CodeBlockPanel>
-  <CodeBlockPanel value="yarn">{install.yarn}</CodeBlockPanel>
-</CodeBlock>
+export function ContentTabsExample() {
+  return (
+    <CodeBlock defaultTab="pnpm" language="bash">
+      <CodeBlockHeader>
+        <CodeBlockTabs label="Package manager">
+          <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+          <CodeBlockTab value="npm">npm</CodeBlockTab>
+          <CodeBlockTab value="yarn">yarn</CodeBlockTab>
+        </CodeBlockTabs>
+        <CodeBlockActions><CodeBlockCopyButton values={INSTALL} /></CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockPanel value="pnpm">{INSTALL.pnpm}</CodeBlockPanel>
+      <CodeBlockPanel value="npm">{INSTALL.npm}</CodeBlockPanel>
+      <CodeBlockPanel value="yarn">{INSTALL.yarn}</CodeBlockPanel>
+    </CodeBlock>
+  );
+}
+
 ```
-
-Four things worth knowing:
-
-- **The pill is a shared element.** Only the selected tab renders one, and Motion matches the two `layoutId`s,
-  so it travels to the tab that was pressed rather than a second pill cross-fading in place. Press another tab
-  mid-flight and it retargets instead of restarting. The labels stay above it, so the pill crosses underneath
-  the neighbouring tabs instead of wiping the label of the tab it left.
-- **A panel is the content.** `CodeBlockPanel` renders `CodeBlockContent` and takes its props (`wrap`,
-  `lineNumbers`, `language`), so a tabbed block keeps the fold, the numbering, the copy affordance and the focus
-  ring a plain block has.
-- **Panels are hidden, not unmounted.** Every variant stays in the tree behind the `hidden` attribute: a tab
-  switch is a look at what is already there, so it cannot lose the reader's scroll position, and only the visible
-  source is focusable.
-- **The height is the selected panel's.** It changes instantly — the size of the block is information, and the
-  one layout animation on this component is the fold. Keep variants that differ by a line or two in the same
-  block; a tab that doubles the height wants two blocks.
-
-`defaultTab` is uncontrolled; `tab` with `onTabChange` drives it from outside when the surrounding page has its
-own idea of which variant is current.
 
 ## Highlighting
 
-Set `language` and a string child is tokenized; leave it out and the same child renders as plain text, which is
-what tool output wants. The tokenizer is [Shiki](https://shiki.style) in its JavaScript-regex mode, imported
-**dynamically**: a block without a `language` never downloads it, and a block with one downloads a single chunk
-plus the grammar for that language.
+A string child with `language="tsx"` loads the Shiki adapter and its grammar dynamically. The content can override the root language, as the JSON block does. An unknown language stays plain and readable. The initial server output stays visible while highlighting loads; theme token variables recolour it without replacing the code.
+
+<ComponentExample name="highlighting" />
 
 ```tsx
-<CodeBlock language="tsx">
-  <CodeBlockContent lineNumbers>{source}</CodeBlockContent>
-</CodeBlock>
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+export function HighlightingExample() {
+  const source = "export const greeting = (name: string) => name.toUpperCase();";
+  return (
+    <div className="grid gap-4">
+      <CodeBlock language="tsx">
+        <CodeBlockHeader><CodeBlockTitle>TypeScript highlighting</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent lineNumbers>{source}</CodeBlockContent>
+      </CodeBlock>
+      <CodeBlock language="tsx">
+        <CodeBlockHeader><CodeBlockTitle>Content language override</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent language="json">{'{ "ready": true }'}</CodeBlockContent>
+      </CodeBlock>
+      <CodeBlock language="unbundled-example-language">
+        <CodeBlockHeader><CodeBlockTitle>Unknown language stays readable</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{source}</CodeBlockContent>
+      </CodeBlock>
+    </div>
+  );
+}
+
 ```
 
-Bundled languages: `bash` (`sh`, `shell`, `zsh`), `css`, `diff`, `html`, `javascript` (`js`), `json`, `jsx`,
-`markdown` (`md`), `python` (`py`), `sql`, `tsx`, `typescript` (`ts`), `yaml` (`yml`). An unknown language is not
-an error — the source stays plain. Add one by adding a row to `languages` in `code-highlight/highlight.tsx`.
+## Visual variants
 
-Two things are worth knowing about how it behaves:
+`default` is the ordinary code surface. `destructive` marks failed output with semantic error colours. Both are fixed instances; choosing a content tab does not change this visual variant.
 
-- **Colours are CSS variables, not fixed hex.** Each token carries `--shiki-light` and `--shiki-dark`, and the
-  span reads whichever one the current theme sets. Switching to dark re-colours the block without re-tokenizing.
-  The two themes are the **high-contrast** GitHub pair, chosen in the same file if you want your own: the plain
-  `github-light` paints parameters in orange at 3.5:1 on white, which fails WCAG AA on any block with a function
-  signature.
-- **Streaming tokenizes once per line.** The hook keeps the grammar state after the last complete line, so an
-  assistant appending a token re-tokenizes the line being written, not the block. Finished lines keep their nodes
-  — React does not re-render them.
-
-The first paint is plain: the highlighter is a separate chunk, so it arrives after hydration. If a flash of
-uncoloured code is not acceptable, highlight on the server and pass the nodes in — the same tokenizer is exported
-as a plain async function for exactly that:
+<ComponentExample name="visual-variants" />
 
 ```tsx
-// Server Component: Shiki never reaches the client bundle.
-const lines = (await highlightCode(source, "tsx")) ?? [source];
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
 
-<CodeBlockContent lineNumbers>
-  {lines.map((line, index) => (
-    <CodeBlockLine key={index}>{line}</CodeBlockLine>
-  ))}
-</CodeBlockContent>;
+export function VisualVariantsExample() {
+  return (
+    <div className="grid gap-4">
+      <CodeBlock variant="default">
+        <CodeBlockHeader><CodeBlockTitle>Successful output</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{"Report generated."}</CodeBlockContent>
+      </CodeBlock>
+      <CodeBlock variant="destructive">
+        <CodeBlockHeader><CodeBlockTitle>Failed output</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{"Error: Destination is read-only."}</CodeBlockContent>
+      </CodeBlock>
+    </div>
+  );
+}
+
 ```
 
-A diff is a `CodeBlockLine` list, not a `language` (see above): the `+` / `−` markers say more than a colour, and a
-raw patch passed as a string with `language="diff"` would lose them. The `diff` grammar is there if you want the
-colours instead.
+## Sizes
 
-Without a `language`, a string child stays **one text node** — the browser appends a chunk to it instead of
-reconciling a tree of spans, which is what makes a streaming output block cheap.
+`default` suits source snippets. `sm` tightens header and content padding and uses smaller text for compact tool output. Size belongs to each block, rather than a shared demo selector.
+
+<ComponentExample name="sizes" />
+
+```tsx
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+export function SizesExample() {
+  return (
+    <div className="grid gap-4">
+      <CodeBlock size="default">
+        <CodeBlockHeader><CodeBlockTitle>Default source</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{"export const ready = true;"}</CodeBlockContent>
+      </CodeBlock>
+      <CodeBlock size="sm">
+        <CodeBlockHeader><CodeBlockTitle>Compact output</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent>{"Task completed."}</CodeBlockContent>
+      </CodeBlock>
+    </div>
+  );
+}
+
+```
+
+## Controlled folding
+
+The caller owns `expanded` and handles `onExpandedChange`. The external buttons demonstrate API updates; the native fold button updates the same state. API updates keep the same source node; normal pointer and keyboard focus behavior still applies.
+
+<ComponentExample name="controlled-fold" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  CodeBlock,
+  CodeBlockContent,
+  CodeBlockExpandButton,
+  CodeBlockFooter,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+const SOURCE = `export async function stream({ prompt, signal }: StreamOptions) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
+    signal,
+  });
+
+  if (!response.ok) throw new Error(await response.text());
+
+  const reader = response.body?.pipeThrough(new TextDecoderStream());
+
+  for await (const chunk of reader) {
+    controller.enqueue(chunk);
+    if (signal.aborted) break;
+  }
+};`;
+
+export function ControlledFoldExample() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="grid gap-3">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => setExpanded(true)}>Expand from outside</Button>
+        <Button variant="outline" onClick={() => setExpanded(false)}>Collapse from outside</Button>
+      </div>
+      <CodeBlock maxLines={4} expanded={expanded} onExpandedChange={setExpanded}>
+        <CodeBlockHeader><CodeBlockTitle>Caller-owned fold</CodeBlockTitle></CodeBlockHeader>
+        <CodeBlockContent lineNumbers>{SOURCE}</CodeBlockContent>
+        <CodeBlockFooter className="min-h-[calc(--spacing(12)+1px)]"><CodeBlockExpandButton /></CodeBlockFooter>
+      </CodeBlock>
+    </div>
+  );
+}
+
+```
+
+## Controlled tabs
+
+The caller owns `tab` and handles `onTabChange`. The external action selects the related output, while the tabs still support native keyboard navigation. Copy follows the controlled selection. This state is independent of the package-manager example.
+
+<ComponentExample name="controlled-tabs" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockPanel,
+  CodeBlockTab,
+  CodeBlockTabs,
+} from "@/components/cadence/code-block";
+
+export function ControlledTabsExample() {
+  const [tab, setTab] = useState("source");
+  const values = { source: "export const ready = true;", output: "ready: true" };
+  return (
+    <div className="grid gap-3">
+      <Button variant="outline" onClick={() => setTab("output")}>Show output from outside</Button>
+      <CodeBlock tab={tab} onTabChange={setTab}>
+        <CodeBlockHeader>
+          <CodeBlockTabs label="Source or output">
+            <CodeBlockTab value="source">Source</CodeBlockTab>
+            <CodeBlockTab value="output">Output</CodeBlockTab>
+          </CodeBlockTabs>
+          <CodeBlockActions><CodeBlockCopyButton values={values} /></CodeBlockActions>
+        </CodeBlockHeader>
+        <CodeBlockPanel value="source">{values.source}</CodeBlockPanel>
+        <CodeBlockPanel value="output">{values.output}</CodeBlockPanel>
+      </CodeBlock>
+    </div>
+  );
+}
+
+```
+
+## Updating text
+
+Append a local chunk to both a plain output string and highlighted source. These are explicit caller events, not a simulated network stream. Keep the same content nodes: plain output remains one text node, finished highlighted lines retain their identity, and Copy always receives the current complete string. Reset is also caller-owned.
+
+<ComponentExample name="updating-text" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+export function UpdatingTextExample() {
+  const [chunks, setChunks] = useState(0);
+  const output = `Build started.\n${"Checked another route.\n".repeat(chunks)}`;
+  const source = `export const ready = true;\n${"// Checked another route.\n".repeat(chunks)}`;
+  return (
+    <div className="grid gap-3">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => setChunks((count) => count + 1)}>Append a local chunk</Button>
+        <Button variant="outline" onClick={() => setChunks(0)}>Reset text</Button>
+      </div>
+      <CodeBlock>
+        <CodeBlockHeader>
+          <CodeBlockTitle>Plain output</CodeBlockTitle>
+          <CodeBlockActions><CodeBlockCopyButton value={output} /></CodeBlockActions>
+        </CodeBlockHeader>
+        <CodeBlockContent className="max-h-48">{output}</CodeBlockContent>
+      </CodeBlock>
+      <CodeBlock language="tsx">
+        <CodeBlockHeader>
+          <CodeBlockTitle>Highlighted source</CodeBlockTitle>
+          <CodeBlockActions><CodeBlockCopyButton value={source} /></CodeBlockActions>
+        </CodeBlockHeader>
+        <CodeBlockContent lineNumbers className="max-h-48">{source}</CodeBlockContent>
+      </CodeBlock>
+    </div>
+  );
+}
+
+```
+
+## Without motion
+
+The first block explicitly uses `mode="none"`: copying and folding resolve immediately. The nested `mode="full"` block opts its content tabs back into full motion; the operating system’s reduced preference still takes precedence. Ordinary examples elsewhere on this page inherit the site header settings.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { FileCode2Icon } from "lucide-react";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import {
+  CodeBlock,
+  CodeBlockActions,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockExpandButton,
+  CodeBlockFooter,
+  CodeBlockHeader,
+  CodeBlockPanel,
+  CodeBlockTab,
+  CodeBlockTabs,
+  CodeBlockTitle,
+} from "@/components/cadence/code-block";
+
+const SOURCE = `export async function stream({ prompt, signal }: StreamOptions) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
+    signal,
+  });
+
+  if (!response.ok) throw new Error(await response.text());
+
+  const reader = response.body?.pipeThrough(new TextDecoderStream());
+
+  for await (const chunk of reader) {
+    controller.enqueue(chunk);
+    if (signal.aborted) break;
+  }
+};`;
+
+const INSTALL = {
+  pnpm: "pnpm dlx shadcn@latest add @cadence/code-block",
+  npm: "npx shadcn@latest add @cadence/code-block",
+  yarn: "yarn dlx shadcn@latest add @cadence/code-block",
+};
+
+export function SourceExample() {
+  return (
+    <CodeBlock maxLines={6} language="tsx">
+      <CodeBlockHeader>
+        <CodeBlockTitle><FileCode2Icon />app/api/chat/route.ts</CodeBlockTitle>
+        <CodeBlockActions><CodeBlockCopyButton value={SOURCE} /></CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockContent lineNumbers>{SOURCE}</CodeBlockContent>
+      <CodeBlockFooter className="min-h-[calc(--spacing(12)+1px)] justify-center"><CodeBlockExpandButton /></CodeBlockFooter>
+    </CodeBlock>
+  );
+}
+
+
+export function ContentTabsExample() {
+  return (
+    <CodeBlock defaultTab="pnpm" language="bash">
+      <CodeBlockHeader>
+        <CodeBlockTabs label="Package manager">
+          <CodeBlockTab value="pnpm">pnpm</CodeBlockTab>
+          <CodeBlockTab value="npm">npm</CodeBlockTab>
+          <CodeBlockTab value="yarn">yarn</CodeBlockTab>
+        </CodeBlockTabs>
+        <CodeBlockActions><CodeBlockCopyButton values={INSTALL} /></CodeBlockActions>
+      </CodeBlockHeader>
+      <CodeBlockPanel value="pnpm">{INSTALL.pnpm}</CodeBlockPanel>
+      <CodeBlockPanel value="npm">{INSTALL.npm}</CodeBlockPanel>
+      <CodeBlockPanel value="yarn">{INSTALL.yarn}</CodeBlockPanel>
+    </CodeBlock>
+  );
+}
+
+
+export function WithoutMotionExample() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="grid gap-4">
+        <SourceExample />
+        <CadenceProvider mode="full"><ContentTabsExample /></CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
+
+```
 
 ## When to use
 
@@ -299,7 +688,7 @@ restyle without a wrapper.
 | copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph` | yes |
 | fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph` | yes |
 | tab indicator | one pill shared between tabs, `layoutId` | `layout.shared` | yes (a third tab pressed mid-travel retargets it) |
-| reduced | fade and rotation stay; the height jumps, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize` resolves to `{ duration: 0 }` | – |
+| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize` resolves to `{ duration: 0 }` | – |
 | none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
 
 Three notes on the choices:
@@ -360,19 +749,24 @@ Three notes on the choices:
 
 ## Performance
 
+The initially folded viewport reserves the built-in line height and padding before hydration, so
+measuring a fold does not pull later document anchors upward. With JavaScript disabled the cap is
+absent and the complete source stays readable. Custom content line height or padding may change
+that estimate; provide a suitable SSR layout if overriding those metrics.
+
 - Without a `language`, a string child is one text node: streaming a chunk does not rebuild a subtree, only the
   changed text is painted. With a `language`, each finished line is one node that is never re-created, and the
   line being written is the only one re-tokenized.
 - One `ResizeObserver` per foldable block, and none for a block that cannot fold. The measurement is a read inside
   the observer callback, never during render.
 - The fold animates `height` — a layout property, and the one place in this component that touches layout. It is
-  scoped to a leaf element whose neighbours do not move, it is clamped, and it resolves to zero duration under
+  scoped to the source viewport and moves following document content, is clamped, and it resolves to zero duration under
   reduced and none.
 - Everything else is `opacity` and `scale` on small elements: two glyphs and a chevron.
 - Shiki is a dynamic import. A block with no `language` never loads it; a block with one loads the engine and a
   single grammar, both cached for the rest of the session. `getLoadedLanguages()` is checked first, so the second
   `tsx` block on a page does not re-load anything.
-- Tokenizing runs on the main thread. It is fast (a screenful is a fraction of a millisecond in the JS engine), but
+- Tokenizing runs on the main thread. Its cost depends on the grammar, source and device;
   a thousand-line file is not free: cap it with `maxLines`, or hand the nodes in from a Server Component with
   `highlightCode`.
 

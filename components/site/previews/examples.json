@@ -116,5 +116,20 @@
     "custom-input",
     "without-motion"
   ],
-  "toast": ["types", "actions", "priority", "progress", "timers", "composition", "swipe", "without-motion"]
+  "toast": ["types", "actions", "priority", "progress", "timers", "composition", "swipe", "without-motion"],
+  "code-block": [
+    "line-numbers",
+    "diff",
+    "folding",
+    "tool-output",
+    "floating-actions",
+    "content-tabs",
+    "highlighting",
+    "visual-variants",
+    "sizes",
+    "controlled-fold",
+    "controlled-tabs",
+    "updating-text",
+    "without-motion"
+  ]
 }

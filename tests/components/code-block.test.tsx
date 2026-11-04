@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   CodeBlock,
@@ -60,6 +61,34 @@ describe("CodeBlock", () => {
     // delayed fallback and cancellation have separate real-engine lifecycle tests.
     expect(await loadHighlighter("ts")).not.toBeNull();
   });
+
+  it.each(["full", "reduced", "none"] as const)(
+    "reserves the initial SSR fold without hiding no-JS source: %s",
+    (mode) => {
+      const tree = (
+        <CadenceProvider mode={mode}>
+          <CodeBlock maxLines={2}>
+            <CodeBlockContent>{SOURCE}</CodeBlockContent>
+          </CodeBlock>
+        </CadenceProvider>
+      );
+      const html = renderToStaticMarkup(tree);
+      expect(html).toContain("--code-block-max-lines:2");
+      expect(html).toContain("scripting:enabled");
+      expect(html).toContain("--leading-relaxed");
+      expect(html).toContain("return 1;");
+      const expanded = renderToStaticMarkup(
+        <CadenceProvider mode={mode}>
+          <CodeBlock maxLines={2} defaultExpanded>
+            <CodeBlockContent>{SOURCE}</CodeBlockContent>
+          </CodeBlock>
+        </CadenceProvider>,
+      );
+      expect(expanded).not.toContain("--code-block-max-lines:");
+      render(tree);
+      expectMotionContract(mode);
+    },
+  );
 
   it("renders the upstream surface with every slot", () => {
     const { container } = render(

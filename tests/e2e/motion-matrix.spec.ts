@@ -508,13 +508,15 @@ test.describe("code-block", () => {
   test("the travelling pill paints underneath the tab labels", async ({ page }) => {
     await openComponent(page, "code-block", "full", "code-block", "full");
 
-    const list = page.locator('[data-slot="code-block-tabs"]').first();
+    const list = page.locator('[data-component-example="code-block/content-tabs"] [data-slot="code-block-tabs"]');
     const tabs = list.locator('[role="tab"]');
 
     // The sampler starts before the click so the first frames — the ones where the
     // pill still sits on the tab it is leaving — are part of the sample.
     await page.evaluate(() => {
-      const blockList = document.querySelector('[data-slot="code-block-tabs"]');
+      const blockList = document.querySelector(
+        '[data-component-example="code-block/content-tabs"] [data-slot="code-block-tabs"]',
+      );
       const first = blockList?.querySelector<HTMLElement>('[data-slot="code-block-tab"]');
       const store = window as unknown as { __pillLayers?: { pill: number; label: number; samples: number } };
       store.__pillLayers = { pill: 0, label: 0, samples: 0 };
@@ -559,7 +561,7 @@ test.describe("code-block", () => {
         test(`tabs: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await openComponent(page, "code-block", requested, "code-block", mode);
 
-          const list = page.locator('[data-slot="code-block-tabs"]').first();
+          const list = page.locator('[data-component-example="code-block/content-tabs"] [data-slot="code-block-tabs"]');
           const tabs = list.locator('[role="tab"]');
           const yarn = tabs.nth(2);
           await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
@@ -593,15 +595,17 @@ test.describe("code-block", () => {
 
           // The panel swap is what the tabs are for: a hidden panel is not painted,
           // and the visible one holds this variant's command.
-          await expect(page.locator('[data-slot="code-block-panel"]:not([hidden]) pre').first()).toHaveText(
-            /yarn dlx shadcn@latest add/,
-          );
+          await expect(
+            page.locator(
+              '[data-component-example="code-block/content-tabs"] [data-slot="code-block-panel"]:not([hidden]) pre',
+            ),
+          ).toHaveText(/yarn dlx shadcn@latest add/);
         });
 
         test(`fold: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await openComponent(page, "code-block", requested, "code-block", mode);
 
-          // The preview's first block is capped at eight lines, so it opens folded.
+          // The preview's block is capped at six lines, so it opens folded.
           // The toggle is located by slot, not by name: its accessible name is the
           // state ("Show all" / "Show less"), so a name locator is stale after the
           // click it just performed.

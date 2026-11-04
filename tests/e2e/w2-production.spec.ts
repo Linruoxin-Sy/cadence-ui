@@ -11,7 +11,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           let sequence = 0;
           w.w2record = (phase) => {
             const selector =
-              '[data-preview="code-block"] [data-slot="code-block-viewport"], [data-preview="code-block"] [data-slot="code-block-tab-indicator"], [data-preview="code-block"] [data-slot="code-block-copy-button"] span[data-motion], [data-preview="code-block"] [data-slot="code-block-expand-button"] span[data-motion]';
+              ':is([data-preview="code-block"], [data-component-example="code-block/content-tabs"]) :is([data-slot="code-block-viewport"], [data-slot="code-block-tab-indicator"], [data-slot="code-block-copy-button"] span[data-motion], [data-slot="code-block-expand-button"] span[data-motion])';
             const parts = [...document.querySelectorAll<HTMLElement>(selector)].map((node) => {
               const css = getComputedStyle(node);
               const matrix = new DOMMatrix(css.transform === "none" ? undefined : css.transform);
@@ -59,7 +59,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await first.getByRole("button", { name: "Copy", exact: true }).click();
         await expect(first.locator('[data-slot="code-block-copy-button"]')).toHaveAttribute("data-copied", "true");
         await first.locator('[data-slot="code-block-expand-button"]').click();
-        await preview.getByRole("tab", { name: "npm", exact: true }).click();
+        await page
+          .locator('[data-component-example="code-block/content-tabs"]')
+          .getByRole("tab", { name: "npm", exact: true })
+          .click();
         await page
           .getByRole("group", { name: "Motion mode" })
           .getByRole("button", { name: "none", exact: true })

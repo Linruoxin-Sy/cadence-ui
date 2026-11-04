@@ -646,6 +646,13 @@ gates and future work belong to [the plan](parity-plan.md#8-next-work).
 
 ---
 
+CodeBlock's initially folded viewport reserves its built-in line-height and padding through a
+static CSS maximum before hydration (`maxLines`, `--leading-relaxed`, `--spacing`). This is initial
+layout, not a transition or a new recipe. Under `scripting: none` the cap does not apply, so the
+whole source remains readable. The first real measurement replaces the reserve before paint;
+subsequent fold changes still use measured, clamped `geometry.resize`. Custom content typography
+or padding can change that initial estimate and remains the caller's SSR sizing responsibility.
+
 ## 9. Testing motion
 
 ### 9.1 Three test layers
