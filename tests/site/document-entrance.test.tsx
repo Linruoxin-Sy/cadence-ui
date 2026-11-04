@@ -1,5 +1,5 @@
 import { renderToString } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { DocumentEntrance } from "@/components/site/document-entrance";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { controlSamples } from "../motion-observer";
@@ -25,6 +25,79 @@ describe("DocumentEntrance server state", () => {
 });
 
 import { act, render } from "@testing-library/react";
+
+describe("DocumentEntrance intersection trigger", () => {
+  it.each(["article", "section", "div"] as const)("observes the unclipped layout box around %s", (as) => {
+    let deliver: IntersectionObserverCallback | undefined;
+    const observe = vi.fn();
+    const unobserve = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(callback: IntersectionObserverCallback) {
+          deliver = callback;
+        }
+        observe = observe;
+        unobserve = unobserve;
+        disconnect = disconnect;
+      },
+    );
+    try {
+      const { container, rerender, unmount } = render(
+        <CadenceProvider mode="full">
+          <DocumentEntrance as={as} className="document-layout">
+            <input aria-label="Draft" defaultValue="Keep me" />
+          </DocumentEntrance>
+        </CadenceProvider>,
+      );
+      const host = container.querySelector<HTMLElement>("[data-document-entrance]");
+      const frame = container.querySelector<HTMLElement>("[data-document-entrance-frame]");
+      const input = container.querySelector("input");
+      expect(host?.tagName.toLowerCase()).toBe(as);
+      expect(host).toHaveClass("document-layout");
+      expect(frame).toBe(host?.parentElement);
+      expect(frame?.style.clipPath).toBe("");
+      expect(observe).toHaveBeenCalledWith(frame);
+      expect(observe).not.toHaveBeenCalledWith(host);
+      if (!frame) throw new Error("Missing entrance frame");
+      const entry = (isIntersecting: boolean): IntersectionObserverEntry => ({
+        target: frame,
+        isIntersecting,
+        intersectionRatio: isIntersecting ? 1 : 0,
+        boundingClientRect: new DOMRect(),
+        intersectionRect: new DOMRect(),
+        rootBounds: null,
+        time: 0,
+      });
+      act(() => deliver?.([entry(false)], {} as IntersectionObserver));
+      expect([...controlSamples.values()].at(-1)?.target.opacity).toBe(0);
+      act(() => deliver?.([entry(true)], {} as IntersectionObserver));
+      expect([...controlSamples.values()].at(-1)?.target.opacity).toBe(1);
+      expect(unobserve).toHaveBeenCalledWith(frame);
+      input?.focus();
+      rerender(
+        <CadenceProvider mode="none">
+          <DocumentEntrance as={as} className="document-layout">
+            <input aria-label="Draft" defaultValue="Keep me" />
+          </DocumentEntrance>
+        </CadenceProvider>,
+      );
+      expect(container.querySelector("[data-document-entrance]")).toBe(host);
+      expect(container.querySelector("input")).toBe(input);
+      expect(input).toHaveFocus();
+      expect([...controlSamples.values()].at(-1)?.target).toMatchObject({
+        opacity: 1,
+        filter: "none",
+        clipPath: "none",
+      });
+      unmount();
+      expect(disconnect).toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
 
 describe("DocumentEntrance hash destinations without an intersection delivery", () => {
   it.each(["full", "reduced", "none"] as const)("reveals a cold deep link in %s", (mode) => {

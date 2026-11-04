@@ -34,7 +34,9 @@ import { useCadenceMotion } from "@/registry/cadence/lib/provider";
  * full height, so the page does not reflow and nothing below is pulled upward.
  * It is also the reason `useInView`, not a mount effect, owns the trigger — a
  * clipped body that is below the fold should stay for the reader who scrolls to
- * it, not play unseen when the page loads.
+ * it, not play unseen when the page loads. Observe the unanimated outer box:
+ * observing the clipped article itself can miss its first intersection when
+ * scrolling moves the clip's zero-height edge above the viewport.
  *
  * Two hygiene details:
  *
@@ -80,9 +82,10 @@ export interface DocumentEntranceProps {
 export function DocumentEntrance({ children, className, as = "div" }: DocumentEntranceProps) {
   const cm = useCadenceMotion();
   const ref = useRef<HTMLElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
   const [settled, setSettled] = useState(false);
   const [anchored, setAnchored] = useState(false);
-  const inView = useInView(ref, { once: true, amount: "some" });
+  const inView = useInView(frameRef, { once: true, amount: "some" });
 
   useEffect(() => {
     // A cold hash can scroll past the article's zero-height initial clip before
@@ -156,25 +159,24 @@ export function DocumentEntrance({ children, className, as = "div" }: DocumentEn
     onAnimationComplete: show && !settled ? () => setSettled(true) : undefined,
   };
 
-  if (as === "article") {
-    return (
+  const content =
+    as === "article" ? (
       <motion.article ref={ref} {...motionProps}>
         {children}
       </motion.article>
-    );
-  }
-
-  if (as === "section") {
-    return (
+    ) : as === "section" ? (
       <motion.section ref={ref} {...motionProps}>
         {children}
       </motion.section>
+    ) : (
+      <motion.div ref={ref as RefObject<HTMLDivElement>} {...motionProps}>
+        {children}
+      </motion.div>
     );
-  }
 
   return (
-    <motion.div ref={ref as RefObject<HTMLDivElement>} {...motionProps}>
-      {children}
-    </motion.div>
+    <div ref={frameRef} className="min-w-0" data-document-entrance-frame>
+      {content}
+    </div>
   );
 }

@@ -341,6 +341,10 @@ breadcrumb, header, preview, and body. The article rises 24px, fades from 0, cle
 `clip-path` from zero height at the same time. The wipe runs on `duration.slow` with `ease.inOut` — quicker
 than the body's `duration.page` — so the edge leads and the content's rise, fade, and blur are still in
 progress as it uncovers them. The clip keeps the element's full box, so the entrance does not reflow the page.
+An unanimated outer box owns the intersection observer and occupies the article's layout slot. The
+article keeps its classes and semantic element. Observing this box lets a cold load, restored scroll or
+fast deep scroll trigger the entrance even when the article's initial zero-height clip is above the
+viewport; the animated clip must never gate its own visibility trigger.
 
 The server paints the hidden state. The root layout's `<noscript>` rule and the `@media print` rule in
 `app/globals.css` restore the body when the entrance cannot run. The component stays outside
