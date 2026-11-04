@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { buttonVariants } from "../../registry/cadence/button";
+import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 type Entry = { id: string; applicable: boolean; part?: string; prop?: string; options?: string[] };
 const matrix: Entry[] = JSON.parse(await readFile("tests/fixtures/preview-variants.json", "utf8"));
@@ -273,21 +274,18 @@ for (const mode of ["full", "reduced", "none"])
   for (const os of [false, true]) {
     test(`stateful shape edits keep draft, node and focus ${mode}/${os}`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
-      await page.goto(`/components/bubble?motion=${mode}`);
-      await page.waitForLoadState("networkidle");
+      await openPopupMotionFixture(page, "bubble", mode);
       const reaction = page.getByRole("button", { name: "Thumbs up" });
       await reaction.click();
-      await reaction.evaluate((node) => {
-        (window as unknown as { reaction: Element }).reaction = node;
-      });
-      await page.getByRole("combobox", { name: "Bubble variant" }).selectOption("outline");
-      await expect(reaction).toHaveAttribute("aria-pressed", "true");
-      expect(await reaction.evaluate((node) => node === (window as unknown as { reaction: Element }).reaction)).toBe(
-        true,
-      );
-      await page.getByRole("combobox", { name: "Variant", exact: true }).selectOption("secondary");
-      await expect(page.getByRole("combobox", { name: "Bubble variant" })).toHaveValue("all");
+      const saved = await reaction.elementHandle();
+      const content = page.getByTestId("reply-0").locator('[data-slot="bubble-content"]');
+      await content.press("F2");
+      await expect(page.getByTestId("reply-0")).toHaveAttribute("data-variant", "outline");
+      await content.press("F2");
       await expect(page.getByTestId("reply-0")).toHaveAttribute("data-variant", "secondary");
+      await expect(content).toBeFocused();
+      await expect(reaction).toHaveAttribute("aria-pressed", "true");
+      expect(await reaction.evaluate((node, saved) => node === saved, saved)).toBe(true);
     });
   }
 

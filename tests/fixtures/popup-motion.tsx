@@ -134,6 +134,7 @@ import {
 } from "../../registry/cadence/sidebar";
 import { createToastManager, Toaster } from "../../registry/cadence/toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/tooltip";
+import { BubbleMotionFixture } from "./bubble-motion";
 
 // A dedicated browser regression input. Changing a native select emits change,
 // so mode updates do not also perform an outside press or steal popup focus.
@@ -427,6 +428,7 @@ function PopupMotionFixture({
           {component === "data-table" && <DataTableDemo />}
           {component === "date-picker" && <DatePickerMotionFixture />}
           {component === "attachment" && <AttachmentMotionFixture />}
+          {component === "bubble" && <BubbleMotionFixture />}
           {component === "drawer" && (
             <Drawer showSwipeHandle>
               <DrawerTrigger render={<Button />}>Open drawer</DrawerTrigger>

@@ -272,5 +272,15 @@
     "caller-owned-file-selection",
     "custom-parts",
     "without-motion"
+  ],
+  "bubble": [
+    "variants",
+    "alignment",
+    "consecutive-messages",
+    "links-and-buttons",
+    "reactions",
+    "updating-text",
+    "custom-parts",
+    "without-motion"
   ]
 }
