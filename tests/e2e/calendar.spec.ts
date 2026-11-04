@@ -259,6 +259,73 @@ test("Calendar native captions, locales, RTL, bounds and finite navigation varia
   }
 });
 
+for (const mode of MODES) {
+  test(`Calendar rapid caption selections preserve both fields in ${mode}`, async ({ page }, info) => {
+    await open(page, mode);
+    const calendar = card(page, "caption-layouts").locator('[data-slot="calendar"][aria-label="dropdown caption"]');
+    const grid = calendar.getByRole("grid");
+    await expect(grid).toHaveAttribute("data-motion", mode);
+    const node = await grid.elementHandle();
+    const results: string[] = [];
+    for (let repeat = 0; repeat < 8; repeat++) {
+      // No intermediate month assertion: the next field is changed as soon as
+      // Playwright finishes the preceding native-select action.
+      await calendar.getByLabel("Choose the Month").selectOption("1");
+      await calendar.getByLabel("Choose the Year").selectOption("2027");
+      await expect(grid).toHaveAttribute("aria-label", "February 2027");
+      results.push((await grid.getAttribute("aria-label")) ?? "");
+      await calendar.getByLabel("Choose the Month").selectOption("10");
+      await calendar.getByLabel("Choose the Year").selectOption("2026");
+      await expect(grid).toHaveAttribute("aria-label", "November 2026");
+      results.push((await grid.getAttribute("aria-label")) ?? "");
+    }
+    expect(await grid.evaluate((el, saved) => el === saved, node)).toBe(true);
+    await info.attach("rapid-caption-results", { body: JSON.stringify(results), contentType: "application/json" });
+  });
+
+  test(`Calendar caption keyboard changes preserve both fields in ${mode}`, async ({ page }, info) => {
+    await page.addInitScript(() => {
+      const events: { key: string; trusted: boolean; label: string | null }[] = [];
+      Object.assign(window, { captionKeys: events });
+      document.addEventListener("keydown", (event) => {
+        if (event.target instanceof HTMLSelectElement)
+          events.push({ key: event.key, trusted: event.isTrusted, label: event.target.getAttribute("aria-label") });
+      });
+    });
+    await open(page, mode);
+    const calendar = card(page, "caption-layouts").locator('[data-slot="calendar"][aria-label="dropdown caption"]');
+    const grid = calendar.getByRole("grid");
+    await expect(grid).toHaveAttribute("data-motion", mode);
+    const month = calendar.getByLabel("Choose the Month");
+    const year = calendar.getByLabel("Choose the Year");
+    for (let repeat = 0; repeat < 4; repeat++) {
+      await month.focus();
+      await page.keyboard.press("Home");
+      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("Tab");
+      await expect(year).toBeFocused();
+      await page.keyboard.press("Home");
+      await page.keyboard.press("ArrowDown");
+      await page.keyboard.press("ArrowDown");
+      await expect(grid).toHaveAttribute("aria-label", "February 2027");
+      await month.focus();
+      await page.keyboard.press("End");
+      await page.keyboard.press("ArrowUp");
+      await page.keyboard.press("Tab");
+      await expect(year).toBeFocused();
+      await page.keyboard.press("Home");
+      await page.keyboard.press("ArrowDown");
+      await expect(grid).toHaveAttribute("aria-label", "November 2026");
+    }
+    const events = await page.evaluate(
+      () => (window as unknown as { captionKeys: { trusted: boolean }[] }).captionKeys,
+    );
+    expect(events.length).toBeGreaterThan(20);
+    expect(events.every((event) => event.trusted)).toBe(true);
+    await info.attach("caption-key-events", { body: JSON.stringify(events), contentType: "application/json" });
+  });
+}
+
 test("Calendar disabled and hidden dates, week rows, custom day focus and caller styles", async ({ page }) => {
   await open(page, "full");
   const disabled = card(page, "disabled-dates");
