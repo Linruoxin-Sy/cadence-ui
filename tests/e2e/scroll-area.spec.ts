@@ -74,20 +74,21 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           expect(s.behavior).toBe("auto");
           if (s.duration !== "0s") expect(s.property).not.toMatch(/all|transform|opacity|filter/);
         }
-        // Content changes are remeasured on native scroll or viewport resize (upstream semantics).
-        const thumb = roots.nth(0).locator('[data-slot="scroll-area-thumb"]');
+        // Exercise caller-owned data and dimensions rather than mutating production DOM.
+        const changing = page.locator('[data-component-example="scroll-area/changing-content"]');
+        const updating = changing.locator('[data-slot="scroll-area-viewport"]');
+        const thumb = changing.locator('[data-slot="scroll-area-thumb"]');
+        const saved = await updating.elementHandle();
         const before = await thumb.evaluate((el) => el.getBoundingClientRect().height);
-        await vertical.locator("ul").evaluate((el) => {
-          el.append(el.cloneNode(true));
-        });
-        await vertical.evaluate((el) => {
-          el.scrollTop = 1;
-        });
+        await changing.getByRole("button", { name: "Change activity count" }).click();
+        await expect(changing.getByRole("listitem")).toHaveCount(40);
+        await updating.focus();
+        await page.keyboard.press("ArrowDown");
+        await expect.poll(() => updating.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
         await expect.poll(() => thumb.evaluate((el) => el.getBoundingClientRect().height)).toBeLessThan(before);
-        await roots.nth(0).evaluate((el) => {
-          el.style.height = "300px";
-        });
-        await expect.poll(() => vertical.evaluate((el) => el.clientHeight)).toBe(298);
+        await changing.getByRole("button", { name: "Resize activity panel" }).click();
+        await expect.poll(() => updating.evaluate((el) => el.clientHeight)).toBe(286);
+        expect(await updating.evaluate((el, handle) => el === handle, saved)).toBe(true);
         expect(errors).toEqual([]);
       });
     }

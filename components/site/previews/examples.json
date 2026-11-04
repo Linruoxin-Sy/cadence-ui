@@ -172,5 +172,14 @@
     "alignment",
     "custom-controls",
     "without-motion"
+  ],
+  "scroll-area": [
+    "vertical",
+    "horizontal",
+    "both-axes",
+    "without-overflow",
+    "caller-rendering",
+    "rtl",
+    "changing-content"
   ]
 }

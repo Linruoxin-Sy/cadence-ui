@@ -22,11 +22,35 @@ npx shadcn@latest add @cadence/scroll-area
 ```tsx
 import { ScrollArea } from "@/components/cadence/scroll-area";
 
-export function Notes() {
+export function VerticalExample() {
   return (
     <ScrollArea aria-label="Release notes" className="h-48 w-full rounded-md border">
-      <ul className="flex flex-col gap-3 p-4 pr-6">
-        {Array.from({ length: 20 }, (_, i) => <li key={i}>Release {i + 1}</li>)}
+      <ul className="flex flex-col gap-3 p-4 pr-6 text-sm">
+        {Array.from({ length: 20 }, (_, i) => (
+          <li key={i.toString()}>Release {20 - i}: improved keyboard navigation and component parity.</li>
+        ))}
+      </ul>
+    </ScrollArea>
+  );
+}
+```
+
+## Vertical scrolling
+
+Constrain the root height and keep padding on a content child. The viewport owns native scrolling; the default vertical track appears only when content overflows. Focus the viewport and use arrows or Page Down, or scroll with a wheel or touch.
+
+<ComponentExample name="vertical" />
+
+```tsx
+import { ScrollArea } from "@/components/cadence/scroll-area";
+
+export function VerticalExample() {
+  return (
+    <ScrollArea aria-label="Release notes" className="h-48 w-full rounded-md border">
+      <ul className="flex flex-col gap-3 p-4 pr-6 text-sm">
+        {Array.from({ length: 20 }, (_, i) => (
+          <li key={i.toString()}>Release {20 - i}: improved keyboard navigation and component parity.</li>
+        ))}
       </ul>
     </ScrollArea>
   );
@@ -35,36 +59,213 @@ export function Notes() {
 
 ## Horizontal scrolling
 
-Add a horizontal ScrollBar inside ScrollArea and let content exceed the viewport width.
-The built-in vertical scrollbar only appears when vertical overflow exists.
+Add a horizontal ScrollBar and give the content a width larger than its viewport. The root stays within its parent; the timeline scrolls locally without widening the page. All six phases remain in the DOM.
+
+<ComponentExample name="horizontal" />
 
 ```tsx
-<ScrollArea aria-label="Project timeline" className="w-full rounded-md border">
-  <div className="flex w-max gap-4 p-4 pb-6">
-    {["Research", "Design", "Build", "Review", "Ship"].map((phase) => (
-      <div key={phase} className="w-40">{phase}</div>
-    ))}
-  </div>
-  <ScrollBar orientation="horizontal" />
-</ScrollArea>
+import { ScrollArea, ScrollBar } from "@/components/cadence/scroll-area";
+
+export function HorizontalExample() {
+  return (
+    <ScrollArea aria-label="Project timeline" className="w-full rounded-md border">
+      <ol className="flex w-max gap-4 p-4 pb-6">
+        {["Research", "Design", "Build", "Review", "Ship", "Learn"].map((phase) => (
+          <li key={phase} className="flex h-24 w-40 items-center justify-center rounded-md bg-muted text-sm">
+            {phase}
+          </li>
+        ))}
+      </ol>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+  );
+}
+```
+
+## Both axes
+
+A bounded height and wide content create two independent native scroll ranges. The default vertical track and explicit horizontal track follow the same viewport. Reserve content space for both overlaid tracks.
+
+<ComponentExample name="both-axes" />
+
+```tsx
+import { ScrollArea, ScrollBar } from "@/components/cadence/scroll-area";
+
+export function BothAxesExample() {
+  return (
+    <ScrollArea aria-label="Delivery log" className="h-48 w-full rounded-md border">
+      <ol className="flex w-[48rem] flex-col gap-3 p-4 pr-6 pb-6 text-sm">
+        {Array.from({ length: 20 }, (_, i) => (
+          <li key={i.toString()} className="flex justify-between gap-8">
+            <span>Delivery {i + 1}: workspace components and documentation</span>
+            <span className="shrink-0">Completed</span>
+          </li>
+        ))}
+      </ol>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+  );
+}
+```
+
+## Without overflow
+
+These short panels have no scroll range. The default track is absent. keepMounted retains the second panel's horizontal track in the DOM even without overflow; it does not create a scroll range or force a useful thumb. Content remains readable.
+
+<ComponentExample name="without-overflow" />
+
+```tsx
+import { ScrollArea, ScrollBar } from "@/components/cadence/scroll-area";
+
+export function WithoutOverflowExample() {
+  return (
+    <div className="grid gap-4">
+      <ScrollArea aria-label="Short note" className="h-32 w-full rounded-md border">
+        <p className="p-4 text-sm">All changes saved.</p>
+      </ScrollArea>
+      <ScrollArea aria-label="Reserved track" className="h-32 w-full rounded-md border">
+        <p className="p-4 text-sm">A mounted horizontal track has no scroll range.</p>
+        <ScrollBar keepMounted orientation="horizontal" />
+      </ScrollArea>
+    </div>
+  );
+}
 ```
 
 ## Caller rendering and sizing
 
-Root props and ref belong to the outer container, not the inner scrolling viewport.
-A custom render element must forward its props, children and ref. State callbacks
-for classes and styles remain supported. Reserve space around content for overlaid tracks.
+Root props, ref, classes and styles belong to the outer section, while children render inside its native viewport. State callbacks retain a fixed height and change only the overflow border. overflowEdgeThreshold delays edge attributes by 16px; it changes neither scroll range nor content visibility. The application-owned action queries the viewport slot from its root ref and scrolls instantly. There is no invented viewport prop. Install Button separately for this composition. Custom render components must forward props, children and ref.
+
+<ComponentExample name="caller-rendering" />
 
 ```tsx
-<ScrollArea
-  ref={rootRef}
-  render={<section />}
-  aria-label="Activity"
-  className={(state) => state.hasOverflowY ? "h-48 rounded-md border" : "max-h-48"}
-  style={{ maxWidth: "100%" }}
->
-  <div className="p-4 pr-6">{activity}</div>
-</ScrollArea>
+"use client";
+
+import { useRef } from "react";
+import { Button } from "@/components/cadence/button";
+import { ScrollArea } from "@/components/cadence/scroll-area";
+
+export function CallerRenderingExample() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  function returnToTop() {
+    rootRef.current
+      ?.querySelector<HTMLElement>('[data-slot="scroll-area-viewport"]')
+      ?.scrollTo({ top: 0, behavior: "instant" });
+  }
+  return (
+    <div className="grid gap-4">
+      <Button variant="outline" onClick={returnToTop}>
+        Return activity to top
+      </Button>
+      <ScrollArea
+        ref={rootRef}
+        render={<section />}
+        aria-label="Workspace activity"
+        overflowEdgeThreshold={{ yStart: 16, yEnd: 16 }}
+        className={(state) =>
+          state.hasOverflowY ? "h-48 w-full rounded-md border border-primary" : "h-48 w-full rounded-md border"
+        }
+        style={() => ({ maxWidth: "100%" })}
+      >
+        <ol className="flex flex-col gap-3 p-4 pr-6 text-sm">
+          {Array.from({ length: 20 }, (_, i) => (
+            <li key={i.toString()}>
+              <a href="/docs/changelog" className="underline underline-offset-4">
+                Activity {i + 1}: read the changelog
+              </a>
+            </li>
+          ))}
+        </ol>
+      </ScrollArea>
+    </div>
+  );
+}
+```
+
+## Right-to-left content
+
+Use native dir for content and Base UI DirectionProvider for the primitive's thumb geometry. At the inline start, the first Arabic phase appears on the right; scrolling reveals the remaining phases without reversing the data array. The custom horizontal track also demonstrates render, callback className and style on the track, rather than on the root or internal thumb.
+
+<ComponentExample name="rtl" />
+
+```tsx
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { ScrollArea, ScrollBar } from "@/components/cadence/scroll-area";
+
+export function RtlExample() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl">
+        <ScrollArea aria-label="مراحل المشروع" className="w-full rounded-md border">
+          <ol className="flex w-max gap-4 p-4 pb-6" lang="ar">
+            {["البحث", "التصميم", "البناء", "المراجعة", "النشر", "التعلم"].map((phase) => (
+              <li key={phase} className="flex h-24 w-40 items-center justify-center rounded-md bg-muted text-sm">
+                {phase}
+              </li>
+            ))}
+          </ol>
+          <ScrollBar
+            orientation="horizontal"
+            render={<div title="Project phases track" />}
+            className={() => "h-3"}
+            style={() => ({ padding: 2 })}
+          />
+        </ScrollArea>
+      </div>
+    </DirectionProvider>
+  );
+}
+```
+
+## Changing content
+
+The caller owns entries and panel dimensions. These two actions change actual data and root height independently; the viewport and draft input keep their identities. This pinned wrapper has no Content part: content-only growth can leave thumb geometry stale until a native scroll or viewport resize. Scroll after changing the count, or resize the panel, to refresh it. It does not automatically follow new entries or virtualize them. Install Button separately for this composition.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ScrollArea } from "@/components/cadence/scroll-area";
+
+export function ChangingContentExample() {
+  const [expanded, setExpanded] = useState(false);
+  const [tall, setTall] = useState(false);
+  return (
+    <div className="grid gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
+          Change activity count
+        </Button>
+        <Button variant="outline" onClick={() => setTall((value) => !value)}>
+          Resize activity panel
+        </Button>
+      </div>
+      <p role="status">
+        {expanded ? 40 : 20} entries · {tall ? "Tall" : "Compact"} panel
+      </p>
+      <ScrollArea
+        aria-label="Updating activity"
+        className={tall ? "h-72 w-full rounded-md border" : "h-48 w-full rounded-md border"}
+      >
+        <div className="flex flex-col gap-3 p-4 pr-6 text-sm">
+          <input
+            aria-label="Activity draft"
+            defaultValue="Keep this draft"
+            className="w-full min-w-0 rounded-md border p-2 focus-visible:outline-2 focus-visible:outline-ring"
+          />
+          <ol className="flex flex-col gap-3">
+            {Array.from({ length: expanded ? 40 : 20 }, (_, i) => (
+              <li key={i.toString()}>Activity {i + 1}: documentation updated.</li>
+            ))}
+          </ol>
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
 ```
 
 ## When to use
@@ -140,8 +341,7 @@ corresponding ScrollBar. Parent grids may need min-w-0. Base UI manages custom s
 while content uses native scrolling; it does not virtualize children.
 
 T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
-HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
-works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
+HTML behavior remains browser-owned. The server renders the real content and bounded overflow viewport, so native scrolling remains available without JavaScript. Custom track measurement, pointer dragging and caller-owned update buttons require hydration. The registry enforces a 4 KiB gzip budget for this item's own shipped
 source; dependencies and application bundles are measured separately.
 
 ## Notes for AI
