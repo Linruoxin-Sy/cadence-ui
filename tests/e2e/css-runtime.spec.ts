@@ -226,9 +226,10 @@ for (const id of ["skeleton", "spinner", "progress", "attachment"])
       id === "progress"
         ? '[aria-label="Preparing preview"] [data-slot="progress-indicator"]'
         : id === "attachment"
-          ? '[data-testid="live-attachment"] [data-slot="attachment-title"]'
+          ? '[data-state="uploading"] [data-slot="attachment-title"]'
           : `[data-slot="${id}"]`;
-    const part = page.locator(`[data-preview="${id}"] ${selector}`).first();
+    const scope = id === "attachment" ? '[data-component-example="attachment/upload-state"]' : `[data-preview="${id}"]`;
+    const part = page.locator(`${scope} ${selector}`).first();
     const result = await part.evaluate(async (node, id) => {
       const variable = id === "spinner" ? "--animate-spin" : "--animate-pulse";
       const name = id === "spinner" ? "spin" : "pulse";
@@ -257,17 +258,15 @@ for (const id of ["skeleton", "spinner", "progress", "attachment"])
     expect(result.before).toBe(id === "spinner" ? "1s" : "2s");
     expect(result.samples.every((f) => f.duration === "0.4s")).toBe(true);
     expect(new Set(result.samples.map((f) => (id === "spinner" ? f.transform : f.opacity))).size).toBeGreaterThan(3);
-    if (id === "attachment") await page.getByLabel("Attachment motion", { exact: true }).selectOption("reduced");
-    else
-      await page
-        .getByRole("group", { name: "Motion mode" })
-        .getByRole("button", { name: "reduced", exact: true })
-        .click();
+
+    await page
+      .getByRole("group", { name: "Motion mode" })
+      .getByRole("button", { name: "reduced", exact: true })
+      .click();
     await expect(part).toHaveAttribute("data-motion", "reduced");
     expect(await part.evaluate((n) => n.getAnimations().some((a) => a instanceof CSSAnimation))).toBe(true);
-    if (id === "attachment") await page.getByLabel("Attachment motion", { exact: true }).selectOption("none");
-    else
-      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
+
+    await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
     await expect(part).toHaveAttribute("data-motion", "none");
     expect(await part.evaluate((n) => n.getAnimations().length)).toBe(0);
   });

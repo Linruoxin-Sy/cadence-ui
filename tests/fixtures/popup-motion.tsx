@@ -9,6 +9,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../../registry/cadence/alert-dialog";
+import {
+  Attachment,
+  AttachmentContent,
+  AttachmentDescription,
+  AttachmentMedia,
+  AttachmentTitle,
+  AttachmentTrigger,
+} from "../../registry/cadence/attachment";
 import { Button } from "../../registry/cadence/button";
 import {
   Combobox,
@@ -130,6 +138,31 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/
 // A dedicated browser regression input. Changing a native select emits change,
 // so mode updates do not also perform an outside press or steal popup focus.
 // Production examples keep the header and normal outside-dismissal semantics.
+function AttachmentMotionFixture() {
+  const [compact, setCompact] = useState(false);
+  return (
+    <Attachment
+      data-attachment-fixture
+      state="uploading"
+      size={compact ? "xs" : "default"}
+      orientation={compact ? "vertical" : "horizontal"}
+      onKeyDown={(event) => {
+        if (event.key === "F2" || event.key === "F3") {
+          event.preventDefault();
+          setCompact(event.key === "F2");
+        }
+      }}
+    >
+      <AttachmentMedia aria-hidden="true">PDF</AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle>retained-report.pdf</AttachmentTitle>
+        <AttachmentDescription>Uploading · 64%</AttachmentDescription>
+      </AttachmentContent>
+      <AttachmentTrigger aria-label="Inspect retained report" />
+    </Attachment>
+  );
+}
+
 function DatePickerMotionFixture() {
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
   return (
@@ -393,6 +426,7 @@ function PopupMotionFixture({
           {component === "sidebar" && <SidebarMotionFixture />}
           {component === "data-table" && <DataTableDemo />}
           {component === "date-picker" && <DatePickerMotionFixture />}
+          {component === "attachment" && <AttachmentMotionFixture />}
           {component === "drawer" && (
             <Drawer showSwipeHandle>
               <DrawerTrigger render={<Button />}>Open drawer</DrawerTrigger>

@@ -17,81 +17,527 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 npx shadcn@latest add @cadence/attachment
 ```
 
+The examples use lucide-react icons; run `pnpm add lucide-react` if needed. The file-selection example also installs Input; Button and the provider are Attachment dependencies.
+
+```install
+npx shadcn@latest add @cadence/input
+```
+
 ## Usage
 
-```tsx
-import {
-  Attachment, AttachmentMedia, AttachmentContent, AttachmentTitle,
-  AttachmentDescription, AttachmentActions, AttachmentAction,
-} from "@/components/cadence/attachment";
+This ready file has a native download link and an independent remove action. The caller chooses the removal focus destination.
 
-export function FileCard({ onRemove }: { onRemove: () => void }) {
+```tsx
+"use client";
+
+import { FileTextIcon, XIcon } from "lucide-react";
+import { useRef, useState } from "react";
+import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from "@/components/cadence/attachment";
+
+const noteUrl = "data:text/plain;charset=utf-8,Project%20notes%0AReview%20the%20attachment%20examples.";
+
+export function ReadyFile() {
+  const [removed, setRemoved] = useState(false);
+  const region = useRef<HTMLDivElement>(null);
   return (
-    <Attachment>
-      <AttachmentMedia aria-hidden="true">PDF</AttachmentMedia>
-      <AttachmentContent>
-        <AttachmentTitle>report.pdf</AttachmentTitle>
-        <AttachmentDescription>PDF · 2.4 MB</AttachmentDescription>
-      </AttachmentContent>
-      <AttachmentActions>
-        <AttachmentAction aria-label="Remove report.pdf" onClick={onRemove}>×</AttachmentAction>
-      </AttachmentActions>
-    </Attachment>
+    <div ref={region} tabIndex={-1} className="max-w-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      {removed ? (
+        <p className="text-sm text-muted-foreground">No attached files.</p>
+      ) : (
+        <Attachment>
+          <AttachmentMedia aria-hidden="true">
+            <FileTextIcon />
+          </AttachmentMedia>
+          <AttachmentContent>
+            <AttachmentTitle>project-notes.txt</AttachmentTitle>
+            <AttachmentDescription>Text file · 45 B</AttachmentDescription>
+          </AttachmentContent>
+          <AttachmentTrigger
+            render={<a href={noteUrl} download="project-notes.txt" aria-label="Download project notes" />}
+          />
+          <AttachmentActions>
+            <AttachmentAction
+              aria-label="Remove project notes"
+              onClick={() => {
+                setRemoved(true);
+                region.current?.focus();
+              }}
+            >
+              <XIcon />
+            </AttachmentAction>
+          </AttachmentActions>
+        </Attachment>
+      )}
+    </div>
   );
 }
 ```
 
 ## Upload state
 
-Pass `state="idle"`, `"uploading"`, `"processing"`, `"error"` or `"done"` from your
-application. Uploading and processing pulse the title; the description carries
-readable status even with animation disabled. An error needs text explaining the
-failure. Set `aria-busy` on the appropriate region and use a separate polite status
-for meaningful milestones, rather than announcing every progress update.
+Pass all five caller-owned states directly: idle, uploading, processing, error and done. Uploading and processing pulse the filename; readable status remains when motion is disabled. These fixed cards do not upload anything. A busy region uses aria-busy; announce meaningful milestones in a separate polite status, rather than each percentage.
+
+<ComponentExample name="upload-state" />
 
 ```tsx
-<Attachment state="uploading" aria-busy="true">
-  <AttachmentContent>
-    <AttachmentTitle>report.pdf</AttachmentTitle>
-    <AttachmentDescription>Uploading · 64%</AttachmentDescription>
-  </AttachmentContent>
-</Attachment>
+import { FileTextIcon } from "lucide-react";
+import { type ComponentProps } from "react";
+import { Attachment, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle } from "@/components/cadence/attachment";
+
+function FileTile({
+  name = "project-notes.txt",
+  description = "Text file · 45 B",
+  ...props
+}: ComponentProps<typeof Attachment> & { name?: string; description?: string }) {
+  return (
+    <Attachment {...props}>
+      <AttachmentMedia aria-hidden="true">
+        <FileTextIcon />
+      </AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle title={name}>{name}</AttachmentTitle>
+        <AttachmentDescription>{description}</AttachmentDescription>
+      </AttachmentContent>
+    </Attachment>
+  );
+}
+
+export function UploadState() {
+  const states = ["idle", "uploading", "processing", "error", "done"] as const;
+  const descriptions = {
+    idle: "Ready to upload",
+    uploading: "Uploading · 64%",
+    processing: "Processing file",
+    error: "Upload failed · connection lost",
+    done: "Upload complete",
+  };
+  return (
+    <div className="flex w-full min-w-0 flex-wrap justify-center gap-3">
+      {states.map((state) => (
+        <FileTile
+          key={state}
+          state={state}
+          name={`${state}.pdf`}
+          description={descriptions[state]}
+          aria-busy={state === "uploading" || state === "processing"}
+        />
+      ))}
+    </div>
+  );
+}
 ```
 
-## Images and sizes
+## Images
 
-Use `AttachmentMedia variant="image"` with a native image and meaningful alt text.
-`orientation="vertical"` stacks it above the metadata; horizontal is the default.
-Sizes are `default`, `sm` and `xs`. The media is dimmed while work is in progress.
-Supply image URLs yourself; the component never creates or revokes object URLs.
+Use AttachmentMedia variant="image" with a native image and meaningful alt text. These vertical cards compare a ready image with a dimmed processing preview. Supply the URL yourself; Attachment never creates or revokes object URLs. This static inline SVG has no object URL lifecycle. Horizontal cards remain the default, as shown in Sizes.
+
+<ComponentExample name="images" />
+
+```tsx
+import { Attachment, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle } from "@/components/cadence/attachment";
+
+const imageUrl =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23d4d4d8'/%3E%3Crect x='10' y='10' width='60' height='60' rx='6' fill='%23fafafa'/%3E%3Cpath d='M20 28h40M20 40h24M20 52h32' stroke='%2352525b' stroke-width='4'/%3E%3C/svg%3E";
+
+export function Images() {
+  return (
+    <div className="flex max-w-full flex-wrap items-start justify-center gap-4">
+      {(["done", "processing"] as const).map((state) => (
+        <Attachment key={state} state={state} orientation="vertical" aria-busy={state === "processing"}>
+          <AttachmentMedia variant="image">
+            {/* biome-ignore lint/performance/noImgElement: Native images are the public AttachmentMedia composition. */}
+            <img src={imageUrl} width={80} height={80} alt="Interface diagram" />
+          </AttachmentMedia>
+          <AttachmentContent>
+            <AttachmentTitle title={`${state}-diagram.svg`}>{state}-diagram.svg</AttachmentTitle>
+            <AttachmentDescription>{state === "done" ? "SVG · 250 B" : "Processing preview"}</AttachmentDescription>
+          </AttachmentContent>
+        </Attachment>
+      ))}
+    </div>
+  );
+}
+```
+
+## Sizes
+
+The default, sm and xs sizes change spacing, text and icon media. Compare them independently of state and orientation; filenames remain in the DOM and truncate within the available width.
+
+<ComponentExample name="sizes" />
+
+```tsx
+import { FileTextIcon } from "lucide-react";
+import { type ComponentProps } from "react";
+import { Attachment, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle } from "@/components/cadence/attachment";
+
+function FileTile({
+  name = "project-notes.txt",
+  description = "Text file · 45 B",
+  ...props
+}: ComponentProps<typeof Attachment> & { name?: string; description?: string }) {
+  return (
+    <Attachment {...props}>
+      <AttachmentMedia aria-hidden="true">
+        <FileTextIcon />
+      </AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle title={name}>{name}</AttachmentTitle>
+        <AttachmentDescription>{description}</AttachmentDescription>
+      </AttachmentContent>
+    </Attachment>
+  );
+}
+
+export function Sizes() {
+  return (
+    <div className="flex max-w-full flex-wrap items-center justify-center gap-4">
+      {(["default", "sm", "xs"] as const).map((size) => (
+        <FileTile key={size} size={size} name={`${size}-notes.txt`} description={`Size: ${size}`} />
+      ))}
+    </div>
+  );
+}
+```
 
 ## Trigger and independent actions
 
-`AttachmentTrigger` fills the card behind `AttachmentActions`. Give the empty
-trigger an accessible name. It defaults to a non-submitting button; `render`
-accepts an element or render function, preserving Base UI event/ref merging.
-Actions default to ghost Button with icon-xs size and accept Button's callbacks,
-native props and `render`. Keep actions in AttachmentActions so their stacking
-order leaves them independently reachable.
+AttachmentTrigger fills the card behind AttachmentActions. The native download link has an accessible name; Save toggles its own state without requesting a download. The disabled delete button stays disabled. This local text download uses a fixed data URL; an application supplies its own file URL and authorization. Default triggers are non-submitting buttons, and actions default to ghost Button with icon-xs size.
+
+<ComponentExample name="trigger-and-actions" />
 
 ```tsx
-<AttachmentTrigger render={<a href="/files/report.pdf" download aria-label="Download report.pdf" />} />
+"use client";
+
+import { XIcon } from "lucide-react";
+import { useState } from "react";
+import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentTitle, AttachmentTrigger } from "@/components/cadence/attachment";
+
+const noteUrl = "data:text/plain;charset=utf-8,Project%20notes%0AReview%20the%20attachment%20examples.";
+
+export function TriggerAndActions() {
+  const [opened, setOpened] = useState(0);
+  const [saved, setSaved] = useState(false);
+  return (
+    <div className="flex min-w-0 max-w-full flex-col items-start gap-3">
+      <Attachment>
+        <AttachmentContent>
+          <AttachmentTitle>review-notes.txt</AttachmentTitle>
+          <AttachmentDescription>Download or save independently</AttachmentDescription>
+        </AttachmentContent>
+        <AttachmentTrigger
+          aria-label="Download review notes"
+          onClick={() => setOpened((n) => n + 1)}
+          render={<a href={noteUrl} download="review-notes.txt" />}
+        />
+        <AttachmentActions>
+          <AttachmentAction size="sm" onClick={() => setSaved((v) => !v)} aria-pressed={saved}>
+            {saved ? "Saved" : "Save"}
+          </AttachmentAction>
+          <AttachmentAction aria-label="Delete locked review notes" disabled>
+            <XIcon />
+          </AttachmentAction>
+        </AttachmentActions>
+      </Attachment>
+      <output className="text-sm text-muted-foreground">
+        Downloads requested: {opened}; {saved ? "saved" : "not saved"}.
+      </output>
+    </div>
+  );
+}
 ```
 
 ## Scrollable groups
 
-Wrap cards in `AttachmentGroup` for a snapping horizontal row. Native scrolling
-is immediate and never smoothed by this component. For presentational cards give
-the group `tabIndex={0}`, `role="group"` and an accessible name; interactive cards
-can be reached with Tab. Allow the group to shrink within its parent.
+AttachmentGroup is always a horizontal snapping scroller. The first row contains horizontal cards and the second contains vertical cards; orientation belongs to each Attachment, not the group. Tab reaches each download link and reveals off-screen cards. A named, focusable group also supports native arrow-key scrolling. Keep min-width: 0 on its parent.
+
+<ComponentExample name="scrollable-groups" />
 
 ```tsx
-<AttachmentGroup tabIndex={0} role="group" aria-label="Selected files">
-  <Attachment orientation="vertical" size="sm">
-    <AttachmentMedia variant="image"><img src={previewUrl} alt="Selected workspace" /></AttachmentMedia>
-    <AttachmentContent><AttachmentTitle>workspace.png</AttachmentTitle></AttachmentContent>
-  </Attachment>
-</AttachmentGroup>
+import { FileTextIcon } from "lucide-react";
+import { Attachment, AttachmentContent, AttachmentDescription, AttachmentGroup, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from "@/components/cadence/attachment";
+
+const noteUrl = "data:text/plain;charset=utf-8,Project%20notes%0AReview%20the%20attachment%20examples.";
+
+export function ScrollableGroups() {
+  return (
+    <div className="flex w-full min-w-0 flex-col gap-4">
+      {(["horizontal", "vertical"] as const).map((orientation) => (
+        <AttachmentGroup
+          key={orientation}
+          tabIndex={0}
+          role="group"
+          aria-label={`${orientation} reference files`}
+          className="w-full focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          {[
+            "research-notes-with-a-very-long-name.txt",
+            "project-roadmap.txt",
+            "interface-reference.txt",
+            "meeting-notes.txt",
+          ].map((name) => (
+            <Attachment key={name} orientation={orientation} size="sm">
+              <AttachmentMedia aria-hidden="true">
+                <FileTextIcon />
+              </AttachmentMedia>
+              <AttachmentContent>
+                <AttachmentTitle title={name}>{name}</AttachmentTitle>
+                <AttachmentDescription>Reference · text file</AttachmentDescription>
+              </AttachmentContent>
+              <AttachmentTrigger render={<a href={noteUrl} download={name} aria-label={`Download ${name}`} />} />
+            </Attachment>
+          ))}
+        </AttachmentGroup>
+      ))}
+    </div>
+  );
+}
+```
+
+## Caller-owned file selection
+
+The native Input owns its FileList, name and browser file selection. This example stores a File locally and exposes explicit simulation actions for progress, processing, completion, failure and retry; it never starts a request or validates the file. Inspect reads the selected metadata. Selection, reset and removal remain independent of the other examples. Reset clears the native input, and removal returns focus to that same input. A real application owns requests, errors, cancellation and cleanup.
+
+<ComponentExample name="caller-owned-file-selection" />
+
+```tsx
+"use client";
+
+import { FileTextIcon, XIcon } from "lucide-react";
+import { type ComponentProps, useId, useRef, useState } from "react";
+import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from "@/components/cadence/attachment";
+import { Button } from "@/components/cadence/button";
+import { Input } from "@/components/cadence/input";
+
+export function CallerOwnedFileSelection() {
+  const id = useId();
+  const input = useRef<HTMLInputElement>(null);
+  const form = useRef<HTMLFormElement>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [state, setState] = useState<NonNullable<ComponentProps<typeof Attachment>["state"]>>("idle");
+  const [notice, setNotice] = useState("No file selected. This example makes no requests.");
+  const descriptions = {
+    idle: "Selected locally · no upload started",
+    uploading: "Local simulation · 64%",
+    processing: "Local simulation · processing",
+    error: "Caller supplied: connection lost",
+    done: "Local simulation complete",
+  };
+  function update(next: typeof state) {
+    setState(next);
+    setNotice(descriptions[next]);
+  }
+  return (
+    <form
+      ref={form}
+      onSubmit={(event) => event.preventDefault()}
+      className="flex w-full min-w-0 max-w-lg flex-col items-start gap-3"
+    >
+      <label htmlFor={`${id}-file`} className="text-sm font-medium">
+        Choose a local file (name only)
+      </label>
+      <Input
+        ref={input}
+        id={`${id}-file`}
+        name="attachment"
+        type="file"
+        aria-describedby={`${id}-notice`}
+        onChange={(event) => {
+          const selected = event.target.files?.[0] ?? null;
+          setFile(selected);
+          setState("idle");
+          setNotice(selected ? `Selected ${selected.name}; no request started.` : "No file selected.");
+        }}
+      />
+      {file && (
+        <Attachment
+          state={state}
+          aria-busy={state === "uploading" || state === "processing"}
+          aria-invalid={state === "error" || undefined}
+          aria-describedby={state === "error" ? `${id}-error` : undefined}
+        >
+          <AttachmentMedia aria-hidden="true">
+            <FileTextIcon />
+          </AttachmentMedia>
+          <AttachmentContent>
+            <AttachmentTitle title={file.name}>{file.name}</AttachmentTitle>
+            <AttachmentDescription>{descriptions[state]}</AttachmentDescription>
+          </AttachmentContent>
+          <AttachmentTrigger
+            aria-label={`Inspect ${file.name}`}
+            onClick={() => setNotice(`${file.name} · ${file.size} bytes · ${file.type || "unknown type"}`)}
+          />
+          <AttachmentActions>
+            <AttachmentAction
+              aria-label={`Remove ${file.name}`}
+              onClick={() => {
+                setFile(null);
+                setState("idle");
+                form.current?.reset();
+                setNotice(`Removed ${file.name}`);
+                input.current?.focus();
+              }}
+            >
+              <XIcon />
+            </AttachmentAction>
+          </AttachmentActions>
+        </Attachment>
+      )}
+      {state === "error" && file && (
+        <p id={`${id}-error`} className="text-sm text-destructive">
+          Connection lost. Retry when your application is ready.
+        </p>
+      )}
+      <div className="flex max-w-full flex-wrap gap-2">
+        <Button type="button" variant="outline" size="sm" disabled={!file} onClick={() => update("uploading")}>
+          Start local simulation
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!file || state !== "uploading"}
+          onClick={() => update("processing")}
+        >
+          Process locally
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!file || state !== "processing"}
+          onClick={() => update("done")}
+        >
+          Finish locally
+        </Button>
+        <Button type="button" variant="outline" size="sm" disabled={!file} onClick={() => update("error")}>
+          Supply failure
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!file || state !== "error"}
+          onClick={() => update("uploading")}
+        >
+          Retry locally
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            form.current?.reset();
+            setFile(null);
+            setState("idle");
+            setNotice("Local selection reset.");
+            input.current?.focus();
+          }}
+        >
+          Reset selection
+        </Button>
+      </div>
+      <p id={`${id}-notice`} role="status" className="max-w-full break-all text-sm text-muted-foreground">
+        {notice}
+      </p>
+    </form>
+  );
+}
+```
+
+## Custom parts
+
+Native root classes, styles and keyboard events pass through. Focus inspect uses a caller ref, and F2 inside the card focuses the same rendered button. The trigger uses Base UI render-function props; the independent download action demonstrates an anchor with Button callback classes and styles. Keep controls as siblings in the action layer rather than nesting them inside a trigger.
+
+<ComponentExample name="custom-parts" />
+
+```tsx
+"use client";
+
+import { useRef, useState } from "react";
+import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentTitle, AttachmentTrigger } from "@/components/cadence/attachment";
+import { Button } from "@/components/cadence/button";
+
+const noteUrl = "data:text/plain;charset=utf-8,Project%20notes%0AReview%20the%20attachment%20examples.";
+
+export function CustomParts() {
+  const trigger = useRef<HTMLButtonElement>(null);
+  const [count, setCount] = useState(0);
+  return (
+    <div className="flex min-w-0 max-w-full flex-col items-start gap-3">
+      <Attachment
+        className="rounded-none"
+        style={{ borderStyle: "dashed" }}
+        onKeyDown={(event) => {
+          if (event.key === "F2") trigger.current?.focus();
+        }}
+      >
+        <AttachmentContent>
+          <AttachmentTitle>custom-notes.txt</AttachmentTitle>
+          <AttachmentDescription>F2 focuses the inspect button</AttachmentDescription>
+        </AttachmentContent>
+        <AttachmentTrigger
+          ref={trigger}
+          aria-label="Inspect custom notes"
+          onClick={() => setCount((n) => n + 1)}
+          render={(props) => <button {...props} type="button" data-caller-trigger="yes" />}
+        />
+        <AttachmentActions>
+          <AttachmentAction
+            render={<a href={noteUrl} download="custom-notes.txt" />}
+            size="sm"
+            className={(s) => (s.disabled ? "opacity-50" : "underline")}
+            style={(s) => ({ fontWeight: s.disabled ? 400 : 600 })}
+          >
+            Download
+          </AttachmentAction>
+        </AttachmentActions>
+      </Attachment>
+      <Button variant="outline" size="sm" onClick={() => trigger.current?.focus()}>
+        Focus inspect
+      </Button>
+      <output className="text-sm text-muted-foreground">Inspections: {count}</output>
+    </div>
+  );
+}
+```
+
+## Without motion
+
+This named example explicitly uses CadenceProvider mode="none". Its uploading title is fully opaque and has no loop from its first insertion. The other specimens inherit the site header mode and speed; reduced keeps the opacity loop, while none cancels it. State, file selection and geometry remain immediate in every mode.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { FileTextIcon } from "lucide-react";
+import { type ComponentProps } from "react";
+import { Attachment, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle } from "@/components/cadence/attachment";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+function FileTile({
+  name = "project-notes.txt",
+  description = "Text file · 45 B",
+  ...props
+}: ComponentProps<typeof Attachment> & { name?: string; description?: string }) {
+  return (
+    <Attachment {...props}>
+      <AttachmentMedia aria-hidden="true">
+        <FileTextIcon />
+      </AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle title={name}>{name}</AttachmentTitle>
+        <AttachmentDescription>{description}</AttachmentDescription>
+      </AttachmentContent>
+    </Attachment>
+  );
+}
+
+export function WithoutMotion() {
+  return (
+    <CadenceProvider mode="none">
+      <FileTile state="uploading" name="quiet-report.pdf" description="Uploading · 64%" aria-busy="true" />
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -159,7 +605,7 @@ The application owns native file input `name`, `accept`, `multiple`, `required`,
 File objects, form submission, validation, upload progress, requests, cancel/retry,
 URLs and URL cleanup. Attachment forwards `aria-invalid`/`data-invalid` when given;
 `state="error"` only styles a supplied failure. It never decides which file is valid.
-The preview's file input reports the selected filename locally and makes no request.
+The Caller-owned file selection example reports a local filename and simulates milestones without requests. Its fixed failure is supplied by the caller, not inferred from the selected File.
 
 ## Responsiveness and performance
 

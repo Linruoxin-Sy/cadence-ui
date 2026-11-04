@@ -262,5 +262,15 @@
     "caller-errors",
     "custom-parts",
     "without-motion"
+  ],
+  "attachment": [
+    "upload-state",
+    "images",
+    "sizes",
+    "trigger-and-actions",
+    "scrollable-groups",
+    "caller-owned-file-selection",
+    "custom-parts",
+    "without-motion"
   ]
 }
