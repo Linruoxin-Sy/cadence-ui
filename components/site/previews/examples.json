@@ -160,5 +160,17 @@
     "row-actions",
     "horizontal-overflow",
     "empty-results"
+  ],
+  "carousel": [
+    "multiple",
+    "vertical",
+    "looping",
+    "rtl",
+    "drag",
+    "changing-slides",
+    "api",
+    "alignment",
+    "custom-controls",
+    "without-motion"
   ]
 }

@@ -18,90 +18,579 @@ npx shadcn@latest add @cadence/carousel
 
 ```tsx
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
-
-export function Example() {
+export function BasicExample() {
   return (
-    <Carousel aria-label="Featured projects" className="mx-12 max-w-sm" tabIndex={0}>
-      <CarouselContent className="touch-pan-y">
-        {[1, 2, 3].map((slide) => (
-          <CarouselItem key={slide} aria-label={`${slide} of 3`}>
-            <div className="rounded-lg border p-8">Project {slide}</div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
+    <div className="w-full max-w-lg px-12 py-12">
+      <Carousel
+        aria-label="Project highlights"
+        tabIndex={0}
+        className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <CarouselContent className="touch-pan-y">
+          {[1, 2, 3, 4].map((slide) => (
+            <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+              <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                {slide}
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    </div>
   );
 }
 ```
 
 ## Multiple visible slides
 
-```tsx
-<Carousel aria-label="Projects" opts={{ align: "start", loop: true }}>
-  <CarouselContent className="-ml-2 touch-pan-y">
-    {[1, 2, 3, 4].map((slide) => (
-      <CarouselItem key={slide} className="pl-2 md:basis-1/2">
-        Project {slide}
-      </CarouselItem>
-    ))}
-  </CarouselContent>
-  <CarouselPrevious />
-  <CarouselNext />
-</Carousel>
-```
+Size slides with caller classes. This fixed layout shows two at `md` and one on narrow screens; the collection remains finite and uses start alignment.
 
-## Vertical collection
+<ComponentExample name="multiple" />
 
 ```tsx
-<Carousel orientation="vertical" aria-label="Updates" className="my-12">
-  <CarouselContent className="h-64 touch-pan-x">
-    <CarouselItem>First update</CarouselItem>
-    <CarouselItem>Second update</CarouselItem>
-  </CarouselContent>
-  <CarouselPrevious />
-  <CarouselNext />
-</Carousel>
-```
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
 
-## API and plugins
-
-```tsx
-"use client";
-import { useEffect, useState } from "react";
-import { Carousel, type CarouselApi, CarouselContent, CarouselItem } from "@/components/cadence/carousel";
-
-export function WithApi() {
-  const [api, setApi] = useState<CarouselApi>();
-  const [selected, setSelected] = useState(0);
-  useEffect(() => {
-    if (!api) return;
-    const update = () => setSelected(api.selectedScrollSnap());
-    update();
-    api.on("select", update);
-    return () => { api.off("select", update); };
-  }, [api]);
+export function MultipleExample() {
   return (
-    <>
-      <Carousel setApi={setApi} aria-label="Projects">
-        <CarouselContent>
-          <CarouselItem>First</CarouselItem>
-          <CarouselItem>Second</CarouselItem>
+    <div className="w-full max-w-lg px-12 py-12">
+      <Carousel
+        aria-label="Project pairs"
+        tabIndex={0}
+        opts={{ align: "start" }}
+        className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <CarouselContent className="touch-pan-y">
+          {[1, 2, 3, 4].map((slide) => (
+            <CarouselItem key={slide} aria-label={`${slide} of 4`} className="md:basis-1/2">
+              <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                {slide}
+              </div>
+            </CarouselItem>
+          ))}
         </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
       </Carousel>
-      <button onClick={() => api?.scrollNext()}>Next project</button>
-      <p aria-live="polite">Project {selected + 1}</p>
-    </>
+    </div>
   );
 }
 ```
 
-Pass Embla plugins through `plugins`; keep plugin instances stable. The API is the actual Embla
-8.6.0 instance, including events, `reInit`, `plugins`, `scrollTo`, `scrollProgress` and `destroy`.
-Plugins are never removed by a motion mode. Stop autoplay or independent animation plugins under
-reduced/none yourself, and provide pause controls. Cadence clamps the engine's interpolation even
-when a plugin or API call explicitly requests `jump=false`.
+## Vertical collection
+
+Set `orientation="vertical"`, an explicit track height, and `touch-pan-x`. The pinned keyboard capture still uses ArrowLeft / ArrowRight on this axis; ArrowUp / ArrowDown are not carousel commands.
+
+<ComponentExample name="vertical" />
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+
+export function VerticalExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <Carousel
+        aria-label="Vertical updates"
+        tabIndex={0}
+        orientation="vertical"
+        className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <CarouselContent className="h-40 touch-pan-x">
+          {[1, 2, 3, 4].map((slide) => (
+            <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+              <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                {slide}
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    </div>
+  );
+}
+```
+
+## Looping
+
+This fixed loop wraps in both directions. Embla may disable looping if there is too little content to fill the viewport; four full-width slides provide sufficient content here.
+
+<ComponentExample name="looping" />
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+
+export function LoopingExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <Carousel
+        aria-label="Looping projects"
+        tabIndex={0}
+        opts={{ loop: true, align: "start" }}
+        className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <CarouselContent className="touch-pan-y">
+          {[1, 2, 3, 4].map((slide) => (
+            <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+              <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                {slide}
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    </div>
+  );
+}
+```
+
+## Right-to-left
+
+Set both native `dir="rtl"` and `opts.direction="rtl"`. The pinned controls still mean previous / next in collection order; their icons and physical positions are not automatically mirrored.
+
+<ComponentExample name="rtl" />
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+
+export function RtlExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <Carousel
+        aria-label="RTL projects"
+        tabIndex={0}
+        opts={{ direction: "rtl", align: "start" }}
+        className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        dir="rtl"
+      >
+        <CarouselContent className="touch-pan-y">
+          {[1, 2, 3, 4].map((slide) => (
+            <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+              <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                {slide}
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    </div>
+  );
+}
+```
+
+## Drag behavior
+
+Compare default snap dragging, `dragFree`, and `watchDrag: false` directly. Reduced/none preserve direct pointer tracking and stop autonomous release interpolation. Free drag can stop between snaps; the buttons still navigate normally.
+
+<ComponentExample name="drag" />
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+
+export function DragExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <div className="grid gap-12">
+        <div className="grid gap-3">
+          <p className="text-sm font-medium">Snapping drag</p>
+          <Carousel
+            aria-label="Snapping drag"
+            tabIndex={0}
+            className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <CarouselContent className="touch-pan-y">
+              {[1, 2, 3, 4].map((slide) => (
+                <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+                  <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                    {slide}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+        <div className="grid gap-3">
+          <p className="text-sm font-medium">Free drag</p>
+          <Carousel
+            aria-label="Free drag"
+            tabIndex={0}
+            opts={{ dragFree: true }}
+            className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <CarouselContent className="touch-pan-y">
+              {[1, 2, 3, 4].map((slide) => (
+                <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+                  <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                    {slide}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+        <div className="grid gap-3">
+          <p className="text-sm font-medium">Buttons only</p>
+          <Carousel
+            aria-label="Buttons only"
+            tabIndex={0}
+            opts={{ watchDrag: false }}
+            className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <CarouselContent className="touch-pan-y">
+              {[1, 2, 3, 4].map((slide) => (
+                <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+                  <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                    {slide}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## Changing slides
+
+These two caller-owned updates are limited to this example. Resize changes the real parent width; Change slides adds/removes the last keyed slide. Embla observes geometry and slide mutations and rebuilds its snaps. Existing slide DOM stays mounted; removing the selected last item clamps to a valid snap.
+
+<ComponentExample name="changing-slides" />
+
+```tsx
+"use client";
+
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+import { Button } from "@/components/cadence/button";
+import { useState } from "react";
+
+export function ChangingExample() {
+  const [narrow, setNarrow] = useState(false);
+  const [count, setCount] = useState(4);
+  return (
+    <div className="grid w-full max-w-lg gap-4">
+      <div className="flex flex-wrap justify-center gap-2">
+        <Button size="sm" variant="outline" onClick={() => setNarrow(!narrow)}>
+          Resize track
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setCount(count === 4 ? 5 : 4)}>
+          Change slides
+        </Button>
+      </div>
+      <div className="px-12 py-12">
+        <Carousel
+          aria-label="Changing projects"
+          tabIndex={0}
+          opts={{ align: "start" }}
+          className={`${narrow ? "mx-auto w-3/4" : "w-full"} outline-none focus-visible:ring-2 focus-visible:ring-ring`}
+        >
+          <CarouselContent className="touch-pan-y">
+            {[1, 2, 3, 4, 5].slice(0, count).map((slide) => (
+              <CarouselItem key={slide} aria-label={`${slide} of ${count}`}>
+                <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                  {slide}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+    </div>
+  );
+}
+```
+
+## API and plugins
+
+Use the real Embla API for external navigation and subscribe with cleanup. A stable lifecycle-only plugin reports readiness without adding animation. This example also keeps a native narrow-screen duration override; reduced/none clamp its interpolation. Install Button for the external action.
+
+<ComponentExample name="api" />
+
+```tsx
+"use client";
+
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+import { Button } from "@/components/cadence/button";
+import { useEffect, useMemo, useState } from "react";
+import type { CarouselApi } from "@/components/cadence/carousel";
+
+export function ApiExample() {
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(1);
+  const [ready, setReady] = useState(false);
+  const plugins = useMemo(
+    () => [
+      {
+        name: "exampleStatus",
+        options: {},
+        init() {
+          setReady(true);
+        },
+        destroy() {
+          setReady(false);
+        },
+      },
+    ],
+    [],
+  );
+  useEffect(() => {
+    if (!api) return;
+    const update = () => setCurrent(api.selectedScrollSnap() + 1);
+    update();
+    api.on("select", update).on("reInit", update);
+    return () => {
+      api.off("select", update).off("reInit", update);
+    };
+  }, [api]);
+  return (
+    <div className="grid w-full max-w-lg gap-4">
+      <Button size="sm" variant="outline" onClick={() => api?.scrollTo(3, false)}>
+        Go to last slide
+      </Button>
+      <div className="px-12 py-12">
+        <Carousel
+          aria-label="API projects"
+          tabIndex={0}
+          className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          setApi={setApi}
+          plugins={plugins}
+          opts={{ breakpoints: { "(max-width: 480px)": { duration: 37 } } }}
+        >
+          <CarouselContent className="touch-pan-y">
+            {[1, 2, 3, 4].map((slide) => (
+              <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+                <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                  {slide}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+      <p role="status" className="text-center text-sm text-muted-foreground">
+        Slide {current} of 4{ready ? " · Ready" : ""}
+      </p>
+    </div>
+  );
+}
+```
+
+The API is the actual Embla 8.6.0 instance, including events, `reInit`, `plugins`, `scrollTo`, `scrollProgress`, and `destroy`. Keep plugin instances stable. Plugins are not removed by motion mode changes: pause autoplay and independent plugin animation under reduced/none yourself and provide pause controls. Cadence clamps engine interpolation even when an API or plugin requests `jump=false`.
+
+## Alignment and initial position
+
+Compare `start`, `center`, and `end` with a fixed `startIndex: 1`. Each slide is two-thirds width and `containScroll: false` preserves the requested edge alignment instead of trimming the endpoint snaps. Arbitrary Embla options are pass-through configuration, not additional Cadence variants.
+
+<ComponentExample name="alignment" />
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+
+export function AlignmentExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <div className="grid gap-12">
+        <div className="grid gap-3">
+          <p className="text-sm font-medium">Alignment: start</p>
+          <Carousel
+            aria-label="Align start"
+            tabIndex={0}
+            opts={{ align: "start", containScroll: false, startIndex: 1 }}
+            className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <CarouselContent className="touch-pan-y">
+              {[1, 2, 3, 4].map((slide) => (
+                <CarouselItem key={slide} aria-label={`${slide} of 4`} className="basis-2/3">
+                  <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                    {slide}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+        <div className="grid gap-3">
+          <p className="text-sm font-medium">Alignment: center</p>
+          <Carousel
+            aria-label="Align center"
+            tabIndex={0}
+            opts={{ align: "center", containScroll: false, startIndex: 1 }}
+            className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <CarouselContent className="touch-pan-y">
+              {[1, 2, 3, 4].map((slide) => (
+                <CarouselItem key={slide} aria-label={`${slide} of 4`} className="basis-2/3">
+                  <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                    {slide}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+        <div className="grid gap-3">
+          <p className="text-sm font-medium">Alignment: end</p>
+          <Carousel
+            aria-label="Align end"
+            tabIndex={0}
+            opts={{ align: "end", containScroll: false, startIndex: 1 }}
+            className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <CarouselContent className="touch-pan-y">
+              {[1, 2, 3, 4].map((slide) => (
+                <CarouselItem key={slide} aria-label={`${slide} of 4`} className="basis-2/3">
+                  <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                    {slide}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## Custom controls
+
+Use `useCarousel` inside the root for caller-owned controls with native disabled states. This horizontal row replaces the default outboard buttons; Button retains its own motion contract. The hook throws outside a Carousel.
+
+<ComponentExample name="custom-controls" />
+
+```tsx
+"use client";
+
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+import { Button } from "@/components/cadence/button";
+import { useCarousel } from "@/components/cadence/carousel";
+
+function ProjectControls() {
+  const { scrollPrev, scrollNext, canScrollPrev, canScrollNext } = useCarousel();
+  return (
+    <div className="mt-4 flex flex-wrap justify-center gap-2">
+      <Button size="sm" variant="outline" disabled={!canScrollPrev} onClick={scrollPrev}>
+        Earlier project
+      </Button>
+      <Button size="sm" disabled={!canScrollNext} onClick={scrollNext}>
+        Later project
+      </Button>
+    </div>
+  );
+}
+
+export function CustomControlsExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <Carousel
+        aria-label="Custom project controls"
+        tabIndex={0}
+        className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <CarouselContent className="touch-pan-y">
+          {[1, 2, 3, 4].map((slide) => (
+            <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+              <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                {slide}
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <ProjectControls />
+      </Carousel>
+    </div>
+  );
+}
+```
+
+## Without motion
+
+The first collection explicitly fixes `mode="none"`; its position updates immediately while dragging remains available. The second explicitly restores full mode inside this example, still respecting the system reduced-motion preference. Other examples inherit the header. Install the provider from `@cadence/cadence-provider`.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/cadence/carousel";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function WithoutMotionExample() {
+  return (
+    <div className="w-full max-w-lg px-12 py-12">
+      <div className="grid gap-12">
+        <CadenceProvider mode="none">
+          <div className="grid gap-3">
+            <p className="text-sm font-medium">Fixed none</p>
+            <Carousel
+              aria-label="Immediate projects"
+              tabIndex={0}
+              className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <CarouselContent className="touch-pan-y">
+                {[1, 2, 3, 4].map((slide) => (
+                  <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+                    <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                      {slide}
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </div>
+        </CadenceProvider>
+        <CadenceProvider mode="full">
+          <div className="grid gap-3">
+            <p className="text-sm font-medium">Nested full</p>
+            <Carousel
+              aria-label="Nested full projects"
+              tabIndex={0}
+              className="w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <CarouselContent className="touch-pan-y">
+                {[1, 2, 3, 4].map((slide) => (
+                  <CarouselItem key={slide} aria-label={`${slide} of 4`}>
+                    <div className="flex h-36 items-center justify-center rounded-xl border bg-muted text-3xl font-semibold">
+                      {slide}
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </div>
+        </CadenceProvider>
+      </div>
+    </div>
+  );
+}
+```
 
 ## When to use
 
