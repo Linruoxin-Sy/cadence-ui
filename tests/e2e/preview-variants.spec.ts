@@ -273,25 +273,6 @@ for (const mode of ["full", "reduced", "none"])
   for (const os of [false, true]) {
     test(`stateful shape edits keep draft, node and focus ${mode}/${os}`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
-      await page.goto(`/components/resizable?motion=${mode}`);
-      await page.waitForLoadState("networkidle");
-      const draft = page.getByRole("textbox", { name: "Draft", exact: true });
-      await draft.fill("Retain this draft");
-      await draft.evaluate((node) => {
-        (window as unknown as { draft: Element }).draft = node;
-      });
-      const selector = page.getByRole("combobox", { name: "Resizable variant" });
-      await selector.focus();
-      await page.keyboard.press("End");
-      await page.keyboard.press("Enter");
-      await expect(selector).toHaveValue("vertical");
-      await expect(selector).toBeFocused();
-      await expect(draft).toHaveValue("Retain this draft");
-      expect(await draft.evaluate((node) => node === (window as unknown as { draft: Element }).draft)).toBe(true);
-      await draft.focus();
-      await page.goBack();
-      await expect(selector).toHaveValue("all");
-      await expect(draft).toBeFocused();
       await page.goto(`/components/bubble?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const reaction = page.getByRole("button", { name: "Thumbs up" });

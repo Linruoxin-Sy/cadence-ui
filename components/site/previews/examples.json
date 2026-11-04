@@ -210,5 +210,17 @@
     "hover-delay",
     "rtl",
     "without-motion"
+  ],
+  "resizable": [
+    "horizontal",
+    "vertical",
+    "handle-styles",
+    "collapsible-panels",
+    "locked-layouts",
+    "external-updates",
+    "resize-previews",
+    "container-resize",
+    "nested-panels",
+    "custom-parts"
   ]
 }

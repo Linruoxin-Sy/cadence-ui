@@ -19,12 +19,32 @@ npx shadcn@latest add @cadence/resizable
 ```tsx
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
 
-export function Workspace() {
+export function Horizontal() {
   return (
-    <ResizablePanelGroup orientation="horizontal" className="min-h-64 rounded-md border">
-      <ResizablePanel defaultSize="40%" minSize="20%"><div className="p-4">Explorer</div></ResizablePanel>
+    <ResizablePanelGroup orientation="horizontal" className="rounded-md border" style={{ height: 240 }}>
+      <ResizablePanel defaultSize="40%" minSize="20%" maxSize="70%" className="overflow-auto p-4 text-sm">Explorer</ResizablePanel>
       <ResizableHandle withHandle aria-label="Resize explorer" />
-      <ResizablePanel defaultSize="60%" minSize="40%"><div className="p-4">Editor</div></ResizablePanel>
+      <ResizablePanel defaultSize="60%" minSize="30%" className="overflow-auto p-4 text-sm">Editor</ResizablePanel>
+    </ResizablePanelGroup>
+  );
+}
+```
+
+## Horizontal layout
+
+A horizontal group places panels side by side. Percentage defaults and constraints leave the editor at least 30% wide; inner content scrolls instead of forcing the page wider. Drag the divider or focus it and use Left/Right. The divider itself has vertical ARIA orientation.
+
+<ComponentExample name="horizontal" />
+
+```tsx
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function Horizontal() {
+  return (
+    <ResizablePanelGroup orientation="horizontal" className="rounded-md border" style={{ height: 240 }}>
+      <ResizablePanel defaultSize="40%" minSize="20%" maxSize="70%" className="overflow-auto p-4 text-sm">Explorer</ResizablePanel>
+      <ResizableHandle withHandle aria-label="Resize explorer" />
+      <ResizablePanel defaultSize="60%" minSize="30%" className="overflow-auto p-4 text-sm">Editor</ResizablePanel>
     </ResizablePanelGroup>
   );
 }
@@ -32,41 +52,265 @@ export function Workspace() {
 
 ## Vertical layout
 
-Set `orientation="vertical"` on the group and give it a definite height. The separator's
-ARIA orientation describes the divider: horizontal for a vertical group.
+Set `orientation="vertical"` and give the group a definite height. Up/Down resize this stack; the divider has horizontal ARIA orientation. Parent height and inner overflow are application responsibilities.
+
+<ComponentExample name="vertical" />
 
 ```tsx
-<ResizablePanelGroup orientation="vertical" style={{ height: 320 }}>
-  <ResizablePanel defaultSize="50%">Preview</ResizablePanel>
-  <ResizableHandle withHandle aria-label="Resize preview" />
-  <ResizablePanel defaultSize="50%">Output</ResizablePanel>
-</ResizablePanelGroup>
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function Vertical() {
+  return (
+    <ResizablePanelGroup orientation="vertical" className="rounded-md border" style={{ height: 300 }}>
+      <ResizablePanel defaultSize="55%" minSize="25%" className="overflow-auto p-4 text-sm">Preview</ResizablePanel>
+      <ResizableHandle withHandle aria-label="Resize preview" />
+      <ResizablePanel minSize="25%" className="overflow-auto p-4 text-sm">Output</ResizablePanel>
+    </ResizablePanelGroup>
+  );
+}
 ```
 
-## Collapse and external updates
+## Handle styles
 
-Use the library's public refs. `defaultLayout` is an initial/persisted layout, not a controlled
-value prop. Apply external changes with `groupRef.setLayout`; no controlled API is invented.
-`onLayoutChange` reports live updates, while `onLayoutChanged` reports completed changes
-and `meta.isUserInteraction`. `onResize` reports pixel and percentage sizes with the prior size.
+`withHandle` adds a decorative grip. Both fixed examples retain the same focusable, labelled separator and keyboard/pointer target; the plain divider is the default. The grip adds no animation and does not change the resize API.
+
+<ComponentExample name="handle-styles" />
 
 ```tsx
-import { useGroupRef, usePanelRef } from "react-resizable-panels";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
 
-export function CollapsibleWorkspace() {
+export function HandleStyles() {
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {[false, true].map((grip) => (
+        <ResizablePanelGroup key={String(grip)} className="rounded-md border" style={{ height: 140 }}>
+          <ResizablePanel defaultSize="50%" minSize="20%" className="overflow-auto p-4 text-sm">{grip ? "Grip" : "Plain"}</ResizablePanel>
+          <ResizableHandle withHandle={grip} aria-label={grip ? "Resize with grip" : "Resize plain divider"} />
+          <ResizablePanel minSize="20%" className="overflow-auto p-4 text-sm">Content</ResizablePanel>
+        </ResizablePanelGroup>
+      ))}
+    </div>
+  );
+}
+```
+
+## Collapsible panels
+
+This fixed example leaves an 8% rail when collapsed, with a 25% minimum, 60% maximum and a 5% collapse threshold. Enter toggles the preceding panel; Home/End reach its permitted bounds. Dragging below the threshold collapses it. Keep essential actions outside collapsed content; a nonzero rail does not guarantee room for every control.
+
+<ComponentExample name="collapsible-panels" />
+
+```tsx
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function CollapsiblePanels() {
+  return (
+    <ResizablePanelGroup className="rounded-md border" style={{ height: 240 }}>
+      <ResizablePanel defaultSize="35%" minSize="25%" maxSize="60%" collapsible collapsedSize="8%" collapsedThreshold="5%" className="overflow-auto p-3 text-sm">
+        <span className="whitespace-nowrap">Files</span>
+      </ResizablePanel>
+      <ResizableHandle withHandle aria-label="Resize collapsible files" />
+      <ResizablePanel minSize="40%" className="overflow-auto p-4 text-sm">Focus the divider and press Enter to collapse or restore Files.</ResizablePanel>
+    </ResizablePanelGroup>
+  );
+}
+```
+
+## Locked layouts
+
+These three groups demonstrate distinct disabled levels. A disabled group locks all resizing. A disabled panel stays fixed even when another divider moves. A disabled separator only locks that boundary: the enabled second divider can still resize other panels, including indirectly across the locked boundary. Group locking keeps separators in the Tab order without adding `aria-disabled` to each one; setting `disabled` on a separator itself adds that attribute and removes its tab stop. Disabled boundaries do not hide panel content.
+
+<ComponentExample name="locked-layouts" />
+
+```tsx
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function LockedLayouts() {
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {(["group", "panel", "separator"] as const).map((lock) => (
+        <ResizablePanelGroup key={lock} disabled={lock === "group"} className="rounded-md border" style={{ height: 150 }}>
+          <ResizablePanel defaultSize="30%" minSize="15%" disabled={lock === "panel"} className="overflow-auto p-3 text-sm">Locked {lock}</ResizablePanel>
+          <ResizableHandle disabled={lock === "separator"} aria-label={`Resize ${lock} first divider`} />
+          <ResizablePanel defaultSize="35%" minSize="15%" className="overflow-auto p-3 text-sm">Middle</ResizablePanel>
+          <ResizableHandle aria-label={`Resize ${lock} second divider`} />
+          <ResizablePanel minSize="15%" className="overflow-auto p-3 text-sm">End</ResizablePanel>
+        </ResizablePanelGroup>
+      ))}
+    </div>
+  );
+}
+```
+
+## External updates
+
+Install `@cadence/button` for the external actions. Each mounted example owns unique IDs and a draft. The public panel ref collapses to zero, expands, resizes and inspects size/collapse state; the group ref reads or applies a percentage layout. `defaultLayout` supplies an initial layout, not a controlled value. The live callback reports every pointer move; the completed callback waits for release and distinguishes user input from imperative updates. Persist `meta.requestedLayout` when retaining an unconstrained request. `onResize` supplies pixels, percentages and the previous size. Resizing, header changes and source expansion preserve the actual input node and draft; actions intentionally move focus to their button.
+
+<ComponentExample name="external-updates" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { useGroupRef, usePanelRef } from "react-resizable-panels";
+import { Button } from "@/components/cadence/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function ExternalUpdates() {
+  const id = useId();
+  const files = `${id}-files`;
+  const editor = `${id}-editor`;
   const group = useGroupRef();
   const panel = usePanelRef();
+  const [size, setSize] = useState(40);
+  const [previous, setPrevious] = useState<number>();
+  const [pixels, setPixels] = useState(0);
+  const [live, setLive] = useState(40);
+  const [origin, setOrigin] = useState("initial");
+  const [requested, setRequested] = useState(40);
+  const [inspection, setInspection] = useState("Not inspected");
   return (
-    <div>
-      <button type="button" onClick={() => panel.current?.collapse()}>Collapse</button>
-      <button type="button" onClick={() => panel.current?.expand()}>Expand</button>
-      <button type="button" onClick={() => panel.current?.resize("55%")}>Resize</button>
-      <button type="button" onClick={() => group.current?.setLayout({ files: 40, editor: 60 })}>Reset</button>
-      <ResizablePanelGroup groupRef={group} style={{ height: 288 }}>
-        <ResizablePanel id="files" panelRef={panel} collapsible minSize="20%" maxSize="60%" defaultSize="40%">Files</ResizablePanel>
-        <ResizableHandle aria-label="Resize files" />
-        <ResizablePanel id="editor" minSize="40%" defaultSize="60%">Editor</ResizablePanel>
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => panel.current?.collapse()}>Collapse</Button>
+        <Button variant="outline" size="sm" onClick={() => panel.current?.expand()}>Expand</Button>
+        <Button variant="outline" size="sm" onClick={() => panel.current?.resize("55%")}>Resize to 55%</Button>
+        <Button variant="outline" size="sm" onClick={() => group.current?.setLayout({ [files]: 40, [editor]: 60 })}>Reset layout</Button>
+        <Button variant="outline" size="sm" onClick={() => {
+          const current = panel.current?.getSize();
+          setInspection(`${Math.round(current?.asPercentage ?? 0)}% / ${Math.round(current?.inPixels ?? 0)}px · ${panel.current?.isCollapsed() ? "collapsed" : "expanded"} · layout ${Math.round(group.current?.getLayout()[files] ?? 0)}%`);
+        }}>Inspect layout</Button>
+      </div>
+      <p role="status" className="text-sm text-muted-foreground">Files {Math.round(size)}% · {origin} · live {Math.round(live)}% · requested {Math.round(requested)}% · previous {previous === undefined ? "initial" : `${Math.round(previous)}%`} · {Math.round(pixels)}px</p>
+      <p className="text-sm text-muted-foreground" data-inspection>{inspection}</p>
+      <ResizablePanelGroup groupRef={group} defaultLayout={{ [files]: 40, [editor]: 60 }} className="rounded-md border" style={{ height: 260 }}
+        onLayoutChange={(layout) => setLive(layout[files] ?? 0)}
+        onLayoutChanged={(layout, meta) => { setOrigin(meta.isUserInteraction ? "user" : "external"); setRequested((meta.requestedLayout ?? layout)[files] ?? 0); }}>
+        <ResizablePanel id={files} panelRef={panel} defaultSize="40%" minSize="20%" maxSize="60%" collapsible className="overflow-auto p-3 text-sm"
+          onResize={(next, _, prev) => { setSize(next.asPercentage); setPixels(next.inPixels); setPrevious(prev?.asPercentage); }}>
+          <label className="flex min-w-0 flex-col gap-2" htmlFor={`${id}-draft`}>Draft
+            <input id={`${id}-draft`} className="w-full min-w-0 rounded border bg-background px-2 py-1" defaultValue="Keep this note" />
+          </label>
+        </ResizablePanel>
+        <ResizableHandle withHandle aria-label="Resize files externally" />
+        <ResizablePanel id={editor} defaultSize="60%" minSize="40%" className="overflow-auto p-4 text-sm">Editor</ResizablePanel>
       </ResizablePanelGroup>
+    </div>
+  );
+}
+```
+
+## Resize previews
+
+`resizePreviewMode="panel"` applies each drag immediately. The fixed `"separator"` example moves an overlay while panels keep their current sizes, then applies the layout on release. Its `preview` node customizes the overlay; keyboard updates remain immediate. These are interaction strategies, not motion modes or timed interpolation.
+
+<ComponentExample name="resize-previews" />
+
+```tsx
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function ResizePreviews() {
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {(["panel", "separator"] as const).map((mode) => (
+        <ResizablePanelGroup key={mode} resizePreviewMode={mode} className="rounded-md border" style={{ height: 180 }}>
+          <ResizablePanel defaultSize="40%" minSize="20%" maxSize="70%" className="overflow-auto p-4 text-sm">{mode === "panel" ? "Live panels" : "Release to apply"}</ResizablePanel>
+          <ResizableHandle withHandle aria-label={`Resize ${mode} preview`} preview={<div className="h-full w-1 bg-primary" />} />
+          <ResizablePanel minSize="30%" className="overflow-auto p-4 text-sm">Editor</ResizablePanel>
+        </ResizablePanelGroup>
+      ))}
+    </div>
+  );
+}
+```
+
+## Container resizing
+
+Install `@cadence/button` for the caller-owned width change. The upper panel preserves its 40% share; the lower preserves 100 pixels as its parent narrows. Numeric sizes are pixels, explicit `"40%"` strings are percentages; other CSS size units are continuous inputs, not variants. At least one panel per group must preserve relative size, and constraints can limit the requested result. The button changes real parent geometry without a width transition.
+
+<ComponentExample name="container-resize" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function ContainerResize() {
+  const [compact, setCompact] = useState(false);
+  return (
+    <div className="flex w-full flex-col items-start gap-4">
+      <Button variant="outline" size="sm" onClick={() => setCompact((value) => !value)}>{compact ? "Restore container" : "Narrow container"}</Button>
+      <div className="flex min-w-0 flex-col gap-4" style={{ width: compact ? "80%" : "100%" }}>
+        {(["preserve-relative-size", "preserve-pixel-size"] as const).map((behavior) => (
+          <ResizablePanelGroup key={behavior} className="rounded-md border" style={{ height: 180 }}>
+            <ResizablePanel defaultSize={behavior === "preserve-pixel-size" ? 100 : "40%"} groupResizeBehavior={behavior} className="overflow-auto p-3 text-sm">
+              {behavior === "preserve-pixel-size" ? "100px" : "40%"}
+            </ResizablePanel>
+            <ResizableHandle aria-label={`Resize ${behavior}`} />
+            <ResizablePanel className="overflow-auto p-3 text-sm">Flexible remainder</ResizablePanel>
+          </ResizablePanelGroup>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## Nested panels
+
+A vertical group can live inside a horizontal panel. Each labelled divider owns its axis. F6 and Shift+F6 cycle enabled separators within the focused divider’s group; Tab follows the document order into the nested group. Give the outer group a height so the nested stack can fill its panel.
+
+<ComponentExample name="nested-panels" />
+
+```tsx
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function NestedPanels() {
+  return (
+    <ResizablePanelGroup className="rounded-md border" style={{ height: 300 }}>
+      <ResizablePanel defaultSize="30%" minSize="15%" className="overflow-auto p-3 text-sm">Files</ResizablePanel>
+      <ResizableHandle withHandle aria-label="Resize nested files" />
+      <ResizablePanel defaultSize="45%" minSize="20%">
+        <ResizablePanelGroup orientation="vertical">
+          <ResizablePanel minSize="25%" className="overflow-auto p-3 text-sm">Preview</ResizablePanel>
+          <ResizableHandle withHandle aria-label="Resize nested preview" />
+          <ResizablePanel minSize="25%" className="overflow-auto p-3 text-sm">Console</ResizablePanel>
+        </ResizablePanelGroup>
+      </ResizablePanel>
+      <ResizableHandle withHandle aria-label="Resize nested inspector" />
+      <ResizablePanel minSize="15%" className="overflow-auto p-3 text-sm">Details</ResizablePanel>
+    </ResizablePanelGroup>
+  );
+}
+```
+
+## Custom parts
+
+Install `@cadence/button` for the focus action. `elementRef` addresses the actual separator DOM node; `panelRef` and `groupRef` address imperative APIs. Caller classes/styles target the panel’s inner content, while library flex geometry retains precedence. This thicker divider disables double-click reset, keeps native click callbacks, increases hit targets and leaves cursor styling to the caller with `disableCursor`. Handle children remain the wrapper’s optional grip; use `preview` for deferred-drag overlays.
+
+<ComponentExample name="custom-parts" />
+
+```tsx
+"use client";
+
+import { useRef, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/cadence/resizable";
+
+export function CustomParts() {
+  const handle = useRef<HTMLDivElement>(null);
+  const [clicks, setClicks] = useState(0);
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <Button variant="outline" size="sm" onClick={() => handle.current?.focus()}>Focus divider</Button>
+      <ResizablePanelGroup disableCursor resizeTargetMinimumSize={{ coarse: 32, fine: 16 }} className="rounded-md border" style={{ height: 200 }}>
+        <ResizablePanel defaultSize="40%" minSize="20%" className="overflow-auto p-4 text-sm" style={{ fontWeight: 600 }}>Files</ResizablePanel>
+        <ResizableHandle elementRef={handle} disableDoubleClick withHandle className="w-2 bg-muted" aria-label="Resize custom divider" onClick={() => setClicks((count) => count + 1)} />
+        <ResizablePanel minSize="30%" className="overflow-auto p-4 text-sm">Editor</ResizablePanel>
+      </ResizablePanelGroup>
+      <p role="status" className="text-sm text-muted-foreground">Divider clicks: {clicks}</p>
     </div>
   );
 }
@@ -106,8 +350,8 @@ stable panel ids to numeric percentages. Slots: `resizable-panel-group`, `resiza
 ## Motion contract
 
 T0: declared, implemented and documented recipe sets are empty. Direct manipulation is functional
-layout, not an authored animation. Pointer, keyboard, collapse/expand and imperative updates apply
-immediately in full, reduced and none. No spring, timer, geometry tween, opacity reveal, provider,
+layout, not an authored animation. The default panel preview, keyboard, collapse/expand and imperative updates apply
+immediately in full, reduced and none. Separator preview defers pointer commitment until release without interpolation. No spring, timer, geometry tween, opacity reveal, provider,
 `data-motion` or motion hook is shipped. Mode changes preserve the same panel nodes and input state.
 
 | Mode | Authored motion |
@@ -124,9 +368,9 @@ it makes the divider lag behind input and bypasses the geometry recipe budget.
 The primitive supplies focusable separators, `aria-controls`, orientation and value bounds/current
 value. Label each handle. Tab focuses the separator; axis arrows resize by 5 percentage points,
 Home/End reach permitted limits, Enter toggles the preceding collapsible panel, and F6/Shift+F6
-cycle enabled separators. Double-click restores the preceding panel's default size unless disabled.
+cycle enabled separators within the same group. Double-click restores the associated panel's default size unless disabled.
 A locked group disables resizing; disabling only a separator still permits indirect panel resizing.
-Keep critical controls outside a collapsible panel so they remain reachable when it is zero-sized.
+Group-level locking retains separator Tab stops without adding `aria-disabled`; a separator’s own `disabled` prop sets `aria-disabled` and removes its tab stop. Keep critical controls outside a collapsible panel so they remain reachable when it is zero-sized.
 
 ## Responsive behavior
 
@@ -140,7 +384,7 @@ The library adjusts constraints on container resize; at least one panel must pre
 No Cadence animation or extra measurement engine is added. The library owns resize observation and
 pointer/keyboard handling. Keep expensive persistence work in `onLayoutChanged`, not every live update.
 Percentage defaults can shift slightly during SSR hydration; provide stable ids and consistent initial
-layout. This T0 source budget excludes the declared third-party dependency; it is not a total bundle claim.
+layout. Static panel text and the initial draft render without JavaScript; pointer/keyboard resizing and public refs require hydration. This T0 source budget excludes the declared third-party dependency; it is not a total bundle claim.
 
 ## Notes for AI
 
