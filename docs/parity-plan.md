@@ -150,6 +150,9 @@ not relabelling old results as current HEAD. Preserve the budgets in animation-s
    4fe1a51 was 221511 bytes; it does not authorize adopting that runtime or rolling out other routes.
    Keep all site functions, SSR/noJS and required Motion features. Repeat full-route measurement and
    functional/visual/a11y validation before asking for a product migration decision.
+   Keep the permanent `tests/e2e/site-js-budget.spec.ts` gate on complete Button and Data Table routes
+   at desktop and narrow widths. Preserve automatic requests, exact served root hashes, complete
+   example counts, cold-layout entries and browser/resource errors when evaluating a candidate.
 2. **Initial Motion ≤48000 bytes.** Establish the actual required production runtime scope, including
    site-exclusive APIs. A registry-only reference compilation or proportional mixed-chunk estimate
    cannot certify the page metric.
