@@ -1,7 +1,6 @@
 // Isolated full-route research. No product source/config or registry forks.
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdirSync as ensureAuditDirectory } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { createRequire } from "node:module";
@@ -12,16 +11,26 @@ import { chromium } from "@playwright/test";
 import { measureInitialScripts, summarizeLayoutShifts } from "./site-js-budget.mjs";
 import { auditButtonPrototype } from "./verify-button-prototype.mjs";
 
-ensureAuditDirectory(".cache/audits", { recursive: true });
-
 const root = process.cwd();
-const dir = path.join(root, ".cache/button-route-prototype");
-await mkdir(dir, { recursive: true });
+const dir = path.resolve(process.env.PROTOTYPE_OUTPUT || `.cache/audits/button-route-${Date.now()}`);
+assert.ok(dir.startsWith(path.resolve(root, ".cache") + path.sep), "research output must stay in .cache");
+await mkdir(path.dirname(dir), { recursive: true });
+await mkdir(dir); // Refuse to overwrite any previous build or evidence.
+const sourceRoot = root.replaceAll("\\", "/");
 const require = createRequire(import.meta.url);
 const viteRequire = createRequire(createRequire(require.resolve("vitest/node")).resolve("vite"));
 const { build, version } = await import(pathToFileURL(viteRequire.resolve("esbuild")));
 const boundaries = {
-  ".cache/button-route-prototype/link": ["PrototypeLink"],
+  [path.join(dir, "link")]: ["PrototypeLink"],
+  "registry/cadence/toc": ["Toc"],
+  "registry/cadence/breadcrumb": [
+    "Breadcrumb",
+    "BreadcrumbItem",
+    "BreadcrumbLink",
+    "BreadcrumbList",
+    "BreadcrumbPage",
+    "BreadcrumbSeparator",
+  ],
   "components/site/component-catalog": ["ComponentCatalog"],
   "components/site/motion-mode": ["MotionModeProvider", "MotionModeSwitch", "MotionSpeedSelect"],
   "components/site/package-manager-preference": ["PackageManagerProvider"],
@@ -43,7 +52,7 @@ const boundaries = {
 const imports = Object.entries(boundaries)
   .map(
     ([file, names]) =>
-      `import { ${names.join(",")} } from ${JSON.stringify(path.join(root, file).replaceAll("\\", "/"))};`,
+      `import { ${names.join(",")} } from ${JSON.stringify(path.resolve(root, file).replaceAll("\\", "/"))};`,
   )
   .join("\n");
 const names = Object.values(boundaries).flat();
@@ -78,10 +87,17 @@ const previewEntries = [
     /(?:"([\w-]+)"|([\w]+)): dynamic\(\(\) => import\("\.\/([\w-]+)"\)\.then\(\(mod\) => \(\{ default: mod\.([\w]+) \}\)\)\)/g,
   ),
 ];
-assert.equal(previewEntries.length, 58);
+const registry = JSON.parse(await readFile("registry.json", "utf8"));
+const componentIds = registry.items
+  .filter((item) => ["registry:ui", "registry:block"].includes(item.type))
+  .map((item) => item.name);
+assert.deepEqual(previewEntries.map((m) => m[1] || m[2]).sort(), [...componentIds].sort());
+const exampleIds = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).button;
 await writeFile(
   path.join(dir, "all-previews.jsx"),
-  previewEntries.map((m, i) => `import {${m[4]} as P${i}} from "../../components/site/previews/${m[3]}";`).join("\n") +
+  previewEntries
+    .map((m, i) => `import {${m[4]} as P${i}} from "${sourceRoot}/components/site/previews/${m[3]}";`)
+    .join("\n") +
     `\nexport const previews={${previewEntries.map((m, i) => `${JSON.stringify(m[1] || m[2])}:P${i}`).join(",")}};`,
 );
 await writeFile(
@@ -93,14 +109,14 @@ await writeFile(
   path.join(dir, "client.jsx"),
   `import { hydrateRoot } from "react-dom/client";
 import {decode} from "./codec";
-import {previews} from "../../components/site/previews";
+import {previews} from "${sourceRoot}/components/site/previews";
 async function preload(path){const id=path.split("?")[0].split("/")[2];await previews[id]?.preload();}
 await preload(location.pathname);
 const tree = await fetch("/prototype-tree.json?path="+encodeURIComponent(location.pathname)).then(r=>r.json());
 window.__hydrationErrors=[];
 const root=hydrateRoot(document, decode(tree), {onRecoverableError(e){window.__hydrationErrors.push(e.message);console.error(e);}});
-let serial=0;
-window.__navigate=async(href,replace=false,scroll=true,history=true)=>{const current=++serial;const url=new URL(href,location.href);await preload(url.pathname);const next=await fetch("/prototype-tree.json?path="+encodeURIComponent(url.pathname)).then(r=>{if(!r.ok)throw Error("Route "+r.status);return r.json();});if(current!==serial)return;if(history)window.history[replace?"replaceState":"pushState"](null,"",url);root.render(decode(next));window.dispatchEvent(new Event("prototype-navigation"));if(scroll)window.scrollTo(0,0);};
+let serial=0;let renderedPath=location.pathname;
+window.__navigate=async(href,replace=false,scroll=true,history=true)=>{const current=++serial;const url=new URL(href,location.href);if(url.pathname===renderedPath){if(history)window.history[replace?"replaceState":"pushState"](window.history.state,"",url);window.dispatchEvent(new Event("prototype-navigation"));return;}await preload(url.pathname);const next=await fetch("/prototype-tree.json?path="+encodeURIComponent(url.pathname)).then(r=>{if(!r.ok)throw Error("Route "+r.status);return r.json();});if(current!==serial)return;if(history)window.history[replace?"replaceState":"pushState"](null,"",url);root.render(decode(next));renderedPath=url.pathname;window.dispatchEvent(new Event("prototype-navigation"));if(scroll)window.scrollTo(0,0);};
 window.addEventListener("popstate",()=>window.__navigate(location.href,false,false,false));
 window.__prototypeReady=true;`,
 );
@@ -108,13 +124,13 @@ await writeFile(
   path.join(dir, "server.jsx"),
   `import {createElement, isValidElement, Fragment} from "react";
 import {renderToString} from "react-dom/server";
-import Root, {metadata as rootMetadata} from "../../app/layout";
-import Layout from "../../app/(site)/layout";
-import Page, {generateMetadata as componentMetadata} from "../../app/(site)/components/[id]/page";
-import Catalog from "../../app/(site)/components/page";
-import Docs from "../../app/(site)/docs/page";
-import Guide, {generateMetadata as guideMetadata} from "../../app/(site)/docs/[slug]/page";
-import Home from "../../app/page";
+import Root, {metadata as rootMetadata} from "${sourceRoot}/app/layout";
+import Layout from "${sourceRoot}/app/(site)/layout";
+import Page, {generateMetadata as componentMetadata} from "${sourceRoot}/app/(site)/components/[id]/page";
+import Catalog from "${sourceRoot}/app/(site)/components/page";
+import Docs from "${sourceRoot}/app/(site)/docs/page";
+import Guide, {generateMetadata as guideMetadata} from "${sourceRoot}/app/(site)/docs/[slug]/page";
+import Home from "${sourceRoot}/app/page";
 import {references} from "./references";
 import {decode} from "./codec";
 const ids=new Map(Object.entries(references).map(([k,v])=>[v,k]));
@@ -125,7 +141,7 @@ async function encode(value){
   const {type,props,key}=value;
   if(typeof type === "function" && !ids.has(type)) return encode(await type(props));
   const name=type===Fragment?"$fragment":ids.get(type)||type;
-  if(typeof name!=="string") throw Error("Unsupported server element "+String(type));
+  if(typeof name!=="string") throw Error("Unsupported server element "+String(type)+" keys="+Object.keys(type||{})+" render="+String(type?.render?.name)+" props="+Object.keys(props));
   return {$element:[name,await encode(props),key]};
  }
  if(typeof value==="function") throw Error("Function crossed server boundary");
@@ -204,7 +220,7 @@ await writeFile(
   path.join(dir, "build.json"),
   JSON.stringify({ esbuild: version, client: client.metafile, server: serverOutput.metafile }, null, 2),
 );
-const fallback = process.env.PROTOTYPE_BASELINE || "http://127.0.0.1:3183";
+const fallback = process.env.PROTOTYPE_BASELINE || "http://127.0.0.1:3100";
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, "http://fixture.invalid");
@@ -280,7 +296,7 @@ else {
       await browser.close();
     }
     browser = await chromium.launch({ channel: process.env.PLAYWRIGHT_CHANNEL || "msedge" });
-    const functionality = await auditButtonPrototype(browser, origin, fallback, dir);
+    const functionality = await auditButtonPrototype(browser, origin, fallback, dir, { componentIds, exampleIds });
     const hash = (body) => createHash("sha256").update(body).digest("hex");
     const sourceHashes = {};
     for (const file of [
@@ -307,10 +323,27 @@ else {
       if (loaded.has(path.basename(file)))
         for (const [input, value] of Object.entries(output.inputs))
           modules[input] = (modules[input] || 0) + value.bytesInOutput;
+    const outputFiles = [];
+    for (const file of Object.keys(client.metafile.outputs)) {
+      const body = await readFile(file);
+      outputFiles.push({ file, bytes: body.length, gzip6: gzipSync(body, { level: 6 }).length, sha256: hash(body) });
+    }
     const report = {
       source: (await import("node:child_process"))
         .execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" })
         .trim(),
+      scope: "Isolated full Button route research; no product framework adoption or Next budget certification",
+      outputDirectory: dir,
+      dirtySourceFiles: (await import("node:child_process"))
+        .execFileSync("git", ["diff", "--name-only"], { encoding: "utf8" })
+        .trim()
+        .split(/\r?\n/)
+        .filter(Boolean),
+      baselineBuildId: (await readFile(path.join(process.env.CADENCE_DIST_DIR || ".next", "BUILD_ID"), "utf8")).trim(),
+      componentIds,
+      exampleIds,
+      outputFiles,
+      ssr: { decoded: Buffer.byteLength(html), gzip6: gzipSync(html, { level: 6 }).length, sha256: hash(html) },
       node: process.version,
       esbuild: version,
       browser: browser.version(),
@@ -327,9 +360,8 @@ else {
       functionality,
     };
     await writeFile(path.join(dir, "raw.json.gz"), gzipSync(JSON.stringify(report), { level: 9 }));
-    await writeFile(".cache/audits/button-route-prototype.raw.json.gz", gzipSync(JSON.stringify(report), { level: 9 }));
     await writeFile(
-      ".cache/audits/button-route-prototype.json",
+      path.join(dir, "report.json"),
       JSON.stringify(
         {
           ...report,
@@ -358,10 +390,23 @@ else {
         })),
       ),
     );
-    assert.ok(results.every((r) => r.errors.length === 0 && r.hydrationErrors.length === 0));
+    assert.ok(
+      results.every(
+        (r) => r.errors.length === 0 && r.hydrationErrors.length === 0 && r.files.every((file) => file.status === 200),
+      ),
+      "runtime or HTTP failure",
+    );
+    assert.ok(
+      results.every((r) => r.cls < 0.02),
+      "cold CLS failed",
+    );
     assert.ok(
       functionality.every((check) => check.status === "PASS"),
       "functional verification failed; see retained report",
+    );
+    assert.ok(
+      results.every((r) => r.gzipBytes <= 120000),
+      "initial JS budget failed; see retained report",
     );
   } finally {
     await browser?.close();

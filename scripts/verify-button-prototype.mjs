@@ -5,14 +5,24 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect } from "@playwright/test";
 import { summarizeLayoutShifts } from "./site-js-budget.mjs";
 
-export async function auditButtonPrototype(browser, origin, baseline, dir) {
+export async function auditButtonPrototype(browser, origin, baseline, dir, { componentIds, exampleIds }) {
   const checks = [];
   async function check(name, run) {
     try {
       const detail = await run();
       checks.push({ name, status: "PASS", detail });
     } catch (e) {
-      checks.push({ name, status: "FAIL", error: e.stack, detail: e.detail });
+      checks.push({
+        name,
+        status: "FAIL",
+        error: e.stack,
+        detail:
+          e.detail ??
+          (await page.evaluate(() => ({
+            url: location.href,
+            activeElement: document.activeElement?.outerHTML,
+          }))),
+      });
       console.log(e.message);
     }
     console.log(`${name}: ${checks.at(-1).status}`);
@@ -22,6 +32,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
     viewport: { width: 1440, height: 1000 },
     permissions: ["clipboard-read", "clipboard-write"],
   });
+  await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
   const page = await context.newPage();
   page.setDefaultTimeout(7000);
   const errors = [];
@@ -31,26 +42,42 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
     await page.waitForFunction(() => window.__prototypeReady);
     await page.waitForLoadState("networkidle");
   };
-  await check("cold route source/TOC/16 original specimens", async () => {
+  await check("cold route source/real Toc/three top buttons/five named specimens", async () => {
     await ready();
-    assert.equal(await page.locator('[data-preview="button"] [data-slot="button"]').count(), 16);
+    assert.equal(await page.locator('[data-preview="button"] [data-slot="button"]').count(), 3);
+    assert.deepEqual(
+      await page
+        .locator("[data-component-example]")
+        .evaluateAll((nodes) => nodes.map((n) => n.dataset.componentExample)),
+      exampleIds.map((id) => `button/${id}`),
+    );
+    for (const [id, count] of Object.entries({ variants: 6, sizes: 8, composition: 1, disabled: 2 }))
+      assert.equal(await page.locator(`[data-component-example="button/${id}"] [data-slot="button"]`).count(), count);
+    assert.equal(
+      await page.locator('select[aria-label="Button variant"],select[aria-label="Button motion"]').count(),
+      0,
+    );
     const toc = await page
-      .locator('nav[aria-label="On this page"] a')
+      .locator('[data-document-toc] nav[aria-label="On this page"] a')
       .evaluateAll((nodes) =>
         nodes.map((a) => ({ text: a.textContent, target: document.querySelector(a.hash)?.textContent })),
       );
     assert.ok(toc.length > 5);
     assert.ok(toc.every((x) => x.text === x.target));
-    await page.locator("article details summary").focus();
+    await page.getByText("Component source", { exact: true }).focus();
     await page.keyboard.press("Enter");
-    const copy = page.locator("article details").getByRole("button", { name: "Copy", exact: true }).first();
+    const copy = page
+      .locator("article details")
+      .filter({ has: page.getByText("Component source", { exact: true }) })
+      .getByRole("button", { name: "Copy", exact: true })
+      .first();
     await copy.click();
     const payload = JSON.parse(await readFile("public/r/button.json", "utf8"));
     assert.equal(
       (await page.evaluate(() => navigator.clipboard.readText())).replaceAll("\r\n", "\n"),
       payload.files[0].content.replaceAll("\r\n", "\n"),
     );
-    return { toc, buttons: 16 };
+    return { toc, buttons: 3, exampleIds };
   });
   await check("all actual package managers clipboard and remembered selection", async () => {
     const list = page.getByRole("tablist", { name: "Package manager" });
@@ -75,29 +102,30 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
     await expect(list.getByRole("tab", { name: "yarn", exact: true })).toHaveAttribute("aria-selected", "true");
     return values;
   });
-  await check("variant history stable specimen and focus", async () => {
-    await ready("/components/button?motion=none&variant=outline#usage");
-    const select = page.getByLabel("Button variant", { exact: true });
-    await expect(select).toHaveValue("outline");
-    await page
-      .locator('[data-preview="button"] button')
-      .first()
-      .evaluate((node) => (window.__specimen = node));
-    await select.focus();
-    await select.selectOption("secondary");
-    await expect(select).toBeFocused();
+  await check("legacy variant URL keeps fixed specimens and native focus", async () => {
+    await ready("/components/button?motion=none&variant=outline");
+    const button = page.locator('[data-preview="button"] button').first();
+    await button.focus();
+    await expect(button).toBeFocused();
+    await button.evaluate((node) => (window.__specimen = node));
+    await page.evaluate(() => {
+      history.pushState({ caller: 1 }, "", "?motion=none&variant=secondary");
+    });
     await page.goBack();
-    await expect(select).toHaveValue("outline");
+    await expect(button).toBeFocused();
     await page.goForward();
-    await expect(select).toHaveValue("secondary");
-    assert.equal(
-      await page
-        .locator('[data-preview="button"] button')
-        .first()
-        .evaluate((node) => node === window.__specimen),
-      true,
-    );
-    assert.equal(new URL(page.url()).hash, "#usage");
+    await expect(button).toBeFocused();
+    assert.equal(await button.evaluate((node) => node === window.__specimen), true);
+    assert.equal(await page.locator('[data-preview="button"] button').count(), 3);
+    assert.equal(new URL(page.url()).searchParams.get("variant"), "secondary");
+    const count = page.locator('[data-component-example="button/composition"]').getByRole("button");
+    await count.focus();
+    await page.keyboard.press("Enter");
+    await expect(count).toHaveText("Count: 1");
+    await page.keyboard.press("Space");
+    await expect(count).toHaveText("Count: 2");
+    await expect(page.locator('[data-component-example="button/disabled"] button').first()).toBeDisabled();
+    await expect(page.locator('[data-component-example="button/links"] a')).toHaveAttribute("href", "/components");
   });
   await check("persistent sidebar navigation search filters and real result target", async () => {
     await ready();
@@ -119,7 +147,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
     await page.getByRole("combobox", { name: /^Intensity/ }).selectOption("subtle");
     await page.getByRole("combobox", { name: /^Complexity/ }).selectOption("S");
     await page.getByRole("combobox", { name: /^Category/ }).selectOption("feedback");
-    await expect(page.getByRole("status")).toContainText("1 of 58");
+    await expect(page.getByRole("status")).toContainText(`1 of ${componentIds.length}`);
     await page
       .locator("[data-catalog-results]")
       .getByRole("link")
@@ -179,18 +207,20 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
     await button.hover();
     await page.mouse.down();
     await page.waitForTimeout(35);
-    await page.evaluate(() => {
-      const select = document.querySelector('select[aria-label="Button motion"]');
-      select.value = "none";
-      select.dispatchEvent(new Event("change", { bubbles: true }));
-    });
-    await expect(button).toHaveAttribute("data-motion", "none");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(button).toHaveAttribute("data-motion", "reduced");
     await expect
       .poll(() => button.evaluate((node) => new DOMMatrixReadOnly(getComputedStyle(node).transform).a))
       .toBe(1);
     assert.equal(await button.evaluate((node) => node === window.__held), true);
     await expect(button).toBeFocused();
     await page.mouse.up();
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    for (const mode of ["none", "reduced", "full"]) {
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: mode, exact: true }).click();
+      await expect(button).toHaveAttribute("data-motion", mode);
+      assert.equal(await button.evaluate((node) => node === window.__held), true);
+    }
     return samples;
   });
   await check("SSR noJS complete content and baseline text/anchors", async () => {
@@ -207,7 +237,8 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
           headings: [...node.querySelectorAll("h1,h2,h3")].map((n) => [n.tagName, n.id, n.textContent]),
         }));
       assert.deepEqual(await extract(candidate), await extract(product));
-      assert.equal(await candidate.locator('[data-preview="button"] button').count(), 16);
+      assert.equal(await candidate.locator('[data-preview="button"] button').count(), 3);
+      assert.equal(await candidate.locator("[data-component-example]").count(), exampleIds.length);
       return { identicalArticleTextLinksHeadings: true };
     } finally {
       await nojs.close();
@@ -227,8 +258,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
         await page.waitForTimeout(500);
         await page.evaluate(() => scrollTo(0, 0));
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-        const violations = (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze())
-          .violations;
+        const violations = (await new AxeBuilder({ page }).analyze()).violations;
         await page.screenshot({ path: path.join(dir, `candidate-${width}-${theme}.png`), fullPage: true });
         const base = await context.newPage();
         await base.setViewportSize({ width, height: 900 });
@@ -285,10 +315,17 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
             await p.goto(`${target}/components/button?motion=full`);
             if (target === origin) await p.waitForFunction(() => window.__prototypeReady);
             await p.waitForLoadState("networkidle");
-            await p.getByLabel("Button variant", { exact: true }).selectOption("outline");
-            await p.locator("article details summary").click();
+            await expect
+              .poll(() => p.locator("article").evaluate((node) => getComputedStyle(node).clipPath))
+              .toBe("none");
+            const composition = p.locator('[data-component-example="button/composition"] button');
+            await composition.click();
+            await expect(composition).toHaveText("Count: 1");
+            await p.getByText("Component source", { exact: true }).click();
             await p.getByRole("tab", { name: "npm", exact: true }).click();
+            if (width < 1280) await p.locator("[data-mobile-toc] summary").click();
             await p
+              .locator(width < 1280 ? "[data-mobile-toc]" : "[data-document-toc]")
               .getByRole("navigation", { name: "On this page" })
               .getByRole("link", { name: "API", exact: true })
               .click();
@@ -307,6 +344,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir) {
           }
         },
       );
+  await context.tracing.stop({ path: path.join(dir, "functionality-trace.zip") });
   await context.close();
   await writeFile(path.join(dir, "functionality.json"), JSON.stringify(checks, null, 2));
   return checks;
