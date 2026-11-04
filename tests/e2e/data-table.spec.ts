@@ -2,6 +2,8 @@ import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode } from "./helpers";
+import { expectMenuAccessibility } from "./menu-accessibility";
+import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   for (const mode of ["full", "reduced", "none"] as const) {
@@ -10,11 +12,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       await page.emulateMedia({ reducedMotion });
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      await page.goto("/components/data-table?motion=none");
+      await page.goto(`/components/data-table?motion=${mode}`);
       await page.waitForLoadState("networkidle");
       const preview = page.locator('[data-preview="data-table"]').first();
       await expect(preview.getByRole("textbox", { name: "Filter emails" })).toBeVisible();
-      await preview.getByLabel("Table motion").selectOption(mode);
+
       const effective = effectiveMode(mode, reducedMotion === "reduce");
       await expect(preview.locator('[data-slot="data-table"]')).toHaveAttribute("data-motion", effective);
       const input = preview.getByRole("textbox", { name: "Filter emails" });
@@ -44,9 +46,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       await preview.getByRole("button", { name: "Next", exact: true }).click();
       await expect(preview.getByText("person23@example.com")).toBeVisible();
       await expect(preview.getByRole("button", { name: "Next", exact: true })).toBeDisabled();
-      await preview.getByRole("button", { name: "Reset table" }).click();
-      await preview.getByRole("button", { name: "Update first payment" }).click();
-      await expect(preview.getByText("$999.00")).toBeVisible();
+      await preview.getByRole("button", { name: "Previous", exact: true }).click();
+      await preview.getByRole("button", { name: "Previous", exact: true }).click();
       const trigger = preview.getByRole("button", { name: "Columns", exact: true });
       await trigger.focus();
       await page.keyboard.press("ArrowDown");
@@ -71,13 +72,14 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         expect(new Set(samples.map((s) => s.opacity)).size).toBeGreaterThan(1);
         expect(new Set(samples.map((s) => s.scale)).size).toBeGreaterThan(1);
       } else expect(samples.every((s) => s.scale === "none")).toBe(true);
+      if (effective === "reduced") expect(new Set(samples.map((s) => s.opacity)).size).toBeGreaterThan(1);
       if (effective === "none") expect(samples.every((s) => s.opacity === "1" && s.duration === "0s")).toBe(true);
       await page.getByRole("menuitemcheckbox", { name: "status", exact: true }).click();
       await page.keyboard.press("Escape");
       await expect(preview.getByRole("columnheader", { name: "Status", exact: true })).toHaveCount(0);
       await input.fill("missing");
       await expect(preview.getByText("No results.")).toHaveAttribute("colspan", "4");
-      await preview.getByLabel("Table motion").selectOption("none");
+      await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
       await expect(table).toHaveAttribute("data-identity", "table");
       await expect(input).toHaveAttribute("data-identity", "input");
       await expect(input).toHaveValue("missing");
@@ -87,7 +89,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           animations: el.getAnimations().length,
         })),
       ).toEqual({ transform: "none", animations: 0 });
-      await preview.getByRole("button", { name: "Reset table" }).click();
+      await input.fill("");
+      await trigger.click();
+      await page.getByRole("menuitemcheckbox", { name: "status", exact: true }).click();
+      await page.keyboard.press("Escape");
+      await expect(preview.getByRole("columnheader", { name: "Status", exact: true })).toBeVisible();
       await page.setViewportSize({ width: 390, height: 900 });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const scroll = preview.locator('[data-slot="table-container"]');
@@ -108,7 +114,7 @@ for (const colorScheme of ["light", "dark"] as const)
     await page.waitForLoadState("networkidle");
     const preview = page.locator('[data-preview="data-table"]').first();
     await expect(preview.getByRole("textbox", { name: "Filter emails" })).toBeVisible();
-    await preview.getByLabel("Table motion").selectOption("none");
+
     await mkdir(".cache/data-table-proof", { recursive: true });
     for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 1000 });
@@ -116,23 +122,57 @@ for (const colorScheme of ["light", "dark"] as const)
       expect(results.violations).toEqual([]);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.evaluate(() => window.scrollTo(0, 0));
-      await page.screenshot({ path: `.cache/data-table-proof/data-table-${colorScheme}-${width}.png`, fullPage: true });
-      await preview.screenshot({ path: `.cache/data-table-proof/preview-${colorScheme}-${width}.png` });
+      await page.screenshot({
+        path: `.cache/data-table-proof/phase4k-final-page-${colorScheme}-${width}.png`,
+        fullPage: true,
+      });
+      const topBox = await preview.boundingBox();
+      const topRoot = await preview.locator('[data-slot="data-table"]').boundingBox();
+      if (!topBox || !topRoot) throw new Error("Missing top table geometry");
+      expect(topRoot.x).toBeGreaterThanOrEqual(topBox.x);
+      expect(topRoot.x + topRoot.width).toBeLessThanOrEqual(topBox.x + topBox.width);
+      await preview.screenshot({ path: `.cache/data-table-proof/phase4k-final-top-${colorScheme}-${width}.png` });
+      for (const card of await page.locator("[data-component-example]").all()) {
+        const name = (await card.getAttribute("data-component-example"))?.split("/")[1];
+        const cardBox = await card.boundingBox();
+        if (!cardBox) throw new Error("Missing card bounds");
+        for (const root of await card.locator('[data-slot="data-table"]').all()) {
+          const bounds = await root.boundingBox();
+          if (!bounds) throw new Error("Missing native table composition");
+          expect(bounds.x).toBeGreaterThanOrEqual(cardBox.x);
+          expect(bounds.x + bounds.width).toBeLessThanOrEqual(cardBox.x + cardBox.width);
+        }
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const clip = await card.boundingBox();
+        if (!clip) throw new Error("Missing card geometry");
+        await page.screenshot({
+          path: `.cache/data-table-proof/phase4k-final-example-${name}-${colorScheme}-${width}.png`,
+          fullPage: true,
+          clip,
+        });
+      }
+      const columns = preview.getByRole("button", { name: "Columns", exact: true });
+      await columns.click();
+      await expectMenuAccessibility(page, async () => {
+        if (!(await page.getByRole("menu").count())) await columns.click();
+      });
+      if (!(await page.getByRole("menu").count())) await columns.click();
+      await page.screenshot({ path: `.cache/data-table-proof/phase4k-final-menu-${colorScheme}-${width}.png` });
+      await page.keyboard.press("Escape");
     }
   });
 
 test("data-table live portal downgrade and system preference preserves nodes", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
-  await page.goto("/components/data-table?motion=none");
-  await page.waitForLoadState("networkidle");
-  const preview = page.locator('[data-preview="data-table"]').first();
+  await openPopupMotionFixture(page, "data-table", "full");
+  const preview = page.locator('[data-preview="data-table"]');
   await expect(preview.getByRole("textbox")).toBeVisible();
   await preview.getByRole("button", { name: "Columns", exact: true }).click();
   const menu = page.getByRole("menu");
   await expect(menu).toBeVisible();
   await menu.evaluate((el) => el.setAttribute("data-identity", "portal"));
   // DOM select change keeps the portal open; pointer focus outside would dismiss it.
-  await preview.getByLabel("Table motion").evaluate((el) => {
+  await page.getByLabel("Fixture motion", { exact: true }).evaluate((el) => {
     (el as HTMLSelectElement).value = "none";
     el.dispatchEvent(new Event("change", { bubbles: true }));
   });
@@ -146,7 +186,7 @@ test("data-table live portal downgrade and system preference preserves nodes", a
       animations: el.getAnimations().length,
     })),
   ).toEqual({ duration: "0s", opacity: "1", scale: "none", animations: 0 });
-  await preview.getByLabel("Table motion").evaluate((el) => {
+  await page.getByLabel("Fixture motion", { exact: true }).evaluate((el) => {
     (el as HTMLSelectElement).value = "full";
     el.dispatchEvent(new Event("change", { bubbles: true }));
   });

@@ -64,15 +64,17 @@ describe("Data Table composition", () => {
     expect(screen.getByText("$99.00")).toBeVisible();
     expect(screen.queryByText("alpha@example.com")).toBeNull();
   });
-  it("exercises controlled pagination, page selection, reset and external amount updates", async () => {
-    render(<DataTablePreview />);
+  it("exercises page selection and external amount updates in their named specimens", async () => {
+    const { unmount, container } = render(<DataTablePreview example="row-selection" />);
     await userEvent.click(screen.getByRole("checkbox", { name: "Select all" }));
-    expect(screen.getByRole("status")).toHaveTextContent("10 of 23");
+    expect(container.querySelector('[role="status"]')).toHaveTextContent("10 of 23");
     await userEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByText("person11@example.com")).toBeVisible();
     expect(screen.getByRole("checkbox", { name: "Select all" })).toHaveAttribute("aria-checked", "false");
-    await userEvent.click(screen.getByRole("button", { name: "Reset table" }));
-    expect(screen.getByRole("status")).toHaveTextContent("0 of 23");
+    await userEvent.click(screen.getByRole("button", { name: "Clear selected IDs" }));
+    expect(container.querySelector('[role="status"]')).toHaveTextContent("0 of 23");
+    unmount();
+    render(<DataTablePreview example="updating-rows" />);
     await userEvent.click(screen.getByRole("button", { name: "Update first payment" }));
     expect(screen.getByText("$999.00")).toBeVisible();
   });

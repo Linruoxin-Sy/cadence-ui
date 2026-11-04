@@ -41,6 +41,7 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "../../registry/cadence/context-menu";
+import { DataTableDemo } from "../../registry/cadence/data-table";
 import {
   Dialog,
   DialogContent,
@@ -369,6 +370,7 @@ function PopupMotionFixture({
             </Sheet>
           )}
           {component === "sidebar" && <SidebarMotionFixture />}
+          {component === "data-table" && <DataTableDemo />}
           {component === "drawer" && (
             <Drawer showSwipeHandle>
               <DrawerTrigger render={<Button />}>Open drawer</DrawerTrigger>

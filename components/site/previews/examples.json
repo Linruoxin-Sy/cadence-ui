@@ -237,5 +237,16 @@
     "caller-updates",
     "custom-parts",
     "without-motion"
+  ],
+  "data-table": [
+    "application-data",
+    "controlled-sorting-and-pagination",
+    "controlled-filter",
+    "column-visibility",
+    "empty-results",
+    "row-selection",
+    "updating-rows",
+    "native-container",
+    "without-motion"
   ]
 }
