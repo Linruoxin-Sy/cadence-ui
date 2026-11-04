@@ -40,6 +40,23 @@ describe("Toast", () => {
     }
     expect(document.querySelector('[data-slot="toast-close"]')).toHaveAttribute("aria-label", "Close toast");
   });
+  it.each(["full", "reduced", "none"] as const)("keeps limited notifications hidden under %s", async (mode) => {
+    const manager = createToastManager();
+    render(
+      <CadenceProvider mode={mode}>
+        <Toaster toastManager={manager} timeout={0} limit={2} />
+      </CadenceProvider>,
+    );
+    act(() => {
+      for (const title of ["First", "Second", "Third"]) manager.add({ title });
+    });
+    await screen.findByText("Third");
+    const limited = document.querySelector('[data-slot="toast"][data-limited]');
+    expect(limited).not.toBeNull();
+    expect(limited?.className).toContain("data-limited:opacity-0");
+    expect(limited).toHaveAttribute("inert");
+    expectMotionContract(mode);
+  });
   it("updates caller state, executes a keyboard action, and removes the toast", async () => {
     const manager = createToastManager();
     const onClick = vi.fn();

@@ -28,7 +28,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         }
         expect(await computed(page, '[data-slot="toast"]', "transition-property")).not.toMatch(/height|bottom|all/);
         await page.keyboard.press("F6");
-        await expect(page.locator('[data-slot="toast-viewport"]')).toBeFocused();
+        await expect(page.locator('[data-slot="toast-viewport"]').filter({ has: toast })).toBeFocused();
         await page.keyboard.press("Tab");
         await expect(toast).toBeFocused();
         await page.keyboard.press("Escape");
@@ -42,8 +42,9 @@ for (const colorScheme of ["light", "dark"] as const) {
     test.use({ colorScheme });
     test("stack, action, axe and screenshots", async ({ page }, testInfo) => {
       await openComponent(page, "toast", "none", "toast-demo");
-      await page.getByRole("button", { name: "Show notification", exact: true }).click();
-      await page.getByRole("button", { name: "Show error", exact: true }).click();
+      const types = page.locator('[data-component-example="toast/types"]');
+      await types.getByRole("button", { name: "Show success", exact: true }).click();
+      await types.getByRole("button", { name: "Show error", exact: true }).click();
       const toasts = page.locator('[data-slot="toast"]');
       await expect(toasts).toHaveCount(2);
       const boxes = await toasts.evaluateAll((elements) =>
@@ -59,9 +60,12 @@ for (const colorScheme of ["light", "dark"] as const) {
         [],
       );
       await page.screenshot({ path: testInfo.outputPath(`toast-${colorScheme}.png`) });
-      await page.getByRole("button", { name: "Undo", exact: true }).click();
-      await expect(page.locator('[data-preview="toast"] [role="status"]')).toHaveText("Changes undone");
-      await page.getByRole("button", { name: "Dismiss all" }).click();
+      await types.getByRole("button", { name: "Clear types", exact: true }).click();
+      await expect(toasts).toHaveCount(0);
+      const actions = page.locator('[data-component-example="toast/actions"]');
+      await actions.getByRole("button", { name: "Archive item", exact: true }).click();
+      await page.getByRole("button", { name: "Restore item", exact: true }).click();
+      await expect(actions.getByRole("status")).toHaveText("Item restored");
       await expect(toasts).toHaveCount(0);
     });
   });

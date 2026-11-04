@@ -115,5 +115,6 @@
     "mounted",
     "custom-input",
     "without-motion"
-  ]
+  ],
+  "toast": ["types", "actions", "priority", "progress", "timers", "composition", "swipe", "without-motion"]
 }

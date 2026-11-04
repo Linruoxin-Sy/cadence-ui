@@ -22,6 +22,8 @@ For manual installation copy `toast/index.tsx`, install `@base-ui/react` and `lu
 Mount one toaster within your `CadenceProvider`. Call the shared manager from event handlers.
 
 ```tsx
+"use client";
+
 import { Button } from "@/components/cadence/button";
 import { toast, Toaster } from "@/components/cadence/toast";
 
@@ -36,56 +38,270 @@ export function Notifications() {
 }
 ```
 
-## Actions and priority
+## Notification types
+
+Types select a glyph, not request handling. Plain, success, info, warning, error and loading are fixed independent commands. Loading is a static glyph in every motion mode.
+
+<ComponentExample name="types" />
 
 ```tsx
-toast.add({
-  title: "Item archived",
-  actionProps: { children: "Undo", onClick: () => restoreItem() },
-});
-toast.add({ title: "Connection unavailable", type: "error", priority: "high" });
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { createToastManager, Toaster } from "@/components/cadence/toast";
+
+export function Types() {
+  const [manager] = useState(createToastManager);
+  return <Toaster toastManager={manager} timeout={0}>
+    <div className="flex flex-wrap gap-2">
+      {([undefined, "success", "info", "warning", "error", "loading"] as const).map(type => <Button key={type ?? "plain"} variant="outline" onClick={() => manager.add({ title: `${type ?? "plain"} notification`, type })}>Show {type ?? "plain"}</Button>)}
+      <Button variant="ghost" onClick={() => manager.close()}>Clear types</Button>
+    </div>
+  </Toaster>;
+}
 ```
 
-Low priority is announced politely; reserve high priority for urgent information. Actions use a real
-button and retain their caller-provided handler. Call `toast.close(id)` in the action handler when activation should dismiss the toast.
+## Actions and dismissal
+
+The caller owns the undo operation and persistent result. This action explicitly closes its notification; action activation alone does not imply dismissal.
+
+<ComponentExample name="actions" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { createToastManager, Toaster } from "@/components/cadence/toast";
+
+export function Actions() {
+  const [manager] = useState(createToastManager);
+  const [result, setResult] = useState("Item available");
+  return <Toaster toastManager={manager} timeout={0}>
+    <div className="flex flex-col gap-3">
+      <Button onClick={() => {
+        setResult("Item archived");
+        const id = manager.add({ title: "Item archived", actionProps: { children: "Restore item", onClick: () => { setResult("Item restored"); manager.close(id); } } });
+      }}>Archive item</Button>
+      <p role="status">{result}</p>
+    </div>
+  </Toaster>;
+}
+```
+
+## Announcement priority
+
+Low priority uses polite announcements. High priority is for urgent information. Neither arrival moves focus; F6 enters the active viewport and Escape dismisses the focused toast.
+
+<ComponentExample name="priority" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { createToastManager, Toaster } from "@/components/cadence/toast";
+
+export function Priority() {
+  const [manager] = useState(createToastManager);
+  return <Toaster toastManager={manager} timeout={0}>
+    <div className="flex flex-wrap gap-2">
+      <Button variant="outline" onClick={() => manager.add({ title: "Draft saved", priority: "low" })}>Polite notification</Button>
+      <Button variant="outline" onClick={() => manager.add({ title: "Connection unavailable", description: "Your draft remains on this device.", type: "error", priority: "high" })}>Urgent notification</Button>
+      <Button variant="ghost" onClick={() => manager.close()}>Clear priority</Button>
+    </div>
+  </Toaster>;
+}
+```
 
 ## Caller-owned progress
 
+Queue, finish and dismiss are explicit application events. This example performs no request and runs no simulated timer. The same manager id updates the existing toast; the persistent result remains after dismissal.
+
+<ComponentExample name="progress" />
+
 ```tsx
-const id = toast.add({ title: "Export queued", type: "loading", timeout: 0 });
-// When application state changes:
-toast.update(id, { title: "Export ready", type: "success", timeout: 5000 });
-// Or dismiss explicitly:
-toast.close(id);
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { createToastManager, Toaster } from "@/components/cadence/toast";
+
+export function Progress() {
+  const [manager] = useState(createToastManager);
+  const [id, setId] = useState<string>();
+  const [result, setResult] = useState("No export queued");
+  return <Toaster toastManager={manager} timeout={0}>
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap gap-2">
+        <Button disabled={!!id} onClick={() => { setId(manager.add({ title: "Export queued", type: "loading", onClose: () => setId(undefined) })); setResult("Export queued"); }}>Queue export</Button>
+        <Button variant="outline" disabled={!id} onClick={() => { if (id) manager.update(id, { title: "Export ready", description: "Download it from your exports page.", type: "success" }); setResult("Export ready"); }}>Finish export</Button>
+        <Button variant="ghost" disabled={!id} onClick={() => { if (id) manager.close(id); setId(undefined); }}>Dismiss export</Button>
+      </div>
+      <p role="status">{result}</p>
+    </div>
+  </Toaster>;
+}
 ```
 
-The caller owns requests, errors, and state. Promise orchestration is outside Cadence's contract;
-use `add`, `update`, and `close`. The loading glyph is static in all modes.
+## Timeout and visible limit
+
+The provider uses a 5000ms timeout and shows at most two notifications. Hovering or focusing pauses timers. The pinned primitive marks older notifications as limited rather than immediately removing them. A per-notification timeout of zero keeps a message until dismissed.
+
+<ComponentExample name="timers" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { createToastManager, Toaster } from "@/components/cadence/toast";
+
+export function Timers() {
+  const [manager] = useState(createToastManager);
+  return <Toaster toastManager={manager} timeout={5000} limit={2}>
+    <div className="flex flex-wrap gap-2">
+      <Button onClick={() => manager.add({ title: "Timed notification", description: "Closes after five seconds without hover or focus." })}>Add timed notification</Button>
+      <Button variant="outline" onClick={() => manager.add({ title: "Persistent notification", timeout: 0 })}>Add persistent notification</Button>
+      <Button variant="ghost" onClick={() => manager.close()}>Clear timers</Button>
+    </div>
+  </Toaster>;
+}
+```
 
 ## Custom composition
 
+Compose the real provider, portal, viewport and parts to customize content. This example omits the type glyph. Each specimen owns one manager and one viewport; applications normally mount one toaster for their shared manager.
+
+<ComponentExample name="composition" />
+
 ```tsx
-import { ToastProvider, ToastPortal, ToastViewport, Toast, ToastContent, ToastTitle, ToastDescription, ToastClose, useToastManager } from "@/components/cadence/toast";
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  createToastManager,
+  ToastProvider,
+  ToastPortal,
+  ToastViewport,
+  Toast,
+  ToastContent,
+  ToastTitle,
+  ToastDescription,
+  ToastAction,
+  ToastClose,
+  useToastManager,
+ } from "@/components/cadence/toast";
 
-function NotificationsList() {
+function NotificationList({ direction = "right" }: { direction?: "up" | "down" | "left" | "right" }) {
   const { toasts } = useToastManager();
-  return toasts.map(item => (
-    <Toast key={item.id} toast={item}>
-      <ToastContent>
-        <div><ToastTitle /><ToastDescription /></div>
-        <ToastClose />
-      </ToastContent>
-    </Toast>
-  ));
+  return toasts.map(item => <Toast key={item.id} toast={item} swipeDirection={direction}>
+    <ToastContent>
+      <div className="flex min-w-0 flex-1 flex-col gap-1"><ToastTitle /><ToastDescription /></div>
+      <ToastAction /><ToastClose />
+    </ToastContent>
+  </Toast>);
 }
-
-<ToastProvider>
-  <ToastPortal><ToastViewport><NotificationsList /></ToastViewport></ToastPortal>
-</ToastProvider>
+export function Composition({ direction = "right", label = "Show custom notification" }: { direction?: "up" | "down" | "left" | "right"; label?: string }) {
+  const [manager] = useState(createToastManager);
+  return <ToastProvider toastManager={manager} timeout={0}>
+    <Button variant="outline" onClick={() => manager.add({ title: "Custom notification", description: `Swipe ${direction} or use the close button.` })}>{label}</Button>
+    <ToastPortal><ToastViewport><NotificationList direction={direction} /></ToastViewport></ToastPortal>
+  </ToastProvider>;
+}
 ```
 
-`createToastManager()` isolates a provider from the shared `toast` singleton. Pass it as `toastManager`
-to `Toaster` or `ToastProvider`. Use `useToastManager()` inside that provider.
+## Swipe directions
+
+Each trigger owns an independent notification with a fixed physical swipe direction. Swipe recognition belongs to Base UI. Full mode shows native movement; reduced and none omit the transform while dismissal and keyboard controls remain available.
+
+<ComponentExample name="swipe" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import {
+  createToastManager,
+  ToastProvider,
+  ToastPortal,
+  ToastViewport,
+  Toast,
+  ToastContent,
+  ToastTitle,
+  ToastDescription,
+  ToastAction,
+  ToastClose,
+  useToastManager,
+ } from "@/components/cadence/toast";
+
+function NotificationList({ direction = "right" }: { direction?: "up" | "down" | "left" | "right" }) {
+  const { toasts } = useToastManager();
+  return toasts.map(item => <Toast key={item.id} toast={item} swipeDirection={direction}>
+    <ToastContent>
+      <div className="flex min-w-0 flex-1 flex-col gap-1"><ToastTitle /><ToastDescription /></div>
+      <ToastAction /><ToastClose />
+    </ToastContent>
+  </Toast>);
+}
+function Composition({ direction = "right", label = "Show custom notification" }: { direction?: "up" | "down" | "left" | "right"; label?: string }) {
+  const [manager] = useState(createToastManager);
+  return <ToastProvider toastManager={manager} timeout={0}>
+    <Button variant="outline" onClick={() => manager.add({ title: "Custom notification", description: `Swipe ${direction} or use the close button.` })}>{label}</Button>
+    <ToastPortal><ToastViewport><NotificationList direction={direction} /></ToastViewport></ToastPortal>
+  </ToastProvider>;
+}
+
+export function Swipe() {
+  return <div className="flex flex-wrap gap-2">{(["up", "down", "left", "right"] as const).map(direction => <Composition key={direction} direction={direction} label={`Swipe ${direction}`} />)}</div>;
+}
+```
+
+## Without motion
+
+These fixed local providers demonstrate none and full nested within none. The operating system reduced-motion preference still takes precedence. Ordinary examples inherit the header mode and speed.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import {
+  createToastManager,
+  ToastProvider,
+  ToastPortal,
+  ToastViewport,
+  Toast,
+  ToastContent,
+  ToastTitle,
+  ToastDescription,
+  ToastAction,
+  ToastClose,
+  useToastManager,
+ } from "@/components/cadence/toast";
+
+function NotificationList({ direction = "right" }: { direction?: "up" | "down" | "left" | "right" }) {
+  const { toasts } = useToastManager();
+  return toasts.map(item => <Toast key={item.id} toast={item} swipeDirection={direction}>
+    <ToastContent>
+      <div className="flex min-w-0 flex-1 flex-col gap-1"><ToastTitle /><ToastDescription /></div>
+      <ToastAction /><ToastClose />
+    </ToastContent>
+  </Toast>);
+}
+function Composition({ direction = "right", label = "Show custom notification" }: { direction?: "up" | "down" | "left" | "right"; label?: string }) {
+  const [manager] = useState(createToastManager);
+  return <ToastProvider toastManager={manager} timeout={0}>
+    <Button variant="outline" onClick={() => manager.add({ title: "Custom notification", description: `Swipe ${direction} or use the close button.` })}>{label}</Button>
+    <ToastPortal><ToastViewport><NotificationList direction={direction} /></ToastViewport></ToastPortal>
+  </ToastProvider>;
+}
+
+export function WithoutMotion() {
+  return <CadenceProvider mode="none"><div className="flex flex-wrap gap-2">
+    <Composition label="Show instant notification" />
+    <CadenceProvider mode="full"><Composition label="Show nested full notification" /></CadenceProvider>
+  </div></CadenceProvider>;
+}
+```
 
 ## When to use
 
@@ -135,8 +351,7 @@ Base UI owns timeout pausing, lifecycle, swipe recognition and removal. No extra
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
 geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The preview's **Popup motion** selector changes the local mode on the
-same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
+first mounted frame. Ordinary examples inherit the site header mode on the same component tree. Base UI `className(state)` and `style(state)` callbacks are evaluated
 before merging; caller utilities and styles win. Native `render`, events and ref cleanup
 remain owned by the primitive.
 

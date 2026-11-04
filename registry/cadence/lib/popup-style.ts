@@ -29,7 +29,8 @@ export function popupClasses<S>(
   const classes = cm.disabled
     ? base
         .split(" ")
-        .filter((part) => !part.includes(":opacity-0"))
+        // Suppress entry/exit fades, while preserving visibility states such as Toast limited.
+        .filter((part) => !/^data-(?:\[(?:starting|ending)-style\]|(?:starting|ending)-style):opacity-0$/.test(part))
         .join(" ")
     : base;
   return stateClasses(

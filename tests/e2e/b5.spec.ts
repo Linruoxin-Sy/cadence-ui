@@ -124,7 +124,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await close(page, id);
           const exit = await samples(page, 40);
           if (expected !== "none") expect(exit.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
-          if (["dropdown-menu", "context-menu", "menubar", "combobox", "command"].includes(id))
+          if (["dropdown-menu", "context-menu", "menubar", "combobox", "command", "toast"].includes(id))
             await openPopupMotionFixture(page, id, requested);
           await mode(page, "full");
           await start(page, id);
@@ -142,7 +142,7 @@ for (const colorScheme of ["light", "dark"] as const)
   test.describe(`B5 visual ${colorScheme}`, () => {
     test.use({ colorScheme });
     for (const id of ids)
-      for (const viewportWidth of ["combobox", "command"].includes(id) ? [1280, 390] : [undefined])
+      for (const viewportWidth of ["combobox", "command", "toast"].includes(id) ? [1280, 390] : [undefined])
         test(`${id} full page and open surface axe${viewportWidth ? ` ${viewportWidth}` : ""}`, async ({ page }) => {
           const errors: string[] = [];
           page.on("pageerror", (e) => errors.push(e.message));
@@ -186,7 +186,7 @@ test.describe("B5 active transition interruption", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ids)
     test(`${id} cancels running geometry and opacity, reverses on stable nodes`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu", "menubar", "combobox", "command"].includes(id))
+      if (["dropdown-menu", "context-menu", "menubar", "combobox", "command", "toast"].includes(id))
         await openPopupMotionFixture(page, id, "none", 4);
       else await page.goto(`/components/${id}?motion=none&speed=0.25`);
       await page.waitForLoadState("networkidle");
@@ -512,7 +512,7 @@ test.describe("B5 native reversal", () => {
   test.use({ reducedMotion: "no-preference" });
   for (const id of ["dropdown-menu", "context-menu", "menubar", "select", "combobox", "command"] as const)
     test(`${id} reopens during exit on the same surface`, async ({ page }) => {
-      if (["dropdown-menu", "context-menu", "menubar", "combobox", "command"].includes(id))
+      if (["dropdown-menu", "context-menu", "menubar", "combobox", "command", "toast"].includes(id))
         await openPopupMotionFixture(page, id, "full", 4);
       else await page.goto(`/components/${id}?motion=full&speed=0.25`);
       await page.waitForLoadState("networkidle");

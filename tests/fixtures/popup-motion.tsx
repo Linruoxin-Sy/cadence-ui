@@ -100,6 +100,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../../registry/cadence/sheet";
+import { createToastManager, Toaster } from "../../registry/cadence/toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/tooltip";
 
 // A dedicated browser regression input. Changing a native select emits change,
@@ -114,6 +115,7 @@ function PopupMotionFixture({
   initialMode: CadenceMode;
   timeScale: number;
 }) {
+  const [toastManager] = useState(createToastManager);
   const [mode, setMode] = useState(initialMode);
   const [commandOpen, setCommandOpen] = useState(false);
   const inputId = useId();
@@ -140,6 +142,13 @@ function PopupMotionFixture({
           </select>
         </label>
         <div data-preview={component}>
+          {component === "toast" && (
+            <Toaster toastManager={toastManager} timeout={0}>
+              <Button onClick={() => toastManager.add({ title: "Changes saved", type: "success" })}>
+                Show notification
+              </Button>
+            </Toaster>
+          )}
           {component === "command" && (
             <>
               <Button onClick={() => setCommandOpen(true)}>Open command palette</Button>
