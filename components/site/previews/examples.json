@@ -142,5 +142,15 @@
     "custom-render",
     "orientation",
     "without-motion"
+  ],
+  "collapsible": [
+    "controlled",
+    "custom-trigger",
+    "disabled",
+    "persistent",
+    "searchable",
+    "changing-content",
+    "custom-render",
+    "without-motion"
   ]
 }

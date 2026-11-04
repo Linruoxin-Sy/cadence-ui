@@ -34,8 +34,8 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       test(`geometry and keyboard ${requested}`, async ({ page }) => {
         const mode = effectiveMode(requested, reducedMotion === "reduce");
         await openComponent(page, "collapsible", requested, "collapsible-content", mode);
-        const preview = page.locator('[data-preview="collapsible"]');
-        const second = preview.getByRole("button", { name: "Hide details" });
+        const preview = page.locator('[data-component-example="collapsible/changing-content"]');
+        const second = preview.getByRole("button", { name: "Project information" });
         const panel = preview.locator('[data-slot="collapsible-content"]');
         await expect(panel).toHaveAttribute("data-motion", mode);
         await expectNaturalHeight(panel);
@@ -104,7 +104,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 for (const mode of MODES) {
   test(`outer box model and closing lifecycle ${mode}`, async ({ page }) => {
     await openComponent(page, "collapsible", mode, "collapsible-content");
-    const preview = page.locator('[data-preview="collapsible"]');
+    const preview = page.locator('[data-component-example="collapsible/changing-content"]');
     const panel = preview.locator('[data-slot="collapsible-content"]');
     // Real React className input: p-4 border on the outer Panel, under Preflight border-box.
     await expect(panel).toHaveClass(/p-4/);

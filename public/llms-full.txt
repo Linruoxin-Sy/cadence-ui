@@ -16371,14 +16371,30 @@ npx shadcn@latest add @cadence/collapsible
 
 ## Usage
 
+A standalone disclosure starts open here. The trigger keeps its expanded state and keyboard semantics; no demo configuration is needed.
+
 ```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
 
-export function Example() {
+export function BasicExample() {
+  const [open, setOpen] = useState(true);
   return (
-    <Collapsible>
-      <CollapsibleTrigger>Show project details</CollapsibleTrigger>
-      <CollapsibleContent>Optional project information.</CollapsibleContent>
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-sm font-semibold">Project details</h3>
+        <CollapsibleTrigger render={<Button variant="outline" size="sm" />}>
+          {open ? "Hide details" : "Show details"}
+        </CollapsibleTrigger>
+      </div>
+      <CollapsibleContent>
+        <p className="mt-4 rounded-lg border p-4 text-sm">
+          Components are copied into your project so you can make them your own.
+        </p>
+      </CollapsibleContent>
     </Collapsible>
   );
 }
@@ -16386,36 +16402,255 @@ export function Example() {
 
 ## Controlled
 
+Own the boolean `open` state in the caller. The external buttons update this example only; the trigger reports requests through `onOpenChange`.
+
+<ComponentExample name="controlled" />
+
 ```tsx
-const [open, setOpen] = useState(false);
-<Collapsible open={open} onOpenChange={setOpen}>
-  <CollapsibleTrigger>Project details</CollapsibleTrigger>
-  <CollapsibleContent>Caller-owned expanded state.</CollapsibleContent>
-</Collapsible>;
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+
+export function ControlledExample() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="grid gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => setOpen(true)}>
+          Open from outside
+        </Button>
+        <Button variant="outline" onClick={() => setOpen(false)}>
+          Close from outside
+        </Button>
+      </div>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleTrigger>Account details</CollapsibleTrigger>
+        <CollapsibleContent>Your account details stay with the caller.</CollapsibleContent>
+      </Collapsible>
+      <p role="status">Details: {open ? "open" : "closed"}</p>
+    </div>
+  );
+}
 ```
 
 ## Custom trigger
 
-```tsx
-<Collapsible defaultOpen>
-  <CollapsibleTrigger render={<Button variant="outline" />}>Toggle details</CollapsibleTrigger>
-  <CollapsibleContent className="text-sm">Initially visible without an entrance animation.</CollapsibleContent>
-</Collapsible>
-```
+Compose Button through `render` for a styled native trigger. When rendering a non-button element, set `nativeButton={false}` so Base UI supplies button role, focus and Enter/Space handling. The first disclosure starts open; the second starts closed.
 
-Import Button from `@/components/cadence/button`. The primitive supplies button semantics and expanded state.
-
-## Persistent and searchable content
+<ComponentExample name="custom-trigger" />
 
 ```tsx
-<Collapsible>
-  <CollapsibleTrigger>Reference notes</CollapsibleTrigger>
-  <CollapsibleContent hiddenUntilFound>Find this text with browser search.</CollapsibleContent>
-</Collapsible>
+"use client";
+
+import { Button } from "@/components/cadence/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+
+export function CustomTriggerExample() {
+  return (
+    <div className="grid gap-4">
+      <Collapsible defaultOpen>
+        <CollapsibleTrigger render={<Button variant="outline" />}>Button details</CollapsibleTrigger>
+        <CollapsibleContent>Initially visible without an entrance animation.</CollapsibleContent>
+      </Collapsible>
+      <Collapsible>
+        <CollapsibleTrigger
+          nativeButton={false}
+          render={<div />}
+          className="w-fit rounded border p-2 focus-visible:outline-2"
+        >
+          Non-native details
+        </CollapsibleTrigger>
+        <CollapsibleContent>A div receives the primitive's role, focus and keyboard handling.</CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+}
 ```
 
-Use `keepMounted` to retain local content state while closed. `hiddenUntilFound` overrides it and lets
-supporting browsers reveal content through find-in-page. Put these props on Content, not the root.
+## Disabled
+
+Disable the whole root or one trigger. A disabled, initially open summary stays readable; disabled triggers cannot toggle and are skipped by normal Tab navigation. Other disclosures remain independent.
+
+<ComponentExample name="disabled" />
+
+```tsx
+"use client";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+
+export function DisabledExample() {
+  return (
+    <div className="grid gap-4">
+      <Collapsible disabled defaultOpen>
+        <CollapsibleTrigger>Locked project</CollapsibleTrigger>
+        <CollapsibleContent>
+          This initially open summary remains readable while the root is disabled.
+        </CollapsibleContent>
+      </Collapsible>
+      <Collapsible>
+        <CollapsibleTrigger disabled>Unavailable details</CollapsibleTrigger>
+        <CollapsibleContent>Not available yet.</CollapsibleContent>
+      </Collapsible>
+      <Collapsible>
+        <CollapsibleTrigger>Available details</CollapsibleTrigger>
+        <CollapsibleContent>You can still open this independent section.</CollapsibleContent>
+      </Collapsible>
+      <a href="/docs/installation">Read the installation guide</a>
+    </div>
+  );
+}
+```
+
+## Persistent content
+
+Put `keepMounted` on Content to retain this native input and its draft when closed. Closed content leaves the focus order. Persistence lasts while the example is mounted; store durable drafts in the caller.
+
+<ComponentExample name="persistent" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+import { Input } from "@/components/cadence/input";
+import { Label } from "@/components/cadence/label";
+
+export function PersistentExample() {
+  const id = useId();
+  return (
+    <Collapsible defaultOpen>
+      <CollapsibleTrigger>Workspace draft</CollapsibleTrigger>
+      <CollapsibleContent keepMounted>
+        <Label htmlFor={id}>Workspace note</Label>
+        <Input id={id} defaultValue="Keep this draft" />
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+```
+
+## Searchable content
+
+Put `hiddenUntilFound` on Content to use `hidden="until-found"` while closed. Supporting browsers can reveal this reference through find-in-page; browser support varies. This option overrides `keepMounted`. It is not a search service or a promise of cross-browser Find UI support.
+
+<ComponentExample name="searchable" />
+
+```tsx
+"use client";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+
+export function SearchableExample() {
+  return (
+    <Collapsible>
+      <CollapsibleTrigger>Reference notes</CollapsibleTrigger>
+      <CollapsibleContent hiddenUntilFound>
+        Cobalt delivery reference: use your order number when contacting support.
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+```
+
+## Changing content
+
+The button adds or removes local detail in this example. The inner natural content is observed and the open panel follows its height, including responsive wrapping. Outer padding and borders remain supported; their box minimum persists during closing. Put decoration on a child when the closing endpoint must reach zero.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+
+export function ChangingContentExample() {
+  const [details, setDetails] = useState(false);
+  return (
+    <Collapsible defaultOpen>
+      <CollapsibleTrigger>Project information</CollapsibleTrigger>
+      <CollapsibleContent className="mt-4 rounded-lg border p-4 text-sm">
+        <p className="mb-4">Components are copied into your project so you can make them your own.</p>
+        <Button variant="outline" size="sm" aria-expanded={details} onClick={() => setDetails(!details)}>
+          Toggle extra detail
+        </Button>
+        {details && (
+          <p className="mt-4">
+            The disclosure follows content changes and responsive wrapping. Reduced and none modes update its height
+            instantly.
+          </p>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+```
+
+## Custom render
+
+Render Root and Content as sections while preserving the supplied props and measurement children. Content has default div semantics; this example explicitly opts into a named region. Caller classes and styles remain applied to the outer panel.
+
+<ComponentExample name="custom-render" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+
+export function CustomRenderExample() {
+  const id = useId();
+  return (
+    <Collapsible defaultOpen render={<section />}>
+      <CollapsibleTrigger id={id}>Support resources</CollapsibleTrigger>
+      <CollapsibleContent
+        render={<section />}
+        role="region"
+        aria-labelledby={id}
+        className="text-muted-foreground"
+        style={{ scrollMarginTop: "6rem" }}
+      >
+        <a href="/docs/installation">Read the installation guide</a> before adding your first component.
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+```
+
+## Without motion
+
+This named example explicitly sets `none` for the first disclosure. The nested `full` provider restores its recipe, while the system reduced-motion preference still wins. Other examples inherit the site header mode and speed.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/cadence/collapsible";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function WithoutMotionExample() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="grid gap-4">
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>Instant disclosure</CollapsibleTrigger>
+          <CollapsibleContent>No height transition runs here.</CollapsibleContent>
+        </Collapsible>
+        <CadenceProvider mode="full">
+          <Collapsible defaultOpen>
+            <CollapsibleTrigger>Nested full disclosure</CollapsibleTrigger>
+            <CollapsibleContent>The operating system can still reduce this transition.</CollapsibleContent>
+          </Collapsible>
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
+```
 
 ## When to use
 
