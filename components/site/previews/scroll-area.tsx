@@ -78,6 +78,7 @@ export function CallerRenderingExample() {
       <ScrollArea
         ref={rootRef}
         render={<section />}
+        role="region"
         aria-label="Workspace activity"
         overflowEdgeThreshold={{ yStart: 16, yEnd: 16 }}
         className={(state) =>
@@ -164,11 +165,11 @@ function BasicExample() {
   return (
     <div className="grid min-w-0 gap-5">
       <div className="min-w-0">
-        <h3 className="mb-2 text-sm font-medium">Release notes</h3>
+        <h2 className="mb-2 text-sm font-medium">Release notes</h2>
         <VerticalExample />
       </div>
       <div className="min-w-0">
-        <h3 className="mb-2 text-sm font-medium">Project timeline</h3>
+        <h2 className="mb-2 text-sm font-medium">Project timeline</h2>
         <HorizontalExample />
       </div>
     </div>

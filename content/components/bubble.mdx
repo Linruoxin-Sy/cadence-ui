@@ -161,7 +161,7 @@ export function Reactions() {
       <Bubble variant="outline">
         <BubbleContent>Was this answer helpful?</BubbleContent>
         <BubbleReactions>
-          <button type="button" className="rounded-full px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-pressed={liked} aria-label="Thumbs up" onClick={() => setLiked((value) => !value)}>👍 {liked ? 1 : 0}</button>
+          <button type="button" className="rounded-full px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-pressed={liked} aria-label={`👍 ${liked ? 1 : 0} thumbs up`} onClick={() => setLiked((value) => !value)}>👍 {liked ? 1 : 0}</button>
         </BubbleReactions>
       </Bubble>
     </BubbleGroup>

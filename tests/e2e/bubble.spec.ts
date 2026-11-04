@@ -100,7 +100,7 @@ for (const os of [false, true])
       expect(await first.evaluate((el) => el.getAnimations().length)).toBe(0);
       await c.getByRole("button", { name: "Append text", exact: true }).click();
       await expect(first).toContainText("Another local chunk. Another local chunk.");
-      const reaction = card(page, "reactions").getByRole("button", { name: "Thumbs up" });
+      const reaction = card(page, "reactions").getByRole("button", { name: /👍 [01] thumbs up/ });
       await reaction.press(" ");
       await expect(reaction).toHaveAttribute("aria-pressed", "true");
       const links = card(page, "links-and-buttons");
@@ -269,7 +269,7 @@ test("Bubble real header and source keep caller values and nodes", async ({ page
     first = c.locator('[data-message-id="initial"]'),
     saved = await first.elementHandle();
   await first.getByRole("button").press("F2");
-  const reaction = card(page, "reactions").getByRole("button", { name: "Thumbs up" });
+  const reaction = card(page, "reactions").getByRole("button", { name: /👍 [01] thumbs up/ });
   await reaction.click();
   const mode = page.getByRole("group", { name: "Motion mode" });
   for (const requested of MODES) {

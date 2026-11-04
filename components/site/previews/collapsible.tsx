@@ -13,7 +13,7 @@ export function BasicExample() {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-sm font-semibold">Project details</h3>
+        <h2 className="text-sm font-semibold">Project details</h2>
         <CollapsibleTrigger render={<Button variant="outline" size="sm" />}>
           {open ? "Hide details" : "Show details"}
         </CollapsibleTrigger>

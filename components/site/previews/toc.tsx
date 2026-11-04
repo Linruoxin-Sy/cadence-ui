@@ -16,9 +16,9 @@ function Compact() {
       <Toc items={items} label="Guide sections" />
       <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-muted-foreground">
         {items.map((item) => (
-          <h3 key={item.id} id={item.id} className="scroll-mt-24 font-normal">
+          <h2 key={item.id} id={item.id} className="scroll-mt-24 font-normal">
             {item.title}
-          </h3>
+          </h2>
         ))}
       </div>
     </div>

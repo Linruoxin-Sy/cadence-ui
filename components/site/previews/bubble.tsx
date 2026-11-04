@@ -131,7 +131,7 @@ function Reactions() {
             type="button"
             className="rounded-full px-2 py-1 outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-pressed={liked}
-            aria-label="Thumbs up"
+            aria-label={`👍 ${liked ? 1 : 0} thumbs up`}
             onClick={() => setLiked((value) => !value)}
           >
             👍 {liked ? 1 : 0}

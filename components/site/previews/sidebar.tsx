@@ -33,7 +33,7 @@ import {
 import { PreviewStack } from "./shell";
 
 // The transform contains desktop fixed panels inside this embedded application shell.
-// SidebarInset is a region here because the documentation already has a main landmark.
+// Render the embedded content as a named section inside the documentation main.
 function Frame({
   label,
   children,
@@ -60,9 +60,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -287,7 +287,7 @@ function GroupsAndActions() {
         <SidebarContent>
           <nav aria-label="Project actions">
             <SidebarGroup>
-              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>Projects</SidebarGroupLabel>
+              <SidebarGroupLabel render={<h3 aria-label="Projects" />}>Projects</SidebarGroupLabel>
               <SidebarGroupAction
                 aria-label="Add project"
                 onClick={() => setProjects((rows) => [...rows, `Project ${rows.length + 1}`])}
@@ -487,7 +487,7 @@ function CustomParts() {
         <SidebarContent>
           <nav aria-label="Custom parts">
             <SidebarGroup>
-              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>المشاريع</SidebarGroupLabel>
+              <SidebarGroupLabel render={<h3 aria-label="Projects" />}>المشاريع</SidebarGroupLabel>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
@@ -532,7 +532,7 @@ export function SidebarPreview({ example }: { example?: string }) {
       content = (["offcanvas", "icon", "none"] as const).map((collapsible) => (
         <Workspace
           key={collapsible}
-          label={`${collapsible} navigation`}
+          label={`${collapsible} collapse navigation`}
           collapsible={collapsible}
           defaultOpen={false}
         />

@@ -134,7 +134,7 @@ export function WithoutOverflowExample() {
 
 ## Caller rendering and sizing
 
-Root props, ref, classes and styles belong to the outer section, while children render inside its native viewport. State callbacks retain a fixed height and change only the overflow border. overflowEdgeThreshold delays edge attributes by 16px; it changes neither scroll range nor content visibility. The application-owned action queries the viewport slot from its root ref and scrolls instantly. There is no invented viewport prop. Install Button separately for this composition. Custom render components must forward props, children and ref.
+The custom section explicitly uses `role="region"` with an accessible name instead of inheriting the primitive's presentation role. Root props, ref, classes and styles belong to the outer section, while children render inside its native viewport. State callbacks retain a fixed height and change only the overflow border. overflowEdgeThreshold delays edge attributes by 16px; it changes neither scroll range nor content visibility. The application-owned action queries the viewport slot from its root ref and scrolls instantly. There is no invented viewport prop. Install Button separately for this composition. Custom render components must forward props, children and ref.
 
 <ComponentExample name="caller-rendering" />
 
@@ -160,6 +160,7 @@ export function CallerRenderingExample() {
       <ScrollArea
         ref={rootRef}
         render={<section />}
+        role="region"
         aria-label="Workspace activity"
         overflowEdgeThreshold={{ yStart: 16, yEnd: 16 }}
         className={(state) =>

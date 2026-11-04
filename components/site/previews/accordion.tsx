@@ -9,24 +9,27 @@ import { PreviewStack } from "./shell";
 
 export function BasicExample() {
   return (
-    <Accordion className="w-full max-w-lg" defaultValue={["install"]}>
-      <AccordionItem value="install">
-        <AccordionTrigger>How do I install a component?</AccordionTrigger>
-        <AccordionContent>
-          Install from the Cadence registry. The source is copied into your project, ready to customise.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="motion">
-        <AccordionTrigger>Can I reduce the motion?</AccordionTrigger>
-        <AccordionContent>
-          Yes. Your system preference is respected, and the provider can disable motion entirely.
-        </AccordionContent>
-      </AccordionItem>
-      <AccordionItem value="disabled" disabled>
-        <AccordionTrigger>Upcoming integrations</AccordionTrigger>
-        <AccordionContent>Not available yet.</AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <section className="grid w-full max-w-lg gap-2">
+      <h2 className="text-sm font-medium">Component questions</h2>
+      <Accordion defaultValue={["install"]}>
+        <AccordionItem value="install">
+          <AccordionTrigger>How do I install a component?</AccordionTrigger>
+          <AccordionContent>
+            Install from the Cadence registry. The source is copied into your project, ready to customise.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="motion">
+          <AccordionTrigger>Can I reduce the motion?</AccordionTrigger>
+          <AccordionContent>
+            Yes. Your system preference is respected, and the provider can disable motion entirely.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="disabled" disabled>
+          <AccordionTrigger>Upcoming integrations</AccordionTrigger>
+          <AccordionContent>Not available yet.</AccordionContent>
+        </AccordionItem>
+      </Accordion>
+    </section>
   );
 }
 

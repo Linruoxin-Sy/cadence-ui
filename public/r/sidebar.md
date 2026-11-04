@@ -16,7 +16,7 @@ npx shadcn@latest add @cadence/sidebar
 
 ## Usage
 
-A minimal embedded application shell with real search and links. At the application root, use the default main semantics of SidebarInset; the region role below is for embedding in this documentation.
+A minimal embedded application shell with real search and links. At the application root, use the default main semantics of SidebarInset. For an embedded shell, use Cadence's additive `render` prop to render a uniquely named section. The default element remains main.
 
 ```tsx
 "use client";
@@ -51,9 +51,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -182,9 +182,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -314,9 +314,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -459,7 +459,7 @@ export function Example() {
 
 ## Variants
 
-These fixed shells compare sidebar, floating and inset separately. Floating adds a padded rounded panel; inset styles its sibling SidebarInset. In this embedded documentation each inset uses role="region" because the page already has a main; use its default main landmark at your application root. The containing transform and absolute panel keep each desktop specimen inside its own card. The local 12rem desktop width is an embedding choice, not a library default.
+These fixed shells compare sidebar, floating and inset separately. Floating adds a padded rounded panel; inset styles its sibling SidebarInset. In this embedded documentation each inset uses `render={<section />}` with a unique accessible name because the page already has a main; use its default main landmark at your application root. The containing transform and absolute panel keep each desktop specimen inside its own card. The local 12rem desktop width is an embedding choice, not a library default.
 
 <ComponentExample name="variants" />
 
@@ -496,9 +496,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -627,9 +627,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -758,9 +758,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -846,7 +846,7 @@ function Workspace({
 }
 
 export function Example() {
-  return <div className="grid gap-5">{(["offcanvas", "icon", "none"] as const).map(collapsible => <Workspace key={collapsible} label={`${collapsible} navigation`} collapsible={collapsible} defaultOpen={false} />)}</div>;
+  return <div className="grid gap-5">{(["offcanvas", "icon", "none"] as const).map(collapsible => <Workspace key={collapsible} label={`${collapsible} collapse navigation`} collapsible={collapsible} defaultOpen={false} />)}</div>;
 }
 ```
 
@@ -890,9 +890,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1053,9 +1053,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1146,9 +1146,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1168,7 +1168,7 @@ function GroupsAndActions() {
         <SidebarContent>
           <nav aria-label="Project actions">
             <SidebarGroup>
-              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>Projects</SidebarGroupLabel>
+              <SidebarGroupLabel render={<h3 aria-label="Projects" />}>Projects</SidebarGroupLabel>
               <SidebarGroupAction
                 aria-label="Add project"
                 onClick={() => setProjects((rows) => [...rows, `Project ${rows.length + 1}`])}
@@ -1265,9 +1265,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1365,9 +1365,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1453,9 +1453,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1551,9 +1551,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1581,7 +1581,7 @@ function CustomParts() {
         <SidebarContent>
           <nav aria-label="Custom parts">
             <SidebarGroup>
-              <SidebarGroupLabel render={<h4 aria-label="Projects" />}>المشاريع</SidebarGroupLabel>
+              <SidebarGroupLabel render={<h3 aria-label="Projects" />}>المشاريع</SidebarGroupLabel>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
@@ -1650,9 +1650,9 @@ function Frame({
       className={`relative isolate h-96 min-h-96 overflow-hidden rounded-lg border [transform:translateZ(0)] ${side === "right" ? "flex-row-reverse" : ""}`}
     >
       {children}
-      <SidebarInset role="region" aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
+      <SidebarInset render={<section />} aria-label={`${label} content`} className="min-w-0 gap-3 p-3">
         <SidebarTrigger aria-label={`Toggle ${label}`} />
-        <h3 className="text-sm font-medium">Project overview</h3>
+        <p className="text-sm font-medium">Project overview</p>
         {content ?? <p className="text-xs text-muted-foreground">Your workspace content.</p>}
       </SidebarInset>
     </SidebarProvider>
@@ -1776,7 +1776,7 @@ provide routing, permissions, or application state.
 
 `SidebarTrigger` accepts Button props and calls caller `onClick` before toggling. `SidebarRail`
 accepts native button props and is excluded from Tab order; the trigger is the keyboard control.
-`SidebarInset` renders a main landmark; use it as the application's main, not inside another main.
+`SidebarInset` defaults to a main landmark and accepts native main props/ref. Cadence adds the Base UI `render` prop (an element or render function) so embedded shells can use a uniquely named section, as above. This preserves the sidebar-inset slot and peer-dependent styling without nesting main landmarks or overriding a main element's role.
 `SidebarInput` and `SidebarSeparator` accept their corresponding component props.
 
 `SidebarHeader`, `SidebarFooter`, `SidebarContent`, `SidebarGroup`, `SidebarGroupContent`,

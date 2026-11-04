@@ -6,6 +6,7 @@ import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import {
   Sidebar,
   SidebarInput,
+  SidebarInset,
   SidebarMenuButton,
   SidebarMenuSkeleton,
   SidebarMenuSubButton,
@@ -36,13 +37,53 @@ function Example({
           <SidebarInput aria-label="Search" />
           <SidebarMenuButton render={<a href="#content" />}>Projects</SidebarMenuButton>
         </Sidebar>
-        <SidebarTrigger />
-        <Status />
+        <SidebarInset render={<section aria-label="Workspace content" />}>
+          <SidebarTrigger />
+          <Status />
+        </SidebarInset>
       </SidebarProvider>
     </CadenceProvider>
   );
 }
 describe("Sidebar", () => {
+  it("keeps the default inset main landmark", () => {
+    render(<SidebarInset className="custom-inset">Main content</SidebarInset>);
+    const main = screen.getByRole("main");
+    expect(main).toHaveAttribute("data-slot", "sidebar-inset");
+    expect(main).toHaveClass("custom-inset", "flex-1");
+    expect(main).not.toHaveAttribute("role");
+  });
+  it.each(["element", "function"] as const)(
+    "renders an embedded inset section through %s with native props and ref cleanup",
+    async (form) => {
+      const cleanup = vi.fn();
+      const ref = vi.fn(() => cleanup);
+      const click = vi.fn();
+      const { unmount } = render(
+        <SidebarInset
+          render={form === "element" ? <section /> : (props) => <section {...props} />}
+          aria-label="Embedded workspace"
+          className="caller-inset"
+          style={{ color: "red" }}
+          onClick={click}
+          ref={ref}
+        >
+          <button type="button">Read report</button>
+        </SidebarInset>,
+      );
+      const region = screen.getByRole("region", { name: "Embedded workspace" });
+      expect(region.tagName).toBe("SECTION");
+      expect(region).toHaveAttribute("data-slot", "sidebar-inset");
+      expect(region).toHaveClass("caller-inset", "flex-1");
+      expect(region).toHaveStyle({ color: "rgb(255, 0, 0)" });
+      expect(ref).toHaveBeenCalledWith(region);
+      await userEvent.tab();
+      await userEvent.keyboard("{Enter}");
+      expect(click).toHaveBeenCalledOnce();
+      unmount();
+      expect(cleanup).toHaveBeenCalledOnce();
+    },
+  );
   it("preserves defaults, native keyboard path, input identity, and cookie writes", async () => {
     const { container } = render(<Example />);
     const panel = container.querySelector('[data-slot="sidebar"]');
