@@ -112,7 +112,7 @@ the check compares payloads against source and fails on stale artifacts.
    `meta.tier`, `meta.batch`, `meta.motion`, `meta.intensity`, `meta.complexity`, and `meta.upstream`.
 4. Write `content/components/<id>.mdx` with matching frontmatter: tier-specific membership and order from documentation-site-and-distribution §2,
    including responsiveness/performance at every tier and input data ownership; no fixed heading count.
-5. Add `components/site/previews/<id>.tsx` and register it in `components/site/previews/index.tsx`.
+5. Add `components/site/previews/<id>.tsx`; the scaffold creates `app/(site)/components/<id>/page.tsx` with its single preview import. Keep that generated entry in sync with `scripts/component-routes.mjs`.
 6. Add `tests/components/<id>.test.tsx`: render, `data-slot`, keyboard path, `reduced` and `none` modes.
 7. Run the [motion conformance check](#motion-conformance-check) above and fix every failed item.
 8. Rebuild payloads, run `pnpm check`, and paste dual-theme screenshots in the PR.

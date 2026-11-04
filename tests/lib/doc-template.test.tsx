@@ -142,7 +142,8 @@ describe("real new-item entry", () => {
       cpSync(path.join(root, "tests"), path.join(temp, "tests"), { recursive: true });
       for (const file of ["registry.json", "registry-snapshots.json"])
         cpSync(path.join(root, file), path.join(temp, file));
-      for (const dir of ["public", "docs", "app"]) symlinkSync(path.join(root, dir), path.join(temp, dir), "junction");
+      for (const dir of ["public", "docs"]) symlinkSync(path.join(root, dir), path.join(temp, dir), "junction");
+      cpSync(path.join(root, "app"), path.join(temp, "app"), { recursive: true });
       cpSync(path.join(root, "registry"), path.join(temp, "registry"), { recursive: true });
       const result = spawnSync(
         process.execPath,
@@ -162,6 +163,9 @@ describe("real new-item entry", () => {
         { cwd: temp, encoding: "utf8" },
       );
       expect(result.status, result.stderr).toBe(0);
+      const route = readFileSync(path.join(temp, "app/(site)/components/fixture/page.tsx"), "utf8");
+      expect(route).toContain('import { FixturePreview } from "@/components/site/previews/fixture"');
+      expect(route).toContain('<ComponentPage id="fixture" preview={FixturePreview} />');
       const run = () =>
         spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], { cwd: temp, encoding: "utf8" });
       // Stubs intentionally fail implementation/payload checks; the actual entry must accept their body.

@@ -64,7 +64,9 @@ A pull request is ready when the component has:
    fails. Keep behavior assertions for engine/native WAAPI writers and existing interactions. T0
    structural components need neither a provider nor this helper. See animation-system §9.3 for
    supported carriers, instant positional geometry and browser-proof limits.
-8. **A preview** in `components/site/previews/<id>.tsx`, registered in `previews/index.tsx`.
+8. **A preview** in `components/site/previews/<id>.tsx`, with its own generated
+   `app/(site)/components/<id>/page.tsx` entry. The scaffold writes the entry;
+   `registry:check` verifies its single preview import and shared page template.
 
 Then run:
 

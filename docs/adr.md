@@ -80,3 +80,13 @@ and a nonempty origin reason. Registry validation still enforces the same docs, 
 budget and applicable motion rules. Parity reports only actual shadcn comparisons; it rejects reclassifying
 a pinned shadcn item as an original. Upstream sync and manifest writing omit original components rather
 than inventing external sources. Future catalogue expansion still requires explicit scope.
+
+## ADR-019 · Component routes own their preview import
+
+Accepted. Keep a small static Next entry per component URL, importing that component's preview
+and calling one shared server page template. Use the same reference for top and named MDX specimens;
+the client frame receives children and owns mode exposure and instant measurement. Scaffolding and
+registry checks keep entries aligned with the catalogue. Shared navigation disables automatic
+destination prefetching to avoid loading other preview graphs before navigation. All current-page
+specimens retain immediate SSR and hydration. This preserves ADR-009 and does not certify performance
+budgets; complete-route requests and functional checks remain required.

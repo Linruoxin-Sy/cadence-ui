@@ -15,21 +15,15 @@ import {
   BreadcrumbSeparator,
 } from "@/registry/cadence/breadcrumb";
 import { Toc } from "@/registry/cadence/toc";
+import type { PreviewComponent } from "./preview";
 
-export async function generateStaticParams() {
-  const components = await listComponents();
-  return components.map((doc) => ({ id: doc.slug }));
-}
-
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params;
+export async function getComponentMetadata(id: string): Promise<Metadata> {
   const doc = await getComponent(id);
   if (!doc) return {};
   return { title: doc.title, description: doc.description };
 }
 
-export default async function ComponentPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function ComponentPage({ id, preview }: { id: string; preview: PreviewComponent }) {
   const doc = await getComponent(id);
   if (!doc) notFound();
 
@@ -38,7 +32,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
   const previous = components[index - 1];
   const next = components[index + 1];
   const files = await getComponentSource(id);
-  const { headings, content } = await compileDocument(doc.body, id);
+  const { headings, content } = await compileDocument(doc.body, id, preview);
 
   return (
     <div className="mx-auto w-full max-w-3xl xl:grid xl:max-w-none xl:grid-cols-[minmax(0,1fr)_14rem] xl:gap-8">
@@ -46,7 +40,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/components" />}>Components</BreadcrumbLink>
+              <BreadcrumbLink render={<Link prefetch={false} href="/components" />}>Components</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -69,7 +63,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
         </details>
 
         <section className="mt-8" aria-label="Live preview">
-          <PreviewFrame id={doc.slug} />
+          <PreviewFrame id={doc.slug} component={preview} />
         </section>
 
         <details className="mt-4 rounded-lg border border-border p-4">
@@ -99,14 +93,14 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
           </a>
           <nav aria-label="Component pagination" className="flex justify-between gap-4">
             {previous ? (
-              <Link rel="prev" href={`/components/${previous.slug}`}>
+              <Link prefetch={false} rel="prev" href={`/components/${previous.slug}`}>
                 Previous: {previous.title}
               </Link>
             ) : (
               <span />
             )}
             {next && (
-              <Link rel="next" href={`/components/${next.slug}`}>
+              <Link prefetch={false} rel="next" href={`/components/${next.slug}`}>
                 Next: {next.title}
               </Link>
             )}

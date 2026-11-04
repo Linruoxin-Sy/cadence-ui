@@ -205,6 +205,20 @@ The shared frame keeps the original top-level `data-preview` marker separate fro
 `data-component-example="component/example-id"` markers, and opts specimens out of prose typography.
 The explanation and runnable code stay beside the reference in MDX, including in distributed docs.
 
+Each component route entry imports its own preview module. The shared server page template passes
+that same component to the top card and MDX renderer, and validates named examples before rendering either
+the top card or an MDX specimen. The client frame receives the selected specimen as `children`;
+it owns only the resolved mode marker and instant measured height. The preview catalogue and
+example-name catalogue stay outside that client boundary. Selection does not change the specimen's
+client ownership, state, IDs, portals or inherited provider. Await selection before returning the
+frame, with no local loading fallback, so the real specimen remains in SSR and no-JS HTML.
+Verify per-page loading against a complete production route: a server import alone does not prove
+client code splitting, and all automatic scripts still count against the unchanged page budget.
+Shared navigation links opt out of automatic destination prefetching, so visible catalogue links
+do not load another page's preview graph. Navigation still uses Next links and loads the requested
+destination normally. Every specimen on the current page is rendered and loaded immediately;
+none is gated on scrolling, interaction or a timer.
+
 During migration, registration opts the entire page into the example-card gate. `registry:build` and
 `registry:check` reject unknown/malformed references, missing or duplicate registered specimens,
 examples outside the example region, and named sections without a card, explanation or TSX code
@@ -241,7 +255,7 @@ The Component source disclosure reads `public/r/<id>.json`'s `content`. Usage an
 sections carry their own runnable usage code; they explain how to compose the component rather
 than duplicating its implementation source.
 
-The preview body is the one place the _site_ owns geometry. The route awaits its lazy preview so
+The preview body is the one place the _site_ owns geometry. The route renders its selected preview so
 SSR/no-JS retains a visible specimen rather than a hidden streamed segment. `MeasuredHeight`
 keeps that height explicit — written in the frame the content changed, from a `ResizeObserver` on the content
 rather than on the wrapper — so the card around a preview is always the size of its example and never lags

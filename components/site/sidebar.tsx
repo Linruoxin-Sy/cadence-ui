@@ -36,6 +36,7 @@ function NavLink({ href, title, active }: { href: string; title: string; active:
   return (
     <Reveal className="origin-left">
       <Link
+        prefetch={false}
         href={href}
         aria-current={active ? "page" : undefined}
         className={cn(

@@ -3,7 +3,8 @@
  *
  *   registry/cadence/<id>/index.tsx
  *   content/components/<id>.mdx
- *   components/site/previews/<id>.tsx   (registered in previews/index.tsx)
+ *   components/site/previews/<id>.tsx
+ *   app/(site)/components/<id>/page.tsx
  *   tests/components/<id>.test.tsx
  *   a matching item in registry.json
  *
@@ -15,6 +16,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { componentRouteSource } from "./component-routes.mjs";
 import { INPUT_DOCS, validateDocTemplate } from "./doc-template.mjs";
 
 const root = process.cwd();
@@ -65,7 +67,7 @@ const sourcePath = path.join(root, "registry", "cadence", id, "index.tsx");
 const docPath = path.join(root, "content", "components", `${id}.mdx`);
 const previewPath = path.join(root, "components", "site", "previews", `${id}.tsx`);
 const testPath = path.join(root, "tests", "components", `${id}.test.tsx`);
-const previewIndexPath = path.join(root, "components", "site", "previews", "index.tsx");
+const routePath = path.join(root, "app", "(site)", "components", id, "page.tsx");
 const exampleCatalogPath = path.join(root, "components", "site", "previews", "examples.json");
 const exampleCatalog = JSON.parse(await readFile(exampleCatalogPath, "utf8"));
 const registryPath = path.join(root, "registry.json");
@@ -79,7 +81,7 @@ const exists = async (file) => {
   }
 };
 
-for (const file of [sourcePath, docPath, previewPath, testPath]) {
+for (const file of [sourcePath, docPath, previewPath, testPath, routePath]) {
   if (await exists(file)) fail(`${path.relative(root, file)} already exists`);
 }
 
@@ -267,15 +269,8 @@ await writeFile(sourcePath, source);
 await writeFile(docPath, docs);
 await writeFile(previewPath, preview);
 await writeFile(testPath, test);
-
-const indexSource = await readFile(previewIndexPath, "utf8");
-// The map is built from `dynamic()` entries, so a scaffold adds one more of those. A
-// static import here would pull the preview into the initial bundle, and a bare
-// identifier (`popover: PopoverPreview`) is not even defined.
-const previewKey = /^[a-z][a-zA-Z0-9]*$/.test(id) ? id : JSON.stringify(id);
-const previewEntry = `  ${previewKey}: dynamic(() => import("./${id}").then((mod) => ({ default: mod.${pascal}Preview }))),`;
-const updatedIndex = indexSource.replace(/\n\};/, `\n${previewEntry}\n};`);
-await writeFile(previewIndexPath, updatedIndex);
+await mkdir(path.dirname(routePath), { recursive: true });
+await writeFile(routePath, componentRouteSource(id));
 await writeFile(exampleCatalogPath, `${JSON.stringify(exampleCatalog, null, 2)}\n`);
 
 const registry = JSON.parse(await readFile(registryPath, "utf8"));
@@ -310,5 +305,6 @@ console.log(`✓ ${id} scaffolded
   registry/cadence/${id}/index.tsx
   content/components/${id}.mdx
   components/site/previews/${id}.tsx
+  app/(site)/components/${id}/page.tsx
   tests/components/${id}.test.tsx
 Next: implement the upstream API, then \`pnpm registry:build && pnpm check\`.`);

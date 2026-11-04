@@ -26,6 +26,10 @@ and [scope/future work](parity-plan.md) define their respective contracts.
 `registry/cadence/**` + `registry.json` + `content/**` → registry build → `public/r/**` and
 generated llms text. The Next App Router site imports registry source directly and renders MDX.
 Build steps embed content, merge metadata and verify contracts; they do not rewrite component logic.
+Each component has a small static Next route entry that imports its own preview and invokes the
+shared server page template. The template binds that reference into MDX examples and supplies
+specimens as children to the client measurement frame. The scaffold creates the entries and
+registry checks verify them; no client-side catalogue chooses among all component modules.
 MCP and a distributed agent skill are not implemented product channels.
 
 ## 3. Repository and install layout

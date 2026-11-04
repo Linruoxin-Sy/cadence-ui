@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { compileDocument } from "@/components/site/mdx";
 
 vi.mock("@/components/site/code-fence", () => ({ MdxCodeFence: () => null }));
+vi.mock("@/components/site/preview", () => ({ PreviewFrame: () => null }));
 
 describe("document heading data", () => {
   it("collects rendered heading text and depth, with unique, working anchors", async () => {

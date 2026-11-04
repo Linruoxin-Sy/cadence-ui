@@ -16,16 +16,17 @@ export function SiteHeader() {
          * previews keep the neutral semantic tokens so installs look like shadcn.
          */}
         <Link
+          prefetch={false}
           href="/"
           className="bg-linear-to-r from-brand-from to-brand-to bg-clip-text text-lg font-semibold tracking-tight text-transparent"
         >
           Cadence UI
         </Link>
         <nav aria-label="Main" className="flex items-center gap-5 text-sm text-muted-foreground">
-          <Link className="transition-colors hover:text-foreground" href="/components">
+          <Link prefetch={false} className="transition-colors hover:text-foreground" href="/components">
             Components
           </Link>
-          <Link className="transition-colors hover:text-foreground" href="/docs">
+          <Link prefetch={false} className="transition-colors hover:text-foreground" href="/docs">
             Docs
           </Link>
           <a className="hidden transition-colors hover:text-foreground sm:inline" href="/r/registry.json">

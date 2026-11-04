@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import { assertComponentExample } from "@/lib/component-examples";
 import type { TocEntry } from "@/registry/cadence/toc";
 import { MdxCodeFence } from "./code-fence";
-import { PreviewFrame } from "./preview";
+import { type PreviewComponent, PreviewFrame } from "./preview";
 
 /**
  * Renders the markdown body of a component or guide.
@@ -62,22 +62,27 @@ export function headingPlugin(headings: TocEntry[]) {
   };
 }
 
-function DocumentExample(componentId: string | undefined, { name }: { name: string }) {
+function DocumentExample(
+  componentId: string | undefined,
+  preview: PreviewComponent | undefined,
+  { name }: { name: string },
+) {
   assertComponentExample(componentId, name);
+  if (!preview) throw new Error(`Missing preview for component: ${componentId}`);
   return (
     <div data-not-typeset className="my-6">
-      <PreviewFrame id={componentId} example={name} />
+      <PreviewFrame id={componentId} example={name} component={preview} />
     </div>
   );
 }
 
-export async function compileDocument(source: string, componentId?: string) {
+export async function compileDocument(source: string, componentId?: string, preview?: PreviewComponent) {
   const headings: TocEntry[] = [];
   const { content } = await compileMDX({
     source,
     options: { mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [headingPlugin(headings)] } },
     components: {
-      ComponentExample: DocumentExample.bind(null, componentId),
+      ComponentExample: DocumentExample.bind(null, componentId, preview),
       table: ({ children, ...props }: ComponentProps<"table">) => (
         <div className="overflow-x-auto">
           {/* biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard scroll target for wide documentation tables. */}

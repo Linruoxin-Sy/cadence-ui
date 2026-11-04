@@ -18,6 +18,7 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 import matter from "gray-matter";
 import { checkCatalogIntensity } from "./catalog-intensity.mjs";
+import { checkComponentRoutes } from "./component-routes.mjs";
 import { checkDocTemplates } from "./doc-template.mjs";
 import { checkMotionDocs } from "./motion-docs.mjs";
 import {
@@ -316,15 +317,12 @@ const previewFiles = new Set(
     .filter((file) => file.endsWith(".tsx") && file !== "index.tsx")
     .map((file) => file.replace(/\.tsx$/, "")),
 );
-const previewIndex = await readFile(path.join(root, "components", "site", "previews", "index.tsx"), "utf8");
+problems.push(...(await checkComponentRoutes(root, registry)));
 
 for (const item of registry.items) {
   if (!isComponent(item)) continue;
   if (!docFiles.has(item.name)) problems.push(`${item.name}: missing content/components/${item.name}.mdx`);
   if (!previewFiles.has(item.name)) problems.push(`${item.name}: missing components/site/previews/${item.name}.tsx`);
-  else if (!previewIndex.includes(`"${item.name}"`) && !previewIndex.includes(`${item.name}:`)) {
-    problems.push(`${item.name}: preview is not registered in previews/index.tsx`);
-  }
 }
 
 // Docs are copy-paste source. Every `@/components/cadence/...` specifier in the user-facing
