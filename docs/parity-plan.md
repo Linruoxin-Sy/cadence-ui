@@ -156,9 +156,13 @@ not relabelling old results as current HEAD. Preserve the budgets in animation-s
 3. **Compiled component addition ≤8000 bytes, shared runtime excluded.** Revalidate dedicated
    dependency and async boundaries with a declared baseline; local-only code passing is insufficient.
    Dedicated dependencies remain counted unless the budget contract is explicitly revised.
-4. **CLS <0.02.** Reproduce and address the mobile Button variant/source/install/TOC interaction window
-   (research baseline 0.040203 on candidate and product), then test affected cold-load and interaction
-   windows. This negative does not invalidate unrelated passing windows or prove lifetime behaviour.
+4. **CLS <0.02.** Keep cold-load and interaction windows distinct. The complete-route regression in
+   `tests/e2e/document-interaction-layout.spec.ts` covers Button's composition/source/install/Toc path
+   and Data Table filtering, pagination, selection, column visibility and record updates at two widths
+   in all three modes. Extend coverage when a changed layout introduces another relevant window;
+   retain raw entries and action times, including recent-input shifts. These bounded scenarios do
+   not certify other routes, themes, clocks or lifetime behaviour, and historical negatives retain
+   their original source binding.
 5. **Real midrange mobile ≥55 fps.** Obtain a debuggable device and environment metadata, collect real
    presented-frame traces through meaningful motion windows and retain reduced/none behaviour.
    Desktop emulation and rAF frequency cannot close this requirement.
