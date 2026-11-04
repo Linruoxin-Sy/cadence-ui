@@ -198,6 +198,119 @@ for (const width of [1280, 390]) {
         });
         expect(errors).toEqual([]);
       });
+      test(`history departure releases active resize ownership ${width}/${mode}/${os}`, async ({ page }, info) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
+        page.on("console", (message) => {
+          if (message.type() === "error") errors.push(`console.error: ${message.text()}`);
+        });
+        page.on("response", (response) => {
+          if (response.status() >= 400) errors.push(`HTTP ${response.status()}: ${response.url()}`);
+        });
+        await page.setViewportSize({ width, height: 900 });
+        await page.emulateMedia({ reducedMotion: os });
+        await page.goto(`/components/input?motion=${mode}&speed=0.25`);
+        await page.waitForLoadState("networkidle");
+        const documentNode = await page.locator("html").elementHandle();
+        const globalState = () =>
+          page.evaluate(() => ({
+            cursor: getComputedStyle(document.documentElement).cursor,
+            userSelect: getComputedStyle(document.body).userSelect,
+            pointerEvents: getComputedStyle(document.body).pointerEvents,
+          }));
+        const before = await globalState();
+        await follow(page, width, "resizable");
+        const specimen = page.locator('[data-component-example="resizable/horizontal"]');
+        const group = specimen.locator('[data-slot="resizable-panel-group"]');
+        const handle = specimen.getByRole("separator", { name: "Resize explorer", exact: true });
+        await handle.scrollIntoViewIfNeeded();
+        const initial = Number(await handle.getAttribute("aria-valuenow"));
+        const box = await handle.boundingBox();
+        if (!box) throw new Error("Missing live resize separator");
+        const probe = await watchRemoval(group);
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+        let active: typeof before;
+        let afterNavigation: typeof before;
+        let draggedValue: number;
+        try {
+          await page.mouse.move(box.x + box.width / 2 + 35, box.y + box.height / 2, { steps: 5 });
+          await expect.poll(async () => Number(await handle.getAttribute("aria-valuenow"))).toBeGreaterThan(initial);
+          draggedValue = Number(await handle.getAttribute("aria-valuenow"));
+          active = await globalState();
+          expect(active.cursor).toMatch(/(?:col|ew|e)-resize/);
+          // Leave while the real pointer is still held. Mouse release must not
+          // be what clears the departed route's global cursor or input ownership.
+          await page.goBack();
+          await expect(page).toHaveURL(new RegExp(`/components/input\\?motion=${mode}&speed=0.25$`));
+          await expect(page.locator('[data-preview="input"]')).toBeVisible();
+          await expect(page.locator('[data-slot="resizable-panel-group"]')).toHaveCount(0);
+          expect(await page.locator("html").evaluate((node, saved) => node === saved, documentNode)).toBe(true);
+          await expect.poll(globalState).toEqual(before);
+          afterNavigation = await globalState();
+          await page.evaluate(async () => {
+            for (let frame = 0; frame < 3; frame++) await new Promise(requestAnimationFrame);
+          });
+          // More native movement before release exercises any stale document
+          // listener against the retained departed nodes.
+          await page.mouse.move(24, 200, { steps: 4 });
+        } finally {
+          await page.mouse.up();
+        }
+        const input = page.locator('[data-preview="input"]').getByRole("textbox", { name: "Workspace", exact: true });
+        await input.fill("Returned during resize");
+        await expect(input).toBeFocused();
+        await page.evaluate(async () => {
+          for (let frame = 0; frame < 12; frame++) await new Promise(requestAnimationFrame);
+        });
+        await expect(input).toBeFocused();
+        await expect(input).toHaveValue("Returned during resize");
+        const removed = await probe.evaluate((record) => {
+          record.stop();
+          return {
+            removed: record.removed,
+            detachedFrames: record.detachedFrames,
+            connectedSamples: record.connectedTransforms.length,
+            lateMutations: record.lateMutations,
+            detachedAnimations: record.detachedAnimations,
+          };
+        });
+        await probe.dispose();
+        expect(removed.removed).toBe(true);
+        expect(removed.detachedFrames).toBeGreaterThan(2);
+        expect(removed.connectedSamples).toBeGreaterThan(0);
+        expect(removed.lateMutations).toEqual([]);
+        expect(removed.detachedAnimations.every((count) => count === 0)).toBe(true);
+        await page.goForward();
+        await expect(page).toHaveURL(/\/components\/resizable$/);
+        await expect(handle).toBeVisible();
+        await handle.focus();
+        await page.keyboard.press("Home");
+        await expect(handle).toHaveAttribute("aria-valuenow", "20");
+        await page.keyboard.press("ArrowRight");
+        await expect(handle).toHaveAttribute("aria-valuenow", "25");
+        await expect(handle).toBeFocused();
+        await expect(page.locator('[data-preview="resizable"]')).toHaveAttribute(
+          "data-preview-motion",
+          effectiveMode(mode, os === "reduce"),
+        );
+        await info.attach("history-active-resize-lifecycle", {
+          body: JSON.stringify({
+            width,
+            mode,
+            os,
+            initial,
+            draggedValue,
+            before,
+            active,
+            afterNavigation,
+            removed,
+            errors,
+          }),
+          contentType: "application/json",
+        });
+        expect(errors).toEqual([]);
+      });
       test(`history departure releases modal ownership ${width}/${mode}/${os}`, async ({ page }, info) => {
         const errors: string[] = [];
         page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));

@@ -93,6 +93,9 @@ with a pending timer, an active portal and an exercised engine. The bounded regr
 `tests/e2e/component-route-lifecycle.spec.ts` checks departed-node writes, modal ownership cleanup,
 new-page input focus and shared layout/settings continuity; it does not certify heap use or every
 component lifecycle.
+It also leaves a real resize gesture through browser history while the pointer remains held:
+the departed group must release its global cursor before pointer release, ignore later pointer
+movement, leave the new page editable, and support keyboard resizing after forward navigation.
 
 ### 6.6 Documentation subtitles
 
