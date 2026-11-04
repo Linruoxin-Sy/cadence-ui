@@ -113,7 +113,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ id: 
           </nav>
         </footer>
       </DocumentEntrance>
-      <aside className="hidden min-w-0 py-12 xl:block" data-document-toc>
+      <aside aria-label="Page sections" className="hidden min-w-0 py-12 xl:block" data-document-toc>
         <Toc
           items={headings}
           className="sticky top-20 max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain pr-1"

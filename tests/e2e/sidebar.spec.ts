@@ -12,7 +12,7 @@ test("keeps the sidebar mounted when crossing docs and components", async ({ pag
   await page.goto("/docs/installation");
   await page.waitForLoadState("networkidle");
 
-  const aside = page.locator("aside");
+  const aside = page.getByRole("complementary", { name: "Documentation sidebar" });
   const docsHeader = aside.getByRole("button", { name: "Docs", exact: true });
   await expect(docsHeader).toBeVisible();
 

@@ -49,3 +49,19 @@ for (const colorScheme of ["light", "dark"] as const) {
     }
   });
 }
+
+// Both visible desktop asides need distinct names; WCAG-only scans omit landmark-unique.
+for (const width of [1440, 390])
+  for (const colorScheme of ["light", "dark"] as const)
+    test(`complete component document has unique landmarks ${width}/${colorScheme}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ colorScheme });
+      await page.goto("/components/button?motion=none");
+      await page.waitForLoadState("networkidle");
+      if (width === 1440) {
+        await expect(page.getByRole("complementary", { name: "Documentation sidebar" })).toBeVisible();
+        await expect(page.getByRole("complementary", { name: "Page sections" })).toBeVisible();
+      }
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+    });
