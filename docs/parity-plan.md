@@ -168,6 +168,8 @@ not relabelling old results as current HEAD. Preserve the budgets in animation-s
    Use the consumer audit's emitted import paths and source composition to locate counted costs.
    Retain static initial paths and reachable async output separately; source `bytesInOutput`
    explains a mixed file's contents and cannot allocate its gzip to individual packages.
+   A dependency-level fix must reach consumers through a supported package release. An authoring-only
+   `node_modules` patch or compiler override is diagnostic and cannot certify copied registry source.
 4. **CLS <0.02.** Keep cold-load and interaction windows distinct. The complete-route regression in
    `tests/e2e/document-interaction-layout.spec.ts` covers Button's composition/source/install/Toc path
    and Data Table filtering, pagination, selection, column visibility and record updates at two widths
