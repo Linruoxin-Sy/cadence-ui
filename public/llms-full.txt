@@ -19909,11 +19909,13 @@ Site navigation with shared popup content and interruptible sizing.
 npx shadcn@latest add @cadence/navigation-menu
 ```
 
+The action examples also use `@cadence/button`; Retained content uses `@cadence/input`.
+Add those registry items when copying the corresponding compositions.
+
 ## Usage
 
 ```tsx
-import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger,
-  NavigationMenuContent, NavigationMenuLink } from "@/components/cadence/navigation-menu";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/cadence/navigation-menu";
 
 export function SiteNavigation() {
   return (
@@ -19931,37 +19933,420 @@ export function SiteNavigation() {
 }
 ```
 
-## Controlled navigation
+## Grouped links
 
-Use a stable item value. `null` closes the popup. Base UI passes change details with the reason
-and cancellation methods through unchanged.
+Use native destinations inside independently sized panels. Learn has a compact list; Build uses a two-column grid. A standalone News link stays in the top-level list.
+
+<ComponentExample name="grouped-links" />
 
 ```tsx
-const [value, setValue] = React.useState<string | null>(null);
-<NavigationMenu value={value} onValueChange={setValue}>…</NavigationMenu>
+"use client";
+
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/cadence/navigation-menu";
+
+export function GroupedLinksExample({ label = "Learning resources" }: { label?: string } = {}) {
+  return (
+    <NavigationMenu aria-label={label}>
+      <NavigationMenuList>
+        <NavigationMenuItem value="learn">
+          <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+          <NavigationMenuContent className="w-60">
+            <NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink>
+            <NavigationMenuLink href="/docs/motion">Motion guide</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem value="build">
+          <NavigationMenuTrigger>Build</NavigationMenuTrigger>
+          <NavigationMenuContent className="grid w-80 max-w-full grid-cols-2 gap-2">
+            <NavigationMenuLink href="/components">Components</NavigationMenuLink>
+            <NavigationMenuLink href="/docs/registry">Registry</NavigationMenuLink>
+            <NavigationMenuLink href="/docs/theming">Themes</NavigationMenuLink>
+            <NavigationMenuLink href="/docs/accessibility">Accessibility</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuLink href="/docs/changelog" className={navigationMenuTriggerStyle()}>News</NavigationMenuLink>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+## Controlled navigation
+
+The caller owns the open item value. External actions set stable item values; `null` closes the popup.
+The in-panel Close navigation action uses `actionsRef.close()`, and `onValueChange` reports its reason.
+External value-only switches may adopt natural geometry immediately. Pressing an outside action can
+first invoke normal outside dismissal; keep a command inside the panel when demonstrating its own
+imperative close reason.
+
+<ComponentExample name="controlled-navigation" />
+
+```tsx
+"use client";
+
+import { useRef, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function ControlledNavigationExample() {
+  const [value, setValue] = useState<string | null>(null);
+  const [reason, setReason] = useState("No interaction yet");
+  const actions = useRef<{ close: () => void; unmount: () => void } | null>(null);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={() => setValue("learn")}>
+          Open Learn
+        </Button>
+        <Button variant="outline" onClick={() => setValue("build")}>
+          Open Build
+        </Button>
+      </div>
+      <p role="status" className="text-sm text-muted-foreground">
+        {value ?? "Closed"} · {reason}
+      </p>
+      <NavigationMenu
+        aria-label="Controlled resources"
+        value={value}
+        actionsRef={actions}
+        onValueChange={(next, details) => {
+          setValue(next);
+          setReason(details.reason);
+        }}
+      >
+        <NavigationMenuList>
+          <NavigationMenuItem value="learn">
+            <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+            <NavigationMenuContent className="w-56">
+              <NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem value="build">
+            <NavigationMenuTrigger>Build</NavigationMenuTrigger>
+            <NavigationMenuContent className="w-72">
+              <NavigationMenuLink href="/components">Browse components</NavigationMenuLink>
+              <NavigationMenuLink href="/docs/registry">Registry integration</NavigationMenuLink>
+              <Button variant="outline" onClick={() => actions.current?.close()}>Close navigation</Button>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
+  );
+}
 ```
 
 ## Active links and custom rendering
 
-Use `active` for the current route. `render` accepts an element or state callback; custom routing
-components must forward native link props and refs.
+Mark the current route with `active`; Base UI supplies `aria-current="page"`. `render` preserves a native nav, button and anchor here. A router component must forward link props and refs. Callback classes/styles receive primitive state and merge last. `navigationMenuTriggerStyle()` styles standalone links; `NavigationMenuIndicator` is a static trigger icon, alongside the built-in chevron. The ref action focuses the actual current-page anchor.
+
+<ComponentExample name="active-links" />
 
 ```tsx
-<NavigationMenuLink active render={<a href="/docs" />}>Docs</NavigationMenuLink>
-<NavigationMenuTrigger className={state => state.open ? "bg-accent" : ""}>
-  Resources
-</NavigationMenuTrigger>
+"use client";
+
+import { useRef } from "react";
+import { Button } from "@/components/cadence/button";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuIndicator, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/cadence/navigation-menu";
+
+export function ActiveLinksExample() {
+  const link = useRef<HTMLAnchorElement>(null);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <NavigationMenu aria-label="Current page resources" render={<nav data-custom-root="resources" />}>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuLink active href="/components/navigation-menu" ref={link}
+              render={<a href="/components/navigation-menu" />} className={navigationMenuTriggerStyle()}>Navigation Menu</NavigationMenuLink>
+          </NavigationMenuItem>
+          <NavigationMenuItem value="resources">
+            <NavigationMenuTrigger render={<button type="button" />}
+              className={(state) => state.open ? "bg-accent" : ""}>
+              Resources<NavigationMenuIndicator aria-hidden="true" />
+            </NavigationMenuTrigger>
+            <NavigationMenuContent className="w-60" style={(state) => ({ padding: state.open ? 12 : 8 })}>
+              <NavigationMenuLink render={<a href="/docs/installation" />}>Installation</NavigationMenuLink>
+              <NavigationMenuLink render={<a href="/docs/changelog" />}>Changelog</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+      <Button variant="outline" onClick={() => link.current?.focus()}>Focus current page</Button>
+    </div>
+  );
+}
 ```
 
 ## Retained content
 
-`keepMounted` keeps inactive content hidden, preserving state across item switches while the popup stays mounted. The default portal unmounts on a complete close, so keepMounted does not retain local state across closing the whole menu. Base UI moves content to the shared
-viewport and makes outgoing content inert during its exit. Updating children resizes the same popup.
+Type a resource note, switch to Guides, and return to Notes. `keepMounted` retains the same input while another panel is active; inactive content is hidden after its exit. During exit, Base UI marks an outgoing panel inert when focus has left it; focus still inside the panel is handed off by the primitive. A complete close unmounts the default portal, so reopening starts a new input with its default draft. It is not persistent application storage.
+
+<ComponentExample name="retained-content" />
 
 ```tsx
-<NavigationMenuContent keepMounted className="w-72">
-  <NavigationMenuLink href="/guides">Guides</NavigationMenuLink>
-</NavigationMenuContent>
+"use client";
+
+import { useId } from "react";
+import { Input } from "@/components/cadence/input";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function RetainedContentExample() {
+  const id = useId();
+  return (
+    <NavigationMenu aria-label="Retained resource draft">
+      <NavigationMenuList>
+        <NavigationMenuItem value="notes">
+          <NavigationMenuTrigger>Notes</NavigationMenuTrigger>
+          <NavigationMenuContent keepMounted className="grid w-64 gap-2">
+            <label htmlFor={id} className="text-sm font-medium">Resource note</label>
+            <Input id={id} defaultValue="Read the install guide" />
+            <NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem value="guides">
+          <NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+          <NavigationMenuContent keepMounted className="w-72">
+            <NavigationMenuLink href="/docs/motion">Motion guide</NavigationMenuLink>
+            <NavigationMenuLink href="/docs/theming">Theming guide</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+## Changing panel content
+
+The in-panel action reveals actual additional destinations and changes the content width. Base UI measures the same shared popup after the update. Full mode interpolates measured width/height; reduced and none apply geometry immediately. The action belongs to this example and does not configure other instances.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function ChangingContentExample() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <NavigationMenu aria-label="Growing resource list">
+      <NavigationMenuList>
+        <NavigationMenuItem value="resources">
+          <NavigationMenuTrigger>Resources</NavigationMenuTrigger>
+          <NavigationMenuContent className={expanded ? "w-80" : "w-60"}>
+            <Button variant="outline" aria-expanded={expanded} onClick={() => setExpanded((current) => !current)}>
+              {expanded ? "Show fewer guides" : "Show more guides"}
+            </Button>
+            <NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink>
+            {expanded && <>
+              <NavigationMenuLink href="/docs/motion">Motion guide</NavigationMenuLink>
+              <NavigationMenuLink href="/docs/theming">Theming guide</NavigationMenuLink>
+              <NavigationMenuLink href="/docs/accessibility">Accessibility guide</NavigationMenuLink>
+            </>}
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+## Vertical navigation
+
+Set `orientation="vertical"` and arrange the list vertically. ArrowUp/ArrowDown move between top-level triggers. The shared popup still uses the root's built-in bottom positioner; orientation does not change its side.
+
+<ComponentExample name="vertical" />
+
+```tsx
+"use client";
+
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function VerticalExample() {
+  return (
+    <NavigationMenu orientation="vertical" aria-label="Vertical resources">
+      <NavigationMenuList className="flex-col items-stretch">
+        <NavigationMenuItem value="learn">
+          <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+          <NavigationMenuContent className="w-60"><NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink></NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem value="build">
+          <NavigationMenuTrigger>Build</NavigationMenuTrigger>
+          <NavigationMenuContent className="w-72"><NavigationMenuLink href="/docs/registry">Registry integration</NavigationMenuLink></NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+## Popup alignment
+
+The root forwards start (default), center and end alignment to its one built-in positioner. Each trigger below belongs to a separate menu. Collision handling may shift the panel on a narrow screen. Root does not forward side/offset props; do not append another positioner to change placement.
+
+<ComponentExample name="alignment" />
+
+```tsx
+"use client";
+
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function AlignmentExample() {
+  return (
+    <div className="flex flex-wrap gap-6">
+      {(["start", "center", "end"] as const).map((align) => (
+        <NavigationMenu key={align} align={align} aria-label={`${align} aligned resources`}>
+          <NavigationMenuList><NavigationMenuItem value="resources">
+            <NavigationMenuTrigger>{align}</NavigationMenuTrigger>
+            <NavigationMenuContent className="w-64"><NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink></NavigationMenuContent>
+          </NavigationMenuItem></NavigationMenuList>
+        </NavigationMenu>
+      ))}
+    </div>
+  );
+}
+```
+
+## Disabled triggers
+
+A disabled trigger cannot activate the popup. Base UI keeps it in the native Tab sequence while arrow traversal skips it. Enter and Space leave it closed. Keep the available destination as a real standalone link. Disabling a trigger does not provide access to the content behind it.
+
+<ComponentExample name="disabled-triggers" />
+
+```tsx
+"use client";
+
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/cadence/navigation-menu";
+
+export function DisabledTriggersExample() {
+  return (
+    <NavigationMenu aria-label="Available resources">
+      <NavigationMenuList>
+        <NavigationMenuItem value="guides"><NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+          <NavigationMenuContent className="w-60"><NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink></NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem value="upcoming"><NavigationMenuTrigger disabled>Upcoming</NavigationMenuTrigger>
+          <NavigationMenuContent><NavigationMenuLink href="/docs/changelog">Changelog</NavigationMenuLink></NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem><NavigationMenuLink className={navigationMenuTriggerStyle()} href="/docs/changelog">News</NavigationMenuLink></NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+## Following links
+
+Both native anchors follow this example's own summary target. `closeOnClick={false}` is the default and keeps the popup open; `closeOnClick` closes it when followed. Enter activates a focused link; Space retains browser scrolling behavior. Application routing still owns the destination.
+
+<ComponentExample name="link-behavior" />
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function LinkBehaviorExample() {
+  const id = useId();
+  return (
+    <div className="grid gap-3">
+      <NavigationMenu aria-label="Link closing behavior">
+        <NavigationMenuList><NavigationMenuItem value="links"><NavigationMenuTrigger>On this page</NavigationMenuTrigger>
+          <NavigationMenuContent className="w-64">
+            <NavigationMenuLink href={`#${id}`} closeOnClick={false}>Keep menu open</NavigationMenuLink>
+            <NavigationMenuLink href={`#${id}`} closeOnClick>Close menu on follow</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem></NavigationMenuList>
+      </NavigationMenu>
+      <p id={id} className="text-sm text-muted-foreground">Local resource summary</p>
+    </div>
+  );
+}
+```
+
+## Pointer delay
+
+This menu waits 300 ms before hover opens and 200 ms before pointer leave closes. These are Base UI intent delays, not animation clocks. Click and keyboard activation remain immediate. The finite interaction policy is fixed here, with no delay selector.
+
+<ComponentExample name="hover-delay" />
+
+```tsx
+"use client";
+
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function HoverDelayExample() {
+  return (
+    <NavigationMenu aria-label="Delayed resources" delay={300} closeDelay={200}>
+      <NavigationMenuList><NavigationMenuItem value="guides"><NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+        <NavigationMenuContent className="w-60"><NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink></NavigationMenuContent>
+      </NavigationMenuItem></NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+```
+
+## Right-to-left navigation
+
+Use the Base UI DirectionProvider and native `dir="rtl"` together. Arrow traversal and logical alignment follow RTL; put native `dir` and `lang` on the portaled content too, because it no longer inherits them from the trigger wrapper. Each item still has a stable value and a real destination.
+
+<ComponentExample name="rtl" />
+
+```tsx
+"use client";
+
+import { DirectionProvider } from "@base-ui/react/direction-provider";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function RtlExample() {
+  return (
+    <DirectionProvider direction="rtl">
+      <div dir="rtl" lang="ar">
+        <NavigationMenu aria-label="موارد التعلم">
+          <NavigationMenuList>
+            <NavigationMenuItem value="learn"><NavigationMenuTrigger>تعلم</NavigationMenuTrigger>
+              <NavigationMenuContent dir="rtl" lang="ar" className="w-60"><NavigationMenuLink href="/docs/installation">التثبيت</NavigationMenuLink></NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem value="build"><NavigationMenuTrigger>بناء</NavigationMenuTrigger>
+              <NavigationMenuContent dir="rtl" lang="ar" className="w-72"><NavigationMenuLink href="/docs/registry">السجل</NavigationMenuLink></NavigationMenuContent>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+    </DirectionProvider>
+  );
+}
+```
+
+## Without motion
+
+This fixed local provider demonstrates `mode="none"` from the first popup insertion. Navigation, focus, links and measurements still work; opacity, scale and geometry transitions have zero duration. Every other example inherits the site header mode/speed and the system preference.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@/components/cadence/navigation-menu";
+
+export function WithoutMotionExample() {
+  return (
+    <CadenceProvider mode="none">
+      <NavigationMenu aria-label="Instant resources">
+        <NavigationMenuList><NavigationMenuItem value="guides"><NavigationMenuTrigger>Guides</NavigationMenuTrigger>
+          <NavigationMenuContent className="w-60"><NavigationMenuLink href="/docs/installation">Installation</NavigationMenuLink></NavigationMenuContent>
+        </NavigationMenuItem></NavigationMenuList>
+      </NavigationMenu>
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use
@@ -20013,7 +20398,8 @@ Popup and content own token-derived CSS clocks so explicit nested modes and the 
 | Keys | Action |
 | --- | --- |
 | Tab / Shift+Tab | Enter and leave the navigation without a modal focus trap. |
-| ArrowLeft / ArrowRight | Move between top-level items in horizontal orientation. |
+| ArrowLeft / ArrowRight | Move between top-level items in horizontal orientation; logical direction follows RTL. |
+| ArrowUp / ArrowDown in a vertical list | Move between top-level triggers. |
 | ArrowDown / Enter / Space | Open a trigger; Tab enters its content. |
 | Escape | Close and return focus to the active trigger. |
 | Enter on a link | Follow the native link destination. |
@@ -20022,8 +20408,7 @@ Popup and content own token-derived CSS clocks so explicit nested modes and the 
 
 Root is a navigation landmark; give multiple navigation regions distinct accessible labels. Triggers
 expose expanded state and content association. Base UI owns pointer hover, click/touch activation,
-focus guards, disabled triggers and outside/Escape dismissal. Closing does not duplicate content or
-remount it to reset motion. Cadence removes aria-hidden from Base UI 1.6’s tabbable focus sentinels within this menu; they remain empty generic spans with their original Tab redirection handlers. Keep link text meaningful and keyboard focus rings visible.
+focus guards and outside/Escape dismissal. Disabled triggers stay focusable but cannot open a panel. Base UI owns the normal portal lifecycle; Cadence does not replace a node to reset a running transition. Cadence removes aria-hidden from Base UI 1.6’s tabbable focus sentinels within this menu; they remain empty generic spans with their original Tab redirection handlers. Keep link text meaningful and keyboard focus rings visible.
 
 ## Responsive behavior
 

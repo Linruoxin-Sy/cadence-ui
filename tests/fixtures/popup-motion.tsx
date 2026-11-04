@@ -86,6 +86,14 @@ import {
   MenubarTrigger,
 } from "../../registry/cadence/menubar";
 import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "../../registry/cadence/navigation-menu";
+import {
   Popover,
   PopoverContent,
   PopoverDescription,
@@ -106,6 +114,64 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../../registry/cadence/
 // A dedicated browser regression input. Changing a native select emits change,
 // so mode updates do not also perform an outside press or steal popup focus.
 // Production examples keep the header and normal outside-dismissal semantics.
+function NavigationMenuFixture() {
+  const [value, setValue] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="flex min-h-96 w-full flex-col items-start gap-4">
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <button
+          type="button"
+          className="rounded border px-2 py-1"
+          onClick={() => setValue(value === "learn" ? "build" : "learn")}
+        >
+          Switch panel
+        </button>
+        <label className="flex items-center gap-2">
+          <input type="checkbox" checked={expanded} onChange={(e) => setExpanded(e.target.checked)} />
+          Extra links
+        </label>
+      </div>
+      <NavigationMenu className="flex-none" aria-label="Example navigation" value={value} onValueChange={setValue}>
+        <NavigationMenuList>
+          <NavigationMenuItem value="learn">
+            <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+            <NavigationMenuContent className="w-60" keepMounted>
+              <button type="button" className="rounded p-2 text-sm underline" onClick={() => setExpanded((v) => !v)}>
+                Toggle details
+              </button>
+              <NavigationMenuLink href="#installation">Installation</NavigationMenuLink>
+              <NavigationMenuLink href="#usage">Usage</NavigationMenuLink>
+              {expanded && <NavigationMenuLink href="#motion-contract">Motion contract</NavigationMenuLink>}
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem value="build">
+            <NavigationMenuTrigger>Build</NavigationMenuTrigger>
+            <NavigationMenuContent className="grid w-80 grid-cols-2 gap-2" keepMounted>
+              <button
+                type="button"
+                className="col-span-2 rounded p-2 text-sm underline"
+                onClick={() => setExpanded((v) => !v)}
+              >
+                Toggle details
+              </button>
+              {expanded && <NavigationMenuLink href="#motion-contract">Motion contract</NavigationMenuLink>}
+              {["Components", "Templates", "Themes", "Registry", "Accessibility", "Performance"].map((text) => (
+                <NavigationMenuLink key={text} href="#usage">
+                  {text}
+                </NavigationMenuLink>
+              ))}
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuLink href="#api">API</NavigationMenuLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
+  );
+}
+
 function PopupMotionFixture({
   component,
   initialMode,
@@ -214,6 +280,7 @@ function PopupMotionFixture({
               </AlertDialogContent>
             </AlertDialog>
           )}
+          {component === "navigation-menu" && <NavigationMenuFixture />}
           {component === "popover" && (
             <Popover>
               <PopoverTrigger render={<Button />}>Open popover</PopoverTrigger>

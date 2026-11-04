@@ -6,7 +6,7 @@ for (const os of ["no-preference", "reduce"] as const)
   for (const mode of MODES)
     test(`CSS navigation content actual part ${mode}/${os}`, async ({ page }, info) => {
       await page.emulateMedia({ reducedMotion: os });
-      await page.goto(`/components/navigation-menu?motion=${mode}&speed=0.25`);
+      await openPopupMotionFixture(page, "navigation-menu", mode, 4);
       await page.waitForLoadState("networkidle");
       const preview = page.locator('[data-preview="navigation-menu"]');
       await preview.getByRole("button", { name: "Learn", exact: true }).click();

@@ -1,6 +1,16 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
 import { MODES, recordedScale, recordScale } from "./helpers";
+import { openPopupMotionFixture } from "./popup-motion-fixture";
+
+// Base UI's safe polygon temporarily suppresses pointer events on sibling triggers.
+// Move the real pointer so its global polygon listener can hand off, before actionability checks.
+async function moveToTrigger(page: Page, trigger: Locator) {
+  await trigger.scrollIntoViewIfNeeded();
+  const box = await trigger.boundingBox();
+  if (!box) throw new Error("Missing navigation trigger bounds");
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 8 });
+}
 
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`navigation menu ${reducedMotion}`, () => {
@@ -20,14 +30,14 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           };
           requestAnimationFrame(tick);
         });
-        await page.goto(`/components/navigation-menu?motion=${mode}`);
+        await openPopupMotionFixture(page, "navigation-menu", mode);
         await page.waitForLoadState("networkidle");
         const preview = page.locator('[data-preview="navigation-menu"]');
         const learn = preview.getByRole("button", { name: "Learn" });
         const build = preview.getByRole("button", { name: "Build" });
         const popup = page.locator('[data-slot="navigation-menu-popup"]');
         const effective = reducedMotion === "reduce" && mode === "full" ? "reduced" : mode;
-        await learn.hover();
+        await moveToTrigger(page, learn);
         await expect(learn).toHaveAttribute("aria-expanded", "true");
         await expect(popup).toHaveAttribute("data-motion", effective);
         await expect(popup.getByRole("link", { name: "Installation", exact: true })).toBeVisible();
@@ -38,16 +48,20 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         else expect(scale.min).toBe(1);
         if (effective !== "none") expect(new Set(opacity).size).toBeGreaterThan(1);
         else expect(opacity.every((value) => value === "1")).toBe(true);
-        await build.hover();
+        await moveToTrigger(page, build);
         await expect(build).toHaveAttribute("aria-expanded", "true");
         await expect(popup.getByRole("link", { name: "Templates", exact: true })).toBeVisible();
-        await learn.hover();
+        await moveToTrigger(page, learn);
         await expect(learn).toHaveAttribute("aria-expanded", "true");
         await learn.focus();
         await page.keyboard.press("ArrowDown");
         await expect(learn).toBeFocused();
         await page.keyboard.press("Tab");
-        await expect(popup.getByRole("button", { name: "Toggle details" })).toBeFocused();
+        await expect(
+          popup
+            .locator('[data-slot="navigation-menu-content"][data-open]')
+            .getByRole("button", { name: "Toggle details" }),
+        ).toBeFocused();
         await page.keyboard.press("Tab");
         await expect(popup.getByRole("link", { name: "Installation", exact: true })).toBeFocused();
         await page.keyboard.press("Escape");
@@ -93,7 +107,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           expect(
             samples.every((s) => !s.animations.some((p) => p === "width" || p === "height" || p === "scale")),
           ).toBe(true);
-        await preview.getByLabel("Menu motion").selectOption("full");
+        await page.getByLabel("Fixture motion", { exact: true }).selectOption("full");
         await learn.focus();
         await page.keyboard.press("ArrowDown");
         await expect(learn).toHaveAttribute("aria-expanded", "true");
@@ -109,7 +123,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           trigger.click();
           for (let i = 0; i < 4; i++) await new Promise(requestAnimationFrame);
           const running = popup.getAnimations().length;
-          const select = el.querySelector('[aria-label="Menu motion"]') as HTMLSelectElement;
+          const select = document.querySelector('[aria-label="Fixture motion"]') as HTMLSelectElement;
           select.value = "none";
           select.dispatchEvent(new Event("change", { bubbles: true }));
           for (let i = 0; i < 4; i++) await new Promise(requestAnimationFrame);
@@ -128,7 +142,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await preview.getByLabel("Extra links").check();
         await preview.getByRole("button", { name: "Switch panel" }).click();
         if (reducedMotion === "no-preference") {
-          await preview.getByLabel("Menu motion").selectOption("full");
+          await page.getByLabel("Fixture motion", { exact: true }).selectOption("full");
           await learn.focus();
           await page.keyboard.press("ArrowDown");
           await page.emulateMedia({ reducedMotion: "reduce" });
@@ -141,7 +155,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         if (!r) throw new Error("Missing popup bounds");
         expect(r.x).toBeGreaterThanOrEqual(0);
         expect(r.x + r.width).toBeLessThanOrEqual(390);
-        await page.getByRole("heading", { name: "Navigation Menu", exact: true }).click();
+        await page.locator("main").click({ position: { x: 2, y: 2 } });
         await expect(popup).toHaveCount(0);
         expect(errors).toEqual([]);
       });

@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 // Samples belong to the actual node, including native animation identities across clock commits.
 async function record(page: Page, selector: string) {
@@ -239,7 +240,7 @@ for (const id of ["accordion", "collapsible"])
     });
 
 test("CSS Navigation popup active opacity none cancellation", async ({ page }, info) => {
-  await page.goto("/components/navigation-menu?motion=full&speed=0.25");
+  await openPopupMotionFixture(page, "navigation-menu", "full", 4);
   await page.waitForLoadState("networkidle");
   await record(page, '[data-slot="navigation-menu-popup"]');
   const preview = page.locator('[data-preview="navigation-menu"]');
@@ -248,7 +249,7 @@ test("CSS Navigation popup active opacity none cancellation", async ({ page }, i
   await expect(popup).toBeVisible();
   await page.waitForTimeout(40);
   await stage(page, "none");
-  await change(preview.getByLabel("Menu motion"), "none");
+  await change(page.getByLabel("Fixture motion", { exact: true }), "none");
   await expect(popup).toHaveAttribute("data-motion", "none");
   await page.waitForTimeout(60);
   const f = await finish(page, info);
@@ -283,10 +284,10 @@ test("CSS actual PreviewStack live same node", async ({ page }, info) => {
 for (const os of ["no-preference", "reduce"] as const)
   test(`CSS Content keepMounted exit reopen and live downgrade ${os}`, async ({ page }, info) => {
     await page.emulateMedia({ reducedMotion: os });
-    await page.goto("/components/navigation-menu?motion=none&speed=0.25");
+    await openPopupMotionFixture(page, "navigation-menu", "none", 4);
     await page.waitForLoadState("networkidle");
     const preview = page.locator('[data-preview="navigation-menu"]');
-    await change(preview.getByLabel("Menu motion"), "full");
+    await change(page.getByLabel("Fixture motion", { exact: true }), "full");
     const learn = preview.getByRole("button", { name: "Learn", exact: true });
     await learn.click();
     const content = page
@@ -309,11 +310,11 @@ for (const os of ["no-preference", "reduce"] as const)
       .evaluate((n: HTMLButtonElement) => n.click());
     await page.waitForTimeout(60);
     await stage(page, "reduced");
-    await change(preview.getByLabel("Menu motion"), "reduced");
+    await change(page.getByLabel("Fixture motion", { exact: true }), "reduced");
     await expect(content).toHaveAttribute("data-motion", "reduced");
     await page.waitForTimeout(40);
     await stage(page, "none");
-    await change(preview.getByLabel("Menu motion"), "none");
+    await change(page.getByLabel("Fixture motion", { exact: true }), "none");
     await expect(content).toHaveAttribute("data-motion", "none");
     await page.waitForTimeout(60);
     const f = await finish(page, info);

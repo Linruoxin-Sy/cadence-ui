@@ -196,5 +196,19 @@
     "custom-day",
     "browse-only",
     "without-motion"
+  ],
+  "navigation-menu": [
+    "grouped-links",
+    "controlled-navigation",
+    "active-links",
+    "retained-content",
+    "changing-content",
+    "vertical",
+    "alignment",
+    "disabled-triggers",
+    "link-behavior",
+    "hover-delay",
+    "rtl",
+    "without-motion"
   ]
 }
