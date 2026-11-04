@@ -181,5 +181,20 @@
     "caller-rendering",
     "rtl",
     "changing-content"
+  ],
+  "calendar": [
+    "single-selection",
+    "multiple-dates",
+    "date-ranges",
+    "multiple-months",
+    "navigation-button-variants",
+    "caption-layouts",
+    "localized-navigation",
+    "controlled-month-and-date",
+    "disabled-dates",
+    "grid-layout",
+    "custom-day",
+    "browse-only",
+    "without-motion"
   ]
 }

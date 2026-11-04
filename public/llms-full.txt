@@ -19298,37 +19298,504 @@ npx shadcn@latest add @cadence/calendar
 
 ```tsx
 "use client";
+import { enUS } from "date-fns/locale";
 import { useState } from "react";
 import { Calendar } from "@/components/cadence/calendar";
 
-export function Example() {
-  const [date, setDate] = useState<Date | undefined>();
-  return <Calendar mode="single" selected={date} onSelect={setDate} />;
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function SingleSelectionExample() {
+  const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Appointment date"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      footer={date ? `Selected: ${date.toDateString()}` : "Choose a date"}
+    />
+  );
+}
+```
+
+## Single selection
+
+Select one appointment, or select it again to clear it. The caller owns `selected`; the footer announces the value. Use `required` when clearing by selecting the same day must be prevented.
+
+<ComponentExample name="single-selection" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function SingleSelectionExample() {
+  const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Appointment date"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      footer={date ? `Selected: ${date.toDateString()}` : "Choose a date"}
+    />
+  );
 }
 ```
 
 ## Multiple dates
 
+Choose one to three independent workshop days with `required`, `min` and `max`. In pinned DayPicker 9.13.2, selecting a fourth date resets the selection to that new date; it does not keep the previous three or disable all other dates.
+
+<ComponentExample name="multiple-dates" />
+
 ```tsx
-const [days, setDays] = useState<Date[] | undefined>([]);
-<Calendar mode="multiple" selected={days} onSelect={setDays} max={5} />;
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function MultipleDatesExample() {
+  const [days, setDays] = useState<Date[]>([new Date(2026, 10, 12)]);
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Workshop days"
+      mode="multiple"
+      required
+      min={1}
+      max={3}
+      selected={days}
+      onSelect={setDays}
+      footer={`${days.length} ${days.length === 1 ? "date" : "dates"}`}
+    />
+  );
+}
 ```
 
 ## Date ranges
 
+Choose a weekday trip of at least two nights. `min` counts nights, not inclusive dates. Weekends are disabled; with `excludeDisabled`, clicking an end across a disabled day resets the start to the clicked date. The caller owns the partial and completed range.
+
+<ComponentExample name="date-ranges" />
+
 ```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
 import type { DateRange } from "react-day-picker";
-const [range, setRange] = useState<DateRange | undefined>();
-<Calendar mode="range" selected={range} onSelect={setRange} min={2}
-  disabled={{ dayOfWeek: [0, 6] }} excludeDisabled />;
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function DateRangesExample() {
+  const [range, setRange] = useState<DateRange | undefined>();
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Weekday trip"
+      mode="range"
+      selected={range}
+      onSelect={setRange}
+      min={2}
+      disabled={{ dayOfWeek: [0, 6] }}
+      excludeDisabled
+      footer={
+        range?.from ? `${range.from.toDateString()} – ${range.to?.toDateString() ?? "Choose an end"}` : "Choose a start"
+      }
+    />
+  );
+}
+```
+
+## Multiple months
+
+A two-month range stays visible across November and December. `pagedNavigation` advances by two months. The real months stack below md and sit side by side at md; `fixedWeeks` reserves six rows in each month. Selection remains one range across both grids.
+
+<ComponentExample name="multiple-months" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
+import type { DateRange } from "react-day-picker";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function MultipleMonthsExample() {
+  const [range, setRange] = useState<DateRange | undefined>({
+    from: new Date(2026, 10, 28),
+    to: new Date(2026, 11, 3),
+  });
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Two-month stay"
+      mode="range"
+      selected={range}
+      onSelect={setRange}
+      numberOfMonths={2}
+      pagedNavigation
+      fixedWeeks
+    />
+  );
+}
+```
+
+## Navigation button variants
+
+All six `buttonVariant` values apply to previous/next navigation buttons. Day buttons keep their selection styling. Each calendar navigates independently; the labels identify the comparison rather than changing any prop.
+
+<ComponentExample name="navigation-button-variants" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function NavigationButtonVariantsExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      {(["default", "secondary", "destructive", "outline", "ghost", "link"] as const).map((variant) => (
+        <div key={variant} className="grid gap-2">
+          <p className="text-sm font-medium">{variant}</p>
+          <Calendar {...stable} aria-label={`${variant} navigation`} buttonVariant={variant} />
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+## Caption layouts
+
+Compare `label`, `dropdown`, `dropdown-months` and `dropdown-years` directly. These are real native month/year navigation controls, bounded by `startMonth` and `endMonth`. An explicit `enUS` locale keeps dropdown formatting consistent between server and browser.
+
+<ComponentExample name="caption-layouts" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function CaptionLayoutsExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      {(["label", "dropdown", "dropdown-months", "dropdown-years"] as const).map((captionLayout) => (
+        <div key={captionLayout} className="grid gap-2">
+          <p className="text-sm font-medium">{captionLayout}</p>
+          <Calendar
+            {...stable}
+            aria-label={`${captionLayout} caption`}
+            captionLayout={captionLayout}
+            startMonth={new Date(2025, 0)}
+            endMonth={new Date(2028, 11)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 ```
 
 ## Localized navigation
 
+The French calendar starts weeks on Monday and offers native dropdowns. The Arabic calendar has an explicit RTL direction and narrow visible weekday labels; its accessible weekday names remain complete. A date-fns locale localizes dates, but pinned DayPicker keeps default previous/next labels in English: provide `labels` for those controls as well. Each calendar has its own accessible name and language.
+
+<ComponentExample name="localized-navigation" />
+
 ```tsx
-import { fr } from "date-fns/locale";
-<Calendar locale={fr} weekStartsOn={1} captionLayout="dropdown"
-  startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} />;
+"use client";
+import { enUS, fr, arSA } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function LocalizedNavigationExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      <Calendar
+        {...stable}
+        aria-label="Calendrier français"
+        lang="fr"
+        locale={fr}
+        weekStartsOn={1}
+        captionLayout="dropdown"
+        startMonth={new Date(2025, 0)}
+        endMonth={new Date(2028, 11)}
+        labels={{ labelNext: () => "Mois suivant", labelPrevious: () => "Mois précédent" }}
+      />
+      <Calendar
+        {...stable}
+        aria-label="التقويم العربي"
+        lang="ar"
+        dir="rtl"
+        locale={arSA}
+        formatters={{ formatWeekdayName: (date) => date.toLocaleDateString("ar-SA", { weekday: "narrow" }) }}
+        labels={{ labelNext: () => "الشهر التالي", labelPrevious: () => "الشهر السابق" }}
+      />
+    </div>
+  );
+}
+```
+
+## Controlled month and date
+
+Both the visible month and selected date belong to this example. “Set November 20” updates them together; “Clear appointment” clears only the selection. Navigation and keyboard changes still call `onMonthChange`. The note is an independent draft that should survive month changes, site motion changes and source expansion. Install Button as well for these caller-owned actions.
+
+<ComponentExample name="controlled-month-and-date" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
+import { Calendar } from "@/components/cadence/calendar";
+import { Button } from "@/components/cadence/button";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function ControlledMonthAndDateExample() {
+  const [month, setMonth] = useState(november);
+  const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
+  return (
+    <div className="grid justify-items-center gap-4">
+      <div className="flex flex-wrap justify-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setMonth(november);
+            setDate(new Date(2026, 10, 20));
+          }}
+        >
+          Set November 20
+        </Button>
+        <Button variant="outline" onClick={() => setDate(undefined)}>
+          Clear appointment
+        </Button>
+      </div>
+      <input
+        aria-label="Appointment note"
+        defaultValue="Keep this draft"
+        className="w-full min-w-0 rounded-md border p-2 text-sm"
+      />
+      <Calendar
+        {...stable}
+        aria-label="Controlled appointment"
+        mode="single"
+        month={month}
+        onMonthChange={setMonth}
+        selected={date}
+        onSelect={setDate}
+        weekStartsOn={1}
+        fixedWeeks
+        footer={date ? `Selected: ${date.toDateString()}` : "No appointment"}
+      />
+    </div>
+  );
+}
+```
+
+## Disabled dates
+
+Compose exact-date, before-date and weekday matchers. November 5 is unavailable and November 11 is hidden. Disabled dates remain visible but cannot be selected; hidden dates leave their grid position empty. These are presentation and selection constraints, not application validation or server authorization.
+
+<ComponentExample name="disabled-dates" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function DisabledDatesExample() {
+  const [date, setDate] = useState<Date | undefined>();
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Available appointment"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      disabled={[new Date(2026, 10, 5), { before: new Date(2026, 10, 4) }, { dayOfWeek: [0, 6] }]}
+      hidden={new Date(2026, 10, 11)}
+      footer={date ? `Selected: ${date.toDateString()}` : "Weekdays from November 4; November 5 unavailable"}
+    />
+  );
+}
+```
+
+## Grid layout
+
+Compare a six-row grid with week numbers and Monday starts against a larger-cell calendar hiding outside-month dates. `showOutsideDays` defaults to true; `fixedWeeks` and `showWeekNumber` default to false. `--cell-size` belongs to the caller, not a Calendar size enum.
+
+<ComponentExample name="grid-layout" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function GridLayoutExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      <Calendar
+        {...stable}
+        aria-label="Fixed six-week grid"
+        className="min-w-72 rounded-md border"
+        fixedWeeks
+        showWeekNumber
+        weekStartsOn={1}
+      />
+      <Calendar
+        {...stable}
+        aria-label="Current month only"
+        mode="single"
+        showOutsideDays={false}
+        className="rounded-md border [--cell-size:--spacing(9)]"
+      />
+    </div>
+  );
+}
+```
+
+## Custom day button
+
+Compose the exported `CalendarDayButton` to preserve native events, disabled state, focus and modifiers while adding a decorative availability dot on Tuesdays. The caption formatter and today class are caller overrides. A static `styles.month_grid.opacity: 1` keeps text at full contrast and takes precedence over the opacity animation; the grid can still translate in full mode. Replacing Month or MonthGrid entirely also takes ownership of month motion.
+
+<ComponentExample name="custom-day" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { useState } from "react";
+import type { DayButtonProps } from "react-day-picker";
+import { Calendar, CalendarDayButton } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+function BookingDay(props: DayButtonProps) {
+  return (
+    <CalendarDayButton {...props} locale={enUS}>
+      {props.children}
+      <span aria-hidden="true">{props.day.date.getDay() === 2 ? "•" : ""}</span>
+    </CalendarDayButton>
+  );
+}
+
+export function CustomDayExample() {
+  const [date, setDate] = useState<Date | undefined>();
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Booking availability"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      components={{ DayButton: BookingDay }}
+      formatters={{
+        formatCaption: (date) => `Bookings · ${date.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`,
+      }}
+      styles={{ month_grid: { opacity: 1 } }}
+      classNames={{ today: "rounded-md underline" }}
+    />
+  );
+}
+```
+
+## Browse without selection
+
+Omitting `mode` displays dates without selectable day buttons. The first calendar can browse only November–December; `disableNavigation` keeps disabled navigation buttons, while `hideNavigation` removes them. These fixed calendars have independent navigation and no invented selected value.
+
+<ComponentExample name="browse-only" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function BrowseOnlyExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      <Calendar
+        {...stable}
+        aria-label="Browse months without selecting"
+        startMonth={november}
+        endMonth={new Date(2026, 11, 1)}
+      />
+      <Calendar {...stable} aria-label="Navigation disabled" disableNavigation />
+      <Calendar {...stable} aria-label="Navigation hidden" hideNavigation />
+    </div>
+  );
+}
+```
+
+## Without motion
+
+This named example intentionally overrides the header with a fixed `CadenceProvider mode="none"`. Its first paint and later month changes are immediate. Ordinary examples inherit the header, including the system reduced-motion preference; reduced mode fades the grid without translating it.
+
+<ComponentExample name="without-motion" />
+
+```tsx
+"use client";
+import { enUS } from "date-fns/locale";
+import { Calendar } from "@/components/cadence/calendar";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+
+export function WithoutMotionExample() {
+  return (
+    <CadenceProvider mode="none">
+      <Calendar {...stable} aria-label="Instant month navigation" mode="single" />
+    </CadenceProvider>
+  );
+}
 ```
 
 ## When to use

@@ -1,108 +1,296 @@
 "use client";
 
-import { enUS, fr } from "date-fns/locale";
+import { arSA, enUS, fr } from "date-fns/locale";
 import { useState } from "react";
-import type { DateRange } from "react-day-picker";
-import { Calendar } from "@/registry/cadence/calendar";
-import type { CadenceMode } from "@/registry/cadence/lib/motion";
+import type { DateRange, DayButtonProps } from "react-day-picker";
+import { Button } from "@/registry/cadence/button";
+import { Calendar, CalendarDayButton } from "@/registry/cadence/calendar";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { usePreviewVariant } from "./use-preview-variant";
+import { PreviewStack } from "./shell";
 
-const previewVariantOptions = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
+const november = new Date(2026, 10, 1);
+const today = new Date(2026, 10, 4);
+const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
 
-export function CalendarPreview() {
-  const { control, choose } = usePreviewVariant("Calendar", previewVariantOptions);
-  const [month, setMonth] = useState(new Date(2026, 10, 1));
+export function SingleSelectionExample() {
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
-  const [multiple, setMultiple] = useState<Date[] | undefined>([]);
-  const [range, setRange] = useState<DateRange | undefined>();
-  const [kind, setKind] = useState("single");
-  const [mode, setMode] = useState<CadenceMode | undefined>();
-  const [months, setMonths] = useState(1);
-  const [french, setFrench] = useState(false);
-  const common = {
-    month,
-    numberOfMonths: months,
-    onMonthChange: setMonth,
-    locale: french ? fr : enUS,
-    weekStartsOn: 1 as const,
-    disabled: new Date(2026, 10, 5),
-    fixedWeeks: true,
-    className: "rounded-md border",
-    captionLayout: "dropdown" as const,
-    startMonth: new Date(2025, 0),
-    endMonth: new Date(2028, 11),
-  };
   return (
-    <>
-      {control}
-      <div className="flex w-full min-w-0 flex-col items-center gap-4">
-        <div className="flex flex-wrap justify-center gap-3 text-sm">
-          <label>
-            Selection{" "}
-            <select aria-label="Selection mode" value={kind} onChange={(e) => setKind(e.target.value)}>
-              <option>single</option>
-              <option>multiple</option>
-              <option>range</option>
-            </select>
-          </label>
-          <label>
-            Motion{" "}
-            <select
-              aria-label="Calendar motion"
-              value={mode ?? "inherit"}
-              onChange={(e) => setMode(e.target.value === "inherit" ? undefined : (e.target.value as CadenceMode))}
-            >
-              <option value="inherit">inherit</option>
-              <option>full</option>
-              <option>reduced</option>
-              <option>none</option>
-            </select>
-          </label>
-          <label>
-            Months{" "}
-            <select aria-label="Displayed months" value={months} onChange={(e) => setMonths(Number(e.target.value))}>
-              <option value="1">1</option>
-              <option value="2">2</option>
-            </select>
-          </label>
-          <label>
-            <input type="checkbox" checked={french} onChange={(e) => setFrench(e.target.checked)} /> French
-          </label>
-          <button
-            type="button"
-            className="underline"
-            onClick={() => {
-              setMonth(new Date(2026, 10, 1));
-              setDate(new Date(2026, 10, 20));
-            }}
-          >
-            Set November 20
-          </button>
+    <Calendar
+      {...stable}
+      aria-label="Appointment date"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      footer={date ? `Selected: ${date.toDateString()}` : "Choose a date"}
+    />
+  );
+}
+
+export function MultipleDatesExample() {
+  const [days, setDays] = useState<Date[]>([new Date(2026, 10, 12)]);
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Workshop days"
+      mode="multiple"
+      required
+      min={1}
+      max={3}
+      selected={days}
+      onSelect={setDays}
+      footer={`${days.length} ${days.length === 1 ? "date" : "dates"}`}
+    />
+  );
+}
+
+export function DateRangesExample() {
+  const [range, setRange] = useState<DateRange | undefined>();
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Weekday trip"
+      mode="range"
+      selected={range}
+      onSelect={setRange}
+      min={2}
+      disabled={{ dayOfWeek: [0, 6] }}
+      excludeDisabled
+      footer={
+        range?.from ? `${range.from.toDateString()} – ${range.to?.toDateString() ?? "Choose an end"}` : "Choose a start"
+      }
+    />
+  );
+}
+
+export function MultipleMonthsExample() {
+  const [range, setRange] = useState<DateRange | undefined>({
+    from: new Date(2026, 10, 28),
+    to: new Date(2026, 11, 3),
+  });
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Two-month stay"
+      mode="range"
+      selected={range}
+      onSelect={setRange}
+      numberOfMonths={2}
+      pagedNavigation
+      fixedWeeks
+    />
+  );
+}
+
+export function NavigationButtonVariantsExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      {(["default", "secondary", "destructive", "outline", "ghost", "link"] as const).map((variant) => (
+        <div key={variant} className="grid gap-2">
+          <p className="text-sm font-medium">{variant}</p>
+          <Calendar {...stable} aria-label={`${variant} navigation`} buttonVariant={variant} />
         </div>
-        <CadenceProvider mode={mode}>
-          {kind === "single" ? (
-            <Calendar {...common} mode="single" selected={date} onSelect={setDate} buttonVariant={choose("ghost")} />
-          ) : kind === "multiple" ? (
-            <Calendar
-              {...common}
-              mode="multiple"
-              selected={multiple}
-              onSelect={setMultiple}
-              buttonVariant={choose("ghost")}
-            />
-          ) : (
-            <Calendar {...common} mode="range" selected={range} onSelect={setRange} buttonVariant={choose("ghost")} />
-          )}
-        </CadenceProvider>
-        <p aria-live="polite" className="text-sm text-muted-foreground">
-          {kind === "single"
-            ? (date?.toDateString() ?? "No date")
-            : kind === "multiple"
-              ? `${multiple?.length ?? 0} dates`
-              : `${range?.from?.toDateString() ?? "Start"} – ${range?.to?.toDateString() ?? "End"}`}
-        </p>
+      ))}
+    </div>
+  );
+}
+
+export function CaptionLayoutsExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      {(["label", "dropdown", "dropdown-months", "dropdown-years"] as const).map((captionLayout) => (
+        <div key={captionLayout} className="grid gap-2">
+          <p className="text-sm font-medium">{captionLayout}</p>
+          <Calendar
+            {...stable}
+            aria-label={`${captionLayout} caption`}
+            captionLayout={captionLayout}
+            startMonth={new Date(2025, 0)}
+            endMonth={new Date(2028, 11)}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function LocalizedNavigationExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      <Calendar
+        {...stable}
+        aria-label="Calendrier français"
+        lang="fr"
+        locale={fr}
+        weekStartsOn={1}
+        captionLayout="dropdown"
+        startMonth={new Date(2025, 0)}
+        endMonth={new Date(2028, 11)}
+        labels={{ labelNext: () => "Mois suivant", labelPrevious: () => "Mois précédent" }}
+      />
+      <Calendar
+        {...stable}
+        aria-label="التقويم العربي"
+        lang="ar"
+        dir="rtl"
+        locale={arSA}
+        formatters={{ formatWeekdayName: (date) => date.toLocaleDateString("ar-SA", { weekday: "narrow" }) }}
+        labels={{ labelNext: () => "الشهر التالي", labelPrevious: () => "الشهر السابق" }}
+      />
+    </div>
+  );
+}
+
+export function ControlledMonthAndDateExample() {
+  const [month, setMonth] = useState(november);
+  const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
+  return (
+    <div className="grid justify-items-center gap-4">
+      <div className="flex flex-wrap justify-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setMonth(november);
+            setDate(new Date(2026, 10, 20));
+          }}
+        >
+          Set November 20
+        </Button>
+        <Button variant="outline" onClick={() => setDate(undefined)}>
+          Clear appointment
+        </Button>
       </div>
-    </>
+      <input
+        aria-label="Appointment note"
+        defaultValue="Keep this draft"
+        className="w-full min-w-0 rounded-md border p-2 text-sm"
+      />
+      <Calendar
+        {...stable}
+        aria-label="Controlled appointment"
+        mode="single"
+        month={month}
+        onMonthChange={setMonth}
+        selected={date}
+        onSelect={setDate}
+        weekStartsOn={1}
+        fixedWeeks
+        footer={date ? `Selected: ${date.toDateString()}` : "No appointment"}
+      />
+    </div>
+  );
+}
+
+export function DisabledDatesExample() {
+  const [date, setDate] = useState<Date | undefined>();
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Available appointment"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      disabled={[new Date(2026, 10, 5), { before: new Date(2026, 10, 4) }, { dayOfWeek: [0, 6] }]}
+      hidden={new Date(2026, 10, 11)}
+      footer={date ? `Selected: ${date.toDateString()}` : "Weekdays from November 4; November 5 unavailable"}
+    />
+  );
+}
+
+export function GridLayoutExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      <Calendar
+        {...stable}
+        aria-label="Fixed six-week grid"
+        className="min-w-72 rounded-md border"
+        fixedWeeks
+        showWeekNumber
+        weekStartsOn={1}
+      />
+      <Calendar
+        {...stable}
+        aria-label="Current month only"
+        mode="single"
+        showOutsideDays={false}
+        className="rounded-md border [--cell-size:--spacing(9)]"
+      />
+    </div>
+  );
+}
+
+function BookingDay(props: DayButtonProps) {
+  return (
+    <CalendarDayButton {...props} locale={enUS}>
+      {props.children}
+      <span aria-hidden="true">{props.day.date.getDay() === 2 ? "•" : ""}</span>
+    </CalendarDayButton>
+  );
+}
+export function CustomDayExample() {
+  const [date, setDate] = useState<Date | undefined>();
+  return (
+    <Calendar
+      {...stable}
+      aria-label="Booking availability"
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      components={{ DayButton: BookingDay }}
+      formatters={{
+        formatCaption: (date) => `Bookings · ${date.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`,
+      }}
+      styles={{ month_grid: { opacity: 1 } }}
+      classNames={{ today: "rounded-md underline" }}
+    />
+  );
+}
+
+export function BrowseOnlyExample() {
+  return (
+    <div className="flex flex-wrap justify-center gap-6">
+      <Calendar
+        {...stable}
+        aria-label="Browse months without selecting"
+        startMonth={november}
+        endMonth={new Date(2026, 11, 1)}
+      />
+      <Calendar {...stable} aria-label="Navigation disabled" disableNavigation />
+      <Calendar {...stable} aria-label="Navigation hidden" hideNavigation />
+    </div>
+  );
+}
+
+export function WithoutMotionExample() {
+  return (
+    <CadenceProvider mode="none">
+      <Calendar {...stable} aria-label="Instant month navigation" mode="single" />
+    </CadenceProvider>
+  );
+}
+
+const examples = {
+  "single-selection": SingleSelectionExample,
+  "multiple-dates": MultipleDatesExample,
+  "date-ranges": DateRangesExample,
+  "multiple-months": MultipleMonthsExample,
+  "navigation-button-variants": NavigationButtonVariantsExample,
+  "caption-layouts": CaptionLayoutsExample,
+  "localized-navigation": LocalizedNavigationExample,
+  "controlled-month-and-date": ControlledMonthAndDateExample,
+  "disabled-dates": DisabledDatesExample,
+  "grid-layout": GridLayoutExample,
+  "custom-day": CustomDayExample,
+  "browse-only": BrowseOnlyExample,
+  "without-motion": WithoutMotionExample,
+};
+export function CalendarPreview({ example }: { example?: string }) {
+  const Example = example ? examples[example as keyof typeof examples] : SingleSelectionExample;
+  if (!Example) return null;
+  return (
+    <PreviewStack className="min-w-0">
+      <div className="flex w-full min-w-0 justify-center">
+        <Example />
+      </div>
+    </PreviewStack>
   );
 }
