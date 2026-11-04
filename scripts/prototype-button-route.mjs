@@ -8,6 +8,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import { chromium } from "@playwright/test";
+import { rechunkButtonPrototype } from "./rechunk-button-prototype.mjs";
 import { measureInitialScripts, summarizeLayoutShifts } from "./site-js-budget.mjs";
 import { auditButtonPrototype } from "./verify-button-prototype.mjs";
 
@@ -19,7 +20,7 @@ await mkdir(dir); // Refuse to overwrite any previous build or evidence.
 const sourceRoot = root.replaceAll("\\", "/");
 const require = createRequire(import.meta.url);
 const viteRequire = createRequire(createRequire(require.resolve("vitest/node")).resolve("vite"));
-const { build, version } = await import(pathToFileURL(viteRequire.resolve("esbuild")));
+const { build, transform, version } = await import(pathToFileURL(viteRequire.resolve("esbuild")));
 const boundaries = {
   [path.join(dir, "link")]: ["PrototypeLink"],
   "registry/cadence/toc": ["Toc"],
@@ -196,6 +197,9 @@ const client = await build({
   minify: true,
   metafile: true,
 });
+const compact =
+  process.env.PROTOTYPE_COMPACT_INITIAL === "1" ? await rechunkButtonPrototype(dir, client.metafile, transform) : null;
+const browserFiles = compact?.chunks.map((chunk) => chunk.file) || Object.keys(client.metafile.outputs);
 serverBuild = true;
 const serverOutput = await build({
   ...common,
@@ -218,7 +222,7 @@ await writeFile(path.join(dir, "index.html"), html);
 await writeFile(path.join(dir, "prototype-tree.json"), JSON.stringify(tree));
 await writeFile(
   path.join(dir, "build.json"),
-  JSON.stringify({ esbuild: version, client: client.metafile, server: serverOutput.metafile }, null, 2),
+  JSON.stringify({ esbuild: version, client: client.metafile, compact, server: serverOutput.metafile }, null, 2),
 );
 const fallback = process.env.PROTOTYPE_BASELINE || "http://127.0.0.1:3100";
 const server = createServer(async (req, res) => {
@@ -241,8 +245,8 @@ const server = createServer(async (req, res) => {
       res.end(url.pathname === "/components/button" ? html : (await generate(url.pathname)).html);
       return;
     } else if (url.pathname === "/prototype.css") file = "prototype.css";
-    else if (Object.keys(client.metafile.outputs).some((p) => path.basename(p) === url.pathname.slice(1)))
-      file = `browser/${url.pathname.slice(1)}`;
+    else if (browserFiles.some((p) => path.basename(p) === url.pathname.slice(1)))
+      file = `${compact ? "browser-compact" : "browser"}/${url.pathname.slice(1)}`;
     if (file) {
       res.setHeader(
         "Content-Type",
@@ -305,6 +309,7 @@ else {
         ...Object.keys(serverOutput.metafile.inputs),
         "scripts/prototype-button-route.mjs",
         "scripts/verify-button-prototype.mjs",
+        "scripts/rechunk-button-prototype.mjs",
         "scripts/site-js-budget.mjs",
         "package.json",
         "pnpm-lock.yaml",
@@ -318,13 +323,16 @@ else {
       .sort())
       sourceHashes[file] = hash(await readFile(file));
     const loaded = new Set(results[0].files.map((f) => new URL(f.url).pathname.slice(1)));
+    const loadedStageOneOutputs = compact
+      ? new Set(compact.chunks.filter((chunk) => loaded.has(chunk.fileName)).flatMap((chunk) => chunk.stageOneOutputs))
+      : null;
     const modules = {};
     for (const [file, output] of Object.entries(client.metafile.outputs))
-      if (loaded.has(path.basename(file)))
+      if (loadedStageOneOutputs ? loadedStageOneOutputs.has(path.resolve(file)) : loaded.has(path.basename(file)))
         for (const [input, value] of Object.entries(output.inputs))
           modules[input] = (modules[input] || 0) + value.bytesInOutput;
     const outputFiles = [];
-    for (const file of Object.keys(client.metafile.outputs)) {
+    for (const file of browserFiles) {
       const body = await readFile(file);
       outputFiles.push({ file, bytes: body.length, gzip6: gzipSync(body, { level: 6 }).length, sha256: hash(body) });
     }
@@ -346,6 +354,7 @@ else {
       ssr: { decoded: Buffer.byteLength(html), gzip6: gzipSync(html, { level: 6 }).length, sha256: hash(html) },
       node: process.version,
       esbuild: version,
+      compact,
       browser: browser.version(),
       protocol:
         "fresh context/cache disabled/no interception, scroll or interaction; load + networkidle +10s +networkidle; all automatic script URLs; decoded bodies gzip6 independently",
@@ -353,7 +362,9 @@ else {
       htmlSha256: hash(html),
       sourceHashes,
       moduleAttribution: {
-        unit: "minified raw bytes in loaded outputs, NOT additive gzip package allocation",
+        unit: compact
+          ? "stage-one minified raw bytes of inputs in loaded rechunked outputs, NOT final bytes or additive gzip allocation"
+          : "minified raw bytes in loaded outputs, NOT additive gzip package allocation",
         modules,
       },
       results,
