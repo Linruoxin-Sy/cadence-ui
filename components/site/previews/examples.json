@@ -152,5 +152,13 @@
     "changing-content",
     "custom-render",
     "without-motion"
+  ],
+  "table": [
+    "footer-totals",
+    "selected-rows",
+    "density-alignment",
+    "row-actions",
+    "horizontal-overflow",
+    "empty-results"
   ]
 }

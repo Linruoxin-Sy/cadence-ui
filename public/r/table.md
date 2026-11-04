@@ -18,8 +18,13 @@ npx shadcn@latest add @cadence/table
 
 ```tsx
 import {
-  Table, TableBody, TableCaption, TableCell,
-  TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/cadence/table";
 
 export function Invoices() {
@@ -29,7 +34,9 @@ export function Invoices() {
       <TableHeader>
         <TableRow>
           <TableHead scope="col">Invoice</TableHead>
-          <TableHead scope="col" className="text-right">Amount</TableHead>
+          <TableHead scope="col" className="text-right">
+            Amount
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -45,28 +52,323 @@ export function Invoices() {
 
 ## Footer totals
 
-`TableFooter` renders a native `tfoot`. Spans and numeric alignment are caller-owned.
+`TableFooter` renders a native `tfoot`. This example keeps a row header, spans the label across two columns and aligns the total with the amounts. The caller supplies both the records and the total; Table does no arithmetic.
+
+<ComponentExample name="footer-totals" />
 
 ```tsx
-<TableFooter>
-  <TableRow>
-    <TableCell colSpan={3}>Total</TableCell>
-    <TableCell className="text-right tabular-nums">$750.00</TableCell>
-  </TableRow>
-</TableFooter>
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/cadence/table";
+
+const invoices = [
+  { id: "INV-001", status: "Paid", method: "Credit card", amount: "$250.00" },
+  { id: "INV-002", status: "Pending", method: "Bank transfer", amount: "$150.00" },
+  { id: "INV-003", status: "Unpaid", method: "PayPal", amount: "$350.00" },
+];
+
+export function FooterTotalsExample() {
+  return (
+    <Table>
+      <TableCaption>November invoice totals.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead scope="col">Invoice</TableHead>
+          <TableHead scope="col">Status</TableHead>
+          <TableHead scope="col" className="text-right">
+            Amount
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((invoice) => (
+          <TableRow key={invoice.id}>
+            <TableHead scope="row">{invoice.id}</TableHead>
+            <TableCell>{invoice.status}</TableCell>
+            <TableCell className="text-right tabular-nums">{invoice.amount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableHead scope="row" colSpan={2}>
+            Total
+          </TableHead>
+          <TableCell className="text-right tabular-nums">$750.00</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  );
+}
 ```
 
 ## Selected rows
 
-Selection state belongs to the application. A data attribute supplies the visual
-state; add a named checkbox when selection must be interactive. Setting this
-attribute alone does not make a row a control or announce selection.
+Selection belongs to the application. These named native checkboxes own their checked state and set `data-state="selected"` on the corresponding rows. The attribute only adds row colour: it does not turn a row into a control, add `aria-selected`, or introduce grid navigation. Space toggles the focused checkbox; the initial selection is independent of every other specimen.
+
+<ComponentExample name="selected-rows" />
 
 ```tsx
-<TableRow data-state="selected">
-  <TableCell>INV-001</TableCell>
-  <TableCell>Paid</TableCell>
-</TableRow>
+"use client";
+
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/cadence/table";
+
+const invoices = [
+  { id: "INV-001", status: "Paid", method: "Credit card", amount: "$250.00" },
+  { id: "INV-002", status: "Pending", method: "Bank transfer", amount: "$150.00" },
+  { id: "INV-003", status: "Unpaid", method: "PayPal", amount: "$350.00" },
+];
+
+export function SelectedRowsExample() {
+  const [selected, setSelected] = useState<string[]>(["INV-001"]);
+  return (
+    <div className="grid gap-4">
+      <Table>
+        <TableCaption>Choose invoices for your report.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead scope="col">Include</TableHead>
+            <TableHead scope="col">Invoice</TableHead>
+            <TableHead scope="col" className="text-right">
+              Amount
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {invoices.map((invoice) => (
+            <TableRow key={invoice.id} data-state={selected.includes(invoice.id) ? "selected" : undefined}>
+              <TableCell>
+                <input
+                  type="checkbox"
+                  aria-label={`Include ${invoice.id}`}
+                  checked={selected.includes(invoice.id)}
+                  onChange={(event) =>
+                    setSelected((current) =>
+                      event.target.checked ? [...current, invoice.id] : current.filter((id) => id !== invoice.id),
+                    )
+                  }
+                  className="size-4 accent-primary focus-visible:outline-2 focus-visible:outline-ring"
+                />
+              </TableCell>
+              <TableHead scope="row">{invoice.id}</TableHead>
+              <TableCell className="text-right tabular-nums">{invoice.amount}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <p role="status">Selected invoices: {selected.length}</p>
+    </div>
+  );
+}
+```
+
+## Density and alignment
+
+Table has no size or density prop. Compare the default spacing with caller-supplied compact cell padding and header height. Left-aligned labels, centred counts and right-aligned amounts are fixed in both tables; `tabular-nums` helps compare numbers. These are CSS choices, not component variants.
+
+<ComponentExample name="density-alignment" />
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/cadence/table";
+
+export function DensityAlignmentExample() {
+  return (
+    <div className="grid gap-6">
+      {[false, true].map((compact) => (
+        <Table key={String(compact)} className={compact ? "[&_td]:p-1 [&_th]:h-8 [&_th]:px-1" : undefined}>
+          <TableCaption>{compact ? "Compact spacing" : "Default spacing"} with numeric alignment.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead scope="col">Plan</TableHead>
+              <TableHead scope="col" className="text-center">
+                Seats
+              </TableHead>
+              <TableHead scope="col" className="text-right">
+                Monthly
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableHead scope="row">Team</TableHead>
+              <TableCell className="text-center tabular-nums">12</TableCell>
+              <TableCell className="text-right tabular-nums">$240.00</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      ))}
+    </div>
+  );
+}
+```
+
+## Row actions
+
+Links and buttons inside cells keep their own keyboard behaviour. Tab reaches the invoice history link and then the payment action; Enter or Space activates the button. The local handler changes only this example and disables the completed action. In an application, the caller owns persistence, pending state and errors. Install `@cadence/button` alongside Table for this composition; the button inherits the surrounding motion settings.
+
+<ComponentExample name="row-actions" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/cadence/table";
+import { Button } from "@/components/cadence/button";
+
+export function RowActionsExample() {
+  const [paid, setPaid] = useState(false);
+  return (
+    <div className="grid gap-4">
+      <Table>
+        <TableCaption>Invoice actions owned by the application.</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead scope="col">Invoice</TableHead>
+            <TableHead scope="col">Status</TableHead>
+            <TableHead scope="col">Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableHead scope="row">
+              <a href="/docs/changelog" className="underline underline-offset-4">
+                INV-001 history
+              </a>
+            </TableHead>
+            <TableCell>{paid ? "Paid" : "Pending"}</TableCell>
+            <TableCell>
+              <Button variant="outline" size="sm" disabled={paid} onClick={() => setPaid(true)}>
+                Mark INV-001 paid
+              </Button>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      <p role="status">{paid ? "INV-001 marked paid locally." : "No payment action yet."}</p>
+    </div>
+  );
+}
+```
+
+## Horizontal overflow
+
+The built-in container scrolls when the table needs more room. Constrain the surrounding layout with `min-w-0`; put the minimum width and a visible focus ring on Table itself. In this wide specimen, focus the named table and press horizontal arrow keys to scroll its ancestor. No columns are removed, and there is no grid arrow-key selection model. Check keyboard scrolling in your target browsers.
+
+<ComponentExample name="horizontal-overflow" />
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/cadence/table";
+
+export function HorizontalOverflowExample() {
+  return (
+    <Table
+      tabIndex={0}
+      className="min-w-[44rem] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+    >
+      <TableCaption>Delivery records. Focus the table and use horizontal arrow keys to scroll.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead scope="col">Invoice</TableHead>
+          <TableHead scope="col">Customer</TableHead>
+          <TableHead scope="col">Delivery reference</TableHead>
+          <TableHead scope="col" className="text-right">
+            Amount
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableHead scope="row">INV-001</TableHead>
+          <TableCell>morgan@example.com</TableCell>
+          <TableCell>November workspace delivery</TableCell>
+          <TableCell className="text-right tabular-nums">$250.00</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  );
+}
+```
+
+## Empty results
+
+Keep the header relationships and place the empty message in one cell spanning every column. The caller decides that the result is empty and provides the message; Table does not fetch or filter records. `whitespace-normal` lets this message wrap at narrow widths.
+
+<ComponentExample name="empty-results" />
+
+```tsx
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/cadence/table";
+
+export function EmptyResultsExample() {
+  return (
+    <Table>
+      <TableCaption>Invoices matching the application's current query.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead scope="col">Invoice</TableHead>
+          <TableHead scope="col">Status</TableHead>
+          <TableHead scope="col" className="text-right">
+            Amount
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell colSpan={3} className="h-24 text-center whitespace-normal text-muted-foreground">
+            No matching invoices. Try another query in your application.
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  );
+}
 ```
 
 ## When to use

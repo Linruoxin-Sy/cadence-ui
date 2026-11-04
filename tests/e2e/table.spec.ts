@@ -55,14 +55,12 @@ for (const colorScheme of ["light", "dark"] as const) {
       const preview = page.locator('[data-preview="table"]');
       await preview.screenshot({ path: testInfo.outputPath(`table-${colorScheme}-desktop.png`) });
       await page.setViewportSize({ width: 390, height: 844 });
-      const wrapper = preview.locator('[data-slot="table-container"]');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await preview.screenshot({ path: testInfo.outputPath(`table-${colorScheme}-narrow-natural.png`) });
-      // Exercise caller-owned table sizing with genuinely wide content geometry.
-      await preview.getByRole("table").evaluate((el) => {
-        el.style.minWidth = "640px";
-      });
-      const sizes = await wrapper.evaluate((el) => ({
+      // Exercise the actual documented wide table without changing its geometry.
+      const wide = page.locator('[data-component-example="table/horizontal-overflow"]');
+      const wideWrapper = wide.locator('[data-slot="table-container"]');
+      const sizes = await wideWrapper.evaluate((el) => ({
         client: el.clientWidth,
         scroll: el.scrollWidth,
         overflow: getComputedStyle(el).overflowX,
@@ -70,16 +68,16 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(sizes.overflow).toBe("auto");
       expect(sizes.scroll).toBeGreaterThan(sizes.client);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await preview.getByRole("table").focus();
-      await expect(preview.getByRole("table")).toBeFocused();
+      await wide.getByRole("table").focus();
+      await expect(wide.getByRole("table")).toBeFocused();
       await page.keyboard.press("ArrowRight");
-      await expect.poll(() => wrapper.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
-      await wrapper.evaluate((el) => {
+      await expect.poll(() => wideWrapper.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+      await wideWrapper.evaluate((el) => {
         el.scrollLeft = el.scrollWidth;
       });
-      expect(await wrapper.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
-      await expect(preview.getByRole("cell", { name: "$750.00" })).toBeInViewport();
-      await preview.screenshot({ path: testInfo.outputPath(`table-${colorScheme}-narrow.png`) });
+      expect(await wideWrapper.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+      await expect(wide.getByRole("cell", { name: "$250.00" })).toBeInViewport();
+      await wide.screenshot({ path: testInfo.outputPath(`table-${colorScheme}-narrow.png`) });
       expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual(
         [],
       );
