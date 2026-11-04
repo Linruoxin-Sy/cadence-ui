@@ -159,6 +159,9 @@ not relabelling old results as current HEAD. Preserve the budgets in animation-s
 3. **Compiled component addition ≤8000 bytes, shared runtime excluded.** Revalidate dedicated
    dependency and async boundaries with a declared baseline; local-only code passing is insufficient.
    Dedicated dependencies remain counted unless the budget contract is explicitly revised.
+   Use the consumer audit's emitted import paths and source composition to locate counted costs.
+   Retain static initial paths and reachable async output separately; source `bytesInOutput`
+   explains a mixed file's contents and cannot allocate its gzip to individual packages.
 4. **CLS <0.02.** Keep cold-load and interaction windows distinct. The complete-route regression in
    `tests/e2e/document-interaction-layout.spec.ts` covers Button's composition/source/install/Toc path
    and Data Table filtering, pagination, selection, column visibility and record updates at two widths

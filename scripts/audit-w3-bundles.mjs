@@ -7,6 +7,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
+import { analyzeConsumerBundles, COMPONENT_ADDITION_LIMIT } from "./consumer-bundle-budget.mjs";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
@@ -42,7 +43,7 @@ const result = {
   esbuild: version,
   protocol:
     "production minified ES2020 ESM; React/ReactDOM external; all public value exports retained; gzip6 per output; no source-byte surrogate",
-  limits: { motion: 48000, component: 8000 },
+  limits: { motion: 48000, component: COMPONENT_ADDITION_LIMIT },
   motion: [],
   components: [],
   sources: [],
@@ -119,7 +120,15 @@ result.requiredMotionImports = {
 };
 assert.deepEqual(result.requiredMotionImports.registry, motionExports.split(",").sort());
 assert.deepEqual(result.requiredMotionImports.site, ["motion", "useInView"]);
-for (const file of [...registryFiles, ...siteFiles, "package.json", "pnpm-lock.yaml"]) {
+for (const file of [
+  ...registryFiles,
+  ...siteFiles,
+  "registry.json",
+  "package.json",
+  "pnpm-lock.yaml",
+  "scripts/audit-w3-bundles.mjs",
+  "scripts/consumer-bundle-budget.mjs",
+]) {
   const body = await readFile(file);
   result.sources.push({ file, sha256: createHash("sha256").update(body).digest("hex") });
 }
@@ -136,33 +145,28 @@ for (const item of items) {
 const graph = await build({ ...common, entryPoints, outdir: path.join(dir, "graph"), splitting: true });
 const outputs = graph.metafile.outputs;
 const key = (file) => path.relative(process.cwd(), file).replaceAll("\\", "/");
-const closure = (entry, includeAsync = true, seen = new Set()) => {
-  if (seen.has(entry)) return seen;
-  seen.add(entry);
-  assert.ok(outputs[entry], entry);
-  for (const dependency of outputs[entry].imports.filter(
-    (dependency) => !dependency.external && (includeAsync || dependency.kind !== "dynamic-import"),
-  ))
-    closure(dependency.path, includeAsync, seen);
-  return seen;
-};
-const shared = closure(key(path.join(dir, "graph/shared.js")));
 const files = Object.fromEntries(graph.outputFiles.map((file) => [key(file.path), summarize(file)]));
-result.shared = [...shared].map((file) => files[file]);
+const accounting = analyzeConsumerBundles({
+  outputs,
+  files,
+  baseline: key(path.join(dir, "graph/shared.js")),
+  entries: Object.fromEntries(items.map((item) => [item.name, key(path.join(dir, `graph/${item.name}.js`))])),
+});
+result.shared = accounting.shared;
+result.components = accounting.components;
 result.componentProtocol = `${items.length}-entry split consumer graph plus explicit baseline of actual registry Motion API union/all Cadence lib exports; subtract only baseline-reachable outputs; keep dedicated dependencies and other installed Cadence components; report initial and reachable async output separately; React/ReactDOM external; not Next chunk attribution or an independent package installation`;
+result.compositionProtocol =
+  "Per-output shortest emitted import paths, static initial paths and positive bytesInOutput source/package composition explain inclusion only. Package names are not exemptions. Raw bytesInOutput are not gzip allocations; every added mixed output remains fully counted.";
+result.compiledInputs = await Promise.all(
+  Object.keys(graph.metafile.inputs).map(async (file) => ({
+    file,
+    sha256: createHash("sha256")
+      .update(await readFile(file))
+      .digest("hex"),
+  })),
+);
 for (const item of items) {
-  const added = [...closure(key(path.join(dir, `graph/${item.name}.js`)))].filter((file) => !shared.has(file));
-  const initial = [...closure(key(path.join(dir, `graph/${item.name}.js`)), false)].filter((file) => !shared.has(file));
-  const gzip = added.reduce((sum, file) => sum + files[file].gzip, 0);
-  const initialGzip = initial.reduce((sum, file) => sum + files[file].gzip, 0);
-  result.components.push({
-    id: item.name,
-    gzip,
-    initialGzip,
-    reachableAsyncGzip: gzip - initialGzip,
-    passed: gzip <= 8000,
-    files: added.map((file) => ({ ...files[file], initial: initial.includes(file) })),
-  });
+  const component = result.components.find((component) => component.id === item.name);
   const local = await build({
     ...common,
     entryPoints: [entryPoints[item.name]],
@@ -178,10 +182,10 @@ for (const item of items) {
       },
     ],
   });
-  result.components.at(-1).localOnly = local.outputFiles.map(summarize);
+  component.localOnly = local.outputFiles.map(summarize);
   await mkdir(path.dirname(local.outputFiles[0].path), { recursive: true });
   for (const file of local.outputFiles) await writeFile(file.path, file.contents);
-  console.log(`${item.name}: ${gzip}/8000`);
+  console.log(`${item.name}: ${component.gzip}/${COMPONENT_ADDITION_LIMIT}`);
 }
 result.graph = graph.metafile;
 await mkdir(path.join(dir, "graph"), { recursive: true });
