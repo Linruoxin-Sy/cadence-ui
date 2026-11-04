@@ -152,6 +152,7 @@ export const columns = columnHelper.columns([
   }),
   columnHelper.display({
     id: "actions",
+    header: "Actions",
     enableHiding: false,
     cell: ({ row }) => {
       const payment = row.original;

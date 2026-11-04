@@ -134,6 +134,14 @@ describe("Calendar", () => {
     expect(screen.getByRole("grid", { name: "novembre 2026" }).style.opacity).toBe("0.7");
     expect(container.querySelector(".caller-day")).toBeTruthy();
     expect(container.querySelector("th[scope=col][aria-label=lundi]")).toHaveTextContent("lu");
+    const weeks = screen.getAllByRole("rowheader");
+    expect(weeks.length).toBeGreaterThan(0);
+    for (const week of weeks) {
+      expect(week.tagName).toBe("TH");
+      expect(week).toHaveAttribute("scope", "row");
+      expect(week).not.toHaveAttribute("week");
+      expect(week).toHaveAccessibleName(/Week \d+/);
+    }
     rerender(
       <Calendar
         mode="single"

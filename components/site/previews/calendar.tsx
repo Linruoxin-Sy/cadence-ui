@@ -2,7 +2,7 @@
 
 import { arSA, enUS, fr } from "date-fns/locale";
 import { useState } from "react";
-import type { DateRange, DayButtonProps } from "react-day-picker";
+import { type DateRange, type DayButtonProps, formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { Button } from "@/registry/cadence/button";
 import { Calendar, CalendarDayButton } from "@/registry/cadence/calendar";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
@@ -10,14 +10,31 @@ import { PreviewStack } from "./shell";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november,
+  today,
+  locale: enUS,
+  className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
-export function SingleSelectionExample() {
+export function SingleSelectionExample({
+  navigationLabel = "Appointment date navigation",
+}: {
+  navigationLabel?: string;
+}) {
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
   return (
     <Calendar
       {...stable}
       aria-label="Appointment date"
+      labels={{ ...stable.labels, labelNav: () => navigationLabel }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -32,6 +49,7 @@ export function MultipleDatesExample() {
     <Calendar
       {...stable}
       aria-label="Workshop days"
+      labels={{ ...stable.labels, labelNav: () => "Workshop days navigation" }}
       mode="multiple"
       required
       min={1}
@@ -49,6 +67,7 @@ export function DateRangesExample() {
     <Calendar
       {...stable}
       aria-label="Weekday trip"
+      labels={{ ...stable.labels, labelNav: () => "Weekday trip navigation" }}
       mode="range"
       selected={range}
       onSelect={setRange}
@@ -71,6 +90,7 @@ export function MultipleMonthsExample() {
     <Calendar
       {...stable}
       aria-label="Two-month stay"
+      labels={{ ...stable.labels, labelNav: () => "Two-month stay navigation" }}
       mode="range"
       selected={range}
       onSelect={setRange}
@@ -87,7 +107,12 @@ export function NavigationButtonVariantsExample() {
       {(["default", "secondary", "destructive", "outline", "ghost", "link"] as const).map((variant) => (
         <div key={variant} className="grid gap-2">
           <p className="text-sm font-medium">{variant}</p>
-          <Calendar {...stable} aria-label={`${variant} navigation`} buttonVariant={variant} />
+          <Calendar
+            {...stable}
+            aria-label={`${variant} navigation`}
+            labels={{ ...stable.labels, labelNav: () => `${variant} navigation` }}
+            buttonVariant={variant}
+          />
         </div>
       ))}
     </div>
@@ -103,6 +128,7 @@ export function CaptionLayoutsExample() {
           <Calendar
             {...stable}
             aria-label={`${captionLayout} caption`}
+            labels={{ ...stable.labels, labelNav: () => `${captionLayout} caption` }}
             captionLayout={captionLayout}
             startMonth={new Date(2025, 0)}
             endMonth={new Date(2028, 11)}
@@ -125,7 +151,12 @@ export function LocalizedNavigationExample() {
         captionLayout="dropdown"
         startMonth={new Date(2025, 0)}
         endMonth={new Date(2028, 11)}
-        labels={{ labelNext: () => "Mois suivant", labelPrevious: () => "Mois précédent" }}
+        labels={{
+          ...stable.labels,
+          labelNav: () => "Navigation du calendrier français",
+          labelNext: () => "Mois suivant",
+          labelPrevious: () => "Mois précédent",
+        }}
       />
       <Calendar
         {...stable}
@@ -134,7 +165,12 @@ export function LocalizedNavigationExample() {
         dir="rtl"
         locale={arSA}
         formatters={{ formatWeekdayName: (date) => date.toLocaleDateString("ar-SA", { weekday: "narrow" }) }}
-        labels={{ labelNext: () => "الشهر التالي", labelPrevious: () => "الشهر السابق" }}
+        labels={{
+          ...stable.labels,
+          labelNav: () => "التنقل في التقويم العربي",
+          labelNext: () => "الشهر التالي",
+          labelPrevious: () => "الشهر السابق",
+        }}
       />
     </div>
   );
@@ -167,6 +203,7 @@ export function ControlledMonthAndDateExample() {
       <Calendar
         {...stable}
         aria-label="Controlled appointment"
+        labels={{ ...stable.labels, labelNav: () => "Controlled appointment navigation" }}
         mode="single"
         month={month}
         onMonthChange={setMonth}
@@ -186,6 +223,7 @@ export function DisabledDatesExample() {
     <Calendar
       {...stable}
       aria-label="Available appointment"
+      labels={{ ...stable.labels, labelNav: () => "Available appointment navigation" }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -202,6 +240,7 @@ export function GridLayoutExample() {
       <Calendar
         {...stable}
         aria-label="Fixed six-week grid"
+        labels={{ ...stable.labels, labelNav: () => "Fixed six-week grid navigation" }}
         className="min-w-72 rounded-md border"
         fixedWeeks
         showWeekNumber
@@ -210,6 +249,7 @@ export function GridLayoutExample() {
       <Calendar
         {...stable}
         aria-label="Current month only"
+        labels={{ ...stable.labels, labelNav: () => "Current month only navigation" }}
         mode="single"
         showOutsideDays={false}
         className="rounded-md border [--cell-size:--spacing(9)]"
@@ -232,6 +272,7 @@ export function CustomDayExample() {
     <Calendar
       {...stable}
       aria-label="Booking availability"
+      labels={{ ...stable.labels, labelNav: () => "Booking availability navigation" }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -251,11 +292,22 @@ export function BrowseOnlyExample() {
       <Calendar
         {...stable}
         aria-label="Browse months without selecting"
+        labels={{ ...stable.labels, labelNav: () => "Browse months without selecting navigation" }}
         startMonth={november}
         endMonth={new Date(2026, 11, 1)}
       />
-      <Calendar {...stable} aria-label="Navigation disabled" disableNavigation />
-      <Calendar {...stable} aria-label="Navigation hidden" hideNavigation />
+      <Calendar
+        {...stable}
+        aria-label="Navigation disabled"
+        labels={{ ...stable.labels, labelNav: () => "Disabled calendar navigation" }}
+        disableNavigation
+      />
+      <Calendar
+        {...stable}
+        aria-label="Navigation hidden"
+        labels={{ ...stable.labels, labelNav: () => "Hidden calendar navigation" }}
+        hideNavigation
+      />
     </div>
   );
 }
@@ -263,7 +315,12 @@ export function BrowseOnlyExample() {
 export function WithoutMotionExample() {
   return (
     <CadenceProvider mode="none">
-      <Calendar {...stable} aria-label="Instant month navigation" mode="single" />
+      <Calendar
+        {...stable}
+        aria-label="Instant month navigation"
+        labels={{ ...stable.labels, labelNav: () => "Instant calendar navigation" }}
+        mode="single"
+      />
     </CadenceProvider>
   );
 }
@@ -283,8 +340,11 @@ const examples = {
   "browse-only": BrowseOnlyExample,
   "without-motion": WithoutMotionExample,
 };
+function PreviewAppointment() {
+  return <SingleSelectionExample navigationLabel="Preview appointment navigation" />;
+}
 export function CalendarPreview({ example }: { example?: string }) {
-  const Example = example ? examples[example as keyof typeof examples] : SingleSelectionExample;
+  const Example = example ? examples[example as keyof typeof examples] : PreviewAppointment;
   if (!Example) return null;
   return (
     <PreviewStack className="min-w-0">

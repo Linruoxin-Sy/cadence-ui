@@ -20,7 +20,7 @@ import {
 function Types() {
   const [manager] = useState(createToastManager);
   return (
-    <Toaster toastManager={manager} timeout={0}>
+    <Toaster viewportProps={{ "aria-label": "Types notifications" }} toastManager={manager} timeout={0}>
       <div className="flex flex-wrap gap-2">
         {([undefined, "success", "info", "warning", "error", "loading"] as const).map((type) => (
           <Button
@@ -43,7 +43,7 @@ function Actions() {
   const [manager] = useState(createToastManager);
   const [result, setResult] = useState("Item available");
   return (
-    <Toaster toastManager={manager} timeout={0}>
+    <Toaster viewportProps={{ "aria-label": "Archive notifications" }} toastManager={manager} timeout={0}>
       <div className="flex flex-col gap-3">
         <Button
           onClick={() => {
@@ -71,7 +71,7 @@ function Actions() {
 function Priority() {
   const [manager] = useState(createToastManager);
   return (
-    <Toaster toastManager={manager} timeout={0}>
+    <Toaster viewportProps={{ "aria-label": "Priority notifications" }} toastManager={manager} timeout={0}>
       <div className="flex flex-wrap gap-2">
         <Button variant="outline" onClick={() => manager.add({ title: "Draft saved", priority: "low" })}>
           Polite notification
@@ -102,7 +102,7 @@ function Progress() {
   const [id, setId] = useState<string>();
   const [result, setResult] = useState("No export queued");
   return (
-    <Toaster toastManager={manager} timeout={0}>
+    <Toaster viewportProps={{ "aria-label": "Export notifications" }} toastManager={manager} timeout={0}>
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           <Button
@@ -149,7 +149,7 @@ function Progress() {
 function Timers() {
   const [manager] = useState(createToastManager);
   return (
-    <Toaster toastManager={manager} timeout={5000} limit={2}>
+    <Toaster viewportProps={{ "aria-label": "Timer notifications" }} toastManager={manager} timeout={5000} limit={2}>
       <div className="flex flex-wrap gap-2">
         <Button
           onClick={() =>
@@ -206,7 +206,7 @@ function Composition({
         {label}
       </Button>
       <ToastPortal>
-        <ToastViewport>
+        <ToastViewport aria-label={`${label} notifications`}>
           <NotificationList direction={direction} />
         </ToastViewport>
       </ToastPortal>
@@ -241,7 +241,7 @@ function DefaultToast() {
   const [manager] = useState(createToastManager);
   const cm = useCadenceMotion();
   return (
-    <Toaster toastManager={manager} timeout={0}>
+    <Toaster toastManager={manager} timeout={0} viewportProps={{ "aria-label": "Preview notifications" }}>
       <div data-slot="toast-demo" data-motion={cm.mode}>
         <Button
           onClick={() =>

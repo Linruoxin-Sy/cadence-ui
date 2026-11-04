@@ -60,6 +60,9 @@ for (const id of [
   "sidebar",
   "bubble",
   "toc",
+  "toast",
+  "calendar",
+  "data-table",
 ])
   for (const width of [1440, 390])
     for (const colorScheme of ["light", "dark"] as const)

@@ -173,11 +173,11 @@ function CalendarChevron({ className, orientation, ...props }: ChevronProps) {
   const Icon = orientation === "left" ? ChevronLeftIcon : orientation === "right" ? ChevronRightIcon : ChevronDownIcon;
   return <Icon className={cn("size-4", className)} {...props} />;
 }
-function CalendarWeekNumber({ children, ...props }: WeekNumberProps) {
+function CalendarWeekNumber({ children, week: _week, ...props }: WeekNumberProps) {
   return (
-    <td {...props}>
+    <th {...props}>
       <div className="flex size-(--cell-size) items-center justify-center text-center">{children}</div>
-    </td>
+    </th>
   );
 }
 // Stable component identities keep DayPicker's navigation and focus tree mounted.

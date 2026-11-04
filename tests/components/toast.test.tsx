@@ -6,6 +6,40 @@ import { createToastManager, Toaster } from "@/registry/cadence/toast";
 import { expectMotionContract } from "../motion-contract";
 
 describe("Toast", () => {
+  it("forwards named viewport props and refs while retaining the default and each manager's list", async () => {
+    const manager = createToastManager();
+    const other = createToastManager();
+    const cleanup = vi.fn();
+    const ref = vi.fn(() => cleanup);
+    const { unmount } = render(
+      <CadenceProvider mode="none">
+        <Toaster toastManager={manager} timeout={0} />
+        <Toaster
+          toastManager={other}
+          timeout={0}
+          viewportProps={{ "aria-label": "Export notifications", className: "caller", ref, lang: "en" }}
+        />
+      </CadenceProvider>,
+    );
+    expect(screen.getByRole("region", { name: "Notifications" })).toHaveAttribute("aria-live", "polite");
+    const viewport = screen.getByRole("region", { name: "Export notifications" });
+    expect(viewport).toHaveClass("caller");
+    expect(viewport).toHaveAttribute("lang", "en");
+    expect(viewport).toHaveAttribute("data-slot", "toast-viewport");
+    expect(ref).toHaveBeenCalledWith(viewport);
+    act(() => {
+      manager.add({ title: "Saved here", type: "success" });
+      other.add({ title: "Export ready", actionProps: { children: "Download" } });
+    });
+    await screen.findByText("Export ready");
+    expect(viewport).toContainElement(screen.getByRole("button", { name: "Download" }));
+    expect(viewport).not.toContainElement(screen.getByText("Saved here"));
+    act(() => other.close());
+    await waitFor(() => expect(screen.queryByText("Export ready")).not.toBeInTheDocument());
+    expect(screen.getByText("Saved here")).toBeVisible();
+    unmount();
+    expect(cleanup).toHaveBeenCalledOnce();
+  });
   it.each(["full", "reduced", "none"] as const)("renders slots with %s motion", async (mode) => {
     const manager = createToastManager();
     render(

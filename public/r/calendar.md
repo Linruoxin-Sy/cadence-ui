@@ -20,11 +20,21 @@ npx shadcn@latest add @cadence/calendar
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function SingleSelectionExample() {
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
@@ -32,6 +42,7 @@ export function SingleSelectionExample() {
     <Calendar
       {...stable}
       aria-label="Appointment date"
+      labels={{ ...stable.labels, labelNav: () => "Appointment date navigation" }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -51,11 +62,21 @@ Select one appointment, or select it again to clear it. The caller owns `selecte
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function SingleSelectionExample() {
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 10, 12));
@@ -63,6 +84,7 @@ export function SingleSelectionExample() {
     <Calendar
       {...stable}
       aria-label="Appointment date"
+      labels={{ ...stable.labels, labelNav: () => "Appointment date navigation" }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -82,11 +104,21 @@ Choose one to three independent workshop days with `required`, `min` and `max`. 
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function MultipleDatesExample() {
   const [days, setDays] = useState<Date[]>([new Date(2026, 10, 12)]);
@@ -94,6 +126,7 @@ export function MultipleDatesExample() {
     <Calendar
       {...stable}
       aria-label="Workshop days"
+      labels={{ ...stable.labels, labelNav: () => "Workshop days navigation" }}
       mode="multiple"
       required
       min={1}
@@ -116,12 +149,22 @@ Choose a weekday trip of at least two nights. `min` counts nights, not inclusive
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import type { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function DateRangesExample() {
   const [range, setRange] = useState<DateRange | undefined>();
@@ -129,6 +172,7 @@ export function DateRangesExample() {
     <Calendar
       {...stable}
       aria-label="Weekday trip"
+      labels={{ ...stable.labels, labelNav: () => "Weekday trip navigation" }}
       mode="range"
       selected={range}
       onSelect={setRange}
@@ -153,12 +197,22 @@ A two-month range stays visible across November and December. `pagedNavigation` 
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import type { DateRange } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function MultipleMonthsExample() {
   const [range, setRange] = useState<DateRange | undefined>({
@@ -169,6 +223,7 @@ export function MultipleMonthsExample() {
     <Calendar
       {...stable}
       aria-label="Two-month stay"
+      labels={{ ...stable.labels, labelNav: () => "Two-month stay navigation" }}
       mode="range"
       selected={range}
       onSelect={setRange}
@@ -188,12 +243,22 @@ All six `buttonVariant` values apply to previous/next navigation buttons. Day bu
 
 ```tsx
 "use client";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { enUS } from "date-fns/locale";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function NavigationButtonVariantsExample() {
   return (
@@ -201,7 +266,8 @@ export function NavigationButtonVariantsExample() {
       {(["default", "secondary", "destructive", "outline", "ghost", "link"] as const).map((variant) => (
         <div key={variant} className="grid gap-2">
           <p className="text-sm font-medium">{variant}</p>
-          <Calendar {...stable} aria-label={`${variant} navigation`} buttonVariant={variant} />
+          <Calendar {...stable} aria-label={`${variant} navigation`}
+      labels={{ ...stable.labels, labelNav: () => `${variant} navigation` }} buttonVariant={variant} />
         </div>
       ))}
     </div>
@@ -217,12 +283,22 @@ Compare `label`, `dropdown`, `dropdown-months` and `dropdown-years` directly. Th
 
 ```tsx
 "use client";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { enUS } from "date-fns/locale";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function CaptionLayoutsExample() {
   return (
@@ -233,6 +309,7 @@ export function CaptionLayoutsExample() {
           <Calendar
             {...stable}
             aria-label={`${captionLayout} caption`}
+      labels={{ ...stable.labels, labelNav: () => `${captionLayout} caption` }}
             captionLayout={captionLayout}
             startMonth={new Date(2025, 0)}
             endMonth={new Date(2028, 11)}
@@ -252,12 +329,22 @@ The French calendar starts weeks on Monday and offers native dropdowns. The Arab
 
 ```tsx
 "use client";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { enUS, fr, arSA } from "date-fns/locale";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function LocalizedNavigationExample() {
   return (
@@ -271,7 +358,7 @@ export function LocalizedNavigationExample() {
         captionLayout="dropdown"
         startMonth={new Date(2025, 0)}
         endMonth={new Date(2028, 11)}
-        labels={{ labelNext: () => "Mois suivant", labelPrevious: () => "Mois précédent" }}
+        labels={{ ...stable.labels, labelNav: () => "Navigation du calendrier français", labelNext: () => "Mois suivant", labelPrevious: () => "Mois précédent" }}
       />
       <Calendar
         {...stable}
@@ -280,7 +367,7 @@ export function LocalizedNavigationExample() {
         dir="rtl"
         locale={arSA}
         formatters={{ formatWeekdayName: (date) => date.toLocaleDateString("ar-SA", { weekday: "narrow" }) }}
-        labels={{ labelNext: () => "الشهر التالي", labelPrevious: () => "الشهر السابق" }}
+        labels={{ ...stable.labels, labelNav: () => "التنقل في التقويم العربي", labelNext: () => "الشهر التالي", labelPrevious: () => "الشهر السابق" }}
       />
     </div>
   );
@@ -297,12 +384,22 @@ Both the visible month and selected date belong to this example. “Set November
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 import { Button } from "@/components/cadence/button";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function ControlledMonthAndDateExample() {
   const [month, setMonth] = useState(november);
@@ -331,6 +428,7 @@ export function ControlledMonthAndDateExample() {
       <Calendar
         {...stable}
         aria-label="Controlled appointment"
+      labels={{ ...stable.labels, labelNav: () => "Controlled appointment navigation" }}
         mode="single"
         month={month}
         onMonthChange={setMonth}
@@ -355,11 +453,21 @@ Compose exact-date, before-date and weekday matchers. November 5 is unavailable 
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function DisabledDatesExample() {
   const [date, setDate] = useState<Date | undefined>();
@@ -367,6 +475,7 @@ export function DisabledDatesExample() {
     <Calendar
       {...stable}
       aria-label="Available appointment"
+      labels={{ ...stable.labels, labelNav: () => "Available appointment navigation" }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -386,12 +495,22 @@ Compare a six-row grid with week numbers and Monday starts against a larger-cell
 
 ```tsx
 "use client";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { enUS } from "date-fns/locale";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function GridLayoutExample() {
   return (
@@ -399,6 +518,7 @@ export function GridLayoutExample() {
       <Calendar
         {...stable}
         aria-label="Fixed six-week grid"
+      labels={{ ...stable.labels, labelNav: () => "Fixed six-week grid navigation" }}
         className="min-w-72 rounded-md border"
         fixedWeeks
         showWeekNumber
@@ -407,6 +527,7 @@ export function GridLayoutExample() {
       <Calendar
         {...stable}
         aria-label="Current month only"
+      labels={{ ...stable.labels, labelNav: () => "Current month only navigation" }}
         mode="single"
         showOutsideDays={false}
         className="rounded-md border [--cell-size:--spacing(9)]"
@@ -426,12 +547,22 @@ Compose the exported `CalendarDayButton` to preserve native events, disabled sta
 "use client";
 import { enUS } from "date-fns/locale";
 import { useState } from "react";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import type { DayButtonProps } from "react-day-picker";
 import { Calendar, CalendarDayButton } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 function BookingDay(props: DayButtonProps) {
   return (
@@ -448,6 +579,7 @@ export function CustomDayExample() {
     <Calendar
       {...stable}
       aria-label="Booking availability"
+      labels={{ ...stable.labels, labelNav: () => "Booking availability navigation" }}
       mode="single"
       selected={date}
       onSelect={setDate}
@@ -470,12 +602,22 @@ Omitting `mode` displays dates without selectable day buttons. The first calenda
 
 ```tsx
 "use client";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { enUS } from "date-fns/locale";
 import { Calendar } from "@/components/cadence/calendar";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function BrowseOnlyExample() {
   return (
@@ -483,11 +625,14 @@ export function BrowseOnlyExample() {
       <Calendar
         {...stable}
         aria-label="Browse months without selecting"
+      labels={{ ...stable.labels, labelNav: () => "Browse months without selecting navigation" }}
         startMonth={november}
         endMonth={new Date(2026, 11, 1)}
       />
-      <Calendar {...stable} aria-label="Navigation disabled" disableNavigation />
-      <Calendar {...stable} aria-label="Navigation hidden" hideNavigation />
+      <Calendar {...stable} aria-label="Navigation disabled"
+      labels={{ ...stable.labels, labelNav: () => "Disabled calendar navigation" }} disableNavigation />
+      <Calendar {...stable} aria-label="Navigation hidden"
+      labels={{ ...stable.labels, labelNav: () => "Hidden calendar navigation" }} hideNavigation />
     </div>
   );
 }
@@ -503,16 +648,27 @@ This named example intentionally overrides the header with a fixed `CadenceProvi
 "use client";
 import { enUS } from "date-fns/locale";
 import { Calendar } from "@/components/cadence/calendar";
+import { formatDay, labelDayButton, labelGridcell } from "react-day-picker";
 import { CadenceProvider } from "@/components/cadence/lib/provider";
 
 const november = new Date(2026, 10, 1);
 const today = new Date(2026, 10, 4);
-const stable = { defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border" };
+const stable = {
+  defaultMonth: november, today, locale: enUS, className: "min-w-64 rounded-md border",
+  labels: {
+    // Include the visible numeral while retaining the localized date and today/selected context.
+    labelDayButton: (...args: Parameters<typeof labelDayButton>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelDayButton(...args)}`,
+    labelGridcell: (...args: Parameters<typeof labelGridcell>) =>
+      `${formatDay(args[0], args[2], args[3])}, ${labelGridcell(...args)}`,
+  },
+};
 
 export function WithoutMotionExample() {
   return (
     <CadenceProvider mode="none">
-      <Calendar {...stable} aria-label="Instant month navigation" mode="single" />
+      <Calendar {...stable} aria-label="Instant month navigation"
+      labels={{ ...stable.labels, labelNav: () => "Instant calendar navigation" }} mode="single" />
     </CadenceProvider>
   );
 }
@@ -574,7 +730,7 @@ precedence over the corresponding animation property. No outgoing duplicate stea
 ## Accessibility
 
 DayPicker owns grid labels, selected/disabled semantics and roving focus. Native month/year
-selects stay keyboard reachable. Pass a meaningful `aria-label` when several calendars appear.
+selects stay keyboard reachable. Pass a meaningful `aria-label` when several calendars appear, and a distinct `labels.labelNav` for each navigation landmark. These examples prepend the visible day numeral to DayPicker’s existing `labelDayButton` and browse-only `labelGridcell`, preserving its localized full date and today/selected context for speech input. These are caller-owned label overrides; Calendar retains DayPicker’s defaults. If you customize `formatDay` or locale-provided day labels, compose those same values into the accessible name.
 DayPicker 9.13.2 keeps its default navigation labels in English even with a date-fns locale;
 provide `labels` to localize those strings. Use the `footer` live region or a separate status for selected values. Do not replace a day
 with a non-interactive element in a selectable calendar.

@@ -197,8 +197,10 @@ test("Calendar native captions, locales, RTL, bounds and finite navigation varia
     const calendar = captions.locator(`[data-slot="calendar"][aria-label="${name} caption"]`);
     await expect(calendar.locator("select")).toHaveCount(count);
   }
-  const dropdown = captions.locator('[aria-label="dropdown caption"]');
+  const dropdown = captions.locator('[data-slot="calendar"][aria-label="dropdown caption"]');
+  await expect(dropdown.getByRole("grid")).toHaveAttribute("data-motion", "none");
   await dropdown.getByLabel("Choose the Month").selectOption("1");
+  await expect(dropdown.getByRole("grid")).toHaveAttribute("aria-label", "February 2026");
   await dropdown.getByLabel("Choose the Year").selectOption("2027");
   await expect(dropdown.getByRole("grid")).toHaveAttribute("aria-label", "February 2027");
   const localized = card(page, "localized-navigation"),
@@ -218,13 +220,18 @@ test("Calendar native captions, locales, RTL, bounds and finite navigation varia
   await arabic.getByRole("button", { name: "الشهر التالي" }).click();
   await expect(arabic.getByRole("grid")).not.toHaveAttribute("aria-label", arabicMonth);
   const browse = card(page, "browse-only"),
-    bounded = browse.locator('[aria-label="Browse months without selecting"]');
+    bounded = browse.locator('[data-slot="calendar"][aria-label="Browse months without selecting"]');
   await expect(bounded.getByRole("button", { name: /previous month/i })).toBeDisabled();
   await bounded.getByRole("button", { name: /next month/i }).click();
   await expect(bounded.getByRole("button", { name: /next month/i })).toBeDisabled();
   await expect(bounded.getByRole("grid").getByRole("button")).toHaveCount(0);
-  await expect(browse.locator('[aria-label="Navigation hidden"]').getByRole("navigation")).toHaveCount(0);
-  for (const button of await browse.locator('[aria-label="Navigation disabled"]').getByRole("button").all())
+  await expect(
+    browse.locator('[data-slot="calendar"][aria-label="Navigation hidden"]').getByRole("navigation"),
+  ).toHaveCount(0);
+  for (const button of await browse
+    .locator('[data-slot="calendar"][aria-label="Navigation disabled"]')
+    .getByRole("button")
+    .all())
     await expect(button).toBeDisabled();
   const variants = card(page, "navigation-button-variants");
   for (const [variant, token] of [
@@ -235,7 +242,7 @@ test("Calendar native captions, locales, RTL, bounds and finite navigation varia
     ["ghost", "hover:bg-accent"],
     ["link", "underline-offset-4"],
   ]) {
-    const calendar = variants.locator(`[aria-label="${variant} navigation"]`),
+    const calendar = variants.locator(`[data-slot="calendar"][aria-label="${variant} navigation"]`),
       button = calendar.getByRole("button", { name: /next month/i });
     await expect(button).toHaveClass(new RegExp(token ?? "missing variant"));
     const bounds = await calendar.evaluate((el) => {
@@ -351,14 +358,19 @@ test("Calendar running reverse, header cancellation and live system preference r
 });
 
 for (const theme of ["light", "dark"])
-  for (const width of [1280, 390])
-    test(`Calendar named examples axe and screenshots ${theme}/${width}`, async ({ page }) => {
+  for (const width of [1280, 390]) {
+    test(`Calendar named examples axe ${theme}/${width}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.addInitScript((value) => localStorage.setItem("cadence-theme", value), theme);
       await open(page);
       expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual(
         [],
       );
+    });
+    test(`Calendar named examples geometry and screenshots ${theme}/${width}`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await page.addInitScript((value) => localStorage.setItem("cadence-theme", value), theme);
+      await open(page);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const grids = card(page, "multiple-months").getByRole("grid");
       const first = await grids.nth(0).boundingBox(),
@@ -382,6 +394,7 @@ for (const theme of ["light", "dark"])
         await page.screenshot({ path: `.cache/calendar-proof/${name}-${theme}-${width}.png`, fullPage: true, clip });
       }
     });
+  }
 
 for (const hash of ["single-selection", "controlled-month-and-date", "localized-navigation"])
   test(`Calendar cold full deep link ${hash}`, async ({ page }) => {

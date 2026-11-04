@@ -20,6 +20,7 @@ describe("Data Table composition", () => {
       <DataTableDemo data={records} ref={ref} className="custom" style={{ color: "red" }} onClick={click} />,
     );
     const root = container.querySelector('[data-slot="data-table"]');
+    expect(screen.getByRole("columnheader", { name: "Actions" })).toHaveAttribute("scope", "col");
     expect(root).toHaveClass("custom");
     expect(root).toHaveStyle({ color: "rgb(255, 0, 0)" });
     expect(ref).toHaveBeenCalledWith(root);

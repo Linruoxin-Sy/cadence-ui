@@ -52,7 +52,7 @@ import { createToastManager, Toaster } from "@/components/cadence/toast";
 
 export function Types() {
   const [manager] = useState(createToastManager);
-  return <Toaster toastManager={manager} timeout={0}>
+  return <Toaster viewportProps={{ "aria-label": "Types notifications" }} toastManager={manager} timeout={0}>
     <div className="flex flex-wrap gap-2">
       {([undefined, "success", "info", "warning", "error", "loading"] as const).map(type => <Button key={type ?? "plain"} variant="outline" onClick={() => manager.add({ title: `${type ?? "plain"} notification`, type })}>Show {type ?? "plain"}</Button>)}
       <Button variant="ghost" onClick={() => manager.close()}>Clear types</Button>
@@ -76,7 +76,7 @@ import { createToastManager, Toaster } from "@/components/cadence/toast";
 export function Actions() {
   const [manager] = useState(createToastManager);
   const [result, setResult] = useState("Item available");
-  return <Toaster toastManager={manager} timeout={0}>
+  return <Toaster viewportProps={{ "aria-label": "Archive notifications" }} toastManager={manager} timeout={0}>
     <div className="flex flex-col gap-3">
       <Button onClick={() => {
         setResult("Item archived");
@@ -102,7 +102,7 @@ import { createToastManager, Toaster } from "@/components/cadence/toast";
 
 export function Priority() {
   const [manager] = useState(createToastManager);
-  return <Toaster toastManager={manager} timeout={0}>
+  return <Toaster viewportProps={{ "aria-label": "Priority notifications" }} toastManager={manager} timeout={0}>
     <div className="flex flex-wrap gap-2">
       <Button variant="outline" onClick={() => manager.add({ title: "Draft saved", priority: "low" })}>Polite notification</Button>
       <Button variant="outline" onClick={() => manager.add({ title: "Connection unavailable", description: "Your draft remains on this device.", type: "error", priority: "high" })}>Urgent notification</Button>
@@ -128,7 +128,7 @@ export function Progress() {
   const [manager] = useState(createToastManager);
   const [id, setId] = useState<string>();
   const [result, setResult] = useState("No export queued");
-  return <Toaster toastManager={manager} timeout={0}>
+  return <Toaster viewportProps={{ "aria-label": "Export notifications" }} toastManager={manager} timeout={0}>
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2">
         <Button disabled={!!id} onClick={() => { setId(manager.add({ title: "Export queued", type: "loading", onClose: () => setId(undefined) })); setResult("Export queued"); }}>Queue export</Button>
@@ -155,7 +155,7 @@ import { createToastManager, Toaster } from "@/components/cadence/toast";
 
 export function Timers() {
   const [manager] = useState(createToastManager);
-  return <Toaster toastManager={manager} timeout={5000} limit={2}>
+  return <Toaster viewportProps={{ "aria-label": "Timer notifications" }} toastManager={manager} timeout={5000} limit={2}>
     <div className="flex flex-wrap gap-2">
       <Button onClick={() => manager.add({ title: "Timed notification", description: "Closes after five seconds without hover or focus." })}>Add timed notification</Button>
       <Button variant="outline" onClick={() => manager.add({ title: "Persistent notification", timeout: 0 })}>Add persistent notification</Button>
@@ -202,7 +202,7 @@ export function Composition({ direction = "right", label = "Show custom notifica
   const [manager] = useState(createToastManager);
   return <ToastProvider toastManager={manager} timeout={0}>
     <Button variant="outline" onClick={() => manager.add({ title: "Custom notification", description: `Swipe ${direction} or use the close button.` })}>{label}</Button>
-    <ToastPortal><ToastViewport><NotificationList direction={direction} /></ToastViewport></ToastPortal>
+    <ToastPortal><ToastViewport aria-label={`${label} notifications`}><NotificationList direction={direction} /></ToastViewport></ToastPortal>
   </ToastProvider>;
 }
 ```
@@ -244,7 +244,7 @@ function Composition({ direction = "right", label = "Show custom notification" }
   const [manager] = useState(createToastManager);
   return <ToastProvider toastManager={manager} timeout={0}>
     <Button variant="outline" onClick={() => manager.add({ title: "Custom notification", description: `Swipe ${direction} or use the close button.` })}>{label}</Button>
-    <ToastPortal><ToastViewport><NotificationList direction={direction} /></ToastViewport></ToastPortal>
+    <ToastPortal><ToastViewport aria-label={`${label} notifications`}><NotificationList direction={direction} /></ToastViewport></ToastPortal>
   </ToastProvider>;
 }
 
@@ -291,7 +291,7 @@ function Composition({ direction = "right", label = "Show custom notification" }
   const [manager] = useState(createToastManager);
   return <ToastProvider toastManager={manager} timeout={0}>
     <Button variant="outline" onClick={() => manager.add({ title: "Custom notification", description: `Swipe ${direction} or use the close button.` })}>{label}</Button>
-    <ToastPortal><ToastViewport><NotificationList direction={direction} /></ToastViewport></ToastPortal>
+    <ToastPortal><ToastViewport aria-label={`${label} notifications`}><NotificationList direction={direction} /></ToastViewport></ToastPortal>
   </ToastProvider>;
 }
 
@@ -319,7 +319,7 @@ export function WithoutMotion() {
 
 | Part | Props | Default / behavior |
 | --- | --- | --- |
-| `Toaster` | Base UI Provider props, `children`, `toastManager` | shared `toast` manager; renders portal, viewport and list |
+| `Toaster` | Base UI Provider props, `children`, `toastManager`, `viewportProps` | shared `toast` manager; optional `viewportProps` forwards Viewport props except `children`; renders portal, viewport and list |
 | `ToastProvider` | `timeout`, `limit`, `toastManager`, `children` | Base UI defaults: 5000ms, limit 3 |
 | `ToastPortal` | Base UI Portal props, `container`, `keepMounted` | document portal |
 | `ToastViewport` | Base UI Viewport props, `className` | fixed bottom right; F6 hotkey |
@@ -368,7 +368,7 @@ remain owned by the primitive.
 
 Base UI announces notification title and description at the selected priority. Focus is not moved when a
 toast arrives. Actions and close controls are named buttons. Important content must also exist in persistent
-application UI; a notification should never be its only location. Timers pause during hover or focus.
+application UI; a notification should never be its only location. Timers pause during hover or focus. Give each independently mounted viewport a distinct, meaningful name with `Toaster viewportProps={{ "aria-label": "Export notifications" }}` or `ToastViewport aria-label` when composing the parts. The default remains “Notifications”; the manager and live-region behavior are unchanged.
 
 ## Responsive behavior
 
