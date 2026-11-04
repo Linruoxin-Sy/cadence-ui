@@ -14485,17 +14485,514 @@ For manual installation copy `command/index.tsx`, install `cmdk` and `lucide-rea
 
 ## Usage
 
-```tsx
-import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/cadence/command";
+The common palette keeps the caller's action and open state together. Its search and list are inside an explicit Command root.
+The local SearchableList composition reads cmdk's result count with useCommandState. A miss collapses the suggestion
+list and announces the empty text outside it. The composed input sets aria-expanded accordingly; the same list and
+its aria-controls target remain mounted. This avoids presenting an expanded listbox without options.
 
-export function Actions() {
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
   return (
-    <Command label="Quick actions" className="max-w-sm rounded-lg border">
-      <CommandInput placeholder="Search actions..." />
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function Palette({
+  label = "Open command palette",
+  showCloseButton = false,
+}: {
+  label?: string;
+  showCloseButton?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [executed, setExecuted] = useState("No action yet");
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        {label}
+      </Button>
+      <p role="status" className="text-sm text-muted-foreground">
+        {executed}
+      </p>
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Workspace commands"
+        description="Find an action, then press Enter to run it."
+        showCloseButton={showCloseButton}
+      >
+        <Command label="Workspace actions">
+          <SearchableList placeholder="Search workspace...">
+
+            <CommandGroup heading="Workspace">
+              {["projects", "search", "settings"].map((value) => (
+                <CommandItem
+                  key={value}
+                  value={value}
+                  onSelect={(action) => {
+                    setExecuted(`Executed: ${action}`);
+                    setOpen(false);
+                  }}
+                >
+                  {value}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </SearchableList>
+        </Command>
+      </CommandDialog>
+    </div>
+  );
+}
+```
+
+## Dialog palette
+
+Keep Command explicit inside CommandDialog. This named palette supplies its own title and description, enables the built-in close button, and closes after an action. The top palette uses the default hidden close button; Escape still dismisses it. Each opener owns independent open and executed-action state. Install `@cadence/button` for the buttons in these examples.
+
+<ComponentExample name="dialog" />
+
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+function Palette({
+  label = "Open command palette",
+  showCloseButton = false,
+}: {
+  label?: string;
+  showCloseButton?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [executed, setExecuted] = useState("No action yet");
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        {label}
+      </Button>
+      <p role="status" className="text-sm text-muted-foreground">
+        {executed}
+      </p>
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Workspace commands"
+        description="Find an action, then press Enter to run it."
+        showCloseButton={showCloseButton}
+      >
+        <Command label="Workspace actions">
+          <SearchableList placeholder="Search workspace...">
+
+            <CommandGroup heading="Workspace">
+              {["projects", "search", "settings"].map((value) => (
+                <CommandItem
+                  key={value}
+                  value={value}
+                  onSelect={(action) => {
+                    setExecuted(`Executed: ${action}`);
+                    setOpen(false);
+                  }}
+                >
+                  {value}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </SearchableList>
+        </Command>
+      </CommandDialog>
+    </div>
+  );
+}
+
+export function NamedPalette() { return <Palette label="Open named palette" showCloseButton />; }
+```
+
+## Keywords and disabled actions
+
+Inline examples reserve the unmatched initial `defaultValue="none"` to start without a highlight.
+cmdk otherwise scrolls its default highlighted item into view on mount, which can move a long page.
+Typing or using arrow keys then selects and scrolls the actual matching item normally.
+The controlled example uses the same initial unmatched value; dialog palettes retain the default first item.
+SearchableList shows empty feedback only for a nonempty query with zero registered matches. The initial
+nonempty result layout stays the same in server markup and after hydration. Filtering and counting stay with cmdk.
+
+Stable item values and optional keywords participate in local fuzzy filtering. Search for user to find Profile or find to find Search files. Disabled items remain visible when they match, but arrows skip them and they cannot run. Groups hide when none of their items match; the default separator hides during a search.
+
+<ComponentExample name="keywords" />
+
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function Keywords() {
+  const [executed, setExecuted] = useState("No action yet");
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Command defaultValue="none" label="Account actions" className="rounded-lg border">
+        <SearchableList placeholder="Try user or find...">
+
+          <CommandGroup heading="Workspace">
+            <CommandItem value="search" keywords={["find"]} onSelect={setExecuted}>
+              Search files
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Account">
+            <CommandItem value="profile" keywords={["account", "user"]} onSelect={setExecuted}>
+              Profile
+            </CommandItem>
+            <CommandItem value="billing" disabled>
+              Billing unavailable
+            </CommandItem>
+          </CommandGroup>
+        </SearchableList>
+      </Command>
+      <p role="status" className="text-sm text-muted-foreground">
+        {executed}
+      </p>
+    </div>
+  );
+}
+```
+
+## Shortcut hints
+
+CommandShortcut displays a hint beside an action. It registers no global shortcut. Click or press Enter here to record the command; an application owns any real routing or keyboard listener and its cleanup.
+
+<ComponentExample name="shortcuts" />
+
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandShortcut } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function Shortcuts() {
+  const [executed, setExecuted] = useState("No action yet");
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Command defaultValue="none" label="Navigation actions" className="rounded-lg border">
+        <SearchableList placeholder="Search navigation...">
+
+          <CommandGroup heading="Navigation">
+            <CommandItem value="settings" onSelect={setExecuted}>
+              Settings<CommandShortcut>⌘,</CommandShortcut>
+            </CommandItem>
+            <CommandItem value="projects" onSelect={setExecuted}>
+              Projects<CommandShortcut>⌘P</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </SearchableList>
+      </Command>
+      <p role="status" className="text-sm text-muted-foreground">
+        {executed}
+      </p>
+    </div>
+  );
+}
+```
+
+## Controlled highlight and query
+
+The root value is the highlighted command, not a submitted form value or a record that an action ran. CommandInput owns a separate search string. Arrow keys only move the highlight; item onSelect records execution. The external button clears the query and highlights settings without running it.
+
+<ComponentExample name="controlled" />
+
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function Controlled() {
+  const [query, setQuery] = useState("");
+  const [highlight, setHighlight] = useState("none");
+  const [executed, setExecuted] = useState("none");
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Command label="Controlled actions" value={highlight} onValueChange={setHighlight} className="rounded-lg border">
+        <SearchableList placeholder="Search controlled actions..." value={query} onValueChange={setQuery}>
+
+          <CommandGroup heading="Workspace">
+            {["projects", "settings"].map((value) => (
+              <CommandItem key={value} value={value} onSelect={setExecuted}>
+                {value}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </SearchableList>
+      </Command>
+      <Button
+        variant="outline"
+        onClick={() => {
+          setQuery("");
+          setHighlight("settings");
+        }}
+      >
+        Highlight settings externally
+      </Button>
+      <p role="status" className="text-sm text-muted-foreground">
+        Query: {query || "empty"}; highlighted: {highlight || "none"}; executed: {executed}
+      </p>
+    </div>
+  );
+}
+```
+
+## A custom filter
+
+A custom filter returns a score from 0 to 1. This fixed policy accepts prefixes of stable values or keywords, ignoring case; pref matches Settings through preferences, while ttings does not. Filtering and list height update immediately.
+
+<ComponentExample name="filter" />
+
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode } from "react";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function PrefixFilter() {
+  return (
+    <Command
+      defaultValue="none"
+      label="Prefix actions"
+      className="w-full max-w-sm rounded-lg border"
+      filter={(value, search, keywords = []) =>
+        [value, ...keywords].some((text) => text.toLowerCase().startsWith(search.trim().toLowerCase())) ? 1 : 0
+      }
+    >
+      <SearchableList placeholder="Match a prefix, such as pref..." emptyMessage="No prefix matches.">
+
+        <CommandGroup heading="Actions">
+          <CommandItem value="settings" keywords={["preferences"]}>
+            Settings
+          </CommandItem>
+          <CommandItem value="projects">Projects</CommandItem>
+        </CommandGroup>
+      </SearchableList>
+    </Command>
+  );
+}
+```
+
+## Caller-owned results
+
+Set shouldFilter=false when the caller supplies the visible result set and its order. This example filters a fixed local city array; it makes no network request. The caller supplies the empty text; SearchableList reads the actual registered result count, collapses the empty list and announces the message outside it. An application owns request cancellation, loading, errors and authorization.
+
+<ComponentExample name="results" />
+
+```tsx
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function CallerResults() {
+  const [query, setQuery] = useState("");
+  const [executed, setExecuted] = useState("No action yet");
+  const results = ["Paris", "London", "Tokyo"].filter((city) => city.toLowerCase().includes(query.toLowerCase()));
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Command defaultValue="none" label="City actions" shouldFilter={false} className="rounded-lg border">
+        <SearchableList placeholder="Search local city data..." value={query} onValueChange={setQuery} emptyMessage="No city found.">
+          <CommandGroup heading="Cities">
+            {results.map((city) => (
+              <CommandItem key={city} value={city} onSelect={setExecuted}>
+                Open {city}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </SearchableList>
+      </Command>
+      <p role="status" className="text-sm text-muted-foreground">
+        {executed}
+      </p>
+    </div>
+  );
+}
+```
+
+## Keyboard and pointer navigation
+
+The left list stops at its first and last enabled item and keeps the default Ctrl+N/J/P/K bindings. The right list loops with arrows, disables those optional bindings, and disables pointer-hover highlighting. Clicking an enabled item still activates it. Both lists skip the disabled middle row; neither setting changes native text editing.
+
+<ComponentExample name="navigation" />
+
+```tsx
+"use client";
+
+import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+export function Navigation() {
+  return (
+    <div className="grid w-full gap-4 sm:grid-cols-2">
+      <Command defaultValue="none" label="Bounded actions" loop={false} className="rounded-lg border">
+        <CommandInput placeholder="Bounded; Ctrl+N enabled" />
+        <CommandList>
+          <CommandGroup heading="Bounded">
+            <CommandItem value="first">First</CommandItem>
+            <CommandItem value="unavailable" disabled>
+              Unavailable
+            </CommandItem>
+            <CommandItem value="last">Last</CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+      <Command
+        defaultValue="none"
+        label="Looping actions"
+        loop
+        vimBindings={false}
+        disablePointerSelection
+        className="rounded-lg border"
+      >
+        <CommandInput placeholder="Looping; arrow keys" />
+        <CommandList>
+          <CommandGroup heading="Looping">
+            <CommandItem value="first">First</CommandItem>
+            <CommandItem value="unavailable" disabled>
+              Unavailable
+            </CommandItem>
+            <CommandItem value="last">Last</CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    </div>
+  );
+}
+```
+
+## An unavailable input
+
+Disable the input when search is unavailable, and separately disable every unavailable action. Disabling the search field alone does not disable other items. The native disabled input cannot receive keyboard focus.
+
+<ComponentExample name="disabled" />
+
+```tsx
+"use client";
+
+import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+export function DisabledInput() {
+  return (
+    <Command defaultValue="none" label="Unavailable search" className="w-full max-w-sm rounded-lg border">
+      <CommandInput disabled placeholder="Search unavailable" />
       <CommandList>
-        <CommandEmpty>No actions found.</CommandEmpty>
-        <CommandGroup heading="Workspace">
-          <CommandItem value="projects" onSelect={() => console.log("projects")}>Open projects</CommandItem>
+        <CommandGroup heading="Unavailable">
+          <CommandItem value="offline" disabled>
+            Offline action
+          </CommandItem>
         </CommandGroup>
       </CommandList>
     </Command>
@@ -14503,57 +15000,169 @@ export function Actions() {
 }
 ```
 
-## Dialog palette
+## Persistent help while filtering
 
-The Base UI composition keeps `Command` explicit inside `CommandDialog`. The visually hidden title
-and description live inside the popup so the portalled dialog remains named.
+forceMount on the Help group and its item keeps the help action available for every query. alwaysRender keeps the decorative rule visible. The Workspace group still follows normal filtering and hides on a miss. Persistent actions need their own valid behavior in the application; this specimen only demonstrates visibility.
+
+<ComponentExample name="mounted" />
 
 ```tsx
-import * as React from "react";
-import { Button } from "@/components/cadence/button";
-import { Command, CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from "@/components/cadence/command";
+"use client";
 
-export function Palette() {
-  const [open, setOpen] = React.useState(false);
+import { Command, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/cadence/command";
+
+export function MountedActions() {
   return (
-    <>
-      <Button onClick={() => setOpen(true)}>Open palette</Button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <Command>
-          <CommandInput placeholder="Search actions..." />
-          <CommandList>
-            <CommandGroup heading="Workspace">
-              <CommandItem value="projects" onSelect={() => setOpen(false)}>Open projects</CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </CommandDialog>
-    </>
+    <Command defaultValue="none" label="Persistent help" className="w-full max-w-sm rounded-lg border">
+      <CommandInput placeholder="Try a query with no matches..." />
+      <CommandList>
+        <CommandGroup heading="Workspace">
+          <CommandItem value="projects">Projects</CommandItem>
+        </CommandGroup>
+        <CommandSeparator alwaysRender />
+        <CommandGroup heading="Help" forceMount>
+          <CommandItem value="help" forceMount>
+            Search the help center
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 }
 ```
 
-## Keywords and disabled actions
+## Composing the search input
+
+SearchableList uses CommandInput's cmdk asChild composition API with one ref-forwarding InputGroupInput. The child sets truthful aria-expanded while preserving input-group styling; this example also supplies native inputMode and autoComplete. The Base UI dialog continues to use its own render API.
+
+<ComponentExample name="custom-input" />
 
 ```tsx
-<CommandGroup heading="Account">
-  <CommandItem value="profile" keywords={["account", "user"]}>Profile</CommandItem>
-  <CommandItem value="billing" disabled>Billing unavailable</CommandItem>
-</CommandGroup>
+"use client";
+
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode } from "react";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+export function CustomInput() {
+  return (
+    <Command defaultValue="none" label="Custom search field" className="w-full max-w-sm rounded-lg border">
+      <SearchableList placeholder="Search with a composed input..." inputMode="search" autoComplete="off">
+
+        <CommandGroup heading="Workspace">
+          <CommandItem value="projects">Projects</CommandItem>
+          <CommandItem value="settings">Settings</CommandItem>
+        </CommandGroup>
+      </SearchableList>
+    </Command>
+  );
+}
 ```
 
-## Shortcut hints
+## Without motion
+
+The first palette is explicitly inside mode=none from its first mount. The second opts back into full within that subtree; the operating system reduced-motion preference still wins. Ordinary examples inherit the site header mode and speed. Inline filtering and highlighting remain immediate in every mode.
+
+<ComponentExample name="without-motion" />
 
 ```tsx
-import { CommandGroup, CommandItem, CommandShortcut } from "@/components/cadence/command";
+"use client";
 
-<CommandGroup heading="Navigation">
-  <CommandItem value="settings">Settings <CommandShortcut>Ctrl+S</CommandShortcut></CommandItem>
-</CommandGroup>
+import { useCommandState } from "cmdk";
+import { type ComponentProps, type ReactNode, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { InputGroupInput } from "@/components/cadence/input-group";
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/cadence/command";
+
+function SearchableList({ children, emptyMessage = "No actions found.", ...inputProps }: Omit<ComponentProps<typeof CommandInput>, "children" | "asChild"> & { children: ReactNode; emptyMessage?: string }) {
+  const empty = useCommandState((state) => state.search.length > 0 && state.filtered.count === 0);
+  return (
+    <>
+      <CommandInput {...inputProps} asChild>
+        <InputGroupInput aria-expanded={!empty} />
+      </CommandInput>
+      {empty && <CommandEmpty><span role="status">{emptyMessage}</span></CommandEmpty>}
+      <CommandList hidden={empty}>{children}</CommandList>
+    </>
+  );
+}
+
+function Palette({
+  label = "Open command palette",
+  showCloseButton = false,
+}: {
+  label?: string;
+  showCloseButton?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const [executed, setExecuted] = useState("No action yet");
+  return (
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        {label}
+      </Button>
+      <p role="status" className="text-sm text-muted-foreground">
+        {executed}
+      </p>
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Workspace commands"
+        description="Find an action, then press Enter to run it."
+        showCloseButton={showCloseButton}
+      >
+        <Command label="Workspace actions">
+          <SearchableList placeholder="Search workspace...">
+
+            <CommandGroup heading="Workspace">
+              {["projects", "search", "settings"].map((value) => (
+                <CommandItem
+                  key={value}
+                  value={value}
+                  onSelect={(action) => {
+                    setExecuted(`Executed: ${action}`);
+                    setOpen(false);
+                  }}
+                >
+                  {value}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </SearchableList>
+        </Command>
+      </CommandDialog>
+    </div>
+  );
+}
+
+export function WithoutMotion() {
+  return (
+    <CadenceProvider mode="none">
+      <div className="flex w-full flex-wrap gap-4">
+        <Palette label="Open instant palette" />
+        <CadenceProvider mode="full">
+          <Palette label="Open nested full palette" />
+        </CadenceProvider>
+      </div>
+    </CadenceProvider>
+  );
+}
 ```
-
-A shortcut is a visual hint; register application shortcuts in the caller. The component does not
-install global keyboard listeners.
 
 ## When to use
 
@@ -14571,7 +15180,7 @@ install global keyboard listeners.
 
 | Part | Props | Default / behavior |
 | --- | --- | --- |
-| `Command` | cmdk root props: `label`, `value`, `defaultValue`, `onValueChange`, `filter`, `shouldFilter`, `loop` | `shouldFilter=true`, `loop=false`; value is the highlighted command |
+| `Command` | cmdk root props: `label`, `value`, `defaultValue`, `onValueChange`, `filter`, `shouldFilter`, `loop`, `vimBindings`, `disablePointerSelection` | `shouldFilter=true`, `loop=false`, `vimBindings=true`, `disablePointerSelection=false`; value is the highlighted command |
 | `CommandDialog` | Base UI Dialog root props, `title`, `description`, `className`, `showCloseButton`, required `children` | title `"Command Palette"`, description `"Search for a command to run..."`, `showCloseButton=false` |
 | `CommandInput` | cmdk input props, `value`, `onValueChange`, `placeholder`, `disabled` | Typing filters locally; the root supplies the accessible label |
 | `CommandList` | cmdk list props, `className` | Scrollable, max height 300px; no height tween |
@@ -14601,8 +15210,8 @@ it adds no transition of its own. Fixed centering translation is layout, not mot
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
 geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The preview's **Popup motion** selector changes the local mode on the
-same component tree. The Dialog surface retains Base UI callback/render/ref semantics. Command parts use
+first mounted frame. Ordinary specimens inherit the site header; the named Without motion example
+uses explicit fixed local providers. The Dialog surface retains Base UI callback/render/ref semantics. Command parts use
 cmdk’s native string class and object style props; cmdk owns filtering and keyboard selection.
 
 ## Keyboard interactions
@@ -14611,6 +15220,7 @@ cmdk’s native string class and object style props; cmdk owns filtering and key
 | --- | --- |
 | ArrowDown / ArrowUp | Move highlight, skipping disabled rows |
 | Home / End | First / last enabled item |
+| Ctrl+N / J, Ctrl+P / K | Next / previous item when vimBindings is enabled (default) |
 | Enter | Run the highlighted item's `onSelect` |
 | Escape | Close the dialog; an inline command has no dismissal behavior |
 | Tab / Shift+Tab | Focus traversal, trapped inside an open dialog |
@@ -14618,8 +15228,10 @@ cmdk’s native string class and object style props; cmdk owns filtering and key
 ## Accessibility
 
 cmdk owns combobox/listbox roles, `aria-activedescendant`, and selected/disabled attributes.
-Give `Command` a `label` to name its search field. The dialog supplies a title, description,
-focus trap, and focus restoration. Empty results are text, not executable options.
+Give `Command` a `label` to name its search field. The dialog supplies a title, description and focus trap. The caller opens it from a real button;
+dismissal restores focus to the initiating control. In these examples, a zero-result list is hidden, the input reports aria-expanded=false,
+and CommandEmpty announces text outside the list. No-result messages are not executable options. SearchableList must stay inside Command
+because useCommandState reads that root's actual cmdk store; it adds no second filter.
 Separators are decorative (`aria-hidden`) because a listbox permits options and option groups.
 
 ## Responsive behavior

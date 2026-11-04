@@ -102,5 +102,18 @@
     "modality",
     "custom-trigger",
     "without-motion"
+  ],
+  "command": [
+    "dialog",
+    "keywords",
+    "shortcuts",
+    "controlled",
+    "filter",
+    "results",
+    "navigation",
+    "disabled",
+    "mounted",
+    "custom-input",
+    "without-motion"
   ]
 }

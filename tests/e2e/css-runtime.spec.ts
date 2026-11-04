@@ -337,3 +337,69 @@ for (const os of ["no-preference", "reduce"] as const)
       await input.press("Escape");
       await expect(popup).toHaveCount(0);
     });
+
+for (const os of ["no-preference", "reduce"] as const)
+  for (const mode of MODES)
+    test(`CSS command actual insertion and same-node reversal ${mode}/${os}`, async ({ page }, info) => {
+      await page.emulateMedia({ reducedMotion: os });
+      await openPopupMotionFixture(page, "command", mode, 4);
+      await page.evaluate(() => {
+        const state = window as unknown as {
+          cbFrames: { opacity: number; scale: string; animations: number }[];
+          cbRecording: boolean;
+        };
+        state.cbFrames = [];
+        state.cbRecording = true;
+        const sample = () => {
+          const n = document.querySelector('[data-slot="dialog-content"]');
+          if (n) {
+            const s = getComputedStyle(n);
+            state.cbFrames.push({ opacity: Number(s.opacity), scale: s.scale, animations: n.getAnimations().length });
+          }
+        };
+        const observer = new MutationObserver(sample);
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        const tick = () => {
+          sample();
+          if (state.cbRecording) requestAnimationFrame(tick);
+          else observer.disconnect();
+        };
+        tick();
+      });
+      const opener = page.getByRole("button", { name: "Open command palette", exact: true });
+      await opener.click();
+      const popup = page.locator('[data-slot="dialog-content"]');
+      await expect(popup).toBeVisible();
+      await page.waitForTimeout(450);
+      const frames = await page.evaluate(() => {
+        const state = window as unknown as {
+          cbFrames: { opacity: number; scale: string; animations: number }[];
+          cbRecording: boolean;
+        };
+        state.cbRecording = false;
+        return state.cbFrames;
+      });
+      await info.attach("raw command insertion", { body: JSON.stringify(frames), contentType: "application/json" });
+      const actual = effectiveMode(mode, os === "reduce");
+      expect(frames.length).toBeGreaterThan(3);
+      if (actual === "none") expect(frames.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
+      else expect(frames.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
+      if (actual !== "full") expect(frames.every((f) => f.scale === "none")).toBe(true);
+      const saved = await popup.elementHandle();
+      await page.getByLabel("Fixture motion").evaluate((n) => {
+        (n as HTMLSelectElement).value = "full";
+        n.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      await page.keyboard.press("Escape");
+      await expect(popup).toHaveAttribute("data-ending-style", "");
+      await opener.evaluate((node) => (node as HTMLButtonElement).click());
+      await expect(popup).not.toHaveAttribute("data-ending-style", "");
+      expect(await popup.evaluate((n, saved) => n === saved, saved)).toBe(true);
+      await page.getByLabel("Fixture motion").evaluate((n) => {
+        (n as HTMLSelectElement).value = "none";
+        n.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      expect(await popup.evaluate((n) => n.getAnimations().length)).toBe(0);
+      await page.keyboard.press("Escape");
+      await expect(popup).toHaveCount(0);
+    });

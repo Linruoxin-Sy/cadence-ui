@@ -23,6 +23,14 @@ import {
   useComboboxAnchor,
 } from "../../registry/cadence/combobox";
 import {
+  Command,
+  CommandDialog,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "../../registry/cadence/command";
+import {
   ContextMenu,
   ContextMenuCheckboxItem,
   ContextMenuContent,
@@ -107,6 +115,7 @@ function PopupMotionFixture({
   timeScale: number;
 }) {
   const [mode, setMode] = useState(initialMode);
+  const [commandOpen, setCommandOpen] = useState(false);
   const inputId = useId();
   const comboAnchor = useComboboxAnchor();
   const field = (
@@ -131,6 +140,22 @@ function PopupMotionFixture({
           </select>
         </label>
         <div data-preview={component}>
+          {component === "command" && (
+            <>
+              <Button onClick={() => setCommandOpen(true)}>Open command palette</Button>
+              <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
+                <Command label="Fixture actions">
+                  <CommandInput placeholder="Retained command query" />
+                  <CommandList>
+                    <CommandGroup heading="Actions">
+                      <CommandItem value="projects">Projects</CommandItem>
+                      <CommandItem value="settings">Settings</CommandItem>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </CommandDialog>
+            </>
+          )}
           {component === "combobox" && (
             <Combobox multiple items={["Next.js", "SvelteKit", "Nuxt.js", "Remix", "Astro"]} defaultValue={["Next.js"]}>
               <ComboboxChips ref={comboAnchor}>

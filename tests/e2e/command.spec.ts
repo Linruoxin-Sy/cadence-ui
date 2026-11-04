@@ -1,6 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
-import { computed, effectiveMode, MODES, openComponent, recordedScale, recordScale, scoped } from "./helpers";
+import { expect, type Page, test } from "@playwright/test";
+import { computed, effectiveMode, MODES, recordedScale, recordScale, scoped } from "./helpers";
+
+async function openCommandPage(page: Page, requested: string, expected: string) {
+  await page.goto(`/components/command?motion=${requested}`);
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator('[data-preview="command"]')).toHaveAttribute("data-preview-motion", expected);
+}
 
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`command ${reducedMotion}`, () => {
@@ -9,10 +15,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
       test(`popup motion ${requested}`, async ({ page }) => {
         const mode = effectiveMode(requested, reducedMotion === "reduce");
         await recordScale(page, '[data-slot="dialog-content"]');
-        await openComponent(page, "command", requested, "command", mode);
+        await openCommandPage(page, requested, mode);
         const trigger = page.getByRole("button", { name: "Open command palette" });
         await trigger.click();
-        const popup = page.getByRole("dialog", { name: "Command Palette" });
+        const popup = page.getByRole("dialog", { name: "Workspace commands" });
         await expect(popup).toBeVisible();
         await expect(popup.getByRole("combobox")).toBeFocused();
         await expect(popup).toHaveAttribute("data-motion", mode);
@@ -39,9 +45,9 @@ for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`command ${colorScheme}`, () => {
     test.use({ colorScheme });
     test("keyboard path, axe and screenshots", async ({ page }, testInfo) => {
-      await openComponent(page, "command", "none", "command");
+      await openCommandPage(page, "none", "none");
       const preview = page.locator('[data-preview="command"]');
-      await preview.screenshot({ path: testInfo.outputPath(`command-${colorScheme}-inline.png`) });
+      await preview.screenshot({ path: testInfo.outputPath(`command-${colorScheme}-top.png`) });
       expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual(
         [],
       );
@@ -57,7 +63,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       await page.keyboard.press("ArrowDown");
       await page.keyboard.press("Enter");
       await expect(popup).not.toBeVisible();
-      await expect(page.locator(scoped("command", '[role="status"]'))).toHaveText("settings");
+      await expect(page.locator(scoped("command", '[role="status"]'))).toHaveText("Executed: settings");
     });
   });
 }
