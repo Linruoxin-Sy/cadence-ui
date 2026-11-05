@@ -13,8 +13,42 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/avatar
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/avatar.json)
+
+Keep `avatar/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared
+`cn` import resolves. Preserve the component's `"use client"` directive:
+`@base-ui/react/avatar` manages image loading, errors and fallback visibility after
+hydration. Avatar is T0 and has no authored animation in full, reduced or none mode;
+no motion runtime, provider or additional item-specific CSS is required.
+
+`AvatarBadge`, `AvatarGroup` and `AvatarGroupCount` are exports from the same Avatar
+file. Use them directly from the Usage import path; no separate Badge or group
+component installation is needed. Include `AvatarFallback` with meaningful initials
+and supply image `alt` text, or `alt=""` when an adjacent name already identifies
+the person. Give a meaningful presence badge a text alternative such as the
+`sr-only` span in Presence, including when the small size hides its icon.
+
+Usage needs your own `/ada.png`. Image and fallback uses an external GitHub image,
+deliberately invalid image data to demonstrate failure, and an avatar without an
+image. Replace those sources with your own assets; Base UI switches between image
+and fallback without a cross-fade. The top preview uses inline SVG portrait data,
+initials and a presence dot with a native `sr-only` span. Sizes and Group use
+initials only. These examples need no additional npm packages or registry items;
+the site's preview frame is not part of the consumer setup.
+
+The Presence example additionally imports `CheckIcon` from `lucide-react`. Install
+it only when copying that example; it is not an Avatar dependency:
+
+```package-manager
+npm install lucide-react
 ```
 
 ## Usage
