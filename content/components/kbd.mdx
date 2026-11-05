@@ -13,9 +13,30 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/kbd
 ```
+
+The Inside a tooltip example also needs Button and Tooltip:
+
+```install
+npx shadcn@latest add @cadence/button @cadence/tooltip
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/kbd.json)
+
+Kbd needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `kbd/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves.
+
+For the Inside a tooltip example, also follow the installation instructions for
+[Button](/components/button#installation) and [Tooltip](/components/tooltip#installation),
+including their dependencies and setup. Those components keep their own motion contracts;
+they are not dependencies of Kbd itself.
 
 ## Usage
 
