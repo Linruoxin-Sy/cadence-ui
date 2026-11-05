@@ -10,9 +10,70 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/textarea
 ```
+
+Usage, the examples and the top preview also use [Label](/components/label). Install
+it when copying those compositions:
+
+```install
+npx shadcn@latest add @cadence/label
+```
+
+The Controlled value and character count example also renders [Button](/components/button)
+for its external action:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| textarea | `@components/cadence/textarea/index.tsx` | [JSON files[].content](https://cadence.dev/r/textarea.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: textarea](https://cadence.dev/r/textarea.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Textarea needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `textarea/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves. Give the textarea an accessible
+name with a label and matching `htmlFor` / `id` as shown in Usage. Content-driven growth
+uses CSS `field-sizing: content` through Tailwind's `field-sizing-content` utility;
+there is no JavaScript auto-grow fallback.
+
+For the labelled compositions, follow [Label's installation](/components/label#installation)
+and copy its component file alongside Textarea; the shared `lib/cn.ts` and its packages are
+already included above. For the Controlled example's action, follow
+[Button's installation](/components/button#installation), including its dependencies and
+motion setup. Label and Button are example dependencies, not dependencies of Textarea.
+Button is rendered only in Controlled; the unused `Button` and `useState` imports in the
+other example snippets can be omitted. React's `useId` and `useState` need no additional
+package beyond the React setup above.
 
 ## Usage
 

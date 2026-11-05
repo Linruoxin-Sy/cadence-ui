@@ -13,9 +13,45 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/textarea
 ```
+
+Usage, the examples and the top preview also use [Label](/components/label). Install
+it when copying those compositions:
+
+```install
+npx shadcn@latest add @cadence/label
+```
+
+The Controlled value and character count example also renders [Button](/components/button)
+for its external action:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/textarea.json)
+
+Textarea needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `textarea/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves. Give the textarea an accessible
+name with a label and matching `htmlFor` / `id` as shown in Usage. Content-driven growth
+uses CSS `field-sizing: content` through Tailwind's `field-sizing-content` utility;
+there is no JavaScript auto-grow fallback.
+
+For the labelled compositions, follow [Label's installation](/components/label#installation)
+and copy its component file alongside Textarea; the shared `lib/cn.ts` and its packages are
+already included above. For the Controlled example's action, follow
+[Button's installation](/components/button#installation), including its dependencies and
+motion setup. Label and Button are example dependencies, not dependencies of Textarea.
+Button is rendered only in Controlled; the unused `Button` and `useState` imports in the
+other example snippets can be omitted. React's `useId` and `useState` need no additional
+package beyond the React setup above.
 
 ## Usage
 
