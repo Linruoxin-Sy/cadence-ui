@@ -10,9 +10,141 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/slider
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| slider | `@components/cadence/slider/index.tsx` | [JSON files[].content](https://cadence.dev/r/slider.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: slider](https://cadence.dev/r/slider.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, keeping `slider/index.tsx` beside the shared `lib/`
+directory, the relative imports intact and the sources' `"use client"` directives.
+The thumb imports `ControlDiv` from `control-animation.tsx`; that module also
+reaches `native-div.tsx` and `press-button.tsx`. Copy every file in the provider,
+motion and utilities payloads, even when you do not wrap the application in a
+provider. The provider files and `motion` package remain required imports.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. Slider needs no additional item-specific CSS, icon package or external
+asset. `feedback.press` scales only the dragged thumb in full; reduced and none
+keep its scale at one with a zero clock. Pointer and keyboard values still
+update immediately in every mode, and the fill has no authored transition.
+Standalone sliders follow the system motion preference. The optional
+`CadenceProvider` controls a subtree's mode and timing; nested full still
+respects system reduced motion.
+
+Usage, the top specimen, Range, Vertical, Disabled, Thumb collisions, Thumb
+alignment and Explicit motion scopes use only Slider and its included helpers.
+Controlled also needs [Button](/components/button):
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab too and add
+`button/index.tsx`. Its shared files are already in Slider's target list; the
+additional npm dependency is:
+
+```package-manager
+npm install class-variance-authority
+```
+
+No example needs another package or external asset. The site's preview shell is
+not consumer setup.
+
+In Next.js App Router, Usage, Controlled and Range need a client module for
+their `useState` and value-change handlers; Controlled also handles an external
+button click. Vertical, Disabled, Thumb collisions, Thumb alignment and Explicit
+motion scopes can be composed in a synchronous Server Component with the shown
+JSX and serializable props; their existing client directives may also be kept.
+An event handler, a function-valued `render`, `className(state)` or `style(state)`,
+or a client-side hook such as `useState` or `useRef` needs a caller client
+boundary. Keep the installed sources' client directives in either case.
+
+Supply an explicit numeric `defaultValue` for an uncontrolled single thumb, or
+own `value` with `onValueChange` for a controlled slider. Arrays create one thumb
+per entry; use ordered values within `min` and `max`, a positive `step` and a
+valid `minStepsBetweenValues` for the available range. `onValueChange` reports
+user changes; `onValueCommitted` reports a completed change. An external state
+reset does not create a user commit. `format` and `locale` change the announced
+value text, not the stored number.
+
+Give each slider an `aria-label` or `aria-labelledby`, and show the current
+value when precision matters. With two thumbs, `aria-label` gains minimum and
+maximum suffixes; larger arrays gain numbered suffixes. A supplied
+`aria-labelledby` is shared by the thumbs, so choose labels that make the range
+understandable. Each thumb contains a native `input[type="range"]`; the root
+`id` is not that input's id. Root `aria-invalid` and `aria-describedby` are not
+automatically copied onto each native input. The caller owns error text and
+native thumb associations; this wrapper exposes no per-thumb props.
+
+Tab visits enabled thumbs. In left-to-right direction, Right/Up increase and
+Left/Down decrease by `step`; Page Up/Down and Shift+arrows use `largeStep`.
+Home/End move to the permitted endpoint, respecting neighbouring thumbs and
+their minimum separation. `thumbCollisionBehavior` selects the pointer policy;
+it does not remove keyboard bounds. Horizontal sliders fill their container;
+give a vertical slider an explicit height, as Vertical does. Cadence defaults to
+edge alignment. `edge-client-only` keeps its thumbs hidden until client
+measurement, so use edge or center when thumbs must be visible before hydration.
+
+For native submission, supply `name` and optionally `form`. Each enabled thumb's
+range input contributes a numeric string under the same name; use
+`FormData.getAll(name)` for a range. There is no extra hidden aggregate input.
+Disabled sliders ignore interaction, leave the tab sequence and contribute no
+entries. The caller owns acceptable values, parsing, error messages, submission,
+server-side validation and persistence. Keep these rules outside the UI; native
+range bounds are not business validation.
 
 ## Usage
 
@@ -171,7 +303,7 @@ export function SliderCollisions() {
 
 ## Thumb alignment
 
-Cadence defaults to `edge`, placing the whole thumb inside the track endpoints. `center` places its centre on the endpoint. `edge-client-only` uses the edge geometry after hydration and omits its thumb from server markup; the track and this explanation remain readable without JavaScript. The other two provide server-rendered thumbs.
+Cadence defaults to `edge`, placing the whole thumb inside the track endpoints. `center` places its centre on the endpoint. `edge-client-only` retains its thumb and native input in the server DOM, hidden until client measurement reveals them with edge geometry. Without JavaScript they stay hidden; the track and this explanation remain readable. Use `edge` or `center` when thumbs must be visible before hydration.
 
 <ComponentExample name="alignment" />
 
