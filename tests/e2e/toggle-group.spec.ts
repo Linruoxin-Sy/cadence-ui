@@ -186,7 +186,8 @@ for (const colorScheme of ["light", "dark"] as const) {
           const root = el.closest('[data-slot="toggle-group"]');
           if (!root) throw Error("Missing group");
           const buttons = [...root.querySelectorAll<HTMLElement>('[data-slot="toggle-group-item"]')];
-          const samples: { label: string | null; above: boolean }[] = [];
+          const samples: { label: string | null; above: boolean; direction: "forward" | "reverse" }[] = [];
+          let direction: "forward" | "reverse" = "forward";
           const sample = () => {
             const fill = root.querySelector<HTMLElement>('[data-slot="toggle-group-indicator"]');
             if (!fill) throw Error("Missing shared fill");
@@ -205,9 +206,14 @@ for (const colorScheme of ["light", "dark"] as const) {
               const stack = document.elementsFromPoint(x, y);
               const labelIndex = stack.indexOf(content),
                 fillIndex = stack.indexOf(fill);
+              // A transformed bounding box can include subpixel/rounded edges
+              // outside the browser's actual fill hit region. Only compare paint
+              // order where the fill participates in this point's hit stack.
+              if (fillIndex < 0) continue;
               samples.push({
                 label: button.textContent,
-                above: labelIndex >= 0 && fillIndex >= 0 && labelIndex < fillIndex,
+                above: labelIndex >= 0 && labelIndex < fillIndex,
+                direction,
               });
             }
             fill.style.removeProperty("pointer-events");
@@ -217,11 +223,19 @@ for (const colorScheme of ["light", "dark"] as const) {
             await new Promise(requestAnimationFrame);
             sample();
             // Reverse a travelling fill while it is still between items.
-            if (i === 7) buttons[0]?.click();
+            if (i === 7) {
+              direction = "reverse";
+              buttons[0]?.click();
+            }
           }
           return samples;
         });
         expect(result.length, "sample actual crossings rather than just final placement").toBeGreaterThan(0);
+        for (const direction of ["forward", "reverse"] as const)
+          expect(
+            result.some((sample) => sample.direction === direction),
+            `${direction} crosses a label`,
+          ).toBe(true);
         expect(
           result.filter((s) => !s.above),
           "all crossed labels paint above the moving fill",
