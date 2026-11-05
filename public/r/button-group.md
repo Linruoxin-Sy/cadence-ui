@@ -10,9 +10,83 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/button-group
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| button-group | `@components/cadence/button-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: button-group](https://cadence.dev/r/button-group.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Keep `button-group/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the
+listed relative paths. Button Group imports Separator even when you do not
+render `ButtonGroupSeparator`; both components share the `cn` helper.
+Button Group and Separator are static T0 components in full, reduced and none
+modes; no motion runtime, provider or additional item-specific CSS is required
+beyond the base theme and Tailwind utilities. Keep their source files'
+`"use client"` directives. In Next.js App Router, a Server Component can render
+these client parts with serializable props. Calling the exported
+`buttonGroupVariants` function belongs in a `"use client"` module.
+
+Usage, Vertical, “Static text inside the group”, “A rule between two controls”,
+and the top preview also use [Button](/components/button). Install it when
+keeping those compositions:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab and copy every listed file,
+including its motion and provider helpers, into the same relative tree. Button
+adds `motion` to the package list above; its provider files are required imports,
+while wrapping the application is optional. Button's press scale plays only in
+full mode and is dropped in reduced and none. The group adds no animation.
+
+Usage, Vertical and the top preview also use `lucide-react` for their plus/minus
+icons. Install it when keeping those icons; Button Group and Button themselves
+do not require an icon package:
+
+```package-manager
+npm install lucide-react
+```
+
+Keep Usage, Vertical and the top preview's existing `"use client"` boundaries
+for their state and event handlers. Put “Static text inside the group” and
+“A rule between two controls” in a `"use client"` module too: they call
+`buttonVariants()` from Button's client module, even though their links retain
+native navigation. The caller owns the zoom value, limits and actions; Button
+Group supplies grouping and layout, without a toolbar arrow-key model.
 
 ## Usage
 
