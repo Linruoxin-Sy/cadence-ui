@@ -10,9 +10,131 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/switch
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| switch | `@components/cadence/switch/index.tsx` | [JSON files[].content](https://cadence.dev/r/switch.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: switch](https://cadence.dev/r/switch.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine files in the target list, including every file from the motion,
+utilities and provider payloads. Keep `switch/index.tsx` beside the shared `lib/`
+directory with its relative imports and the sources' `"use client"` directives
+intact. The thumb uses `ControlSpan`, whose imports also reach `native-div.tsx`
+and `press-button.tsx`; copying only `provider.tsx` is not enough. The provider
+files and `motion` package are required even without an application wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. There is no additional Switch-specific CSS, icon package or external
+asset. `state.morph` animates only the thumb's horizontal transform in full;
+reduced and none jump to the checked endpoint without travel animation. The
+track colour is state feedback. Both `default` and `sm` measure their own travel
+with `ResizeObserver`; the first measured position settles immediately, including
+an initially checked switch in none. Standalone switches follow the system
+motion preference. The optional `CadenceProvider` controls a subtree's mode and
+timing; a nested full scope still respects system reduced motion.
+
+Usage, the top specimen and the labelled examples also need
+[Label](/components/label). Controlled additionally uses [Button](/components/button).
+Install the items needed by your example:
+
+```install
+npx shadcn@latest add @cadence/label @cadence/button
+```
+
+For manual installation, follow their Manual tabs too: add `label/index.tsx`
+and, when using Button, `button/index.tsx`. Their shared files are already in
+Switch's target list. Label adds no npm package; Button also requires:
+
+```package-manager
+npm install class-variance-authority
+```
+
+Explicit motion scopes uses only Switch and the included provider. No example
+needs another package or external asset. The site's preview shell is not
+consumer setup.
+
+In Next.js App Router, Controlled needs a client module for `useState`,
+`onCheckedChange` and the external button's click handler. Usage, Sizes, In a
+settings row, Disabled and read-only, and Explicit motion scopes can be composed
+in a synchronous Server Component using the shown `useId` or stable unique IDs,
+JSX and serializable props; their existing client directives may also be kept.
+An event handler, a function-valued `render`, `className(state)` or `style(state)`,
+or a client-side hook such as `useState` or `useRef` needs a caller client
+boundary. Preserve the installed sources' client directives in either case.
+
+Give every switch a visible label linked by `htmlFor` and a unique `id`, or an
+`aria-label`; connect help text with `aria-describedby`. With the default renderer,
+the visible control is a `span` with `role="switch"` beside a hidden native
+checkbox input. The supplied `id` belongs to that input and Base UI connects the
+label to the visible control. Use `defaultChecked` for an uncontrolled initial
+state, or own `checked` with `onCheckedChange` for a controlled switch.
+
+Tab focuses an enabled switch; Space and Enter toggle it. `disabled` prevents
+interaction and removes it from the tab sequence. `readOnly` keeps it focusable
+while preventing changes. Keep the control from shrinking and let the surrounding
+label and description wrap, as the settings row does.
+
+For native submission, supply `name` and optionally `value` and `form`. A checked,
+enabled switch contributes its name/value entry, with `"on"` as the default value.
+An unchecked switch contributes nothing unless `uncheckedValue` supplies an
+explicit off value. Disabled switches contribute neither value; a checked
+read-only switch retains its entry. `required` uses browser constraint validation
+to prevent submission while unchecked. The caller owns allowed state, error
+messages, submission, server-side validation and persistence, including save
+failures for immediate settings. Cadence forwards supplied `aria-invalid`;
+provide a visible error message, as it adds no destructive track style.
 
 ## Usage
 
