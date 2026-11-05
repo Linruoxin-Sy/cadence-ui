@@ -10,9 +10,78 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/item
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| item | `@components/cadence/item/index.tsx` | [JSON files[].content](https://cadence.dev/r/item.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: item](https://cadence.dev/r/item.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Keep `item/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the listed relative
+paths. Item imports Separator even when you do not render `ItemSeparator`; both
+components share the `cn` helper. Item and Separator are static T0 components in
+full, reduced and none modes; no motion runtime, provider or additional
+item-specific CSS is required beyond the base theme and Tailwind utilities.
+Keep the source files' `"use client"` directives for Base UI behavior. The Usage
+and body examples can render these client parts from a Server Component in
+Next.js App Router; they do not call the exported variant functions or add event
+handlers.
+
+Usage, Sizes, Media, Header and footer, and the top preview use `lucide-react`.
+Install it when keeping those icons:
+
+```package-manager
+npm install lucide-react
+```
+
+The top preview also uses [Button](/components/button) for Download plan.md.
+Install it when reproducing that action:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab and copy every shared
+motion and provider file it lists. Button adds `motion` to the packages listed
+above; wrapping the application in its provider is optional. Its press scales in
+full mode and drops that scale in reduced and none modes, while Item remains
+static. Put the preview's download event handler in a `"use client"` module; the
+caller owns the download content and browser action. The body examples do not
+need Button. A whole-row link uses a native anchor through `render`, needs no
+extra registry item and does not gain Button's press animation. Variants,
+Separators and A whole-row link need no example-only packages.
 
 ## Usage
 
