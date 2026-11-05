@@ -13,12 +13,93 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/popover
 ```
 
 The examples compose `@cadence/button`, `@cadence/checkbox`, `@cadence/label`, `@cadence/field`,
 and `@cadence/input` as needed. Install those items when copying their corresponding examples.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/popover.json)
+
+Copy all nine target files, keeping `popover/index.tsx` and the shared `lib/`
+directory in the same `cadence/` tree. Preserve relative imports and the
+sources' `"use client"` directives. Copy every file in the motion, utilities
+and provider payloads, including helpers not imported by Popover directly.
+The provider files and `motion` package are required imports even when you
+omit the optional provider wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. Include the Cadence easing and motion-scale tokens used by the
+popup classes. No additional item-specific CSS or external asset is required.
+Full fades and scales the panel from its anchor; reduced keeps opacity only;
+none removes the transitions and hidden entry/exit styles. The portalled popup
+resolves its own mode and token clock. Standalone components follow the system
+motion preference; an optional `CadenceProvider` controls a subtree, and nested
+full still respects system reduced motion.
+
+The examples need additional registry items. Copy each item's complete Manual
+setup, including its npm dependencies and shared files:
+
+- [Button](https://cadence.dev/components/button#installation) is used by Usage,
+  the top specimen and every body example.
+- [Checkbox](https://cadence.dev/components/checkbox#installation) and
+  [Label](https://cadence.dev/components/label#installation) are used by Usage,
+  the top specimen and Column visibility. Checkbox also requires `lucide-react`.
+- [Field](https://cadence.dev/components/field#installation) and
+  [Input](https://cadence.dev/components/input#installation) are used by With a form.
+
+Logical sides and RTL imports Base UI `DirectionProvider`, and Modal when it
+has to be imports Base UI `Popover.Close`; both come from the already required
+`@base-ui/react` package. Explicit motion scopes uses the included provider.
+The site's preview shell is not consumer setup.
+
+In Next.js App Router, Usage, Column visibility, With a form, Controlled and
+the top specimen need a caller client module for their state and handlers.
+Positioned by side, Aligned to the trigger, Logical sides and RTL, Modal when
+it has to be and Explicit motion scopes contain serializable JSX and
+element-valued `render` props, so they can be composed in synchronous Server
+Components. Caller refs, event handlers, function-valued `render`,
+`className(state)` or `style(state)` also need a caller client boundary.
+Synchronous `useId` alone does not require one. Keep the installed client
+directives and the snippets' existing directives when copying them unchanged.
+
+Place the trigger and content within the same `Popover` root. Use
+`defaultOpen` for uncontrolled opening, or `open` / `onOpenChange` for caller
+control. For an external opener, use a unique `triggerId` matching the trigger's
+`id` so the panel stays anchored. `PopoverTrigger` renders a button by default;
+`render={<Button />}` merges the trigger onto that button. Custom render
+elements must preserve supplied props and refs.
+
+`PopoverContent` already owns the portal, positioner and popup. Its positioning
+defaults are `side="bottom"`, `align="center"`, `sideOffset={4}` and
+`alignOffset={0}`; offsets control geometry, not animation. Base UI can flip
+or shift the panel to avoid collisions. Logical sides need Base UI
+`DirectionProvider` as well as DOM `dir`, as shown in the RTL example.
+Cadence exports no separate Portal, Positioner, Anchor, Arrow or Close part.
+Include `PopoverTitle` for an accessible name and `PopoverDescription` for
+supporting context. Popup props such as `initialFocus` and `finalFocus` pass
+through; Base UI manages ARIA associations and focus return.
+
+The root is non-modal by default. Enter or Space opens from the trigger;
+Escape and outside presses dismiss, and Tab can leave the non-modal panel.
+`modal={true}` blocks outside interaction and locks desktop page scrolling;
+`modal="trap-focus"` avoids that scroll lock. Both modal settings need a
+registered Base UI `Popover.Close` inside the content to activate focus
+trapping, as in Modal when it has to be. Modal popovers still allow dismissal;
+provide the close control for touch screen readers, and account for Base UI's
+touch scrolling behavior.
+
+The caller owns column selection, form drafts, saved values, requests,
+validation, errors, persistence and controlled closing. In With a form, Save
+handles submission and closes explicitly; dismissing does not save, and the
+draft survives in caller state. Native `required` belongs to that example's
+input. Popover performs no validation or automatic saving; render supplied
+invalid state on the relevant controls with `aria-invalid` / `data-invalid`.
 
 ## Usage
 
