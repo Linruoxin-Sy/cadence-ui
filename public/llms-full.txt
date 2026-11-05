@@ -8838,12 +8838,147 @@ Text alignment, view density, and other mode sets.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/toggle-group
 ```
 
 Installing the group also installs `toggle`, because the items share its variant
 classes.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/toggle](https://cadence.dev/r/toggle.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| toggle | `@components/cadence/toggle/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle.json) |
+| toggle-group | `@components/cadence/toggle-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: toggle](https://cadence.dev/r/toggle.json)
+
+[Source files: toggle-group](https://cadence.dev/r/toggle-group.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten target files, preserving the sibling `toggle/`, `toggle-group/`
+and shared `lib/` directories, relative imports and `"use client"` directives.
+The group imports Toggle's variant classes, and its default item renderer
+reaches `press-button.tsx`, `control-animation.tsx` and `native-div.tsx`.
+Copy every file in the listed payloads; the provider files and `motion` package
+are required imports even without an application provider wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. No additional item-specific CSS or external asset is required. In full,
+`feedback.press` scales item content, `layout.shared` moves a decorative fill
+within each single-selection group, and `state.morph` fades/scales local fills
+in multiple selection. Reduced drops press scale and shared travel but keeps
+local opacity feedback; none settles all three immediately. Standalone groups
+follow the system motion preference. The optional `CadenceProvider` controls
+mode and timing; a nested full scope still respects system reduced motion.
+
+Usage, the top specimen, Multiple and Vertical use icons. They need this
+example-only package; Toggle Group itself does not:
+
+```package-manager
+npm install lucide-react
+```
+
+Controlled also needs [Button](/components/button):
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab and add `button/index.tsx`.
+Its npm dependencies and shared files are already in this installation graph.
+The other examples need only Toggle Group and its included helpers. The site's
+preview shell is not consumer setup.
+
+In Next.js App Router, Segmented with a required selection and Controlled need
+client modules for `useState`, change handlers and the external button's click
+handler. Usage, Visual variants, Multiple, Spacing, Vertical, Sizes, Disabled
+and Explicit motion scopes can be composed in synchronous Server Components
+with the shown JSX and serializable props. Caller refs, event handlers,
+function-valued `render`, `className(state)` or `style(state)`, and client hooks
+such as `useState` or `useRef` need a caller client boundary. Keep the installed
+sources' client directives.
+
+Give each item a stable, nonempty `value`. The group owns pressed state through
+an array: use `defaultValue` for uncontrolled initial values, or `value` with
+`onValueChange` for controlled values. Single selection is the default and
+allows an empty array when the selected item is pressed again; `multiple`
+allows independent values. To require one selection, use the shown caller
+policy that ignores empty requests. Group values take precedence over item
+`pressed` / `defaultPressed`; `details.cancel()` in an item or group change
+handler can veto a change.
+
+The group renders `role="group"`, and items are native `type="button"` buttons
+with `aria-pressed`. Name the group and every icon-only item. Tab enters the
+enabled controls; horizontal arrows or vertical Up/Down move focus without
+selecting, Home/End reach the ends, and Space/Enter toggle the focused item.
+`loopFocus` defaults to true; false stops at either end. Disabled items are
+skipped and cannot activate; disabling the group retains its values. For RTL
+arrow navigation, use Base UI's `DirectionProvider` from
+`@base-ui/react/direction-provider` with `direction="rtl"`, as well as RTL
+document direction. Group size and variant are inherited by items; `spacing`
+sets the gap, and zero joins adjacent pressed fills in multiple selection.
+Nested groups have separate value, appearance and shared-fill scopes.
+
+These buttons do not generate hidden inputs or submit the selected array
+through `name` or item `value`, and do not expose a submit-button `type` or
+`form` association. If a form needs these values, map caller-owned state to
+explicit form fields and handle reset in the caller. The caller owns business
+data, persistence, required-selection rules, validation, error text and any
+`aria-invalid` / `aria-describedby` association.
+
+Native animation and drag handlers, state-based classes/styles and refs pass
+through the default renderer. A caller item `render` replaces its press
+renderer while retaining the supplied decorative fill and content children;
+spread the supplied props, including children, and preserve the ref and button
+semantics. Keep `nativeButton` consistent with the rendered element.
 
 ## Usage
 

@@ -13,12 +13,95 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/toggle-group
 ```
 
 Installing the group also installs `toggle`, because the items share its variant
 classes.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/toggle-group.json)
+
+Copy all ten target files, preserving the sibling `toggle/`, `toggle-group/`
+and shared `lib/` directories, relative imports and `"use client"` directives.
+The group imports Toggle's variant classes, and its default item renderer
+reaches `press-button.tsx`, `control-animation.tsx` and `native-div.tsx`.
+Copy every file in the listed payloads; the provider files and `motion` package
+are required imports even without an application provider wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. No additional item-specific CSS or external asset is required. In full,
+`feedback.press` scales item content, `layout.shared` moves a decorative fill
+within each single-selection group, and `state.morph` fades/scales local fills
+in multiple selection. Reduced drops press scale and shared travel but keeps
+local opacity feedback; none settles all three immediately. Standalone groups
+follow the system motion preference. The optional `CadenceProvider` controls
+mode and timing; a nested full scope still respects system reduced motion.
+
+Usage, the top specimen, Multiple and Vertical use icons. They need this
+example-only package; Toggle Group itself does not:
+
+```package-manager
+npm install lucide-react
+```
+
+Controlled also needs [Button](/components/button):
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab and add `button/index.tsx`.
+Its npm dependencies and shared files are already in this installation graph.
+The other examples need only Toggle Group and its included helpers. The site's
+preview shell is not consumer setup.
+
+In Next.js App Router, Segmented with a required selection and Controlled need
+client modules for `useState`, change handlers and the external button's click
+handler. Usage, Visual variants, Multiple, Spacing, Vertical, Sizes, Disabled
+and Explicit motion scopes can be composed in synchronous Server Components
+with the shown JSX and serializable props. Caller refs, event handlers,
+function-valued `render`, `className(state)` or `style(state)`, and client hooks
+such as `useState` or `useRef` need a caller client boundary. Keep the installed
+sources' client directives.
+
+Give each item a stable, nonempty `value`. The group owns pressed state through
+an array: use `defaultValue` for uncontrolled initial values, or `value` with
+`onValueChange` for controlled values. Single selection is the default and
+allows an empty array when the selected item is pressed again; `multiple`
+allows independent values. To require one selection, use the shown caller
+policy that ignores empty requests. Group values take precedence over item
+`pressed` / `defaultPressed`; `details.cancel()` in an item or group change
+handler can veto a change.
+
+The group renders `role="group"`, and items are native `type="button"` buttons
+with `aria-pressed`. Name the group and every icon-only item. Tab enters the
+enabled controls; horizontal arrows or vertical Up/Down move focus without
+selecting, Home/End reach the ends, and Space/Enter toggle the focused item.
+`loopFocus` defaults to true; false stops at either end. Disabled items are
+skipped and cannot activate; disabling the group retains its values. For RTL
+arrow navigation, use Base UI's `DirectionProvider` from
+`@base-ui/react/direction-provider` with `direction="rtl"`, as well as RTL
+document direction. Group size and variant are inherited by items; `spacing`
+sets the gap, and zero joins adjacent pressed fills in multiple selection.
+Nested groups have separate value, appearance and shared-fill scopes.
+
+These buttons do not generate hidden inputs or submit the selected array
+through `name` or item `value`, and do not expose a submit-button `type` or
+`form` association. If a form needs these values, map caller-owned state to
+explicit form fields and handle reset in the caller. The caller owns business
+data, persistence, required-selection rules, validation, error text and any
+`aria-invalid` / `aria-describedby` association.
+
+Native animation and drag handlers, state-based classes/styles and refs pass
+through the default renderer. A caller item `render` replaces its press
+renderer while retaining the supplied decorative fill and content children;
+spread the supplied props, including children, and preserve the ref and button
+semantics. Keep `nativeButton` consistent with the rendered element.
 
 ## Usage
 
