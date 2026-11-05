@@ -13,6 +13,8 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/tooltip
 ```
@@ -20,6 +22,87 @@ npx shadcn@latest add @cadence/tooltip
 Optionally wrap the app in `TooltipProvider` once to set one delay for every tooltip; Base UI does not
 require it.
 These examples also use `@cadence/button`; the icon example uses `lucide-react`.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/tooltip.json)
+
+Copy all nine target files, keeping `tooltip/index.tsx` and the shared `lib/`
+directory in the same `cadence/` tree. Preserve relative imports and the
+sources' `"use client"` directives. Copy every file in the motion, utilities
+and provider payloads, including helpers not imported by Tooltip directly.
+The provider files and `motion` package are required imports even without
+the optional `CadenceProvider` wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. Include the Cadence easing and motion-scale tokens used by the
+popup classes. No additional item-specific CSS or external asset is required.
+Full fades and scales the label from its anchor; reduced keeps opacity only;
+none removes transitions and hidden entry/exit styles. The portalled popup
+resolves its own mode and token clock. Standalone components follow the system
+motion preference; an optional `CadenceProvider` controls a subtree, and nested
+full still respects system reduced motion.
+
+[Button](https://cadence.dev/components/button#installation) is used by Usage,
+the top specimen and every body example. Copy its complete Manual setup,
+including its npm dependencies and shared files. Usage and the top specimen
+also import an icon:
+
+```package-manager
+npm install lucide-react
+```
+
+Logical sides and RTL imports Base UI `DirectionProvider` from the already
+required `@base-ui/react` package. Explicit motion scopes uses the included
+Cadence provider. The site's preview shell is not consumer setup.
+
+In Next.js App Router, Controlled needs a caller client module for its state
+and event handlers. The other examples and top specimen contain serializable
+JSX and element-valued `render` props, so they can be composed in synchronous
+Server Components. Caller refs, event handlers, function-valued `render`,
+`className(state)` or `style(state)` also need a caller client boundary.
+Synchronous `useId` alone does not require one. Keep the installed client
+directives and the snippets' existing directives when copying them unchanged.
+
+Place `TooltipTrigger` and `TooltipContent` within the same `Tooltip` root.
+Use `defaultOpen` for uncontrolled opening, or `open` / `onOpenChange` for
+caller control. External opening needs a unique `triggerId` matching the
+trigger's `id`, as in Controlled, to keep the popup anchored. The trigger
+renders a button by default; `render={<Button />}` merges onto that button.
+Custom render elements must preserve supplied props and refs.
+
+`TooltipContent` already owns the portal, positioner, popup and arrow. Its
+positioning defaults are `side="top"`, `align="center"`, `sideOffset={4}` and
+`alignOffset={0}`. Offsets control geometry, and Base UI can flip or shift the
+label to avoid collisions. Logical sides need Base UI `DirectionProvider`
+as well as DOM `dir`, as shown in the RTL example. Cadence exports no separate
+Portal, Positioner, Arrow or Anchor part.
+
+`TooltipProvider` is optional and groups adjacent hints under one hover delay;
+its Cadence default is `delay={0}`. Without a provider or trigger override,
+Base UI uses 600ms. A trigger's `delay` overrides the initial delay; an active
+provider group can show adjacent hints immediately. Keyboard focus opens
+immediately. Trigger `closeDelay` controls hover closing. These interaction
+delays are independent of motion mode, including none.
+
+Give icon-only triggers an accessible name such as `aria-label`. Cadence adds
+`role="tooltip"` and links the open popup through `aria-describedby`; the hint
+supplements the control's name. Hover or keyboard focus reveals the label,
+leaving hides it, and Escape dismisses without moving focus. Enter and Space
+still activate the trigger. Keep essential instructions visible and use
+Popover for interactive content.
+
+Root or trigger `disabled` suppresses the hint; disable the rendered Button
+separately to block its action. A native disabled button cannot receive focus.
+Disabled controls therefore uses a focusable, disabled Button rendered as a
+span around the truly disabled native button, with `pointer-events-none` on
+the inner button so hover targets the wrapper. Preserve that composition for
+both pointer and keyboard access.
+
+The caller owns action availability, business data, shortcut behavior, requests
+and controlled open state. Tooltip only presents explanatory UI; it does not
+implement those actions or validate form data. JavaScript is required for
+hover, focus, delayed opening and controlled updates.
 
 ## Usage
 
