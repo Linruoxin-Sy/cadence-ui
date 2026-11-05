@@ -13,9 +13,45 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/card
 ```
+
+Usage, Action in the header, Content-sized and Section boundaries also render
+[Button](/components/button). Install it when copying those compositions:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+The top preview also renders [Badge](/components/badge):
+
+```install
+npx shadcn@latest add @cadence/badge
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/card.json)
+
+Card needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `card/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves. Preserve the component's
+`"use client"` directive: the optional `fit="content"` uses the browser's native
+`ResizeObserver` to measure content height and apply it immediately, with no interpolation
+or additional observer package. Before measurement, server-rendered cards use natural
+content layout. Card has no animation in full, reduced or none mode.
+
+For the action compositions, follow [Button's installation](/components/button#installation),
+including its dependencies and motion setup. To reproduce the top preview, also follow
+[Badge's installation](/components/badge#installation); the shared `lib/cn.ts` and its
+packages are already included above. Button and Badge are composition dependencies,
+not dependencies of Card. Compact renders neither, and the body example snippets do not
+render Badge, so their unused imports can be omitted. React's `useRef` and `useState`
+are used only by Content-sized and need no additional package beyond the React setup
+above; their unused imports in the other snippets can also be omitted.
 
 ## Usage
 
