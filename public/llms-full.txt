@@ -4493,9 +4493,124 @@ Currency fields, URLs, and inputs with inline actions.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/input-group
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
+- [@cadence/textarea](https://cadence.dev/r/textarea.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| textarea | `@components/cadence/textarea/index.tsx` | [JSON files[].content](https://cadence.dev/r/textarea.json) |
+| input-group | `@components/cadence/input-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/input-group.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: input](https://cadence.dev/r/input.json)
+
+[Source files: textarea](https://cadence.dev/r/textarea.json)
+
+[Source files: input-group](https://cadence.dev/r/input-group.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 12 files in the target list, keeping `input-group/index.tsx`,
+`button/index.tsx`, `input/index.tsx`, `textarea/index.tsx` and the shared `lib/`
+files in the listed relative tree. Input Group imports Button, Input and Textarea
+even when a composition does not render every part. Its Button dependency needs
+the motion and provider helpers; those files are required imports, while wrapping
+the application in `CadenceProvider` is optional. No additional item-specific CSS
+is required beyond the base theme and Tailwind utilities.
+
+The frame, addons, text and controls add no authored motion in full, reduced or
+none mode. `InputGroupButton` composes Button's press feedback: it scales only in
+full mode and drops that scale in reduced and none. Focus and invalid colour/ring
+changes are state feedback, not motion.
+
+Usage and the top preview also use [Kbd](/components/kbd). Install it when keeping
+the shortcut hint:
+
+```install
+npx shadcn@latest add @cadence/kbd
+```
+
+For manual installation, copy `files[].content` from the
+[Kbd payload](https://cadence.dev/r/kbd.json) to
+`@components/cadence/kbd/index.tsx`, reusing the `lib/cn.ts` already listed above.
+Kbd adds no npm dependencies beyond the shared helpers. It displays a shortcut
+hint; registering a keyboard shortcut belongs to the application.
+
+Usage, “A button in the frame” and the top preview also use `lucide-react` for
+their search/clear icons. Install it when keeping those icons; Input Group's
+recursive component dependencies do not require an icon package:
+
+```package-manager
+npm install lucide-react
+```
+
+Keep the source files' existing `"use client"` directives. In Next.js App Router,
+a Server Component can compose the client parts in Usage and Alignments with
+serializable props. Keep the existing client boundaries in “A button in the
+frame”, “A textarea with a footer”, Invalid and the preview; their hooks and
+event handlers stay there. Calling the exported `inputGroupAddonVariants` or
+`inputGroupButtonVariants` functions also belongs in a client module.
+
+Use `InputGroupInput` or `InputGroupTextarea` for the control and give it an
+accessible name; addon text is not a label. Clicking an addon focuses its sibling
+input, unless the click is on a button or the caller prevents it; this convenience
+does not focus a textarea. Buttons keep their native focus and activation. The
+caller owns values, clearing, character limits, submission, error messages and
+`aria-invalid`/`aria-describedby`. Input Group renders that state and performs no
+validation; no validation package or schema setup is needed.
 
 ## Usage
 
