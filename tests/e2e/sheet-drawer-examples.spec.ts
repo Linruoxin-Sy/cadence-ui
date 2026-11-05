@@ -64,9 +64,61 @@ for (const id of (["sheet", "drawer"] as const).filter((id) => catalog[id])) {
       const overflow = await page.locator("body").evaluate((node) => getComputedStyle(node).overflow);
       expect(overflow === "hidden").toBe(value === "true");
       if (value !== "false") {
-        for (let i = 0; i < 5; i++) {
-          await page.keyboard.press("Tab");
-          expect(await popup.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+        const audit = await popup.evaluateHandle((panel) => {
+          const sample = () => {
+            const active = document.activeElement;
+            const rect = active?.getBoundingClientRect();
+            return {
+              inside: panel.contains(active),
+              guard:
+                active?.hasAttribute("data-base-ui-focus-guard") === true &&
+                active.getAttribute("aria-hidden") === "true" &&
+                active.parentElement === panel.parentElement &&
+                !!rect &&
+                rect.width <= 1 &&
+                rect.height <= 1,
+              active: active?.outerHTML,
+              ariaHidden: active?.getAttribute("aria-hidden"),
+              size: rect ? { width: rect.width, height: rect.height } : null,
+              sameParent: active?.parentElement === panel.parentElement,
+              connected: panel.isConnected,
+              open: panel.hasAttribute("data-open") && !panel.hasAttribute("data-ending-style"),
+              samePanel: document.querySelector(`[data-slot="${panel.getAttribute("data-slot")}"]`) === panel,
+            };
+          };
+          const events: ReturnType<typeof sample>[] = [];
+          const onFocus = () => events.push(sample());
+          document.addEventListener("focusin", onFocus);
+          return { sample, events, stop: () => document.removeEventListener("focusin", onFocus) };
+        });
+        const steps = [];
+        // Base UI forwards its hidden sibling guards on rAF. Check every focus
+        // event as well as the settled target so a real escape cannot be missed.
+        for (const direction of ["Tab", "Shift+Tab"])
+          for (let i = 0; i < 5; i++) {
+            await page.keyboard.press(direction);
+            const immediate = await audit.evaluate((state) => state.sample());
+            await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+            const frame = await audit.evaluate((state) => state.sample());
+            await expect.poll(() => audit.evaluate((state) => state.sample().inside)).toBe(true);
+            steps.push({ direction, immediate, frame, settled: await audit.evaluate((state) => state.sample()) });
+          }
+        const events = await audit.evaluate((state) => {
+          state.stop();
+          return state.events;
+        });
+        await audit.dispose();
+        await test.info().attach(`${id} ${value} trapped focus path`, {
+          body: JSON.stringify({ events, steps }),
+          contentType: "application/json",
+        });
+        expect(events.length).toBeGreaterThan(0);
+        for (const state of [
+          ...events,
+          ...steps.flatMap(({ immediate, frame, settled }) => [immediate, frame, settled]),
+        ]) {
+          expect(state.connected && state.open && state.samePanel).toBe(true);
+          expect(state.inside || state.guard, state.active).toBe(true);
         }
       } else {
         await page.getByRole("group", { name: "Motion mode" }).getByRole("button").first().focus();
