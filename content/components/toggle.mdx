@@ -13,9 +13,77 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/toggle
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/toggle.json)
+
+Copy all nine target files, keeping `toggle/index.tsx` beside the shared `lib/`
+directory and preserving the relative imports and `"use client"` directives.
+The default renderer imports `press-button.tsx`, which reaches
+`control-animation.tsx` and `native-div.tsx`; copy every file in the motion,
+utilities and provider payloads. The provider files and `motion` package are
+required imports even when you do not wrap the application in a provider.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. Toggle needs no additional item-specific CSS or external asset. The
+default renderer uses `feedback.press` for its press scale in full; reduced and
+none keep scale at one with a zero clock. Pressed colours still communicate
+state in every mode. Standalone toggles follow the system motion preference;
+the optional `CadenceProvider` controls a subtree's mode and timing. A nested
+full scope still respects system reduced motion.
+
+Usage, the top specimen, With a label, Controlled and Inside a form use icons.
+They need this example-only dependency; Toggle itself does not:
+
+```package-manager
+npm install lucide-react
+```
+
+Controlled and Inside a form also need [Button](/components/button):
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab and add `button/index.tsx`.
+Its npm dependencies and shared files are already in Toggle's installation
+graph. Variants, Sizes, Disabled and Explicit motion scopes need only Toggle
+and the included helpers. The site's preview shell is not consumer setup.
+
+In Next.js App Router, Controlled and Inside a form need a client module for
+`useState`, change handlers and click or submit handlers. Usage, Variants,
+Sizes, With a label, Disabled and Explicit motion scopes can be composed in a
+synchronous Server Component with the shown JSX and serializable props. A
+caller ref, event handler, function-valued `render`, `className(state)` or
+`style(state)`, or a client-side hook such as `useState` or `useRef` needs a
+caller client boundary. Keep the installed sources' client directives.
+
+Use `defaultPressed` for initial uncontrolled state, or own `pressed` with
+`onPressedChange` for controlled state. The callback receives the next boolean
+and event details; `details.cancel()` vetoes the change. Give icon-only buttons
+an `aria-label`; text children can supply the name. Enabled buttons are reached
+with Tab and toggle with Space or Enter. `disabled` blocks activation and
+removes the button from the tab order while retaining its pressed state.
+
+The default element is a native `button` with `type="button"` and
+`aria-pressed`. Toggle does not expose a submit-button `type` or `form`
+association, generate a hidden input, or submit its pressed state through
+`name`. Its `value` identifies an item in a Toggle Group, not a submitted
+checked value. Inside a form explicitly maps caller state to a hidden input;
+use Checkbox when you need a checked form control. The caller owns state,
+persistence, validation, error text and any `aria-invalid` / `aria-describedby`
+association.
+
+Native animation and drag handlers, state-based classes/styles and refs pass
+through the default renderer. A caller `render` replaces that renderer and
+its press effect; spread the supplied props and preserve its ref and button
+semantics. Keep `nativeButton` consistent with the rendered element.
 
 ## Usage
 
