@@ -9390,12 +9390,148 @@ Login codes, email verification, and device pairing.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/input-otp
 ```
 
 The component wraps [`input-otp`](https://github.com/guilhermerodz/input-otp),
 which owns the single hidden input, paste handling, and the caret position.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion input-otp lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| input-otp | `@components/cadence/input-otp/index.tsx` | [JSON files[].content](https://cadence.dev/r/input-otp.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: input-otp](https://cadence.dev/r/input-otp.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, preserving the sibling `input-otp/` and shared
+`lib/` directories, relative imports and `"use client"` directives. Copy every
+file in the listed payloads, including the provider helpers. The provider files
+and `motion` package are required imports even without a provider wrapper.
+`lucide-react` is a component dependency: `InputOTPSeparator` imports its dash
+icon even when your composition omits the separator.
+
+Complete the linked base theme setup and ensure Tailwind scans the copied
+files. No extra item-specific CSS or external asset is required. The
+`input-otp` dependency supplies its transparent-input styling and no-JavaScript
+CSS fallback; do not replace the real input with one input per slot. Its
+`nonce` prop supports the injected runtime style tag when your CSP requires
+one; review `noScriptCSSFallback` separately for your application's CSP.
+
+Full mode plays `state.morph` when a character changes, with opacity and scale;
+reduced keeps opacity at neutral scale; none shows characters immediately.
+Deleting is instant, character nodes stay mounted, and mode changes cancel an
+entry. The fake caret is static. Standalone inputs follow the system motion
+preference. The optional `CadenceProvider` controls mode and timing; an explicit
+nested full scope still respects system reduced motion.
+
+Controlled needs [Button](/components/button) and [Label](/components/label).
+Invalid, Disabled and read-only, and the top specimen also use Label:
+
+```install
+npx shadcn@latest add @cadence/button @cadence/label
+```
+
+For manual setup, follow their Manual tabs and add `button/index.tsx` and
+`label/index.tsx`. Their shared files are already included above. Button adds
+these npm dependencies; Label needs no additional npm package:
+
+```package-manager
+npm install @base-ui/react class-variance-authority
+```
+
+The other examples need only Input OTP and its included helpers. Numeric paste
+imports `REGEXP_ONLY_DIGITS` from the already required `input-otp` package.
+The site's preview shell is not consumer setup.
+
+In Next.js App Router, Controlled needs a caller client module for its state,
+change/completion handlers and clear button. Grouped numeric codes and paste
+needs one for its function-valued `pasteTransformer`. Usage, Without a
+separator and Explicit motion scopes can use synchronous Server Components
+with the shown serializable props. Invalid, Disabled and read-only, and the
+top specimen use synchronous `useId` only; that hook alone does not require a
+client boundary. Keep their shown client directives when copying the examples.
+Caller refs, event handlers, function-valued `render`, `useState` or `useRef`
+need a caller client boundary. Preserve the installed sources' directives.
+
+Pass the required `maxLength` and render one slot for each index from zero
+through `maxLength - 1`, inside the same InputOTP. Groups and separators only
+arrange those slots; they do not create separate inputs. Keep codes as strings
+to preserve leading zeros. Use `defaultValue` for an uncontrolled initial
+value, or `value` with `onChange(nextString)` for editable controlled state.
+`onComplete` reports a change from a shorter value to a full code; an initially
+full value or replacing one full code with another is not a new completion.
+The callback does not verify or submit the code by itself.
+
+The default keyboard hint is `inputMode="numeric"`, not a character filter.
+Set `pattern` explicitly when needed; `REGEXP_ONLY_DIGITS` accepts digits.
+A `pasteTransformer` normalizes the pasted text before the pattern check;
+select all to replace a full code, otherwise paste uses the current selection
+and truncates to `maxLength`. Selection, arrow keys and Backspace belong to
+the single real input; slots mirror its active range and character state.
+`containerClassName` styles the visible wrapper, while `className` styles
+the transparent input. The default password-manager strategy is
+`pushPasswordManagerStrategy="increase-width"`; `"none"` disables that
+badge accommodation. Test actual autofill and password-manager integrations
+in your target browsers.
+
+Associate a visible Label with the InputOTP's `id`, or supply `aria-label`.
+Put `aria-invalid` and `aria-describedby` on the real InputOTP, and
+`aria-invalid` on each slot for its destructive border. Disabled blocks focus
+and editing; read-only retains focus and selection for a fixed value. Native
+`name`, `form` and `required` props belong to the real input: it contributes
+one string under its name, disabled inputs are excluded, and read-only values
+remain available to the form. Keep form reset explicit in caller state; do
+not rely on native reset to synchronize the dependency's internal draft or
+your completion message. The caller owns code delivery, normalization policy,
+verification, submission, expiry/errors, retry limits and persistence.
 
 ## Usage
 
