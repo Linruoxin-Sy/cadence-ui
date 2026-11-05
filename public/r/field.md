@@ -10,9 +10,92 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/field
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/label](https://cadence.dev/r/label.json) — direct registry dependency.
+- [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| label | `@components/cadence/label/index.tsx` | [JSON files[].content](https://cadence.dev/r/label.json) |
+| separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| field | `@components/cadence/field/index.tsx` | [JSON files[].content](https://cadence.dev/r/field.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: label](https://cadence.dev/r/label.json)
+
+[Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: field](https://cadence.dev/r/field.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Keep `field/index.tsx`, `label/index.tsx`, `separator/index.tsx` and `lib/cn.ts`
+at the listed relative paths. Field imports Label and Separator even when you do
+not render those parts; all three components share the `cn` helper. Field, Label
+and Separator are static T0 components in full, reduced and none modes; no motion
+runtime, provider or additional item-specific CSS is required beyond the base
+theme and Tailwind utilities. Keep the source files' `"use client"` directives.
+In Next.js App Router, a Server Component can render these client parts with
+serializable props. Calling the exported `fieldVariants` function belongs in a
+`"use client"` module; none of the examples below calls it.
+
+Usage, Orientation, Responsive layout, “An error, from the caller”, “A set, a
+legend, and a divider”, and the top preview use [Input](/components/input). Install it when
+keeping those controls:
+
+```install
+npx shadcn@latest add @cadence/input
+```
+
+“An error, from the caller” also uses [Button](/components/button), and “A choice
+card” uses [Checkbox](/components/checkbox). Install the items for those examples:
+
+```install
+npx shadcn@latest add @cadence/button @cadence/checkbox
+```
+
+For manual Input and Button installations, follow their Manual tabs and copy all
+listed files while preserving the shared relative tree. Input adds
+`input/index.tsx` and no packages beyond Field's dependency list. For Checkbox,
+copy `checkbox/index.tsx` from its [registry JSON](https://cadence.dev/r/checkbox.json)
+and the same `lib/` motion and provider files listed by Button; Checkbox does not
+need `button/index.tsx`. Button adds `motion`, and Checkbox adds `motion` and
+`lucide-react`. Wrapping the application in their provider is optional.
+Button drops its press scale in reduced and none modes;
+Checkbox keeps an opacity-only indicator in reduced and changes instantly in
+none. Field stays static in all three modes.
+
+Keep the documented example compositions and top preview's existing `"use client"`
+boundaries. The error example needs a client boundary for its state and event
+handler. A composition with stable caller-supplied IDs and serializable
+props can instead render the client parts from a Server Component. The caller
+owns input values, invalid-state decisions, messages, `data-invalid`,
+`aria-invalid` and description IDs. Field only renders that supplied state; it
+does not require a validation library.
 
 ## Usage
 
