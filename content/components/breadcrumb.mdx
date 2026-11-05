@@ -13,9 +13,42 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/breadcrumb
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/breadcrumb.json)
+
+Copy both files in the target list, keeping `breadcrumb/index.tsx` beside the
+shared `lib/` directory containing `cn.ts`. No motion runtime, provider or
+additional item-specific CSS is required beyond the base theme and Tailwind
+utilities. The trail stays static in full, reduced and none modes; the link's
+colour transition is hover feedback. `lucide-react` is a component dependency
+for the default chevron and ellipsis, even when an example uses a custom separator.
+
+Keep the source's existing `"use client"` directive. In Next.js App Router, a
+Server Component can compose the parts shown in Usage and the named examples
+with serializable props, including the `render` element in “A router link”.
+Event handlers or a function passed to `render` belong in a client module. The
+preview already has a client boundary; copying its specimen does not require
+the site's preview shell.
+
+Only “A router link” needs `next/link` from an existing Next.js application; the
+Breadcrumb source imports no framework router. In another router, use its link
+element with `render` and keep the resulting anchor's destination. The caller
+owns route destinations, ancestor order and which ancestors are hidden; Breadcrumb
+does not derive a trail from the URL or navigate on its own.
+
+“A deep trail that collapses” and the top preview use native `details`/`summary`,
+so no extra registry item or npm package is needed. The disclosure keeps its
+browser-owned state and supports Enter and Space without JavaScript.
+`BreadcrumbEllipsis` is decorative; keep the summary's accessible name and make
+hidden ancestors reachable. Use `BreadcrumbPage` for the current page and give
+each navigation landmark a distinct label when rendering several trails.
 
 ## Usage
 

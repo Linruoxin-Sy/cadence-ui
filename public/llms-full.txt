@@ -4899,9 +4899,67 @@ Hierarchy navigation, from the root to the current page.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/breadcrumb
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge @base-ui/react lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| breadcrumb | `@components/cadence/breadcrumb/index.tsx` | [JSON files[].content](https://cadence.dev/r/breadcrumb.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: breadcrumb](https://cadence.dev/r/breadcrumb.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Copy both files in the target list, keeping `breadcrumb/index.tsx` beside the
+shared `lib/` directory containing `cn.ts`. No motion runtime, provider or
+additional item-specific CSS is required beyond the base theme and Tailwind
+utilities. The trail stays static in full, reduced and none modes; the link's
+colour transition is hover feedback. `lucide-react` is a component dependency
+for the default chevron and ellipsis, even when an example uses a custom separator.
+
+Keep the source's existing `"use client"` directive. In Next.js App Router, a
+Server Component can compose the parts shown in Usage and the named examples
+with serializable props, including the `render` element in “A router link”.
+Event handlers or a function passed to `render` belong in a client module. The
+preview already has a client boundary; copying its specimen does not require
+the site's preview shell.
+
+Only “A router link” needs `next/link` from an existing Next.js application; the
+Breadcrumb source imports no framework router. In another router, use its link
+element with `render` and keep the resulting anchor's destination. The caller
+owns route destinations, ancestor order and which ancestors are hidden; Breadcrumb
+does not derive a trail from the URL or navigate on its own.
+
+“A deep trail that collapses” and the top preview use native `details`/`summary`,
+so no extra registry item or npm package is needed. The disclosure keeps its
+browser-owned state and supports Enter and Space without JavaScript.
+`BreadcrumbEllipsis` is decorative; keep the summary's accessible name and make
+hidden ancestors reachable. Use `BreadcrumbPage` for the current page and give
+each navigation landmark a distinct label when rendering several trails.
 
 ## Usage
 
