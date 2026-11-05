@@ -61,3 +61,23 @@ export function installationPlugin() {
     );
   };
 }
+
+/** Keep component containers outside prose scopes, then restart prose per panel. */
+export function documentFlowPlugin() {
+  return (tree: Node) => {
+    const output: Node[] = [];
+    let prose: Node[] = [];
+    const flush = () => {
+      if (prose.length) output.push(element("DocumentProse", prose));
+      prose = [];
+    };
+    for (const node of tree.children ?? []) {
+      if (node.type === "mdxJsxFlowElement" && node.name === "Installation") {
+        flush();
+        output.push(node);
+      } else prose.push(node);
+    }
+    flush();
+    tree.children = output;
+  };
+}

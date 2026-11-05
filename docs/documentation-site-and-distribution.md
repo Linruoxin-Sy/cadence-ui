@@ -128,7 +128,11 @@ The scaffold emits these markers for all future components.
 The site's remark AST transform wraps only Installation in the installed Cadence Tabs parts with
 `TabsList variant="line"`, default Command. Package-manager CodeBlock tabs retain their global
 remembered preference; method selection is local. Both panels stay mounted to preserve per-file
-fold state. Server components replace generated source links with every payload file's full
+fold state. The AST places the Tabs container outside the surrounding typeset flow, then wraps
+each panel's body in its own typeset scope. Upstream typeset CSS stays unchanged and nested
+registry components keep their own styles. The no-JS stylesheet exposes both panels;
+normal inactive panels retain `hidden` and stay out of keyboard navigation.
+Server components replace generated source links with every payload file's full
 `files[].content` and `target`, including multi-file libraries. Shiki runs on the server.
 Each source block controls `expanded` (initial false) and `onExpandedChange`, defaults to 16 lines,
 and uses CodeBlock's existing footer/expand button, numbering, scrolling and complete-file copy.

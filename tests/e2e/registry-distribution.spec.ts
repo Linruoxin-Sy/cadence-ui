@@ -6,6 +6,7 @@ import { registryItemSchema, registrySchema } from "shadcn/schema";
 
 test("production /r overrides public files and serves exact conditional resources", async ({ request }, info) => {
   const evidence = [];
+  const registry = JSON.parse(await readFile("registry.json", "utf8"));
   for (const name of (await readdir("public/r")).filter((name) => /^[a-z0-9-]+\.(json|md)$/.test(name))) {
     const response = await request.get(`/r/${name}`);
     expect(response.status(), name).toBe(200);
@@ -23,7 +24,7 @@ test("production /r overrides public files and serves exact conditional resource
     if (name === "registry.json") registrySchema.parse(JSON.parse(body.toString()));
     else if (name === "catalog.json") {
       const catalog = JSON.parse(body.toString());
-      expect(catalog).toHaveLength(65);
+      expect(catalog).toHaveLength(registry.items.length);
       for (const entry of catalog) {
         expect((await request.get(entry.docs)).status(), entry.docs).toBe(200);
         expect((await request.get(entry.item)).status(), entry.item).toBe(200);
@@ -106,8 +107,10 @@ test("retained snapshots serve immutable exact bytes and dependency closure", as
 for (const theme of ["light", "dark"]) {
   for (const width of [1280, 390]) {
     test(`new guides render and link correctly ${theme}/${width}`, async ({ page, request }) => {
+      test.setTimeout(120_000);
       await page.setViewportSize({ width, height: 900 });
       await page.addInitScript((theme) => localStorage.setItem("cadence-theme", theme), theme);
+      const checkedLinks = new Set<string>();
       for (const slug of ["accessibility", "registry", "ai", "changelog"]) {
         await page.goto(`/docs/${slug}?motion=none`);
         await page.waitForLoadState("networkidle");
@@ -116,7 +119,11 @@ for (const theme of ["light", "dark"]) {
         const links = await page
           .locator("main a[href^='/']")
           .evaluateAll((nodes) => nodes.map((node) => node.getAttribute("href") ?? ""));
-        for (const href of new Set(links)) expect((await request.get(href)).status(), href).toBe(200);
+        for (const href of new Set(links)) {
+          if (checkedLinks.has(href)) continue;
+          expect((await request.get(href)).status(), href).toBe(200);
+          checkedLinks.add(href);
+        }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         expect(
           (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,

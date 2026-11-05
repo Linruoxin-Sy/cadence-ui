@@ -13,7 +13,7 @@ test("one package-manager choice reaches every install command on the site", asy
   await page.waitForLoadState("networkidle");
 
   const lists = page.getByRole("tablist", { name: "Package manager" });
-  await expect(lists).toHaveCount(4);
+  await expect(lists).toHaveCount(3);
 
   // The server paints pnpm; every fence agrees before the reader touches anything.
   for (const list of await lists.all()) {

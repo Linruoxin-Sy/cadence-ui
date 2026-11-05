@@ -4,7 +4,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import { Children, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { installationPlugin } from "@/components/site/installation-markdown";
+import { documentFlowPlugin, installationPlugin } from "@/components/site/installation-markdown";
 import {
   expandInstallation,
   hasInstallationTabs,
@@ -27,6 +27,9 @@ function ManualPanel({ children }: { children: ReactNode }) {
 }
 function SourceMarker({ id }: { id: string }) {
   return <span data-source={id} />;
+}
+function ProseMarker({ children }: { children: ReactNode }) {
+  return <div data-prose>{children}</div>;
 }
 
 describe("shared installation plan", () => {
@@ -119,9 +122,10 @@ describe("installation authoring and AST", () => {
   it("turns only parsed boundaries into panels, retaining multiple fences and code containing marker text", async () => {
     const { content } = await compileMDX({
       source: expandInstallation(body, registry.items, "button"),
-      options: { mdxOptions: { remarkPlugins: [installationPlugin] } },
+      options: { mdxOptions: { remarkPlugins: [installationPlugin, documentFlowPlugin] } },
       components: {
         Installation: PanelCount,
+        DocumentProse: ProseMarker,
         InstallationCommand: CommandPanel,
         InstallationManual: ManualPanel,
         InstallationSource: SourceMarker,
@@ -133,6 +137,10 @@ describe("installation authoring and AST", () => {
     expect(html).toContain("@cadence/spinner");
     expect(html).toContain('data-source="cadence-provider"');
     expect(html).not.toContain("<strong>Manual</strong>");
+    const dom = document.createElement("div");
+    dom.innerHTML = html;
+    expect(dom.querySelector("[data-panels]")?.closest("[data-prose]")).toBeNull();
+    expect(dom.querySelectorAll("[data-prose]")).toHaveLength(2);
     const tree = {
       type: "root",
       children: [

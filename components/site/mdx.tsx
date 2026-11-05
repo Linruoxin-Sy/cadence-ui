@@ -1,12 +1,11 @@
 import { compileMDX } from "next-mdx-remote/rsc";
-import { Children, type ComponentProps, type ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import remarkGfm from "remark-gfm";
 import { assertComponentExample } from "@/lib/component-examples";
 import type { TocEntry } from "@/registry/cadence/toc";
 import { MdxCodeFence } from "./code-fence";
-import { installationPlugin } from "./installation-markdown";
-import { InstallationSource } from "./installation-source";
-import { InstallationTabs } from "./installation-tabs";
+import { installationComponents } from "./installation";
+import { documentFlowPlugin, installationPlugin } from "./installation-markdown";
 import { type PreviewComponent, PreviewFrame } from "./preview";
 
 /**
@@ -79,20 +78,8 @@ function DocumentExample(
   );
 }
 
-function Installation({ children }: { children: ReactNode }) {
-  const panels = Children.toArray(children);
-  return (
-    <>
-      <noscript>
-        <style>{`[data-installation] [data-slot="tabs-content"][hidden] { display: block; }`}</style>
-      </noscript>
-      <InstallationTabs command={panels[0]} manual={panels[1]} />
-    </>
-  );
-}
-
-function InstallationPanel({ children }: { children: ReactNode }) {
-  return <div>{children}</div>;
+function DocumentProse({ children }: { children: ReactNode }) {
+  return <div className="typeset typeset-docs">{children}</div>;
 }
 
 export async function compileDocument(source: string, componentId?: string, preview?: PreviewComponent) {
@@ -100,13 +87,14 @@ export async function compileDocument(source: string, componentId?: string, prev
   const { content } = await compileMDX({
     source,
     options: {
-      mdxOptions: { remarkPlugins: [remarkGfm, installationPlugin], rehypePlugins: [headingPlugin(headings)] },
+      mdxOptions: {
+        remarkPlugins: [remarkGfm, installationPlugin, documentFlowPlugin],
+        rehypePlugins: [headingPlugin(headings)],
+      },
     },
     components: {
-      Installation,
-      InstallationCommand: InstallationPanel,
-      InstallationManual: InstallationPanel,
-      InstallationSource,
+      DocumentProse,
+      ...installationComponents,
       ComponentExample: DocumentExample.bind(null, componentId, preview),
       table: ({ children, ...props }: ComponentProps<"table">) => (
         <div className="overflow-x-auto">
@@ -119,7 +107,7 @@ export async function compileDocument(source: string, componentId?: string, prev
       pre: ({ children }: ComponentProps<"pre">) => <MdxCodeFence>{children}</MdxCodeFence>,
     },
   });
-  return { headings, content: <div className="typeset typeset-docs">{content}</div> };
+  return { headings, content: <div className="min-w-0 [&>.typeset:not(:first-child)]:mt-8">{content}</div> };
 }
 
 export async function Mdx({ source }: { source: string }) {
