@@ -75,6 +75,12 @@ for styling only and do not gain Button's press animation. Empty itself remains
 static. Keep A second action's `"use client"` directive for React state and event
 handlers; the caller owns filtering and recovery.
 
+In Next.js App Router, add `"use client"` above the imports in example files that
+call `buttonVariants` (including Usage and Without media), or import those
+compositions through an existing Client Component boundary, because this function
+comes from Button's client module and cannot be called directly from a Server
+Component.
+
 The example snippets also retain some unused icon and Button imports. Installing
 both dependencies supports copying them verbatim; remove unused imports if you
 only need the Empty parts. Bounded or unbounded and the inline SVG illustration
