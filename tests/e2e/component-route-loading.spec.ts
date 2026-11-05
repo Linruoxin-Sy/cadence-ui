@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { expect, test } from "@playwright/test";
 import { measureInitialScripts } from "../../scripts/site-js-budget.mjs";
+import { openComponentSource } from "./installation-helpers";
 
 // Assert byte isolation separately from the unchanged 120 KB full-page budget.
 // An own-export positive control prevents missing/renamed bundle markers passing silently.
@@ -50,6 +51,23 @@ for (const [id, own, other] of [
         bodies.some((body) => body.includes(other)),
         "neighbouring preview must load only on its own route",
       ).toBe(false);
+      expect(bodies.some((body) => body.includes("github-light-high-contrast"))).toBe(false);
+      const scriptsBeforeSource = await page.evaluate(() =>
+        performance
+          .getEntriesByType("resource")
+          .map((entry) => entry.name)
+          .filter((name) => new URL(name).pathname.endsWith(".js")),
+      );
+      await openComponentSource(page, id);
+      await page.waitForLoadState("networkidle");
+      expect(
+        await page.evaluate(() =>
+          performance
+            .getEntriesByType("resource")
+            .map((entry) => entry.name)
+            .filter((name) => new URL(name).pathname.endsWith(".js")),
+        ),
+      ).toEqual(scriptsBeforeSource);
     } finally {
       await context.close();
     }

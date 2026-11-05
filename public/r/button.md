@@ -10,8 +10,69 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/button
+```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+The Sizes example also uses `lucide-react` for its icons. Install it only when using those icons;
+Button itself does not require an icon package:
+
+```package-manager
+npm install lucide-react
 ```
 
 ## Usage

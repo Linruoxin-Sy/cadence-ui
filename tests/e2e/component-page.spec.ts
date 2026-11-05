@@ -115,7 +115,7 @@ for (const theme of ["light", "dark"])
         await page.goto(`/components/${id}?motion=none`);
         await page.waitForLoadState("networkidle");
         await page.evaluate((theme) => document.documentElement.classList.toggle("dark", theme === "dark"), theme);
-        const table = page.locator("table.docs-table").first();
+        const table = page.locator("table.docs-table:visible").first();
         await table.focus();
         if (width === 390) {
           expect(await table.evaluate((node) => node.getBoundingClientRect().width)).toBeGreaterThanOrEqual(704);
