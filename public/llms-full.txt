@@ -6543,9 +6543,128 @@ Independent yes/no choices and multi-select lists.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/checkbox
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| checkbox | `@components/cadence/checkbox/index.tsx` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: checkbox](https://cadence.dev/r/checkbox.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine files in the target list, including every file from the motion,
+utilities and provider payloads. Keep `checkbox/index.tsx` beside the shared
+`lib/` directory with the relative imports and `"use client"` directives intact.
+The indicator uses `ControlSpan`, whose imports also reach `native-div.tsx` and
+`press-button.tsx`; copying only `provider.tsx` is not enough. The provider files
+and `motion` package are required even without an application wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. There is no additional Checkbox-specific CSS or asset. `lucide-react`
+supplies the tick and mixed-state icons. Only the indicator animates:
+`state.morph` fades and scales it in full, keeps opacity with immediate full size
+in reduced, and settles immediately in none, including an initially checked
+control. Standalone checkboxes follow the system motion preference; the optional
+`CadenceProvider` controls a subtree's mode and timing. A nested full scope still
+respects the system reduced-motion preference.
+
+Usage, the top specimen and the labelled examples also need
+[Label](/components/label). Controlled and Native form submission additionally
+use [Button](/components/button). Install the items needed by your example:
+
+```install
+npx shadcn@latest add @cadence/label @cadence/button
+```
+
+For manual installation, follow their Manual tabs too: add `label/index.tsx`
+and, when using Button, `button/index.tsx`. Their shared files are already in
+Checkbox's target list. Label adds no npm package; Button also requires:
+
+```package-manager
+npm install class-variance-authority
+```
+
+Explicit motion scopes uses only Checkbox and the included provider. No example
+needs another package or external asset. The site's preview shell is not consumer
+setup.
+
+In Next.js App Router, Controlled and Native form submission need a client
+module for their state and event handlers. The other snippets can be composed
+in a synchronous Server Component using the shown `useId` or stable unique IDs,
+JSX and serializable props; their existing client directives may also be kept.
+An event handler, a function-valued `render`, `className(state)` or `style(state)`,
+or a client-side hook such as `useState` or `useRef` needs a caller client
+boundary. Preserve the installed sources' client directives in either case.
+
+Give every control a visible label linked with `htmlFor` and a unique `id`, or
+an `aria-label`. With the default renderer, the supplied `id` belongs to the
+hidden native input; Base UI gives the visible checkbox its own accessible
+name, focus and Space-key behavior. Use `defaultChecked` for an uncontrolled
+initial value, or own `checked` with `onCheckedChange`. `indeterminate` announces
+mixed state but does not set `checked` or derive a child selection for you.
+
+Keep the default root as a flex or grid item, as Usage does. Inside a plain
+block wrapper, give Checkbox `className="inline-flex"` so its `span` respects
+the control's width and height, as the wrapped Static checkbox in Explicit
+motion scopes demonstrates.
+
+For native submission, supply `name` and `value`: a checked, enabled input
+contributes that entry; an unchecked input is omitted unless you supply
+`uncheckedValue`. Disabled inputs are omitted. A read-only choice stays
+focusable and retains its checked submission value. `required` participates in
+browser constraint validation, as the form example demonstrates. The caller
+owns acceptance rules, controlled state, error text, submission, server-side
+validation and persistence; Cadence renders `aria-invalid` and the described
+error without deciding when either should clear.
 
 ## Usage
 
