@@ -13,9 +13,46 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/label
 ```
+
+The Usage and Disabled examples also use [Input](/components/input). Install it when
+copying those examples:
+
+```install
+npx shadcn@latest add @cadence/input
+```
+
+To reproduce the styled checkboxes in the top preview, also install
+[Checkbox](/components/checkbox):
+
+```install
+npx shadcn@latest add @cadence/checkbox
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/label.json)
+
+Label needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `label/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves. Associate the label with a
+control using `htmlFor` and a matching `id`, or wrap the control as shown below.
+
+For Usage and Disabled, also copy [Input's source file](https://cadence.dev/r/input.json)
+to `@components/cadence/input/index.tsx` and install its additional package:
+
+```package-manager
+npm install @base-ui/react
+```
+
+The top preview's styled checkboxes require
+[Checkbox's installation](/components/checkbox#installation) and its own dependencies and
+motion setup. Input and Checkbox are example dependencies, not dependencies of Label.
+The Wrapping example uses a native checkbox and needs no additional dependencies.
 
 ## Usage
 

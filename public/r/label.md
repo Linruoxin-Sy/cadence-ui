@@ -10,9 +10,71 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/label
 ```
+
+The Usage and Disabled examples also use [Input](/components/input). Install it when
+copying those examples:
+
+```install
+npx shadcn@latest add @cadence/input
+```
+
+To reproduce the styled checkboxes in the top preview, also install
+[Checkbox](/components/checkbox):
+
+```install
+npx shadcn@latest add @cadence/checkbox
+```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| label | `@components/cadence/label/index.tsx` | [JSON files[].content](https://cadence.dev/r/label.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: label](https://cadence.dev/r/label.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Label needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `label/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves. Associate the label with a
+control using `htmlFor` and a matching `id`, or wrap the control as shown below.
+
+For Usage and Disabled, also copy [Input's source file](https://cadence.dev/r/input.json)
+to `@components/cadence/input/index.tsx` and install its additional package:
+
+```package-manager
+npm install @base-ui/react
+```
+
+The top preview's styled checkboxes require
+[Checkbox's installation](/components/checkbox#installation) and its own dependencies and
+motion setup. Input and Checkbox are example dependencies, not dependencies of Label.
+The Wrapping example uses a native checkbox and needs no additional dependencies.
 
 ## Usage
 
