@@ -5925,12 +5925,126 @@ Focused tasks such as renaming, inviting, or confirming.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/dialog
 ```
 
 This also installs `button`, which the dialog uses for its close control.
 The editing example additionally uses `@cadence/field` and `@cadence/input`.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| dialog | `@components/cadence/dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/dialog.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: dialog](https://cadence.dev/r/dialog.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten files in the target list. Keep `dialog/index.tsx` and
+`button/index.tsx` beside the shared `lib/` directory, with their relative
+imports and `"use client"` directives intact. Button is required by Dialog's
+built-in close controls, even if your own trigger uses a native button. Copy all
+files from the motion, utilities and provider payloads. The popup uses CSS
+transitions, but its provider imports and the installed Button still require
+`motion`; wrapping the application in `CadenceProvider` is optional.
+
+Complete the base theme setup linked above, including Cadence's easing and scale
+tokens, and ensure Tailwind scans the copied files. There is no additional
+Dialog-specific CSS. Each portalled overlay and panel resolves its own token
+clock, including provider `timeScale`: full fades the overlay and fades/scales
+the panel, reduced keeps opacity only, and none removes transitions and hidden
+entry/exit opacity from the first frame. Without a wrapper, Dialog follows the
+system motion preference. Use the included provider for explicit scopes; a
+nested full scope still respects the system reduced-motion preference.
+
+Usage, Editing a project and the top specimen also use [Field](/components/field)
+and [Input](/components/input). Install them when copying the editing form:
+
+```install
+npx shadcn@latest add @cadence/field @cadence/input
+```
+
+For manual installation, follow their Manual tabs too: add `field/index.tsx`,
+`label/index.tsx`, `separator/index.tsx` and `input/index.tsx` alongside the shared
+files already listed here. They add no npm packages beyond Dialog's complete
+dependency command. The other examples' rendered controls need only Dialog,
+the included Button and, for Explicit motion scopes, the included provider.
+Several snippets retain unused Field/Input imports; install those items if you
+copy the imports verbatim, or remove the unused imports. No example needs an
+extra asset; `lucide-react` already supplies the built-in close icon. The site's
+preview shell is not consumer setup.
+
+In Next.js App Router, keep the editing, controlled and footer export examples
+in a client module because they own state and event handlers. Long content also
+needs a client module for its focus ref. Without the built-in close button,
+Modal and non-modal behavior, and Explicit motion scopes can be composed in a
+Server Component with the shown JSX elements and serializable props; their
+existing client directives may also be kept. `render={<Button />}` does not by
+itself require a caller client boundary. A function-valued `render`,
+`className(state)` or `style(state)`, event handler, or client-side hook such as
+`useState` or `useRef` needs that boundary. Preserve the installed sources'
+client directives in either case.
+
+`DialogContent` already includes its portal and backdrop; do not add another
+overlay around the standard composition. Give every panel a `DialogTitle` and
+keep a visible close action when hiding the corner button. The default modal
+traps focus and locks page scrolling; `modal={false}` and `"trap-focus"` change
+that behavior but still keep DialogContent's backdrop. Base UI handles focus,
+Escape and dismissal; the caller owns controlled open state, draft/saved data,
+submission, validation and persistence. Cancel does not reset the editing
+example's draft. For long content, supply the maximum height, scrolling and
+initial focus target shown below so the heading and final close action remain
+reachable. Hydrated interactions require JavaScript.
 
 ## Usage
 
