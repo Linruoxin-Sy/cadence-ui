@@ -10,9 +10,98 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/pagination
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| pagination | `@components/cadence/pagination/index.tsx` | [JSON files[].content](https://cadence.dev/r/pagination.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: pagination](https://cadence.dev/r/pagination.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten files in the target list, keeping `pagination/index.tsx` and
+`button/index.tsx` beside the shared `lib/` directory. Pagination imports
+`buttonVariants` from the Button module for its anchor styles, so retain that
+module's complete motion/provider dependency tree even though no `Button` is
+rendered. The provider files are required imports; wrapping your application is
+optional. Pagination itself stays static in full, reduced and none modes, with
+only colour, border and shadow state feedback from the button styles. No
+additional item-specific CSS is needed beyond the base theme and Tailwind utilities.
+
+Keep the source's existing `"use client"` directives. In Next.js App Router,
+Usage, the collapsed range, custom labels, sizes and boundary examples can be
+composed in a Server Component with serializable props. “Without a page in the
+URL” needs its own client module for `useState`, `useId` and the click handler.
+The top preview has a client boundary already; copying its specimen does not
+require the site's preview shell. All examples use the same installation files
+and packages, including `lucide-react` for the component's chevrons and ellipsis;
+none needs a framework router package.
+
+Every page control is a native anchor. The caller supplies destinations, the
+visible range, `isActive`, boundary states and result data; Pagination does not
+read the URL, fetch records or calculate pages. Replace the sample query URLs
+with destinations your application actually handles. The local-state example
+preserves modified clicks, but its fragment fallback only reaches the results
+region and cannot restore the selected page when shared or reloaded.
+
+At a boundary, omit `href` and keep `role="link"` plus `aria-disabled="true"`;
+`aria-disabled` alone does not stop an anchor with a destination. Ellipses remain
+decorative. Give repeated navigation landmarks distinct labels, keep meaningful
+previous/next accessible names when changing their text, and choose a compact
+range that fits the parent on narrow screens.
 
 ## Usage
 

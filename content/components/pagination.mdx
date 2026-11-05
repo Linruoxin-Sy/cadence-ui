@@ -13,9 +13,46 @@ registryDeps: ["@cadence/button", "@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/pagination
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/pagination.json)
+
+Copy all ten files in the target list, keeping `pagination/index.tsx` and
+`button/index.tsx` beside the shared `lib/` directory. Pagination imports
+`buttonVariants` from the Button module for its anchor styles, so retain that
+module's complete motion/provider dependency tree even though no `Button` is
+rendered. The provider files are required imports; wrapping your application is
+optional. Pagination itself stays static in full, reduced and none modes, with
+only colour, border and shadow state feedback from the button styles. No
+additional item-specific CSS is needed beyond the base theme and Tailwind utilities.
+
+Keep the source's existing `"use client"` directives. In Next.js App Router,
+Usage, the collapsed range, custom labels, sizes and boundary examples can be
+composed in a Server Component with serializable props. “Without a page in the
+URL” needs its own client module for `useState`, `useId` and the click handler.
+The top preview has a client boundary already; copying its specimen does not
+require the site's preview shell. All examples use the same installation files
+and packages, including `lucide-react` for the component's chevrons and ellipsis;
+none needs a framework router package.
+
+Every page control is a native anchor. The caller supplies destinations, the
+visible range, `isActive`, boundary states and result data; Pagination does not
+read the URL, fetch records or calculate pages. Replace the sample query URLs
+with destinations your application actually handles. The local-state example
+preserves modified clicks, but its fragment fallback only reaches the results
+region and cannot restore the selected page when shared or reloaded.
+
+At a boundary, omit `href` and keep `role="link"` plus `aria-disabled="true"`;
+`aria-disabled` alone does not stop an anchor with a destination. Ellipses remain
+decorative. Give repeated navigation landmarks distinct labels, keep meaningful
+previous/next accessible names when changing their text, and choose a compact
+range that fits the parent on narrow screens.
 
 ## Usage
 
