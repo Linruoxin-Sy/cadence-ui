@@ -13,9 +13,45 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/skeleton
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/skeleton.json)
+
+Keep `skeleton/index.tsx` and all shared `lib/` files at the listed relative paths,
+including every file in the motion and provider items. Preserve the `"use client"`
+directives. Skeleton uses a CSS opacity pulse, but its `useCadenceMotion` import
+still requires the shared provider files and their `motion` dependency. Wrapping
+the application in `CadenceProvider` is optional; without it, Skeleton follows the
+system motion preference.
+
+Full and reduced modes both keep Tailwind's `animate-pulse` opacity loop. None
+uses `animate-none` and keeps the placeholder at full opacity. The loop clock is
+the theme's `--animate-pulse` token; provider `timeScale` does not change it.
+Without motion uses the included provider with `mode="none"`, so that example is
+static from the server render. No additional item-specific CSS is required beyond
+the base theme and Tailwind utilities.
+
+Swapping in the real content also uses [Button](/components/button). Install it
+when using that example:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab as well; it adds
+`@base-ui/react` and `class-variance-authority` alongside the shared dependencies
+already listed here. Keep the example's `"use client"` directive for React state.
+Usage, Text lines, Avatar and name, Without motion and the top preview need no
+other registry items, npm packages or image assets. Their shapes use Skeleton and
+native elements; Avatar and name does not import the Avatar component. The caller
+owns sizes and loading state: set `aria-busy` on the containing region and reserve
+space for the loaded content. The site's preview frame is not consumer setup.
 
 ## Usage
 
