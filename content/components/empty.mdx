@@ -13,9 +13,53 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/empty
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/empty.json)
+
+Keep `empty/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared
+`cn` import resolves. Empty is a static T0 component in full, reduced and none
+modes; no motion runtime, provider or additional item-specific CSS is required
+beyond the base theme and Tailwind utilities. Empty's source has no `"use client"`
+directive and can be rendered on the server.
+
+Usage, A second action, the icon form of Icon or illustration and the top preview
+use `lucide-react`. Install it when keeping those icons:
+
+```package-manager
+npm install lucide-react
+```
+
+Usage, A second action, Without media and the top preview use
+[Button](/components/button) or its `buttonVariants` export. Install it when
+keeping those imports:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab and copy every shared
+motion and provider file it lists. Button adds `@base-ui/react` and `motion` to
+the packages listed above; wrapping the application in its provider is optional.
+The Clear filters Button scales on press in full mode and drops that scale in
+reduced and none modes. The native Browse components links use `buttonVariants`
+for styling only and do not gain Button's press animation. Empty itself remains
+static. Keep A second action's `"use client"` directive for React state and event
+handlers; the caller owns filtering and recovery.
+
+The example snippets also retain some unused icon and Button imports. Installing
+both dependencies supports copying them verbatim; remove unused imports if you
+only need the Empty parts. Bounded or unbounded and the inline SVG illustration
+need no extra package once those unused imports are removed. Without media needs
+no icon package after removing its unused icon import, but its styled link still
+uses `buttonVariants`. No example needs external image assets, and the site's
+preview frame is not consumer setup.
 
 ## Usage
 

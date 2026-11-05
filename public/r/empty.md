@@ -10,9 +10,78 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/empty
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| empty | `@components/cadence/empty/index.tsx` | [JSON files[].content](https://cadence.dev/r/empty.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: empty](https://cadence.dev/r/empty.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Keep `empty/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared
+`cn` import resolves. Empty is a static T0 component in full, reduced and none
+modes; no motion runtime, provider or additional item-specific CSS is required
+beyond the base theme and Tailwind utilities. Empty's source has no `"use client"`
+directive and can be rendered on the server.
+
+Usage, A second action, the icon form of Icon or illustration and the top preview
+use `lucide-react`. Install it when keeping those icons:
+
+```package-manager
+npm install lucide-react
+```
+
+Usage, A second action, Without media and the top preview use
+[Button](/components/button) or its `buttonVariants` export. Install it when
+keeping those imports:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab and copy every shared
+motion and provider file it lists. Button adds `@base-ui/react` and `motion` to
+the packages listed above; wrapping the application in its provider is optional.
+The Clear filters Button scales on press in full mode and drops that scale in
+reduced and none modes. The native Browse components links use `buttonVariants`
+for styling only and do not gain Button's press animation. Empty itself remains
+static. Keep A second action's `"use client"` directive for React state and event
+handlers; the caller owns filtering and recovery.
+
+The example snippets also retain some unused icon and Button imports. Installing
+both dependencies supports copying them verbatim; remove unused imports if you
+only need the Empty parts. Bounded or unbounded and the inline SVG illustration
+need no extra package once those unused imports are removed. Without media needs
+no icon package after removing its unused icon import, but its styled link still
+uses `buttonVariants`. No example needs external image assets, and the site's
+preview frame is not consumer setup.
 
 ## Usage
 
