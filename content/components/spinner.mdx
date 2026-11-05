@@ -13,9 +13,56 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/spinner
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/spinner.json)
+
+Copy all nine files in the target list, keeping `spinner/index.tsx` beside the
+shared `lib/` directory and preserving relative imports and `"use client"`
+directives. The glyph uses a CSS loop, but its `useCadenceMotion` import still
+requires the provider files and their `motion` dependency. Copy every file from
+the motion, utilities and provider payloads; wrapping the application in
+`CadenceProvider` is optional. Without a wrapper, Spinner follows the system
+motion preference.
+
+Full and reduced both keep the single-glyph `animate-spin` rotation, the
+animation system's specific reduced-motion exception. None uses `animate-none`
+and leaves the named icon visible and still. Tailwind's `--animate-spin` theme
+token owns the loop clock; provider `timeScale`, including zero, does not change
+it. Use `mode="none"` on the included provider to stop the loop, as the explicit
+`data-motion="none"` example does from its first render. No additional item-specific
+CSS is required beyond the base theme and Tailwind utilities.
+
+Inside a button also uses [Button](/components/button). Install it when copying
+that example:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab too; it adds
+`button/index.tsx`, `@base-ui/react` and `class-variance-authority` alongside the
+shared files and packages already listed here. Usage, Sized by the caller, A
+specific label, `data-motion="none"` and the top specimen need no other registry items,
+npm packages or assets. `lucide-react` is already an implementation dependency
+for the loading glyph; the site's preview shell is not consumer setup.
+
+In Next.js App Router, all five body examples can be composed in a Server
+Component with their shown serializable props, including the nested provider.
+Keep the installed sources' client boundaries. A caller that adds React state,
+event handlers or browser APIs needs its own client module. The examples are
+fixed loading states: the caller starts and finishes requests, mounts or removes
+Spinner, sets and clears the region's `aria-busy`, and exposes completion or error
+feedback. Keep a meaningful status label; inside the pending button, keep its
+written label, `disabled` and `aria-busy`, and hide the redundant glyph with
+`aria-hidden`. Reserve any changing label width and choose icon sizes that fit
+the surrounding layout.
 
 ## Usage
 
