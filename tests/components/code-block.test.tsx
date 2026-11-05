@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
@@ -48,6 +48,7 @@ function stubMeasurement(contentHeight = 400) {
     return style;
   });
   vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(contentHeight);
+  vi.spyOn(HTMLElement.prototype, "getClientRects").mockReturnValue([new DOMRect()] as unknown as DOMRectList);
 }
 
 afterEach(() => {
@@ -55,6 +56,32 @@ afterEach(() => {
 });
 
 describe("CodeBlock", () => {
+  it.each(["full", "reduced", "none"] as const)("defers a hidden tab's first fold measurement: %s", (mode) => {
+    stubMeasurement();
+    let visible = false;
+    let resize: ResizeObserverCallback | undefined;
+    vi.mocked(HTMLElement.prototype.getClientRects).mockImplementation(() =>
+      visible ? ([new DOMRect()] as unknown as DOMRectList) : ([] as unknown as DOMRectList),
+    );
+    vi.spyOn(globalThis, "ResizeObserver").mockImplementation((callback: ResizeObserverCallback) => {
+      resize = callback;
+      return { observe() {}, unobserve() {}, disconnect() {} };
+    });
+    const { container } = render(
+      <CadenceProvider mode={mode}>
+        <CodeBlock maxLines={2}>
+          <CodeBlockContent>{SOURCE}</CodeBlockContent>
+        </CodeBlock>
+      </CadenceProvider>,
+    );
+    const viewport = slot(container, "code-block-viewport");
+    expect(viewport.style.height).toBe("");
+    visible = true;
+    act(() => resize?.([], {} as ResizeObserver));
+    expect(viewport.style.height).toBe("56px");
+    expectMotionContract(mode);
+  });
+
   beforeAll(async () => {
     // This suite tests rendering, not cold module/grammar throughput. Await real
     // readiness before starting Testing Library's DOM-update clock. Cold loading,

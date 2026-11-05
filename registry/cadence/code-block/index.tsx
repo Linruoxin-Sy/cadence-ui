@@ -721,15 +721,13 @@ function CodeBlockContent({
     if (!pre || maxLines === undefined) return;
 
     const measure = () => {
+      if (!pre.getClientRects().length) return;
       const styles = window.getComputedStyle(pre);
       const lineHeight = Number.parseFloat(styles.lineHeight);
       const top = Number.parseFloat(styles.paddingTop);
       const full = pre.scrollHeight;
-      // `lineHeight` is the computed pixel value, so a page that changes
-      // `leading-*` or the font size moves the fold with it. The bottom padding is
-      // deliberately not part of the fold: the source continues below the cut, and
-      // including it shows the top of the next line instead of ending on a line
-      // boundary. `floor` keeps a fractional line height from spilling the same way.
+      // Follow computed font metrics. Exclude bottom padding and round down to
+      // keep the fold on a line boundary.
       const foldedHeight = Number.isFinite(lineHeight) ? top + Math.floor(lineHeight * maxLines) : full;
       const target = Math.min(folded ? foldedHeight : full, full);
       floor.current = Math.min(foldedHeight, full);
