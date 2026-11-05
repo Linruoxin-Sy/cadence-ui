@@ -13,9 +13,45 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/alert
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/alert.json)
+
+Keep `alert/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared
+`cn` import resolves. Alert is a static T0 component in full, reduced and none
+modes; no motion runtime, provider or additional item-specific CSS is required
+beyond the base theme and Tailwind utilities. Alert's source has no `"use client"`
+directive and can be rendered on the server.
+
+Usage, Destructive and the top preview use icons from `lucide-react`; With an
+action uses the same package. Install it when keeping those icons:
+
+```package-manager
+npm install lucide-react
+```
+
+With an action also uses [Button](/components/button). Install it when using that
+example:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab and copy every shared
+motion and provider file it lists. Button adds `@base-ui/react` and `motion` to
+the packages listed above; wrapping the application in its provider is optional.
+Its press scale runs in full mode and is dropped in reduced and none modes;
+Alert itself remains static. Keep the example's `"use client"` directive for
+React state and event handlers. The caller owns dismissal and remounting.
+
+Without an icon needs only Alert and native content. No example needs image
+assets, and the site's preview frame is not consumer setup.
 
 ## Usage
 

@@ -10,9 +10,70 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/alert
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| alert | `@components/cadence/alert/index.tsx` | [JSON files[].content](https://cadence.dev/r/alert.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: alert](https://cadence.dev/r/alert.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Keep `alert/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared
+`cn` import resolves. Alert is a static T0 component in full, reduced and none
+modes; no motion runtime, provider or additional item-specific CSS is required
+beyond the base theme and Tailwind utilities. Alert's source has no `"use client"`
+directive and can be rendered on the server.
+
+Usage, Destructive and the top preview use icons from `lucide-react`; With an
+action uses the same package. Install it when keeping those icons:
+
+```package-manager
+npm install lucide-react
+```
+
+With an action also uses [Button](/components/button). Install it when using that
+example:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For a manual Button installation, follow its Manual tab and copy every shared
+motion and provider file it lists. Button adds `@base-ui/react` and `motion` to
+the packages listed above; wrapping the application in its provider is optional.
+Its press scale runs in full mode and is dropped in reduced and none modes;
+Alert itself remains static. Keep the example's `"use client"` directive for
+React state and event handlers. The caller owns dismissal and remounting.
+
+Without an icon needs only Alert and native content. No example needs image
+assets, and the site's preview frame is not consumer setup.
 
 ## Usage
 
