@@ -10,12 +10,136 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/drawer
 ```
 
 The examples compose `@cadence/button`, `@cadence/field` and `@cadence/input` as needed.
 Install those items when copying their corresponding examples.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| drawer | `@components/cadence/drawer/index.tsx` | [JSON files[].content](https://cadence.dev/r/drawer.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: drawer](https://cadence.dev/r/drawer.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine files in the target list, including every shared `lib/` file.
+Keep the mirrored `cadence/` tree, relative imports and `"use client"` directives
+intact. The popup and backdrop use CSS transitions, but the provider imports
+still require `motion`. The provider files are required; wrapping your
+application in `CadenceProvider` is optional.
+
+Complete the base theme setup linked above, including Cadence's easing tokens,
+and ensure Tailwind scans the copied files. There is no additional
+Drawer-specific CSS or asset in these payloads. Each portalled popup and
+backdrop resolves its own motion clock, including provider `timeScale`: full
+slides and fades the popup, reduced keeps the fade and drops the closed-state
+slide, and none removes authored transitions and hidden entry/exit opacity
+from the first frame. Direct finger tracking remains in all three modes.
+Without a wrapper, Drawer follows the system motion preference; a nested full
+scope still respects the system reduced-motion preference.
+
+Usage, the top Move conversation specimen and every body example additionally
+use [Button](/components/button). Controlled draft also needs
+[Field](/components/field) and [Input](/components/input). Install the items
+used by the example you copy:
+
+```install
+npx shadcn@latest add @cadence/button @cadence/field @cadence/input
+```
+
+For manual installation, follow those pages' Manual tabs too. Button adds
+`button/index.tsx`; Controlled draft additionally adds `field/index.tsx`,
+`label/index.tsx`, `separator/index.tsx` and `input/index.tsx`. Reuse the shared
+files already listed here. Button and Field require this extra npm package;
+Input adds none beyond Drawer's complete dependency command:
+
+```package-manager
+npm install class-variance-authority
+```
+
+Explicit motion scopes uses the included provider. The site's preview shell
+is not consumer setup.
+
+In Next.js App Router, Usage, the top Move conversation specimen, Snap points
+and Controlled draft need a client module for their state and event handlers.
+A visible swipe handle, Swiping from another edge, Non-modal and focus-only
+drawers, and Explicit motion scopes can be composed in a synchronous Server
+Component with their shown JSX elements and serializable props; their existing
+client directives may also be kept. `render={<Button />}` and synchronous
+`useId` alone do not require a caller client boundary. A ref, event handler,
+`useState`, function-valued `render`, `className(state)` or `style(state)` does
+require that boundary. Preserve the installed sources' client directives.
+
+`DrawerContent` already includes its portal, viewport, popup and scrollable
+content region, plus a backdrop only when `modal={true}`. Do not duplicate
+these parts in the standard composition. Drawer defaults to `swipeDirection="down"`,
+`modal={true}` and no handle. Direction selects both the edge and the outward
+dismissal gesture: down/up are vertical, left/right are horizontal. The optional
+handle is an aria-hidden visual cue; retain a real `DrawerClose` and a
+`DrawerTitle`, with meaningful supporting text through `DrawerDescription`.
+Trigger and Close use native buttons by default; `render` composes another
+element with Base UI's props and ref.
+
+Default modal behavior traps focus and locks page scrolling. `modal={false}`
+allows interaction with the page; `modal="trap-focus"` traps focus without
+scroll lock. Those two modes have no backdrop in this composition. Base UI
+owns focus, Escape, outside dismissal, focus return and swipe recognition.
+Vertical snap points are Base UI positions; the Snap points example controls
+`snapPoint` through `onSnapPointChange`, Expand and Peek. The caller owns open
+and snap state when controlled, action data, draft/saved values, submission,
+validation and persistence. Move conversation and Save only update local
+example state; Cancel preserves the draft without updating the saved value.
+The content region scrolls inside the popup, including its header and footer;
+constrain tall content to your viewport. Hydrated interactions require JavaScript.
 
 ## Usage
 
