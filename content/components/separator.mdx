@@ -13,9 +13,22 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/separator
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/separator.json)
+
+Separator needs only the two files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required. Keep `separator/index.tsx` and `lib/cn.ts` at the
+listed relative paths so the shared `cn` import resolves.
+
+All examples on this page use Separator alone and need no additional dependencies. A vertical
+separator needs a parent with a defined height, as shown in the Vertical example.
 
 ## Usage
 
