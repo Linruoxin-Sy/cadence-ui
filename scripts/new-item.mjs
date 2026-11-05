@@ -132,9 +132,15 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 \`\`\`install
 npx shadcn@latest add @cadence/${id}
 \`\`\`
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/${id}.json)
 
 ## Usage
 

@@ -15,6 +15,7 @@ import {
   BreadcrumbSeparator,
 } from "@/registry/cadence/breadcrumb";
 import { Toc } from "@/registry/cadence/toc";
+import { hasInstallationTabs } from "@/scripts/installation.mjs";
 import type { PreviewComponent } from "./preview";
 
 export async function getComponentMetadata(id: string): Promise<Metadata> {
@@ -31,7 +32,8 @@ export async function ComponentPage({ id, preview }: { id: string; preview: Prev
   const index = components.findIndex((component) => component.slug === id);
   const previous = components[index - 1];
   const next = components[index + 1];
-  const files = await getComponentSource(id);
+  const migrated = hasInstallationTabs(doc.body);
+  const files = migrated ? [] : await getComponentSource(id);
   const { headings, content } = await compileDocument(doc.body, id, preview);
 
   return (
@@ -66,22 +68,24 @@ export async function ComponentPage({ id, preview }: { id: string; preview: Prev
           <PreviewFrame id={doc.slug} component={preview} />
         </section>
 
-        <details className="mt-4 rounded-lg border border-border p-4">
-          <summary className="cursor-pointer text-sm font-medium">Component source</summary>
-          <p className="my-3 text-sm text-muted-foreground">
-            Installable source from the registry payload. See Usage below for examples.
-          </p>
-          <div className="grid min-w-0 gap-4">
-            {files.map((file) => (
-              <CodeFence
-                key={file.path}
-                title={file.path}
-                source={file.content}
-                language={file.path.endsWith("css") ? "css" : "tsx"}
-              />
-            ))}
-          </div>
-        </details>
+        {!migrated && (
+          <details data-legacy-source data-component-source={id} className="mt-4 rounded-lg border border-border p-4">
+            <summary className="cursor-pointer text-sm font-medium">Component source</summary>
+            <p className="my-3 text-sm text-muted-foreground">
+              Installable source from the registry payload. See Usage below for examples.
+            </p>
+            <div className="grid min-w-0 gap-4">
+              {files.map((file) => (
+                <CodeFence
+                  key={file.path}
+                  title={file.path}
+                  source={file.content}
+                  language={file.path.endsWith("css") ? "css" : "tsx"}
+                />
+              ))}
+            </div>
+          </details>
+        )}
 
         <section className="mt-4">{content}</section>
         <footer className="mt-12 grid gap-6 border-t border-border pt-6 text-sm">

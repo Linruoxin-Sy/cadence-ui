@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { summarizeLayoutShifts } from "../../scripts/site-js-budget.mjs";
+import { openComponentSource } from "./installation-helpers";
 
 type Shift = {
   value: number;
@@ -90,8 +91,9 @@ async function mark(page: Page, name: string) {
 
 async function documentControls(page: Page, width: number) {
   await mark(page, "open component source");
-  await page.getByText("Component source", { exact: true }).click();
-  await expect(page.locator("article > details[open]")).toHaveCount(1);
+  await openComponentSource(page, new URL(page.url()).pathname.split("/").at(-1) ?? "");
+  const installation = page.locator("[data-installation]");
+  if (await installation.count()) await installation.getByRole("tab", { name: "Command", exact: true }).click();
   await mark(page, "switch installation command to npm");
   await page.getByRole("tab", { name: "npm", exact: true }).click();
   await expect(page.getByRole("tab", { name: "npm", exact: true })).toHaveAttribute("aria-selected", "true");

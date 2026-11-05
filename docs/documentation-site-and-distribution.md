@@ -111,6 +111,34 @@ and registry:check (therefore pnpm check); new-item validates its generated body
 that same gate. This checks structure and nonempty coverage, not prose truth or live
 performance. Contributors must review the claims against source.
 
+### Installation methods and source ownership
+
+Component Installation sections use standalone Markdown `**Command**` and `**Manual**` paragraphs.
+Keep all CLI fences, notes and example dependencies under Command. Manual contains the canonical
+`[Manual installation files](https://cadence.dev/r/<id>.json)` link, plus component-specific setup
+or example-only dependencies. Do not copy implementation source into MDX.
+
+`scripts/installation.mjs` resolves registry dependencies in dependency-first order, deduplicates
+targets and npm specs without dropping version pins, and expands this link into the complete npm
+commands, direct/transitive registry dependencies, target list, payload source links, metadata CSS
+and optional provider setup. The site, payload `docs`, `/r/<id>.md` and llms-full use this same
+expanded body. Build/check validate markers and freshness. Source links remain useful in plain text.
+The scaffold emits these markers for all future components.
+
+The site's remark AST transform wraps only Installation in the installed Cadence Tabs parts with
+`TabsList variant="line"`, default Command. Package-manager CodeBlock tabs retain their global
+remembered preference; method selection is local. Both panels stay mounted to preserve per-file
+fold state. Server components replace generated source links with every payload file's full
+`files[].content` and `target`, including multi-file libraries. Shiki runs on the server.
+Each source block controls `expanded` (initial false) and `onExpandedChange`, defaults to 16 lines,
+and uses CodeBlock's existing footer/expand button, numbering, scrolling and complete-file copy.
+Ordinary Usage/example fences stay fully expanded. Hidden blocks defer first measurement until
+visible; initial SSR folds are CSS-reserved and no-JS retains readable complete source.
+
+During the per-document migration, unmarked pages keep the legacy source disclosure. Marked pages
+remove that disclosure. Remove this transition branch after all 59 pages migrate. The final contract
+is Command/Manual on every component page; transitional acceptance does not certify that rollout.
+
 ### 2.1 The Motion contract section (this project's signature content)
 
 Every component has one flat `## Motion contract` section and a Markdown table. Recipe names

@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode, pressScale } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const registry = JSON.parse(await readFile("registry.json", "utf8"));
 const ids: string[] = registry.items
@@ -19,24 +20,28 @@ test("all 59 SSR routes expose real headings, registry source, ordered navigatio
     expect(response.status()).toBe(200);
     const html = await response.text();
     // Parse SSR HTML without loading 59 client runtimes.
-    const result = await page.evaluate((html) => {
-      const doc = new DOMParser().parseFromString(html, "text/html");
-      const toc = doc.querySelector('nav[aria-label="On this page"]');
-      return {
-        headings: [...(toc?.querySelectorAll("a") ?? [])].map((a) => ({
-          title: a.textContent,
-          target: doc.getElementById(a.hash.slice(1))?.textContent,
-        })),
-        previous: doc.querySelector('[rel="prev"]')?.getAttribute("href"),
-        next: doc.querySelector('[rel="next"]')?.getAttribute("href"),
-        edit: [...doc.querySelectorAll("a")].find((a) => a.textContent === "Edit this page")?.getAttribute("href"),
-        source: [...doc.querySelectorAll('article details [data-slot="code-block-content"]')].map((block) =>
-          [...block.querySelectorAll('[data-slot="code-block-line-content"]')]
-            .map((line) => (line.textContent === "\n" ? "" : line.textContent))
-            .join("\n"),
-        ),
-      };
-    }, html);
+    const result = await page.evaluate(
+      ({ html, id }) => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const toc = doc.querySelector('nav[aria-label="On this page"]');
+        return {
+          headings: [...(toc?.querySelectorAll("a") ?? [])].map((a) => ({
+            title: a.textContent,
+            target: doc.getElementById(a.hash.slice(1))?.textContent,
+          })),
+          previous: doc.querySelector('[rel="prev"]')?.getAttribute("href"),
+          next: doc.querySelector('[rel="next"]')?.getAttribute("href"),
+          edit: [...doc.querySelectorAll("a")].find((a) => a.textContent === "Edit this page")?.getAttribute("href"),
+          source: [...doc.querySelectorAll(`[data-component-source="${id}"] [data-slot="code-block-content"]`)].map(
+            (block) =>
+              [...block.querySelectorAll('[data-slot="code-block-line-content"]')]
+                .map((line) => (line.textContent === "\n" ? "" : line.textContent))
+                .join("\n"),
+          ),
+        };
+      },
+      { html, id },
+    );
     expect(result.headings.length).toBeGreaterThan(5);
     for (const heading of result.headings) expect(heading.target).toBe(heading.title);
     expect(result.previous).toBe(index ? `/components/${ids[index - 1]}` : undefined);
@@ -74,9 +79,7 @@ for (const mode of ["full", "reduced", "none"] as const)
       expect(await button.evaluate((node) => node === (window as unknown as { specimen: Element }).specimen)).toBe(
         true,
       );
-      const details = page.locator("article details:not([data-mobile-toc])");
-      await details.locator("summary").focus();
-      await page.keyboard.press("Enter");
+      const details = await openComponentSource(page, "button");
       const source = details.locator('[data-slot="code-block-content"]').first();
       await expect(source).toContainText("function Button");
       await details.getByRole("button", { name: "Copy", exact: true }).first().click();

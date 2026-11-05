@@ -7,8 +7,8 @@ description: Add Cadence to a Next.js or Vite project with the shadcn CLI, or co
 
 - React 19 and TypeScript
 - Tailwind CSS v4 (shadcn's current default)
-- A project initialized with `npx shadcn@latest init` and Base UI as the component library
-- `motion` is installed automatically by the CLI; no other runtime is required
+- For CLI installation, a project initialized with `npx shadcn@latest init` and Base UI as the component library
+- Each item's npm and registry dependencies are installed automatically by the CLI; Manual lists the exact recursive requirements
 
 Cadence components are UI only. They render invalid state from `aria-invalid` but never validate
 a value; the boundary is the same one [Field](/components/field) demonstrates.
@@ -78,20 +78,101 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ## Manual installation
 
-Start with the packages the CLI would have installed:
+Manual installation needs no shadcn CLI or `components.json`. Start with a React 19 + TypeScript
+project and Tailwind v4 configured for your framework. Configure `@/*` to resolve to your source
+directory (or adjust the Usage imports). Your global stylesheet needs `@import "tailwindcss";`,
+the shadcn semantic colour variables and their Tailwind mappings. If your project already uses
+shadcn, keep its theme. Otherwise this minimal light/dark base is enough to start:
 
-```package-manager
-npm install motion lucide-react @base-ui/react clsx tailwind-merge
+```css
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.16 0 0);
+  --card: var(--background);
+  --card-foreground: var(--foreground);
+  --popover: var(--background);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.2 0 0);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.965 0 0);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--secondary);
+  --muted-foreground: oklch(0.52 0 0);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.58 0.21 25);
+  --border: oklch(0.91 0 0);
+  --input: var(--border);
+  --ring: oklch(0.3 0 0);
+}
+
+.dark {
+  --background: oklch(0.16 0 0);
+  --foreground: oklch(0.97 0 0);
+  --primary: oklch(0.95 0 0);
+  --primary-foreground: oklch(0.17 0 0);
+  --secondary: oklch(0.26 0 0);
+  --muted-foreground: oklch(0.7 0 0);
+  --destructive: oklch(0.65 0.2 25);
+  --border: oklch(0.3 0 0);
+  --ring: oklch(0.8 0 0);
+}
 ```
 
-Then copy the files by hand:
+Append the Cadence theme CSS below. This block is generated from the
+[theme payload](https://cadence.dev/r/cadence-theme.json): `cssVars.theme` maps to `@theme inline`,
+`cssVars.light` to `:root`, `cssVars.dark` to `.dark`, and `css` preserves the nested CSS rules.
 
-1. Copy `lib/motion.ts`, `lib/cn.ts`, and `lib/provider.tsx` from the registry item into
-   `components/cadence/lib/`.
-2. Copy the component folder into `components/cadence/<id>/`.
-3. Copy the `docs` body from `/r/<id>.json` if you want the documentation next to the code.
+[Cadence theme CSS](https://cadence.dev/r/cadence-theme.json)
+
+Then open your component page's **Installation → Manual** tab:
+
+1. Run its npm dependency command, preserving version pins. Install example-only packages only
+   if you use those examples; there is no universal runtime package list.
+2. Copy **every** file in its dependency-first target list. In each linked `/r/<id>.json`,
+   `files[].content` is the complete source and `files[].target` is its destination. Replace
+   `@components` with your components directory, such as `src/components`.
+3. Shared items contain multiple files: `cadence-motion` includes `motion.ts` and `geometry.ts`;
+   `cadence-provider` includes `provider.tsx`, `popup-style.ts`, `control-animation.tsx`,
+   `native-div.tsx`, and `press-button.tsx`. Copy all of them when listed, plus `cn.ts` from
+   `cadence-utils`. Other items may require additional helpers; the generated list is authoritative.
+4. Apply any item-specific CSS shown in Manual, import the component as Usage shows, and optionally
+   wrap the app as above when the item includes `cadence-provider`.
 
 Every item keeps relative imports (`../lib/motion`), so the folder can be moved as a whole.
+The payload's `docs`, `/r/<id>.md` and `llms-full.txt` provide the same instructions and complete
+file links for readers outside the website. During migration, pages with the older source disclosure
+still expose the current component files and linkable dependency payloads.
 
 ## Troubleshooting
 
@@ -112,4 +193,5 @@ Cadence intentionally reduces or disables motion in that case.
 
 ### TypeScript cannot resolve `../lib/motion`
 
-You copied a component without its dependencies. Re-run the CLI, or copy the `lib/` folder as well.
+You copied a component without its complete dependency tree. Follow the Manual target list and
+copy every file from every linked payload, including the multi-file shared items.

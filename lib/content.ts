@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { expandInstallation, expandInstallationGuide } from "@/scripts/installation.mjs";
 
 export interface DocFrontmatter {
   title: string;
@@ -109,11 +110,14 @@ export async function listComponentGroups(): Promise<ComponentGroup[]> {
 }
 
 export async function getComponent(slug: string): Promise<Doc | null> {
+  let doc: Doc;
   try {
-    return await readDoc(path.join(contentRoot, "components", `${slug}.mdx`));
+    doc = await readDoc(path.join(contentRoot, "components", `${slug}.mdx`));
   } catch {
     return null;
   }
+  const registry = JSON.parse(await readFile(path.join(process.cwd(), "registry.json"), "utf8"));
+  return { ...doc, body: expandInstallation(doc.body, registry.items, slug) };
 }
 
 const guideOrder = [
@@ -146,7 +150,10 @@ export async function listGuides(): Promise<Doc[]> {
 
 export async function getGuide(slug: string): Promise<Doc | null> {
   try {
-    return await readDoc(path.join(contentRoot, "docs", `${slug}.mdx`));
+    const doc = await readDoc(path.join(contentRoot, "docs", `${slug}.mdx`));
+    if (slug !== "installation") return doc;
+    const registry = JSON.parse(await readFile(path.join(process.cwd(), "registry.json"), "utf8"));
+    return { ...doc, body: expandInstallationGuide(doc.body, registry.items) };
   } catch {
     return null;
   }

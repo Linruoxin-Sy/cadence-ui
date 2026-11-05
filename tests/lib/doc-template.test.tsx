@@ -7,6 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { checkDocTemplates } from "../../scripts/doc-template.mjs";
+import { freshDocs } from "../fixtures/fresh-docs";
 
 const root = process.cwd();
 const registry = JSON.parse(readFileSync("registry.json", "utf8"));
@@ -18,14 +19,20 @@ beforeAll(() => {
   cpSync("registry.json", path.join(fixture, "registry.json"));
   cpSync("registry-snapshots.json", path.join(fixture, "registry-snapshots.json"));
   cpSync("components", path.join(fixture, "components"), { recursive: true });
-  for (const dir of ["registry", "public", "docs", "app"]) {
+  cpSync("public", path.join(fixture, "public"), {
+    recursive: true,
+    filter: (file) => path.basename(file) !== "snapshots",
+  });
+  symlinkSync(path.join(root, "public/r/snapshots"), path.join(fixture, "public/r/snapshots"), "junction");
+  for (const dir of ["registry", "docs", "app"]) {
     symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
   }
 });
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));
 
-function entry(file: string, source: string) {
+function entry(file: string, source: string, fresh = false) {
   writeFileSync(path.join(fixture, file), source);
+  if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), source);
   try {
     const result = spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
       cwd: fixture,
@@ -34,6 +41,7 @@ function entry(file: string, source: string) {
     return { status: result.status, output: result.stdout + result.stderr };
   } finally {
     writeFileSync(path.join(fixture, file), readFileSync(path.join(root, file), "utf8"));
+    if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), readFileSync(path.join(root, file), "utf8"));
   }
 }
 
@@ -42,11 +50,12 @@ const badge = readFileSync(badgePath, "utf8");
 const without = (source: string, title: string) =>
   source.replace(new RegExp(`## ${title}\\n[\\s\\S]*?(?=\\n## |$)`), "");
 
-describe("real registry template entry", () => {
+// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; checker subprocesses take up to 8s under full-suite I/O contention.
+describe("real registry template entry", { timeout: 15_000 }, () => {
   it("accepts all 59 real tier/block bodies", async () => {
     expect(await checkDocTemplates(root, registry)).toEqual([]);
     expect(entry(badgePath, badge).status).toBe(0);
-  });
+  }, 15_000);
   it.each([
     ["missing performance", without(badge, "Responsiveness and performance"), "expected one ## Responsive behavior"],
     ["missing required rationale", without(badge, "When to use"), "expected one ## When to use"],
@@ -125,7 +134,7 @@ describe("real registry template entry", () => {
       )
       .replace("## API", "## API\n\n### `Badge` and `BadgeIcon`");
     try {
-      const result = entry(badgePath, source);
+      const result = entry(badgePath, source, true);
       expect(result.status, result.output).toBe(0);
     } finally {
       writeFileSync(catalogPath, catalogSource);

@@ -2,6 +2,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { validateInstallation } from "./installation.mjs";
 import { visibleLines } from "./motion-docs.mjs";
 
 export const INPUT_DOCS = new Set([
@@ -25,7 +26,7 @@ export const INPUT_DOCS = new Set([
 ]);
 
 export function validateDocTemplate(body, item, label, exampleCatalog = {}) {
-  const problems = [];
+  const problems = validateInstallation(body, item.name);
   const fail = (message) => problems.push(`${label}: ${message}`);
   const lines = visibleLines(body);
   for (let index = 0; index < lines.length; index++) {

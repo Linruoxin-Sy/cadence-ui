@@ -20,6 +20,7 @@ import matter from "gray-matter";
 import { checkCatalogIntensity } from "./catalog-intensity.mjs";
 import { checkComponentRoutes } from "./component-routes.mjs";
 import { checkDocTemplates } from "./doc-template.mjs";
+import { expandInstallation } from "./installation.mjs";
 import { checkMotionDocs } from "./motion-docs.mjs";
 import {
   calledRecipes,
@@ -41,6 +42,7 @@ const problems = [...checkCatalogIntensity(registry), ...(await checkDocTemplate
 const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
 problems.push(...(await checkMotionDocs(root, registry, RECIPES)));
 const docsDir = path.join(root, "content", "components");
+const fullDocs = await readFile(path.join(root, "public", "llms-full.txt"), "utf8");
 
 /** Frontmatter is the human-facing copy of `meta`; the two must not drift. */
 async function docFrontmatter(name) {
@@ -86,6 +88,16 @@ for (const item of registry.items) {
 
   if (isComponent(item) && (!payload.docs || payload.docs.length < 200)) {
     problems.push(`${item.name}: payload is missing a real docs body`);
+  }
+
+  if (isComponent(item)) {
+    const raw = matter(await readFile(path.join(docsDir, `${item.name}.mdx`), "utf8"));
+    const expected = expandInstallation(raw.content.trim(), registry.items, item.name);
+    if (payload.docs !== expected) problems.push(`${item.name}: stale payload docs (run registry:build)`);
+    const markdown = `public/r/${item.name}.md`;
+    if (!(await readFile(path.join(root, markdown), "utf8")).includes(expected))
+      problems.push(`${markdown}: stale installation docs for ${item.name}`);
+    if (!fullDocs.includes(expected)) problems.push(`public/llms-full.txt: stale installation docs for ${item.name}`);
   }
 
   if (isComponent(item)) {

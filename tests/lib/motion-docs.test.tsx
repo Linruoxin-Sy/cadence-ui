@@ -5,6 +5,7 @@ import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { checkMotionDocs } from "../../scripts/motion-docs.mjs";
 import { recipeCatalogue } from "../../scripts/motion-manifest.mjs";
+import { freshDocs } from "../fixtures/fresh-docs";
 
 const root = process.cwd();
 const registry = JSON.parse(readFileSync("registry.json", "utf8"));
@@ -21,14 +22,20 @@ beforeAll(() => {
   cpSync("tests", path.join(fixture, "tests"), { recursive: true });
   cpSync("registry.json", path.join(fixture, "registry.json"));
   cpSync("registry-snapshots.json", path.join(fixture, "registry-snapshots.json"));
-  for (const dir of ["registry", "public", "docs", "app", "components"]) {
+  cpSync("public", path.join(fixture, "public"), {
+    recursive: true,
+    filter: (file) => path.basename(file) !== "snapshots",
+  });
+  symlinkSync(path.join(root, "public/r/snapshots"), path.join(fixture, "public/r/snapshots"), "junction");
+  for (const dir of ["registry", "docs", "app", "components"]) {
     symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
   }
 });
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));
 
-function entry(file: string, source: string) {
+function entry(file: string, source: string, fresh = false) {
   writeFileSync(path.join(fixture, file), source);
+  if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), source);
   try {
     const result = spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
       cwd: fixture,
@@ -37,10 +44,12 @@ function entry(file: string, source: string) {
     return { status: result.status, output: result.stdout + result.stderr };
   } finally {
     writeFileSync(path.join(fixture, file), readFileSync(path.join(root, file), "utf8"));
+    if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), readFileSync(path.join(root, file), "utf8"));
   }
 }
 
-describe("registry:check motion docs entry", () => {
+// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; checker subprocesses take up to 8s under full-suite I/O contention.
+describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
   it("requires an animated component's actual test file", () => {
     const file = path.join(fixture, "tests/components/button.test.tsx");
     const source = readFileSync(file, "utf8");
@@ -52,7 +61,7 @@ describe("registry:check motion docs entry", () => {
     } finally {
       writeFileSync(file, source);
     }
-  });
+  }, 15_000);
 
   it("accepts all 59 real contracts, including T0, composed, continuous, CSS and engine forms", async () => {
     expect(
@@ -120,6 +129,7 @@ describe("registry:check motion docs entry", () => {
         "## Motion contract",
         `| Prop | Type |\n| --- | --- |\n| recipe | \`theme.reveal\` |\n${extra}\n## Motion contract`,
       ),
+      true,
     );
     expect(result.status).toBe(0);
   });

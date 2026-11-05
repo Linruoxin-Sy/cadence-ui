@@ -1,9 +1,12 @@
 import { compileMDX } from "next-mdx-remote/rsc";
-import type { ComponentProps } from "react";
+import { Children, type ComponentProps, type ReactNode } from "react";
 import remarkGfm from "remark-gfm";
 import { assertComponentExample } from "@/lib/component-examples";
 import type { TocEntry } from "@/registry/cadence/toc";
 import { MdxCodeFence } from "./code-fence";
+import { installationPlugin } from "./installation-markdown";
+import { InstallationSource } from "./installation-source";
+import { InstallationTabs } from "./installation-tabs";
 import { type PreviewComponent, PreviewFrame } from "./preview";
 
 /**
@@ -76,12 +79,34 @@ function DocumentExample(
   );
 }
 
+function Installation({ children }: { children: ReactNode }) {
+  const panels = Children.toArray(children);
+  return (
+    <>
+      <noscript>
+        <style>{`[data-installation] [data-slot="tabs-content"][hidden] { display: block; }`}</style>
+      </noscript>
+      <InstallationTabs command={panels[0]} manual={panels[1]} />
+    </>
+  );
+}
+
+function InstallationPanel({ children }: { children: ReactNode }) {
+  return <div>{children}</div>;
+}
+
 export async function compileDocument(source: string, componentId?: string, preview?: PreviewComponent) {
   const headings: TocEntry[] = [];
   const { content } = await compileMDX({
     source,
-    options: { mdxOptions: { remarkPlugins: [remarkGfm], rehypePlugins: [headingPlugin(headings)] } },
+    options: {
+      mdxOptions: { remarkPlugins: [remarkGfm, installationPlugin], rehypePlugins: [headingPlugin(headings)] },
+    },
     components: {
+      Installation,
+      InstallationCommand: InstallationPanel,
+      InstallationManual: InstallationPanel,
+      InstallationSource,
       ComponentExample: DocumentExample.bind(null, componentId, preview),
       table: ({ children, ...props }: ComponentProps<"table">) => (
         <div className="overflow-x-auto">

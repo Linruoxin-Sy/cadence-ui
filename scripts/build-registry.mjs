@@ -15,6 +15,7 @@ import os from "node:os";
 import path from "node:path";
 import matter from "gray-matter";
 import { checkDocTemplates } from "./doc-template.mjs";
+import { expandInstallation } from "./installation.mjs";
 import { motionRecipes } from "./motion-manifest.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
@@ -45,7 +46,8 @@ async function readDocs() {
     if (!entry.endsWith(".mdx")) continue;
     const raw = await readFile(path.join(docsDir, entry), "utf8");
     const { data, content } = matter(raw);
-    docs.set(entry.replace(/\.mdx$/, ""), { data, body: content.trim() });
+    const id = entry.replace(/\.mdx$/, "");
+    docs.set(id, { data, body: expandInstallation(content.trim(), registry.items, id) });
   }
   return docs;
 }
