@@ -2074,9 +2074,61 @@ Images, videos, and embeds that must keep their shape.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/aspect-ratio
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| aspect-ratio | `@components/cadence/aspect-ratio/index.tsx` | [JSON files[].content](https://cadence.dev/r/aspect-ratio.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: aspect-ratio](https://cadence.dev/r/aspect-ratio.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Aspect Ratio needs only the two files and packages listed above; no Base UI primitive,
+motion runtime, provider or additional item-specific CSS is required. Keep
+`aspect-ratio/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared `cn`
+import resolves. The component has no `"use client"` directive and renders a plain
+`div` with CSS sizing. It has no animation in full, reduced or none mode; interactive
+children still need their own client setup.
+
+Pass a positive numeric `ratio` such as `16 / 9`; there is no default. The component
+writes `--ratio` for Tailwind v4's `aspect-(--ratio)` utility. Give the parent an
+appropriate width, then size and crop the media child with classes such as
+`size-full object-cover`. The caller supplies the media's accessible name, such as
+image `alt`, video `aria-label` or iframe `title`.
+
+Usage, Square, Video, Multiple ratios in one grid and the top preview need no
+additional components or npm packages. Supply your own `/cover.jpg` for Usage.
+Square and the grid include inline SVG image data; Video uses native media controls,
+an inline poster and caption track, and an external MDN sample clip with
+`preload="none"` and no autoplay. Replace the clip and provide captions for your own
+spoken content. These media assets are caller-owned, with no extra media package
+required.
 
 ## Usage
 
