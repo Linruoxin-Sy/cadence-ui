@@ -6789,7 +6789,7 @@ export function StaticCheckbox() {
     <CadenceProvider mode="none">
       <div className="flex items-center gap-6">
         <div data-testid="initial-none">
-          <Checkbox aria-label="Static checkbox" defaultChecked />
+          <Checkbox aria-label="Static checkbox" className="inline-flex" defaultChecked />
         </div>
         <CadenceProvider mode="full">
           <Checkbox aria-label="Explicit full checkbox" />
