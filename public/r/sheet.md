@@ -10,12 +10,129 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/sheet
 ```
 
 This also installs `button`, which the sheet uses for its close control and its footer actions.
 Install `@cadence/checkbox` and `@cadence/field` for the filter composition, and `@cadence/input` for the controlled form.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: sheet](https://cadence.dev/r/sheet.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten files in the target list, including `button/index.tsx` and every
+shared `lib/` file. Keep the mirrored `cadence/` tree, relative imports and
+`"use client"` directives intact. Button is required by Sheet's built-in close
+control even when your trigger is a native button. The panel and backdrop use
+CSS transitions, but Button and the provider imports still require `motion`;
+wrapping your application in `CadenceProvider` is optional.
+
+Complete the base theme setup linked above, including Cadence's easing tokens,
+and ensure Tailwind scans the copied files. There is no additional Sheet-specific
+CSS or asset. Each portalled panel and backdrop resolves its own motion clock,
+including provider `timeScale`: full fades the backdrop and slides/fades the
+panel, reduced keeps opacity only, and none removes transitions and hidden
+entry/exit opacity from the first frame. Without a wrapper, Sheet follows the
+system motion preference. An explicit nested full scope still respects the
+system reduced-motion preference.
+
+Usage and the top filter specimen additionally need [Checkbox](/components/checkbox)
+and [Field](/components/field). Controlled form needs Field and
+[Input](/components/input). Install the items used by the example you copy:
+
+```install
+npx shadcn@latest add @cadence/checkbox @cadence/field @cadence/input
+```
+
+For manual installation, follow those pages' Manual tabs too. The filter adds
+`checkbox/index.tsx`, `field/index.tsx`, `label/index.tsx` and
+`separator/index.tsx`; the controlled form adds `field/index.tsx`,
+`label/index.tsx`, `separator/index.tsx` and `input/index.tsx`. Reuse the shared
+files already listed here. These compositions add no npm packages beyond
+Sheet's complete dependency command. The remaining examples need only Sheet,
+the included Button and, for Explicit motion scopes, the included provider.
+The built-in close icon comes from the required `lucide-react` dependency.
+The site's preview shell is not consumer setup.
+
+In Next.js App Router, Usage, the top filter specimen and Controlled form need
+a client module for their state and event handlers. A long list needs one for
+its initial-focus ref. The four edges, Without the built-in close button, Modal
+behavior and Explicit motion scopes can be composed in a synchronous Server
+Component with their shown JSX elements and serializable props; their existing
+client directives may also be kept. `render={<Button />}` and synchronous
+`useId` alone do not require a caller client boundary. A ref, event handler,
+`useState`, `useRef`, function-valued `render`, `className(state)` or `style(state)`
+does require that boundary. Preserve the installed sources' client directives.
+
+`SheetContent` already includes its portal and backdrop; do not duplicate them
+in the standard composition. It defaults to the right edge with the corner
+close button visible. Use `side` for the four physical edges, and keep a visible
+close action when setting `showCloseButton={false}`. Give every panel a
+`SheetTitle` and meaningful supporting text through `SheetDescription`. Default
+modal behavior traps focus and locks page scrolling; `modal={false}` and
+`modal="trap-focus"` change those behaviors but still keep SheetContent's
+backdrop. Base UI handles focus, Escape, outside dismissal and focus return.
+The caller owns controlled open state, filter application, draft/saved values,
+submission, validation and persistence. Cancel preserves the controlled
+example's draft. For long content, keep the header and footer outside the
+`min-h-0 flex-1 overflow-y-auto` body and supply the initial focus target shown
+below. Top and bottom panels size to content, so constrain tall content for
+your viewport. Hydrated interactions require JavaScript.
 
 ## Usage
 
