@@ -10,11 +10,133 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/hover-card
 ```
 
 The action, placement and scope examples compose `@cadence/button`. Install that item when copying those examples.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| hover-card | `@components/cadence/hover-card/index.tsx` | [JSON files[].content](https://cadence.dev/r/hover-card.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: hover-card](https://cadence.dev/r/hover-card.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, keeping `hover-card/index.tsx` and the shared
+`lib/` directory in the same `cadence/` tree. Preserve relative imports and
+the sources' `"use client"` directives. Copy every file in the motion,
+utilities and provider payloads, including helpers not imported by Hover
+Card directly. The provider files and `motion` package are required imports
+even without the optional `CadenceProvider` wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. Include the Cadence easing and motion-scale tokens used by the
+popup classes. No additional item-specific CSS or external asset is required.
+Full fades and scales the card from its anchor; reduced keeps opacity only;
+none removes transitions and hidden entry/exit styles. The portalled popup
+resolves its own mode and token clock. Standalone components follow the system
+motion preference; an optional `CadenceProvider` controls a subtree, and nested
+full still respects system reduced motion.
+
+Usage, the top specimen and Trigger delay use only Hover Card. With an action
+inside, Placement, Alignment, Logical placement, Controlled preview and
+Explicit motion scopes also use
+[Button](https://cadence.dev/components/button#installation). Copy its complete
+Manual setup, including its npm dependencies and shared files. Logical
+placement imports Base UI `DirectionProvider` from the already required
+`@base-ui/react` package. Explicit motion scopes uses the included Cadence
+provider. Beyond Button's dependencies, the examples need no additional npm
+package. The site's preview shell is not consumer setup.
+
+In Next.js App Router, With an action inside needs a caller client module for
+its ref, state and keyboard/click handlers; Controlled preview needs one for
+its state and event handlers. The other examples and top specimen contain
+serializable JSX and element-valued `render` props, so they can be composed
+in synchronous Server Components. Caller refs, event handlers,
+function-valued `render`, `className(state)` or `style(state)` also need a
+caller client boundary. Synchronous `useId` alone does not require one. Keep
+the installed client directives and the snippets' existing directives when
+copying them unchanged.
+
+Place `HoverCardTrigger` and `HoverCardContent` within the same `HoverCard`
+root. Use `defaultOpen` for uncontrolled opening, or `open` / `onOpenChange`
+for caller control. External opening needs a unique `triggerId` matching the
+trigger's `id`, as in Controlled preview, to keep the card anchored. The
+trigger renders an anchor by default: give it a useful `href` and visible
+link text. `render={<Button />}` merges onto a button; custom render elements
+must preserve supplied props and refs.
+
+`HoverCardContent` already owns the portal, positioner and popup. Its
+positioning defaults are `side="bottom"`, `align="center"`, `sideOffset={4}`
+and `alignOffset={4}`. Offsets control geometry, and Base UI can flip or shift
+the card to avoid collisions. Logical sides need Base UI `DirectionProvider`
+as well as DOM `dir`, as shown in Logical placement. Cadence exports no
+separate Portal, Positioner, Arrow or Anchor part.
+
+Trigger `delay` and `closeDelay` default to 600ms and 300ms. Pointer entry and
+keyboard focus can open the card; focus opening also uses `delay`. Pointer
+crossing into the popup keeps it open, and leaving uses the closing delay.
+These interaction delays are independent of motion mode, including none.
+Escape dismisses the card; Enter on a link keeps its normal navigation.
+The action example supplies its own ArrowDown ref bridge to Follow because
+the portal does not place that action immediately after the trigger in page
+Tab order. Preserve that bridge when copying the example.
+
+Keep the trigger's accessible name and destination useful on their own.
+The popup has no dialog role and is not the trigger's accessible description.
+All previewed information must also be available at the destination or in
+visible page content: touch activation may follow the link without revealing
+the preview. Use Popover for an intentionally opened task or essential action.
+The caller owns navigation, profile data, Follow state, requests and errors;
+the example's Follow action changes local state only.
 
 ## Usage
 
