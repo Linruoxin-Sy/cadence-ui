@@ -25,6 +25,42 @@ async function aligned(tab: Locator, line = false, vertical = false) {
     )
     .toBeLessThan(2);
 }
+
+// Check the path relative to the list, including the first painted frame. A
+// centered list can move while Base UI swaps panels of different heights.
+async function straightSelection(tab: Locator, vertical = false) {
+  await expect
+    .poll(() =>
+      tab.evaluate((el) => {
+        const indicator = el.closest('[data-slot="tabs-list"]')?.querySelector('[data-slot="tabs-indicator"]');
+        return indicator ? getComputedStyle(indicator).transform : null;
+      }),
+    )
+    .toBe("none");
+  const trace = await tab.evaluate(async (el, vertical) => {
+    const list = el.closest('[data-slot="tabs-list"]');
+    if (!list) throw Error("missing list");
+    const position = () => {
+      const indicator = list.querySelector('[data-slot="tabs-indicator"]');
+      if (!indicator) throw Error("missing indicator");
+      const rect = indicator.getBoundingClientRect();
+      const origin = list.getBoundingClientRect();
+      return { x: rect.x - origin.x, y: rect.y - origin.y };
+    };
+    const before = position();
+    (el as HTMLElement).click();
+    const points = [];
+    for (let i = 0; i < 18; i++) {
+      await new Promise(requestAnimationFrame);
+      points.push(position());
+    }
+    return { before, points, axis: vertical ? ("x" as const) : ("y" as const) };
+  }, vertical);
+  expect(Math.max(...trace.points.map((point) => Math.abs(point[trace.axis] - trace.before[trace.axis])))).toBeLessThan(
+    1,
+  );
+}
+
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`tabs ${reducedMotion}`, () => {
     test.use({ reducedMotion });
@@ -40,7 +76,14 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(
           preview.getByRole("button", { name: /Toggle orientation|Resize list|Change selection/ }),
         ).toHaveCount(0);
-        await preview.getByRole("tab", { name: "Activity" }).click();
+        const previewOverview = preview.getByRole("tab", { name: "Overview" });
+        const previewActivity = preview.getByRole("tab", { name: "Activity" });
+        await aligned(previewOverview);
+        await straightSelection(previewActivity);
+        await aligned(previewActivity);
+        await straightSelection(previewOverview);
+        await aligned(previewOverview);
+        await previewActivity.click();
         for (const vertical of [false, true]) {
           const verticalCard = page.locator('[data-component-example="tabs/vertical"]');
           const project = vertical
@@ -53,6 +96,10 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             activity = project.getByRole("tab", { name: "Activity" });
           await expect(project).toHaveAttribute("data-orientation", vertical ? "vertical" : "horizontal");
           if (vertical) await expect(project.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
+          await overview.click();
+          await aligned(overview);
+          await straightSelection(activity, vertical);
+          await aligned(activity);
           await overview.click();
           await aligned(overview);
           // Sample before/after synchronous retarget and subsequent frames in the browser.
@@ -122,6 +169,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           await expect(overview).toHaveAttribute("aria-selected", "true");
           const account = settings.getByRole("tab", { name: "Account" }),
             notifications = settings.getByRole("tab", { name: "Notifications" });
+          await aligned(account, true, vertical);
+          await straightSelection(notifications, vertical);
+          await aligned(notifications, true, vertical);
+          await account.click();
+          await aligned(account, true, vertical);
           await account.focus();
           await page.keyboard.press(vertical ? "ArrowDown" : "ArrowRight");
           await expect(notifications).toHaveAttribute("aria-selected", "true");

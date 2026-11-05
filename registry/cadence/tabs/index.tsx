@@ -3,8 +3,8 @@
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
-import { LayoutGroup, motion } from "motion/react";
-import { useId } from "react";
+import { LayoutGroup, MotionConfig, motion } from "motion/react";
+import { useId, useRef } from "react";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
 
@@ -64,6 +64,19 @@ function TriggerSurface({
   render: TabsPrimitive.Tab.Props["render"];
 }) {
   const cm = useCadenceMotion();
+  const indicatorRef = useRef<HTMLSpanElement>(null);
+  // Panels can reflow/recenter the list during a selection commit. Measure the
+  // shared element in list-local coordinates so that movement isn't animated too.
+  const listPoint = (point: { x: number; y: number }) => {
+    const list = indicatorRef.current?.closest<HTMLElement>('[data-slot="tabs-list"]');
+    const view = list?.ownerDocument.defaultView;
+    if (!list || !view) return point;
+    const rect = list.getBoundingClientRect();
+    return {
+      x: point.x - rect.x - view.scrollX + list.scrollLeft,
+      y: point.y - rect.y - view.scrollY + list.scrollTop,
+    };
+  };
   const indicatorClass =
     "pointer-events-none absolute inset-0 -z-10 rounded-md bg-background shadow-sm dark:bg-input/30 group-data-[variant=line]/tabs-list:rounded-none group-data-[variant=line]/tabs-list:bg-foreground group-data-[variant=line]/tabs-list:shadow-none group-data-[variant=line]/tabs-list:inset-auto group-data-[variant=line]/tabs-list:bottom-[-5px] group-data-[variant=line]/tabs-list:inset-x-0 group-data-[variant=line]/tabs-list:h-0.5 group-data-[orientation=vertical]/tabs:group-data-[variant=line]/tabs-list:inset-y-0 group-data-[orientation=vertical]/tabs:group-data-[variant=line]/tabs-list:left-auto group-data-[orientation=vertical]/tabs:group-data-[variant=line]/tabs-list:-right-1 group-data-[orientation=vertical]/tabs:group-data-[variant=line]/tabs-list:h-auto group-data-[orientation=vertical]/tabs:group-data-[variant=line]/tabs-list:w-0.5";
   return useRender({
@@ -84,15 +97,18 @@ function TriggerSurface({
             (cm.reduced || cm.timeScale === 0 ? (
               <span aria-hidden="true" data-slot="tabs-indicator" data-motion={cm.mode} className={indicatorClass} />
             ) : (
-              <motion.span
-                aria-hidden="true"
-                data-slot="tabs-indicator"
-                data-motion={cm.mode}
-                className={indicatorClass}
-                layoutId="selection"
-                initial={false}
-                transition={cm.transition("layout.shared")}
-              />
+              <MotionConfig transformPagePoint={listPoint}>
+                <motion.span
+                  ref={indicatorRef}
+                  aria-hidden="true"
+                  data-slot="tabs-indicator"
+                  data-motion={cm.mode}
+                  className={indicatorClass}
+                  layoutId="selection"
+                  initial={false}
+                  transition={cm.transition("layout.shared")}
+                />
+              </MotionConfig>
             ))}
           {elementProps.children}
         </>

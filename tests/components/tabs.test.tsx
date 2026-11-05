@@ -200,7 +200,10 @@ describe("Tabs", () => {
           <Example />
         </CadenceProvider>,
       );
+      fireEvent.click(screen.getByRole("tab", { name: "Charlie" }));
+      expect(screen.getByRole("tab", { name: "Charlie" })).toHaveAttribute("aria-selected", "true");
       const indicator = container.querySelector('[data-slot="tabs-indicator"]');
+      expect(indicator?.parentElement).toBe(screen.getByRole("tab", { name: "Charlie" }));
       expectMotionContract(mode, {
         behavior: () => {
           if (mode !== "full") expect(indicator).not.toHaveAttribute("style");

@@ -17052,7 +17052,9 @@ render/ref and state callbacks remain available. Panels switch immediately witho
 | None | Static indicator, no transform or animation | Zero duration | Instant |
 
 Each list has a unique LayoutGroup. Default and line indicators follow both axes; independent and nested
-lists cannot exchange indicators. The primitive owns active state, cancellation, disabled fallback and
+lists cannot exchange indicators. Shared-layout measurements use list-local coordinates, so panel reflow,
+parent recentering and page scrolling do not add a sideways or vertical detour to the selection path.
+The primitive owns active state, cancellation, disabled fallback and
 mounting. Reduced and none render a plain span with no layoutId. Parent size changes leave the indicator
 anchored to the selected trigger. There is no panel fade, height animation or extra recipe.
 
