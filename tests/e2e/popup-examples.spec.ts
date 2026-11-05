@@ -183,13 +183,28 @@ for (const id of ids) {
             await specimen.scrollIntoViewIfNeeded();
             await specimen.screenshot({ path: `.cache/b4-proof/${id}-${name}-${theme}-${width}.png` });
             const triggers = specimen.locator(`[data-slot="${id}-trigger"]`);
-            const trigger = (await triggers.count())
-              ? specimen.locator(`[data-slot="${id}-trigger"]:not([disabled]):not([aria-disabled="true"])`).first()
-              : specimen.getByRole("button").first();
+            const disabledTooltip = id === "tooltip" && name === "disabled";
+            const trigger = disabledTooltip
+              ? triggers.first()
+              : (await triggers.count())
+                ? specimen.locator(`[data-slot="${id}-trigger"]:not([disabled]):not([aria-disabled="true"])`).first()
+                : specimen.getByRole("button").first();
+            if (disabledTooltip) {
+              expect(await trigger.evaluate((node) => node.tagName)).toBe("SPAN");
+              await expect(trigger).toHaveRole("button");
+              await expect(trigger).toHaveAttribute("tabindex", "0");
+              await expect(trigger).toHaveAttribute("aria-disabled", "true");
+              await expect(trigger.locator("button")).toBeDisabled();
+            }
             if (id === "tooltip" || id === "hover-card") await trigger.focus();
             else await trigger.click(id === "context-menu" ? { button: "right" } : {});
             const surface = popup(page, id);
             await expect(surface).toBeVisible();
+            if (disabledTooltip) {
+              await expect(trigger).toBeFocused();
+              await expect(surface).toHaveText("Finish the required fields first");
+              await expect(trigger).toHaveAccessibleDescription("Finish the required fields first");
+            }
             const reopenMenu = async (child = false) => {
               if (await page.locator(`[data-slot="${id}-sub-content"]`).count()) await page.keyboard.press("Escape");
               if (await surface.count()) {
