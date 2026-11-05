@@ -387,7 +387,7 @@ export function StaticProgress() {
 | `value`           | `number \| null`                      | –       | Required. `null` means indeterminate.        |
 | `min`, `max`      | `number`                              | `0`, `100` | Range.                                    |
 | `format`          | `Intl.NumberFormatOptions`            | –       | How `ProgressValue` formats the number.      |
-| `getAriaValueText`| `(formatted: string, raw: number | null) => string`              | –       | Human-readable value for assistive tech.     |
+| `getAriaValueText`| `(formatted: string, raw: number \| null) => string`              | –       | Human-readable value for assistive tech.     |
 | `className`       | `string` / state callback                              | –       | Merged last; the default is a wrap layout.   |
 
 ### `ProgressTrack`, `ProgressIndicator`, `ProgressLabel`, `ProgressValue`
