@@ -390,11 +390,73 @@ if (catalog.popover)
     for (const value of ["false", "true", "trap-focus"]) {
       await card(page, "popover", "modal").getByRole("button", { name: value, exact: true }).click();
       await expect(surface.getByRole("button", { name: "Close options" })).toBeFocused();
-      if (value !== "false")
-        for (let i = 0; i < 4; i++) {
-          await page.keyboard.press("Tab");
-          expect(await surface.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+      if (value !== "false") {
+        const focusAudit = await surface.evaluateHandle((panel) => {
+          const sample = () => {
+            const active = document.activeElement;
+            const rect = active?.getBoundingClientRect();
+            return {
+              inside: panel.contains(active),
+              guard:
+                active?.hasAttribute("data-base-ui-focus-guard") === true &&
+                active.getAttribute("aria-hidden") === "true" &&
+                active.parentElement === panel.parentElement &&
+                !!rect &&
+                rect.width <= 1 &&
+                rect.height <= 1,
+              active: active?.outerHTML,
+              tag: active?.tagName,
+              ariaHidden: active?.getAttribute("aria-hidden"),
+              size: rect ? { width: rect.width, height: rect.height } : null,
+              sameParent: active?.parentElement === panel.parentElement,
+              connected: panel.isConnected,
+              open: panel.hasAttribute("data-open") && !panel.hasAttribute("data-ending-style"),
+              samePanel: document.querySelector('[data-slot="popover-content"]') === panel,
+            };
+          };
+          const events: ReturnType<typeof sample>[] = [];
+          const onFocus = () => events.push(sample());
+          document.addEventListener("focusin", onFocus);
+          return { sample, events, stop: () => document.removeEventListener("focusin", onFocus) };
+        });
+        const steps = [];
+        // Base UI forwards its hidden sibling guards on rAF. Record the entire
+        // focus path so a transient escape cannot be hidden by a later recovery.
+        for (const direction of ["Tab", "Shift+Tab"])
+          for (let i = 0; i < 4; i++) {
+            await page.keyboard.press(direction);
+            const immediate = await focusAudit.evaluate((audit) => audit.sample());
+            await page.evaluate(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())));
+            const frame = await focusAudit.evaluate((audit) => audit.sample());
+            await expect
+              .poll(() =>
+                focusAudit.evaluate((audit) => {
+                  const state = audit.sample();
+                  return state.connected && state.open && state.samePanel && state.inside;
+                }),
+              )
+              .toBe(true);
+            const settled = await focusAudit.evaluate((audit) => audit.sample());
+            steps.push({ direction, immediate, frame, settled });
+          }
+        const events = await focusAudit.evaluate((audit) => {
+          audit.stop();
+          return audit.events;
+        });
+        await focusAudit.dispose();
+        await test.info().attach(`popover ${value} trapped focus path`, {
+          body: JSON.stringify({ events, steps }),
+          contentType: "application/json",
+        });
+        expect(events.length).toBeGreaterThan(0);
+        for (const state of [
+          ...events,
+          ...steps.flatMap(({ immediate, frame, settled }) => [immediate, frame, settled]),
+        ]) {
+          expect(state.connected && state.open && state.samePanel).toBe(true);
+          expect(state.inside || state.guard, state.active).toBe(true);
         }
+      }
       expect(
         await page.evaluate(
           () =>
