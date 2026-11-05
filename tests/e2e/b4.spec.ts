@@ -117,10 +117,55 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await page.setViewportSize({ width: 390, height: 900 });
           expect(await popup.evaluate((n) => n === (window as unknown as { saved: Element }).saved)).toBe(true);
           if (["dialog", "alert-dialog", "sheet", "drawer"].includes(id)) {
-            for (let i = 0; i < 8; i++) {
-              await page.keyboard.press("Tab");
-              expect(await popup.evaluate((n) => n.contains(document.activeElement))).toBe(true);
-            }
+            const focusAudit = await popup.evaluateHandle((panel) => {
+              const events: { inside: boolean; guard: boolean; active: string | undefined }[] = [];
+              const onFocus = () => {
+                const active = document.activeElement;
+                const rect = active?.getBoundingClientRect();
+                events.push({
+                  inside: panel.contains(active),
+                  guard:
+                    active?.hasAttribute("data-base-ui-focus-guard") === true &&
+                    active.getAttribute("aria-hidden") === "true" &&
+                    active.parentElement === panel.parentElement &&
+                    !!rect &&
+                    rect.width <= 1 &&
+                    rect.height <= 1,
+                  active: active?.outerHTML.slice(0, 500),
+                });
+              };
+              document.addEventListener("focusin", onFocus);
+              return { events, stop: () => document.removeEventListener("focusin", onFocus) };
+            });
+            // Base UI wraps through an invisible sibling guard, then enqueues
+            // focus back into the panel on rAF. Observe the whole path: waiting
+            // alone could hide a real, transient focus escape to the background.
+            for (const key of ["Tab", "Shift+Tab"])
+              for (let i = 0; i < 8; i++) {
+                await page.keyboard.press(key);
+                await expect
+                  .poll(() =>
+                    popup.evaluate(
+                      (n) =>
+                        n.isConnected &&
+                        !n.hasAttribute("data-ending-style") &&
+                        n === (window as unknown as { saved: Element }).saved &&
+                        n.contains(document.activeElement),
+                    ),
+                  )
+                  .toBe(true);
+              }
+            const events = await focusAudit.evaluate((audit) => {
+              audit.stop();
+              return audit.events;
+            });
+            await focusAudit.dispose();
+            expect(events.length).toBeGreaterThan(0);
+            expect(events.filter((event) => !event.inside && !event.guard)).toEqual([]);
+            await test.info().attach("trapped focus path after resize", {
+              body: JSON.stringify(events),
+              contentType: "application/json",
+            });
           }
           await start(page, id);
           await page.keyboard.press("Escape");
