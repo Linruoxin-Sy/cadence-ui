@@ -7022,9 +7022,133 @@ Choosing one option from a small, fixed set.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/radio-group
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| radio-group | `@components/cadence/radio-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/radio-group.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: radio-group](https://cadence.dev/r/radio-group.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine files in the target list, including every file from the motion,
+utilities and provider payloads. Keep `radio-group/index.tsx` beside the shared
+`lib/` directory with its relative imports and the sources' `"use client"`
+directives intact. The dot uses `ControlSpan`, whose imports also reach
+`native-div.tsx` and `press-button.tsx`; copying only `provider.tsx` is not enough.
+The provider files and `motion` package are required even without an application
+wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. There is no additional Radio Group-specific CSS, icon package or external
+asset. Only the dots animate: `state.morph` uses opacity and scale in
+full, keeps opacity with immediate full size in reduced, and settles immediately
+in none, including an initially selected item. Standalone groups follow the
+system motion preference; the optional `CadenceProvider` controls a subtree's
+mode and timing. A nested full scope still respects system reduced motion.
+
+Usage, the top specimen and the labelled examples also need
+[Label](/components/label). Controlled and Native form submission additionally
+use [Button](/components/button). Install the items needed by your example:
+
+```install
+npx shadcn@latest add @cadence/label @cadence/button
+```
+
+For manual installation, follow their Manual tabs too: add `label/index.tsx`
+and, when using Button, `button/index.tsx`. Their shared files are already in
+Radio Group's target list. Label adds no npm package; Button also requires:
+
+```package-manager
+npm install class-variance-authority
+```
+
+Explicit motion scopes uses only Radio Group and the included provider. No
+example needs another package or external asset. The site's preview shell is
+not consumer setup.
+
+In Next.js App Router, Controlled and Native form submission need a client
+module for their state and event handlers. The other snippets can be composed
+in a synchronous Server Component using the shown `useId` or stable unique IDs,
+JSX and serializable props; their existing client directives may also be kept.
+An event handler, a function-valued `render`, `className(state)` or `style(state)`,
+or a client-side hook such as `useState` or `useRef` needs a caller client
+boundary. Preserve the installed sources' client directives in either case.
+
+Name each group with `aria-label` or `aria-labelledby`. Give every item a unique
+`value` and a visible label linked by `htmlFor` and a unique `id`, or an
+`aria-label`. With the default renderer, the item is a visible `span` with
+`role="radio"` beside a hidden native radio input; the supplied item `id` belongs
+to that input and Base UI connects the label to the visible control. Use
+`defaultValue` for an uncontrolled initial selection, or own `value` with
+`onValueChange` for a controlled group.
+
+Tab enters at the selected item, or the first enabled item when none is selected.
+Arrow keys move focus and selection, wrap, and skip disabled items; Space selects
+the focused item. There is one tab stop per group. Group `disabled` disables all
+items and removes them from the tab sequence. `readOnly` keeps the choices
+focusable while preventing selection changes. Keep each default item in a flex
+or grid layout, as the examples do; a horizontal layout changes the arrangement,
+not the keyboard model.
+
+For native submission, put `name` on the group and `value` on each item. Only the
+selected, enabled input contributes the group's name/value entry; no selection
+or a disabled selection contributes nothing. A read-only selected input retains
+its submission value. `required` uses browser constraint validation to prevent
+submission without a choice. The caller owns allowed values, controlled state,
+error text, submission, server-side validation and persistence. Cadence renders
+the supplied group error semantics; also pass `aria-invalid` to each item when
+its ring should show the error. Selecting an option does not clear a caller's
+error automatically.
 
 ## Usage
 
