@@ -10339,11 +10339,138 @@ Destructive or irreversible actions that need confirmation.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/alert-dialog
 ```
 
 This also installs `button`, which the two actions render through.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| alert-dialog | `@components/cadence/alert-dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/alert-dialog.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: alert-dialog](https://cadence.dev/r/alert-dialog.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten target files, keeping `alert-dialog/index.tsx`, `button/index.tsx`
+and the shared `lib/` directory in the same `cadence/` tree. Preserve the
+relative imports and the sources' `"use client"` directives. Button reaches
+`press-button.tsx`, which imports `control-animation.tsx` and in turn
+`native-div.tsx`; copy every file in the provider, motion and utilities
+payloads. The provider files and `motion` package remain required imports
+even when you omit the optional provider wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. Include the Cadence easing and motion-scale tokens used by the
+popup classes. There is no additional item-specific CSS or external asset.
+The overlay fades and the panel fades and scales in full; reduced keeps
+opacity only, and none removes the transitions and hidden entry styles.
+Each portalled surface resolves its own provider clock. Standalone components
+follow the system motion preference; an optional `CadenceProvider` controls
+a subtree, and nested full still respects system reduced motion. The included
+Button retains its own press-feedback contract.
+
+Usage, Confirmation sizes and With an icon import `Trash2Icon`; the top
+specimen uses it too. To copy those snippets unchanged, also install:
+
+```package-manager
+npm install lucide-react
+```
+
+An icon is optional for the component. Controlled, A confirmation that is
+still working and Explicit motion scopes need no additional package or
+registry item. Button and `CadenceProvider` are already included above.
+The site's preview shell is not consumer setup.
+
+In Next.js App Router, Usage, Confirmation sizes, With an icon, Controlled,
+the pending example and the top specimen need a caller client module for
+their `useState` and event handlers. Explicit motion scopes contains only
+serializable JSX and element-valued `render` props, so it can be composed in
+a synchronous Server Component. Caller refs, event handlers, function-valued
+`render`, `className(state)` or `style(state)` also need a caller client
+boundary. Synchronous `useId` alone does not require one. Preserve the
+installed sources' client directives.
+
+Place the trigger and content within the same `AlertDialog` root. The root
+supports uncontrolled `defaultOpen`, or controlled `open` / `onOpenChange`;
+it remains modal and ignores outside pointer presses. `AlertDialogContent`
+already renders its portal, overlay and popup, so do not add another portal
+or overlay around it. It accepts popup props such as `initialFocus` and
+`finalFocus`; `size` defaults to `"default"`, with `"sm"` for the compact
+layout. The separately exported Portal and Overlay are for custom composition.
+
+Always include `AlertDialogTitle` for the accessible name and use
+`AlertDialogDescription` for the consequence. Base UI associates them with
+the alert dialog and manages focus trapping, scroll locking and Escape.
+Keep Cancel first in DOM order so keyboard and mouse opening initially focus
+the safe choice; touch opening can focus the popup itself. Default focus return
+uses the trigger; when opening from an
+external control, keep a suitable return target or supply `finalFocus`.
+Mark a decorative media icon `aria-hidden="true"`. Custom Base UI `render`
+elements must preserve the supplied props and ref; `render={<Button />}`
+does not need an extra wrapper or `asChild`.
+
+`AlertDialogCancel` renders Base UI Close through Button and closes
+automatically; its defaults are `variant="outline"` and `size="default"`.
+`AlertDialogAction` renders Button and leaves the dialog open. Use controlled
+state to close after the caller's operation succeeds. Neither button performs
+the destructive operation for you. In the pending example, the caller disables
+both decision buttons, sets `aria-busy`, and rejects close requests while
+pending; Complete request only resolves a local simulation. The caller owns
+authorization, request execution, pending/error/retry UI, dismissal policy,
+result announcements and persistence. The component adds no validation or
+automatic form submission.
 
 ## Usage
 
