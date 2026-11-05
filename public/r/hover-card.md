@@ -418,8 +418,9 @@ exist only for pointer users.
 ## Responsive behavior
 
 The panel is `w-64` with `p-4`; Base UI flips it to another side and shifts the alignment when the
-viewport cannot fit it. On touch devices there is no hover: the trigger still opens the card on focus or
-tap, and the content must not assume a pointer is nearby.
+viewport cannot fit it. On touch devices there is no hover: tapping the trigger link may navigate
+directly without revealing the preview. All previewed information must also be available at the
+destination or in visible page content.
 
 ## Performance
 
