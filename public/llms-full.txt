@@ -9899,9 +9899,142 @@ Uploads, imports, and other work with a measurable end.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/progress
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| progress | `@components/cadence/progress/index.tsx` | [JSON files[].content](https://cadence.dev/r/progress.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: progress](https://cadence.dev/r/progress.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, keeping `progress/index.tsx` beside the shared
+`lib/` directory, the relative imports intact and the sources' `"use client"`
+directives. Progress imports `NativeControlDiv` from `control-animation.tsx`,
+which also reaches `native-div.tsx` and `press-button.tsx`. Copy the complete
+provider, motion and utilities payloads, even without a provider wrapper.
+The provider files and `motion` package remain required imports.
+
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. Progress needs no additional item-specific CSS, icon package or external
+asset. Its full-width indicator uses `scaleX` for determinate updates through
+`data.transition`; reduced and none jump to the new fraction. A null value
+uses the theme's opacity-only `animate-pulse` in full and reduced, and
+`animate-none` in none. Continuous loops follow the theme animation token,
+not the provider speed. Standalone bars follow the system motion preference;
+an optional `CadenceProvider` controls a subtree, and nested full still respects
+system reduced motion.
+
+Usage, the top specimen, Labelled, Indeterminate, Complete, Custom range,
+Composed track and Explicit motion scopes use only Progress and its included
+helpers. Caller-owned progress also needs [Button](/components/button):
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab and add `button/index.tsx`.
+Its shared files and Base UI package are already included above; its additional
+npm dependency is:
+
+```package-manager
+npm install class-variance-authority
+```
+
+No example needs another package or external asset. The site's preview shell
+is not consumer setup.
+
+In Next.js App Router, Usage, Labelled, Indeterminate, Complete, Composed track
+and the top specimen can be composed in synchronous Server Components with
+the shown serializable props. Custom range needs a caller client module for
+its function-valued `getAriaValueText`. Caller-owned progress and Explicit
+motion scopes need one for `useState` and slider change handlers; the former
+also handles a button click. Synchronous `useId` alone does not require a
+client boundary. Caller refs, event handlers, function-valued `render`,
+`className(state)`, `style(state)` or `ProgressValue` children also need a
+caller client boundary. Preserve the installed sources' client directives.
+
+Supply a finite numeric `value` within a finite `min`/`max` range with
+`max > min`, or explicitly pass `null` for indeterminate work. The default
+range is zero to 100; there is no `defaultValue` or automatic progress source.
+The fill fraction is `(value - min) / (max - min)`, clamped to zero through one.
+At the maximum, Base UI exposes the complete state. `ProgressValue` displays
+the normalized percentage by default, so three of five displays 60%; `format`
+and `locale` configure number formatting. `getAriaValueText(formatted, raw)`
+customizes the accessible value text without changing the fill or visible
+value. For null, Base UI omits `aria-valuenow` and the default visible value
+is empty; provide meaningful loading text separately.
+
+`Progress` appends its own track and indicator after its children. Put
+`ProgressLabel` and `ProgressValue` inside the root. Adding a `ProgressTrack`
+with `ProgressIndicator` creates an additional track sharing the same fraction,
+as Composed track shows; it does not replace the default. Keep the indicator's
+full width and transform ownership when styling it. A custom indicator `render`
+replaces the animation adapter, so the caller must preserve its motion contract.
+
+The root owns `role="progressbar"` and its range/value ARIA attributes, not
+the track. Give it an `aria-label` or `aria-labelledby`, or let the nested
+`ProgressLabel` register its association after hydration. Use an explicit
+root name when it must already be associated in server/no-JS markup.
+`ProgressValue` is visible text with `aria-hidden`; the root supplies the
+accessible value. The default bar has no tab stop, keyboard value editing,
+hidden form input or submission value. Native props, refs and Base UI `render`
+belong to their respective parts; retain the supplied props and ref when
+replacing an element. Put cancellation or retry in separate controls.
+
+The caller owns the real work, progress reports, range policy, loading/error
+text, completion announcement, cancellation, retries and persistence. A value
+of 100 in the default range only renders completion; it does not finish or
+validate an upload, submit a form or announce a live status by itself.
 
 ## Usage
 
