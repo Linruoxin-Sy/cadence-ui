@@ -13,8 +13,24 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/badge
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/badge.json)
+
+Badge needs only the files and packages listed above; no motion runtime, provider or
+additional item-specific CSS is required.
+
+The With an icon example also uses `lucide-react`. Install it only when using those
+icons; Badge itself does not require an icon package:
+
+```package-manager
+npm install lucide-react
 ```
 
 ## Usage

@@ -61,7 +61,8 @@ describe("real registry template entry", { timeout: 15_000 }, () => {
     ["missing required rationale", without(badge, "When to use"), "expected one ## When to use"],
     [
       "opening order",
-      badge.replace("## Installation", "## Usage").replace("## Usage\n\n```tsx", "## Installation\n\n```tsx"),
+      // Keep installation markers inside their section so this exercises ordering.
+      badge.replace(/(## Installation\n[\s\S]*?)(## Usage\n[\s\S]*?)(?=## Variants)/, "$2$1"),
       "body must open",
     ],
     ["late example", `${badge}\n## Another example\n\nText.\n`, "out of template order"],
