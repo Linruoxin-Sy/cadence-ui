@@ -10,6 +10,8 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/bubble
 ```
@@ -19,6 +21,116 @@ These examples also use Button for caller-owned actions. Install it separately w
 ```install
 npx shadcn@latest add @cadence/button
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| bubble | `@components/cadence/bubble/index.tsx` | [JSON files[].content](https://cadence.dev/r/bubble.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: bubble](https://cadence.dev/r/bubble.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 9 target files, including every shared motion and provider helper.
+Keep the sibling `cadence/` tree, relative imports and shipped `"use client"`
+directives. Complete the linked manual base setup with Cadence theme CSS,
+including `ease-cadence-out`, ensure Tailwind CSS v4 scans the copied files,
+and apply `bg-background text-foreground` to your application root. No
+additional item-specific stylesheet is required. The provider files are
+required imports; wrapping the application is optional. Standalone parts
+follow the system motion preference; a provider selects a local mode or
+recipe clock.
+
+Updating text and Custom parts additionally use Button. For a fully manual
+installation, copy its complete `files[].content` from the JSON below to
+the listed target. Button's direct registry dependencies are
+`@cadence/cadence-motion`, `@cadence/cadence-utils` and
+`@cadence/cadence-provider`; reuse all their files from the base graph.
+Its full recursive npm dependencies are `clsx`, `tailwind-merge`,
+`motion`, `@base-ui/react` and `class-variance-authority`, already in
+the base command. No additional CSS is needed. The [Button Manual](/components/button#installation)
+also exposes its complete source blocks; no CLI command is required.
+
+| Additional item | Target file | Full source |
+| --- | --- | --- |
+| [@cadence/button](https://cadence.dev/r/button.json) | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+
+Usage and the static variants, alignment and grouping examples can remain
+Server Components: their caller props and children are serializable. Native
+anchor JSX with `href` can also cross the installed client boundary. Keep
+hooks, local state, event handlers, refs, render functions and Button callback
+classes/styles in a `"use client"` caller. The shipped parts keep their own
+client boundary. Bubble, BubbleGroup and BubbleReactions take native div props,
+including string `className` and object `style`; do not pass Button's
+state callbacks to those parts.
+
+Bubble presents caller-owned content. The application owns sender and
+conversation semantics, stable message IDs, text chunks, reaction state,
+transport, cancellation, retry, history limits and scroll anchoring. It adds
+no streaming runtime, validation or hidden form value. Keep announcements in
+a separate status region and choose a focus destination after removing a
+focused message. BubbleGroup arranges a column; it does not infer senders or
+message roles.
+
+BubbleContent accepts a Base UI render element or function. Use a real anchor
+with `href` or a native button with an explicit `type`, preserve supplied
+props and refs in render functions, and avoid nested interactive controls.
+Name reaction buttons and keep their pressed state in the caller. Keep
+parents shrinkable and leave vertical space for overlapping reactions;
+their offsets are static positioning in every mode. Bubble caps at 80% of
+its parent by default; ghost permits full width and rich content owns its
+overflow treatment.
+
+New Bubble nodes use the one-shot `data.transition` opacity entry on the
+local recipe clock. Full and reduced fade; reduced shortens the duration,
+and none removes the starting opacity and transition. Existing text,
+variants, alignment, reaction positions and resize update immediately on
+stable nodes. Removal unmounts immediately without an exit animation; there
+is no measured resize animation. Optional
+Button actions retain Button's separate `feedback.press` contract.
 
 ## Usage
 
