@@ -318,7 +318,7 @@ export function Composition({ direction = "right", label = "Show custom notifica
 
 ## Swipe directions
 
-Each trigger owns an independent notification with a fixed physical swipe direction. Swipe recognition belongs to Base UI. Full mode shows native movement; reduced and none omit the transform while dismissal and keyboard controls remain available.
+Each trigger owns an independent notification with a fixed physical swipe direction. Swipe recognition belongs to Base UI. Reduced and none omit Cadence's swipe-variable transform; Base UI still tracks the pointer directly with no transition in every mode. Swipe dismissal and keyboard controls remain available.
 
 <ComponentExample name="swipe" />
 
@@ -448,11 +448,11 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored`, duration.base, ease.out | yes, CSS transition |
-| close / limited | opacity to 0, exit scale in full | `exit.fade`, duration.base | yes |
-| swipe | Base UI swipe x/y variables, full only | primitive-owned gesture | yes |
+| close / limited | opacity to 0; exit scale on close in full | `exit.fade`, duration.base | yes |
+| swipe | Base UI pointer tracking in every mode; swipe-variable transform in full | primitive-owned gesture | yes |
 | stack / content updates | bottom and natural height update instantly | no layout transition | n/a |
-| reduced | opacity only; scale and swipe transform absent | duration.base × 0.6 | yes |
-| none | zero duration, transform absent | zero duration | n/a |
+| reduced | opacity transitions only; no animated scale or swipe transform | duration.base × 0.6 | yes |
+| none | zero duration; native pointer tracking remains immediate | zero duration | n/a |
 
 Notifications remain expanded in a vertical stack; there is no collapsed height or stack-scale animation.
 Base UI owns timeout pausing, lifecycle, swipe recognition and removal. No extra animation scheduler is added.
