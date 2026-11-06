@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"))["code-block"];
 const cardSelector = (name: string) => `[data-component-example="code-block/${name}"]`;
@@ -185,7 +186,7 @@ test("code-block controlled state append nodes focus and disclosure survive head
   await expect(pre).toBeFocused();
   await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "full", exact: true }).click();
   await expect(updating.locator('[data-slot="code-block"]').first()).toHaveAttribute("data-motion", "reduced");
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "code-block");
   expect(await pre.evaluate((n, original) => n === original, original)).toBe(true);
   await expect(pre).toContainText("Checked another route.");
   await expect(controlled.getByRole("tab", { name: "Output", exact: true })).toHaveAttribute("aria-selected", "true");
