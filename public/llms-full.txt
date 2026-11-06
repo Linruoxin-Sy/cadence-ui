@@ -22085,9 +22085,120 @@ A swipeable collection with previous and next controls.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/carousel
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority embla-carousel-react@8.6.0 lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| carousel | `@components/cadence/carousel/index.tsx` | [JSON files[].content](https://cadence.dev/r/carousel.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: carousel](https://cadence.dev/r/carousel.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten target files, including every file from the motion and provider
+helpers, into the same `cadence/` tree so their relative imports resolve.
+Preserve the sources' `"use client"` directives and the exact
+`embla-carousel-react@8.6.0` pin: the motion policy integrates with that
+engine's internals. Complete the base theme setup linked above and ensure
+Tailwind scans the copied files. No additional item-specific CSS is required.
+The provider files are required imports; an application wrapper is optional.
+Standalone components follow the system motion preference. Use
+`CadenceProvider` to control a subtree as shown above.
+
+Usage, Multiple visible slides, Vertical collection, Looping, Right-to-left,
+Drag behavior, Alignment and initial position, and Without motion use
+serializable props and children and can be composed in a Server Component.
+Changing slides needs a client caller for state and handlers. API and plugins
+needs a client caller for hooks, `setApi`, plugin lifecycle functions and
+external navigation; Custom controls needs one for `useCarousel` and its
+handlers. Refs, function-valued options and Button render/state callbacks
+also require a client caller. Button and CadenceProvider are already included
+in this installation graph; the top preview and examples need no additional
+component or example-only npm dependencies.
+
+Keep CarouselContent and CarouselItem inside Carousel; call `useCarousel`
+only beneath that root. Supply stable slide keys, a region label, slide labels,
+and any current-slide announcement yourself. The root is not focusable by
+default: supply `tabIndex={0}` and a visible focus style when needed. Both
+orientations use ArrowLeft / ArrowRight; native navigation buttons support
+Enter / Space. Interactive slide content must accommodate that root capture
+handler. Offscreen slides remain mounted and accessible.
+
+Constrain the parent width, size slides with basis classes, and leave space
+for the outboard controls. CarouselContent props, classes and ref address
+the inner track, not its fixed overflow-hidden viewport. Horizontal tracks
+use `touch-pan-y`; vertical tracks need an explicit height and
+`touch-pan-x`. Set `orientation="vertical"` to select that axis; it takes
+precedence over `opts.axis`. RTL needs both native `dir="rtl"` and
+`opts.direction="rtl"`; the default control positions and icons stay as shown.
+
+SSR renders static markup; Embla initializes its position and options after
+hydration. Embla owns track translation, snapping, drag, loop, focus, resize
+and slide-mutation handling. Navigate through its API rather than adding a
+second transform or CSS transition to the track. Full mode interpolates;
+reduced and none keep the correct slide position and direct pointer tracking
+while making autonomous engine interpolation immediate. A live downgrade
+settles the existing target without resetting selection. Button retains its
+own press-feedback policy.
+
+Keep plugin instances stable and clean up API subscriptions. The caller owns
+data updates, external selection/status, and independent plugin animation or
+autoplay; pause those under reduced/none and provide pause controls. Carousel
+does not bundle autoplay, data fetching or virtualization. Caller overrides
+of navigation `onClick`, `disabled`, or root `onKeyDownCapture` replace the
+corresponding defaults, so preserve the intended navigation yourself.
 
 ## Usage
 
