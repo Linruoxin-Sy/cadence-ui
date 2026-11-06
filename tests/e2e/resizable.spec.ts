@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES, pressScale } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).resizable;
 const card = (page: Page, name: string) => page.locator(`[data-component-example="resizable/${name}"]`);
@@ -172,7 +173,7 @@ for (const os of ["no-preference", "reduce"] as const)
         await expect(input).toHaveValue("Persistent workspace draft");
         await staticParts(external);
       }
-      await page.getByText("Component source", { exact: true }).click();
+      await openComponentSource(page, "resizable");
       expect(await input.evaluate((n, saved) => n === saved, saved)).toBe(true);
       expect(await group(external).evaluate((n, saved) => n === saved, savedGroup)).toBe(true);
       await input.focus();
