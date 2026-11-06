@@ -13,9 +13,70 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/calendar
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/calendar.json)
+
+Copy all ten target files, including Button and every shared helper, into the
+same `cadence/` tree. Preserve relative imports and shipped `"use client"`
+directives. Button is already a recursive dependency, including its full npm
+dependencies and source; the Controlled month and date example needs no
+additional installation. All other examples use packages and provider files
+already listed above.
+
+Complete the base theme setup and ensure Tailwind CSS v4 scans the copied
+files. Calendar supplies its own DayPicker class names; no additional
+Calendar-specific stylesheet or `react-day-picker/style.css` import is
+required. Keep DayPicker's optional `animate` CSS clock off when using
+Cadence month motion.
+
+Keep `"use client"` on the caller files shown in Usage and all examples.
+Declare selection/month state, event handlers, refs, function matchers,
+`labels`, `formatters` and custom `components` inside that client boundary.
+date-fns locale objects such as `enUS`, `fr` and `arSA` contain functions:
+import and pass them inside the client caller as well. A Server Component can
+render Calendar with serializable props, including Date values and plain
+date/range/weekday matchers, or pass those values to a client wrapper; Date
+objects alone do not require a client caller. Controlled values need their
+matching client callbacks. Omitting `mode` browses dates without selection.
+
+The caller owns selected dates/ranges, visible month when controlled,
+timezone, form serialization and application validation. Pass consistent
+`defaultMonth`, `today` and, when needed, `timeZone` across server and
+browser. For native dropdown captions, supply an explicit locale within the
+client wrapper to avoid environment-dependent month formatting. Locale does
+not translate the pinned DayPicker's default previous/next labels: provide
+`labels` for those controls and distinct `aria-label`/`labels.labelNav`
+names for multiple calendars. The examples compose visible day numerals with
+localized accessible dates; preserve that composition when changing formatters.
+
+Keep the complete DayPicker props on a custom day component, including its
+events, disabled state, children and focus modifiers. The Custom day example
+wraps `CalendarDayButton` and passes its locale explicitly. Replacing
+`Month` or `MonthGrid` also replaces the default month motion owner;
+caller-provided grid opacity/transform styles take precedence over the
+corresponding animation property.
+
+Provider imports are required; wrapping is optional. Standalone Calendar
+respects the system preference. Month changes fade and translate the existing
+grid in full mode, fade only in reduced, and update immediately in none.
+First paint and selection/range styles are static, and week-count height
+changes immediately. A fixed `CadenceProvider mode="none"` also disables
+month animation under a full-mode parent. Do not key/remount Calendar by month
+to animate it; keep focus and caller drafts in the existing tree.
+
+Cells default to 32px; allow space for larger cells, week numbers and multiple
+months. Months stack below `md` and form a row at `md`. Server-rendered
+dates, initial selection, native caption options and source files remain
+readable without JavaScript; navigation, selection, focus management and
+caller actions require hydration. Calendar is inline and creates no hidden
+form field or popup. Follow [Usage](#usage) for the client selection example.
 
 ## Usage
 

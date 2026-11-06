@@ -10,9 +10,122 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/calendar
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority react-day-picker@9.13.2 date-fns@4.1.0 lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: calendar](https://cadence.dev/r/calendar.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten target files, including Button and every shared helper, into the
+same `cadence/` tree. Preserve relative imports and shipped `"use client"`
+directives. Button is already a recursive dependency, including its full npm
+dependencies and source; the Controlled month and date example needs no
+additional installation. All other examples use packages and provider files
+already listed above.
+
+Complete the base theme setup and ensure Tailwind CSS v4 scans the copied
+files. Calendar supplies its own DayPicker class names; no additional
+Calendar-specific stylesheet or `react-day-picker/style.css` import is
+required. Keep DayPicker's optional `animate` CSS clock off when using
+Cadence month motion.
+
+Keep `"use client"` on the caller files shown in Usage and all examples.
+Declare selection/month state, event handlers, refs, function matchers,
+`labels`, `formatters` and custom `components` inside that client boundary.
+date-fns locale objects such as `enUS`, `fr` and `arSA` contain functions:
+import and pass them inside the client caller as well. A Server Component can
+render Calendar with serializable props, including Date values and plain
+date/range/weekday matchers, or pass those values to a client wrapper; Date
+objects alone do not require a client caller. Controlled values need their
+matching client callbacks. Omitting `mode` browses dates without selection.
+
+The caller owns selected dates/ranges, visible month when controlled,
+timezone, form serialization and application validation. Pass consistent
+`defaultMonth`, `today` and, when needed, `timeZone` across server and
+browser. For native dropdown captions, supply an explicit locale within the
+client wrapper to avoid environment-dependent month formatting. Locale does
+not translate the pinned DayPicker's default previous/next labels: provide
+`labels` for those controls and distinct `aria-label`/`labels.labelNav`
+names for multiple calendars. The examples compose visible day numerals with
+localized accessible dates; preserve that composition when changing formatters.
+
+Keep the complete DayPicker props on a custom day component, including its
+events, disabled state, children and focus modifiers. The Custom day example
+wraps `CalendarDayButton` and passes its locale explicitly. Replacing
+`Month` or `MonthGrid` also replaces the default month motion owner;
+caller-provided grid opacity/transform styles take precedence over the
+corresponding animation property.
+
+Provider imports are required; wrapping is optional. Standalone Calendar
+respects the system preference. Month changes fade and translate the existing
+grid in full mode, fade only in reduced, and update immediately in none.
+First paint and selection/range styles are static, and week-count height
+changes immediately. A fixed `CadenceProvider mode="none"` also disables
+month animation under a full-mode parent. Do not key/remount Calendar by month
+to animate it; keep focus and caller drafts in the existing tree.
+
+Cells default to 32px; allow space for larger cells, week numbers and multiple
+months. Months stack below `md` and form a row at `md`. Server-rendered
+dates, initial selection, native caption options and source files remain
+readable without JavaScript; navigation, selection, focus management and
+caller actions require hydration. Calendar is inline and creates no hidden
+form field or popup. Follow [Usage](#usage) for the client selection example.
 
 ## Usage
 
