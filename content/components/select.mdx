@@ -13,9 +13,87 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/select
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/select.json)
+
+Copy all nine files in the target list, including every shared `lib/` file.
+Keep the mirrored `cadence/` tree, relative imports and `"use client"` directives
+intact. The provider files and `motion` are required imports even though the
+popup itself uses CSS transitions; wrapping your application in
+`CadenceProvider` is optional.
+
+Complete the base theme setup linked above, including Cadence's easing tokens,
+and ensure Tailwind scans the copied files. These payloads contain no additional
+Select-specific CSS or assets. Full mode animates the measured value-slot width,
+the pointer label handoff, the check and the popup. Reduced makes width changes
+instant, skips the handoff and removes scale while retaining opacity; none
+removes authored transitions from the first frame. Standalone Select follows
+the system motion preference; a nested full scope still respects system
+reduced motion.
+
+Usage, Sizes, Groups and labels, Disabled and invalid, Multiple values, Panel
+placement and the top specimen need only this dependency graph. Controlled
+value and Form submission additionally use [Button](/components/button):
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+For manual installation, follow Button's Manual tab too. Add
+`button/index.tsx`, reuse the shared files listed here, and install its one
+extra npm dependency:
+
+```package-manager
+npm install class-variance-authority
+```
+
+In Next.js App Router, Controlled value and Form submission need a client
+module for their state and event handlers. Keep the original Usage composition
+in a client module too: its automatic child-label lookup requires the client
+`SelectItem` identity. For a Server Component composition of Usage, supply an
+explicit `items` value-to-label map; without it, the trigger displays raw values
+such as `next` and `remix`. The other shown examples already supply `items` and
+can be composed in synchronous Server Components with their serializable JSX
+and props; synchronous `useId` alone does not require a caller client boundary.
+Existing client directives may be kept. A ref, event handler, function-valued
+`SelectValue` children, `render`, `className(state)` or `style(state)` does need
+that boundary. Preserve the installed sources' client directives. The site's
+preview shell is not consumer setup; hydrated interactions require JavaScript.
+
+`SelectContent` already includes its portal, positioner, popup, list and scroll
+arrows. The default `alignItemWithTrigger={true}` overlays the selected item
+on the trigger when space and the input method permit it; touch uses anchored
+placement. Set it to false when requesting `side`, `align` or their offsets,
+as Panel placement does. Base UI handles collision fallback, list scrolling,
+keyboard navigation, focus return and dismissal. Name every trigger with a
+visible associated label or `aria-label`.
+
+The caller owns the option data and labels, controlled `value`/`onValueChange`
+and `open`/`onOpenChange` when supplied, validation, error text, submission and
+remote loading. `defaultValue` initializes an uncontrolled selection; use an
+array with `multiple`. `items` maps values to display labels, as in the top
+specimen and body examples. Without it, Cadence derives labels from directly
+composed `SelectItem` children, including nested groups; it cannot inspect
+items hidden inside a custom component wrapper. Supply `items` for those
+wrappers, and provide explicit labels in `items` for object values. Object
+values may also need Base UI's `itemToStringLabel`,
+`itemToStringValue` and `isItemEqualToValue`; keep object identity stable or
+provide a comparator. Function props require a client caller.
+
+`name` enables native form submission through Base UI's visually hidden input;
+multiple values produce repeated entries under that name. `required` uses
+browser constraint validation, `disabled` prevents interaction and omits the
+value from FormData, and `readOnly` prevents choosing a different value.
+Pass `aria-invalid` and associated error text to the trigger for caller-owned
+invalid state. The Form submission example reads FormData into local state;
+it does not persist or send data. No validation or form-state package is needed.
 
 ## Usage
 
