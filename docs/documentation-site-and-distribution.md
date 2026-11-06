@@ -144,6 +144,8 @@ rendering path. Build/check parse the Markdown boundaries and require a real, no
 fence under Command and exactly one canonical standalone source link under Manual. Marker-like
 text inside code is ordinary source text. The browser suite enumerates every registry component,
 so a missing installation method cannot silently remove a page from acceptance.
+Expanded installation bodies use LF, matching `.gitattributes`. CRLF authoring is accepted and
+normalized before expansion so committed JSON docs agree with text in a fresh checkout.
 
 ### 2.1 The Motion contract section (this project's signature content)
 

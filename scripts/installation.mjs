@@ -217,6 +217,9 @@ export function validateInstallation(body, id) {
 }
 
 export function expandInstallation(body, items, id) {
+  // JSON escapes retain CR while Git normalizes Markdown to LF. Serialize the
+  // same body on either platform, without changing code-file payload contents.
+  body = body.replace(/\r\n?/g, "\n");
   const bounds = installationBounds(body, id);
   if (bounds.problems.length) throw new Error(bounds.problems.join("\n"));
   return body.slice(0, bounds.start) + manualInstructions(installationPlan(items, id)) + body.slice(bounds.end);

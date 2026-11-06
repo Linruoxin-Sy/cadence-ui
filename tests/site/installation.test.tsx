@@ -140,14 +140,18 @@ describe("installation authoring and AST", () => {
     expect(() => expandInstallation(source, registry.items, "button")).toThrow("Installation needs ordered");
   });
 
-  it.each(["\n", "\r\n"])(
+  it.each(["\n", "\r\n", "\r"])(
     "expands the parsed link, preserving marker-like source text with %j line endings",
     (newline) => {
       const literal = `~~~md\n**Command**\n**Manual**\n${manualLink("button")}\n~~~`;
       const source = body.replace(command, `${command}\n\n${literal}`).replaceAll("\n", newline);
       expect(validateInstallation(source, "button")).toEqual([]);
       const expanded = expandInstallation(source, registry.items, "button");
-      expect(expanded).toContain(literal.replaceAll("\n", newline));
+      expect(expanded).toContain(literal);
+      expect(expanded).toBe(
+        expandInstallation(body.replace(command, `${command}\n\n${literal}`), registry.items, "button"),
+      );
+      expect(expanded).not.toContain("\r");
       expect(expanded).toContain("[Source files: button](https://cadence.dev/r/button.json)");
       expect(expanded.split(manualLink("button"))).toHaveLength(2);
     },
@@ -208,6 +212,7 @@ describe("installation authoring and AST", () => {
     )) {
       const raw = matter(await readFile(`content/components/${item.name}.mdx`, "utf8")).content.trim();
       const expected = expandInstallation(raw, registry.items, item.name);
+      expect(expected).not.toContain("\r");
       expect(JSON.parse(await readFile(`public/r/${item.name}.json`, "utf8")).docs).toBe(expected);
       expect(await readFile(`public/r/${item.name}.md`, "utf8")).toContain(expected);
       expect(full).toContain(expected);
