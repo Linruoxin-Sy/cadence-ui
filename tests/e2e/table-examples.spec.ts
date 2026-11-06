@@ -181,7 +181,7 @@ for (const anchor of ["usage", "selected-rows", "horizontal-overflow"])
     const heading = page.locator(`h2#${anchor}`);
     await expect(heading).toBeInViewport();
     expect(await heading.evaluate((n) => n.getBoundingClientRect().top)).toBeGreaterThanOrEqual(0);
-    expect(await heading.evaluate((n) => getComputedStyle(n.closest("article") ?? n).opacity)).toBe("1");
+    await expect.poll(() => heading.evaluate((n) => getComputedStyle(n.closest("article") ?? n).opacity)).toBe("1");
   });
 
 for (const theme of ["light", "dark"] as const)
