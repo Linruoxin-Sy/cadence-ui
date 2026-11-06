@@ -14319,11 +14319,148 @@ Picking from a long list you can filter by typing.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/combobox
 ```
 
 Combobox examples that use external actions also require `@cadence/button`.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — transitive registry dependency.
+- [@cadence/input](https://cadence.dev/r/input.json) — transitive registry dependency.
+- [@cadence/textarea](https://cadence.dev/r/textarea.json) — transitive registry dependency.
+- [@cadence/input-group](https://cadence.dev/r/input-group.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| textarea | `@components/cadence/textarea/index.tsx` | [JSON files[].content](https://cadence.dev/r/textarea.json) |
+| input-group | `@components/cadence/input-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/input-group.json) |
+| combobox | `@components/cadence/combobox/index.tsx` | [JSON files[].content](https://cadence.dev/r/combobox.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: input](https://cadence.dev/r/input.json)
+
+[Source files: textarea](https://cadence.dev/r/textarea.json)
+
+[Source files: input-group](https://cadence.dev/r/input-group.json)
+
+[Source files: combobox](https://cadence.dev/r/combobox.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all thirteen target files, including every shared `lib/` file and the
+Button, Input, Textarea and Input Group sources. Keep the mirrored `cadence/`
+tree, relative imports and `"use client"` directives intact. Input Group imports
+all three controls even when this composition only renders its input and button.
+The provider files and `motion` are required imports; wrapping your application
+in `CadenceProvider` is optional.
+
+Complete the base theme setup linked above, including Cadence's easing tokens,
+and ensure Tailwind scans the copied files. These payloads contain no additional
+Combobox-specific CSS or assets. Full mode scales and fades the popup and animates
+the selection tick. Reduced keeps opacity and removes scale; none disables those
+transitions from the first frame. Filtering and list placement update immediately
+in every mode. Standalone components respect the system motion preference, as
+does a nested full provider.
+
+Usage, the top specimen and every body example use only this dependency graph.
+Button for Controlled values and submission is already included transitively
+through Input Group; no extra file or npm package is needed. Logical sides also
+uses `DirectionProvider` from the already required `@base-ui/react`; pair its
+direction with the DOM `dir` attribute, as shown.
+
+In Next.js App Router, keep all fifteen shown Usage/example compositions in
+client modules. Each passes a function to `ComboboxList`; Groups and separators
+also uses a `ComboboxCollection` callback. Multiple values uses
+`useComboboxAnchor` and function-valued `ComboboxValue` children. Controlled
+values and submission, Object values and Caller-owned results additionally own
+state, handlers or effects. Synchronous `useId` alone does not require a client
+caller, but the list callbacks in Disabled, read-only and invalid do. Function
+props such as `filter`, label/value converters, equality comparators, `render`,
+`className(state)` and `style(state)`, and refs or event handlers also need that
+boundary. A Server Component can render one of these client compositions with
+serializable data props. The site's preview shell is not consumer setup;
+hydrated filtering, selection and dismissal require JavaScript.
+
+`ComboboxInput` includes the input-group frame, native input, optional trigger
+and optional clear control. Name the input with a visible associated label or
+`aria-label`; name a separate trigger too. `ComboboxContent` includes the portal,
+positioner and popup; compose `ComboboxEmpty` and `ComboboxList` inside it.
+The default placement is bottom/start with a side offset of 6. Base UI handles
+collision fallback, highlighting, keyboard navigation and dismissal. The list
+scrolls within the available popup height. On narrow screens, prefer top/bottom
+placement: the default minimum popup width can override the available width in
+inline-side layouts. If using inline sides, explicitly reduce the content's
+minimum width and verify the result. In a multiple-value composition, use
+an array selection, render chips with `ComboboxValue`, attach
+`useComboboxAnchor` to `ComboboxChips`, and pass the same ref to the content.
+Hiding chip remove buttons does not prevent Backspace removal; use root
+`readOnly` when changes must be forbidden.
+
+The caller owns the catalogue, selected `value`, input query and `open` state
+when controlled, labels, validation, error text, submission and remote results.
+Pass `items` for the render-function lists shown here; `defaultValue` initializes
+an uncontrolled selection. Object values use `itemToStringLabel`,
+`itemToStringValue` and a stable identity or `isItemEqualToValue` comparator.
+For externally filtered results, pass `filter={null}` and keep cancellation,
+loading/error feedback and result ordering in the caller. `ComboboxEmpty`
+represents no matches, not a pending request.
+
+`name` supplies the selected value to native FormData; multiple selections
+produce repeated entries. Typing a query alone does not commit a selection.
+`required` enables native constraint validation, `disabled` prevents editing and
+omits the value from FormData, and `readOnly` preserves the selection while still
+allowing the popup to be browsed. Supply `aria-invalid` on the input and associate
+caller-owned error text. Controlled values and submission uses `noValidate` and
+only records the submission in local state. No validation or form-state package
+is needed.
 
 ## Usage
 
