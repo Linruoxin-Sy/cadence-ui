@@ -16991,8 +16991,8 @@ export function MenuMotionScopes() {
 `open`, `defaultOpen`, `onOpenChange` and the remaining Base UI Context Menu root props.
 The installed API omits `modal` and `triggerId`; it retains the underlying modal menu behavior.
 Outside pointer interaction is blocked while open and desktop scrolling is locked.
-The Context Menu primitive contains Tab focus in its open panel. Use Escape or activate a
-command to dismiss it; do not assume the Tab dismissal behavior of Dropdown Menu.
+Tab stays within the open panel. Shift+Tab or Escape closes the root menu and returns
+focus to the target; activating an ordinary command also dismisses it.
 
 ### `ContextMenuTrigger`
 
@@ -17054,7 +17054,8 @@ remain owned by the primitive.
 | `Enter` / `Space`         | Runs the highlighted item.                                    |
 | `ArrowRight` / `ArrowLeft` | Opens or closes a submenu.                                   |
 | `Escape`                  | Closes the menu and returns focus to the trigger.             |
-| `Tab` / `Shift+Tab`        | Keeps focus in the open context menu; Escape dismisses it.     |
+| `Tab`                     | Keeps focus in the open context menu.                         |
+| `Shift+Tab`               | Closes the root menu and returns focus to the target.         |
 
 ## Accessibility
 
@@ -17065,8 +17066,9 @@ remain owned by the primitive.
 - On touch, Base UI opens the menu on a long press and cancels it if the finger moves —
   which is why the same actions must also be reachable from a visible control.
 - Escape restores focus to the target. The installed Context Menu uses a modal focus manager
-  internally, so Tab and Shift+Tab remain within the open menu. Unlike Dropdown Menu, it
-  does not expose a modal prop. Keep Escape and visible command paths available.
+  internally: Tab stays within the open menu, while Shift+Tab closes the root menu and
+  returns focus to the target. Unlike Dropdown Menu, it does not expose a modal prop.
+  Keep Escape and visible command paths available.
 
 ## Responsive behavior
 
