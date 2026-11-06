@@ -13,9 +13,50 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/collapsible
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/collapsible.json)
+
+Copy all nine target files, keeping `collapsible/index.tsx` and the shared
+`lib/` directory in the same `cadence/` tree. Preserve relative imports and
+the sources' `"use client"` directives. Copy every file in the motion,
+utilities and provider payloads, including helpers not imported by Collapsible
+directly. The provider files and `motion` package are required imports even
+without the optional `CadenceProvider` wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. Include the Cadence duration and easing tokens used by the
+disclosure classes. No additional item-specific CSS or external asset is
+required. Keep the inner measurement wrapper: full mode transitions the
+nonnegative measured panel height, while reduced and none update it
+immediately. Initially open server-rendered content retains its natural height.
+Outer padding and borders remain part of the closing box minimum; put
+decoration on a child when the closing endpoint must reach zero.
+Standalone components follow the system preference; use `CadenceProvider`
+to choose a product mode or override an inherited scope.
+
+The Usage, Controlled and Changing content examples need a client caller for
+their local state and event handlers. Use a client caller for refs or
+function-valued `render`, `className` and `style` props too. Static
+composition with serializable props and children, including element-valued
+`render`, can be authored in a Server Component. Persistent content and
+Custom render retain their client directives; synchronous `useId` alone
+does not require a client caller. A custom Content render must preserve the
+supplied props and measurement children.
+
+Usage, Controlled, Custom trigger and Changing content additionally use
+`@cadence/button`; Persistent content uses `@cadence/input` and
+`@cadence/label`. Install those items separately, or copy every target and
+recursive dependency from their Manual panels. The caller owns the boolean
+open state, content updates and durable input data. Collapsible provides
+disclosure UI; `keepMounted` retains a draft only while mounted, and
+`hiddenUntilFound` depends on browser support.
 
 ## Usage
 
