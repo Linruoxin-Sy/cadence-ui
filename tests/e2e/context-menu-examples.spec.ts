@@ -148,19 +148,30 @@ test("context-menu real targets, row alternative, local selection, disabled part
     await expect(popup).toBeVisible();
     await popup.getByRole("menuitemcheckbox", { name: "Grid", exact: true }).focus();
     await page.keyboard.press(key);
-    await expect(popup).toBeVisible();
-    await expect.poll(() => popup.evaluate((node) => node.contains(document.activeElement))).toBe(true);
-    const focus = await popup.evaluate((node) => {
+    if (key === "Tab") {
+      await expect(popup).toBeVisible();
+      await expect.poll(() => popup.evaluate((node) => node.contains(document.activeElement))).toBe(true);
+    } else {
+      await expect(popup).toHaveCount(0);
+      await expect(selection).toBeFocused();
+    }
+    const focus = await page.evaluate(() => {
       const active = document.activeElement;
+      const panel = document.querySelector('[data-slot="context-menu-content"]');
       return {
-        inside: node.contains(active),
+        open: !!panel,
+        inside: !!panel?.contains(active),
+        connected: !!active?.isConnected,
         slot: active?.getAttribute("data-slot"),
         hidden: !!active?.closest('[data-base-ui-focus-guard], [aria-hidden="true"], [inert]'),
       };
     });
+    expect(focus.open).toBe(key === "Tab");
+    expect(focus.inside).toBe(key === "Tab");
+    expect(focus.connected).toBe(true);
     expect(focus.hidden).toBe(false);
     tabProof.push({ key, ...focus });
-    await dismiss();
+    if (key === "Tab") await dismiss();
     await expect(selection).toBeFocused();
   }
   await test
