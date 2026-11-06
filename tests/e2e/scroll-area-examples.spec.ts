@@ -216,7 +216,7 @@ for (const anchor of ["usage", "caller-rendering-and-sizing", "changing-content"
     await page.waitForLoadState("networkidle");
     const heading = page.locator(`h2#${anchor}`);
     await expect(heading).toBeInViewport();
-    expect(await heading.evaluate((n) => getComputedStyle(n.closest("article") ?? n).opacity)).toBe("1");
+    await expect.poll(() => heading.evaluate((n) => getComputedStyle(n.closest("article") ?? n).opacity)).toBe("1");
   });
 for (const theme of ["light", "dark"] as const)
   for (const width of [1280, 390])
