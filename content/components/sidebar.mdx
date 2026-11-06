@@ -13,9 +13,75 @@ registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/sidebar
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/sidebar.json)
+
+Copy all 16 target files, including `lib/hooks/use-mobile.ts` and every
+`cadence-motion` and `cadence-provider` helper. Keep their relative imports,
+the `cadence/` directory structure and the shipped `"use client"` directives.
+Complete the linked manual base setup, including Cadence theme CSS, and ensure
+Tailwind CSS v4 scans the copied files. Its `--color-sidebar*` mappings supply
+the sidebar utilities with semantic colour fallbacks; set matching
+`--sidebar*` light/dark variables to customize them. No separate Sidebar
+stylesheet is required. Apply `bg-background text-foreground` to your application
+root so the main content inherits the active theme's text colour.
+The registry graph already includes Button, Input,
+Separator, Sheet, Skeleton, Tooltip and `lucide-react` used by these examples;
+they require no additional example-only installation.
+
+Keep `SidebarProvider`, navigation and `SidebarInset` together as in
+[Usage](#usage). `SidebarProvider` is required for sidebar state and
+`useSidebar`; it is separate from the optional `CadenceProvider` motion wrapper.
+No `TooltipProvider` is required; add one only to share tooltip delay settings.
+Use the default main element for application content, or
+`SidebarInset render={<section />}` with a unique accessible name for an
+embedded shell inside an existing main.
+
+Serializable props, children and native elements such as `render={<a href="/" />}`
+can be composed from a Server Component. Keep search state, controlled
+`open`/`onOpenChange`, handlers, refs, `useSidebar` and function-valued
+`render`/class/style props inside a `"use client"` caller, as the interactive
+examples do. Supply real destinations or your router's link element through
+`render`, not `asChild`; the caller owns routing, filtering and active state.
+Set `aria-current="page"` on the current link as well as `isActive` for styling.
+
+Desktop starts expanded unless `defaultOpen` or controlled `open` says otherwise.
+Controlled callers must apply requested `onOpenChange` values themselves.
+Desktop `open` does not control `openMobile`, which starts false. Below 768px,
+collapsible sidebars switch to an 18rem modal Sheet after hydration; server
+rendering initially uses the desktop tree. `collapsible="none"` remains static.
+Desktop collapse retains children, while breakpoint changes and mobile closing
+can unmount them: keep persistent drafts above Sidebar. Include a visible mobile
+close control when needed; Sheet also provides Escape, outside dismissal and
+focus management. Its built-in close button is hidden by Sidebar.
+
+The desktop setter writes `sidebar_state=true` or `false` for seven days at
+path `/`; it never reads the cookie. To restore it, read the request cookie on
+the server and pass a boolean `defaultOpen`, using a consistent server/client
+initial value. Otherwise a reload uses the default again. This cookie records
+desktop state only. Ctrl+B or Cmd+B also toggles inside inputs and broadcasts
+to every mounted provider; prefer one application provider. The rail is not
+in Tab order, so retain the labelled trigger.
+
+Desktop widths default to 16rem and 3rem for the icon rail; override
+`--sidebar-width` and `--sidebar-width-icon` through provider style. Mobile
+uses its own 18rem width; customize Sidebar style when needed. The 12rem widths,
+containing transform and absolute desktop panels in these embedded examples
+are local layout choices. Caller `style.transform` on Sidebar takes ownership
+of desktop positioning and suppresses its offcanvas motion.
+
+Sidebar animates only desktop offcanvas translation with `layout.move` in full;
+reduced and none update position immediately. Gaps and icon widths always
+change immediately. Mobile Sheet, buttons, tooltips and loading skeletons keep
+their own inherited motion contracts; install their helpers even if you only
+use desktop navigation.
 
 ## Usage
 

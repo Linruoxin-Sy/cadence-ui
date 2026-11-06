@@ -26161,9 +26161,151 @@ Workspace navigation for dashboards and application shells.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/sidebar
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/use-mobile](https://cadence.dev/r/use-mobile.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
+- [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+- [@cadence/sheet](https://cadence.dev/r/sheet.json) — direct registry dependency.
+- [@cadence/skeleton](https://cadence.dev/r/skeleton.json) — direct registry dependency.
+- [@cadence/tooltip](https://cadence.dev/r/tooltip.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| use-mobile | `@components/cadence/lib/hooks/use-mobile.ts` | [JSON files[].content](https://cadence.dev/r/use-mobile.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
+| skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
+| tooltip | `@components/cadence/tooltip/index.tsx` | [JSON files[].content](https://cadence.dev/r/tooltip.json) |
+| sidebar | `@components/cadence/sidebar/index.tsx` | [JSON files[].content](https://cadence.dev/r/sidebar.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: use-mobile](https://cadence.dev/r/use-mobile.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: input](https://cadence.dev/r/input.json)
+
+[Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: sheet](https://cadence.dev/r/sheet.json)
+
+[Source files: skeleton](https://cadence.dev/r/skeleton.json)
+
+[Source files: tooltip](https://cadence.dev/r/tooltip.json)
+
+[Source files: sidebar](https://cadence.dev/r/sidebar.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 16 target files, including `lib/hooks/use-mobile.ts` and every
+`cadence-motion` and `cadence-provider` helper. Keep their relative imports,
+the `cadence/` directory structure and the shipped `"use client"` directives.
+Complete the linked manual base setup, including Cadence theme CSS, and ensure
+Tailwind CSS v4 scans the copied files. Its `--color-sidebar*` mappings supply
+the sidebar utilities with semantic colour fallbacks; set matching
+`--sidebar*` light/dark variables to customize them. No separate Sidebar
+stylesheet is required. Apply `bg-background text-foreground` to your application
+root so the main content inherits the active theme's text colour.
+The registry graph already includes Button, Input,
+Separator, Sheet, Skeleton, Tooltip and `lucide-react` used by these examples;
+they require no additional example-only installation.
+
+Keep `SidebarProvider`, navigation and `SidebarInset` together as in
+[Usage](#usage). `SidebarProvider` is required for sidebar state and
+`useSidebar`; it is separate from the optional `CadenceProvider` motion wrapper.
+No `TooltipProvider` is required; add one only to share tooltip delay settings.
+Use the default main element for application content, or
+`SidebarInset render={<section />}` with a unique accessible name for an
+embedded shell inside an existing main.
+
+Serializable props, children and native elements such as `render={<a href="/" />}`
+can be composed from a Server Component. Keep search state, controlled
+`open`/`onOpenChange`, handlers, refs, `useSidebar` and function-valued
+`render`/class/style props inside a `"use client"` caller, as the interactive
+examples do. Supply real destinations or your router's link element through
+`render`, not `asChild`; the caller owns routing, filtering and active state.
+Set `aria-current="page"` on the current link as well as `isActive` for styling.
+
+Desktop starts expanded unless `defaultOpen` or controlled `open` says otherwise.
+Controlled callers must apply requested `onOpenChange` values themselves.
+Desktop `open` does not control `openMobile`, which starts false. Below 768px,
+collapsible sidebars switch to an 18rem modal Sheet after hydration; server
+rendering initially uses the desktop tree. `collapsible="none"` remains static.
+Desktop collapse retains children, while breakpoint changes and mobile closing
+can unmount them: keep persistent drafts above Sidebar. Include a visible mobile
+close control when needed; Sheet also provides Escape, outside dismissal and
+focus management. Its built-in close button is hidden by Sidebar.
+
+The desktop setter writes `sidebar_state=true` or `false` for seven days at
+path `/`; it never reads the cookie. To restore it, read the request cookie on
+the server and pass a boolean `defaultOpen`, using a consistent server/client
+initial value. Otherwise a reload uses the default again. This cookie records
+desktop state only. Ctrl+B or Cmd+B also toggles inside inputs and broadcasts
+to every mounted provider; prefer one application provider. The rail is not
+in Tab order, so retain the labelled trigger.
+
+Desktop widths default to 16rem and 3rem for the icon rail; override
+`--sidebar-width` and `--sidebar-width-icon` through provider style. Mobile
+uses its own 18rem width; customize Sidebar style when needed. The 12rem widths,
+containing transform and absolute desktop panels in these embedded examples
+are local layout choices. Caller `style.transform` on Sidebar takes ownership
+of desktop positioning and suppresses its offcanvas motion.
+
+Sidebar animates only desktop offcanvas translation with `layout.move` in full;
+reduced and none update position immediately. Gaps and icon widths always
+change immediately. Mobile Sheet, buttons, tooltips and loading skeletons keep
+their own inherited motion contracts; install their helpers even if you only
+use desktop navigation.
 
 ## Usage
 
