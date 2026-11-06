@@ -10,9 +10,97 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/resizable
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge react-resizable-panels@4.16.0 lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| resizable | `@components/cadence/resizable/index.tsx` | [JSON files[].content](https://cadence.dev/r/resizable.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: resizable](https://cadence.dev/r/resizable.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Copy both target files into the same `cadence/` tree, keeping the relative
+`../lib/cn` import and the shipped `"use client"` directive. Complete the
+base theme setup and ensure Tailwind CSS v4 scans the copied files. Keep
+`react-resizable-panels` pinned to `4.16.0`: these wrappers use its v4
+Group, Panel and Separator APIs. No Resizable stylesheet or Provider is required.
+
+External updates, Container resizing and Custom parts additionally use
+[Button manual installation](https://cadence.dev/components/button#installation).
+Copy all of Button's targets and install its recursive npm dependencies from
+that page; merge shared files once. This supplies the action buttons without
+the shadcn CLI. Button retains its own motion contract.
+
+Compose `ResizablePanelGroup`, panels and labelled handles as in [Usage](#usage).
+The declarative Usage can be composed from a Server Component with its string
+props, style objects and children. Keep state, DOM/imperative refs, event
+handlers, layout/resize callbacks and the engine's ref or persistence hooks
+inside a `"use client"` caller, as the interactive examples do. Import
+`useGroupRef` and `usePanelRef` from the pinned engine package when needed.
+
+Give vertical groups a definite height; constrain parent width and allow
+inner content to scroll. Orientation and mobile breakpoints belong to the
+caller. Numeric sizes are pixels; use explicit strings such as `"40%"`
+for percentages. Group `defaultLayout` maps matching panel ids to numeric
+percentages and supplies an initial layout, not a controlled value. Use
+`groupRef.current?.setLayout()` or `panelRef.current` methods for subsequent updates.
+At least one panel per group must preserve relative size; min/max and
+collapse constraints can change the applied result.
+
+The engine owns pointer resizing, separator keyboard/ARIA behavior, resize
+observation and deferred separator previews. Label each handle and keep
+essential controls reachable outside collapsed panels. `elementRef` addresses
+the DOM; `groupRef` and `panelRef` expose imperative APIs. Panel classes and
+styles target inner content; the engine retains its flex geometry. Handle
+children are the wrapper's optional grip; `preview` customizes the deferred
+overlay. This API does not use Base UI `render` or `asChild`.
+
+The caller owns persistence and draft data. Use stable panel ids and a
+consistent initial layout across server rendering and hydration. Restore
+browser storage after mount through the imperative API, or pass a serialized
+server-loaded layout. If using the engine's `useDefaultLayout` during SSR,
+provide server-safe storage with a consistent initial value: its default
+reads `localStorage` during rendering, even in a `"use client"` caller.
+`onLayoutChange` reports live pointer updates; prefer
+`onLayoutChanged` for persistence after release, using
+`meta.isUserInteraction` and `meta.requestedLayout` when appropriate.
+Initial mount and imperative updates can also report completed changes;
+an unchanged applied layout may emit no new completed callback.
+
+Resizable adds no authored animation: full, reduced and none keep direct
+layout updates immediate. Separator preview defers pointer commitment until
+release; it does not tween geometry. Avoid adding width/flex transitions.
+No motion Provider is needed for Resizable itself. Static panel content and
+initial drafts render without JavaScript, while pointer/keyboard resizing
+and public refs require hydration. Percentage-based initial sizes may be
+adjusted after the engine measures the container. Both installation panels expose
+complete source without JavaScript.
 
 ## Usage
 
