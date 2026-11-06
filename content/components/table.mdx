@@ -13,9 +13,45 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/table
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/table.json)
+
+Copy both target files, keeping `table/index.tsx` and `lib/cn.ts` in the
+same `cadence/` tree so the relative import resolves. Preserve the source's
+`"use client"` directive. Complete the base theme setup linked above and
+ensure Tailwind scans the copied files. Table needs no motion runtime,
+provider or additional item-specific CSS; all three motion modes keep its
+native table parts static. Row colour feedback is CSS state feedback.
+
+Usage, Footer totals, Density and alignment, Horizontal overflow, and Empty
+results pass serializable props and children and can be composed in a Server
+Component. Selected rows and Row actions require a client caller for their
+state and event handlers. Refs and event handlers also require a client
+caller. Row actions additionally uses [Button](/components/button): install
+it separately, or copy every target and recursive dependency from its Manual
+panel, including its motion setup. The other examples and the top preview
+need no additional component dependencies.
+
+Keep the native caption, header, body and footer hierarchy, provide a meaningful
+caption or accessible name, and set header `scope` as shown below. Table
+does not fetch records, calculate totals, sort, filter, paginate or own
+selection. The caller supplies stable row keys, data, selected state and
+action handlers; `data-state="selected"` only styles a row. Controls inside
+cells keep their own keyboard behaviour.
+
+Table's props, classes and ref target the `table`, not its automatic
+`overflow-x-auto` wrapper. Constrain the surrounding layout with `min-w-0`
+where needed, and choose column widths and wrapping yourself. For a wide
+table, supply `tabIndex={0}`, a caption and a visible focus ring as in
+Horizontal overflow, then verify native arrow-key scrolling in your target
+browsers. Columns remain present; Table adds no grid keyboard model.
 
 ## Usage
 

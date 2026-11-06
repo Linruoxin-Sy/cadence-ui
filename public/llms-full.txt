@@ -21572,9 +21572,70 @@ Invoices, transaction histories, and small collections of structured records.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/table
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| table | `@components/cadence/table/index.tsx` | [JSON files[].content](https://cadence.dev/r/table.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: table](https://cadence.dev/r/table.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+Copy both target files, keeping `table/index.tsx` and `lib/cn.ts` in the
+same `cadence/` tree so the relative import resolves. Preserve the source's
+`"use client"` directive. Complete the base theme setup linked above and
+ensure Tailwind scans the copied files. Table needs no motion runtime,
+provider or additional item-specific CSS; all three motion modes keep its
+native table parts static. Row colour feedback is CSS state feedback.
+
+Usage, Footer totals, Density and alignment, Horizontal overflow, and Empty
+results pass serializable props and children and can be composed in a Server
+Component. Selected rows and Row actions require a client caller for their
+state and event handlers. Refs and event handlers also require a client
+caller. Row actions additionally uses [Button](/components/button): install
+it separately, or copy every target and recursive dependency from its Manual
+panel, including its motion setup. The other examples and the top preview
+need no additional component dependencies.
+
+Keep the native caption, header, body and footer hierarchy, provide a meaningful
+caption or accessible name, and set header `scope` as shown below. Table
+does not fetch records, calculate totals, sort, filter, paginate or own
+selection. The caller supplies stable row keys, data, selected state and
+action handlers; `data-state="selected"` only styles a row. Controls inside
+cells keep their own keyboard behaviour.
+
+Table's props, classes and ref target the `table`, not its automatic
+`overflow-x-auto` wrapper. Constrain the surrounding layout with `min-w-0`
+where needed, and choose column widths and wrapping yourself. For a wide
+table, supply `tabIndex={0}`, a caption and a visible focus ring as in
+Horizontal overflow, then verify native arrow-key scrolling in your target
+browsers. Columns remain present; Table adds no grid keyboard model.
 
 ## Usage
 
