@@ -2,10 +2,11 @@ import { spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { checkDocTemplates } from "../../scripts/doc-template.mjs";
 import { freshDocs } from "../fixtures/fresh-docs";
 
@@ -29,6 +30,9 @@ beforeAll(() => {
   }
 });
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));
+// Repeated synchronous CLI checks must let the worker receive reporter replies
+// between cases; otherwise a long suite can exhaust Vitest's RPC deadline.
+afterEach(() => yieldToEventLoop());
 
 function entry(file: string, source: string, fresh = false) {
   writeFileSync(path.join(fixture, file), source);
