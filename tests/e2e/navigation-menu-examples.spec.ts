@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"))["navigation-menu"];
@@ -215,7 +216,7 @@ test("Navigation caller values header/source updates and actual native link foll
   await expect(c.getByRole("status")).toContainText("imperative-action");
   for (const mode of MODES)
     await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: mode, exact: true }).click();
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "navigation-menu");
   expect(await nav.evaluate((n, old) => n === old, handle)).toBe(true);
   await c.getByRole("button", { name: "Build", exact: true }).click();
   await expect(popup(page)).toHaveAttribute("data-motion", "none");
