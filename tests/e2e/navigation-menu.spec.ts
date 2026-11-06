@@ -113,6 +113,20 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect(learn).toHaveAttribute("aria-expanded", "true");
         await expect(popup).toHaveAttribute("data-motion", reducedMotion === "reduce" ? "reduced" : "full");
         await expect.poll(() => popup.evaluate((el) => el.getAnimations().length)).toBe(0);
+        // Base UI queues measurement before its resize; wait for the active panel's auto-size reset.
+        await expect
+          .poll(() =>
+            popup.evaluate((el) => {
+              const active = el.querySelector('[data-slot="navigation-menu-content"][data-open]');
+              return (
+                !!active?.querySelector('a[href="#installation"]') &&
+                el.style.getPropertyValue("--popup-width") === "auto" &&
+                el.style.getPropertyValue("--popup-height") === "auto" &&
+                el.getAnimations().length === 0
+              );
+            }),
+          )
+          .toBe(true);
         const downgrade = await preview.evaluate(async (el) => {
           const popup = document.querySelector('[data-slot="navigation-menu-popup"]');
           const switcher = Array.from(el.querySelectorAll("button")).find((b) => b.textContent === "Switch panel");
@@ -151,6 +165,13 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         }
         await page.setViewportSize({ width: 390, height: 900 });
         await expect(popup).toBeVisible();
+        // setViewportSize can resolve before the positioner's resize update.
+        await expect
+          .poll(async () => {
+            const bounds = await popup.boundingBox();
+            return bounds ? Math.max(-bounds.x, bounds.x + bounds.width - 390) : Number.POSITIVE_INFINITY;
+          })
+          .toBeLessThanOrEqual(0);
         const r = await popup.boundingBox();
         if (!r) throw new Error("Missing popup bounds");
         expect(r.x).toBeGreaterThanOrEqual(0);
