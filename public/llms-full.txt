@@ -23595,7 +23595,7 @@ export function PieExample() {
 
 ## Legends and theme colours
 
-ChartStyle scopes the config colour variables to each chart. The first legend uses config icons; the second fixes `hideIcon` to show a text-only legend. Light and dark theme mappings apply independently of neighbouring examples.
+ChartStyle scopes the config colour variables to each chart. The first legend uses config icons; the second uses `hideIcon` to replace them with colour markers. Light and dark theme mappings apply independently of neighbouring examples.
 
 <ComponentExample name="legends" />
 
