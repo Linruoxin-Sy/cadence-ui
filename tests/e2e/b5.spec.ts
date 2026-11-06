@@ -330,12 +330,23 @@ for (const preference of ["no-preference", "reduce"] as const)
         await expect(trigger.locator('[data-slot="select-value"]')).toHaveText("Remix");
         await trigger.focus();
         await trigger.press("ArrowDown");
+        await expect(page.getByRole("listbox")).toBeVisible();
+        await expect(page.getByRole("option", { name: "Remix", exact: true })).toBeFocused();
         await page.keyboard.press("a");
+        await expect(page.getByRole("option", { name: "Astro", exact: true })).toBeFocused();
         await page.keyboard.press("Enter");
         await expect(trigger.locator('[data-slot="select-value"]')).toHaveText("Astro");
         await trigger.click();
+        const popup = page.locator('[data-slot="select-content"]');
+        await expect(popup).toBeVisible();
+        await expect(popup).toHaveAttribute("data-side", "none");
+        // Resize dismisses an already-open, item-aligned popup. Let the open
+        // commit and its passive resize listener finish before sending resize.
+        await popup.evaluate(
+          () => new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+        );
         await page.setViewportSize({ width: 390, height: 900 });
-        await expect(page.locator('[data-slot="select-content"]')).not.toBeVisible();
+        await expect(popup).not.toBeVisible();
         await expect(trigger).toBeFocused();
         await page.goto(`/components/combobox?motion=${requested}`);
         await page.waitForLoadState("networkidle");
