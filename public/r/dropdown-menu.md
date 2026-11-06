@@ -610,8 +610,8 @@ export function MenuMotionScopes() {
 
 ## When not to use
 
-- A list of links to another page. Use a `navigation-menu` or plain links: an item that
-  navigates is a link, and a menu item is not one.
+- A list of links for ordinary site navigation. Use a `navigation-menu` or plain links;
+  a navigational command in a menu retains the menu's keyboard behavior.
 - A value you select and read back. Use `select`, which keeps the chosen value in the trigger.
 - A destructive answer that must be confirmed. Use `alert-dialog`; a menu item is a
   one-keystroke action and closes immediately.
@@ -705,8 +705,9 @@ remain owned by the primitive.
 
 - Base UI wires the trigger with `aria-haspopup="menu"` and `aria-expanded`, and renders the
   panel as `role="menu"` with `menuitem`, `menuitemcheckbox`, and `menuitemradio` parts.
-- A menu item is not a link. If an entry navigates, render an anchor inside it
-  (`render={<a href="…" />}` on a `MenuItem` still needs the role, so prefer a plain link).
+- For a navigational command, use `DropdownMenuItem render={<a href="…" />}`. The anchor
+  keeps its `href` and receives `role="menuitem"` and Base UI's focus and activation behavior.
+  Do not nest a second interactive link inside an item.
 - `DropdownMenuLabel` inside a `DropdownMenuGroup` is the group's accessible name. Outside a
   group it is a caption: visible to sighted users, not announced as a label.
 - `DropdownMenuShortcut` is text, not a binding. Announce the shortcut in the item's label
@@ -716,8 +717,11 @@ remain owned by the primitive.
 
 ## Responsive behavior
 
-The panel caps at `--available-height` and scrolls, and the positioner flips the side and
-shifts along the cross axis to stay inside the viewport. On touch, the menu opens on tap and
+The panel caps at `--available-height` and scrolls. The positioner can flip the side and
+shift along the cross axis, but caller-defined widths can still exceed the available space
+in side placements. Cap them with `max-w-(--available-width)` and verify open bounds;
+reduce the `min-w-[8rem]` minimum too if the available space is narrower.
+On touch, the menu opens on tap and
 the highlighted item follows the tap; there is no hover state to design around. `min-w-[8rem]`
 keeps short menus readable, and the panel does not stretch to the trigger's width — a menu
 is as wide as its widest item.
