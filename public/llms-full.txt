@@ -14149,8 +14149,8 @@ separately from the animated outer slot, including content and viewport changes.
 
 ## Accessibility
 
-- Base UI renders the trigger as a combobox and the popup as a listbox, wired with
-  `aria-expanded`, `aria-controls`, and `aria-activedescendant`.
+- Base UI renders the trigger as a combobox and the list as a listbox, wired with
+  `aria-expanded` and `aria-controls`; keyboard navigation moves focus to the options.
 - Name the control with `aria-label` or a visible external label associated with the trigger; the value alone is not a name.
 - The selected item keeps `aria-selected="true"`; the check is a visual duplicate, not the only signal.
 - Under reduced motion the value still changes and the check still appears; nothing is conveyed by
@@ -14166,8 +14166,8 @@ errors; this component does not validate or install a form-state library.
 ## Responsive behavior
 
 The popup is at least `--anchor-width` wide and caps at `--available-height`, so it flips and scrolls
-inside the viewport. `alignItemWithTrigger` keeps the selected item over the trigger on touch, where a
-list attached below the finger is harder to read. The width animation is short and only touches the
+inside the viewport. `alignItemWithTrigger` keeps the selected item over the trigger when space permits;
+touch opening disables this alignment and uses anchored placement. The width animation is short and only touches the
 trigger, so a select in a toolbar does not reflow the page beyond its own row.
 
 ## Performance
@@ -14176,7 +14176,7 @@ trigger, so a select in a toolbar does not reflow the page beyond its own row.
   duration of the handoff. No blur and no shadow animation.
 - Width is a layout property; it is allowed only on this T3 component and only through
   `geometry.resize`, which jumps under reduced and none.
-- The list virtualisation is Base UI's; the component adds no per-item animation beyond the check
+- The list renders every supplied item without virtualisation; the component adds no per-item animation beyond the check
   indicator.
 - Budget: T3 (12 KB gzip). If a page animates several selects at once, only the open one moves.
 
