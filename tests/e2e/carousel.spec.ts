@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).carousel;
 const selector = (name: string) => `[data-component-example="carousel/${name}"]`;
@@ -189,7 +190,7 @@ test("carousel live downgrade, system cancellation, custom controls and state id
   });
   expect(new Set(samples).size).toBe(1);
   expect(await track.evaluate((n, saved) => n === saved, node)).toBe(true);
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "carousel");
   await expect(card.getByRole("status")).toHaveText("Slide 3 of 4 · Ready");
   expect(await track.evaluate((n, saved) => n === saved, node)).toBe(true);
   const custom = page.locator(selector("custom-controls"));
