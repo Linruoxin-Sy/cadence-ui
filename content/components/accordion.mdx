@@ -13,9 +13,45 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/accordion
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/accordion.json)
+
+Copy all nine target files, keeping `accordion/index.tsx` and the shared
+`lib/` directory in the same `cadence/` tree. Preserve relative imports and
+the sources' `"use client"` directives. Copy every file in the motion,
+utilities and provider payloads, including helpers not imported by Accordion
+directly. The provider files and `motion` package are required imports even
+without the optional `CadenceProvider` wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. Include the Cadence duration and easing tokens used by the
+disclosure classes. No additional item-specific CSS or external asset is
+required. Keep the inner measurement wrapper: full mode transitions the
+nonnegative measured panel height, while reduced and none update it
+immediately. Initially open server-rendered content retains its natural height.
+Standalone components follow the system preference; use `CadenceProvider`
+to choose a product mode or override an inherited scope.
+
+The basic Usage and the static examples can be composed in a Server Component
+with serializable values and children, including the `render={<section />}`
+element. Use a client caller for controlled arrays and their change handlers,
+the Changing content action, refs, or function-valued `render`, `className`
+and `style` props. The Persistent content example retains its client directive;
+synchronous `useId` alone does not require a client caller. Keep a meaningful
+level-two section heading above the trigger's level-three headings.
+
+The Controlled and Changing content examples additionally use
+`@cadence/button`; Persistent content uses `@cadence/input` and
+`@cadence/label`. Install those items separately, or copy every target and
+recursive dependency from their Manual panels. The caller owns open-value
+arrays, content updates and any input data; Accordion provides disclosure UI.
 
 ## Usage
 
