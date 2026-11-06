@@ -1,5 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES, pressScale } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 import { expectMenuAccessibility } from "./menu-accessibility";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
@@ -118,7 +119,7 @@ for (const os of [false, true])
       await expect(input).toHaveValue("example.com");
       expect(await input.evaluate((el, saved) => el === saved, savedInput)).toBe(true);
       expect(await table.evaluate((el, saved) => el === saved, savedTable)).toBe(true);
-      await page.getByText("Component source", { exact: true }).click();
+      await openComponentSource(page, "data-table");
       await expect(input).toHaveValue("example.com");
       await updates.getByRole("button", { name: "Remove first payment" }).click();
       await expect(updates.locator('[role="status"]')).toContainText("0 of 3");
