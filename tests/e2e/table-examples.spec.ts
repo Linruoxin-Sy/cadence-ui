@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).table;
 const selector = (name: string) => `[data-component-example="table/${name}"]`;
@@ -64,7 +65,7 @@ for (const os of ["no-preference", "reduce"] as const)
         expect(await checkbox.evaluate((n, original) => n === original, saved)).toBe(true);
         await expect(action).toBeDisabled();
       }
-      await page.getByText("Component source", { exact: true }).click();
+      await openComponentSource(page, "table");
       await expect(checkbox).toBeChecked();
       expect(await checkbox.evaluate((n, original) => n === original, saved)).toBe(true);
       await expect(top.getByRole("cell", { name: "Paid", exact: true })).toHaveCount(1);
