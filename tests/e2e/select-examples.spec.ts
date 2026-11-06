@@ -13,6 +13,8 @@ for (const os of [false, true])
       await expect(trigger).toContainText("Next.js");
       await expect(trigger).toContainText("Astro");
       await trigger.click();
+      await expect(trigger).toHaveAttribute("aria-expanded", "true");
+      await expect(trigger).toHaveAttribute("aria-controls", /.+/);
       const listId = await trigger.getAttribute("aria-controls");
       const list = page.locator(`[id="${listId}"]`);
       await expect(list).toHaveAttribute("aria-multiselectable", "true");
@@ -40,6 +42,8 @@ for (const os of [false, true])
       ]) {
         const control = placement.getByRole("combobox", { name: `Framework, ${name}`, exact: true });
         await control.click();
+        await expect(control).toHaveAttribute("aria-expanded", "true");
+        await expect(control).toHaveAttribute("aria-controls", /.+/);
         const panelId = await control.getAttribute("aria-controls");
         const panel = page.locator(`[id="${panelId}"]`).locator("..");
         await expect(panel).toBeVisible();
