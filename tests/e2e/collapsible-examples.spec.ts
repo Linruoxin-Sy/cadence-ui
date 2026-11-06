@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).collapsible;
 const selector = (name: string) => `[data-component-example="collapsible/${name}"]`;
@@ -179,7 +180,7 @@ test("collapsible live system reduction cancels geometry and retains native node
   expect(await input.evaluate((n, original) => n === original, saved)).toBe(true);
   await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
   await expect(panel).toHaveAttribute("data-motion", "none");
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "collapsible");
   await expect(input).toHaveValue("Live native draft");
   expect(await input.evaluate((n, original) => n === original, saved)).toBe(true);
 });
