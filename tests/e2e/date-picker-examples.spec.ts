@@ -8,6 +8,7 @@ const examples: Record<"date-picker", string[]> = JSON.parse(
 );
 
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const card = (page: Page, id: string) => page.locator(`[data-component-example="date-picker/${id}"]`);
@@ -247,7 +248,7 @@ test("Date Picker real fixed none, header and source retain independent state", 
       mode,
     );
   }
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "date-picker");
   expect(await input.evaluate((el, s) => el === s, saved)).toBe(true);
   await expect(input).toHaveValue("13:45");
 });
@@ -270,7 +271,7 @@ test("Date Picker SSR, no-JS, distribution and legacy URL", async ({ page, brows
   const md = await (await request.get("/r/date-picker.md")).text();
   expect(md).toContain("export function DateInput");
   expect(md).toContain("Choose an appointment before submitting.");
-  expect((md.match(/export function/g) ?? []).length).toBe(13);
+  expect((md.slice(md.indexOf("## Usage")).match(/export function/g) ?? []).length).toBe(13);
   const payload = await (await request.get("/r/date-picker.json")).json();
   expect(payload.docs).toContain("export function RangePresets");
   for (const variant of ["all", "range", "unknown"]) {

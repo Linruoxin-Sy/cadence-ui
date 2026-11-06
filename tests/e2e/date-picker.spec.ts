@@ -168,7 +168,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await page.goto("/components/date-picker?motion=none");
     await page.waitForLoadState("networkidle");
     const preview = page.locator('[data-preview="date-picker"]').first();
-    await expect(page.locator("article table")).toHaveCount(2);
+    await expect(page.locator("article table:not([data-installation] table)")).toHaveCount(2);
     await expect(page.getByRole("cell", { name: '"single" | "range"', exact: true })).toBeVisible();
     await mkdir(".cache/date-picker-proof", { recursive: true });
     for (const width of [1280, 390]) {
