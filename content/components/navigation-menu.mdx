@@ -13,12 +13,71 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/navigation-menu
 ```
 
 The action examples also use `@cadence/button`; Retained content uses `@cadence/input`.
 Add those registry items when copying the corresponding compositions.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/navigation-menu.json)
+
+Copy all nine target files, including every shared helper, into the same
+`cadence/` tree. Preserve relative imports and shipped `"use client"`
+directives. Complete the base theme setup and ensure Tailwind CSS v4 scans
+the copied files. No additional Navigation Menu stylesheet is required.
+
+For the action examples, also follow [Button manual installation](https://cadence.dev/components/button#installation),
+copying every target and installing its recursive dependencies. Retained
+content additionally needs [Input manual installation](https://cadence.dev/components/input#installation).
+Both pages provide complete files and npm commands without the shadcn CLI;
+merge shared targets once. The RTL example's `DirectionProvider` comes from
+the already listed `@base-ui/react` package. The fixed-motion example uses
+the provider files above.
+
+Usage can compose these client components from a Server Component with its
+string props and children. Keep state, refs, `actionsRef`, event handlers,
+callback classes/styles and function-based `render` composition inside a
+`"use client"` caller. `navigationMenuTriggerStyle()` is also exported from
+a client module: call it inside that client boundary, as the examples do.
+Do not invoke it from a Server Component. Preserve the client boundaries shown in the
+examples when copying their compositions.
+
+Compose Root, List, Item, Trigger, Content and real Link destinations as in
+[Usage](#usage). Give navigation landmarks distinct accessible labels and
+items stable values. Root already appends one portaled positioner, popup and
+viewport; do not append another `NavigationMenuPositioner`. Root forwards
+`align` to that positioner; orientation changes keyboard traversal, not its
+bottom placement. Size each content panel responsively within the available
+viewport; the shared viewport scrolls overflowing content. For RTL, preserve
+`DirectionProvider`, the native wrapper's `dir`/`lang`, and those native
+attributes on the portaled content.
+
+The caller owns route destinations, active-route state and router integration.
+Custom link components must forward native link props and refs. `active`
+marks the current page; `closeOnClick` opts into closing on link activation.
+Controlled `value` needs a matching client `onValueChange`; `null` closes
+the menu. Base UI owns hover intent, click/touch, focus guards, keyboard
+traversal and outside/Escape dismissal. Keep its native focus handlers and
+portal lifecycle. Intent delays are not animation durations.
+
+Provider imports are required; wrapping is optional. Standalone menus respect
+the system preference. Full mode scales/fades the popup and resizes its
+measured width/height; reduced keeps opacity and applies geometry instantly;
+none removes every authored transition. Keep the same popup through updates
+and mode changes. `keepMounted` retains inactive panels while the portal is
+open, but a complete close unmounts the default portal and resets uncontrolled
+input drafts on reopening. Store persistent drafts in caller state.
+
+Without JavaScript, server-rendered top-level labels and standalone anchors
+remain available, and both installation methods expose complete source.
+Popup content is portaled and requires hydration: provide another accessible
+route to essential destinations instead of relying on hover-only access.
+Navigation Menu does not create a mobile drawer or manage application data.
 
 ## Usage
 

@@ -10,12 +10,119 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/navigation-menu
 ```
 
 The action examples also use `@cadence/button`; Retained content uses `@cadence/input`.
 Add those registry items when copying the corresponding compositions.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| navigation-menu | `@components/cadence/navigation-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/navigation-menu.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: navigation-menu](https://cadence.dev/r/navigation-menu.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, including every shared helper, into the same
+`cadence/` tree. Preserve relative imports and shipped `"use client"`
+directives. Complete the base theme setup and ensure Tailwind CSS v4 scans
+the copied files. No additional Navigation Menu stylesheet is required.
+
+For the action examples, also follow [Button manual installation](https://cadence.dev/components/button#installation),
+copying every target and installing its recursive dependencies. Retained
+content additionally needs [Input manual installation](https://cadence.dev/components/input#installation).
+Both pages provide complete files and npm commands without the shadcn CLI;
+merge shared targets once. The RTL example's `DirectionProvider` comes from
+the already listed `@base-ui/react` package. The fixed-motion example uses
+the provider files above.
+
+Usage can compose these client components from a Server Component with its
+string props and children. Keep state, refs, `actionsRef`, event handlers,
+callback classes/styles and function-based `render` composition inside a
+`"use client"` caller. `navigationMenuTriggerStyle()` is also exported from
+a client module: call it inside that client boundary, as the examples do.
+Do not invoke it from a Server Component. Preserve the client boundaries shown in the
+examples when copying their compositions.
+
+Compose Root, List, Item, Trigger, Content and real Link destinations as in
+[Usage](#usage). Give navigation landmarks distinct accessible labels and
+items stable values. Root already appends one portaled positioner, popup and
+viewport; do not append another `NavigationMenuPositioner`. Root forwards
+`align` to that positioner; orientation changes keyboard traversal, not its
+bottom placement. Size each content panel responsively within the available
+viewport; the shared viewport scrolls overflowing content. For RTL, preserve
+`DirectionProvider`, the native wrapper's `dir`/`lang`, and those native
+attributes on the portaled content.
+
+The caller owns route destinations, active-route state and router integration.
+Custom link components must forward native link props and refs. `active`
+marks the current page; `closeOnClick` opts into closing on link activation.
+Controlled `value` needs a matching client `onValueChange`; `null` closes
+the menu. Base UI owns hover intent, click/touch, focus guards, keyboard
+traversal and outside/Escape dismissal. Keep its native focus handlers and
+portal lifecycle. Intent delays are not animation durations.
+
+Provider imports are required; wrapping is optional. Standalone menus respect
+the system preference. Full mode scales/fades the popup and resizes its
+measured width/height; reduced keeps opacity and applies geometry instantly;
+none removes every authored transition. Keep the same popup through updates
+and mode changes. `keepMounted` retains inactive panels while the portal is
+open, but a complete close unmounts the default portal and resets uncontrolled
+input drafts on reopening. Store persistent drafts in caller state.
+
+Without JavaScript, server-rendered top-level labels and standalone anchors
+remain available, and both installation methods expose complete source.
+Popup content is portaled and requires hydration: provide another accessible
+route to essential destinations instead of relying on hover-only access.
+Navigation Menu does not create a mobile drawer or manage application data.
 
 ## Usage
 
