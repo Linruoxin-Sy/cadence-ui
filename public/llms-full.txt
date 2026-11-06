@@ -16489,9 +16489,134 @@ Right-click actions on a file, row, or canvas.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/context-menu
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| context-menu | `@components/cadence/context-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/context-menu.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: context-menu](https://cadence.dev/r/context-menu.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, including every shared `lib/` file. Keep the mirrored
+`cadence/` tree, relative imports and `"use client"` directives intact. The provider
+files and `motion` are required imports; wrapping your application in
+`CadenceProvider` is optional. Complete the base theme setup linked above,
+including Cadence's easing tokens, and ensure Tailwind scans the copied files.
+These payloads contain no additional context-menu-specific CSS or assets.
+
+Usage and the top specimen need only Context Menu and its listed dependencies.
+Beside a row menu also composes Dropdown Menu and Button. Follow
+[Dropdown Menu's manual installation](https://cadence.dev/components/dropdown-menu#installation)
+and [Button's manual installation](https://cadence.dev/components/button#installation),
+copying their full [Dropdown Menu payload](https://cadence.dev/r/dropdown-menu.json)
+and [Button payload](https://cadence.dev/r/button.json). Beyond the shared files
+above, add `@components/cadence/dropdown-menu/index.tsx` and
+`@components/cadence/button/index.tsx`. Their only additional npm dependency is:
+
+```package-manager
+npm install class-variance-authority
+```
+
+Logical sides in RTL uses `DirectionProvider` from the already required
+`@base-ui/react`; pair it with the DOM `dir` attribute, as shown.
+
+In Next.js App Router, keep Usage, Beside a row menu, Selection items, Submenus,
+Destructive and disabled items, and Controlled open in client modules: they own
+state and handlers. Where the panel opens, Pointer alignment, Logical sides in
+RTL and Explicit motion scopes are static compositions and can be rendered by
+a Server Component with serializable props. Adding event handlers, refs or
+function-valued `render`, `className` or `style` props requires a client caller;
+synchronous `useId` alone does not. Keep the shipped client directives. The
+site's preview shell is not consumer setup. Opening, navigation, selection and
+dismissal require hydration; without JavaScript the target and code remain readable.
+
+Compose a root, trigger and content. The trigger renders a `div`; supply a
+focusable target with `tabIndex={0}` and a useful name or explanation for
+Shift+F10 and the Context Menu key. Base UI handles the native `contextmenu`
+event, pointer anchor and touch long press, including movement cancellation.
+Keep the same actions available through a visible control for discoverability
+and touch use. Content includes its own portal, positioner and popup. Both
+Content and SubContent default to right/start, zero side offset and a 4px
+alignment offset; do not add another portal around them. Submenus use Sub,
+SubTrigger and SubContent. Base UI owns collision handling, roving item focus,
+typeahead, submenu navigation and dismissal. Constrain unusually wide caller
+content with `max-w-(--available-width)` and check the minimum width and actual
+open bounds on narrow screens.
+
+The caller owns commands and their effects, authorization, controlled `open`,
+checkbox `checked`, radio-group `value`, persistence and error feedback. Use
+`defaultOpen`, `defaultChecked` and `defaultValue` for uncontrolled initial
+state. Establish the context anchor through the real target event; setting
+`open` from an unrelated button supplies no cursor point. The installed root
+omits `modal` and `triggerId`: Tab stays within the open panel, while
+Shift+Tab or Escape closes it and restores focus to the target. Outside pointer
+interaction is blocked and desktop scrolling is locked while open.
+
+Use `onClick` for commands. Ordinary items close by default;
+`closeOnClick={false}` keeps them open, and checkbox/radio items stay open by
+default. Disabled items remain keyboard-discoverable but cannot activate;
+root `disabled` prevents the context menu opening. Shortcut text registers no
+key binding. Labels inside ContextMenuGroup name that group; outside it,
+including inside RadioGroup, they are captions. Usage's navigational command
+passes an anchor through the item's `render` prop so its `href` and the menu
+role, focus and activation behavior share one element. This component supplies
+no form-state or validation package; the examples update only local state.
+
+Full mode scales and fades panels and animates the checkbox/radio mark.
+Reduced retains opacity at full size; none disables these transitions from
+the first mounted frame. A nested provider can restore full inside none,
+subject to the system reduced-motion preference. Preserve the primitive's
+events and focus behavior when supplying custom render elements or handlers.
 
 ## Usage
 
