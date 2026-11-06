@@ -10,6 +10,8 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/date-picker
 ```
@@ -20,6 +22,153 @@ install them with `npx shadcn@latest add @cadence/input @cadence/field` before
 copying those examples. For manual installation copy `registry/cadence/date-picker/index.tsx` to
 `components/cadence/date-picker/index.tsx`, install those registry items and
 `date-fns@4.1.0` plus `lucide-react`. Keep the sibling tree and relative imports.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority react-day-picker@9.13.2 date-fns@4.1.0 lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/calendar](https://cadence.dev/r/calendar.json) — direct registry dependency.
+- [@cadence/popover](https://cadence.dev/r/popover.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
+| popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
+| date-picker | `@components/cadence/date-picker/index.tsx` | [JSON files[].content](https://cadence.dev/r/date-picker.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: calendar](https://cadence.dev/r/calendar.json)
+
+[Source files: popover](https://cadence.dev/r/popover.json)
+
+[Source files: date-picker](https://cadence.dev/r/date-picker.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 12 target files, including every `cadence-motion` and
+`cadence-provider` helper. Keep the sibling `cadence/` tree, relative imports
+and shipped `"use client"` directives. Complete the linked manual base setup
+with Cadence theme CSS, ensure Tailwind CSS v4 scans the copied files, and apply
+`bg-background text-foreground` to your application root. Keep
+`react-day-picker@9.13.2` and `date-fns@4.1.0` pinned. The default Calendar needs
+no DayPicker stylesheet: its appearance comes from the copied Tailwind classes.
+Enabling DayPicker's optional `animate` engine or replacing its parts requires
+caller-owned styles and motion. `CadenceProvider` is optional; standalone
+controls follow the system motion preference, and the provider selects a local
+mode or clock.
+
+For the Date input and Time examples, also copy these four additional files in
+dependency order. Their complete recursive npm dependencies are `clsx`,
+`tailwind-merge`, `@base-ui/react` and `class-variance-authority`, all already
+included in the command above; reuse the existing `cadence-utils` file. No extra
+CSS or validation package is required.
+
+| Additional item | Target file | Full source |
+| --- | --- | --- |
+| [@cadence/input](https://cadence.dev/r/input.json) | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| [@cadence/label](https://cadence.dev/r/label.json) | `@components/cadence/label/index.tsx` | [JSON files[].content](https://cadence.dev/r/label.json) |
+| [@cadence/separator](https://cadence.dev/r/separator.json) | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| [@cadence/field](https://cadence.dev/r/field.json) | `@components/cadence/field/index.tsx` | [JSON files[].content](https://cadence.dev/r/field.json) |
+
+Input directly depends on `cadence-utils`; Field directly depends on
+`cadence-utils`, Label and Separator. Label and Separator each depend on
+`cadence-utils`. The [Input Manual](/components/input#installation) and
+[Field Manual](/components/field#installation) expose these complete source
+blocks. All other imports in Usage and the examples, including Button and the
+provider, are covered by the base graph above.
+
+The minimal [Usage](#usage) can remain a Server Component. The installed client
+composition creates its own state and event handlers. Serializable `Date`
+values, date ranges and plain `calendarProps` such as `defaultMonth`, `today`
+and date matchers can cross that boundary. A serialized Date preserves an
+instant, so server and browser time zones must agree on its civil fields for
+matching trigger text. When they differ, pass civil year/month/day data to a
+client wrapper and construct the local Date there; a server-created local
+midnight is not a portable date-only value. Keep state hooks, change callbacks,
+native event handlers, refs, render/component functions, custom formatters and
+labels in a `"use client"` caller. Imported date-fns locale objects contain
+functions: construct and pass them inside that client boundary, as the Locale
+example does. Hooks and function-valued props in the controlled and custom-parts
+examples belong to the caller.
+
+`DatePickerDemo` is an editable composition. Omit `value` for internal state,
+optionally seeded by `defaultValue`; a present `value`, including `undefined`,
+is controlled. Pair it with `onValueChange` for editable controlled selection;
+without that callback it is read-only. Keep the ownership model stable.
+For controlled empty state, create the explicit `value={undefined}` inside a
+client caller. The current RSC transport omits that own property, so a
+server-passed undefined value becomes uncontrolled; serializable
+nonempty Dates do not have that property-presence issue.
+Use `mode="range"` with `DateRange` values; it defaults to two displayed months,
+which `calendarProps.numberOfMonths` can override. Selection and deselection
+leave the popup open. The composition owns `mode`, `selected`, `onSelect` and
+`required`; use Calendar directly for multiple or required selection. Pair
+`open` with `onOpenChange`, and `calendarProps.month` with `onMonthChange`, when
+the application owns those states. `defaultOpen` initializes uncontrolled open
+state. Calendar props also own disabled-date matchers, navigation limits and
+range constraints; `disabled` on the composition disables its trigger.
+
+Use local civil dates such as `new Date(year, monthIndex, day)`. A date-only ISO
+string parses as UTC; it can display the previous local day. Pass deterministic
+`defaultMonth` and `today` when the calendar must not depend on the host clock.
+If setting DayPicker's `timeZone`, supply dates with matching civil fields and
+keep trigger formatting consistent. The caller owns parsing, persistence,
+submission, time-zone conversion and DST policy. The Date input example owns
+its native ISO civil-date draft; Time owns a separate time string. This block
+adds no hidden form value or validation. Render application errors through
+`triggerProps` with `aria-invalid` and `aria-describedby`.
+
+Keep the trigger in a shrinkable parent: its date text truncates, while the
+available-size constrained popup scrolls. Range months stack at narrow widths
+and sit beside each other at the Calendar's desktop breakpoint. Preserve a
+focusable button and supplied props when customizing the trigger render, and
+retain the popup title and Calendar keyboard semantics. Button owns the press
+recipe, Popover owns its anchored open/close recipes, and Calendar owns month
+transitions. Full plays their authored transforms and fades; reduced keeps
+fades and drops transforms; none settles immediately. Date labels, selection
+and calendar geometry update immediately in every mode.
 
 ## Usage
 
