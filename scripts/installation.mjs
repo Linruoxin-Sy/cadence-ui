@@ -1,4 +1,8 @@
 /** Shared, deterministic installation plan for authoring, distribution and the site. */
+import remarkParse from "remark-parse";
+import { unified } from "unified";
+
+const markdown = unified().use(remarkParse);
 export const SITE = "https://cadence.dev";
 export const manualLink = (id) => `[Manual installation files](${SITE}/r/${id}.json)`;
 
@@ -155,32 +159,65 @@ export function manualInstructions(plan) {
   return lines.join("\n").trim();
 }
 
-/** The marker opts in a page; legacy pages remain unchanged during migration. */
-export function hasInstallationTabs(body) {
-  return /^\*\*(?:Command|Manual)\*\*\s*$/m.test(body);
+const nodeText = (node) => node.value ?? node.children?.map(nodeText).join("") ?? "";
+const methodMarker = (node, label) =>
+  node.type === "paragraph" &&
+  node.children.length === 1 &&
+  node.children[0].type === "strong" &&
+  node.children[0].children.length === 1 &&
+  node.children[0].children[0].type === "text" &&
+  node.children[0].children[0].value === label;
+
+/** Parse the same standalone Markdown boundaries consumed by the site's AST transform. */
+function installationBounds(body, id) {
+  const nodes = markdown.parse(body).children;
+  const start = nodes.findIndex(
+    (node) => node.type === "heading" && node.depth === 2 && nodeText(node) === "Installation",
+  );
+  let end = nodes.findIndex((node, index) => index > start && node.type === "heading" && node.depth === 2);
+  if (end < 0) end = nodes.length;
+  const section = start < 0 ? [] : nodes.slice(start + 1, end);
+  const commands = section.flatMap((node, index) => (methodMarker(node, "Command") ? [index] : []));
+  const manuals = section.flatMap((node, index) => (methodMarker(node, "Manual") ? [index] : []));
+  const links = [];
+  const visit = (node, parent, index) => {
+    if (node.type === "link" && nodeText(node) === "Manual installation files") links.push({ node, parent, index });
+    for (const child of node.children ?? []) visit(child, node, index);
+  };
+  for (const [index, node] of section.entries()) visit(node, null, index);
+  const link = links[0];
+  const linkStart = link?.node.position?.start.offset;
+  const linkEnd = link?.node.position?.end.offset;
+  if (
+    commands.length === 1 &&
+    manuals.length === 1 &&
+    commands[0] < manuals[0] &&
+    section
+      .slice(commands[0] + 1, manuals[0])
+      .some((node) => node.type === "code" && node.lang === "install" && node.value.trim()) &&
+    links.length === 1 &&
+    link.index > manuals[0] &&
+    section.includes(link.parent) &&
+    link.parent.type === "paragraph" &&
+    link.parent.children.length === 1 &&
+    Number.isInteger(linkStart) &&
+    Number.isInteger(linkEnd) &&
+    body.slice(linkStart, linkEnd) === manualLink(id)
+  )
+    return { problems: [], start: linkStart, end: linkEnd };
+  return {
+    problems: [
+      `${id}: Installation needs ordered standalone **Command** / **Manual** boundaries, a nonempty install fence and exactly one standalone ${manualLink(id)}`,
+    ],
+  };
 }
 
 export function validateInstallation(body, id) {
-  if (!hasInstallationTabs(body)) return [];
-  const section = body.match(/^## Installation\s*\n([\s\S]*?)(?=^## |$(?![\s\S]))/m)?.[1] ?? "";
-  const command = section.indexOf("**Command**");
-  const manual = section.indexOf("**Manual**");
-  const count = (text) => section.split(text).length - 1;
-  return command >= 0 &&
-    manual > command &&
-    count("**Command**") === 1 &&
-    count("**Manual**") === 1 &&
-    count(manualLink(id)) === 1 &&
-    /```install\s/.test(section.slice(command, manual))
-    ? []
-    : [
-        `${id}: Installation needs ordered standalone **Command** / **Manual** boundaries, an install fence and exactly one ${manualLink(id)}`,
-      ];
+  return installationBounds(body, id).problems;
 }
 
 export function expandInstallation(body, items, id) {
-  const problems = validateInstallation(body, id);
-  if (problems.length) throw new Error(problems.join("\n"));
-  if (!hasInstallationTabs(body)) return body;
-  return body.replace(manualLink(id), manualInstructions(installationPlan(items, id)));
+  const bounds = installationBounds(body, id);
+  if (bounds.problems.length) throw new Error(bounds.problems.join("\n"));
+  return body.slice(0, bounds.start) + manualInstructions(installationPlan(items, id)) + body.slice(bounds.end);
 }

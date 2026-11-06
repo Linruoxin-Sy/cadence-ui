@@ -17,7 +17,15 @@ export function Sizes() { return <Fixture />; }
 `;
 const body = `## Installation
 
-Install it.
+**Command**
+
+\`\`\`install
+npx shadcn@latest add @cadence/fixture
+\`\`\`
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/fixture.json)
 
 ## Usage
 

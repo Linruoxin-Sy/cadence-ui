@@ -47,7 +47,7 @@ async function readDocs() {
     const raw = await readFile(path.join(docsDir, entry), "utf8");
     const { data, content } = matter(raw);
     const id = entry.replace(/\.mdx$/, "");
-    docs.set(id, { data, body: expandInstallation(content.trim(), registry.items, id) });
+    docs.set(id, { data, body: content.trim() });
   }
   return docs;
 }
@@ -97,6 +97,9 @@ if (problems.length) {
   console.error(`Registry docs check failed:\n${problems.map((p) => `  - ${p}`).join("\n")}`);
   process.exit(1);
 }
+
+// Every distribution channel below consumes the same validated, expanded body.
+for (const [id, doc] of docs) doc.body = expandInstallation(doc.body, registry.items, id);
 
 const sha = sourceSha();
 const staged = {

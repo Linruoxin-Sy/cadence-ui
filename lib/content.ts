@@ -158,11 +158,3 @@ export async function getGuide(slug: string): Promise<Doc | null> {
     return null;
   }
 }
-
-/** Exact installable payload, including every file in a block. */
-export async function getComponentSource(slug: string): Promise<Array<{ path: string; content: string }>> {
-  const payload = JSON.parse(await readFile(path.join(process.cwd(), "public", "r", `${slug}.json`), "utf8")) as {
-    files: Array<{ path: string; content: string }>;
-  };
-  return payload.files;
-}

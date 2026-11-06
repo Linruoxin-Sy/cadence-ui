@@ -59,6 +59,8 @@ describe("real registry template entry", { timeout: 15_000 }, () => {
   it.each([
     ["missing performance", without(badge, "Responsiveness and performance"), "expected one ## Responsive behavior"],
     ["missing required rationale", without(badge, "When to use"), "expected one ## When to use"],
+    ["missing install methods", badge.replace("**Command**", ""), "Installation needs ordered"],
+    ["wrong Manual item", badge.replace("/r/badge.json", "/r/button.json"), "Installation needs ordered"],
     [
       "opening order",
       // Keep installation markers inside their section so this exercises ordering.
@@ -107,6 +109,27 @@ describe("real registry template entry", { timeout: 15_000 }, () => {
       });
       expect(result.status).toBe(1);
       expect(result.stderr).toContain(`${badgePath}: expected one ## Responsive behavior`);
+    } finally {
+      writeFileSync(path.join(fixture, badgePath), badge);
+    }
+  });
+  it.each([
+    ["unmarked methods", badge.replace("**Manual**", "")],
+    ["unclosed command fence", badge.replace(/```install\n([^`]+)```/, "```install\n$1")],
+  ])("rejects %s before registry:build changes any component payload", (_, source) => {
+    const targets = registry.items
+      .filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type))
+      .map((item: { name: string }) => path.join(fixture, "public/r", `${item.name}.json`));
+    const previous = targets.map((file: string) => readFileSync(file, "utf8"));
+    writeFileSync(path.join(fixture, badgePath), source);
+    try {
+      const result = spawnSync(process.execPath, [path.join(root, "scripts/build-registry.mjs")], {
+        cwd: fixture,
+        encoding: "utf8",
+      });
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain(`${badgePath}: badge: Installation needs ordered`);
+      expect(targets.map((file: string) => readFileSync(file, "utf8"))).toEqual(previous);
     } finally {
       writeFileSync(path.join(fixture, badgePath), badge);
     }

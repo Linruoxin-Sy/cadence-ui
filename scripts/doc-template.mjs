@@ -26,7 +26,7 @@ export const INPUT_DOCS = new Set([
 ]);
 
 export function validateDocTemplate(body, item, label, exampleCatalog = {}) {
-  const problems = validateInstallation(body, item.name);
+  const problems = validateInstallation(body, item.name).map((message) => `${label}: ${message}`);
   const fail = (message) => problems.push(`${label}: ${message}`);
   const lines = visibleLines(body);
   for (let index = 0; index < lines.length; index++) {

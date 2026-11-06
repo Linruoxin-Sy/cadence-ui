@@ -139,9 +139,11 @@ and uses CodeBlock's existing footer/expand button, numbering, scrolling and com
 Ordinary Usage/example fences stay fully expanded. Hidden blocks defer first measurement until
 visible; initial SSR folds are CSS-reserved and no-JS retains readable complete source.
 
-During the per-document migration, unmarked pages keep the legacy source disclosure. Marked pages
-remove that disclosure. Remove this transition branch after all 59 pages migrate. The final contract
-is Command/Manual on every component page; transitional acceptance does not certify that rollout.
+Every component page requires Command/Manual; there is no separate source disclosure or legacy
+rendering path. Build/check parse the Markdown boundaries and require a real, nonempty install
+fence under Command and exactly one canonical standalone source link under Manual. Marker-like
+text inside code is ordinary source text. The browser suite enumerates every registry component,
+so a missing installation method cannot silently remove a page from acceptance.
 
 ### 2.1 The Motion contract section (this project's signature content)
 

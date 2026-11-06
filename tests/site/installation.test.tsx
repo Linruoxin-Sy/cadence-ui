@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { documentFlowPlugin, installationPlugin } from "@/components/site/installation-markdown";
 import {
   expandInstallation,
-  hasInstallationTabs,
+  expandInstallationGuide,
   installationCss,
   installationPlan,
   manualInstructions,
@@ -108,15 +108,64 @@ describe("installation authoring and AST", () => {
     "```install\nnpx shadcn@latest add @cadence/button\n```\n\nKeep this note.\n\n```install\nnpx shadcn@latest add @cadence/spinner\n```";
   const body = `## Installation\n\n**Command**\n\n${command}\n\n**Manual**\n\n${manualLink("button")}\n\n## Usage\n\nUse it.`;
 
-  it("preserves every command fence and note, and leaves legacy documents untouched", () => {
+  it("preserves every command fence and note", () => {
     const expanded = expandInstallation(body, registry.items, "button");
     expect(expanded).toContain(command);
     expect(expanded).toContain("npm install clsx tailwind-merge motion @base-ui/react class-variance-authority");
     expect(expanded).toContain("@components/cadence/lib/press-button.tsx");
     expect(expanded).toContain("[Source files: button](https://cadence.dev/r/button.json)");
-    expect(expandInstallation("## Installation\n\nold", registry.items, "button")).toBe("## Installation\n\nold");
-    expect(validateInstallation(body.replace("**Manual**", "**Other**"), "button")).toHaveLength(1);
-    expect(hasInstallationTabs(body)).toBe(true);
+  });
+
+  it.each([
+    ["unmarked", "## Installation\n\nold\n\n## Usage\n\nUse it."],
+    ["missing Manual", body.replace("**Manual**", "**Other**")],
+    ["inline marker", body.replace("**Command**", "Choose **Command**")],
+    ["reversed methods", body.replace("**Command**", "**Manual**").replace("**Manual**\n\n[", "**Command**\n\n[")],
+    ["duplicate marker", body.replace("**Manual**", "**Manual**\n\n**Manual**")],
+    ["empty command", body.replace(command, "```install\n\n```")],
+    ["command text outside a fence", body.replace(command, "npx shadcn@latest add @cadence/button")],
+    ["wrong source item", body.replace(manualLink("button"), manualLink("badge"))],
+    ["source link in prose", body.replace(manualLink("button"), `Copy ${manualLink("button")}.`)],
+    ["source link in a list", body.replace(manualLink("button"), `- ${manualLink("button")}`)],
+    ["duplicate source link", body.replace(manualLink("button"), `${manualLink("button")}\n\n${manualLink("button")}`)],
+    ["source link outside Installation", body.replace(manualLink("button"), "").concat(`\n\n${manualLink("button")}`)],
+  ])("rejects %s before expanding component instructions", (_, source) => {
+    expect(validateInstallation(source, "button")).toHaveLength(1);
+    expect(() => expandInstallation(source, registry.items, "button")).toThrow("Installation needs ordered");
+  });
+
+  it("rejects marker text consumed by an unclosed command fence", async () => {
+    const source = await readFile("tests/fixtures/installation/unclosed-command-fence.mdx", "utf8");
+    expect(validateInstallation(source, "button")).toHaveLength(1);
+    expect(() => expandInstallation(source, registry.items, "button")).toThrow("Installation needs ordered");
+  });
+
+  it.each(["\n", "\r\n"])(
+    "expands the parsed link, preserving marker-like source text with %j line endings",
+    (newline) => {
+      const literal = `~~~md\n**Command**\n**Manual**\n${manualLink("button")}\n~~~`;
+      const source = body.replace(command, `${command}\n\n${literal}`).replaceAll("\n", newline);
+      expect(validateInstallation(source, "button")).toEqual([]);
+      const expanded = expandInstallation(source, registry.items, "button");
+      expect(expanded).toContain(literal.replaceAll("\n", newline));
+      expect(expanded).toContain("[Source files: button](https://cadence.dev/r/button.json)");
+      expect(expanded.split(manualLink("button"))).toHaveLength(2);
+    },
+  );
+
+  it("retains the separate installation guide path without component method markers", async () => {
+    const source = matter(await readFile("content/docs/installation.mdx", "utf8")).content;
+    const expanded = expandInstallationGuide(source, registry.items);
+    expect(expanded).toContain("--motion-duration-fast: 0ms;");
+    expect(expanded).not.toContain("[Cadence theme CSS]");
+    const { content } = await compileMDX({
+      source: expanded,
+      options: { mdxOptions: { remarkPlugins: [installationPlugin, documentFlowPlugin] } },
+      components: { DocumentProse: ProseMarker },
+    });
+    const html = renderToStaticMarkup(content);
+    expect(html).toContain("Manual installation");
+    expect(html).not.toContain("data-panels");
   });
 
   it("turns only parsed boundaries into panels, retaining multiple fences and code containing marker text", async () => {

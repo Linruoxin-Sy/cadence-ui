@@ -1,20 +1,22 @@
 import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, test } from "@playwright/test";
-import { hasInstallationTabs, installationPlan } from "../../scripts/installation.mjs";
+import { installationPlan } from "../../scripts/installation.mjs";
 import { openComponentSource } from "./installation-helpers";
 
 const registry = JSON.parse(await readFile("registry.json", "utf8"));
-const pages = (
-  await Promise.all(
-    registry.items
-      .filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type))
-      .map(async (item: { name: string }) => ({
-        id: item.name,
-        body: await readFile(`content/components/${item.name}.mdx`, "utf8"),
-      })),
-  )
-).filter(({ body }) => hasInstallationTabs(body));
+const pages = await Promise.all(
+  registry.items
+    .filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type))
+    .map(async (item: { name: string }) => ({
+      id: item.name,
+      body: await readFile(`content/components/${item.name}.mdx`, "utf8"),
+    })),
+);
+
+test.beforeAll(() => {
+  expect(pages).toHaveLength(59);
+});
 
 async function sourceText(block: Locator) {
   return block
@@ -22,7 +24,7 @@ async function sourceText(block: Locator) {
     .evaluateAll((lines) => lines.map((line) => (line.textContent === "\n" ? "" : line.textContent)).join("\n"));
 }
 
-// Adopted documents opt into the same checks; Button's deeper specialised tests stay separate.
+// Every registry component runs these checks; Button's deeper tests stay separate.
 for (const { id, body } of pages) {
   const plan = installationPlan(registry.items, id);
   const files = (

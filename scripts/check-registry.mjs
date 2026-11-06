@@ -20,7 +20,7 @@ import matter from "gray-matter";
 import { checkCatalogIntensity } from "./catalog-intensity.mjs";
 import { checkComponentRoutes } from "./component-routes.mjs";
 import { checkDocTemplates } from "./doc-template.mjs";
-import { expandInstallation } from "./installation.mjs";
+import { expandInstallation, validateInstallation } from "./installation.mjs";
 import { checkMotionDocs } from "./motion-docs.mjs";
 import {
   calledRecipes,
@@ -92,12 +92,16 @@ for (const item of registry.items) {
 
   if (isComponent(item)) {
     const raw = matter(await readFile(path.join(docsDir, `${item.name}.mdx`), "utf8"));
-    const expected = expandInstallation(raw.content.trim(), registry.items, item.name);
-    if (payload.docs !== expected) problems.push(`${item.name}: stale payload docs (run registry:build)`);
-    const markdown = `public/r/${item.name}.md`;
-    if (!(await readFile(path.join(root, markdown), "utf8")).includes(expected))
-      problems.push(`${markdown}: stale installation docs for ${item.name}`);
-    if (!fullDocs.includes(expected)) problems.push(`public/llms-full.txt: stale installation docs for ${item.name}`);
+    // Template diagnostics already include malformed installation boundaries. Keep
+    // collecting other failures instead of throwing while checking freshness.
+    if (!validateInstallation(raw.content, item.name).length) {
+      const expected = expandInstallation(raw.content.trim(), registry.items, item.name);
+      if (payload.docs !== expected) problems.push(`${item.name}: stale payload docs (run registry:build)`);
+      const markdown = `public/r/${item.name}.md`;
+      if (!(await readFile(path.join(root, markdown), "utf8")).includes(expected))
+        problems.push(`${markdown}: stale installation docs for ${item.name}`);
+      if (!fullDocs.includes(expected)) problems.push(`public/llms-full.txt: stale installation docs for ${item.name}`);
+    }
   }
 
   if (isComponent(item)) {
