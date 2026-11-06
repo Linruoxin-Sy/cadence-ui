@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8"))["scroll-area"];
 const selector = (name: string) => `[data-component-example="scroll-area/${name}"]`;
@@ -72,7 +73,7 @@ for (const os of ["no-preference", "reduce"] as const)
         expect(await viewport.evaluate((n) => n.scrollTop)).toBe(scrollPosition);
         await staticParts(changing);
       }
-      await page.getByText("Component source", { exact: true }).click();
+      await openComponentSource(page, "scroll-area");
       await expect(input).toHaveValue("Preserved activity draft");
       expect(await input.evaluate((n, h) => n === h, original)).toBe(true);
       await input.focus();
