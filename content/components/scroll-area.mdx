@@ -13,9 +13,72 @@ registryDeps: ["@cadence/cadence-utils"]
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/scroll-area
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/scroll-area.json)
+
+Copy both target files into the same `cadence/` tree so the relative import
+of `lib/cn` resolves. Preserve the component's `"use client"` directive.
+Complete the base theme setup linked above and ensure Tailwind scans the copied
+files. No motion runtime, provider or additional item-specific CSS is required.
+
+Usage, Vertical scrolling, Horizontal scrolling, Both axes and Without overflow
+use serializable props and children and can be composed in a Server Component.
+Caller rendering and sizing needs a client caller for its ref, handler and
+state callbacks. Changing content needs one for state and handlers. Right-to-left
+content also needs a client caller as written because its track uses function
+`className` and `style` props. Refs, events and other function-valued
+render/state props require a client caller. Custom render components must forward
+props, children and ref. The top preview needs no extra dependencies.
+
+Install [Button](/components/button) separately for Caller rendering and sizing
+and Changing content. Without the CLI, follow Button's Manual instructions to
+copy all its target files and install its complete recursive dependencies.
+These example-only files and dependencies are separate from Scroll Area's
+two-file installation graph. The CLI is an optional shortcut:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+The RTL example imports DirectionProvider from the already-installed
+`@base-ui/react/direction-provider`; it adds no npm dependency. Use both that
+provider and native `dir="rtl"` for matching content direction and thumb geometry.
+
+Constrain the root height for vertical overflow and the parent width for wide
+content; grid/flex parents may need `min-w-0`. Put content padding on a child,
+reserving room for the overlaid tracks. The root creates the viewport, default
+vertical track and corner; add `ScrollBar orientation="horizontal"` inside it
+for horizontal content. Additional tracks are rendered inside the viewport.
+There is no exported Content part or viewport prop/ref API. Root props, classes,
+styles and ref address the outer element; ScrollBar props address the track,
+whose thumb is internal. Query the viewport slot from the root ref when the
+application needs imperative scrolling.
+
+Supply accessible names, content semantics, stable keys and individually labelled
+controls. The overflowing viewport uses native Tab, arrows, Page Up/Down and
+Home/End; tracks and thumbs provide pointer control. `keepMounted` retains a
+track without creating overflow. `overflowEdgeThreshold` only delays edge state
+attributes. Neither option hides or removes content.
+
+SSR includes the actual content and bounded overflow viewport, so native scrolling
+remains available without JavaScript. Custom track measurement, pointer dragging
+and caller update buttons require hydration. Base UI refreshes geometry on native
+scrolling and viewport resize; content-only growth can leave the thumb stale until
+one of those occurs because this wrapper has no Content part. The caller owns
+entries, dimensions, scrolling to new data, pagination and virtualization.
+
+Scroll Area is static in full, reduced and none: native thumb positioning remains
+functional and no fade, smoothing or resize interpolation is added. Native wheel,
+touch momentum and keyboard scrolling follow the browser/platform policy.
+Application-added smooth scrolling or animation remains caller-owned; the optional
+Button composition retains Button's separate motion contract.
 
 ## Usage
 
