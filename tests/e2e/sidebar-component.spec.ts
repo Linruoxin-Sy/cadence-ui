@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const runtimeErrors = new WeakMap<Page, string[]>();
@@ -116,7 +117,7 @@ for (const os of [false, true])
           .getByRole("group", { name: "Motion mode" })
           .getByRole("button", { name: requested, exact: true })
           .click();
-      await page.getByText("Component source", { exact: true }).click();
+      await openComponentSource(page, "sidebar");
       expect(await draft.evaluate((n, h) => n === h, node)).toBe(true);
       await expect(draft).toHaveValue("Retain my project draft");
       const ids = await page.locator("[id]").evaluateAll((nodes) => nodes.map((n) => n.id));
