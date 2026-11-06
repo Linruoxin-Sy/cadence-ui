@@ -10,12 +10,121 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/toast
 ```
 
 For manual installation copy `toast/index.tsx`, install `@base-ui/react` and `lucide-react`, and install
 `button`, `cadence-utils`, and `cadence-provider`.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| toast | `@components/cadence/toast/index.tsx` | [JSON files[].content](https://cadence.dev/r/toast.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: toast](https://cadence.dev/r/toast.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all ten target files, including Button and every shared `lib/` file.
+Keep the mirrored `cadence/` tree, relative imports and `"use client"`
+directives intact. The provider files and `motion` are required imports;
+wrapping your application in `CadenceProvider` is optional. Complete the
+linked base theme setup, including Cadence's easing tokens, and ensure
+Tailwind scans the copied files. No additional Toast-specific CSS or assets
+are required. Usage, the top preview and all eight body examples use this
+same dependency graph, with no example-only package or file.
+
+Mount one `Toaster` for the shared `toast` manager in a stable application
+location, within any `CadenceProvider` that should control its motion.
+`Toaster` supplies the Base UI provider, portal, viewport and notification
+list, and can wrap your application children. `CadenceProvider` controls
+motion; it does not mount a toaster. For an isolated notification area,
+create a stable manager with `useState(createToastManager)` and pass that
+same manager to its one provider. Give independently mounted viewports
+distinct names through `viewportProps={{ "aria-label": "Export notifications" }}`.
+The custom composition instead mounts `ToastProvider`, `ToastPortal`,
+`ToastViewport` and a list that reads `useToastManager` under that provider.
+
+Keep Usage and all eight interactive body compositions in client modules.
+The shared `toast` export is a client-side manager; call `add`, `update` and
+`close` from application events. Custom manager objects, hook calls, refs,
+event handlers, `actionProps.onClick` and state callbacks belong in the same
+client boundary. A Server Component can render a client notification
+composition with serializable props or wrap children in `Toaster` using its
+default manager; do not create or pass a manager across the server boundary.
+The site's preview shell is not consumer setup. Notification interactions
+require hydrated JavaScript.
+
+The caller owns message data, request state, action effects and persistent
+results. Keep the id returned by `add` to update or close that notification;
+`close()` clears the manager's notifications. An action does not close its
+toast automatically: call `close(id)` when that is the intended result.
+Toaster's defaults remain Base UI's 5000ms timeout and limit of three;
+`timeout={0}` keeps a notification until dismissal. Hover and focus pause
+the primitive's timers. The Timers example explicitly uses a limit of two;
+older limited notifications remain mounted, hidden and inert.
+
+Full mode uses token-backed opacity and scale; reduced keeps opacity
+transitions only, and none removes transitions. Base UI's direct pointer
+tracking and swipe dismissal remain available in every mode. Stack positions
+and natural content height update immediately. Loading is a static glyph.
+`CadenceProvider`'s `timeScale` changes animation clocks, not notification
+timeouts, and the system reduced-motion preference still applies to a
+nested full provider. Base UI owns swipe recognition and dismissal; custom
+composition selects the physical swipe direction. F6 enters the active
+viewport, Tab reaches the notification and its controls, and Escape closes
+the focused notification. Keep important information in persistent UI and
+choose announcement priority for the message's urgency.
 
 ## Usage
 
