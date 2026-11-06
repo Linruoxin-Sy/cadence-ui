@@ -13,9 +13,48 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/tabs
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/tabs.json)
+
+Copy all nine target files, keeping `tabs/index.tsx` and the shared `lib/`
+directory in the same `cadence/` tree. Preserve relative imports and the
+sources' `"use client"` directives. Copy every file in the motion, utilities
+and provider payloads, including helpers not imported by Tabs directly.
+The provider files and `motion` package are required imports even without
+the optional `CadenceProvider` wrapper.
+
+Complete the base theme setup linked above and ensure Tailwind scans the
+copied files. No additional item-specific CSS or external asset is required.
+Standalone components follow the system motion preference; use
+`CadenceProvider` to choose a product mode or override an inherited scope.
+Each list scopes its own shared selection indicator. Full mode moves it
+using `layout.shared`; reduced, none and a zero clock place it immediately.
+Panels switch without a fade or height animation. The caller chooses list
+width, scrolling and orientation; preserve the indicator children and refs
+when supplying a custom trigger render.
+
+Controlled and List sizing need a client caller for their state and event
+handlers. Refs, event handlers and function-valued `render`, `className`
+or `style` props also require a client caller. Usage, Vertical, Line style,
+Custom elements and persistent panels, and Disabled use serializable props
+and children and can be composed in a Server Component. Element-valued
+`render` is supported there; synchronous `useId` inside TabsList does not
+itself require a client caller.
+
+Controlled and List sizing additionally use `@cadence/button`. Install it
+separately, or copy every target and recursive dependency from its Manual
+panel. The caller owns controlled selection and durable panel data. Supply
+matching trigger/content values and a list label; `null` selects no panel.
+`keepMounted` retains the draft textarea while its panel is hidden, but
+does not persist data after the Tabs tree unmounts. Default lists activate
+with Enter or Space; `activateOnFocus` opts into selection on arrow focus.
 
 ## Usage
 
