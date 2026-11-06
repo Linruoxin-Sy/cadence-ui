@@ -2,7 +2,9 @@ import { readFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
+import { expandInstallation } from "../../scripts/installation.mjs";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const names: string[] = JSON.parse(readFileSync("components/site/previews/examples.json", "utf8")).bubble;
@@ -279,7 +281,7 @@ test("Bubble real header and source keep caller values and nodes", async ({ page
     await expect(first).toContainText("Another local chunk.");
     await expect(reaction).toHaveAttribute("aria-pressed", "true");
   }
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "bubble");
   expect(await first.evaluate((el, saved) => el === saved, saved)).toBe(true);
 });
 
@@ -344,11 +346,15 @@ test("Bubble SSR, no-JS, distributed code and inert legacy URLs retain local sta
     await context.close();
   }
   const md = readFileSync("content/components/bubble.mdx", "utf8"),
-    body = md.slice(md.indexOf("## Installation")).trim();
+    body = expandInstallation(
+      md.slice(md.indexOf("## Installation")).trim(),
+      JSON.parse(readFileSync("registry.json", "utf8")).items,
+      "bubble",
+    );
   expect((await (await request.get("/r/bubble.json")).json()).docs).toBe(body);
   expect(await (await request.get("/r/bubble.md")).text()).toContain(body);
   expect(await (await request.get("/llms-full.txt")).text()).toContain(body);
-  expect((body.match(/```tsx/g) || []).length).toBe(9);
+  expect((md.slice(md.indexOf("## Usage")).match(/```tsx/g) || []).length).toBe(9);
   await page.goto("/components/bubble?motion=none&variant=outline&keep=yes#updating-text");
   await page.waitForLoadState("networkidle");
   const first = card(page, "updating-text").locator('[data-message-id="initial"]'),
