@@ -17947,12 +17947,132 @@ Install commands, source snippets, and tool output.
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/code-block
 ```
 
 The block installs `button` for the copy and fold controls, and `code-highlight` — the Shiki adapter — for syntax
 colouring. That second item is only downloaded when a block actually asks for a `language`.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority shiki lucide-react
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/code-highlight](https://cadence.dev/r/code-highlight.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| code-highlight | `@components/cadence/code-highlight/highlight.tsx` | [JSON files[].content](https://cadence.dev/r/code-highlight.json) |
+| code-highlight | `@components/cadence/code-highlight/use-highlighted-code.tsx` | [JSON files[].content](https://cadence.dev/r/code-highlight.json) |
+| code-block | `@components/cadence/code-block/index.tsx` | [JSON files[].content](https://cadence.dev/r/code-block.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: code-highlight](https://cadence.dev/r/code-highlight.json)
+
+[Source files: code-block](https://cadence.dev/r/code-block.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all twelve target files, including Button, both Code Highlight files and
+every shared `lib/` file. Keep the mirrored `cadence/` tree, relative imports
+and shipped `"use client"` directives intact. The provider files and `motion`
+are required imports; wrapping your application in `CadenceProvider` is optional.
+Complete the base theme setup linked above, including Cadence's easing tokens,
+and ensure Tailwind scans the copied files. These payloads contain no additional
+code-block-specific CSS or assets. Usage, the top specimen and every example
+use only the dependencies listed above, including `lucide-react` and Button;
+there are no example-only packages to install.
+
+The CLI installs Code Highlight's files and its `shiki` dependency along with
+Code Block. The on-demand download described under Command means the browser's
+dynamic highlighter and grammar imports, not an optional installation step.
+A string child with `language` loads that client highlighter after hydration;
+omitted or unknown languages remain plain text. `CodeBlockContent` can override
+the root language. For server highlighting, await `highlightCode` from
+`@/components/cadence/code-highlight/highlight` and render its returned lines
+through `CodeBlockLine` inside `CodeBlockContent`, retaining the original string
+for Copy. Handle its `null` result with plain source. The website's Usage fences
+and these Manual source blocks already receive server-highlighted nodes; that
+site pipeline is separate from a consumer passing `language`. Folding limits
+visible height, not the amount of text tokenized.
+
+In Next.js App Router, Controlled folding, Controlled tabs and Updating text
+need client caller modules because they own state and event callbacks. Usage
+and the other static compositions can be rendered by a Server Component with
+serializable props. Adding handlers, refs or function-valued props requires a
+client caller; synchronous `useId` alone does not. Keep each tab's `value`, its
+panel's `value` and the `values` copy map aligned. For a server-composed tabbed
+block, pass `defaultTab` explicitly as Content tabs does, or supply a controlled
+`tab` from a client caller. Do not rely on automatic first-tab discovery across
+the server/client boundary: omitting the initial selection leaves no selected
+tab and shows every panel, including after hydration. A client caller can use
+the automatic fallback. The site's preview shell and package-manager
+preference are not consumer setup. Hydration enables Copy, tabs, highlighting
+and folding; without JavaScript the complete source remains readable.
+
+The caller owns source text, selected content, stream/network state, errors and
+the exact copy string. Pass the full string to `CodeBlockCopyButton` as `value`,
+or use `values` for tab-specific text; diff markers and removed rows are excluded
+only when the caller excludes them from that string. Clipboard writes require
+a secure context and browser permission. A refused or unavailable clipboard
+announces failure; readers can select the source manually. Keep stable content
+nodes while appending text rather than keying the block by its source.
+
+`CodeBlock` defaults to the `default` variant and size. Folding is opt-in via
+`maxLines`; `defaultExpanded` defaults to false, and `expanded` with
+`onExpandedChange` makes it controlled. Place `CodeBlockExpandButton` in a
+footer; it appears only for overflowing content. This Manual uses the existing
+controlled 16-line fold per file, keeps the complete copy string, and retains
+fold state when switching installation methods. Ordinary Usage fences remain
+fully expanded. Content defaults to unwrapped, unnumbered source starting at
+line 1; use `lineNumbers`, `startLine`, or `wrap` deliberately. Constrain the
+parent width and use native source scrolling, or `wrap` with a bounded content
+height for output. Give tab lists a meaningful `label` and keep native focus,
+panel relationships and source scrolling intact.
 
 ## Usage
 
