@@ -13,11 +13,80 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/dropdown-menu
 ```
 
 The examples compose `@cadence/button`; install that item alongside the menu when copying them.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/dropdown-menu.json)
+
+Copy all nine target files, including every shared `lib/` file. Keep the mirrored
+`cadence/` tree, relative imports and `"use client"` directives intact. The provider
+files and `motion` are required imports; wrapping your application in
+`CadenceProvider` is optional. Complete the base theme setup linked above,
+including Cadence's easing tokens, and ensure Tailwind scans the copied files.
+These payloads contain no additional menu-specific CSS or assets.
+
+Usage, the top specimen and every body example also compose Button. Follow
+[Button's manual installation](https://cadence.dev/components/button#installation)
+and copy its full [payload source](https://cadence.dev/r/button.json), adding
+`@components/cadence/button/index.tsx` alongside the shared files already listed.
+Its only additional npm dependency is:
+
+```package-manager
+npm install class-variance-authority
+```
+
+Logical placement uses `DirectionProvider` from the already required
+`@base-ui/react`; pair its direction with the DOM `dir` attribute, as shown.
+
+In Next.js App Router, keep Usage, Items, shortcuts, and destructive actions,
+Checkbox and radio items, Submenus, Grouping and Controlled open in client
+modules: they own state and handlers. Disabled controls, Placement, Alignment,
+Logical placement, Non-modal menu and Explicit motion scopes are static
+compositions and can be rendered by a Server Component using serializable props,
+including the JSX element passed to `render`. Adding event handlers, refs or
+function-valued `render`, `className` or `style` props requires a client caller.
+Synchronous `useId` alone does not require one. The site's preview shell is not
+consumer setup; hydrated opening, navigation, selection and dismissal require
+JavaScript.
+
+Compose a root, trigger and content. Pass Button through the trigger's `render`
+prop so the primitive's accessible name, expanded state and events reach the
+actual button. Content already includes its portal, positioner and popup; do
+not add a second portal around it. Its defaults are bottom/start with a 4px
+side offset and zero alignment offset. Submenus use Sub, SubTrigger and
+SubContent; their defaults are right/start, zero side offset and -3px alignment
+offset. Base UI owns collision handling, item focus, typeahead, submenu
+navigation and dismissal. Cap caller-defined widths for narrow viewports and
+verify the actual open panel bounds. In Placement, the fixed `w-52` can overflow
+a narrow side placement; add `max-w-(--available-width)` and check the minimum
+width too.
+
+The caller owns commands and their effects, permissions, controlled `open`,
+checkbox `checked` and radio-group `value`, persistence and error feedback.
+Use `defaultOpen`, `defaultChecked` and `defaultValue` for uncontrolled initial
+state. For external opening, Controlled open pairs a unique root `triggerId`
+with the trigger's `id` to preserve the anchor. Put actions on `onClick`;
+ordinary items close by default, `closeOnClick={false}` keeps them open, and
+checkbox/radio items stay open by default. Disabled items expose their state
+and remain discoverable with arrow keys but cannot activate. Shortcut text
+does not register a key binding. Group labels name a DropdownMenuGroup;
+ungrouped labels are captions. This menu supplies no form-state or validation
+package, and the examples only update local status text.
+
+Full mode scales and fades the popup and animates the checkbox/radio mark.
+Reduced keeps opacity and removes scale; none disables those transitions from
+the first mounted frame. A nested provider can restore full inside none,
+subject to the system reduced-motion preference. Keep native menu focus and
+dismissal behavior when supplying custom render elements or handlers; use
+ordinary links or Navigation Menu for a navigation list and Popover for a task
+form.
 
 ## Usage
 
