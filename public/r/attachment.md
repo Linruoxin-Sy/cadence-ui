@@ -10,6 +10,8 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/attachment
 ```
@@ -19,6 +21,126 @@ The examples use lucide-react icons; run `pnpm add lucide-react` if needed. The 
 ```install
 npx shadcn@latest add @cadence/input
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| attachment | `@components/cadence/attachment/index.tsx` | [JSON files[].content](https://cadence.dev/r/attachment.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: attachment](https://cadence.dev/r/attachment.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 10 target files, including every shared motion and provider helper.
+Keep the sibling `cadence/` tree, relative imports and shipped `"use client"`
+directives. Complete the linked manual base setup with Cadence theme CSS,
+ensure Tailwind CSS v4 scans the copied files, and apply
+`bg-background text-foreground` to your application root. No additional
+item-specific stylesheet or upload runtime is required. The provider files
+are required imports; wrapping the application is optional. Standalone parts
+follow the system motion preference; a provider selects a local mode or
+recipe clock.
+
+The icons in Usage and the examples additionally require:
+
+```package-manager
+npm install lucide-react
+```
+
+For Caller-owned file selection, also copy Input's complete source below.
+Its direct registry dependency is `@cadence/cadence-utils`; reuse the
+`lib/cn.ts` file already copied above. Its full recursive npm dependencies
+are `@base-ui/react`, `clsx` and `tailwind-merge`, already included in the
+base command. No additional CSS is needed. The [Input Manual](/components/input#installation)
+also exposes its complete source block.
+
+| Additional item | Target file | Full source |
+| --- | --- | --- |
+| [@cadence/input](https://cadence.dev/r/input.json) | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+
+Button and CadenceProvider imports in the examples are covered by the base
+graph. Keep hooks, local state, event handlers, refs, render functions and
+Button callback classes/styles in a `"use client"` caller. Usage removes a
+card and restores focus through client state and a ref. File selection reads
+the browser's FileList and File metadata inside its change handler. Static
+metadata, serializable state/size/orientation props and a native anchor JSX
+element with `href`/`download` can be composed in a Server Component; they
+do not require caller hooks. The installed parts retain their client boundary.
+
+Attachment displays `state`; it stores no File or request state. The caller
+owns selection, upload requests, progress, processing, failure/retry, cancellation,
+removal and persistence. The file-selection example simulates milestones without
+requests and clears its native input on reset/removal. Supply download and
+preview URLs yourself, including permissions and lifetime. If creating object
+URLs, revoke superseded URLs and clean them up on unmount after their consumers
+finish using them; Attachment creates or revokes none. The inline data URLs in
+these examples have no object URL cleanup. Render application errors through
+`aria-invalid`, descriptive text and `aria-describedby`; announce milestones
+outside a busy region. The component supplies no validation or hidden form value.
+
+Keep the overlay trigger and actions as siblings. Name icon-only controls,
+preserve image alt text, and choose a focus destination when removing a focused
+card. The default trigger is a native `type="button"`; a rendered anchor owns
+its native link/download behavior. Custom render functions must spread the
+supplied props and retain the ref on a focusable element. Retain Button's
+native/disabled semantics when customizing actions. Keep parents shrinkable:
+filenames truncate, and AttachmentGroup scrolls horizontally with native
+snap points. The group does not own card orientation or list virtualization.
+
+Uploading and processing titles use the theme's `animate-pulse` opacity loop
+in full and reduced modes; none applies `animate-none` and leaves text opaque.
+The provider's `timeScale` controls recipes, not this continuous CSS clock;
+retune `--animate-pulse` in the theme when needed. Default actions use Button's
+`feedback.press` scale in full, with no scale in reduced/none. State, file,
+size, orientation, media and removal updates are immediate in every mode;
+Attachment adds no entry, exit or measured resize animation.
 
 ## Usage
 
