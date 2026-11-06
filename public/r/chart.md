@@ -10,9 +10,142 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/chart
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion recharts@3.10.1
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| chart | `@components/cadence/chart/index.tsx` | [JSON files[].content](https://cadence.dev/r/chart.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: chart](https://cadence.dev/r/chart.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all nine target files, including every shared helper, into the same
+`cadence/` tree. Preserve relative imports and the shipped `"use client"`
+directives. Complete the base theme setup linked above and ensure Tailwind
+scans these files. No additional Chart-specific CSS is required. Configured
+colours such as `--primary` and `--chart-1` must exist in your theme;
+ChartStyle scopes the resulting `--color-<key>` variables to each chart.
+
+Put `"use client"` at the top of the caller file for Usage and every chart
+example, including static bar, line, area and pie compositions. Recharts
+3.10.1 cannot be imported directly in a React Server Component: its context
+initialization requires the client boundary. A Server Component may fetch data
+and pass serializable rows/configuration into that client wrapper. Define
+config icon component references, tooltip/legend formatters, event handlers,
+refs and live-data state inside the client boundary. Preserve the wrapper when
+copying the examples below, even where their snippets omit the directive.
+
+Import chart types, series and axes from the already-installed `recharts`;
+ChartContainer supplies configuration, responsive sizing and the motion clock,
+not a data prop. Keep data keys aligned with config keys and series
+`dataKey`/`nameKey`; use `var(--color-<key>)` on series. Provide either
+`color` or a complete light/dark `theme` map per config entry. Tooltip and
+legend content need ChartContainer context. `hideIcon` replaces a config
+icon with the colour marker; it does not remove that marker. `type="none"`
+payload entries are omitted. Tooltip formatters replace the whole value row,
+so include its label and value; `labelFormatter` formats the heading.
+
+Legends and theme colours uses four caller-supplied theme variables. The base
+theme above does not define them. For example, add these semantic mappings
+to your global stylesheet; choose your own accessible palette as needed:
+
+```css
+:root {
+  --chart-1: var(--foreground);
+  --chart-2: var(--foreground);
+  --chart-3: var(--muted-foreground);
+  --chart-4: var(--muted-foreground);
+}
+```
+
+These mappings follow the base foreground tokens when the theme changes.
+This example also needs the example-only icons:
+
+```package-manager
+npm install lucide-react
+```
+
+Live data and motion ownership additionally uses [Button](/components/button).
+Without the CLI, follow Button's Manual instructions to copy all its target
+files and install its complete recursive dependencies. These example-only
+dependencies are separate from Chart's nine-file graph. The optional CLI
+shortcut is:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+The top preview uses only Chart and Recharts. Give the container a nonzero
+height/min-height and available width; flex/grid parents may need `min-w-0`.
+ResponsiveContainer uses ResizeObserver after hydration; `initialDimension`
+defaults to 320 × 200 and is only the initial fallback, not the final layout.
+Supply an accessible name, enable Recharts `accessibilityLayer`, and retain
+a caption/text summary or data table for exact values. The caller owns data,
+loading, filtering, formatting, stable identity and responsive tick density.
+Server rendering reserves the chart container; SVG charts appear after
+hydration. Responsive measurement, keyboard/pointer tooltips and update actions
+require JavaScript. Keep the adjacent text/table usable without it.
+
+The provider files are required imports; wrapping is optional. Standalone
+charts respect the system preference. Full animates SVG data geometry through
+`data.transition`; reduced and none settle it immediately with no chart fade.
+Static SVG coordinate transforms remain. Provider `timeScale` controls the
+clock; series `animationDuration`, `animationBegin` and `animationEasing`
+cannot bypass it, while `isAnimationActive={false}` opts a series out.
+ChartTooltip placement is immediate in every mode. Cadence traverses the
+provided chart elements for its installed Recharts series; custom component
+boundaries, shapes, nested animation controllers and independent CSS/WAAPI
+must implement the same motion policy themselves. Mode changes should keep
+the chart, axes, legend and caller state mounted.
 
 ## Usage
 

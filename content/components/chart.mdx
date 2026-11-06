@@ -13,9 +13,94 @@ registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/ca
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/chart
 ```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/chart.json)
+
+Copy all nine target files, including every shared helper, into the same
+`cadence/` tree. Preserve relative imports and the shipped `"use client"`
+directives. Complete the base theme setup linked above and ensure Tailwind
+scans these files. No additional Chart-specific CSS is required. Configured
+colours such as `--primary` and `--chart-1` must exist in your theme;
+ChartStyle scopes the resulting `--color-<key>` variables to each chart.
+
+Put `"use client"` at the top of the caller file for Usage and every chart
+example, including static bar, line, area and pie compositions. Recharts
+3.10.1 cannot be imported directly in a React Server Component: its context
+initialization requires the client boundary. A Server Component may fetch data
+and pass serializable rows/configuration into that client wrapper. Define
+config icon component references, tooltip/legend formatters, event handlers,
+refs and live-data state inside the client boundary. Preserve the wrapper when
+copying the examples below, even where their snippets omit the directive.
+
+Import chart types, series and axes from the already-installed `recharts`;
+ChartContainer supplies configuration, responsive sizing and the motion clock,
+not a data prop. Keep data keys aligned with config keys and series
+`dataKey`/`nameKey`; use `var(--color-<key>)` on series. Provide either
+`color` or a complete light/dark `theme` map per config entry. Tooltip and
+legend content need ChartContainer context. `hideIcon` replaces a config
+icon with the colour marker; it does not remove that marker. `type="none"`
+payload entries are omitted. Tooltip formatters replace the whole value row,
+so include its label and value; `labelFormatter` formats the heading.
+
+Legends and theme colours uses four caller-supplied theme variables. The base
+theme above does not define them. For example, add these semantic mappings
+to your global stylesheet; choose your own accessible palette as needed:
+
+```css
+:root {
+  --chart-1: var(--foreground);
+  --chart-2: var(--foreground);
+  --chart-3: var(--muted-foreground);
+  --chart-4: var(--muted-foreground);
+}
+```
+
+These mappings follow the base foreground tokens when the theme changes.
+This example also needs the example-only icons:
+
+```package-manager
+npm install lucide-react
+```
+
+Live data and motion ownership additionally uses [Button](/components/button).
+Without the CLI, follow Button's Manual instructions to copy all its target
+files and install its complete recursive dependencies. These example-only
+dependencies are separate from Chart's nine-file graph. The optional CLI
+shortcut is:
+
+```install
+npx shadcn@latest add @cadence/button
+```
+
+The top preview uses only Chart and Recharts. Give the container a nonzero
+height/min-height and available width; flex/grid parents may need `min-w-0`.
+ResponsiveContainer uses ResizeObserver after hydration; `initialDimension`
+defaults to 320 × 200 and is only the initial fallback, not the final layout.
+Supply an accessible name, enable Recharts `accessibilityLayer`, and retain
+a caption/text summary or data table for exact values. The caller owns data,
+loading, filtering, formatting, stable identity and responsive tick density.
+Server rendering reserves the chart container; SVG charts appear after
+hydration. Responsive measurement, keyboard/pointer tooltips and update actions
+require JavaScript. Keep the adjacent text/table usable without it.
+
+The provider files are required imports; wrapping is optional. Standalone
+charts respect the system preference. Full animates SVG data geometry through
+`data.transition`; reduced and none settle it immediately with no chart fade.
+Static SVG coordinate transforms remain. Provider `timeScale` controls the
+clock; series `animationDuration`, `animationBegin` and `animationEasing`
+cannot bypass it, while `isAnimationActive={false}` opts a series out.
+ChartTooltip placement is immediate in every mode. Cadence traverses the
+provided chart elements for its installed Recharts series; custom component
+boundaries, shapes, nested animation controllers and independent CSS/WAAPI
+must implement the same motion policy themselves. Mode changes should keep
+the chart, axes, legend and caller state mounted.
 
 ## Usage
 
