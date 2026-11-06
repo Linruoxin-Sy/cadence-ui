@@ -47,7 +47,7 @@ for (const { id, body } of pages) {
         await expect(page.locator("[data-legacy-source]")).toHaveCount(0);
 
         // Check every authored Command fence, including extra install/example commands.
-        const commandBody = body.split("**Command**")[1]?.split("**Manual**")[0] ?? "";
+        const commandBody = body.replaceAll("\r\n", "\n").split("**Command**")[1]?.split("**Manual**")[0] ?? "";
         const fences = [...commandBody.matchAll(/```[^\n]*\n([\s\S]*?)\n```/g)];
         const commandPanel = installation.getByRole("tabpanel", { name: "Command", exact: true });
         const managers = commandPanel.getByRole("tablist", { name: "Package manager" });
