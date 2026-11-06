@@ -10,12 +10,136 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/command
 ```
 
 For manual installation copy `command/index.tsx`, install `cmdk` and `lucide-react`, and install the
 `dialog`, `input-group`, `cadence-utils`, and `cadence-provider` registry dependencies.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react cmdk
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — transitive registry dependency.
+- [@cadence/dialog](https://cadence.dev/r/dialog.json) — direct registry dependency.
+- [@cadence/input](https://cadence.dev/r/input.json) — transitive registry dependency.
+- [@cadence/textarea](https://cadence.dev/r/textarea.json) — transitive registry dependency.
+- [@cadence/input-group](https://cadence.dev/r/input-group.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| dialog | `@components/cadence/dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/dialog.json) |
+| input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| textarea | `@components/cadence/textarea/index.tsx` | [JSON files[].content](https://cadence.dev/r/textarea.json) |
+| input-group | `@components/cadence/input-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/input-group.json) |
+| command | `@components/cadence/command/index.tsx` | [JSON files[].content](https://cadence.dev/r/command.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: dialog](https://cadence.dev/r/dialog.json)
+
+[Source files: input](https://cadence.dev/r/input.json)
+
+[Source files: textarea](https://cadence.dev/r/textarea.json)
+
+[Source files: input-group](https://cadence.dev/r/input-group.json)
+
+[Source files: command](https://cadence.dev/r/command.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all fourteen target files, including every shared `lib/` file and the
+Button, Dialog, Input, Textarea and Input Group sources. Input Group imports
+all three controls even when Command only renders its input. Keep the mirrored
+`cadence/` tree, relative imports and `"use client"` directives intact. The
+provider files and `motion` are required imports; wrapping your application in
+`CadenceProvider` is optional.
+
+Complete the linked base theme setup, including Cadence's easing tokens, and
+ensure Tailwind scans the copied files. These payloads contain no additional
+Command-specific CSS or assets. Inline commands do not animate. CommandDialog
+inherits Dialog's scale and fade in full mode, opacity only in reduced, and
+zero-duration transitions in none. Filtering, highlighting and list height
+changes remain immediate. The system reduced-motion preference also applies
+without a provider and to an explicitly nested full provider.
+
+Usage, the top palette and all eleven body examples use this dependency graph.
+Button is already included through Dialog and Input Group; `cmdk` also supplies
+the examples' `useCommandState`. No example-only package or file is needed.
+
+Keep Usage and the stateful palette, keyword, shortcut, controlled, caller-owned
+result and Without motion compositions in client modules. A custom filter is
+a function prop; SearchableList also subscribes to the actual Command store
+with `useCommandState`, so A custom filter and Composing the search input need
+a client caller too. Refs, event handlers and other function props require
+the same boundary. Static compositions such as Keyboard and pointer navigation,
+An unavailable input and Persistent help while filtering can be rendered from a Server Component
+with serializable props; the examples' client directives remain valid. A
+Server Component can also render a client composition with serializable data.
+The site's preview shell is not consumer setup. Search, selection and dialog
+interaction require hydrated JavaScript.
+
+Compose `CommandInput` and `CommandList` inside `Command`, with items inside
+groups. `CommandDialog` supplies the dialog surface, title and description;
+it does not create a Command root or an opener. The caller owns open state,
+action execution, routing, requests and any global shortcut listener.
+`CommandShortcut` is only a visual hint. Root `value` controls the highlight;
+input `value` controls the query; item `onSelect` runs the action. Supply stable
+item values and optional keywords for cmdk's local filter, or set
+`shouldFilter={false}` and manage results in the caller.
+
+Give Command an accessible `label`. Reuse Usage's SearchableList inside that
+root when hiding a zero-result list and announcing empty feedback outside it;
+its input keeps `aria-controls` pointing to the mounted list and reports
+`aria-expanded={false}` while empty. CommandInput retains cmdk's `asChild`
+input composition, while the Base UI dialog uses `render`. Disabled items
+cannot run and are skipped by arrow navigation. The list scrolls within its
+300px maximum height; the parent owns inline width. The inline examples use
+an unmatched initial value to avoid cmdk scrolling its default highlighted
+item into view on mount; dialog palettes retain the default first highlight.
 
 ## Usage
 
