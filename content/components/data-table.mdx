@@ -13,6 +13,8 @@ registryDeps: ["@cadence/button", "@cadence/checkbox", "@cadence/dropdown-menu",
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/data-table
 ```
@@ -22,6 +24,61 @@ Checkbox and Dropdown Menu items. Manual installation: copy
 `registry/cadence/data-table/index.tsx` to `components/cadence/data-table/index.tsx`,
 install those registry dependencies, then install `@tanstack/react-table@9.3.1`.
 Keep the relative imports and sibling install tree.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/data-table.json)
+
+Copy all 14 target files, including every `cadence-motion` and
+`cadence-provider` helper. Keep the relative imports, sibling `cadence/`
+directories and shipped `"use client"` directives. Complete the linked manual
+base setup with Cadence theme CSS and ensure Tailwind CSS v4 scans the copied
+files. No additional Data Table stylesheet is required. Apply
+`bg-background text-foreground` to your application root. `CadenceProvider` is
+optional: without it, the controls follow the system motion preference; use it
+to choose a local mode or clock. All imports in Usage and the examples, including
+Button and the provider, are already covered by this installation graph.
+
+Keep the exact `@tanstack/react-table@9.3.1` dependency. This file uses v9's
+`useTable`, explicit feature and row-model registration, and `table.FlexRender`;
+v8's `useReactTable` setup is not interchangeable. `DataTableDemo` is the payments
+composition shown below. Its exported `Payment` type and `columns` describe
+that composition; to change columns or record shape, edit the copied file
+rather than passing a generic `columns` prop.
+
+The minimal [Usage](#usage) can remain a Server Component. Pass serializable
+`Payment[]` data and initial read-only state from the server; the installed
+client component creates its own column header/cell functions and event handlers.
+Keep state hooks, change callbacks, native event handlers and refs in a
+`"use client"` caller, as the controlled examples do. Customize the exported
+`columns` and their header/cell functions in the copied client module.
+
+Supply unique stable `id` values, numeric USD amounts, emails and one of the four
+documented statuses. Omitted `data` shows five sample payments; `data={[]}` shows
+the empty state. The top site specimen supplies 23 records separately. Sorting,
+filtering, visibility, selection and pagination each have independent state:
+omit both props for internal state, or pair the state prop with its
+`on…Change` callback and apply TanStack's value-or-updater requests. A state prop
+alone is read-only; a callback alone replaces the internal setter.
+
+Selection is keyed by payment ID. Select all affects the current page; the live
+count includes selected rows matching the current filter. Keep selection cleanup
+for removed records in your caller. The composition processes the supplied
+collection on the client; fetching, persistence, server pagination,
+virtualization and cell editing require application code or adaptation of the
+copied composition. Copy payment ID uses the browser clipboard and its original
+ID; the host owns clipboard permissions and errors. Email customer uses `mailto:`.
+
+Keep the named native table and its horizontal scroll container inside a
+shrinkable parent (`min-w-0`). Columns remain available at narrow widths; the
+toolbar lets the filter input shrink beside Columns, and the footer can wrap.
+The caller-owned minimum height in Usage reserves room
+for ten rows, so filtering does not move the footer; retune or omit it for your
+page size and typography. This is layout space, not a height animation. Table
+data, row order and geometry update immediately in every mode. The installed
+Button, Checkbox and Dropdown Menu retain their own press, indicator and popup
+recipes: full uses their authored motion, reduced drops scale and retains fades,
+and none settles immediately.
 
 ## Usage
 

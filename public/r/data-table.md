@@ -10,6 +10,8 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/data-table
 ```
@@ -19,6 +21,129 @@ Checkbox and Dropdown Menu items. Manual installation: copy
 `registry/cadence/data-table/index.tsx` to `components/cadence/data-table/index.tsx`,
 install those registry dependencies, then install `@tanstack/react-table@9.3.1`.
 Keep the relative imports and sibling install tree.
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority lucide-react @tanstack/react-table@9.3.1
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/checkbox](https://cadence.dev/r/checkbox.json) — direct registry dependency.
+- [@cadence/dropdown-menu](https://cadence.dev/r/dropdown-menu.json) — direct registry dependency.
+- [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
+- [@cadence/table](https://cadence.dev/r/table.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| checkbox | `@components/cadence/checkbox/index.tsx` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
+| dropdown-menu | `@components/cadence/dropdown-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/dropdown-menu.json) |
+| input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
+| table | `@components/cadence/table/index.tsx` | [JSON files[].content](https://cadence.dev/r/table.json) |
+| data-table | `@components/cadence/data-table/index.tsx` | [JSON files[].content](https://cadence.dev/r/data-table.json) |
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: checkbox](https://cadence.dev/r/checkbox.json)
+
+[Source files: dropdown-menu](https://cadence.dev/r/dropdown-menu.json)
+
+[Source files: input](https://cadence.dev/r/input.json)
+
+[Source files: table](https://cadence.dev/r/table.json)
+
+[Source files: data-table](https://cadence.dev/r/data-table.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 14 target files, including every `cadence-motion` and
+`cadence-provider` helper. Keep the relative imports, sibling `cadence/`
+directories and shipped `"use client"` directives. Complete the linked manual
+base setup with Cadence theme CSS and ensure Tailwind CSS v4 scans the copied
+files. No additional Data Table stylesheet is required. Apply
+`bg-background text-foreground` to your application root. `CadenceProvider` is
+optional: without it, the controls follow the system motion preference; use it
+to choose a local mode or clock. All imports in Usage and the examples, including
+Button and the provider, are already covered by this installation graph.
+
+Keep the exact `@tanstack/react-table@9.3.1` dependency. This file uses v9's
+`useTable`, explicit feature and row-model registration, and `table.FlexRender`;
+v8's `useReactTable` setup is not interchangeable. `DataTableDemo` is the payments
+composition shown below. Its exported `Payment` type and `columns` describe
+that composition; to change columns or record shape, edit the copied file
+rather than passing a generic `columns` prop.
+
+The minimal [Usage](#usage) can remain a Server Component. Pass serializable
+`Payment[]` data and initial read-only state from the server; the installed
+client component creates its own column header/cell functions and event handlers.
+Keep state hooks, change callbacks, native event handlers and refs in a
+`"use client"` caller, as the controlled examples do. Customize the exported
+`columns` and their header/cell functions in the copied client module.
+
+Supply unique stable `id` values, numeric USD amounts, emails and one of the four
+documented statuses. Omitted `data` shows five sample payments; `data={[]}` shows
+the empty state. The top site specimen supplies 23 records separately. Sorting,
+filtering, visibility, selection and pagination each have independent state:
+omit both props for internal state, or pair the state prop with its
+`on…Change` callback and apply TanStack's value-or-updater requests. A state prop
+alone is read-only; a callback alone replaces the internal setter.
+
+Selection is keyed by payment ID. Select all affects the current page; the live
+count includes selected rows matching the current filter. Keep selection cleanup
+for removed records in your caller. The composition processes the supplied
+collection on the client; fetching, persistence, server pagination,
+virtualization and cell editing require application code or adaptation of the
+copied composition. Copy payment ID uses the browser clipboard and its original
+ID; the host owns clipboard permissions and errors. Email customer uses `mailto:`.
+
+Keep the named native table and its horizontal scroll container inside a
+shrinkable parent (`min-w-0`). Columns remain available at narrow widths; the
+toolbar lets the filter input shrink beside Columns, and the footer can wrap.
+The caller-owned minimum height in Usage reserves room
+for ten rows, so filtering does not move the footer; retune or omit it for your
+page size and typography. This is layout space, not a height animation. Table
+data, row order and geometry update immediately in every mode. The installed
+Button, Checkbox and Dropdown Menu retain their own press, indicator and popup
+recipes: full uses their authored motion, reduced drops scale and retains fades,
+and none settles immediately.
 
 ## Usage
 
