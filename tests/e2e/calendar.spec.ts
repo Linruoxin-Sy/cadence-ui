@@ -2,6 +2,7 @@ import { mkdir, readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 
 const names: string[] = JSON.parse(await readFile("components/site/previews/examples.json", "utf8")).calendar;
 const card = (page: Page, name: string) => page.locator(`[data-component-example="calendar/${name}"]`);
@@ -145,7 +146,7 @@ test("Calendar keyboard paths, controlled updates, drafts and independent select
     await expect(grid).toHaveAttribute("data-motion", mode);
     await expect(note).toHaveValue("A real appointment draft");
   }
-  await page.getByText("Component source", { exact: true }).click();
+  await openComponentSource(page, "calendar");
   expect(await note.evaluate((el, saved) => el === saved, node)).toBe(true);
   expect(await grid.evaluate((el, saved) => el === saved, table)).toBe(true);
   await expect(page.locator('[data-preview="calendar"]').locator('[data-selected-single="true"]')).toHaveCount(1);
