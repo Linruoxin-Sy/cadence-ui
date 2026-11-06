@@ -10,9 +10,135 @@
 
 ## Installation
 
+**Command**
+
 ```install
 npx shadcn@latest add @cadence/toc
 ```
+
+**Manual**
+
+Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tokens. Follow the [manual setup guide](https://cadence.dev/docs/installation#manual-installation) for the base CSS and aliases; copying files does not require the shadcn CLI.
+
+1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
+
+```package-manager
+npm install clsx tailwind-merge motion
+```
+
+2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
+
+- [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+
+3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
+
+| Item | Target file | Full source |
+| --- | --- | --- |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| toc | `@components/cadence/toc/index.tsx` | [JSON files[].content](https://cadence.dev/r/toc.json) |
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: toc](https://cadence.dev/r/toc.json)
+
+4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
+
+No additional item-specific CSS configuration is required beyond the base theme.
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Copy all 9 target files, including every shared motion and provider helper.
+Keep the sibling `cadence/` tree, relative imports and shipped `"use client"`
+directives. Complete the linked manual base setup with Cadence theme CSS,
+ensure Tailwind CSS v4 scans the copied files, and apply
+`bg-background text-foreground` to your application root. No additional
+item-specific stylesheet is required. The provider files are required imports;
+wrapping the application is optional. Standalone Toc respects the system
+motion preference; a provider selects a local mode or recipe clock.
+
+The Controlled active section example additionally uses Button. For a fully
+manual installation, install its complete recursive npm dependencies:
+
+```package-manager
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
+```
+
+The Toc command above already covers `clsx`, `tailwind-merge` and `motion`;
+Button adds `@base-ui/react` and `class-variance-authority`. Copy Button's
+complete `files[].content` from the JSON below to its target. Its direct
+registry dependencies are `@cadence/cadence-motion`, `@cadence/cadence-utils`
+and `@cadence/cadence-provider`; reuse all their files from the base graph.
+No additional CSS is needed. The [Button Manual](/components/button#installation)
+also exposes its complete source blocks; no CLI command is required.
+
+| Additional item | Target file | Full source |
+| --- | --- | --- |
+| [@cadence/button](https://cadence.dev/r/button.json) | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+
+Usage can remain a Server Component: its entries and native nav props are
+serializable. Keep state, effects, event handlers, refs and function props in a `"use client"`
+caller; the controlled and bounded-scroll examples own their state and handlers.
+Preserve the shipped component's own client boundary.
+
+Build `items` from the same heading data as the article. Supply existing,
+unique ids without a leading `#`, readable titles and document order;
+`depth` is `2` by default or `3` for one indented level. Toc does not parse
+Markdown, generate headings or own routing. Empty items render nothing.
+An omitted `activeId` enables window tracking, initially marking the first
+entry until layout is measured. Missing headings are skipped by tracking;
+keep every target present rather than relying on the first-entry fallback.
+
+Supplying `activeId` disables automatic tracking. An empty or unknown id
+leaves no current entry; activating a link does not update caller state.
+Use your router/observer or a delegated nav `onClick` as in the controlled
+example; there is no `onActiveIdChange` prop. The caller also tracks a
+bounded scroll container and supplies its current id. Remount after replacing
+heading elements dynamically, or pass new items so targets are collected again.
+
+`scrollOffset` only sets the automatic window-tracking threshold (default
+`96`); it does not set the navigation destination. Set headings'
+`scroll-margin-top` and the scrolling host's `scroll-padding-top` for fixed
+headers. The caller owns sticky placement, container height/overflow and
+responsive disclosure or column layout. Keep parents shrinkable for wrapped
+labels and do not add a second CSS/native smooth-scroll clock.
+
+Native anchors work before hydration and without JavaScript. After hydration,
+an unmodified primary activation navigates the nearest overflowing scroll
+host, preserving URL parameters/history state and notifying hash listeners.
+Completion focuses the heading without a second scroll; temporary tabindex
+is restored on blur/unmount. Modified clicks, missing targets and
+caller-cancelled events retain native behavior. A nav `onClick` runs first;
+call `preventDefault()` only when the caller intends to suppress navigation.
+
+Full mode uses `layout.shared` for one persistent reading indicator and
+`scroll.navigate` for explicit link navigation. Initial measured placement
+is immediate. Reduced/none place the indicator and navigate
+immediately; a live downgrade completes an active trip, while user input,
+resize, history, external hashes or unmount cancel it. Positive clock changes
+retime from the current position. Static placement geometry is not a resize
+animation. Optional Button actions retain Button's separate `feedback.press`
+contract.
 
 ## Usage
 
