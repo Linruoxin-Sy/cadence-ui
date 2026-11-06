@@ -1094,10 +1094,10 @@ an undo affordance should not also hand out half of one.
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored` | yes: a CSS transition, so reopening reverses it |
-| close | popup `opacity` 1→0 | `exit.fade` | yes |
+| close | popup `opacity` 1→0, `scale` 1→`--motion-scale-in` | `exit.fade` | yes |
 | select | tick `scale` `0.96`→1, `opacity` 0→1 | `state.morph` | yes: a spring, retargeted from the current value |
 | filter | none — rows are replaced, not moved | – | – |
-| reduced | popup fades without scaling, tick appears at full size | – | – |
+| reduced | popup and tick fade without scaling; tick stays at full size | – | – |
 | none | every duration is zero | – | – |
 
 The scale grows out of `--transform-origin`, which Base UI writes from the positioner, so the panel opens
@@ -1145,7 +1145,9 @@ errors; this component does not validate or install a form-state library.
 ## Responsive behavior
 
 The single-value popup anchors to the native input, not the input-group frame, and has a minimum width
-`--spacing(7)` larger than that input, clamped to available viewport width. It flips above the field near the viewport edge, and the list — not the
+`--spacing(7)` larger than that input. Its maximum width follows available space, but the minimum can
+override it in narrow inline-side placements and let the popup extend outside the viewport. Prefer
+top/bottom placement there, or explicitly reduce the content's minimum width and check the result. It flips above the field near the viewport edge, and the list — not the
 popup — scrolls inside `--available-height`. In the chips layout the frame wraps to a second line instead
 of scrolling horizontally, and the popup widens to the chips container.
 
