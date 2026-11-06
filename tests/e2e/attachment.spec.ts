@@ -2,7 +2,9 @@ import { readFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
+import { expandInstallation } from "../../scripts/installation.mjs";
 import { effectiveMode, MODES, pressScale } from "./helpers";
+import { openComponentSource } from "./installation-helpers";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
 const names: string[] = JSON.parse(readFileSync("components/site/previews/examples.json", "utf8")).attachment;
@@ -232,7 +234,7 @@ for (const os of [false, true])
     expect(await title.evaluate((el) => el.getAnimations().length)).toBe(0);
     await c.getByRole("button", { name: "Start local simulation", exact: true }).click();
     expect(await title.evaluate((el) => el.getAnimations().length)).toBe(1);
-    await page.getByText("Component source", { exact: true }).click();
+    await openComponentSource(page, "attachment");
     expect(await title.evaluate((el, saved) => el === saved, saved)).toBe(true);
     await expect(title).toHaveText("retained.txt");
   });
@@ -341,12 +343,16 @@ test("Attachment SSR, no-JS, distributed runnable code and inert legacy variant 
   for (const name of names) await expect(card(p, name)).toBeVisible();
   await ctx.close();
   const md = readFileSync("content/components/attachment.mdx", "utf8"),
-    body = md.slice(md.indexOf("## Installation")).trim();
+    body = expandInstallation(
+      md.slice(md.indexOf("## Installation")).trim(),
+      JSON.parse(readFileSync("registry.json", "utf8")).items,
+      "attachment",
+    );
   const payload = await (await request.get("/r/attachment.json")).json();
   expect(payload.docs).toBe(body);
   const distributed = await (await request.get("/r/attachment.md")).text();
   expect(distributed).toContain(body);
-  expect((distributed.match(/```tsx/g) || []).length).toBe(9);
+  expect((distributed.slice(distributed.indexOf("## Usage")).match(/```tsx/g) || []).length).toBe(9);
   expect(await (await request.get("/llms-full.txt")).text()).toContain(body);
   await page.goto("/components/attachment?motion=none&speed=0.25&variant=xs&keep=yes#caller-owned-file-selection");
   await page.waitForLoadState("networkidle");
