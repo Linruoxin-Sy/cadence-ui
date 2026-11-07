@@ -16,16 +16,11 @@ Item treats a row's media, copy and actions as one identity, while allowing late
     "group": ["item#ItemGroup"],
     "part": ["item#ItemActions", "item#ItemMedia", "item#ItemHeader", "item#ItemFooter"],
     "media": ["item#ItemMedia"],
-    "text": [
-      "item#Item",
-      "item#ItemTitle",
-      "item#ItemDescription",
-      "item#ItemContent",
-      "item#ItemHeader",
-      "item#ItemFooter"
-    ],
+    "text": ["item#ItemTitle", "item#ItemDescription", "item#ItemContent", "item#ItemHeader", "item#ItemFooter"],
     "value": ["item#ItemTitle", "item#ItemDescription", "item#ItemContent", "item#ItemHeader", "item#ItemFooter"],
-    "surface": ["item#Item", "item#ItemMedia"]
+    "surface": ["item#Item", "item#ItemMedia"],
+    "foreground": ["item#Item", "item#ItemTitle", "item#ItemDescription"],
+    "separator": ["item#ItemSeparator", "separator#Separator"]
   }
 }
 ```
@@ -34,10 +29,10 @@ Item treats a row's media, copy and actions as one identity, while allowing late
 
 | Capability      | Coverage and owner                                                                                                                                 | References                                                                        |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Appearance      | default: item for insertion and separately changed media/actions; ItemGroup coordinates group insertion; inherited for a larger parent entrance.   | default: `item.root.enter`, `item.root.exit`, `item.part.enter`, `item.part.exit` |
+| Appearance      | default: item for insertion and separately changed media/actions; ItemGroup coordinates group insertion; inherited for a larger parent entrance.   | default: `item.root.enter`, `item.root.exit`, `item.group.enter`, `item.part.enter`, `item.part.exit`; inherited: `@separator` |
 | Size            | default: item owns content/header/footer-driven block size; item-group owns retained item positions; externally constrained axes remain inherited. | default: `item.root.resize`                                                       |
-| Surface colour  | default: item variant/background/border and ItemMedia surface; interaction colours apply only to actual interactive render targets.                | default: `item.surface.colour`                                                    |
-| Text colour     | default: title, description and inherited row foreground; composed independent actions own their states.                                           | default: `item.text.colour`                                                       |
+| Surface colour  | default: item variant/background/border and ItemMedia surface; interaction colours apply only to actual interactive render targets. ItemSeparator delegates its rule colour to Separator.                | default: `item.surface.colour`; inherited: `item.separator.colour`                                                    |
+| Text colour     | default: title, description and inherited row foreground; composed independent actions own their states.                                           | default: `item.foreground.colour`                                                       |
 | Changed text    | default: plain ItemTitle and ItemDescription, plus directly owned plain content/header/footer text; composed rich content.                         | default: `item.text.replace`; composed: `@text`                                   |
 | Changed numbers | default: direct quantity values in known display parts; numeric identifiers remain text; composed rich metrics/actions keep their own owner.       | default: `item.value.roll`; composed: `@value`                                    |
 
@@ -51,7 +46,11 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | Header/footer/content or explicit size change / item                               | Resolve final spacing/typography and interpolate measured block size; independently inserted media/actions fade within it. | Size immediate, short opacity.                    | Immediate.                 | `item.root.resize` → `geometry.content` → `geometry.resize/measured`; `item.part.enter` → `presence.inline` → `data.transition/opacity`                                                    |
 | Existing media/action region removed or explicitly replaced / retained local owner | Fade only the changed noninteractive visual while current actions and semantic content commit immediately.                 | Short opacity.                                    | Final content immediately. | `item.part.exit` → `presence.exit` → `exit.fade/opacity`; `item.media.replace` → `data.update` → `data.transition/opacity`                                                                 |
 | Display text/quantity revision / known display part                                | Changed-only text, stagger:none, or quantity reels.                                                                        | Short changed-text opacity; quantities immediate. | Immediate.                 | `item.text.replace` → `text.replace` → `text.change/changed-runs`; `item.value.roll` → `number.compact` → `number.roll/reels`                                                              |
-| Variant or actual interactive state / row/media/text owners                        | Scoped colour transition.                                                                                                  | Short colour.                                     | Immediate.                 | `item.surface.colour` → `state.color` → `state.color/surface`; `item.text.colour` → `state.color` → `state.color/foreground`                                                               |
+| Variant or actual interactive state / row/media/text owners                        | Scoped colour transition.                                                                                                  | Short colour.                                     | Immediate.                 | `item.surface.colour` → `state.color` → `state.color/surface`; `item.foreground.colour` → `state.color` → `state.color/foreground`                                                               |
+| Independently inserted ItemGroup / group | One group opacity envelope; initial rows/separators consume that cause and later row insertion retains its own cause. | Short opacity only. | Final group immediately. | `item.group.enter` → `presence.inline` → `data.transition/opacity` |
+| ItemSeparator rule colour / inherited Separator owner | Transition its rule background once through Separator; Item does not add another rule writer. | Inherited short colour. | Final colour immediately. | `item.separator.colour` → `state.color` → `state.color/surface` (inherited Separator) |
+
+The `foreground` binding owns the row foreground and explicit Title/Description overrides; inheriting Content/Header/Footer/Media paint follows that row once. The `text` binding addresses known display parts only, never arbitrary Item root children. ItemSeparator inherits [Separator](separator.md), preserving its exact preset/forms without a wrapper controller.
 
 ## Interruption and lifecycle
 

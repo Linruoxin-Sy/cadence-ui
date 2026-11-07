@@ -28,7 +28,7 @@ Button gives immediate press feedback while keeping its label and hit target sta
 | Surface colour  | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state.                                                    | default: `button.root.colour`                       |
 | Text colour     | default: button foreground; inherited by text and currentColor icons unless explicitly overridden.                                                                  | default: `button.root.colour`                       |
 | Changed text    | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot.                                              | default: `button.label.replace`; composed: `@label` |
-| Changed numbers | default: direct numeric display children use compact reels when they represent quantities; composed for rich content; numeric identifiers remain text.              | default: `button.label.roll`; composed: `@label`    |
+| Changed numbers | default: a supported direct numeric child is the quantity signal and uses compact reels without changing its existing output; identifier strings remain text and rich content is composed.              | default: `button.label.roll`; composed: `@label`    |
 
 ## Choreography and modes
 

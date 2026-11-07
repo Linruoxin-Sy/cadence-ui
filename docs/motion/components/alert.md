@@ -16,7 +16,8 @@ Alert makes a new message noticeable without delaying its announcement or shakin
     "text": ["alert#AlertTitle", "alert#AlertDescription"],
     "value": ["alert#AlertTitle", "alert#AlertDescription"],
     "surface": ["alert#Alert"],
-    "icon": ["alert#Alert"]
+    "icon": ["alert#Alert"],
+    "foreground": ["alert#Alert", "alert#AlertTitle", "alert#AlertDescription"]
   }
 }
 ```
@@ -27,10 +28,10 @@ Alert makes a new message noticeable without delaying its announcement or shakin
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
 | Appearance      | default: alert owns one entrance; inherited when a parent notification/region owner consumes the same cause.                          | default: `alert.root.enter`, `alert.root.exit`   |
 | Size            | default: alert owns title/description/action-driven block size; a parent may consume outer sibling reflow.                            | default: `alert.root.resize`                     |
-| Surface colour  | default: alert background/border and authored icon surface changes on variant/context updates.                                        | default: `alert.surface.colour`                  |
-| Text colour     | default: root/title/description and currentColor icon foreground; composed action controls retain their own state owners.             | default: `alert.text.colour`                     |
-| Changed text    | default: plain AlertTitle/AlertDescription and directly owned message strings; composed rich message content.                         | default: `alert.text.replace`; composed: `@text` |
-| Changed numbers | default: direct message quantities in known display parts; composed rich quantities; error codes and numeric identifiers remain text. | default: `alert.value.roll`; composed: `@value`  |
+| Surface colour  | default: alert background/border on variant/context updates; a caller-authored icon surface remains composed content.                                        | default: `alert.surface.colour`                  |
+| Text colour     | default: root/title/description and currentColor icon foreground; composed action controls retain their own state owners.             | default: `alert.foreground.colour`                     |
+| Changed text    | default: plain AlertTitle/AlertDescription strings; root-level arbitrary children and rich message content retain composed ownership.                         | default: `alert.text.replace`; composed: `@text` |
+| Changed numbers | default: supported direct numeric Title/Description children are quantities using their existing displayed output; identifier/error-code strings remain text, and rich quantities are composed. | default: `alert.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 
@@ -40,8 +41,10 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Message insertion/removal / alert and retained parent | Surface opacity entrance/exit; role=alert and committed message are immediate.                       | Short opacity.                                           | Immediate. | `alert.root.enter` → `presence.surface` → `enter.pop/opacity`; `alert.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                               |
 | Message/action content changes / alert                | Changed-only text, stagger:none, or quantity reels; measured height adjusts in the same transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `alert.text.replace` → `text.replace` → `text.change/changed-runs`; `alert.value.roll` → `number.compact` → `number.roll/reels`; `alert.root.resize` → `geometry.content` → `geometry.resize/measured` |
-| Variant/context change / root and foreground owners   | Scoped colour transition.                                                                            | Short colour.                                            | Immediate. | `alert.surface.colour` → `state.color` → `state.color/surface`; `alert.text.colour` → `state.color` → `state.color/foreground`                                                                         |
+| Variant/context change / root and foreground owners   | Scoped colour transition.                                                                            | Short colour.                                            | Immediate. | `alert.surface.colour` → `state.color` → `state.color/surface`; `alert.foreground.colour` → `state.color` → `state.color/foreground`                                                                         |
 | Explicit keyed icon replacement / existing icon child | Bounded opacity crossfade; no automatic SVG path morph.                                              | Short opacity.                                           | Immediate. | `alert.icon.replace` → `data.update` → `data.transition/opacity`                                                                                                                                       |
+
+The foreground binding coordinates the root and explicit title/description overrides; inherited title/currentColor icon paint follows that root once, without a second glyph controller. The text/value bindings address Title and Description only. An arbitrary direct root child is not discovered by scanning the alert grid.
 
 ## Interruption and lifecycle
 
@@ -58,5 +61,7 @@ Keep the incoming direct SVG and existing grid/selector contract intact. A retai
 ## Acceptance scenarios
 
 Target acceptance; not executed: default/destructive changes; icon added/removed; concurrent title/description/action changes; error-code versus count content; repeated message updates without duplicate announcements; caller removal; all modes and zero clock during resize.
+
+Also pending: update root foreground with an inheriting currentColor icon and an independently coloured description; each property has one owner and arbitrary root children keep their structure.
 
 Also pending: an icon swaps while an AlertAction is focused and its description expands, then the alert closes; preserve one grid column/name/announcement and no clipped action or stale icon overlay.

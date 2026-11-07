@@ -16,22 +16,8 @@ Field makes helper and error changes readable while preserving the control's loc
     "message": ["field#FieldDescription", "field#FieldError"],
     "content": ["field#FieldContent", "field#Field", "field#FieldSet"],
     "group": ["field#FieldGroup"],
-    "text": [
-      "field#FieldLabel",
-      "field#FieldTitle",
-      "field#FieldLegend",
-      "field#FieldDescription",
-      "field#FieldError",
-      "field#FieldSeparator"
-    ],
-    "value": [
-      "field#FieldLabel",
-      "field#FieldTitle",
-      "field#FieldLegend",
-      "field#FieldDescription",
-      "field#FieldError",
-      "field#FieldSeparator"
-    ],
+    "text": ["field#FieldLabel", "field#FieldTitle", "field#FieldLegend", "field#FieldDescription", "field#FieldError", "field#FieldSeparator"],
+    "value": ["field#FieldLabel", "field#FieldTitle", "field#FieldLegend", "field#FieldDescription", "field#FieldError", "field#FieldSeparator"],
     "structure": ["field#FieldSet", "field#FieldGroup"],
     "surface": ["field#FieldLabel", "field#FieldSeparator"],
     "separator": ["separator#Separator"]
@@ -46,7 +32,7 @@ Field makes helper and error changes readable while preserving the control's loc
 | Appearance      | default: field for independent insertion and later description/error rows; inherited for FieldGroup/FieldSet entrance coordination.                                           | default: `field.root.enter`, `field.message.enter`, `field.message.exit`, `field.structure.enter` |
 | Size            | default: field-content/field shell owns helper/error-driven block size; FieldGroup owns sibling position; native control geometry remains with the control.                   | default: `field.content.resize`                                                                   |
 | Surface colour  | Default: authored FieldLabel surface and FieldSeparator caption backing; inherited: the actual Separator child owns its rule colour. Composed controls keep their own chrome. | default: `field.surface.colour`; inherited: `field.separator.colour`                              |
-| Text colour     | default: legend, label/title, description and error foregrounds respond to supplied invalid/disabled context.                                                                 | default: `field.text.colour`                                                                      |
+| Text colour     | default: legend, label/title, description, separator caption and error foregrounds respond to supplied invalid/disabled context.                                                                 | default: `field.text.colour`                                                                      |
 | Changed text    | default: plain legend, label/title, description, separator caption and error messages; composed rich descendants preserve their structure.                                    | default: `field.text.replace`; composed: `@text`                                                  |
 | Changed numbers | default: direct quantity displays in those textual parts; composed rich counters; numeric field names/error identifiers remain text.                                          | default: `field.value.roll`; composed: `@value`                                                   |
 
@@ -56,7 +42,7 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 
 | Trigger / owner                                                                             | full                                                                                                                                             | reduced                                              | none                                 | Binding → preset → recipe/form                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Field insertion / field or enclosing group                                                  | One opacity entrance.                                                                                                                            | Short opacity.                                       | Immediate.                           | `field.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                                            |
+| Field insertion / Field (enclosing structure entry is a separate owner)                                                  | One opacity entrance.                                                                                                                            | Short opacity.                                       | Immediate.                           | `field.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                                            |
 | Description/error appears or disappears / content and row                                   | Open the measured block space while the changed row fades; retained siblings reflow.                                                             | Geometry immediate; short opacity.                   | Immediate.                           | `field.message.enter` → `presence.inline` → `data.transition/opacity`; `field.message.exit` → `presence.exit` → `exit.fade/opacity`; `field.content.resize` → `geometry.content` → `geometry.resize/measured`; `field.group.move` → `layout.compact` → `layout.move/position` |
 | Text/quantity revision / actual display part                                                | Changed-only text with stagger:none or quantity rolling; share the size transaction.                                                             | Short changed-text opacity; quantity/size immediate. | Immediate.                           | `field.text.replace` → `text.replace` → `text.change/changed-runs`; `field.value.roll` → `number.compact` → `number.roll/reels`                                                                                                                                               |
 | Standalone field-set/group or legend/label/separator-caption revision / owning display host | One independent opacity entrance for the structure; known text changes consume one measured destination without a second Label/Separator writer. | Short opacity/text feedback; geometry immediate.     | Final structure/content immediately. | `field.structure.enter` → `presence.inline` → `data.transition/opacity`; `field.content.resize` → `geometry.content` → `geometry.resize/measured`; `field.text.replace` → `text.replace` → `text.change/changed-runs`                                                         |
@@ -74,6 +60,8 @@ New errors replace pending errors immediately; do not serialize announcements be
 
 Keep `errors` deduplication and children precedence unchanged. A single plain message has one text-diff owner; in the internally generated multi-error list, exact retained messages keep identity while added/removed messages use local row presence. The API supplies no stable error IDs, so never pair unrelated messages by array index or invent validation identity. A returning message cannot be removed by an obsolete exit callback; only the current semantic error region is announced.
 
+Run FieldError's existing children/error resolution before choosing a renderer: its falsy children may defer to the errors array or return null. A numeric zero must not become a visible error merely because a numeric helper wrapper is truthy. FieldSeparator likewise retains its existing caption conditional: zero/empty/false children do not acquire a new caption or presence owner. Only an actually rendered plain display is eligible for the text/number binding; this preserves existing behavior rather than introducing validation.
+
 ## Geometry and performance
 
 Measure the changed message block after commitment and clamp it to the owning content area. Lay out labels/descriptions/errors at final available width before host-height interpolation, avoiding continuous word reflow during the height change. A FieldGroup may consume outer reflow without writing the same field height. Native inputs are never diffed or scaled. Responsive orientation changes and passive wrapping commit directly; explicit owned structure changes may reflow. Long error lists use bounded changed-row work, with no repeated animation of unchanged messages.
@@ -83,5 +71,7 @@ Choose one host for each changed cause: FieldContent owns its message block, or 
 ## Acceptance scenarios
 
 Target acceptance; not executed: helper plus error together; rapid errors-array changes; plain and rich descriptions; vertical/horizontal/responsive fields; label/control association; row removal with focused control; all modes and zero clock without duplicate announcements.
+
+Also pending: compare FieldError children={0}, empty string and false with/without errors, and FieldSeparator children={0}; animation integration must preserve the current branch/output exactly.
 
 Also pending: duplicate/error-list reorder and single-to-list changes, a returning message during exit, standalone FieldSet legend updates, and helper growth around an idle focused input; preserve deduplication, one announcement and native editor stability.

@@ -13,12 +13,15 @@ Bubble introduces a message once and then limits motion to the fragments, dimens
   "migration": "legacy",
   "parts": {
     "root": ["bubble#Bubble"],
-    "text": ["bubble#BubbleContent", "bubble#BubbleReactions"],
+    "text": ["bubble#BubbleContent"],
     "content": ["bubble#BubbleContent"],
     "reaction": ["bubble#BubbleReactions"],
     "reactions": ["bubble#BubbleReactions"],
     "message": ["bubble#Bubble"],
-    "surface": ["bubble#BubbleContent", "bubble#BubbleReactions"]
+    "surface": ["bubble#BubbleContent", "bubble#BubbleReactions"],
+    "foreground": ["bubble#BubbleContent", "bubble#BubbleReactions"],
+    "value": ["bubble#BubbleContent"],
+    "group": ["bubble#BubbleGroup"]
   }
 }
 ```
@@ -27,12 +30,12 @@ Bubble introduces a message once and then limits motion to the fragments, dimens
 
 | Capability      | Coverage and owner                                                                                                                                                                                                                                                      | References                                                                    |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| Appearance      | default: bubble owns message insertion; BubbleReactions owns its overlay insertion and later directly owned reaction visuals. Rich reaction controls inherit their own owners. BubbleGroup coordinates initial group entry; an enclosing owner consumes the same cause. | default: `bubble.root.enter`, `bubble.reaction.enter`, `bubble.reaction.exit` |
+| Appearance      | default: bubble owns message insertion; BubbleReactions owns its overlay insertion and later directly owned reaction visuals. Rich reaction controls inherit their own owners. BubbleGroup coordinates initial group entry; an enclosing owner consumes the same cause. | default: `bubble.root.enter`, `bubble.group.enter`, `bubble.reaction.enter`, `bubble.reaction.exit` |
 | Size            | default: bubble-content/bubble host owns low-frequency text, edit or attachment-driven geometry; bubble-reactions owns its independent overlay size; dense append updates may resolve height immediately under the condition below.                                     | default: `bubble.content.resize`, `bubble.reaction.resize`                    |
 | Surface colour  | default: bubble-content variant and actual interactive-render background/border; bubble-reactions surface owns its own target.                                                                                                                                          | default: `bubble.surface.colour`                                              |
-| Text colour     | default: content and reaction foreground, preserving explicit rich descendant owners.                                                                                                                                                                                   | default: `bubble.text.colour`                                                 |
-| Changed text    | default: direct plain BubbleContent strings and direct reaction display strings; appends animate only new safe fragments; composed rich Markdown, links and embedded children preserve structure.                                                                       | default: `bubble.text.replace`, `bubble.reaction.replace`; composed: `@text`  |
-| Changed numbers | default: direct quantities in known reaction/display content; composed rich reaction counts; timestamps, IDs and quoted numeric text remain textual.                                                                                                                    | default: `bubble.reaction.roll`; composed: `@reaction`                        |
+| Text colour     | default: content and reaction foreground, preserving explicit rich descendant owners.                                                                                                                                                                                   | default: `bubble.foreground.colour`                                                 |
+| Changed text    | default: direct plain BubbleContent strings and direct reaction display strings; appends animate only new safe fragments; composed rich Markdown, links and embedded children preserve structure.                                                                       | default: `bubble.text.replace`, `bubble.reaction.replace`; composed: `@text`, `@reaction`  |
+| Changed numbers | default: supported direct numbers in BubbleContent and BubbleReactions are quantities, preserving existing displayed output; timestamp/ID/quoted numeric strings remain text and rich counts are composed.                                                                                                                    | default: `bubble.value.roll`, `bubble.reaction.roll`; composed: `@value`, `@reaction`                        |
 
 ## Choreography and modes
 
@@ -47,7 +50,11 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | Direct plain reaction display revision / BubbleReactions text owner | Retain unchanged graphemes and replace changed runs with stagger:none; rich reaction controls retain their own display owner.                                       | Short changed-text opacity.                                                      | Final text immediately.      | `bubble.reaction.replace` → `text.replace` → `text.change/changed-runs`                                                                                                                                                                                                              |
 | Reaction side/align changes / overlay placement owner               | Commit final anchor constraints, then bounded visual displacement from the current safe position; existing placement translate and motion have one composed writer. | Final placement immediately.                                                     | Final placement immediately. | `bubble.reactions.place` → `layout.compact` → `layout.move/position`                                                                                                                                                                                                                 |
 | Message align changes / owning message layout scope                 | Use one final message box for bounded position reflow when a stable scope exists; otherwise place immediately. No surface entrance replay.                          | Final placement immediately.                                                     | Final placement immediately. | `bubble.message.move` → `layout.compact` → `layout.move/position`                                                                                                                                                                                                                    |
-| Variant or actual interactive state / content/reactions             | Scoped colour transition; a plain div gains no press behaviour.                                                                                                     | Short colour.                                                                    | Immediate.                   | `bubble.surface.colour` → `state.color` → `state.color/surface`; `bubble.text.colour` → `state.color` → `state.color/foreground`                                                                                                                                                     |
+| Variant or actual interactive state / content/reactions             | Scoped colour transition; a plain div gains no press behaviour.                                                                                                     | Short colour.                                                                    | Immediate.                   | `bubble.surface.colour` → `state.color` → `state.color/surface`; `bubble.foreground.colour` → `state.color` → `state.color/foreground`                                                                                                                                                     |
+| Independent BubbleGroup insertion / group | One opacity envelope for initial messages; suppress their duplicate root entrances. | Short opacity only. | Final group immediately. | `bubble.group.enter` → `presence.inline` → `data.transition/opacity` |
+| Direct numeric BubbleContent revision / value owner | Roll changed numeric places in the existing display format; share the content host destination, not a second width writer. | Final number immediately. | Final number immediately. | `bubble.value.roll` → `number.compact` → `number.roll/reels` |
+
+The `text` region addresses BubbleContent replacement only; `reaction` owns BubbleReactions replacement, and `foreground` coordinates their distinct paint. A direct number selects the content quantity renderer, while a string remains text; switching renderer type establishes an immediate baseline rather than inventing a number source. Parent/group entry consumes initial content/reaction appearance without suppressing later independent revisions.
 
 ## Interruption and lifecycle
 
@@ -68,5 +75,7 @@ Long appends use the known append/revision boundary without rescanning the full 
 ## Acceptance scenarios
 
 Target acceptance; not executed: new message without duplicate text entrance; plain edits retaining prefixes; dense append with newlines; isolated edit after streaming; attachment/media change; reaction count and placement changes; rich selectable content; align/variant changes; all modes and zero clock mid-update.
+
+Also pending: insert a BubbleGroup containing direct numeric BubbleContent and reaction counts, then change only the content number; initial content is immediate, one envelope enters, and later only its numeric owner runs without reaction-text replacement.
 
 Also pending: coalesced appends exceed the aggregate text budget while reactions update, select/copy text during streaming, recycle a message node, then hide/restore its parent; final text is complete and singular with no queued replay. Change reaction side/align while its count and message width change; one placement writer reaches the latest safe destination.

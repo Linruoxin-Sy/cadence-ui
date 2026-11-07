@@ -13,9 +13,10 @@ Card coordinates content changes as one stable surface. A plain Card is not an i
   "migration": "legacy",
   "parts": {
     "root": ["card#Card"],
-    "text": ["card#Card", "card#CardTitle", "card#CardDescription", "card#CardContent"],
+    "text": ["card#CardTitle", "card#CardDescription", "card#CardContent"],
     "value": ["card#CardTitle", "card#CardDescription", "card#CardContent"],
-    "surface": ["card#Card", "card#CardHeader", "card#CardFooter"]
+    "surface": ["card#Card", "card#CardHeader", "card#CardFooter"],
+    "foreground": ["card#Card", "card#CardTitle", "card#CardDescription", "card#CardContent"]
   }
 }
 ```
@@ -27,9 +28,9 @@ Card coordinates content changes as one stable surface. A plain Card is not an i
 | Appearance      | default: card owns one dynamic surface entrance including initial header/content/footer; inherited when a larger parent owns that cause.                                              | default: `card.root.enter`, `card.root.exit`    |
 | Size            | default: card owns content-driven block geometry; fit=content also owns intrinsic inline geometry through its existing card-flow arrangement; constrained axes remain inherited.      | default: `card.root.resize`                     |
 | Surface colour  | default: card background/border/shadow and independently styled header/footer surfaces on authored variant/theme changes.                                                             | default: `card.surface.colour`                  |
-| Text colour     | default: card foreground and title/description overrides; composed descendants retain explicit colour owners.                                                                         | default: `card.text.colour`                     |
+| Text colour     | default: card foreground and title/description overrides; composed descendants retain explicit colour owners.                                                                         | default: `card.foreground.colour`                     |
 | Changed text    | default: plain CardTitle and CardDescription; plain display content directly owned by CardContent is eligible; composed rich body/action/footer content is not recursively rewritten. | default: `card.text.replace`; composed: `@text` |
-| Changed numbers | default: direct quantity values in known plain display parts; composed rich metrics; numeric titles/identifiers remain text.                                                          | default: `card.value.roll`; composed: `@value`  |
+| Changed numbers | default: supported direct numbers in Title, Description and Content use quantity presentation without changing their existing output; title/identifier strings remain text and rich metrics are composed.                                                          | default: `card.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 
@@ -40,7 +41,9 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | Dynamic insertion/removal / card                             | Coherent surface opacity entrance and retained exit, without child cascades.                       | Short opacity.                                                       | Immediate. | `card.root.enter` → `presence.surface` → `enter.pop/opacity`; `card.root.exit` → `presence.exit` → `exit.fade/opacity`       |
 | Content/header/footer or explicit size change / card         | Retarget measured owned dimensions with final spacing/typography; stable content remains unscaled. | Final geometry immediately.                                          | Immediate. | `card.root.resize` → `geometry.content` → `geometry.resize/measured`                                                         |
 | Display revision / title, description or known plain content | Changed-only text with stagger:none or quantity reels, coordinated with card geometry.             | Short changed-text opacity; final quantity and geometry immediately. | Immediate. | `card.text.replace` → `text.replace` → `text.change/changed-runs`; `card.value.roll` → `number.roll` → `number.roll/reels`   |
-| Surface/foreground target changes / relevant owner           | Scoped colour/shadow transition.                                                                   | Short colour.                                                        | Immediate. | `card.surface.colour` → `state.color` → `state.color/surface`; `card.text.colour` → `state.color` → `state.color/foreground` |
+| Surface/foreground target changes / relevant owner           | Scoped colour/shadow transition.                                                                   | Short colour.                                                        | Immediate. | `card.surface.colour` → `state.color` → `state.color/surface`; `card.foreground.colour` → `state.color` → `state.color/foreground` |
+
+The `text`/`value` regions address only the named plain display parts. `foreground` coordinates paint on the declared hosts; an inherited colour runs at its ancestor owner once, while an explicitly overridden foreground has its own disjoint controller. Structural/media children are not added to the text renderer merely because they inherit that paint.
 
 ## Interruption and lifecycle
 

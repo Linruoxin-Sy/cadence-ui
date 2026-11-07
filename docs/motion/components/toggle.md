@@ -45,8 +45,8 @@ Momentary press and persistent selection are distinct: pressing compresses the c
 
 - `pressed`, native events and focus follow the actual committed state immediately. A controlled callback does not pre-commit selection. Repeated activations retarget current press/colour states; selection does not reset the release animation.
 - A changed label uses one latest text transaction. The accessible name updates immediately; decorative outgoing glyphs never duplicate copied or spoken text.
-- Disabled state, lost pointer capture, parent close and unmount clear press state. Parent presence owns exit; Toggle adds no minimum display time.
-- Live reduced cancels scale/layout/numeric rolling; none and zero clock cancel all clocks and leave the latest dimensions, colours and label.
+- Disabled state, lost pointer capture, blur, parent close and unmount clear only momentary press feedback; they do not reset the committed `pressed` selection. Parent presence owns exit; Toggle adds no minimum display time.
+- Live reduced cancels scale/layout/numeric rolling; none omits decorative scale and cancels every presentation clock. A zero recipe clock in full mode instead snaps a still-held feedback layer to `scale.press` and its later release to rest, with final dimensions/colours/label immediately. Timing cancellation never discards native held state, pointer capture or the controlled selected value.
 
 ## Geometry and performance
 
@@ -60,5 +60,5 @@ Momentary press and persistent selection are distinct: pressing compresses the c
 
 - Pending: press/release with external pressed updates, disable mid-press, and verify selected appearance survives release.
 - Pending: replace a partially unchanged label while changing size, including rich children and an icon-only accessible label.
-- Pending: verify parent-owned appearance, all modes, mid-flight downgrades, zero clock and cleanup.
+- Pending: verify parent-owned appearance, all modes, mid-flight downgrades, zero clock and cleanup. Hold a selected Toggle while setting zero timeScale, then blur/disable: feedback settles correctly and selection changes only through the existing controlled/uncontrolled semantics.
 - Pending: combine group reflow and press with a long growing label and custom `render`; verify one transform per layer, readable text, native input in reduced/none and immediate fallback when a safe feedback/size host is absent.

@@ -13,10 +13,11 @@ Empty introduces an empty-state explanation calmly and keeps its recovery action
   "migration": "legacy",
   "parts": {
     "root": ["empty#Empty"],
-    "text": ["empty#EmptyTitle", "empty#EmptyDescription", "empty#EmptyContent", "empty#EmptyMedia"],
+    "text": ["empty#EmptyTitle", "empty#EmptyDescription", "empty#EmptyContent"],
     "value": ["empty#EmptyTitle", "empty#EmptyDescription", "empty#EmptyContent"],
     "media": ["empty#EmptyMedia"],
-    "surface": ["empty#Empty", "empty#EmptyMedia"]
+    "surface": ["empty#Empty", "empty#EmptyMedia"],
+    "foreground": ["empty#EmptyTitle", "empty#EmptyDescription", "empty#EmptyContent", "empty#EmptyMedia"]
   }
 }
 ```
@@ -28,7 +29,7 @@ Empty introduces an empty-state explanation calmly and keeps its recovery action
 | Appearance      | default: empty owns one entrance including EmptyHeader, EmptyMedia, title, description and initial content; inherited for a parent-owned state-region entrance. | default: `empty.root.enter`, `empty.root.exit`   |
 | Size            | default: empty owns later copy/media/content-driven dimensions; inherited when the parent owns the empty/content region exchange.                               | default: `empty.root.resize`                     |
 | Surface colour  | default: EmptyMedia's actual empty-icon surface and any authored root surface; composed actions retain their own surface owners.                                | default: `empty.surface.colour`                  |
-| Text colour     | default: title, description and media foreground on authored visual changes.                                                                                    | default: `empty.text.colour`                     |
+| Text colour     | default: title, description and media foreground on authored visual changes.                                                                                    | default: `empty.foreground.colour`                     |
 | Changed text    | default: plain EmptyTitle/EmptyDescription and directly owned plain display content; composed rich EmptyContent and descriptions.                               | default: `empty.text.replace`; composed: `@text` |
 | Changed numbers | default: direct quantity displays in known text parts; composed rich counts; identifiers in examples or instructions remain textual.                            | default: `empty.value.roll`; composed: `@value`  |
 
@@ -42,7 +43,9 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | Caller replaces empty region / retained parent                                | Fade the old empty region; the parent owns the destination layout.                                    | Short opacity.                                                 | Immediate replacement.    | `empty.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                                                                                              |
 | Copy/media/action content changes / empty                                     | Changed-only text with stagger:none or quantity reels; measured content dimensions retarget together. | Short changed-text opacity; quantity and dimensions immediate. | Immediate.                | `empty.text.replace` → `text.replace` → `text.change/changed-runs`; `empty.value.roll` → `number.compact` → `number.roll/reels`; `empty.root.resize` → `geometry.content` → `geometry.resize/measured` |
 | Explicit media replacement within a retained empty state / media visual owner | Local opacity replacement for the changed supplied visual; existing title/action do not re-enter.     | Short opacity.                                                 | Final visual immediately. | `empty.media.replace` → `data.update` → `data.transition/opacity`                                                                                                                                      |
-| Surface/foreground targets change / actual display owner                      | Scoped colour transition.                                                                             | Short colour.                                                  | Immediate.                | `empty.surface.colour` → `state.color` → `state.color/surface`; `empty.text.colour` → `state.color` → `state.color/foreground`                                                                         |
+| Surface/foreground targets change / actual display owner                      | Scoped colour transition.                                                                             | Short colour.                                                  | Immediate.                | `empty.surface.colour` → `state.color` → `state.color/surface`; `empty.foreground.colour` → `state.color` → `state.color/foreground`                                                                         |
+
+The `text`/`value` regions address only the named plain display parts. `foreground` coordinates paint on the declared hosts; an inherited colour runs at its ancestor owner once, while an explicitly overridden foreground has its own disjoint controller. Structural/media children are not added to the text renderer merely because they inherit that paint.
 
 ## Interruption and lifecycle
 
