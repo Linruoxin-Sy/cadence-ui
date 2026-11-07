@@ -179,12 +179,26 @@ shared recipes/controllers and checks, the Button/Badge/Card/Tabs/Select pilots,
 rollout, the planned public primitives, and full distribution/performance acceptance. Keep actual
 registry declarations and public documentation truthful until each capability is implemented.
 
+Follow [ADR-022](adr.md#adr-022--continuous-performance-work-with-final-hard-gates): shared work may
+follow contract/tooling alignment while the existing performance task remains pending. Continue
+performance work and affected measurements throughout migration; close that task before final
+performance acceptance and the final audit. Development-stage acceptance covers its own behavior,
+compatibility, source budgets and regressions, with required measurements collected and failures
+reported. It does not turn global performance failures or missing device evidence into a pass.
+Missing stage measurements or failed stage checks still block that stage. Measure real consumer and
+complete-page costs for shared work and all five pilots before propagating their patterns. Compare
+recorded baselines; fix behavior, compatibility, source-budget or layout-stability regressions and
+unexplained or unbounded cost growth. Quantified costs of authorized capabilities need a named
+remediation owner/task and plan in the unresolved performance work, not zero byte growth per build.
+Keep unchanged budget comparisons explicit; replacing a baseline cannot certify a failed budget.
+
 The project is not yet performance-accepted. Historical measurements below are diagnostic baselines
 bound to their measured source; subsequent component/site changes require appropriate remeasurement,
 not relabelling old results as current HEAD. Preserve the animation system's performance budgets.
 
-1. **Complete-page initial JS ≤120000 bytes.** Resolve the remaining full-route cost with a specifically
-   scoped proposal before further architecture work. The complete Button research baseline at source
+1. **Complete-page initial JS ≤120000 bytes.** Resolve the remaining full-route cost with specifically
+   scoped, measured work before final performance acceptance. This is not a prerequisite for shared
+   capability development. The complete Button research baseline at source
    4fe1a51 was 221511 bytes; it does not authorize adopting that runtime or rolling out other routes.
    Keep all site functions, SSR/noJS and required Motion features. Repeat full-route measurement and
    functional/visual/a11y validation before asking for a product migration decision.

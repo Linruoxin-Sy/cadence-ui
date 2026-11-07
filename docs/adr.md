@@ -171,3 +171,41 @@ rollout plan owns implementation dependencies. Public MDX, metadata and shipped 
 describe implemented behavior. Add preset resolution, capability/reference validation, scaffold
 support and actual component integration through the pending rollout, with corresponding tests and
 distribution changes. Updating these design documents alone changes no runtime or installation claim.
+
+## ADR-022 · Continuous performance work with final hard gates
+
+Accepted as an implementation sequencing decision within the authorized Motion v2 scope. Separate
+the known complete-route performance baseline from the technical dependencies of shared capabilities
+and component migration. Shared runtime development may follow contract/tooling alignment without
+first closing the existing performance task. That task remains pending until its required evidence
+passes, and must close before final performance acceptance and the final audit.
+
+Known complete Button and Data Table routes exceed the page budget; actual initial Motion, independent
+copied-consumer costs and real-device frame evidence are not all accepted. These failures and missing
+measurements remain explicit and bound to their measured source. A compatible local optimization or
+an accepted development stage does not certify global performance or complete the Motion v2 goal.
+
+Performance work continues throughout implementation. Preserve each item's source ceiling, mandatory
+checks and affected real browser/engine and performance measurements. Shared work and all five pilots
+require real consumer and complete-page measurements before their patterns guide further migration.
+Compare affected costs with their recorded baselines. Before propagating a pattern, fix behavior,
+compatibility, source-budget or layout-stability regressions and unexplained or unbounded cost growth.
+Quantified costs of authorized capabilities require a named remediation owner/task and plan, tracked
+against unchanged limits in the unresolved performance task and final acceptance. Development does
+not require zero byte growth in every build; changing a baseline cannot turn a failed budget into a
+pass. The final gate is not permission to accumulate unbounded cost.
+
+Development gates accept their own behavior, compatibility, source-budget and regression evidence;
+required stage evidence must pass or, for measurement, be collected with its actual result. Existing
+global JS-budget failures and missing real-device proof remain unresolved in the performance task
+and final acceptance. Keep performance assertions unchanged and report failures as failures. Missing
+stage measurements or failed behavior, compatibility, source budgets or layout stability still block
+that development gate. Neither shared nor pilot stage completion may be presented as performance
+acceptance.
+
+This changes acceptance timing, not target scope, budget numbers, measurement coverage or runtime
+conformance requirements. All 59 components and four planned public primitives remain required;
+source, metadata, public documentation and tests must agree on implemented capabilities. Final
+delivery cannot pass with any failed or unmeasured requirement. ADR-009 and ADR-016 retain their
+framework and product-adoption constraints; this decision authorizes no framework replacement,
+budget relaxation, dependency exemption or publication of planned capabilities.

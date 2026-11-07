@@ -188,11 +188,27 @@ passing does not certify another family or enlarge its source budget.
 
 ## 5. Dependency-ordered phases
 
+Under [ADR-022](adr.md#adr-022--continuous-performance-work-with-final-hard-gates), the existing
+performance task in [parity-plan §8](parity-plan.md#8-next-work) stays pending while shared capabilities
+and component migration follow their technical dependencies. It must close before final performance
+acceptance and the final audit. Performance work continues during these phases, with source budgets,
+mandatory checks and affected real browser/engine and performance measurements retained.
+
+Phases 1–4 accept their own behavior, compatibility, source-budget and regression evidence. Required
+measurements must be collected and their actual failures retained; an existing global JS-budget
+failure or missing real-device proof remains unresolved in the performance task and Phase 5. This
+distinction does not permit missing stage measurements, failed stage checks or weakened assertions.
+Compare affected costs with recorded baselines. Before propagating a pattern, fix behavior,
+compatibility, source-budget or layout-stability regressions and unexplained or unbounded cost growth.
+Quantified costs of authorized capabilities require a named remediation owner/task and plan in the
+unresolved performance task and Phase 5; zero byte growth per build is not required. Replacing a
+baseline cannot certify a failed budget. Stage completion is not performance acceptance or delivery.
+
 ### Phase 1: Contract-to-tooling alignment
 
 Depends on the target design. Target reference tooling is available; runtime support and per-item
-v2 enforcement remain pending. The performance prerequisite in parity-plan §8 still applies before
-further shared runtime architecture work.
+v2 enforcement remain pending. Shared runtime work follows contract/tooling alignment; closing the
+existing performance task is a final delivery dependency, not a development prerequisite.
 
 - `scripts/motion-targets.mjs` validates current UI/block inventory, actual value-export anchors,
   six capability references and exact target preset/recipe forms. `new-item` creates a deliberately
@@ -232,7 +248,9 @@ further shared runtime architecture work.
 
 Gate: targeted resolver/parser/helper tests prove both valid integrations and rejected drift; existing
 parity and source budget rules still work. No check is removed merely because migration exposes a
-failure. The design and installed behaviour remain distinguishable.
+failure. Measure real shared runtime/consumer reachability and complete pilot-route costs against
+unchanged limits before pilots begin; global performance failures remain open under the section 5
+acceptance distinction. The design and installed behaviour remain distinguishable.
 
 ### Phase 2: Shared capabilities and primitive contracts
 
@@ -295,7 +313,10 @@ MDX frontmatter/Motion contract, preview and component/browser fixtures in the s
 Gate: unchanged upstream usage works; all applicable baseline capabilities are visible in meaningful
 examples; unchanged text retains identity; no doubled geometry, stretched text, lost focus or stale
 exit callback occurs. Check all modes and both themes, and measure real consumer/page costs before
-using pilots as the pattern for catalogue rollout.
+using pilots as the pattern for catalogue rollout. Missing measurements or failed behavioral,
+compatibility, source-budget or layout-stability checks block this gate. Apply the section 5 cost
+policy to measured growth; unresolved global JS-budget and real-device requirements remain explicit
+in the performance task and Phase 5, not a pilot pass claim.
 
 ### Phase 4: Catalogue rollout by ownership family
 
@@ -320,6 +341,8 @@ immediate DataTable filter semantics and the caller's Tabs mount policy.
 Depends on the changed components and their dependencies passing their gates. Rebuild registry
 payloads, guides and generated AI text from actual implementation. Verify copied consumer installs,
 dedicated dependencies, routes and source provenance; retain immutable snapshots unchanged.
+Final performance acceptance and the final audit also explicitly depend on closing the existing
+performance task; accepted development gates cannot substitute for that closure.
 
 Gate: required commands and relevant real browser/engine paths pass; complete-route measurements
 meet the unchanged budgets below. Full catalogue adoption remains incomplete if a requirement is
@@ -344,7 +367,9 @@ make paint/layout work free.
 Performance remains unresolved as described in [parity-plan.md](parity-plan.md#8-next-work). Measure
 consumer dependencies and complete routes, including automatically requested scripts; separate cold
 layout and interaction windows. Historical measurements do not certify new shared helpers or new
-component code. No framework change, relaxed budget or dependency exemption is part of this plan.
+component code. Continue scoped remediation and affected remeasurement during development; all
+required performance evidence must pass at final delivery. No framework change, relaxed budget or
+dependency exemption is part of this plan.
 
 For implementation changes, run `pnpm registry:build` before `pnpm check` when shipped source,
 metadata or content changes, then the affected browser/runtime and performance checks. Documentation
