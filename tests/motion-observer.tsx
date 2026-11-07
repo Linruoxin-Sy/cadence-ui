@@ -3,6 +3,7 @@ import { vi } from "vitest";
 
 export type Sample = Record<string, unknown>;
 export const imperativeSamples: unknown[][] = [];
+export const imperativeControls: { complete(): void; readonly finished: Promise<unknown> }[] = [];
 export const motionSamples = new Map<object, Sample>();
 export const controlSamples = new Map<object, { target: Sample; transition: Sample }>();
 
@@ -10,7 +11,7 @@ export const controlSamples = new Map<object, { target: Sample; transition: Samp
 vi.mock("motion/react", async (original) => {
   const actual = await original<typeof import("motion/react")>();
   const React = await import("react");
-  const { motionSamples, controlSamples, imperativeSamples } = await import("./motion-observer");
+  const { motionSamples, controlSamples, imperativeSamples, imperativeControls } = await import("./motion-observer");
   const cache = new Map<string, React.ComponentType<Sample>>();
   function observe(Real: React.ComponentType<Sample>) {
     return function ObservedMotion(props: Sample) {
@@ -46,7 +47,15 @@ vi.mock("motion/react", async (original) => {
     motion,
     animate: (...args: Parameters<typeof actual.animate>) => {
       imperativeSamples.push(args);
-      return actual.animate(...args);
+      const controls = actual.animate(...args);
+      imperativeControls.push(controls);
+      return controls;
+    },
+    animateSingleValue: (...args: Parameters<typeof actual.animateSingleValue>) => {
+      imperativeSamples.push(args);
+      const controls = actual.animateSingleValue(...args);
+      if (controls) imperativeControls.push(controls);
+      return controls;
     },
     useAnimationControls() {
       const controls = actual.useAnimationControls();

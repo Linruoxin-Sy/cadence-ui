@@ -1,10 +1,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { frame } from "motion/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Toc } from "@/registry/cadence/toc";
 import { expectMotionContract } from "../motion-contract";
-import { imperativeSamples } from "../motion-observer";
+import { imperativeControls, imperativeSamples } from "../motion-observer";
 
 const observers = new Set<ResizeObserverCallback>();
 beforeEach(() => {
@@ -97,7 +98,7 @@ describe("Toc", () => {
     },
   );
 
-  it("settles an ongoing trip when downgraded, cancels user-interrupted trips, and preserves caller tabindex", () => {
+  it("settles an ongoing trip when downgraded, cancels user-interrupted trips, and preserves caller tabindex", async () => {
     const fixture = (mode: "full" | "none") => (
       <CadenceProvider mode={mode}>
         <Toc items={items} />
@@ -117,14 +118,38 @@ describe("Toc", () => {
     expect(heading).toHaveFocus();
     expect(heading).toHaveAttribute("tabindex", "0");
     rerender(fixture("full"));
+    screen.getByRole("link", { name: "API" }).focus();
     fireEvent.click(screen.getByRole("link", { name: "API" }));
     const call = imperativeSamples.at(-1);
-    const callbacks = call?.[2] as { onUpdate(value: number): void; onComplete(): void };
-    fireEvent.wheel(window);
-    vi.mocked(window.scrollTo).mockClear();
-    callbacks.onUpdate(1000);
-    callbacks.onComplete();
+    const callbacks = call?.[2] as { onUpdate(value: number): void };
+    const controls = imperativeControls.at(-1);
+    expect(controls).toBeDefined();
+    if (!controls) throw new Error("Expected the installed scroll controller");
+    let completed = false;
+    const completion = controls.finished.then(() => {
+      completed = true;
+    });
+    // Resolve the real engine before cancellation, leaving the Group's completion
+    // notification queued. stop() cannot retract that notification.
+    await act(async () => {
+      controls.complete();
+      await new Promise<void>((resolve) => {
+        // complete() settles on the next real engine tick. Cancel in that frame's
+        // postRender phase, before Promise completion handlers run.
+        frame.postRender(() => {
+          expect(completed).toBe(false);
+          fireEvent.wheel(window);
+          vi.mocked(window.scrollTo).mockClear();
+          callbacks.onUpdate(1000);
+          resolve();
+        });
+      });
+      await completion;
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    });
+    expect(completed).toBe(true);
     expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(heading).not.toHaveFocus();
     height.mockRestore();
   });
 

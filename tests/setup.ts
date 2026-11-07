@@ -71,10 +71,11 @@ window.scrollTo = vi.fn();
 
 // Observers retain real Motion behavior; clear only test-owned observations.
 import { beforeEach } from "vitest";
-import { controlSamples, imperativeSamples, motionSamples } from "./motion-observer";
+import { controlSamples, imperativeControls, imperativeSamples, motionSamples } from "./motion-observer";
 
 beforeEach(() => {
   controlSamples.clear();
   motionSamples.clear();
   imperativeSamples.length = 0;
+  imperativeControls.length = 0;
 });

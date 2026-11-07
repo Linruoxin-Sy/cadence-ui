@@ -86,6 +86,20 @@ try {
         await page.waitForTimeout(90);
         const partial = await page.evaluate(() => window.sampleW2("partial"));
         report.cases.push({ label, name: "partial target", samples: [partial] });
+        if (["select", "code", "sidebar"].includes(kind))
+          try {
+            if (effective === "full") {
+              assert(partial.drivers.length > 0, "Expected observed installed scalar driver");
+              assert(
+                partial.drivers.some((driver) => driver.animating),
+                "Expected a running scalar flight",
+              );
+            } else {
+              assert.equal(partial.drivers.length, 0, "Immediate geometry must not start a scalar flight");
+            }
+          } catch (e) {
+            report.failures.push(`${label}/actual scalar observation: ${e.message}`);
+          }
         if (kind === "code" && effective === "full")
           try {
             const viewport = partial.parts.find((p) => p.slot === "code-block-viewport");
