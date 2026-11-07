@@ -1,7 +1,8 @@
 # Animation system implementation plan
 
 This is the implementation plan for the target contract in [animation-system.md](animation-system.md).
-The design is specified; the implementation phases below are all pending. Existing components,
+The design is specified; the runtime implementation phases below remain pending. Internal target
+reference validation and scaffolding exist, as distinguished under Phase 1. Existing components,
 registry metadata, public documentation and executable checks still describe the installed system
 until each migration is implemented and verified. A design decision is not evidence that a component
 already supplies the new behaviour.
@@ -108,17 +109,17 @@ label. Intensity remains descriptive and must not restrict capability or weaken 
 
 ## 3. Shared implementation work
 
-| Workstream         | Deliverable                                                                                                                               | Acceptance evidence                                                                                                                           |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tokens and recipes | One authored token source; CSS and Motion adapters; `state.color` and `text.change` definitions; updated `number.roll` execution contract | Recipe catalogue, CSS token exports, guide tables and resolver tests agree; no component-local motion literals                                |
-| Presets and bindings | Implement the reviewed purpose/compact/panel presets and each component's part bindings without a full-catalogue runtime map | Parameter references resolve to the shared source; CSS/JS effective clocks agree; overrides cannot bypass modes, clamping or budgets |
-| Semantic changes   | Explicit content/state revision and stable identity handling                                                                              | Re-renders and passive resizes do not restart effects; rapid updates follow the latest committed state                                        |
-| Geometry           | Shared measurement and retargeting helpers with one writer per axis                                                                       | Observe natural content and size a separate host; clamp valid geometry; avoid feedback loops; preserve text scale and baseline                |
-| Presence           | Entry/exit ownership integrated with Base UI and ordinary React content                                                                   | Closing can reverse; obsolete completion cannot remove reopened content; focus/portal/scroll ownership cleans up correctly                    |
-| Text               | Grapheme-aware stable diff with bounded work and shaping fallback                                                                         | Unchanged content stays mounted; insert/delete/replace and repeated characters behave correctly; only the intended accessible text is exposed |
-| Numbers            | Locale-aware value decomposition and stable digit-place identity                                                                          | Correct direction, carry, sign, separators, precision and digit-count changes; retarget without replaying intermediate update queues          |
-| Modes and clocks   | Shared CSS/Motion/engine cancellation paths                                                                                               | Running full-to-reduced/none changes settle before paint; zero clock is immediate; nested scopes respect system preference                    |
-| Existing engines   | Adapters for actual installed writers such as Embla and Recharts                                                                          | No second transform/data-geometry writer; actual engine motion obeys the effective mode and lifecycle                                         |
+| Workstream           | Deliverable                                                                                                                               | Acceptance evidence                                                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tokens and recipes   | One authored token source; CSS and Motion adapters; `state.color` and `text.change` definitions; updated `number.roll` execution contract | Recipe catalogue, CSS token exports, guide tables and resolver tests agree; no component-local motion literals                                |
+| Presets and bindings | Implement the reviewed purpose/compact/panel presets and each component's part bindings without a full-catalogue runtime map              | Parameter references resolve to the shared source; CSS/JS effective clocks agree; overrides cannot bypass modes, clamping or budgets          |
+| Semantic changes     | Explicit content/state revision and stable identity handling                                                                              | Re-renders and passive resizes do not restart effects; rapid updates follow the latest committed state                                        |
+| Geometry             | Shared measurement and retargeting helpers with one writer per axis                                                                       | Observe natural content and size a separate host; clamp valid geometry; avoid feedback loops; preserve text scale and baseline                |
+| Presence             | Entry/exit ownership integrated with Base UI and ordinary React content                                                                   | Closing can reverse; obsolete completion cannot remove reopened content; focus/portal/scroll ownership cleans up correctly                    |
+| Text                 | Grapheme-aware stable diff with bounded work and shaping fallback                                                                         | Unchanged content stays mounted; insert/delete/replace and repeated characters behave correctly; only the intended accessible text is exposed |
+| Numbers              | Locale-aware value decomposition and stable digit-place identity                                                                          | Correct direction, carry, sign, separators, precision and digit-count changes; retarget without replaying intermediate update queues          |
+| Modes and clocks     | Shared CSS/Motion/engine cancellation paths                                                                                               | Running full-to-reduced/none changes settle before paint; zero clock is immediate; nested scopes respect system preference                    |
+| Existing engines     | Adapters for actual installed writers such as Embla and Recharts                                                                          | No second transform/data-geometry writer; actual engine motion obeys the effective mode and lifecycle                                         |
 
 A CSS sampled spring curve can express a fixed transition but does not replace a physics controller
 that must inherit velocity from an interrupted gesture. CSS intrinsic-size interpolation also does
@@ -188,34 +189,43 @@ passing does not certify another family or enlarge its source budget.
 
 ### Phase 1: Contract-to-tooling alignment
 
-Depends on the target design. All work below is pending.
+Depends on the target design. Target reference tooling is available; runtime support and per-item
+v2 enforcement remain pending. The performance prerequisite in parity-plan §8 still applies before
+further shared runtime architecture work.
 
-- Validate the documented contract inventory against current UI/block ids and define the minimal
-  machine-checkable references for six capabilities and preset bindings. Extend the future scaffold
-  to create an individual design file/index entry. Markdown decisions exist; these validators and
-  scaffold changes do not. Keep the shared preset catalogue separate from runtime Recipe identifiers.
-- Implement preset resolution, target size token aliases and single-source CSS/Motion output without
+- `scripts/motion-targets.mjs` validates current UI/block inventory, actual value-export anchors,
+  six capability references and exact target preset/recipe forms. `new-item` creates a deliberately
+  unfinished individual contract and index entry; placeholders fail validation. The reference schema
+  in motion/README keeps shared target forms separate from runtime Recipe identifiers. It checks
+  structural closure, not semantic truth, active property ownership or runtime acceptance.
+- Implement preset resolution, target size springs and `rotation.halfTurn`, and single-source CSS/Motion output without
   changing unrelated base-token defaults. Prove mode/zero-clock precedence, local/portal clocks and
   static per-component dependency reachability; colour-only usage must not load the whole catalogue.
 - Validate the semantic closure of each contract: applicable capability to action/owner, action to
   exact preset/recipe form, and full/reduced/none plus interruption to observable properties. Include
   directional `content.switch`/`content.month` and size-linked `layout.sidebar` as explicit target forms;
   equal timing tokens alone do not prove coordinated progress or geometry.
+  Audit exact host/region coverage as well as export existence: title/count/checkbox/sub-trigger text,
+  separator/arrow/backdrop paint, native editor foreground and inherited accessories cannot disappear
+  behind a broad root anchor. A composition either uses its dependency's preset/form unchanged or
+  explicitly overrides that existing owner; no second writer is introduced. Exercise disjoint menu
+  item/surface colour channels and single-writer theme/interaction updates.
   Reject an incomplete binding chain, conflicting repeated binding or an inherited action with an
   unnamed actual owner. Validate the full/reduced/none targets independently from zero recipe time;
   a held full-mode press at zero time must not be mistaken for the none presentation.
 
 - Reconcile recipe/mode/token support in `registry/cadence/lib/motion.ts`, the provider, CSS token
   exports and theme registry item. Introduce target recipe names only with their execution contract.
-- Update `scripts/motion-manifest.mjs`, `scripts/motion-docs.mjs`, `scripts/check-registry.mjs`,
+- Pending runtime migration: update `scripts/motion-manifest.mjs`, `scripts/motion-docs.mjs`, `scripts/check-registry.mjs`,
   `scripts/catalog-intensity.mjs`, scaffold/template checks and corresponding fixtures for the new
   recipe forms and temporary tier/budget semantics. Preserve source/metadata/docs equality.
-- Extend `tests/motion-contract.tsx`, the observer and reporter to cover colours, text/number
+- Pending runtime migration: extend `tests/motion-contract.tsx`, the observer and reporter to cover colours, text/number
   controllers, continuous reduced cancellation and actual successful mode assertions.
-- Separate support for target assertions from their per-item enforcement during rollout. Define
-  an explicit migration marker or fixture declaration in the minimal schema; unmigrated items still
-  prove their documented baseline, and migrated items must prove the stricter contract. Remove
-  transitional exceptions only with the corresponding source and public-doc update.
+- Target reference metadata explicitly records `migration: "legacy"`; absent/unknown state fails.
+  Registry checking and the runtime reporter reject `v2` until strict enforcement support exists.
+  Legacy items still prove their documented baseline. Next, enable shared target assertion support,
+  then migrate individual items with stricter helper/observer evidence, source and public docs together.
+  Remove transitional exceptions only with those changes; a marker cannot promote legacy evidence.
 - Keep legacy runtime differences explicit while a component remains unmigrated. Do not update
   generated metadata or public claims to describe pending behaviour.
 
@@ -247,6 +257,12 @@ opacity survives presence/loop cleanup, focused entering controls remain visible
 refs/direct-child structure, and effect replay/abandoned renders create no duplicate owners. Exercise
 forced-colours, print, document hiding/restoration and nested/portalled contexts. These are pending
 shared gates, not evidence supplied by the design files.
+Include positive-to-positive clock changes, then zero and live downgrade on the same target: captured
+finite tween clocks versus retimed physics/scroll controllers must follow the preset policy. Prove
+exact opacity-only surface forms, chevron versus copy-glyph targets, native input foreground versus
+display helpers, and hover/focus/collapse arbitration for accessory controls. Colour checks cover
+fixed shadow topology, immediate focus geometry, pseudo-elements and final cascade restoration;
+none of these design statements establish an implemented capability.
 
 ### Phase 3: Five pilots
 

@@ -12,19 +12,19 @@ baseline until each implementation slice lands with its tests and distribution u
 
 ## 1. Design principles
 
-| Principle                 | Contract                                                                                |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| P1 Source ownership       | Ordinary editable source files, no runtime UI package or injected licensing             |
-| P2 No alias assumptions   | Relative imports and bare package names inside shipped source                           |
+| Principle                 | Contract                                                                                           |
+| ------------------------- | -------------------------------------------------------------------------------------------------- |
+| P1 Source ownership       | Ordinary editable source files, no runtime UI package or injected licensing                        |
+| P2 No alias assumptions   | Relative imports and bare package names inside shipped source                                      |
 | P3 Motion contract        | Every component has an individual design; every action names cause, recipe, modes and cancellation |
-| P4 Accessibility parity   | Preserve native semantics, keyboard/focus, screen-reader state and reduced motion       |
-| P5 Docs as data           | One component MDX body feeds the site, registry docs and generated AI text              |
-| P6 Light by default       | Declare dependencies explicitly; heavy optional engines never load incidentally         |
-| P7 Traceability           | Item metadata and sourceSha identify distributed source; snapshots identify exact bytes |
-| P8 Superset               | Same upstream ids, exports, props/defaults and data-slot; additions are documented      |
-| P9 Motion follows meaning | Cover applicable changes with coordinated motion; each property has one owner and cause |
-| P10 Pinned upstream       | upstream/manifest.json is authoritative; parity is checked against its pin              |
-| P11 UI only               | Consumers own data, form state and validation                                           |
+| P4 Accessibility parity   | Preserve native semantics, keyboard/focus, screen-reader state and reduced motion                  |
+| P5 Docs as data           | One component MDX body feeds the site, registry docs and generated AI text                         |
+| P6 Light by default       | Declare dependencies explicitly; heavy optional engines never load incidentally                    |
+| P7 Traceability           | Item metadata and sourceSha identify distributed source; snapshots identify exact bytes            |
+| P8 Superset               | Same upstream ids, exports, props/defaults and data-slot; additions are documented                 |
+| P9 Motion follows meaning | Cover applicable changes with coordinated motion; each property has one owner and cause            |
+| P10 Pinned upstream       | upstream/manifest.json is authoritative; parity is checked against its pin                         |
+| P11 UI only               | Consumers own data, form state and validation                                                      |
 
 ## 2. Architecture
 
@@ -39,22 +39,22 @@ MCP and a distributed agent skill are not implemented product channels.
 
 ## 3. Repository and install layout
 
-| Path                                                       | Owner                                                               |
-| ---------------------------------------------------------- | ------------------------------------------------------------------- |
-| registry/cadence/<id>/index.tsx                            | Component source and public exports                                 |
-| registry/cadence/lib/                                      | Shared helpers, providers and motion tokens                         |
-| docs/motion/README.md, docs/motion/presets.md                | Individual-design index, shared target parameter assignments and binding rules |
-| docs/motion/components/<id>.md                             | One target part-level animation contract per UI/block id            |
-| registry.json                                              | Item types, targets, dependencies, tiers and batches                |
-| upstream/manifest.json                                     | Pinned upstream API surface and visual style                        |
-| content/components/*.mdx                                   | User-facing component content and metadata                          |
-| content/docs/*.mdx                                         | User-facing guides                                                  |
-| app/, components/site/, lib/                               | Next site, content loading and registry HTTP handling               |
-| public/r/                                                  | Generated aliases and tracked immutable snapshots                   |
-| scripts/                                                   | Registry, parity and reusable development tools                     |
-| tests/components/, tests/site/, tests/e2e/, tests/runtime/ | Behaviour, contracts and browser/runtime checks                     |
-| tests/fixtures/                                            | Minimal executable test inputs, including negative source specimens |
-| .cache/                                                    | Ignored generated audit output and experimental builds              |
+| Path                                                       | Owner                                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| registry/cadence/<id>/index.tsx                            | Component source and public exports                                            |
+| registry/cadence/lib/                                      | Shared helpers, providers and motion tokens                                    |
+| docs/motion/README.md, docs/motion/presets.md              | Individual-design index, shared target parameter assignments and binding rules |
+| docs/motion/components/<id>.md                             | One target part-level animation contract per UI/block id                       |
+| registry.json                                              | Item types, targets, dependencies, tiers and batches                           |
+| upstream/manifest.json                                     | Pinned upstream API surface and visual style                                   |
+| content/components/*.mdx                                   | User-facing component content and metadata                                     |
+| content/docs/*.mdx                                         | User-facing guides                                                             |
+| app/, components/site/, lib/                               | Next site, content loading and registry HTTP handling                          |
+| public/r/                                                  | Generated aliases and tracked immutable snapshots                              |
+| scripts/                                                   | Registry, parity and reusable development tools                                |
+| tests/components/, tests/site/, tests/e2e/, tests/runtime/ | Behaviour, contracts and browser/runtime checks                                |
+| tests/fixtures/                                            | Minimal executable test inputs, including negative source specimens            |
+| .cache/                                                    | Ignored generated audit output and experimental builds                         |
 
 Source `registry/cadence/<id>/index.tsx` installs to
 `@components/cadence/<id>/index.tsx`. Consumers import `@/components/cadence/<id>`.
@@ -101,7 +101,8 @@ implementation, rather than be bypassed by relabelling components or weakening b
 The target capability matrix records whether each applicable behaviour is provided by default,
 inherited from an owning part, available through documented composition, or not applicable with a
 reason. These are distinct delivery relationships, not interchangeable claims of automatic support.
-The matrix and any schema/checker changes are rollout work, not existing registry fields. Target
+The internal reference schema in `docs/motion/README.md` checks target edges and explicit migration
+state; these are not registry fields or runtime evidence. Remaining schema/checker integration is rollout work. Target
 intensity is reviewed from actual authored behaviour and its scope; it must not be inferred solely
 from a recipe name or prefix. The current intensity policy and catalogue remain the delivered
 baseline until their migration is implemented and verified.

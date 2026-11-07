@@ -4,16 +4,16 @@ This directory contains current concepts, contracts and future work. User-facing
 in `content/docs/` and `content/components/`; component inventory and install metadata live in
 `registry.json`. Git history is the record of completed work, measurements and handoffs.
 
-| Read                                                            | Before                                                                       |
-| --------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| [Overall design](overall-design.md)                             | Changing architecture, install paths, shared code, APIs, themes or the build |
-| [Animation system](animation-system.md)                         | Changing tokens, recipes, modes, engine integration or motion tests          |
+| Read                                                            | Before                                                                          |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [Overall design](overall-design.md)                             | Changing architecture, install paths, shared code, APIs, themes or the build    |
+| [Animation system](animation-system.md)                         | Changing tokens, recipes, modes, engine integration or motion tests             |
 | [Individual component motion](motion/README.md)                 | Designing or reviewing one component's parts, choreography and six capabilities |
-| [Motion presets and bindings](motion/presets.md)                 | Selecting component rhythm or changing shared parameter assignments          |
-| [Animation system rollout](animation-system-plan.md)            | Choosing a v2 migration task, its dependencies or its acceptance evidence    |
-| [Site and distribution](documentation-site-and-distribution.md) | Changing MDX, previews, site controls, registry HTTP or snapshots            |
-| [Architecture decisions](adr.md)                                | Revisiting a foundational decision                                           |
-| [Scope and next work](parity-plan.md)                           | Choosing work, a tier or a batch, or checking unresolved requirements        |
+| [Motion presets and bindings](motion/presets.md)                | Selecting component rhythm or changing shared parameter assignments             |
+| [Animation system rollout](animation-system-plan.md)            | Choosing a v2 migration task, its dependencies or its acceptance evidence       |
+| [Site and distribution](documentation-site-and-distribution.md) | Changing MDX, previews, site controls, registry HTTP or snapshots               |
+| [Architecture decisions](adr.md)                                | Revisiting a foundational decision                                              |
+| [Scope and next work](parity-plan.md)                           | Choosing work, a tier or a batch, or checking unresolved requirements           |
 
 The animation system defines the accepted v2 target and identifies the existing implementation as
 the migration baseline. The rollout plan records remaining work; it is not a list of delivered APIs.

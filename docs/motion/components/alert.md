@@ -4,27 +4,44 @@ Status: target design; implementation and verification pending.
 
 Alert makes a new message noticeable without delaying its announcement or shaking the whole surface. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["alert#Alert"],
+    "text": ["alert#AlertTitle", "alert#AlertDescription"],
+    "value": ["alert#AlertTitle", "alert#AlertDescription"],
+    "surface": ["alert#Alert"],
+    "icon": ["alert#Alert"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: alert owns one entrance; inherited when a parent notification/region owner consumes the same cause. |
-| Size | default: alert owns title/description/action-driven block size; a parent may consume outer sibling reflow. |
-| Surface colour | default: alert background/border and authored icon surface changes on variant/context updates. |
-| Text colour | default: root/title/description and currentColor icon foreground; composed action controls retain their own state owners. |
-| Changed text | default: plain AlertTitle/AlertDescription and directly owned message strings; composed rich message content. |
-| Changed numbers | default: direct message quantities in known display parts; composed rich quantities; error codes and numeric identifiers remain text. |
+| Capability      | Coverage and owner                                                                                                                    | References                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Appearance      | default: alert owns one entrance; inherited when a parent notification/region owner consumes the same cause.                          | default: `alert.root.enter`, `alert.root.exit`   |
+| Size            | default: alert owns title/description/action-driven block size; a parent may consume outer sibling reflow.                            | default: `alert.root.resize`                     |
+| Surface colour  | default: alert background/border and authored icon surface changes on variant/context updates.                                        | default: `alert.surface.colour`                  |
+| Text colour     | default: root/title/description and currentColor icon foreground; composed action controls retain their own state owners.             | default: `alert.text.colour`                     |
+| Changed text    | default: plain AlertTitle/AlertDescription and directly owned message strings; composed rich message content.                         | default: `alert.text.replace`; composed: `@text` |
+| Changed numbers | default: direct message quantities in known display parts; composed rich quantities; error codes and numeric identifiers remain text. | default: `alert.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Message insertion/removal / alert and retained parent | Surface opacity entrance/exit; role=alert and committed message are immediate. | Short opacity. | Immediate. | `alert.root.enter` → `presence.surface` → opacity-only `enter.pop`; `alert.root.exit` → `presence.exit` → `exit.fade` |
-| Message/action content changes / alert | Changed-only text, stagger:none, or quantity reels; measured height adjusts in the same transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `alert.text.replace` → `text.replace` → target `text.change`; `alert.value.roll` → `number.compact` → revised `number.roll`; `alert.root.resize` → `geometry.content` → `geometry.resize` |
-| Variant/context change / root and foreground owners | Scoped colour transition. | Short colour. | Immediate. | `alert.surface.colour` → `state.color` → target `state.color`; `alert.text.colour` → `state.color` → target `state.color` |
-| Explicit keyed icon replacement / existing icon child | Bounded opacity crossfade; no automatic SVG path morph. | Short opacity. | Immediate. | `alert.icon.replace` → `data.update` → local opacity `data.transition` |
+| Trigger / owner                                       | full                                                                                                 | reduced                                                  | none       | Binding → preset → recipe/form                                                                                                                                                                         |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Message insertion/removal / alert and retained parent | Surface opacity entrance/exit; role=alert and committed message are immediate.                       | Short opacity.                                           | Immediate. | `alert.root.enter` → `presence.surface` → `enter.pop/opacity`; `alert.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                               |
+| Message/action content changes / alert                | Changed-only text, stagger:none, or quantity reels; measured height adjusts in the same transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `alert.text.replace` → `text.replace` → `text.change/changed-runs`; `alert.value.roll` → `number.compact` → `number.roll/reels`; `alert.root.resize` → `geometry.content` → `geometry.resize/measured` |
+| Variant/context change / root and foreground owners   | Scoped colour transition.                                                                            | Short colour.                                            | Immediate. | `alert.surface.colour` → `state.color` → `state.color/surface`; `alert.text.colour` → `state.color` → `state.color/foreground`                                                                         |
+| Explicit keyed icon replacement / existing icon child | Bounded opacity crossfade; no automatic SVG path morph.                                              | Short opacity.                                           | Immediate. | `alert.icon.replace` → `data.update` → `data.transition/opacity`                                                                                                                                       |
 
 ## Interruption and lifecycle
 

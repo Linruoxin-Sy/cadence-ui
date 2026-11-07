@@ -4,29 +4,54 @@ Status: target design; implementation and verification pending.
 
 A single-select group uses one shared selection surface; a multi-select group gives each selected item its own state. The group coordinates layout so labels do not start competing springs. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["toggle-group#ToggleGroup"],
+    "indicator": ["toggle-group#ToggleGroup", "toggle-group#ToggleGroupItem"],
+    "item": ["toggle-group#ToggleGroupItem"],
+    "items": ["toggle-group#ToggleGroup"],
+    "content": ["toggle-group#ToggleGroupItem"],
+    "quantity": ["toggle-group#ToggleGroupItem"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `toggle-group` owns one entrance; `toggle-group-item` and `toggle-group-content` inherit it. |
-| Size | Default: group owns content-driven strip dimensions and item reflow along `orientation`; each label exposes a natural target without independently animating the same strip geometry. |
-| Surface colour | Default: shared selected surface in single mode; item surfaces independently in `multiple` mode. Root owns variant track colour. |
-| Text colour | Default: item foreground follows selected/hover/disabled state. |
-| Changed text | Default for owned primitive item content: each `toggle-group-content` replaces only changed runs. Rich children are composed. |
-| Changed numbers | Composed: only explicit quantity children roll; item values and numeric-looking option names remain identifiers. |
+| Capability      | Application and owner                                                                                                                                                                 | References                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Appearance      | Default: `toggle-group` owns one entrance; `toggle-group-item` and `toggle-group-content` inherit it.                                                                                 | default: `toggle-group.root.enter`                                                               |
+| Size            | Default: group owns content-driven strip dimensions and item reflow along `orientation`; each label exposes a natural target without independently animating the same strip geometry. | default: `toggle-group.root.resize`                                                              |
+| Surface colour  | Default: shared selected surface in single mode; item surfaces independently in `multiple` mode. Root owns variant track colour.                                                      | default: `toggle-group.item.colour`, `toggle-group.root.colour`, `toggle-group.indicator.colour` |
+| Text colour     | Default: item foreground follows selected/hover/disabled state.                                                                                                                       | default: `toggle-group.item.colour`                                                              |
+| Changed text    | Default for owned primitive item content: each `toggle-group-content` replaces only changed runs. Rich children are composed.                                                         | default: `toggle-group.content.change`; composed: `@content`                                     |
+| Changed numbers | Composed: only explicit quantity children roll; item values and numeric-looking option names remain identifiers.                                                                      | composed: `toggle-group.quantity.change`                                                         |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Group insertion / root | One opacity entrance without item stagger. | Short opacity. | Final group immediately. | `toggle-group.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Single selection / group selection surface | One shared indicator translates/resizes between committed item boxes; no outgoing duplicate selected plate. | Plate places immediately; no residual selection tween. | Final plate immediately. | `toggle-group.indicator.select` → `layout.selection` → `layout.shared` |
-| Multiple selection / each item indicator | Local indicator opacity and `scale.in` feedback; token colour belongs to the separate colour binding and there is no shared travelling plate. | Opacity only, final indicator geometry. | Final state immediately. | `toggle-group.item.select` → `state.indicator` → `state.morph` |
-| Pointer/keyboard press / item visual owner | `scale.press`, separated from group indicator coordinates. | No scale. | No tween. | `toggle-group.item.press` → `feedback.press` → `feedback.press` |
-| Interaction/variant / surface and text owners | Scoped surface, border and foreground colours. | Short colour feedback. | Final colours immediately. | `toggle-group.item.colour` → `state.color` → target `state.color` |
-| Labels/item set/explicit size / group layout owner | One measured axis transaction retargets strip and selection plate together. | Final layout immediately. | Final layout immediately. | `toggle-group.root.resize` → `geometry.compact` → `geometry.resize`; `toggle-group.items.reflow` → `layout.compact` → `layout.move` |
-| Primitive item label / content presentation | Retain unchanged graphemes; changed runs use `stagger: none`. | Changed-run opacity only. | Final text immediately. | `toggle-group.content.change` → `text.replace` → target `text.change` |
-| Explicit composed quantity / that child owner | Roll changed places only, without interpreting option values or ordinary numeric-looking labels as quantities. | Final number immediately. | Final number immediately. | `toggle-group.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                          | Full                                                                                                                                          | Reduced                                                | None                       | Binding → preset → recipe/form                                                                                                                        |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Group insertion / root                                   | One opacity entrance without item stagger.                                                                                                    | Short opacity.                                         | Final group immediately.   | `toggle-group.root.enter` → `presence.inline` → `data.transition/opacity`                                                                             |
+| Single selection / group selection surface               | One shared indicator translates/resizes between committed item boxes; no outgoing duplicate selected plate.                                   | Plate places immediately; no residual selection tween. | Final plate immediately.   | `toggle-group.indicator.select` → `layout.selection` → `layout.shared/selection`                                                                      |
+| Multiple selection / each item indicator                 | Local indicator opacity and `scale.in` feedback; token colour belongs to the separate colour binding and there is no shared travelling plate. | Opacity only, final indicator geometry.                | Final state immediately.   | `toggle-group.item.select` → `state.indicator` → `state.morph/indicator`                                                                              |
+| Pointer/keyboard press / item visual owner               | `scale.press`, separated from group indicator coordinates.                                                                                    | No scale.                                              | No tween.                  | `toggle-group.item.press` → `feedback.press` → `feedback.press/scale`                                                                                 |
+| Interaction/variant / surface and text owners            | Scoped surface, border and foreground colours.                                                                                                | Short colour feedback.                                 | Final colours immediately. | `toggle-group.item.colour` → `state.color` → `state.color/surface-foreground`                                                                         |
+| Labels/item set/explicit size / group layout owner       | One measured axis transaction retargets strip and selection plate together.                                                                   | Final layout immediately.                              | Final layout immediately.  | `toggle-group.root.resize` → `geometry.compact` → `geometry.resize/measured`; `toggle-group.items.reflow` → `layout.compact` → `layout.move/position` |
+| Primitive item label / content presentation              | Retain unchanged graphemes; changed runs use `stagger: none`.                                                                                 | Changed-run opacity only.                              | Final text immediately.    | `toggle-group.content.change` → `text.replace` → `text.change/changed-runs`                                                                           |
+| Explicit composed quantity / that child owner            | Roll changed places only, without interpreting option values or ordinary numeric-looking labels as quantities.                                | Final number immediately.                              | Final number immediately.  | `toggle-group.quantity.change` → `number.compact` → `number.roll/reels`                                                                               |
+| Root variant or shared/local selected-fill paint changes | Root track and selected decoration have separate scoped surface-colour owners; item foreground remains with item.colour.                      | Short colour; selected geometry is immediate.          | Final paint immediately.   | `toggle-group.root.colour` → `state.color` → `state.color/surface`; `toggle-group.indicator.colour` → `state.color` → `state.color/surface`           |
+
+Root track colour belongs to `root.colour`; each actual selected-decoration layer belongs to
+`indicator.colour` in both single and multiple modes. Item colour owns item foreground and any
+remaining non-indicator surface only. It never adds another selected background under the plate.
+Selection opacity/scale and colour are disjoint properties on the decoration; mode changes cancel
+both through its current owner before changing between shared and per-item decoration.
 
 ## Interruption and lifecycle
 

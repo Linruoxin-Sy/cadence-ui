@@ -6,30 +6,65 @@ Code Block keeps code readable while explaining folding, active-file changes and
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). The target preserves native `pre`/code selection, the current tab API, controlled expansion and exact copy semantics.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "surface": [
+      "code-block#CodeBlock",
+      "code-block#CodeBlockLine",
+      "code-block#CodeBlockTab",
+      "code-block#CodeBlockCopyButton",
+      "code-block#CodeBlockExpandButton",
+      "code-block#CodeBlockTitle"
+    ],
+    "viewport": ["code-block#CodeBlockContent", "code-block#CodeBlockPanel"],
+    "indicator": ["code-block#CodeBlockTabs"],
+    "icon": ["code-block#CodeBlockCopyButton", "code-block#CodeBlockExpandButton"],
+    "actions": ["code-block#CodeBlockActions"],
+    "text": [
+      "code-block#CodeBlockTitle",
+      "code-block#CodeBlockFooter",
+      "code-block#CodeBlockTab",
+      "code-block#CodeBlockExpandButton",
+      "code-block#CodeBlockContent",
+      "code-block#CodeBlockLine"
+    ],
+    "line": ["code-block#CodeBlockLine"],
+    "value": ["code-block#CodeBlockFooter"],
+    "control": ["code-block#CodeBlockCopyButton", "code-block#CodeBlockExpandButton", "code-block#CodeBlockTab"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: independent dynamic block insertion and floating actions use local opacity; wholly new/deleted source lines may fade only under the identity rule below. A parent surface consumes same-cause block insertion, and that insertion consumes initial line entry. |
-| Size | Default: each visible `code-block-viewport` owns measured clamped block-size for fold/expand and a known revision of its own content. The actual natural pre/code surface is measured separately. Switching between distinct persisted Panel hosts does not imply a shared height owner; that continuity requires explicit ancestor composition. |
-| Surface colour | Default: variant, highlighted/added/removed line and action/tab state surfaces; token syntax colours are not treated as newly inserted source. |
-| Text colour | Default for owned title/tab/control state foreground and explicit line-state changes; syntax-highlighter output keeps its own style ownership. |
-| Changed text | Default for owned plain title/tab/footer/expand-button labels and safe direct-string code source updates. Modified source retains unchanged graphemes/runs across line and token boundaries. Arbitrary rich token trees without safe source mapping update immediately; rich non-code labels use explicit composition. |
-| Changed numbers | Default for a supported direct quantity in a non-code display part such as Footer; composed for rich quantitative accessories. Not applicable to source numerals, line numbers, filenames, tab values or language/version labels, which are code/identity text rather than scalar counters. |
+| Capability      | Applicability and owner                                                                                                                                                                                                                                                                                                                          | References                                                                                                                                  |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: independent dynamic block insertion and floating actions use local opacity; wholly new/deleted source lines may fade only under the identity rule below. A parent surface consumes same-cause block insertion, and that insertion consumes initial line entry.                                                                          | default: `code-block.surface.enter`, `code-block.actions.enter`, `code-block.actions.exit`, `code-block.line.enter`, `code-block.line.exit` |
+| Size            | Default: each visible `code-block-viewport` owns measured clamped block-size for fold/expand and a known revision of its own content. The actual natural pre/code surface is measured separately. Switching between distinct persisted Panel hosts does not imply a shared height owner; that continuity requires explicit ancestor composition. | default: `code-block.viewport.resize`                                                                                                       |
+| Surface colour  | Default: variant, highlighted/added/removed line and action/tab state surfaces; token syntax colours are not treated as newly inserted source.                                                                                                                                                                                                   | default: `code-block.surface.colour`                                                                                                        |
+| Text colour     | Default for owned title/tab/control state foreground and explicit line-state changes; syntax-highlighter output keeps its own style ownership.                                                                                                                                                                                                   | default: `code-block.surface.colour`                                                                                                        |
+| Changed text    | Default for owned plain title/tab/footer/expand-button labels and safe direct-string code source updates. Modified source retains unchanged graphemes/runs across line and token boundaries. Arbitrary rich token trees without safe source mapping update immediately; rich non-code labels use explicit composition.                           | default: `code-block.text.replace`; composed: `@text`                                                                                       |
+| Changed numbers | Default for a supported direct quantity in a non-code display part such as Footer; composed for rich quantitative accessories. Not applicable to source numerals, line numbers, filenames, tab values or language/version labels, which are code/identity text rather than scalar counters.                                                      | default: `code-block.value.change`; composed: `@value`                                                                                      |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Independent late insertion; block paint | Opacity-only surface entry, with code already at its current source and no line cascade. | Short opacity. | Visible immediately. | `code-block.surface.enter` → `presence.surface` → opacity-only `enter.pop` |
-| Fold/expand or known active content size; viewport | One clamped block-size transition between actual folded/full destinations. | Final size immediately. | Final size immediately. | `code-block.viewport.resize` → `geometry.content` → `geometry.resize` |
-| Active tab changes; tab-indicator | Persistent local selection marker moves to the active tab. | Destination immediately. | Destination immediately. | `code-block.indicator.select` → `layout.selection` → `layout.shared` |
-| Copy result/expanded state; existing button icons | Local indicator change with opacity and permitted transform; button identity and label semantics stay stable. | Short opacity, final geometry. | Final state immediately. | `code-block.icon.change` → `state.indicator` → `state.morph` |
-| Existing hover/focus action visibility | Opacity entry/exit; focus makes controls usable immediately. | Short opacity. | Immediate visibility. | `code-block.actions.enter` → `presence.inline` → one-shot `data.transition`; `code-block.actions.exit` → `presence.exit` → `exit.fade` |
-| Safe source/owned label replacement | Animate changed graphemes/runs only, no stagger; a whole line may fade only when none of its units are retained elsewhere in the same source revision. | Short opacity on changed units only; unsafe/high-frequency/selection-conflicting updates immediate. | Final source/label immediately. | `code-block.text.replace` → `text.replace` → planned `text.change`; `code-block.line.enter` → `presence.inline` → one-shot `data.transition`; `code-block.line.exit` → `presence.exit` → `exit.fade` |
-| Direct non-code display quantity changes | Changed places roll without interpreting code or line-number text. | Final quantity immediately. | Final quantity immediately. | `code-block.value.change` → `number.compact` → `number.roll` |
-| Copy/expand button press | Inherit Button feedback on its visual layer, separately from icon state and viewport geometry. | No scale; short colour. | Immediate. | `code-block.control.press` → `feedback.press` → `feedback.press` |
-| Variant/highlight/tab/action state colours | Scoped surface/foreground/border colour; focus ring immediate. | Short colour. | Final colours immediately. | `code-block.surface.colour` → `state.color` → planned `state.color` |
+| Trigger and owner                                  | Full                                                                                                                                                   | Reduced                                                                                             | None                            | Binding → preset → recipe                                                                                                                                                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Independent late insertion; block paint            | Opacity-only surface entry, with code already at its current source and no line cascade.                                                               | Short opacity.                                                                                      | Visible immediately.            | `code-block.surface.enter` → `presence.surface` → `enter.pop/opacity`                                                                                                                                            |
+| Fold/expand or known active content size; viewport | One clamped block-size transition between actual folded/full destinations.                                                                             | Final size immediately.                                                                             | Final size immediately.         | `code-block.viewport.resize` → `geometry.content` → `geometry.resize/measured`                                                                                                                                   |
+| Active tab changes; tab-indicator                  | Persistent local selection marker moves to the active tab.                                                                                             | Destination immediately.                                                                            | Destination immediately.        | `code-block.indicator.select` → `layout.selection` → `layout.shared/selection`                                                                                                                                   |
+| Copy result/expanded state; existing button icons  | Copy icon uses opacity and `scale.in`; expand chevron turns by `rotation.halfTurn` without fading. Button identity and label semantics stay stable.    | Copy icon uses short opacity; expand chevron orientation is immediate.                              | Final state immediately.        | `code-block.icon.change` → `state.indicator` → `state.morph/indicator`                                                                                                                                           |
+| Existing hover/focus action visibility             | Opacity entry/exit; focus makes controls usable immediately.                                                                                           | Short opacity.                                                                                      | Immediate visibility.           | `code-block.actions.enter` → `presence.inline` → `data.transition/opacity`; `code-block.actions.exit` → `presence.exit` → `exit.fade/opacity`                                                                    |
+| Safe source/owned label replacement                | Animate changed graphemes/runs only, no stagger; a whole line may fade only when none of its units are retained elsewhere in the same source revision. | Short opacity on changed units only; unsafe/high-frequency/selection-conflicting updates immediate. | Final source/label immediately. | `code-block.text.replace` → `text.replace` → `text.change/changed-runs`; `code-block.line.enter` → `presence.inline` → `data.transition/opacity`; `code-block.line.exit` → `presence.exit` → `exit.fade/opacity` |
+| Direct non-code display quantity changes           | Changed places roll without interpreting code or line-number text.                                                                                     | Final quantity immediately.                                                                         | Final quantity immediately.     | `code-block.value.change` → `number.compact` → `number.roll/reels`                                                                                                                                               |
+| Copy/expand button press                           | Inherit Button feedback on its visual layer, separately from icon state and viewport geometry.                                                         | No scale; short colour.                                                                             | Immediate.                      | `code-block.control.press` → `feedback.press` → `feedback.press/scale`                                                                                                                                           |
+| Variant/highlight/tab/action state colours         | Scoped surface/foreground/border colour; focus ring immediate.                                                                                         | Short colour.                                                                                       | Final colours immediately.      | `code-block.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                   |
 
 ## Interruption and lifecycle
 

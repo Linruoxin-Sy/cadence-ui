@@ -4,27 +4,42 @@ Status: target design; implementation and verification pending.
 
 Badge makes a compact status or quantity change legible without bouncing the surrounding sentence. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); the bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["badge#Badge"],
+    "label": ["badge#Badge"],
+    "value": ["badge#Badge"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: badge for dynamic insertion; inherited when an enclosing item owns the same entrance. |
-| Size | default: badge owns intrinsic inline size as its display content changes; constrained or wrapping layout is clamped. |
-| Surface colour | default: badge background and border on variant and actual interactive state changes. |
-| Text colour | default: badge foreground and inheriting currentColor icons. |
-| Changed text | default: direct plain string children use changed-only replacement; composed for rich child content. |
-| Changed numbers | default: direct quantities use compact rolling; numeric labels, versions and identifiers remain textual; rich quantities use explicit composition. |
+| Capability      | Coverage and owner                                                                                                                                 | References                                         |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Appearance      | default: badge for dynamic insertion; inherited when an enclosing item owns the same entrance.                                                     | default: `badge.root.enter`, `badge.root.exit`     |
+| Size            | default: badge owns intrinsic inline size as its display content changes; constrained or wrapping layout is clamped.                               | default: `badge.root.resize`                       |
+| Surface colour  | default: badge background and border on variant and actual interactive state changes.                                                              | default: `badge.root.colour`                       |
+| Text colour     | default: badge foreground and inheriting currentColor icons.                                                                                       | default: `badge.root.colour`                       |
+| Changed text    | default: direct plain string children use changed-only replacement; composed for rich child content.                                               | default: `badge.label.replace`; composed: `@label` |
+| Changed numbers | default: direct quantities use compact rolling; numeric labels, versions and identifiers remain textual; rich quantities use explicit composition. | default: `badge.value.roll`; composed: `@value`    |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent add/remove / badge | Opacity entrance and retained exit. | Short opacity only. | Immediate. | `badge.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `badge.root.exit` → `presence.exit` → `exit.fade` |
-| Status label changes / label | Replace only changed graphemes, stagger:none; resize the badge concurrently. | Short changed-text opacity; size immediate. | Immediate. | `badge.label.replace` → `text.replace` → target `text.change`; `badge.root.resize` → `geometry.compact` → `geometry.resize` |
-| Quantity changes / numeric display | Roll changed places; keep affixes stable and share the width transaction. | Final quantity immediately. | Immediate. | `badge.value.roll` → `number.compact` → revised `number.roll` |
-| Variant or actual link interaction / badge | Scoped background, border and foreground transition. | Short colour feedback. | Immediate. | `badge.root.colour` → `state.color` → target `state.color` |
+| Trigger / owner                            | full                                                                         | reduced                                     | none       | Binding → preset → recipe/form                                                                                                             |
+| ------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Independent add/remove / badge             | Opacity entrance and retained exit.                                          | Short opacity only.                         | Immediate. | `badge.root.enter` → `presence.inline` → `data.transition/opacity`; `badge.root.exit` → `presence.exit` → `exit.fade/opacity`              |
+| Status label changes / label               | Replace only changed graphemes, stagger:none; resize the badge concurrently. | Short changed-text opacity; size immediate. | Immediate. | `badge.label.replace` → `text.replace` → `text.change/changed-runs`; `badge.root.resize` → `geometry.compact` → `geometry.resize/measured` |
+| Quantity changes / numeric display         | Roll changed places; keep affixes stable and share the width transaction.    | Final quantity immediately.                 | Immediate. | `badge.value.roll` → `number.compact` → `number.roll/reels`                                                                                |
+| Variant or actual link interaction / badge | Scoped background, border and foreground transition.                         | Short colour feedback.                      | Immediate. | `badge.root.colour` → `state.color` → `state.color/surface-foreground`                                                                     |
 
 ## Interruption and lifecycle
 

@@ -6,26 +6,42 @@ Collapsible is a quiet, general disclosure: the body opens from its trigger with
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). Local bindings describe target design, not installable API.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["collapsible#CollapsibleContent"],
+    "trigger": ["collapsible#CollapsibleTrigger"],
+    "label": ["collapsible#CollapsibleTrigger", "collapsible#CollapsibleContent"],
+    "value": ["collapsible#CollapsibleTrigger", "collapsible#CollapsibleContent"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: content opacity accompanies semantic opening/closing. Parent presence suppresses a duplicate same-cause entrance; initial visible content is never re-hidden after SSR. |
-| Size | Default: content owns measured block-size for open state and known intrinsic content changes. The root and nested children do not add a second writer. |
-| Surface colour | Default where the trigger defines state surfaces; a bare unstyled trigger receives no invented background. Nested controls inherit their own contracts. |
-| Text colour | Default for component-defined trigger foreground changes; other text inherits the current semantic colour. |
-| Changed text | Default for a directly owned plain trigger/body string; arbitrary rich trigger/body content is composed and not recursively rewritten. |
-| Changed numbers | Default for a supported direct numeric quantity in trigger/body display; composed for nested numeric components. Numeric-looking strings and identifiers remain text; editable descendants never roll. |
+| Capability      | Applicability and owner                                                                                                                                                                                | References                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Appearance      | Default: content opacity accompanies semantic opening/closing. Parent presence suppresses a duplicate same-cause entrance; initial visible content is never re-hidden after SSR.                       | default: `collapsible.content.enter`, `collapsible.content.exit` |
+| Size            | Default: content owns measured block-size for open state and known intrinsic content changes. The root and nested children do not add a second writer.                                                 | default: `collapsible.content.resize`                            |
+| Surface colour  | Default where the trigger defines state surfaces; a bare unstyled trigger receives no invented background. Nested controls inherit their own contracts.                                                | default: `collapsible.trigger.colour`                            |
+| Text colour     | Default for component-defined trigger foreground changes; other text inherits the current semantic colour.                                                                                             | default: `collapsible.trigger.colour`                            |
+| Changed text    | Default for a directly owned plain trigger/body string; arbitrary rich trigger/body content is composed and not recursively rewritten.                                                                 | default: `collapsible.label.replace`; composed: `@label`         |
+| Changed numbers | Default for a supported direct numeric quantity in trigger/body display; composed for nested numeric components. Numeric-looking strings and identifiers remain text; editable descendants never roll. | default: `collapsible.value.change`; composed: `@value`          |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Open, close or known content update; content shell | Compact clamped block-size continuity from the current size. | Final natural/closed size immediately. | Final size immediately. | `collapsible.content.resize` → `geometry.compact` → `geometry.resize` |
-| Visibility change; inner paint | Opacity entry/exit without vertical translation of reading content. | Short entry after final open geometry; fully clipped closed body completes immediately. | Immediate semantic visibility. | `collapsible.content.enter` → `presence.inline` → one-shot `data.transition`; `collapsible.content.exit` → `presence.exit` → `exit.fade` |
-| Defined trigger state changes | Scoped surface/text colour; focus ring immediately. | Short colour. | Final colour immediately. | `collapsible.trigger.colour` → `state.color` → planned `state.color` |
-| Direct plain trigger/body text changes | Changed graphemes/runs only, no stagger; opening presence consumes same-cause body text entry. | Short opacity on changed runs only. | Final text immediately. | `collapsible.label.replace` → `text.replace` → planned `text.change` |
-| Direct displayed quantity changes | Changed place-value reels only; body geometry stays with the content shell. | Final quantity/geometry immediately. | Final quantity/geometry immediately. | `collapsible.value.change` → `number.compact` → `number.roll` |
+| Trigger and owner                                  | Full                                                                                           | Reduced                                                                                 | None                                 | Binding → preset → recipe                                                                                                                       |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open, close or known content update; content shell | Compact clamped block-size continuity from the current size.                                   | Final natural/closed size immediately.                                                  | Final size immediately.              | `collapsible.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                  |
+| Visibility change; inner paint                     | Opacity entry/exit without vertical translation of reading content.                            | Short entry after final open geometry; fully clipped closed body completes immediately. | Immediate semantic visibility.       | `collapsible.content.enter` → `presence.inline` → `data.transition/opacity`; `collapsible.content.exit` → `presence.exit` → `exit.fade/opacity` |
+| Defined trigger state changes                      | Scoped surface/text colour; focus ring immediately.                                            | Short colour.                                                                           | Final colour immediately.            | `collapsible.trigger.colour` → `state.color` → `state.color/surface-foreground`                                                                 |
+| Direct plain trigger/body text changes             | Changed graphemes/runs only, no stagger; opening presence consumes same-cause body text entry. | Short opacity on changed runs only.                                                     | Final text immediately.              | `collapsible.label.replace` → `text.replace` → `text.change/changed-runs`                                                                       |
+| Direct displayed quantity changes                  | Changed place-value reels only; body geometry stays with the content shell.                    | Final quantity/geometry immediately.                                                    | Final quantity/geometry immediately. | `collapsible.value.change` → `number.compact` → `number.roll/reels`                                                                             |
 
 ## Interruption and lifecycle
 

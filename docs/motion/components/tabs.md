@@ -6,27 +6,50 @@ Tabs links a persistent selection marker to the newly active content. The marker
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). Binding names are local design references.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "indicator": ["tabs#TabsList"],
+    "panel": ["tabs#TabsContent"],
+    "trigger": ["tabs#TabsTrigger"],
+    "label": ["tabs#TabsTrigger", "tabs#TabsContent"],
+    "value": ["tabs#TabsTrigger", "tabs#TabsContent"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: the newly active panel may reveal its paint after an actual selection change. Initial active content is already visible; focus-only movement does not switch or animate panels. |
-| Size | Default where a mounted active panel owns a known intrinsic size change: its content shell uses clamped block-size continuity. Inherited when an enclosing layout coordinates that axis; composed for an explicitly authored shared panel viewport. Separate panel hosts do not imply cross-panel height continuity. |
-| Surface colour | Default: trigger hover/active/disabled surfaces and the indicator's semantic surface. The moving indicator is not a duplicate background on the trigger. |
-| Text colour | Default: trigger selection/disabled foreground, inherited within the panel. Immediate focus visibility is separate. |
-| Changed text | Default for direct plain trigger and active-panel strings; arbitrary rich panel children retain their text owners. Selecting an unchanged panel is presence, not a source-text revision. |
-| Changed numbers | Default for a supported direct quantity in a trigger or panel; composed numeric badges/statistics own their reels. A tab value, index or numeric identifier is not a counter. |
+| Capability      | Applicability and owner                                                                                                                                                                                                                                                                                              | References                                              |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Appearance      | Default: the newly active panel may reveal its paint after an actual selection change. Initial active content is already visible; focus-only movement does not switch or animate panels.                                                                                                                             | default: `tabs.panel.change`                            |
+| Size            | Default where a mounted active panel owns a known intrinsic size change: its content shell uses clamped block-size continuity. Inherited when an enclosing layout coordinates that axis; composed for an explicitly authored shared panel viewport. Separate panel hosts do not imply cross-panel height continuity. | default: `tabs.panel.resize`                            |
+| Surface colour  | Default: trigger hover/active/disabled surfaces and the indicator's semantic surface. The moving indicator is not a duplicate background on the trigger.                                                                                                                                                             | default: `tabs.trigger.colour`, `tabs.indicator.colour` |
+| Text colour     | Default: trigger selection/disabled foreground, inherited within the panel. Immediate focus visibility is separate.                                                                                                                                                                                                  | default: `tabs.trigger.colour`                          |
+| Changed text    | Default for direct plain trigger and active-panel strings; arbitrary rich panel children retain their text owners. Selecting an unchanged panel is presence, not a source-text revision.                                                                                                                             | default: `tabs.label.replace`; composed: `@label`       |
+| Changed numbers | Default for a supported direct quantity in a trigger or panel; composed numeric badges/statistics own their reels. A tab value, index or numeric identifier is not a counter.                                                                                                                                        | default: `tabs.value.change`; composed: `@value`        |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Active value changes; indicator | Move the same local marker to the selected trigger, including its extent, on the list's actual axis. | Marker at destination immediately. | Marker at destination immediately. | `tabs.indicator.select` → `layout.selection` → `layout.shared` |
-| Active panel changes; panel paint | Opacity and `distance.xs` travel following actual activation direction/orientation; unknown/reordered destinations use opacity only. No replay for unrelated renders. | Short opacity, no travel. | Final active panel immediately. | `tabs.panel.change` → `content.switch` → local transform/opacity form of `data.transition` |
-| Active content's known intrinsic size changes | One clamped shell follows the destination block-size, coordinated with panel paint. | Destination size immediately. | Destination size immediately. | `tabs.panel.resize` → `geometry.compact` → `geometry.resize` |
-| Trigger states change | Scoped surface/foreground colour. | Short colour. | Final colours immediately. | `tabs.trigger.colour` → `state.color` → planned `state.color` |
-| Plain trigger/active-panel text changes | Preserve unchanged graphemes; replace changed runs without stagger; panel entry consumes same-cause text entry. | Short opacity on changed runs only. | Final text immediately. | `tabs.label.replace` → `text.replace` → planned `text.change` |
-| Direct display quantity changes | Changed places roll while semantics update immediately. | Final quantity immediately. | Final quantity immediately. | `tabs.value.change` → `number.compact` → `number.roll` |
+| Trigger and owner                                              | Full                                                                                                                                                                  | Reduced                                          | None                               | Binding → preset → recipe                                                      |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ---------------------------------- | ------------------------------------------------------------------------------ |
+| Active value changes; indicator                                | Move the same local marker to the selected trigger, including its extent, on the list's actual axis.                                                                  | Marker at destination immediately.               | Marker at destination immediately. | `tabs.indicator.select` → `layout.selection` → `layout.shared/selection`       |
+| Active panel changes; panel paint                              | Opacity and `distance.xs` travel following actual activation direction/orientation; unknown/reordered destinations use opacity only. No replay for unrelated renders. | Short opacity, no travel.                        | Final active panel immediately.    | `tabs.panel.change` → `content.switch` → `data.transition/directional-content` |
+| Active content's known intrinsic size changes                  | One clamped shell follows the destination block-size, coordinated with panel paint.                                                                                   | Destination size immediately.                    | Destination size immediately.      | `tabs.panel.resize` → `geometry.compact` → `geometry.resize/measured`          |
+| Trigger states change                                          | Scoped surface/foreground colour.                                                                                                                                     | Short colour.                                    | Final colours immediately.         | `tabs.trigger.colour` → `state.color` → `state.color/surface-foreground`       |
+| Plain trigger/active-panel text changes                        | Preserve unchanged graphemes; replace changed runs without stagger; panel entry consumes same-cause text entry.                                                       | Short opacity on changed runs only.              | Final text immediately.            | `tabs.label.replace` → `text.replace` → `text.change/changed-runs`             |
+| Direct display quantity changes                                | Changed places roll while semantics update immediately.                                                                                                               | Final quantity immediately.                      | Final quantity immediately.        | `tabs.value.change` → `number.compact` → `number.roll/reels`                   |
+| Indicator theme/variant paint changes / persistent list marker | Scoped surface/border colour on the marker; no second trigger active fill.                                                                                            | Short colour; marker geometry remains immediate. | Final paint immediately.           | `tabs.indicator.colour` → `state.color` → `state.color/surface`                |
+
+The marker's surface/border paint belongs to `indicator.colour`, anchored to its actual TabsList
+host. Trigger foreground/hover/disabled paint belongs to `trigger.colour`; neither writes the other's
+active fill. A list variant change commits its final shape/layout immediately and rebases the marker,
+then permits only the documented colour feedback; radius/thickness are not `state.color` properties.
 
 ## Interruption and lifecycle
 

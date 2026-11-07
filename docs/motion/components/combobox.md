@@ -4,30 +4,80 @@ Status: target design; implementation and verification pending.
 
 Typing stays attached to the native input while the results surface adapts to the current result set. Committed values and chips receive selective feedback without replaying every filtered row. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["combobox#ComboboxContent"],
+    "input": ["combobox#ComboboxInput", "combobox#ComboboxChipsInput"],
+    "chip": ["combobox#ComboboxChip"],
+    "chips": ["combobox#ComboboxChips"],
+    "label": [
+      "combobox#ComboboxValue",
+      "combobox#ComboboxChip",
+      "combobox#ComboboxItem",
+      "combobox#ComboboxLabel",
+      "combobox#ComboboxEmpty"
+    ],
+    "surface": [
+      "combobox#ComboboxContent",
+      "combobox#ComboboxItem",
+      "combobox#ComboboxChip",
+      "combobox#ComboboxChips",
+      "combobox#ComboboxValue",
+      "combobox#ComboboxLabel",
+      "combobox#ComboboxEmpty",
+      "combobox#ComboboxTrigger",
+      "combobox#ComboboxInput",
+      "combobox#ComboboxSeparator"
+    ],
+    "indicator": ["combobox#ComboboxItem"],
+    "position": ["combobox#ComboboxContent"],
+    "quantity": ["combobox#ComboboxChip", "combobox#ComboboxItem"],
+    "input-frame": ["input-group#InputGroup"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `combobox-content` owns popup presence; initial result rows inherit it. Newly committed chips have a local insertion owner within `combobox-chips`. |
-| Size | Default: content/list share one popup height owner; chip container owns intentional row-wrap height. Input/anchor widths keep existing constraints. |
-| Surface colour | Default: popup, item and chip surfaces own state colours; the composed Input Group owns input-frame chrome. |
-| Text colour | Default: item/value/chip/empty/label parts own display foreground changes; native input styling is inherited from its input owner. |
-| Changed text | Default for plain committed `combobox-value`, chip labels, item labels and empty/group labels. Native `ComboboxInput`/`ComboboxChipsInput` text is immediate; rich/render-function content is composed. |
-| Changed numbers | Composed: explicit quantity displays may roll. Option values and query text are not counters; Combobox adds no result-count prop. |
+| Capability      | Application and owner                                                                                                                                                                                   | References                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `combobox-content` owns popup presence; initial result rows inherit it. Newly committed chips have a local insertion owner within `combobox-chips`.                                            | default: `combobox.content.enter`, `combobox.content.exit`, `combobox.chip.enter`, `combobox.chip.exit` |
+| Size            | Default: content/list share one popup height owner; chip container owns intentional row-wrap height. Input/anchor widths keep existing constraints.                                                     | default: `combobox.content.resize`, `combobox.chips.resize`                                             |
+| Surface colour  | Default: popup, item and chip surfaces own state colours; the composed Input Group owns input-frame chrome.                                                                                             | default: `combobox.surface.colour`; inherited: `@input-frame`                                           |
+| Text colour     | Default: item/value/chip/empty/label parts own display foreground changes; native input styling is inherited from its input owner.                                                                      | default: `combobox.surface.colour`; inherited: `@input-frame`                                           |
+| Changed text    | Default for plain committed `combobox-value`, chip labels, item labels and empty/group labels. Native `ComboboxInput`/`ComboboxChipsInput` text is immediate; rich/render-function content is composed. | default: `combobox.label.change`; composed: `@label`                                                    |
+| Changed numbers | Composed: explicit quantity displays may roll. Option values and query text are not counters; Combobox adds no result-count prop.                                                                       | composed: `combobox.quantity.change`                                                                    |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Popup open/close / content | Anchor-relative opacity with `scale.in`; short opacity exit. | Short opacity only. | Final semantic state immediately. | `combobox.content.enter` → `presence.popup` → `popup.anchored`; `combobox.content.exit` → `presence.exit` → `exit.fade` |
-| Native editing/filtering / Base UI input and list | Commit query, results, selection and active descendant immediately; no row-by-row entry stagger. | Same immediate editing. | Same immediate editing. | `combobox.input.edit` → `engine.native` → Base UI Combobox/native editing (no new recipe) |
-| Result set/empty state changes / popup height owner | Measure latest result-region height and clamp; existing keyed rows keep identity and scroll. | Final height immediately. | Final height immediately. | `combobox.content.resize` → `geometry.compact` → `geometry.resize` |
-| Commit/remove chip / chip group layout owner | Local chip opacity plus bounded group reflow; removed chip cannot retain a remove-button target. | Opacity only; final layout immediately. | Final chips/layout immediately. | `combobox.chip.enter` → `presence.inline` → one-shot `data.transition`; `combobox.chip.exit` → `presence.exit` → `exit.fade`; `combobox.chips.reflow` → `layout.compact` → `layout.move` |
-| Chip wrapping / chip shell | One measured final container height, coordinated with the chip reflow target. | Immediate geometry. | Immediate geometry. | `combobox.chips.resize` → `geometry.compact` → `geometry.resize` |
-| Owned committed display text / relevant part | Changed-run replacement, `stagger: none`; query/native caret text is excluded. | Changed-run opacity only. | Final display text immediately. | `combobox.label.change` → `text.replace` → target `text.change` |
-| Token/highlight/selection/disabled / popup, item, chip, trigger and display text | Scoped surface/foreground colour and local selection-marker opacity; keyboard focus remains immediate. | Short colour/opacity only. | Final state immediately. | `combobox.surface.colour` → `state.color` → target `state.color`; `combobox.indicator.select` → `state.indicator` → `state.morph` |
-| Anchor/collision change / positioner | Correct placement immediately, preserving the actual `useComboboxAnchor`/caller anchor and available bounds. | Same placement. | Same placement. | `combobox.position.place` → `engine.native` → Base UI Combobox positioning (no new recipe) |
-| Explicit composed quantity / child owner | Roll changed places on discrete display revisions; query and option identity remain nonnumeric. | Final number immediately. | Final number immediately. | `combobox.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                  | Full                                                                                                                                 | Reduced                                             | None                              | Binding → preset → recipe/form                                                                                                                                                                           |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Popup open/close / content                                                       | Anchor-relative opacity with `scale.in`; short opacity exit.                                                                         | Short opacity only.                                 | Final semantic state immediately. | `combobox.content.enter` → `presence.popup` → `popup.anchored/presence`; `combobox.content.exit` → `presence.exit` → `exit.fade/opacity`                                                                 |
+| Native editing/filtering / Base UI input and list                                | Commit query, results, selection and active descendant immediately; no row-by-row entry stagger.                                     | Same immediate editing.                             | Same immediate editing.           | `combobox.input.edit` → `engine.native` → `native/base-ui-combobox` (Base UI Combobox/native editing (no new recipe))                                                                                    |
+| Result set/empty state changes / popup height owner                              | Measure latest result-region height and clamp; existing keyed rows keep identity and scroll.                                         | Final height immediately.                           | Final height immediately.         | `combobox.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                              |
+| Commit/remove chip / chip group layout owner                                     | Local chip opacity plus bounded group reflow; removed chip cannot retain a remove-button target.                                     | Opacity only; final layout immediately.             | Final chips/layout immediately.   | `combobox.chip.enter` → `presence.inline` → `data.transition/opacity`; `combobox.chip.exit` → `presence.exit` → `exit.fade/opacity`; `combobox.chips.reflow` → `layout.compact` → `layout.move/position` |
+| Chip wrapping / chip shell                                                       | One measured final container height, coordinated with the chip reflow target.                                                        | Immediate geometry.                                 | Immediate geometry.               | `combobox.chips.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                                |
+| Owned committed display text / relevant part                                     | Changed-run replacement, `stagger: none`; query/native caret text is excluded.                                                       | Changed-run opacity only.                           | Final display text immediately.   | `combobox.label.change` → `text.replace` → `text.change/changed-runs`                                                                                                                                    |
+| Token/highlight/selection/disabled / popup, item, chip, trigger and display text | Scoped surface/foreground colour and local selection-marker opacity; keyboard focus remains immediate.                               | Short colour/opacity only.                          | Final state immediately.          | `combobox.surface.colour` → `state.color` → `state.color/surface-foreground`; `combobox.indicator.select` → `state.indicator` → `state.morph/indicator`                                                  |
+| Anchor/collision change / positioner                                             | Correct placement immediately, preserving the actual `useComboboxAnchor`/caller anchor and available bounds.                         | Same placement.                                     | Same placement.                   | `combobox.position.place` → `engine.native` → `native/base-ui-combobox` (Base UI Combobox positioning (no new recipe))                                                                                   |
+| Explicit composed quantity / child owner                                         | Roll changed places on discrete display revisions; query and option identity remain nonnumeric.                                      | Final number immediately.                           | Final number immediately.         | `combobox.quantity.change` → `number.compact` → `number.roll/reels`                                                                                                                                      |
+| Chip-remove hover/focus / internal remove-button paint                           | Opacity follows its existing resting/active paint, without changing hit geometry; focus makes the control fully visible immediately. | Short opacity for pointer changes; focus immediate. | Final opacity immediately.        | `combobox.chip.affordance` → `presence.inline` → `data.transition/opacity`                                                                                                                               |
+
+The `surface` binding covers separate popup/item/chip/chips-frame and display-foreground regions,
+plus Trigger, the internal clear control hosted by ComboboxInput, and the separator rule. The
+ComboboxInput anchor in that map means its clear-control region, not its Input Group frame or native
+editor. Input Group owns that frame/foreground once; Chips owns its distinct focus/invalid frame.
+`label.change` explicitly includes ComboboxValue and Chip's display children, never ChipsInput's
+value or ChipRemove's accessible name. Option/chip identities remain text even when numeric; rich
+quantity accessories use composition. Variant classes alone do not supply Button's press executor.
+ChipRemove has one opacity owner; disabled resting opacity and immediate focus take precedence over
+hover feedback, and no decorative glyph can intercept remove activation.
 
 ## Interruption and lifecycle
 
@@ -52,3 +102,5 @@ Typing stays attached to the native input while the results surface adapts to th
 - Pending: multi-chip insertion/removal and wrapping with a popup anchored through `useComboboxAnchor` do not produce competing geometry writers.
 - Pending: large/virtualized lists, rich labels, partial plain-text updates, all modes, live downgrade, zero clock and close during filtering.
 - Pending: type into a wrapping chips field while adding/removing chips, downgrade mid-edit and deliver async results after close; caret/focused controls stay visible, values remain current and no parent/child size spring competes.
+
+- Pending: rename a retained Value/Chip and group label, hover then focus ChipRemove, and change invalid/theme state on both input and chips compositions; no editor diff, duplicate frame colour or stale remove action is allowed.

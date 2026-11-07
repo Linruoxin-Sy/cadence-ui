@@ -4,25 +4,39 @@ Status: target design; implementation and verification pending.
 
 Input uses its chrome to explain focus, invalid and disabled state while leaving editing entirely native. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["input#Input"],
+    "control": ["input#Input"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: input for independent dynamic insertion; inherited when Field or another parent owns the same entrance. |
-| Size | default for an explicit component-owned size change while unfocused and outside selection/gesture interaction; inherited for parent width/passive layout. A focused editor's content box and caret are never interpolated. |
-| Surface colour | default: input background, border and scoped focus/invalid shadow respond to native state and authored attributes. |
-| Text colour | default: foreground and placeholder colour as visual state changes; caret, selection and accessible state remain native. |
-| Changed text | not applicable to editable value or placeholder replacement: the browser owns editing and selection; composed external labels/help follow their own contracts. |
-| Changed numbers | not applicable to native input values, including number inputs and read-only values; external display quantities require composition. |
+| Capability      | Coverage and owner                                                                                                                                                                                                         | References                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Appearance      | default: input for independent dynamic insertion; inherited when Field or another parent owns the same entrance.                                                                                                           | default: `input.root.enter`                         |
+| Size            | default for an explicit component-owned size change while unfocused and outside selection/gesture interaction; inherited for parent width/passive layout. A focused editor's content box and caret are never interpolated. | default: `input.root.resize`; inherited: `@control` |
+| Surface colour  | default: input background, border and scoped focus/invalid shadow respond to native state and authored attributes.                                                                                                         | default: `input.root.colour`                        |
+| Text colour     | default: foreground and placeholder colour as visual state changes; caret, selection and accessible state remain native.                                                                                                   | default: `input.root.colour`                        |
+| Changed text    | not applicable to editable value or placeholder replacement: the browser owns editing and selection; composed external labels/help follow their own contracts.                                                             | not-applicable: `@root`                             |
+| Changed numbers | not applicable to native input values, including number inputs and read-only values; external display quantities require composition.                                                                                      | not-applicable: `@root`                             |
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / input | Opacity entrance with an immediately usable control. | Short opacity only. | Immediate. | `input.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Focus, invalid, disabled or theme change / input chrome | Scoped colour/shadow transition; focus indication is available on the first semantic frame. | Short colour feedback. | Immediate final chrome. | `input.root.colour` → `state.color` → target `state.color` |
-| Explicit owned size change / input | Bounded box interpolation only while unfocused and outside native selection/gesture interaction; otherwise commit final geometry immediately. | Immediate size. | Immediate size. | `input.root.resize` → `geometry.compact` → `geometry.resize` |
-| Typing, autofill, composition or value update / native control | Native update, no visual text surrogate. | Same native update. | Same native update. | `input.control.edit` → `engine.native` → native Input editing (no recipe) |
+| Trigger / owner                                                | full                                                                                                                                          | reduced                | none                    | Binding → preset → recipe/form                                                             |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----------------------- | ------------------------------------------------------------------------------------------ |
+| Independent insertion / input                                  | Opacity entrance with an immediately usable control.                                                                                          | Short opacity only.    | Immediate.              | `input.root.enter` → `presence.inline` → `data.transition/opacity`                         |
+| Focus, invalid, disabled or theme change / input chrome        | Scoped colour/shadow transition; focus indication is available on the first semantic frame.                                                   | Short colour feedback. | Immediate final chrome. | `input.root.colour` → `state.color` → `state.color/surface-foreground`                     |
+| Explicit owned size change / input                             | Bounded box interpolation only while unfocused and outside native selection/gesture interaction; otherwise commit final geometry immediately. | Immediate size.        | Immediate size.         | `input.root.resize` → `geometry.compact` → `geometry.resize/measured`                      |
+| Typing, autofill, composition or value update / native control | Native update, no visual text surrogate.                                                                                                      | Same native update.    | Same native update.     | `input.control.edit` → `engine.native` → `native/input` (native Input editing (no recipe)) |
 
 ## Interruption and lifecycle
 

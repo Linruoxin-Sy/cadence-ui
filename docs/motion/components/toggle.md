@@ -4,27 +4,42 @@ Status: target design; implementation and verification pending.
 
 Momentary press and persistent selection are distinct: pressing compresses the control briefly, while the selected surface remains after release. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["toggle#Toggle"],
+    "label": ["toggle#Toggle"],
+    "quantity": ["toggle#Toggle"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `toggle` owns independent entrance; a toolbar/group entrance takes precedence. |
-| Size | Default: the root shell owns content-driven width and explicit size changes; constrained width stays constrained and passive reflow is immediate. |
-| Surface colour | Default: root owns pressed, hover, disabled and variant background/border changes. |
-| Text colour | Default: root foreground is inherited by icon/plain label; explicit child component colours keep their own owner. |
-| Changed text | Default for owned primitive text children: retain unchanged graphemes and replace changed runs. Rich JSX uses composed ownership without recursive rewriting. |
-| Changed numbers | Composed: explicit quantity children may use a numeric owner; a numeric-looking toggle label/value is an option identity by default. |
+| Capability      | Application and owner                                                                                                                                         | References                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Appearance      | Default: `toggle` owns independent entrance; a toolbar/group entrance takes precedence.                                                                       | default: `toggle.root.enter`                       |
+| Size            | Default: the root shell owns content-driven width and explicit size changes; constrained width stays constrained and passive reflow is immediate.             | default: `toggle.root.resize`                      |
+| Surface colour  | Default: root owns pressed, hover, disabled and variant background/border changes.                                                                            | default: `toggle.root.colour`                      |
+| Text colour     | Default: root foreground is inherited by icon/plain label; explicit child component colours keep their own owner.                                             | default: `toggle.root.colour`                      |
+| Changed text    | Default for owned primitive text children: retain unchanged graphemes and replace changed runs. Rich JSX uses composed ownership without recursive rewriting. | default: `toggle.label.change`; composed: `@label` |
+| Changed numbers | Composed: explicit quantity children may use a numeric owner; a numeric-looking toggle label/value is an option identity by default.                          | composed: `toggle.quantity.change`                 |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / root | Opacity entrance; no automatic selected-state replay. | Short opacity. | Final state immediately. | `toggle.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Pointer/keyboard press / supported content-feedback layer | `scale.press` while active; release retargets to rest independently of selection. The native root remains an unscaled hit/focus target. | No scale; colour feedback. | Target immediately. | `toggle.root.press` → `feedback.press` → `feedback.press` |
-| Pressed/hover/disabled state / root | Scoped surface, border and text colours. | Short colour feedback. | Target colours immediately. | `toggle.root.colour` → `state.color` → target `state.color` |
-| Label or size change / root shell | Measure natural target and clamp width/height; preserve existing min dimensions. | Immediate geometry. | Immediate geometry. | `toggle.root.resize` → `geometry.compact` → `geometry.resize` |
-| Owned text change / label presentation | Changed runs fade out/in with retained graphemes fixed; `stagger: none`. | Safe changed-run opacity only. | Final text immediately. | `toggle.label.change` → `text.replace` → target `text.change` |
-| Explicit composed quantity / quantity owner | Roll changed places only. | Final number immediately. | Final number immediately. | `toggle.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                           | Full                                                                                                                                    | Reduced                        | None                        | Binding → preset → recipe/form                                          |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | --------------------------- | ----------------------------------------------------------------------- |
+| Independent insertion / root                              | Opacity entrance; no automatic selected-state replay.                                                                                   | Short opacity.                 | Final state immediately.    | `toggle.root.enter` → `presence.inline` → `data.transition/opacity`     |
+| Pointer/keyboard press / supported content-feedback layer | `scale.press` while active; release retargets to rest independently of selection. The native root remains an unscaled hit/focus target. | No scale; colour feedback.     | Target immediately.         | `toggle.root.press` → `feedback.press` → `feedback.press/scale`         |
+| Pressed/hover/disabled state / root                       | Scoped surface, border and text colours.                                                                                                | Short colour feedback.         | Target colours immediately. | `toggle.root.colour` → `state.color` → `state.color/surface-foreground` |
+| Label or size change / root shell                         | Measure natural target and clamp width/height; preserve existing min dimensions.                                                        | Immediate geometry.            | Immediate geometry.         | `toggle.root.resize` → `geometry.compact` → `geometry.resize/measured`  |
+| Owned text change / label presentation                    | Changed runs fade out/in with retained graphemes fixed; `stagger: none`.                                                                | Safe changed-run opacity only. | Final text immediately.     | `toggle.label.change` → `text.replace` → `text.change/changed-runs`     |
+| Explicit composed quantity / quantity owner               | Roll changed places only.                                                                                                               | Final number immediately.      | Final number immediately.   | `toggle.quantity.change` → `number.compact` → `number.roll/reels`       |
 
 ## Interruption and lifecycle
 

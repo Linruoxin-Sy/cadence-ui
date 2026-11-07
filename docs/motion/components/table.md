@@ -6,26 +6,43 @@ Table supplies readable state feedback inside a genuine HTML table. It does not 
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). The target adds applicable presentation defaults without inventing data APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "surface": ["table#Table"],
+    "row": ["table#TableRow", "table#TableHead", "table#TableCell", "table#TableCaption", "table#TableFooter"],
+    "text": ["table#TableCell", "table#TableHead", "table#TableCaption"],
+    "number": ["table#TableCell"],
+    "collection": ["table#Table"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default for a later inserted whole table surface when no parent owns presence. Row insertion/removal is composed by the owner with stable row identities; the primitive cannot infer collection intent. |
-| Size | Inherited/native by default: table layout owns content-driven column widths and row heights immediately. Composed for a deliberate collection-level outer geometry transaction, such as DataTable's result region; a primitive does not independently spring every cell. |
-| Surface colour | Default: the actual `table-row` hover/selected surfaces, plus explicitly authored head/cell/caption surfaces. Table does not invent an expanded-row state or expansion API. |
-| Text colour | Default for component-defined head/cell/caption state foreground; ordinary descendants inherit. No duplicated per-character colour writer. |
-| Changed text | Default for directly owned plain Cell/Head/Caption strings. Preserve unchanged graphemes; rich cell nodes, controls and editors keep their own owners. |
-| Changed numbers | Default for direct finite numeric cell content with known numeric semantics. Formatted strings require an explicit composed numeric owner; identifiers, dates and version strings stay text. |
+| Capability      | Applicability and owner                                                                                                                                                                                                                                                  | References                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Appearance      | Default for a later inserted whole table surface when no parent owns presence. Row insertion/removal is composed by the owner with stable row identities; the primitive cannot infer collection intent.                                                                  | default: `table.surface.enter`                      |
+| Size            | Inherited/native by default: table layout owns content-driven column widths and row heights immediately. Composed for a deliberate collection-level outer geometry transaction, such as DataTable's result region; a primitive does not independently spring every cell. | inherited: `table.collection.delegate`              |
+| Surface colour  | Default: the actual `table-row` hover/selected surfaces, the existing footer background, plus explicitly authored head/cell/caption surfaces. Table does not invent an expanded-row state or expansion API.                                                              | default: `table.row.colour`                         |
+| Text colour     | Default for component-defined head/cell/caption state foreground; ordinary descendants inherit. No duplicated per-character colour writer.                                                                                                                               | default: `table.row.colour`                         |
+| Changed text    | Default for directly owned plain Cell/Head/Caption strings. Preserve unchanged graphemes; rich cell nodes, controls and editors keep their own owners.                                                                                                                   | default: `table.text.replace`; composed: `@text`    |
+| Changed numbers | Default for direct finite numeric cell content with known numeric semantics. Formatted strings require an explicit composed numeric owner; identifiers, dates and version strings stay text.                                                                             | default: `table.number.change`; composed: `@number` |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Independent late insertion; table-container paint | Short surface opacity entry; no per-row cascade. | Short opacity only. | Visible immediately. | `table.surface.enter` → `presence.surface` → `enter.pop` |
-| Hover/selected or explicitly authored surface state; actual paint owner | Scoped background and defined foreground/border colour. Focus remains immediate. | Short colour. | Final colours immediately. | `table.row.colour` → `state.color` → planned `state.color` |
-| Direct plain cell/head/caption text change | Changed graphemes/runs only, without stagger or full-row replay. | Short opacity on changed runs only. | Final text immediately. | `table.text.replace` → `text.replace` → planned `text.change` |
-| Owned numeric cell changes | Changed place-value reels only; alignment and final formatted value remain correct. | Final number immediately. | Final number immediately. | `table.number.change` → `number.compact` → `number.roll` |
-| Composition requests row reordering/known size transition | Delegate to that collection's single layout/geometry owner; no second primitive effect. | Inherit immediate collection geometry. | Immediate geometry. | `table.collection.delegate` → `engine.native` → native table layout (the composition declares its own `layout.move`/`geometry.resize` binding) |
+| Trigger and owner                                                       | Full                                                                                    | Reduced                                | None                       | Binding → preset → recipe                                                                                                                                   |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Independent late insertion; table-container paint                       | Short surface opacity entry; no per-row cascade.                                        | Short opacity only.                    | Visible immediately.       | `table.surface.enter` → `presence.surface` → `enter.pop/opacity`                                                                                            |
+| Hover/selected or explicitly authored surface state; actual paint owner | Scoped background and defined foreground/border colour. Focus remains immediate.        | Short colour.                          | Final colours immediately. | `table.row.colour` → `state.color` → `state.color/surface-foreground`                                                                                       |
+| Direct plain cell/head/caption text change                              | Changed graphemes/runs only, without stagger or full-row replay.                        | Short opacity on changed runs only.    | Final text immediately.    | `table.text.replace` → `text.replace` → `text.change/changed-runs`                                                                                          |
+| Owned numeric cell changes                                              | Changed place-value reels only; alignment and final formatted value remain correct.     | Final number immediately.              | Final number immediately.  | `table.number.change` → `number.compact` → `number.roll/reels`                                                                                              |
+| Composition requests row reordering/known size transition               | Delegate to that collection's single layout/geometry owner; no second primitive effect. | Inherit immediate collection geometry. | Immediate geometry.        | `table.collection.delegate` → `engine.native` → `native/table` (native table layout (the composition declares its own layout.move/geometry.resize binding)) |
 
 ## Interruption and lifecycle
 

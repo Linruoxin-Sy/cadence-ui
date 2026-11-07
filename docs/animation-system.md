@@ -23,26 +23,26 @@ identified separately below; do not put them into a registry payload before they
 
 ## 1. Principles and architecture
 
-| #   | Principle                    | Meaning                                                                                      | Counter-example                                     |
-| --- | ---------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| M1  | Motion explains causality    | Where an element came from, where it went, and why it changed must be legible                | Gratuitous bounce, spin, flicker                    |
-| M2  | One coordinated change       | Related text, size, icon and colour changes share a cause and property owners                | Parent and child independently spring the same size |
-| M3  | Duration follows hierarchy   | Small controls fast, panels medium, whole pages slow                                         | 600 ms button, 120 ms page                          |
-| M4  | Interruptible and re-entrant | Re-opening while a close animation runs reverses smoothly                                    | Hard cuts with CSS keyframes                        |
-| M5  | Reduced means equivalent     | Preserve information and operation while removing decorative travel, blur, stagger and loops | State changes become invisible after reduction      |
-| M6  | Individually authored components | Design each component's parts, triggers and choreography; use global style as guidance | One generic effect copied across the catalogue |
+| #   | Principle                        | Meaning                                                                                      | Counter-example                                     |
+| --- | -------------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| M1  | Motion explains causality        | Where an element came from, where it went, and why it changed must be legible                | Gratuitous bounce, spin, flicker                    |
+| M2  | One coordinated change           | Related text, size, icon and colour changes share a cause and property owners                | Parent and child independently spring the same size |
+| M3  | Duration follows hierarchy       | Small controls fast, panels medium, whole pages slow                                         | 600 ms button, 120 ms page                          |
+| M4  | Interruptible and re-entrant     | Re-opening while a close animation runs reverses smoothly                                    | Hard cuts with CSS keyframes                        |
+| M5  | Reduced means equivalent         | Preserve information and operation while removing decorative travel, blur, stagger and loops | State changes become invisible after reduction      |
+| M6  | Individually authored components | Design each component's parts, triggers and choreography; use global style as guidance       | One generic effect copied across the catalogue      |
 
 Semantic state, focus, direct manipulation and final geometry remain available. The complete mode
 policy is in §6.
 
 ### 1.1 Four layers and three execution paths
 
-| Layer                   | Owns                                                                              | Must not own                                                 |
-| ----------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Layer                   | Owns                                                                                                                | Must not own                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
 | Component signals       | Semantic state, change cause, stable identity, direction, content revision and selection of a reviewed part binding | Component-local raw durations, easing curves or physical constants |
-| Policy and coordination | Mode, initial presentation, ownership, group rhythm, cancellation and retargeting | Validation, request state or business success/failure        |
-| Recipes and tokens      | Properties, visual targets, timing, reduction and interruption contracts          | Application state transitions                                |
-| Executors               | CSS transitions/loops, Motion measurement/physics, existing engine adapters       | Independent competing writers or altered native semantics    |
+| Policy and coordination | Mode, initial presentation, ownership, group rhythm, cancellation and retargeting                                   | Validation, request state or business success/failure              |
+| Recipes and tokens      | Properties, visual targets, timing, reduction and interruption contracts                                            | Application state transitions                                      |
+| Executors               | CSS transitions/loops, Motion measurement/physics, existing engine adapters                                         | Independent competing writers or altered native semantics          |
 
 CSS owns colour and suitable simple state/presence transitions. Motion owns measured geometry,
 continuous layout, numeric reels and applicable gesture settling. Base UI, Embla, Recharts and
@@ -60,8 +60,9 @@ coordination contract, not a new global application event bus.
 Every component/part records the applicable trigger, owner, default response and three-mode policy.
 Coverage is **default** (owned here), **inherited** (coordinated by a parent), **composed** (explicit
 caller composition), or **not applicable** with a reason. An inherited capability is not proof of
-a local recipe implementation. Formal capability metadata and its schema are a plan deliverable;
-these labels are not new fields already accepted by the registry checker.
+a local recipe implementation. The [internal reference schema](motion/README.md#21-internal-reference-schema)
+checks target capability/action/part closure. It does not add public registry capability metadata or
+prove installed behaviour; the existing recipe declarations remain the shipped contract.
 
 | Capability              | Existing or target recipes                                | Required outcome                                                             |
 | ----------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -674,6 +675,16 @@ do not prove contrast. A forced-colours environment always uses native semantic 
 animate an inherited colour again on each glyph, or overwrite caller colour values with sampled inline
 styles left behind after cancellation.
 
+A scoped shadow colour transition keeps its geometry and shadow-list topology fixed. Focus ring
+width/offset, border width, shadow blur/spread, gradients/background images and filters are not
+implicitly granted by `state.color`; unsupported changes settle immediately unless another reviewed
+recipe explicitly owns them. Focus/invalid visibility must be established on the first state frame,
+not grown from an absent outline. Placeholder paint, a pseudo-element rule, and an SVG arrow may
+participate only through their named host/region; no generic descendant colour scanner is implied.
+State and theme revisions affecting the same region feed one colour controller, not parallel
+hover/theme/selection transitions. Cancellation restores the current cascade rather than leaving
+sampled colours or temporary transition overrides pinned inline.
+
 ### 3.6 Changed text
 
 AnimatedText uses text.change, independently of text.reveal/text.split entrances. The target pipeline
@@ -1145,7 +1156,7 @@ or padding can change that initial estimate and remains the caller's SSR sizing 
 | ----------- | ---------------------------- | -------------------------------------------------------------------------------- |
 | Unit        | Vitest + RTL                 | API behaviour, `data-motion` branches, accessibility attributes, no `@/` imports |
 | Interaction | Playwright                   | Final state after open/close/keyboard/drag                                       |
-| Visual      | Playwright`toHaveScreenshot` | 3 states (open, closed, mid-animation) × 2 themes × 2 motion modes               |
+| Visual      | Playwright`toHaveScreenshot` | 3 states (open, closed, mid-animation) × 2 themes × full/reduced/none            |
 
 ### 9.2 reduced-motion matrix
 

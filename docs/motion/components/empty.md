@@ -4,28 +4,45 @@ Status: target design; implementation and verification pending.
 
 Empty introduces an empty-state explanation calmly and keeps its recovery action immediately usable. It does not infer loading, filtering or failure from application data. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["empty#Empty"],
+    "text": ["empty#EmptyTitle", "empty#EmptyDescription", "empty#EmptyContent", "empty#EmptyMedia"],
+    "value": ["empty#EmptyTitle", "empty#EmptyDescription", "empty#EmptyContent"],
+    "media": ["empty#EmptyMedia"],
+    "surface": ["empty#Empty", "empty#EmptyMedia"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: empty owns one entrance including EmptyHeader, EmptyMedia, title, description and initial content; inherited for a parent-owned state-region entrance. |
-| Size | default: empty owns later copy/media/content-driven dimensions; inherited when the parent owns the empty/content region exchange. |
-| Surface colour | default: EmptyMedia's actual empty-icon surface and any authored root surface; composed actions retain their own surface owners. |
-| Text colour | default: title, description and media foreground on authored visual changes. |
-| Changed text | default: plain EmptyTitle/EmptyDescription and directly owned plain display content; composed rich EmptyContent and descriptions. |
-| Changed numbers | default: direct quantity displays in known text parts; composed rich counts; identifiers in examples or instructions remain textual. |
+| Capability      | Coverage and owner                                                                                                                                              | References                                       |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Appearance      | default: empty owns one entrance including EmptyHeader, EmptyMedia, title, description and initial content; inherited for a parent-owned state-region entrance. | default: `empty.root.enter`, `empty.root.exit`   |
+| Size            | default: empty owns later copy/media/content-driven dimensions; inherited when the parent owns the empty/content region exchange.                               | default: `empty.root.resize`                     |
+| Surface colour  | default: EmptyMedia's actual empty-icon surface and any authored root surface; composed actions retain their own surface owners.                                | default: `empty.surface.colour`                  |
+| Text colour     | default: title, description and media foreground on authored visual changes.                                                                                    | default: `empty.text.colour`                     |
+| Changed text    | default: plain EmptyTitle/EmptyDescription and directly owned plain display content; composed rich EmptyContent and descriptions.                               | default: `empty.text.replace`; composed: `@text` |
+| Changed numbers | default: direct quantity displays in known text parts; composed rich counts; identifiers in examples or instructions remain textual.                            | default: `empty.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Empty region appears / root or parent region | One surface opacity entrance, with action available immediately. | Short opacity. | Immediate. | `empty.root.enter` → `presence.surface` → opacity-only `enter.pop` |
-| Caller replaces empty region / retained parent | Fade the old empty region; the parent owns the destination layout. | Short opacity. | Immediate replacement. | `empty.root.exit` → `presence.exit` → `exit.fade` |
-| Copy/media/action content changes / empty | Changed-only text with stagger:none or quantity reels; measured content dimensions retarget together. | Short changed-text opacity; quantity and dimensions immediate. | Immediate. | `empty.text.replace` → `text.replace` → target `text.change`; `empty.value.roll` → `number.compact` → revised `number.roll`; `empty.root.resize` → `geometry.content` → `geometry.resize` |
-| Explicit media replacement within a retained empty state / media visual owner | Local opacity replacement for the changed supplied visual; existing title/action do not re-enter. | Short opacity. | Final visual immediately. | `empty.media.replace` → `data.update` → local opacity `data.transition` |
-| Surface/foreground targets change / actual display owner | Scoped colour transition. | Short colour. | Immediate. | `empty.surface.colour` → `state.color` → target `state.color`; `empty.text.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                                               | full                                                                                                  | reduced                                                        | none                      | Binding → preset → recipe/form                                                                                                                                                                         |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Empty region appears / root or parent region                                  | One surface opacity entrance, with action available immediately.                                      | Short opacity.                                                 | Immediate.                | `empty.root.enter` → `presence.surface` → `enter.pop/opacity`                                                                                                                                          |
+| Caller replaces empty region / retained parent                                | Fade the old empty region; the parent owns the destination layout.                                    | Short opacity.                                                 | Immediate replacement.    | `empty.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                                                                                              |
+| Copy/media/action content changes / empty                                     | Changed-only text with stagger:none or quantity reels; measured content dimensions retarget together. | Short changed-text opacity; quantity and dimensions immediate. | Immediate.                | `empty.text.replace` → `text.replace` → `text.change/changed-runs`; `empty.value.roll` → `number.compact` → `number.roll/reels`; `empty.root.resize` → `geometry.content` → `geometry.resize/measured` |
+| Explicit media replacement within a retained empty state / media visual owner | Local opacity replacement for the changed supplied visual; existing title/action do not re-enter.     | Short opacity.                                                 | Final visual immediately. | `empty.media.replace` → `data.update` → `data.transition/opacity`                                                                                                                                      |
+| Surface/foreground targets change / actual display owner                      | Scoped colour transition.                                                                             | Short colour.                                                  | Immediate.                | `empty.surface.colour` → `state.color` → `state.color/surface`; `empty.text.colour` → `state.color` → `state.color/foreground`                                                                         |
 
 ## Interruption and lifecycle
 

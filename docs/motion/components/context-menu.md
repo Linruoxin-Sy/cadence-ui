@@ -4,30 +4,77 @@ Status: target design; implementation and verification pending.
 
 A context menu belongs to the current invocation location. A new right-click or keyboard invocation creates the new anchored presentation immediately, without flying the previous menu across the screen. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent"],
+    "sub-content": ["context-menu#ContextMenuSubContent"],
+    "position": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent"],
+    "item": [
+      "context-menu#ContextMenuItem",
+      "context-menu#ContextMenuCheckboxItem",
+      "context-menu#ContextMenuRadioItem",
+      "context-menu#ContextMenuSubTrigger"
+    ],
+    "surface": [
+      "context-menu#ContextMenuContent",
+      "context-menu#ContextMenuSubContent",
+      "context-menu#ContextMenuLabel",
+      "context-menu#ContextMenuShortcut",
+      "context-menu#ContextMenuSeparator"
+    ],
+    "indicator": ["context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem"],
+    "label": [
+      "context-menu#ContextMenuItem",
+      "context-menu#ContextMenuCheckboxItem",
+      "context-menu#ContextMenuRadioItem",
+      "context-menu#ContextMenuSubTrigger",
+      "context-menu#ContextMenuLabel",
+      "context-menu#ContextMenuShortcut"
+    ],
+    "quantity": ["context-menu#ContextMenuItem", "context-menu#ContextMenuLabel"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `context-menu-content` owns invocation-relative presence; `context-menu-sub-content` owns its row-anchored presence. Rows inherit their panel entrance. |
-| Size | Default: each content shell owns intentional menu width/height changes; Base UI owns pointer/focused-element origin and collision placement. |
-| Surface colour | Default: popup, item and sub-trigger surfaces own background/border/highlight state. Trigger content is caller-owned. |
-| Text colour | Default: owned item/label/shortcut foreground transitions follow destructive, disabled and pointer-highlight state. |
-| Changed text | Default for plain item/label/shortcut strings; retain unchanged graphemes. Rich labels are composed without rewriting caller markup. |
-| Changed numbers | Composed: explicit quantities can roll; action keys, shortcuts and numeric-looking labels are not parsed as counters. |
+| Capability      | Application and owner                                                                                                                                            | References                                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `context-menu-content` owns invocation-relative presence; `context-menu-sub-content` owns its row-anchored presence. Rows inherit their panel entrance. | default: `context-menu.content.enter`, `context-menu.sub-content.enter`, `context-menu.content.exit`, `context-menu.sub-content.exit` |
+| Size            | Default: each content shell owns intentional menu width/height changes; Base UI owns pointer/focused-element origin and collision placement.                     | default: `context-menu.content.resize`                                                                                                |
+| Surface colour  | Default: popup, item and sub-trigger surfaces own background/border/highlight state. Trigger content is caller-owned.                                            | default: `context-menu.item.colour`, `context-menu.surface.colour`                                                                    |
+| Text colour     | Default: owned item/label/shortcut foreground transitions follow destructive, disabled and pointer-highlight state.                                              | default: `context-menu.item.colour`, `context-menu.surface.colour`                                                                    |
+| Changed text    | Default for plain item/label/shortcut strings; retain unchanged graphemes. Rich labels are composed without rewriting caller markup.                             | default: `context-menu.label.change`; composed: `@label`                                                                              |
+| Changed numbers | Composed: explicit quantities can roll; action keys, shortcuts and numeric-looking labels are not parsed as counters.                                            | composed: `context-menu.quantity.change`                                                                                              |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Invocation / root content | Place at native origin immediately, then opacity entrance with optional `distance.xs` side approach. | Short opacity only. | Open target immediately. | `context-menu.content.enter` → `presence.menu` → `popup.anchored` |
-| Submenu open / sub-content | Local anchor-relative opacity/side approach; parent stays fixed. | Short opacity only. | Open target immediately. | `context-menu.sub-content.enter` → `presence.menu` → `popup.anchored` |
-| Branch close / corresponding content | Opacity exit only, no stagger. | Short opacity. | Closed target immediately. | `context-menu.content.exit` → `presence.exit` → `exit.fade`; `context-menu.sub-content.exit` → `presence.exit` → `exit.fade` |
-| New invocation or collision / Base UI positioner | Cancel old approach and place at the new valid origin; no cross-screen interpolation. | Immediate. | Immediate. | `context-menu.position.place` → `engine.native` → Base UI ContextMenu positioning (no new recipe) |
-| Pointer state / item | Scoped surface/foreground transition; keyboard highlight is immediate. | Short colour feedback; keyboard immediate. | Final state immediately. | `context-menu.item.colour` → `state.color` → target `state.color` |
-| Supplied tokens/disabled/destructive state / popup, label, shortcut and item owners | Scoped surface/border/foreground colour with one writer per property. | Short colour. | Final colours immediately. | `context-menu.surface.colour` → `state.color` → target `state.color` |
-| Checkbox/radio change / item indicator | Local opacity/`scale.in` marker feedback with immediate semantic checked state. | Opacity only. | Final marks immediately. | `context-menu.indicator.select` → `state.indicator` → `state.morph` |
-| Structure/text change / shell and text owners | Measured clamped size; changed plain text runs use `stagger: none`. | Geometry immediate; changed-run opacity only. | Final geometry/text immediately. | `context-menu.content.resize` → `geometry.compact` → `geometry.resize`; `context-menu.label.change` → `text.replace` → target `text.change` |
-| Explicit composed quantity / child owner | Roll changed places without parsing action identities or shortcuts as numbers. | Final number immediately. | Final number immediately. | `context-menu.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                          | Full                                                                                        | Reduced                                       | None                             | Binding → preset → recipe/form                                                                                                                             |
+| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invocation / root content                                                                | Place at native origin immediately, then opacity entrance with `distance.xs` side approach. | Short opacity only.                           | Open target immediately.         | `context-menu.content.enter` → `presence.menu` → `popup.anchored/presence`                                                                                 |
+| Submenu open / sub-content                                                               | Local anchor-relative opacity/side approach; parent stays fixed.                            | Short opacity only.                           | Open target immediately.         | `context-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence`                                                                             |
+| Branch close / corresponding content                                                     | Opacity exit only, no stagger.                                                              | Short opacity.                                | Closed target immediately.       | `context-menu.content.exit` → `presence.exit` → `exit.fade/opacity`; `context-menu.sub-content.exit` → `presence.exit` → `exit.fade/opacity`               |
+| New invocation or collision / Base UI positioner                                         | Cancel old approach and place at the new valid origin; no cross-screen interpolation.       | Immediate.                                    | Immediate.                       | `context-menu.position.place` → `engine.native` → `native/base-ui-context-menu` (Base UI ContextMenu positioning (no new recipe))                          |
+| Pointer state / item                                                                     | Scoped surface/foreground transition; keyboard highlight is immediate.                      | Short colour feedback; keyboard immediate.    | Final state immediately.         | `context-menu.item.colour` → `state.color` → `state.color/surface-foreground`                                                                              |
+| Supplied tokens/disabled/destructive state / popup, label, shortcut and separator owners | Scoped surface/border/foreground colour with one writer per property.                       | Short colour.                                 | Final colours immediately.       | `context-menu.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                           |
+| Checkbox/radio change / item indicator                                                   | Local opacity/`scale.in` marker feedback with immediate semantic checked state.             | Opacity only.                                 | Final marks immediately.         | `context-menu.indicator.select` → `state.indicator` → `state.morph/indicator`                                                                              |
+| Structure/text change / shell and text owners                                            | Measured clamped size; changed plain text runs use `stagger: none`.                         | Geometry immediate; changed-run opacity only. | Final geometry/text immediately. | `context-menu.content.resize` → `geometry.compact` → `geometry.resize/measured`; `context-menu.label.change` → `text.replace` → `text.change/changed-runs` |
+| Explicit composed quantity / child owner                                                 | Roll changed places without parsing action identities or shortcuts as numbers.              | Final number immediately.                     | Final number immediately.        | `context-menu.quantity.change` → `number.compact` → `number.roll/reels`                                                                                    |
+
+`item.colour` is the sole surface/foreground controller on Item, CheckboxItem, RadioItem and
+SubTrigger, merging pointer, checked, disabled, destructive and theme targets. Keyboard highlight
+is immediate. `surface.colour` owns the distinct popup shells, Label/Shortcut foreground and
+Separator rule; it never writes those item properties again. Both root and sub-content use the same
+`content.resize` preset through their own per-branch host. Each label binding includes checkbox,
+radio and sub-trigger children; generated marker/chevron glyphs remain separate from that text slot.
+The menu's side approach is selected by this contract, with opacity-only fallback for invalidated
+placement or an interaction that requires an immediately stationary target.
 
 ## Interruption and lifecycle
 
@@ -50,3 +97,5 @@ A context menu belongs to the current invocation location. A new right-click or 
 - Pending: nested selection, label updates, disabled/removing items, edge collisions and branch closure preserve native action/focus behavior.
 - Pending: all modes, live downgrade, zero clock and unmount during a reinvocation leave no stale origin or submenu.
 - Pending: update a long action label near an edge while focus moves to it, then deliver async data after dismissal and reinvoke elsewhere; immediate readability and current native lifecycle ownership win over old geometry callbacks.
+
+- Pending: rename CheckboxItem/RadioItem/SubTrigger text and recolour a separator while pointer, disabled and theme state change together; inspect one colour writer per region and both submenu size hosts.

@@ -6,27 +6,43 @@ The actual block is `DatePickerDemo`: a Button trigger, Popover and Calendar com
 
 Use the [shared contract](../README.md), [presets](../presets.md) and [Calendar contract](calendar.md). Preserve current controlled-value detection, callbacks, formatter/locale configuration and trigger/content overrides.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "trigger": ["date-picker#DatePickerDemo", "button#Button"],
+    "popup": ["popover#PopoverContent"],
+    "label": ["date-picker#DatePickerDemo"],
+    "calendar": ["calendar#Calendar"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Inherited: Popover owns open/close and Calendar owns later month changes. The outer `date-picker` div adds no duplicate entrance. |
-| Size | Default for the owned trigger's formatted-label change through one Button geometry owner. Inherited by default from one Popover surface host for Calendar month/range-size changes: Calendar supplies natural destination geometry and does not run a second height spring for that cause. Caller replacement of either host is an explicit composed boundary. |
-| Surface colour | Inherited from Button, Popover and Calendar; no additional block-level state surface. |
-| Text colour | Default for placeholder-to-selected foreground on the trigger; other colours inherit the composed parts. |
-| Changed text | Default: the owned formatted date/range string diffs graphemes, retaining unchanged portions. Label/placeholder strings have the same safe text contract. Native caption dropdowns and rich caller overrides stay untouched. |
-| Changed numbers | Not applicable to the digits in formatted dates/ranges: they represent date labels, not scalar measurements. A composed quantitative accessory would own its separate number animation. |
+| Capability      | Applicability and owner                                                                                                                                                                                                                                                                                                                                        | References                                                                                                   |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Appearance      | Inherited: Popover owns open/close and Calendar owns later month changes. The outer `date-picker` div adds no duplicate entrance.                                                                                                                                                                                                                              | inherited: `date-picker.popup.enter`, `date-picker.popup.exit`, `date-picker.calendar.change`                |
+| Size            | Default for the owned trigger's formatted-label change through one Button geometry owner. Inherited by default from one Popover surface host for Calendar month/range-size changes: Calendar supplies natural destination geometry and does not run a second height spring for that cause. Caller replacement of either host is an explicit composed boundary. | default: `date-picker.trigger.resize`; inherited: `date-picker.popup.resize`; composed: `@trigger`, `@popup` |
+| Surface colour  | Inherited from Button, Popover and Calendar; no additional block-level state surface.                                                                                                                                                                                                                                                                          | inherited: `date-picker.trigger.colour`                                                                      |
+| Text colour     | Default for placeholder-to-selected foreground on the trigger; other colours inherit the composed parts.                                                                                                                                                                                                                                                       | default: `date-picker.trigger.colour`                                                                        |
+| Changed text    | Default: the owned formatted date/range string diffs graphemes, retaining unchanged portions. Label/placeholder strings have the same safe text contract. Native caption dropdowns and rich caller overrides stay untouched.                                                                                                                                   | default: `date-picker.label.replace`; composed: `@label`                                                     |
+| Changed numbers | Not applicable to the digits in formatted dates/ranges: they represent date labels, not scalar measurements. A composed quantitative accessory would own its separate number animation.                                                                                                                                                                        | not-applicable: `@trigger`                                                                                   |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Trigger press | Inherit Button press and semantic activation immediately. | Colour only. | Immediate. | `date-picker.trigger.press` → `feedback.press` → `feedback.press` |
-| Popover open/close | Anchored surface entry/exit; Calendar does not repeat that same-cause entrance. | Short opacity only. | Immediate visibility. | `date-picker.popup.enter` → `presence.popup` → `popup.anchored`; `date-picker.popup.exit` → `presence.exit` → `exit.fade` |
-| Selected value/placeholder/locale changes; trigger label | Changed graphemes/runs only, without stagger. The new accessible label is immediate. | Short opacity on changed runs only. | Final label immediately. | `date-picker.label.replace` → `text.replace` → planned `text.change` |
-| Owned label changes trigger width | One clamped inline-size transition respecting caller width and truncation. Fixed-width triggers need no resize. | Destination width immediately. | Destination width immediately. | `date-picker.trigger.resize` → `geometry.compact` → `geometry.resize` |
-| Empty/selected/disabled/hover state; trigger | Inherit/scoped Button surface and placeholder foreground colour, with one writer. | Short colour. | Final colours immediately. | `date-picker.trigger.colour` → `state.color` → planned `state.color` |
-| Displayed month/week-count changes | Inherit Calendar's month-grid paint; its natural destination feeds the single bounded Popover height host. | Grid opacity only when focus stays visible; final height immediately. | Immediate Calendar/Popover target. | `date-picker.calendar.change` → `content.month` → month-grid form of `data.transition`; `date-picker.popup.resize` → `geometry.panel` → `geometry.resize` |
+| Trigger and owner                                        | Full                                                                                                            | Reduced                                                               | None                               | Binding → preset → recipe                                                                                                                                    |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Trigger press                                            | Inherit Button press and semantic activation immediately.                                                       | Colour only.                                                          | Immediate.                         | `date-picker.trigger.press` → `feedback.press` → `feedback.press/scale`                                                                                      |
+| Popover open/close                                       | Anchored surface entry/exit; Calendar does not repeat that same-cause entrance.                                 | Short opacity only.                                                   | Immediate visibility.              | `date-picker.popup.enter` → `presence.popup` → `popup.anchored/presence`; `date-picker.popup.exit` → `presence.exit` → `exit.fade/opacity`                   |
+| Selected value/placeholder/locale changes; trigger label | Changed graphemes/runs only, without stagger. The new accessible label is immediate.                            | Short opacity on changed runs only.                                   | Final label immediately.           | `date-picker.label.replace` → `text.replace` → `text.change/changed-runs`                                                                                    |
+| Owned label changes trigger width                        | One clamped inline-size transition respecting caller width and truncation. Fixed-width triggers need no resize. | Destination width immediately.                                        | Destination width immediately.     | `date-picker.trigger.resize` → `geometry.compact` → `geometry.resize/measured`                                                                               |
+| Empty/selected/disabled/hover state; trigger             | Inherit/scoped Button surface and placeholder foreground colour, with one writer.                               | Short colour.                                                         | Final colours immediately.         | `date-picker.trigger.colour` → `state.color` → `state.color/surface-foreground`                                                                              |
+| Displayed month/week-count changes                       | Inherit Calendar's month-grid paint; its natural destination feeds the single bounded Popover height host.      | Grid opacity only when focus stays visible; final height immediately. | Immediate Calendar/Popover target. | `date-picker.calendar.change` → `content.month` → `data.transition/month-grid`; `date-picker.popup.resize` → `geometry.compact` → `geometry.resize/measured` |
 
 ## Interruption and lifecycle
 
@@ -37,7 +53,7 @@ Use the [shared contract](../README.md), [presets](../presets.md) and [Calendar 
 
 ## Geometry and performance
 
-Measure the owned label only when its known value changes and the trigger actually owns intrinsic inline-size. Preserve `max-w-full`, truncation and caller styles; do not force width to the full untruncated string. Button feedback uses its internal visual layer, preserving the actual Popover anchor geometry. Popover placement and collision coordinates remain Base UI-owned. Calendar's natural destination height feeds the default Popover geometry.panel host; the Calendar shell takes its destination directly for that transaction. A caller's custom content can explicitly delegate back to Calendar with the Popover size writer disabled for that cause, but cannot leave both active. Range mode measures the actual multi-month arrangement and keeps available-height scrolling; no per-day size observers.
+Measure the owned label only when its known value changes and the trigger actually owns intrinsic inline-size. Preserve `max-w-full`, truncation and caller styles; do not force width to the full untruncated string. Button feedback uses its internal visual layer, preserving the actual Popover anchor geometry. Popover placement and collision coordinates remain Base UI-owned. Calendar's natural destination height feeds the default Popover geometry.compact host; the Calendar shell takes its destination directly for that transaction. A caller's custom content can explicitly delegate back to Calendar with the Popover size writer disabled for that cause, but cannot leave both active. Range mode measures the actual multi-month arrangement and keeps available-height scrolling; no per-day size observers.
 
 Measure the natural trigger-label region separately from the Button's size host, at destination constrained inline-size. Keep the label's destination layout/truncation stable while the shell changes width; do not repeatedly wrap text or scale glyphs. Calendar applies its own destination-width grid layout before an owned height transition.
 

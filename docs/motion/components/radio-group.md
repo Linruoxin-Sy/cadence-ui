@@ -4,24 +4,39 @@ Status: target design; implementation and verification pending.
 
 Selection reads as a coordinated exchange between two local dots. A dot never flies across distant options. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["radio-group#RadioGroup"],
+    "indicator": ["radio-group#RadioGroupItem"],
+    "item": ["radio-group#RadioGroupItem"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `radio-group` owns one independent group entrance; items inherit it. An entering field group may own the whole entrance instead. |
-| Size | Inherited: group layout follows its parent; `radio-group-item` remains a fixed circle. There is no owned label-driven shell. |
-| Surface colour | Default: each `radio-group-item` owns selected, hover, disabled and invalid background/border feedback. |
-| Text colour | Default: each `radio-group-indicator` owns dot colour. External labels belong to their own owners. |
-| Changed text | Not applicable: Radio Group has no owned label slot. Caller-composed labels may use their own text contract. |
-| Changed numbers | Not applicable: option values are identities, including numeric values; this control does not display a quantity. |
+| Capability      | Application and owner                                                                                                                     | References                         |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| Appearance      | Default: `radio-group` owns one independent group entrance; items inherit it. An entering field group may own the whole entrance instead. | default: `radio-group.root.enter`  |
+| Size            | Inherited: group layout follows its parent; `radio-group-item` remains a fixed circle. There is no owned label-driven shell.              | inherited: `@root`                 |
+| Surface colour  | Default: each `radio-group-item` owns selected, hover, disabled and invalid background/border feedback.                                   | default: `radio-group.item.colour` |
+| Text colour     | Default: each `radio-group-indicator` owns dot colour. External labels belong to their own owners.                                        | default: `radio-group.item.colour` |
+| Changed text    | Not applicable: Radio Group has no owned label slot. Caller-composed labels may use their own text contract.                              | not-applicable: `@root`            |
+| Changed numbers | Not applicable: option values are identities, including numeric values; this control does not display a quantity.                         | not-applicable: `@root`            |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Group insertion / group | One opacity entrance, with all option targets ready together. | Short opacity. | Final group immediately. | `radio-group.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Selection / group selection coordinator | Shared selection transaction fades/scales the old and new local indicators using `scale.in`; no travelling row plate. | Crossfade local dots. | Exactly the selected dot immediately. | `radio-group.indicator.select` → `state.indicator` → `state.morph` |
-| Option state / item and dot | Scoped border/background/glyph colour feedback. | Short colour feedback. | Target colours immediately. | `radio-group.item.colour` → `state.color` → target `state.color` |
+| Trigger / owner                         | Full                                                                                                                  | Reduced                | None                                  | Binding → preset → recipe/form                                               |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------- |
+| Group insertion / group                 | One opacity entrance, with all option targets ready together.                                                         | Short opacity.         | Final group immediately.              | `radio-group.root.enter` → `presence.inline` → `data.transition/opacity`     |
+| Selection / group selection coordinator | Shared selection transaction fades/scales the old and new local indicators using `scale.in`; no travelling row plate. | Crossfade local dots.  | Exactly the selected dot immediately. | `radio-group.indicator.select` → `state.indicator` → `state.morph/indicator` |
+| Option state / item and dot             | Scoped border/background/glyph colour feedback.                                                                       | Short colour feedback. | Target colours immediately.           | `radio-group.item.colour` → `state.color` → `state.color/surface-foreground` |
 
 ## Interruption and lifecycle
 

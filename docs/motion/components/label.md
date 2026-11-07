@@ -4,25 +4,40 @@ Status: target design; implementation and verification pending.
 
 Label clarifies changes to a control's name without moving the click-to-focus relationship. It does not add floating-label behaviour. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["label#Label"],
+    "text": ["label#Label"],
+    "value": ["label#Label"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: label for independent insertion; inherited when a Field or other parent owns the same insertion. |
-| Size | default: label owns a content-driven intrinsic box when independently laid out; inherited by a coordinating Field geometry transaction; passive wrapping is immediate. |
-| Surface colour | not applicable to the default transparent label surface; composed if the caller deliberately supplies a stateful surface. |
-| Text colour | default: label foreground on authored disabled/invalid/context changes; inherited when a parent owns that foreground property. |
-| Changed text | default: direct plain label text uses changed-only replacement; composed for structured rich labels. |
-| Changed numbers | default for an explicitly numeric quantity used as display content; numeric field names and identifiers remain text; rich quantity content is composed. |
+| Capability      | Coverage and owner                                                                                                                                                     | References                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Appearance      | default: label for independent insertion; inherited when a Field or other parent owns the same insertion.                                                              | default: `label.root.enter`                      |
+| Size            | default: label owns a content-driven intrinsic box when independently laid out; inherited by a coordinating Field geometry transaction; passive wrapping is immediate. | default: `label.root.resize`                     |
+| Surface colour  | not applicable to the default transparent label surface; composed if the caller deliberately supplies a stateful surface.                                              | not-applicable: `@root`; composed: `@root`       |
+| Text colour     | default: label foreground on authored disabled/invalid/context changes; inherited when a parent owns that foreground property.                                         | default: `label.root.colour`                     |
+| Changed text    | default: direct plain label text uses changed-only replacement; composed for structured rich labels.                                                                   | default: `label.text.replace`; composed: `@text` |
+| Changed numbers | default for an explicitly numeric quantity used as display content; numeric field names and identifiers remain text; rich quantity content is composed.                | default: `label.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / label | Opacity entrance. | Short opacity. | Immediate. | `label.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Name changes / display text | Replace changed graphemes with stagger:none; keep the native label and semantic name live. | Short changed-text opacity without travel or stagger. | Immediate. | `label.text.replace` → `text.replace` → target `text.change` |
-| Display quantity changes / numeric content | Roll changed places only. | Final value immediately. | Immediate. | `label.value.roll` → `number.compact` → revised `number.roll` |
-| Content box or foreground changes / declared owner | Bounded intrinsic size and scoped colour transition. | Size immediate; short colour. | Immediate. | `label.root.resize` → `geometry.compact` → `geometry.resize`; `label.root.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                    | full                                                                                       | reduced                                               | none       | Binding → preset → recipe/form                                                                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Independent insertion / label                      | Opacity entrance.                                                                          | Short opacity.                                        | Immediate. | `label.root.enter` → `presence.inline` → `data.transition/opacity`                                                                    |
+| Name changes / display text                        | Replace changed graphemes with stagger:none; keep the native label and semantic name live. | Short changed-text opacity without travel or stagger. | Immediate. | `label.text.replace` → `text.replace` → `text.change/changed-runs`                                                                    |
+| Display quantity changes / numeric content         | Roll changed places only.                                                                  | Final value immediately.                              | Immediate. | `label.value.roll` → `number.compact` → `number.roll/reels`                                                                           |
+| Content box or foreground changes / declared owner | Bounded intrinsic size and scoped colour transition.                                       | Size immediate; short colour.                         | Immediate. | `label.root.resize` → `geometry.compact` → `geometry.resize/measured`; `label.root.colour` → `state.color` → `state.color/foreground` |
 
 ## Interruption and lifecycle
 

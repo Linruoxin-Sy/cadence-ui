@@ -4,29 +4,51 @@ Status: target design; implementation and verification pending.
 
 Determinate progress uses one committed target for its fill and formatted value. Indeterminate progress communicates activity without fabricating a percentage or completion. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["progress#Progress"],
+    "indicator": ["progress#ProgressIndicator"],
+    "value": ["progress#ProgressValue"],
+    "label": ["progress#ProgressLabel"],
+    "surface": [
+      "progress#ProgressTrack",
+      "progress#ProgressIndicator",
+      "progress#ProgressLabel",
+      "progress#ProgressValue"
+    ]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `progress` owns one entrance; track, indicator, label and value inherit it. |
-| Size | Default: content-driven label/value arrangement may change root height; the root shell owns this bounded geometry. Track length remains caller-owned; fill extent is data geometry. |
-| Surface colour | Default: `progress-track` and `progress-indicator` own caller-driven semantic surface colours; no completion colour is invented. |
-| Text colour | Default: `progress-label` and `progress-value` own their explicit/inherited foreground token changes. |
-| Changed text | Default for plain `ProgressLabel` content; retain unchanged graphemes. Rich label children use composed ownership. |
-| Changed numbers | Default: `progress-value` owns formatted determinate value changes using the root's value/range/format semantics. A direct numeric quantity supplied to ProgressLabel has its own display owner; it is not inferred to be the progress value. `null` has no inferred numeric value. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                               | References                                              |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Appearance      | Default: `progress` owns one entrance; track, indicator, label and value inherit it.                                                                                                                                                                                                | default: `progress.root.enter`                          |
+| Size            | Default: content-driven label/value arrangement may change root height; the root shell owns this bounded geometry. Track length remains caller-owned; fill extent is data geometry.                                                                                                 | default: `progress.root.resize`                         |
+| Surface colour  | Default: `progress-track` and `progress-indicator` own caller-driven semantic surface colours; no completion colour is invented.                                                                                                                                                    | default: `progress.surface.colour`                      |
+| Text colour     | Default: `progress-label` and `progress-value` own their explicit/inherited foreground token changes.                                                                                                                                                                               | default: `progress.surface.colour`                      |
+| Changed text    | Default for plain `ProgressLabel` content; retain unchanged graphemes. Rich label children use composed ownership.                                                                                                                                                                  | default: `progress.label.change`; composed: `@label`    |
+| Changed numbers | Default: `progress-value` owns formatted determinate value changes using the root's value/range/format semantics. A direct numeric quantity supplied to ProgressLabel has its own display owner; it is not inferred to be the progress value. `null` has no inferred numeric value. | default: `progress.value.change`, `progress.label.roll` |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / root | Opacity entrance at the actual current progress; no zero-to-value introduction. | Short opacity. | Final state immediately. | `progress.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Determinate value / indicator | Retarget bounded fill from the current visual position; never overshoot min/max. Coordinate its target, direction and start rhythm with the value. | Final fill immediately. | Final fill immediately. | `progress.indicator.update` → `data.progress` → determinate `data.transition` |
-| Determinate formatted value / value | Roll changed places to the same committed target; final accessible value is immediate. | Final formatted value immediately. | Final formatted value immediately. | `progress.value.change` → `number.compact` → revised `number.roll` |
-| Indeterminate activity / indicator | One low-contrast local opacity pulse, only while indeterminate and visible; no travelling marquee. | Static indeterminate presentation. | Static indeterminate presentation. | `progress.indicator.activity` → `status.loop` → continuous `data.transition` |
-| Plain label / label | Changed-run replacement, `stagger: none`. | Changed-run opacity only. | Final label immediately. | `progress.label.change` → `text.replace` → target `text.change` |
-| Direct numeric label / label display owner | Roll changed places as an independent quantity, with no inferred relation to fill. | Final label quantity immediately. | Final label quantity immediately. | `progress.label.roll` → `number.compact` → revised `number.roll` |
-| Semantic token change / relevant parts | Scoped surface/foreground colour transition. | Short colour feedback. | Final colours immediately. | `progress.surface.colour` → `state.color` → target `state.color` |
-| Known label/value content change / root shell | Measure final content height and clamp; track keeps its caller constraint. Passive wrapping remains immediate. | Final geometry immediately. | Final geometry immediately. | `progress.root.resize` → `geometry.compact` → `geometry.resize` |
+| Trigger / owner                               | Full                                                                                                                                               | Reduced                            | None                               | Binding → preset → recipe/form                                                |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------- |
+| Independent insertion / root                  | Opacity entrance at the actual current progress; no zero-to-value introduction.                                                                    | Short opacity.                     | Final state immediately.           | `progress.root.enter` → `presence.inline` → `data.transition/opacity`         |
+| Determinate value / indicator                 | Retarget bounded fill from the current visual position; never overshoot min/max. Coordinate its target, direction and start rhythm with the value. | Final fill immediately.            | Final fill immediately.            | `progress.indicator.update` → `data.progress` → `data.transition/determinate` |
+| Determinate formatted value / value           | Roll changed places to the same committed target; final accessible value is immediate.                                                             | Final formatted value immediately. | Final formatted value immediately. | `progress.value.change` → `number.compact` → `number.roll/reels`              |
+| Indeterminate activity / indicator            | One low-contrast local opacity pulse, only while indeterminate and visible; no travelling marquee.                                                 | Static indeterminate presentation. | Static indeterminate presentation. | `progress.indicator.activity` → `status.loop` → `data.transition/continuous`  |
+| Plain label / label                           | Changed-run replacement, `stagger: none`.                                                                                                          | Changed-run opacity only.          | Final label immediately.           | `progress.label.change` → `text.replace` → `text.change/changed-runs`         |
+| Direct numeric label / label display owner    | Roll changed places as an independent quantity, with no inferred relation to fill.                                                                 | Final label quantity immediately.  | Final label quantity immediately.  | `progress.label.roll` → `number.compact` → `number.roll/reels`                |
+| Semantic token change / relevant parts        | Scoped surface/foreground colour transition.                                                                                                       | Short colour feedback.             | Final colours immediately.         | `progress.surface.colour` → `state.color` → `state.color/surface-foreground`  |
+| Known label/value content change / root shell | Measure final content height and clamp; track keeps its caller constraint. Passive wrapping remains immediate.                                     | Final geometry immediately.        | Final geometry immediately.        | `progress.root.resize` → `geometry.compact` → `geometry.resize/measured`      |
 
 ## Interruption and lifecycle
 

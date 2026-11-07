@@ -37,14 +37,14 @@ compound parts need to be reviewed together. Registry blocks also have their own
 coordinate inherited component effects. The index follows current registry ids; families aid navigation
 only and never become another animation tier.
 
-| Location | Authoritative content | Must not claim |
-| --- | --- | --- |
-| `docs/animation-system.md` | Shared execution rules, recipe contracts and visual guidance | Every component must look identical |
-| `docs/motion/presets.md` | Target token assignments, preset scope and override precedence | New runtime exports already exist |
-| `docs/motion/components/<id>.md` | Target parts, six capabilities, actions, modes, interruption and bounds | A planned effect is already installed |
-| `docs/animation-system-plan.md` | Implementation sequence and unresolved acceptance | Design approval is runtime completion |
-| `content/components/<id>.mdx` | Actually shipped usage and Motion contract | Pending design as current user capability |
-| `registry.json`, shipped source and tests | Implemented declarations and evidence | A design binding is a new recipe or metadata field |
+| Location                                  | Authoritative content                                                   | Must not claim                                     |
+| ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
+| `docs/animation-system.md`                | Shared execution rules, recipe contracts and visual guidance            | Every component must look identical                |
+| `docs/motion/presets.md`                  | Target token assignments, preset scope and override precedence          | New runtime exports already exist                  |
+| `docs/motion/components/<id>.md`          | Target parts, six capabilities, actions, modes, interruption and bounds | A planned effect is already installed              |
+| `docs/animation-system-plan.md`           | Implementation sequence and unresolved acceptance                       | Design approval is runtime completion              |
+| `content/components/<id>.mdx`             | Actually shipped usage and Motion contract                              | Pending design as current user capability          |
+| `registry.json`, shipped source and tests | Implemented declarations and evidence                                   | A design binding is a new recipe or metadata field |
 
 Keep one source for each decision. A component may refine global visual defaults through a documented
 preset, but may not override the mandatory execution contract. If a local design requires a new
@@ -75,6 +75,14 @@ Review the connection between those sections, not just their presence. Every def
 must resolve to an action row and binding; an inherited/composed capability names its actual owner
 and the reference contract, without claiming a second local implementation. Conversely, every action
 must have a semantic cause, permitted properties, a preset/recipe form and all three mode outcomes.
+A binding anchor must cover every public part named in its action, including internal regions
+hosted by that part. A prose mention alone does not connect an omitted label, badge, submenu or
+backdrop to its controller. Grouped colour bindings name distinct regions or one shared controller:
+two bindings on the same item's colour property are not made safe by choosing the same preset.
+Structural roots/providers/portals and pass-through compositions may delegate, but their painted
+accessories still need an explicit owner. Inherited bindings keep the dependency's exact preset/form
+unless the local contract declares an override at that same owner.
+
 Optional geometry needs a concrete safe/immediate fallback; "animate if possible" without a rule is
 not a complete design. Bindings with multiple possible recipe forms must select the one actually
 designed for that part. Do not treat an index/filename check as a semantic conformance review.
@@ -89,18 +97,59 @@ The six rows are Appearance, Size, Surface colour, Text colour, Changed text and
 An action such as selected-indicator movement, chart interpolation or a direct gesture can add rows
 in the choreography table; it does not substitute for evaluating the six baseline capabilities.
 
-| Relationship | Meaning in these target contracts |
-| --- | --- |
-| Default | An applicable ordinary API/content change receives the effect after migration without extra animation wiring |
-| Inherited | A named parent/part/dependency already coordinates the same event; this part supplies no duplicate writer |
-| Composed | Caller-authored rich content or an explicit additional effect uses a documented helper/composition; identify the boundary |
-| Not applicable | This part lacks that semantic event, or the animation would violate native operation; state why |
+| Relationship   | Meaning in these target contracts                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Default        | An applicable ordinary API/content change receives the effect after migration without extra animation wiring              |
+| Inherited      | A named parent/part/dependency already coordinates the same event; this part supplies no duplicate writer                 |
+| Composed       | Caller-authored rich content or an explicit additional effect uses a documented helper/composition; identify the boundary |
+| Not applicable | This part lacks that semantic event, or the animation would violate native operation; state why                           |
 
 Do not turn every built-in label into composed behavior. Known owned plain strings and supported direct
 numeric display values integrate the shared helpers by default. Mixed JSX, rich content, links, render
 callbacks and external labels retain their structure and opt into explicit composition. Numeric-looking
 strings, dates, code, identifiers and OTP characters are not counters. A genuinely absent numeric part
 does not justify inventing one or exempting the rest of the component.
+
+### 2.1 Internal reference schema
+
+Each file has a `## Contract references` section with one `json motion-contract` fenced block.
+Its JSON object records `schema: 1`, `target: "motion-v2"`, `migration: "legacy"` and `parts`.
+`parts` maps each binding's middle segment to one or more `component-id#Export` anchors. These anchors
+identify actual public parts containing the designed internal region, not new exports or wrappers.
+External anchors must be declared registry dependencies and have their own catalogue contract.
+For example, Button's `feedback` and `label` regions both anchor to `button#Button`; the inherited
+Button Group separator anchors to `separator#Separator`.
+
+The capability table's References column uses semicolon-separated `default:`, `inherited:`,
+`composed:` and `not-applicable:` clauses. Effect references name action bindings. `@part` identifies
+a native/inherited/composed boundary at a real exported part; it does not assert a local animation.
+Default effects must reference an action, while not-applicable cases reference parts and explain why
+in the ownership column. A default effect needs a local integration anchor; a foreign-only owner
+cannot be relabelled default. Mixed responsibilities stay separate: ButtonGroupText's surface is default,
+Separator's rule colour is inherited, and that rule never satisfies the Text colour row. Rich-child
+boundaries supplement built-in text/number defaults rather than replacing them. Prose retains the
+specific cause, conditional parent ownership, property subset, caller boundary and immediate fallback.
+
+Every action chain ends with one exact `recipe/form` reference from the preset table's Target forms
+column. Those are internal target forms, **not** `meta.motion` objects or the installed `MOTION_FORMS`.
+Colour forms distinguish surface, foreground and their coordinated combination; native forms name
+the actual engine. The mode columns remain Full, Reduced and None; zero recipe time is a separate
+clock decision governed by the shared contract, never an alias for None.
+
+`scripts/motion-targets.mjs` parses real Markdown tables, validates inventory/index against current
+registry UI/block items, checks value-export anchors, capability/action edges, exact preset forms,
+duplicate bindings and required modes/lifecycle/bounds/scenarios. It rejects unfinished scaffold
+placeholders. This proves reference closure, not that prose is true, properties have one live writer,
+measurements are safe or an animation passes runtime/performance acceptance. Review every part and
+conditional relationship manually; a matching recipe alone does not establish semantic applicability.
+
+Migration is explicit and fail-closed. `legacy` keeps all installed manifest, MDX, intensity, source
+budget and successful runtime-helper gates. Missing/unknown markers fail; `v2` currently fails because
+the stricter runtime observer, public docs and intensity enforcement have not landed. The marker is
+internal to this design file, is never copied into registry payloads, and cannot waive existing checks.
+Later shared support must enable stricter evidence before any item changes to `v2`; per-item source,
+metadata, user docs and tests must then migrate together. Inventory comes from the registry, so adding
+the planned primitives will require contracts without changing a hard-coded count.
 
 ## 3. Common execution obligations
 
@@ -220,20 +269,20 @@ The following 59 files cover the current 57 UI items and two blocks exactly once
 target, with implementation and verification still pending. The four planned animation primitives
 are specified in the system/rollout documents and are not added to this existing-catalogue count.
 
-| Family | Individual contracts |
-| --- | --- |
-| Actions and groups | [Button](components/button.md), [Button Group](components/button-group.md), [Toggle](components/toggle.md), [Toggle Group](components/toggle-group.md) |
-| Inline structure | [Badge](components/badge.md), [Kbd](components/kbd.md), [Label](components/label.md), [Separator](components/separator.md) |
-| Editing and fields | [Input](components/input.md), [Textarea](components/textarea.md), [Input OTP](components/input-otp.md), [Input Group](components/input-group.md), [Field](components/field.md) |
-| Surfaces and identity | [Card](components/card.md), [Aspect Ratio](components/aspect-ratio.md), [Avatar](components/avatar.md), [Item](components/item.md), [Empty](components/empty.md), [Alert](components/alert.md) |
-| Selection and progress | [Checkbox](components/checkbox.md), [Radio Group](components/radio-group.md), [Switch](components/switch.md), [Slider](components/slider.md), [Progress](components/progress.md) |
-| Ongoing feedback | [Skeleton](components/skeleton.md), [Spinner](components/spinner.md) |
-| Overlays | [Dialog](components/dialog.md), [Alert Dialog](components/alert-dialog.md), [Popover](components/popover.md), [Tooltip](components/tooltip.md), [Hover Card](components/hover-card.md), [Sheet](components/sheet.md), [Drawer](components/drawer.md), [Toast](components/toast.md) |
-| Menus and search | [Select](components/select.md), [Combobox](components/combobox.md), [Dropdown Menu](components/dropdown-menu.md), [Context Menu](components/context-menu.md), [Menubar](components/menubar.md), [Command](components/command.md) |
-| Disclosure and navigation | [Accordion](components/accordion.md), [Collapsible](components/collapsible.md), [Tabs](components/tabs.md), [Navigation Menu](components/navigation-menu.md), [Sidebar](components/sidebar.md), [Toc](components/toc.md), [Breadcrumb](components/breadcrumb.md), [Pagination](components/pagination.md) |
-| Data and dates | [Table](components/table.md), [Data Table](components/data-table.md), [Calendar](components/calendar.md), [Date Picker](components/date-picker.md), [Chart](components/chart.md) |
-| Viewports and manipulation | [Carousel](components/carousel.md), [Scroll Area](components/scroll-area.md), [Resizable](components/resizable.md) |
-| Files, conversations and code | [Attachment](components/attachment.md), [Bubble](components/bubble.md), [Code Block](components/code-block.md) |
+| Family                        | Individual contracts                                                                                                                                                                                                                                                                                     |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actions and groups            | [Button](components/button.md), [Button Group](components/button-group.md), [Toggle](components/toggle.md), [Toggle Group](components/toggle-group.md)                                                                                                                                                   |
+| Inline structure              | [Badge](components/badge.md), [Kbd](components/kbd.md), [Label](components/label.md), [Separator](components/separator.md)                                                                                                                                                                               |
+| Editing and fields            | [Input](components/input.md), [Textarea](components/textarea.md), [Input OTP](components/input-otp.md), [Input Group](components/input-group.md), [Field](components/field.md)                                                                                                                           |
+| Surfaces and identity         | [Card](components/card.md), [Aspect Ratio](components/aspect-ratio.md), [Avatar](components/avatar.md), [Item](components/item.md), [Empty](components/empty.md), [Alert](components/alert.md)                                                                                                           |
+| Selection and progress        | [Checkbox](components/checkbox.md), [Radio Group](components/radio-group.md), [Switch](components/switch.md), [Slider](components/slider.md), [Progress](components/progress.md)                                                                                                                         |
+| Ongoing feedback              | [Skeleton](components/skeleton.md), [Spinner](components/spinner.md)                                                                                                                                                                                                                                     |
+| Overlays                      | [Dialog](components/dialog.md), [Alert Dialog](components/alert-dialog.md), [Popover](components/popover.md), [Tooltip](components/tooltip.md), [Hover Card](components/hover-card.md), [Sheet](components/sheet.md), [Drawer](components/drawer.md), [Toast](components/toast.md)                       |
+| Menus and search              | [Select](components/select.md), [Combobox](components/combobox.md), [Dropdown Menu](components/dropdown-menu.md), [Context Menu](components/context-menu.md), [Menubar](components/menubar.md), [Command](components/command.md)                                                                         |
+| Disclosure and navigation     | [Accordion](components/accordion.md), [Collapsible](components/collapsible.md), [Tabs](components/tabs.md), [Navigation Menu](components/navigation-menu.md), [Sidebar](components/sidebar.md), [Toc](components/toc.md), [Breadcrumb](components/breadcrumb.md), [Pagination](components/pagination.md) |
+| Data and dates                | [Table](components/table.md), [Data Table](components/data-table.md), [Calendar](components/calendar.md), [Date Picker](components/date-picker.md), [Chart](components/chart.md)                                                                                                                         |
+| Viewports and manipulation    | [Carousel](components/carousel.md), [Scroll Area](components/scroll-area.md), [Resizable](components/resizable.md)                                                                                                                                                                                       |
+| Files, conversations and code | [Attachment](components/attachment.md), [Bubble](components/bubble.md), [Code Block](components/code-block.md)                                                                                                                                                                                           |
 
 ## 6. Maintenance and migration
 
@@ -244,6 +293,6 @@ design; use Git history for completion records, not a second delivery log in thi
 
 A new catalogue component needs its own file and index entry before motion implementation. A new
 exported part is assessed within its component file. Do not silently rename a file independently of
-its registry id. The future scaffold/checker should validate inventory, six-capability coverage,
-preset references and relevant contract structure; that tooling is planned, not implemented by these
-Markdown files. Temporary review reports belong in `.cache/`, not in this directory.
+its registry id. The scaffold and target checker enforce the internal references described in §2.1;
+runtime implementation, semantic review and performance acceptance remain separate obligations.
+Temporary review reports belong in `.cache/`, not in this directory.

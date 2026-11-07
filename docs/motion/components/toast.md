@@ -4,30 +4,49 @@ Status: target design; implementation and verification pending.
 
 A notification joins the stack, can update in place, and leaves under the manager's existing lifecycle. Content feedback must not restart its dismissal timer or compete with swipe and stack geometry. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["toast#Toast"],
+    "stack": ["toast#ToastViewport"],
+    "title": ["toast#ToastTitle"],
+    "description": ["toast#ToastDescription"],
+    "icon": ["toast#Toast"],
+    "surface": ["toast#Toast", "toast#ToastTitle", "toast#ToastDescription"],
+    "quantity": ["toast#ToastTitle", "toast#ToastDescription"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `toast` owns presence through the Base UI adapter; `toast-content`, title, description and actions inherit entrance. |
-| Size | Default through the native owner: toast natural height and stack offsets form one Base UI geometry transaction. A measured destination updates that owner's size/stack channels; never add a second transform or bottom writer. |
-| Surface colour | Default: root owns supplied surface/border tokens; `toast-icon` owns semantic icon colour. Action/close buttons retain their button owners. |
-| Text colour | Default: `toast-title` and `toast-description` own foreground transitions; type/icon feedback does not recolour arbitrary caller content. |
-| Changed text | Default for primitive title/description: preserve unchanged graphemes and replace changed runs on the same toast ID. Rich children are composed. |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                    | References                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Appearance      | Default: `toast` owns presence through the Base UI adapter; `toast-content`, title, description and actions inherit entrance.                                                                                                                                            | default: `toast.root.enter`, `toast.root.exit`                                |
+| Size            | Default through the native owner: toast natural height and stack offsets form one Base UI geometry transaction. A measured destination updates that owner's size/stack channels; never add a second transform or bottom writer.                                          | default: `toast.root.resize`                                                  |
+| Surface colour  | Default: root owns supplied surface/border tokens; `toast-icon` owns semantic icon colour. Action/close buttons retain their button owners.                                                                                                                              | default: `toast.surface.colour`                                               |
+| Text colour     | Default: `toast-title` and `toast-description` own foreground transitions; type/icon feedback does not recolour arbitrary caller content.                                                                                                                                | default: `toast.surface.colour`                                               |
+| Changed text    | Default for primitive title/description: preserve unchanged graphemes and replace changed runs on the same toast ID. Rich children are composed.                                                                                                                         | default: `toast.title.change`, `toast.description.change`; composed: `@title` |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. | default: `toast.quantity.change`; composed: `@quantity`                       |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Manager adds toast / root adapter | Opacity and `scale.in` entrance in the actual stack position; no independent positional transform. | Short opacity only. | Final visible target immediately. | `toast.root.enter` → `presence.popup` → `popup.anchored` |
-| Manager dismisses / root adapter | Opacity exit; native swipe displacement remains authoritative if present. | Short opacity only. | Closed presentation immediately. | `toast.root.exit` → `presence.exit` → `exit.fade` |
-| Swipe / Base UI root | Native direct movement, progress and dismissal threshold without an extra interpolation clock. | Same direct manipulation. | Same direct manipulation; no authored settling. | `toast.root.swipe` → `engine.native` → Base UI Toast swipe/stack owner (no new recipe) |
-| Stack/content changes / Base UI geometry owner | One committed natural-size/stack destination coordinates clamped toast height and visible stack displacement; native swipe has priority. | Final geometry immediately. | Final geometry immediately. | `toast.root.resize` → `geometry.compact` → `geometry.resize`; `toast.stack.reflow` → `layout.compact` → `layout.move` (native single-owner adapter) |
-| Same-ID title/description update / text owners | Changed-run replacement, `stagger: none`; no remount or entrance replay. | Changed-run opacity only. | Final text immediately. | `toast.title.change` → `text.replace` → target `text.change`; `toast.description.change` → `text.replace` → target `text.change` |
-| Type/icon changes / icon presentation | Replace only the changed decorative icon with local opacity; keep message semantics immediate. | Short opacity. | Final icon immediately. | `toast.icon.change` → `data.update` → `data.transition` |
-| Loading type / icon | Target default adds a theme-clock loading spin only while active and visible; the delivered baseline currently uses a static glyph. | Static loading icon. | Static loading icon. | `toast.icon.activity` → `status.loop` → continuous `data.transition` |
-| Supplied tokens / root, icon and text | Scoped colour transition. | Short colour feedback. | Target colours immediately. | `toast.surface.colour` → `state.color` → target `state.color` |
-| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `toast.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                                     | Full                                                                                                                                     | Reduced                     | None                                            | Binding → preset → recipe/form                                                                                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manager adds toast / root adapter                                                                   | Opacity and `scale.in` entrance in the actual stack position; no independent positional transform.                                       | Short opacity only.         | Final visible target immediately.               | `toast.root.enter` → `presence.popup` → `popup.anchored/presence`                                                                                                     |
+| Manager dismisses / root adapter                                                                    | Opacity exit; native swipe displacement remains authoritative if present.                                                                | Short opacity only.         | Closed presentation immediately.                | `toast.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                                                             |
+| Swipe / Base UI root                                                                                | Native direct movement, progress and dismissal threshold without an extra interpolation clock.                                           | Same direct manipulation.   | Same direct manipulation; no authored settling. | `toast.root.swipe` → `engine.native` → `native/base-ui-toast` (Base UI Toast swipe/stack owner (no new recipe))                                                       |
+| Stack/content changes / Base UI geometry owner                                                      | One committed natural-size/stack destination coordinates clamped toast height and visible stack displacement; native swipe has priority. | Final geometry immediately. | Final geometry immediately.                     | `toast.root.resize` → `geometry.compact` → `geometry.resize/measured`; `toast.stack.reflow` → `layout.compact` → `layout.move/position` (native single-owner adapter) |
+| Same-ID title/description update / text owners                                                      | Changed-run replacement, `stagger: none`; no remount or entrance replay.                                                                 | Changed-run opacity only.   | Final text immediately.                         | `toast.title.change` → `text.replace` → `text.change/changed-runs`; `toast.description.change` → `text.replace` → `text.change/changed-runs`                          |
+| Type/icon changes / icon presentation                                                               | Replace only the changed decorative icon with local opacity; keep message semantics immediate.                                           | Short opacity.              | Final icon immediately.                         | `toast.icon.change` → `data.update` → `data.transition/opacity`                                                                                                       |
+| Loading type / icon                                                                                 | Target default adds a theme-clock loading spin only while active and visible; the delivered baseline currently uses a static glyph.      | Static loading icon.        | Static loading icon.                            | `toast.icon.activity` → `status.loop` → `data.transition/continuous`                                                                                                  |
+| Supplied tokens / root, icon and text                                                               | Scoped colour transition.                                                                                                                | Short colour feedback.      | Target colours immediately.                     | `toast.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                                             |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                                        | Final number immediately.   | Final number immediately.                       | `toast.quantity.change` → `number.compact` → `number.roll/reels`                                                                                                      |
 
 ## Interruption and lifecycle
 

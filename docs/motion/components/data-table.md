@@ -6,27 +6,48 @@ The current registry block exports `DataTableDemo`, `Payment` and `columns`: an 
 
 Use the [shared contract](../README.md), [presets](../presets.md) and [Table contract](table.md). Bindings describe the target for the actual composition.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "table": ["table#TableRow", "table#TableCell", "table#TableHead"],
+    "rows": ["data-table#DataTableDemo"],
+    "row": ["data-table#DataTableDemo"],
+    "region": ["data-table#DataTableDemo"],
+    "cell": ["data-table#DataTableDemo"],
+    "value": ["data-table#DataTableDemo"],
+    "button": ["button#Button"],
+    "checkbox": ["checkbox#Checkbox"],
+    "menu": ["dropdown-menu#DropdownMenuContent"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: genuinely inserted visible payment rows receive a compact presence effect; the inherited Table surface consumes a same-cause whole-block entrance. Filtered/removed rows leave the semantic result immediately. Existing rows revisited by pagination are not new business records. |
-| Size | Default for known visible-row/column changes: the composition coordinates one bounded table-region geometry owner where native table layout can be preserved. Native layout is the immediate fallback. |
-| Surface colour | Inherited: TableRow selection/hover, Checkbox and menu states; the block does not layer another row background writer. |
-| Text colour | Inherited from those parts; owned payment status/email content uses the cell's semantic foreground. |
-| Changed text | Default: owned status/email and result/empty-state strings update changed graphemes. Native filter-input editing stays immediate. |
-| Changed numbers | Default: known payment amounts and selected/result counts use numeric owners with the existing formatter. IDs/emails remain text; no new balance/progress field is introduced. |
+| Capability      | Applicability and owner                                                                                                                                                                                                                                                                      | References                                                                                                                   |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: genuinely inserted visible payment rows receive a compact presence effect; the inherited Table surface consumes a same-cause whole-block entrance. Filtered/removed rows leave the semantic result immediately. Existing rows revisited by pagination are not new business records. | default: `data-table.row.enter`, `data-table.row.exit`; inherited: `data-table.menu.enter`, `data-table.menu.exit`, `@table` |
+| Size            | Default for known visible-row/column changes: the composition coordinates one bounded table-region geometry owner where native table layout can be preserved. Native layout is the immediate fallback.                                                                                       | default: `data-table.region.resize`                                                                                          |
+| Surface colour  | Inherited: TableRow selection/hover, Checkbox and menu states; the block does not layer another row background writer.                                                                                                                                                                       | inherited: `@table`, `@checkbox`, `@menu`                                                                                    |
+| Text colour     | Inherited from those parts; owned payment status/email content uses the cell's semantic foreground.                                                                                                                                                                                          | inherited: `@table`, `@button`, `@menu`                                                                                      |
+| Changed text    | Default: owned status/email and result/empty-state strings update changed graphemes. Native filter-input editing stays immediate.                                                                                                                                                            | default: `data-table.cell.replace`                                                                                           |
+| Changed numbers | Default: known payment amounts and selected/result counts use numeric owners with the existing formatter. IDs/emails remain text; no new balance/progress field is introduced.                                                                                                               | default: `data-table.value.change`                                                                                           |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Sorting or retained-row reorder; visible collection | Stable payment ids move surviving visible rows to final native positions. | Final positions immediately. | Final positions immediately. | `data-table.rows.reorder` → `layout.compact` → `layout.move` |
-| Genuine insertion/removal or result replacement; affected visible rows | Compact opacity entry/exit; no mandatory stagger. Outgoing paint is optional and noninteractive after semantic removal. | Short opacity where safe; semantics immediately. | Final result immediately. | `data-table.row.enter` → `presence.inline` → one-shot `data.transition`; `data-table.row.exit` → `presence.exit` → `exit.fade` |
-| Known result/column change; table region | One clamped block-size transition if a valid bounded owner exists; native columns resolve directly. | Final geometry immediately. | Final geometry immediately. | `data-table.region.resize` → `geometry.compact` → `geometry.resize` |
-| Status/email/owned result text changes | Changed runs only, without stagger, preserving stable row/cell identity. This integration supplies Table's known display owner rather than adding a second text layer. | Short opacity on changed runs only. | Final text immediately. | `data-table.cell.replace` → `text.replace` → planned `text.change` |
-| Amount/selection/result count changes | Raw known quantities and the existing formatter drive place-value rolling; no counting through intermediate business values or second Table text diff on the formatted amount. | Final value immediately. | Final value immediately. | `data-table.value.change` → `number.compact` → `number.roll` |
-| Button/Checkbox/menu interaction | Inherit the actual control's press, indicator and popup motion without replaying the block. | Colour/opacity only; indicators at final geometry. | All immediate. | `data-table.button.press` → `feedback.press` → `feedback.press`; `data-table.checkbox.change` → `state.indicator` → `state.morph`; `data-table.menu.enter` → `presence.menu` → `popup.anchored`; `data-table.menu.exit` → `presence.exit` → `exit.fade` |
+| Trigger and owner                                                      | Full                                                                                                                                                                           | Reduced                                            | None                         | Binding → preset → recipe                                                                                                                                                                                                                                                                |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sorting or retained-row reorder; visible collection                    | Stable payment ids move surviving visible rows to final native positions.                                                                                                      | Final positions immediately.                       | Final positions immediately. | `data-table.rows.reorder` → `layout.compact` → `layout.move/position`                                                                                                                                                                                                                    |
+| Genuine insertion/removal or result replacement; affected visible rows | Compact opacity entry/exit; no mandatory stagger. Outgoing paint is optional and noninteractive after semantic removal.                                                        | Short opacity where safe; semantics immediately.   | Final result immediately.    | `data-table.row.enter` → `presence.inline` → `data.transition/opacity`; `data-table.row.exit` → `presence.exit` → `exit.fade/opacity`                                                                                                                                                    |
+| Known result/column change; table region                               | One clamped block-size transition if a valid bounded owner exists; native columns resolve directly.                                                                            | Final geometry immediately.                        | Final geometry immediately.  | `data-table.region.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                                                                                                             |
+| Status/email/owned result text changes                                 | Changed runs only, without stagger, preserving stable row/cell identity. This integration supplies Table's known display owner rather than adding a second text layer.         | Short opacity on changed runs only.                | Final text immediately.      | `data-table.cell.replace` → `text.replace` → `text.change/changed-runs`                                                                                                                                                                                                                  |
+| Amount/selection/result count changes                                  | Raw known quantities and the existing formatter drive place-value rolling; no counting through intermediate business values or second Table text diff on the formatted amount. | Final value immediately.                           | Final value immediately.     | `data-table.value.change` → `number.compact` → `number.roll/reels`                                                                                                                                                                                                                       |
+| Button/Checkbox/menu interaction                                       | Inherit the actual control's press, indicator and popup motion without replaying the block.                                                                                    | Colour/opacity only; indicators at final geometry. | All immediate.               | `data-table.button.press` → `feedback.press` → `feedback.press/scale`; `data-table.checkbox.change` → `state.indicator` → `state.morph/indicator`; `data-table.menu.enter` → `presence.menu` → `popup.anchored/presence`; `data-table.menu.exit` → `presence.exit` → `exit.fade/opacity` |
 
 ## Interruption and lifecycle
 

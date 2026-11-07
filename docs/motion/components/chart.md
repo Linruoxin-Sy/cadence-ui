@@ -6,27 +6,45 @@ Chart animates changes to the represented data through Recharts, rather than sca
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). This contract adds no chart type, data model or public engine selector.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "series": ["chart#ChartContainer"],
+    "surface": ["chart#ChartContainer"],
+    "annotation": ["chart#ChartTooltipContent", "chart#ChartLegendContent"],
+    "label": ["chart#ChartTooltipContent", "chart#ChartLegendContent"],
+    "value": ["chart#ChartTooltipContent"],
+    "interaction": ["chart#ChartContainer"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: a genuinely later inserted chart surface may enter once; initial series are already at their SSR/first-render data state. Legend/tooltip paint has its own later interaction cause. |
-| Size | Inherited/native: ResponsiveContainer owns responsive dimensions and Recharts owns data geometry. A known outer expansion is composed by its actual container, never simulated by scaling the SVG or a second chart height writer. |
-| Surface colour | Default for owned legend/tooltip surfaces and semantic state colours. Data-series fill/stroke changes are delegated to the existing Recharts data owner when it already writes those properties. |
-| Text colour | Default for owned legend/tooltip label/value foreground; caller renderer output inherits or owns its explicit styles. |
-| Changed text | Default for owned plain config labels and safe tooltip/legend strings. Arbitrary formatter React nodes are composed; pointer-scrub labels update immediately to avoid lag. |
-| Changed numbers | Default for an owned finite numeric tooltip value on a discrete data revision with stable payload identity and a known formatter. Pointer/keyboard scrubbing uses immediate values; arrays, numeric-looking identifiers, axes, rich formatter output and arbitrary series text are engine/caller-owned rather than reparsed as counters. |
+| Capability      | Applicability and owner                                                                                                                                                                                                                                                                                                                  | References                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Appearance      | Default: a genuinely later inserted chart surface may enter once; initial series are already at their SSR/first-render data state. Legend/tooltip paint has its own later interaction cause.                                                                                                                                             | default: `chart.surface.enter`, `chart.annotation.enter`, `chart.annotation.exit` |
+| Size            | Inherited/native: ResponsiveContainer owns responsive dimensions and Recharts owns data geometry. A known outer expansion is composed by its actual container, never simulated by scaling the SVG or a second chart height writer.                                                                                                       | inherited: `chart.interaction.direct`                                             |
+| Surface colour  | Default for owned legend/tooltip surfaces and semantic state colours. Data-series fill/stroke changes are delegated to the existing Recharts data owner when it already writes those properties.                                                                                                                                         | default: `chart.annotation.colour`                                                |
+| Text colour     | Default for owned legend/tooltip label/value foreground; caller renderer output inherits or owns its explicit styles.                                                                                                                                                                                                                    | default: `chart.annotation.colour`                                                |
+| Changed text    | Default for owned plain config labels and safe tooltip/legend strings. Arbitrary formatter React nodes are composed; pointer-scrub labels update immediately to avoid lag.                                                                                                                                                               | default: `chart.label.replace`; composed: `@label`                                |
+| Changed numbers | Default for an owned finite numeric tooltip value on a discrete data revision with stable payload identity and a known formatter. Pointer/keyboard scrubbing uses immediate values; arrays, numeric-looking identifiers, axes, rich formatter output and arbitrary series text are engine/caller-owned rather than reparsed as counters. | default: `chart.value.change`; composed: `@value`                                 |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Data changes; actual Recharts series | Existing series interpolation reaches the latest data through the shared controller adapter. | Final data geometry immediately. | Final data geometry immediately. | `chart.series.update` → `data.update` → engine form of `data.transition` |
-| Independent later insertion; chart surface | Surface opacity only, without duplicating same-cause series entry. | Short opacity. | Visible immediately. | `chart.surface.enter` → `presence.surface` → `enter.pop` |
-| Tooltip/legend visibility change; owned paint | Short local opacity; tooltip position follows pointer/focus immediately. | Short opacity. | Immediate visibility. | `chart.annotation.enter` → `presence.inline` → one-shot `data.transition`; `chart.annotation.exit` → `presence.exit` → `exit.fade` |
-| Owned annotation state colour | Scoped surface/text colour; no overlay competing with a series fill/stroke writer. | Short colour. | Final colours immediately. | `chart.annotation.colour` → `state.color` → planned `state.color` |
-| Discrete owned text/value updates | Changed text runs without stagger; changed numeric places roll when formatting and cadence permit. | Changed text opacity only; numeric value immediately. | Final content immediately. | `chart.label.replace` → `text.replace` → planned `text.change`; `chart.value.change` → `number.compact` → `number.roll` |
-| Pointer/focus scrub or responsive layout | Native position, current value and chart dimensions update directly. | Same direct operation. | Same direct operation. | `chart.interaction.direct` → `engine.native` → Recharts/ResponsiveContainer native operation |
+| Trigger and owner                             | Full                                                                                               | Reduced                                               | None                             | Binding → preset → recipe                                                                                                                 |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Data changes; actual Recharts series          | Existing series interpolation reaches the latest data through the shared controller adapter.       | Final data geometry immediately.                      | Final data geometry immediately. | `chart.series.update` → `data.update` → `data.transition/recharts`                                                                        |
+| Independent later insertion; chart surface    | Surface opacity only, without duplicating same-cause series entry.                                 | Short opacity.                                        | Visible immediately.             | `chart.surface.enter` → `presence.surface` → `enter.pop/opacity`                                                                          |
+| Tooltip/legend visibility change; owned paint | Short local opacity; tooltip position follows pointer/focus immediately.                           | Short opacity.                                        | Immediate visibility.            | `chart.annotation.enter` → `presence.inline` → `data.transition/opacity`; `chart.annotation.exit` → `presence.exit` → `exit.fade/opacity` |
+| Owned annotation state colour                 | Scoped surface/text colour; no overlay competing with a series fill/stroke writer.                 | Short colour.                                         | Final colours immediately.       | `chart.annotation.colour` → `state.color` → `state.color/surface-foreground`                                                              |
+| Discrete owned text/value updates             | Changed text runs without stagger; changed numeric places roll when formatting and cadence permit. | Changed text opacity only; numeric value immediately. | Final content immediately.       | `chart.label.replace` → `text.replace` → `text.change/changed-runs`; `chart.value.change` → `number.compact` → `number.roll/reels`        |
+| Pointer/focus scrub or responsive layout      | Native position, current value and chart dimensions update directly.                               | Same direct operation.                                | Same direct operation.           | `chart.interaction.direct` → `engine.native` → `native/recharts` (Recharts/ResponsiveContainer native operation)                          |
 
 ## Interruption and lifecycle
 

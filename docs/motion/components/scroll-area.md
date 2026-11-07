@@ -6,26 +6,43 @@ Scroll Area gives subtle feedback about scrollability while keeping scrolling na
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). This design adds no automatic scrolling, scroll smoothing or content animation engine.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "scrollbar": ["scroll-area#ScrollBar"],
+    "thumb": ["scroll-area#ScrollBar"],
+    "viewport": ["scroll-area#ScrollArea"],
+    "text": ["scroll-area#ScrollArea"],
+    "value": ["scroll-area#ScrollArea"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: scrollbar paint fades according to the primitive's actual visibility/interaction state. A later inserted outer surface may inherit parent presence; its entire content is not independently revealed. |
-| Size | Not applicable to interpolation of viewport, scroll extent or thumb size: native geometry must track real content immediately. A composed child may own a content change without making ScrollArea chase it. |
-| Surface colour | Default: scrollbar/thumb state colours where defined and the actual viewport focus shadow/outline feedback. The hit region does not shrink with paint; scrollability does not invent a disabled control state. |
-| Text colour | Default for an explicitly changing viewport foreground, or inherited from its existing parent colour owner; rich child components retain their own foregrounds. |
-| Changed text | Default for a direct plain string child of the owned viewport; composed for rich child content. No descendant scanner, document rewrite or editor interception is introduced. |
-| Changed numbers | Default for a supported direct viewport display quantity; composed for rich numeric children. Scroll offsets/extents and numeric identifiers are not displayed counters. |
+| Capability      | Applicability and owner                                                                                                                                                                                        | References                                                           |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Appearance      | Default: scrollbar paint fades according to the primitive's actual visibility/interaction state. A later inserted outer surface may inherit parent presence; its entire content is not independently revealed. | default: `scroll-area.scrollbar.enter`, `scroll-area.scrollbar.exit` |
+| Size            | Not applicable to interpolation of viewport, scroll extent or thumb size: native geometry must track real content immediately. A composed child may own a content change without making ScrollArea chase it.   | not-applicable: `@viewport`, `@thumb`                                |
+| Surface colour  | Default: scrollbar/thumb state colours where defined and the actual viewport focus shadow/outline feedback. The hit region does not shrink with paint; scrollability does not invent a disabled control state. | default: `scroll-area.thumb.colour`, `scroll-area.viewport.colour`   |
+| Text colour     | Default for an explicitly changing viewport foreground, or inherited from its existing parent colour owner; rich child components retain their own foregrounds.                                                | default: `scroll-area.viewport.colour`                               |
+| Changed text    | Default for a direct plain string child of the owned viewport; composed for rich child content. No descendant scanner, document rewrite or editor interception is introduced.                                  | default: `scroll-area.text.replace`; composed: `@text`               |
+| Changed numbers | Default for a supported direct viewport display quantity; composed for rich numeric children. Scroll offsets/extents and numeric identifiers are not displayed counters.                                       | default: `scroll-area.value.change`; composed: `@value`              |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Scrollbar becomes visible/hidden; scrollbar paint | Short opacity entry/exit from current paint state, using existing visibility semantics. | Short opacity only. | Immediate semantic visibility. | `scroll-area.scrollbar.enter` → `presence.inline` → one-shot `data.transition`; `scroll-area.scrollbar.exit` → `presence.exit` → `exit.fade` |
-| Thumb/track hover or drag state | Scoped background/border colour; no geometric thickness or hit-target tween. | Short colour. | Final colours immediately. | `scroll-area.thumb.colour` → `state.color` → planned `state.color` |
-| Viewport focus or explicit foreground change | Immediately recognizable focus, with declared scoped shadow/foreground colour feedback. | Short colour feedback. | Final paint immediately. | `scroll-area.viewport.colour` → `state.color` → planned `state.color` |
-| Direct plain display child revision; viewport content | Changed text runs without stagger or changed quantity reels; only bounded safe display content participates. | Changed-text opacity only; quantities immediately. | Final content immediately. | `scroll-area.text.replace` → `text.replace` → planned `text.change`; `scroll-area.value.change` → `number.compact` → `number.roll` |
-| Wheel, touch, keyboard, thumb drag or content/viewport resize | Native scroll coordinates, thumb translation/extent and corner geometry update directly. | Same direct operation. | Same direct operation. | `scroll-area.viewport.direct` → `engine.native` → Base UI plus native scrolling/scrollbar geometry |
+| Trigger and owner                                             | Full                                                                                                         | Reduced                                            | None                           | Binding → preset → recipe                                                                                                                           |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scrollbar becomes visible/hidden; scrollbar paint             | Short opacity entry/exit from current paint state, using existing visibility semantics.                      | Short opacity only.                                | Immediate semantic visibility. | `scroll-area.scrollbar.enter` → `presence.inline` → `data.transition/opacity`; `scroll-area.scrollbar.exit` → `presence.exit` → `exit.fade/opacity` |
+| Thumb/track hover or drag state                               | Scoped background/border colour; no geometric thickness or hit-target tween.                                 | Short colour.                                      | Final colours immediately.     | `scroll-area.thumb.colour` → `state.color` → `state.color/surface`                                                                                  |
+| Viewport focus or explicit foreground change                  | Immediately recognizable focus, with declared scoped shadow/foreground colour feedback.                      | Short colour feedback.                             | Final paint immediately.       | `scroll-area.viewport.colour` → `state.color` → `state.color/surface-foreground`                                                                    |
+| Direct plain display child revision; viewport content         | Changed text runs without stagger or changed quantity reels; only bounded safe display content participates. | Changed-text opacity only; quantities immediately. | Final content immediately.     | `scroll-area.text.replace` → `text.replace` → `text.change/changed-runs`; `scroll-area.value.change` → `number.compact` → `number.roll/reels`       |
+| Wheel, touch, keyboard, thumb drag or content/viewport resize | Native scroll coordinates, thumb translation/extent and corner geometry update directly.                     | Same direct operation.                             | Same direct operation.         | `scroll-area.viewport.direct` → `engine.native` → `native/base-ui-scroll-area` (Base UI plus native scrolling/scrollbar geometry)                   |
 
 ## Interruption and lifecycle
 

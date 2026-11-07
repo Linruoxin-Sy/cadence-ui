@@ -4,28 +4,45 @@ Status: target design; implementation and verification pending.
 
 A preview arrives as a coherent surface anchored to its trigger. Its richer contents can change size without replaying every avatar, line or action. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["hover-card#HoverCardContent"],
+    "text": ["hover-card#HoverCardContent"],
+    "surface": ["hover-card#HoverCardContent"],
+    "position": ["hover-card#HoverCardContent"],
+    "quantity": ["hover-card#HoverCardContent"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `hover-card-content` owns surface presence; arbitrary initial child content inherits it. |
-| Size | Default: content shell owns intentional natural width/height changes within the positioner's available space. |
-| Surface colour | Default: content owns background/border tokens; nested components retain their own surface owners. |
-| Text colour | Default: the content popup's foreground token transitions and inherits to plain content; the logical root is not a new painted surface and explicitly styled children retain ownership. |
-| Changed text | Default only for a primitive content string; rich preview children are composed with their own display owners. Hover Card has no title/description part to invent. |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich preview quantities inside rich children/render functions. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                  | References                                                     |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Appearance      | Default: `hover-card-content` owns surface presence; arbitrary initial child content inherits it.                                                                                                                                                                      | default: `hover-card.content.enter`, `hover-card.content.exit` |
+| Size            | Default: content shell owns intentional natural width/height changes within the positioner's available space.                                                                                                                                                          | default: `hover-card.content.resize`                           |
+| Surface colour  | Default: content owns background/border tokens; nested components retain their own surface owners.                                                                                                                                                                     | default: `hover-card.surface.colour`                           |
+| Text colour     | Default: the content popup's foreground token transitions and inherits to plain content; the logical root is not a new painted surface and explicitly styled children retain ownership.                                                                                | default: `hover-card.surface.colour`                           |
+| Changed text    | Default only for a primitive content string; rich preview children are composed with their own display owners. Hover Card has no title/description part to invent.                                                                                                     | default: `hover-card.text.change`; composed: `@text`           |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich preview quantities inside rich children/render functions. | default: `hover-card.quantity.change`; composed: `@quantity`   |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Base UI preview open / content | Opacity and `distance.xs` approach from the resolved anchor side. | Short opacity only. | Final surface immediately. | `hover-card.content.enter` → `presence.popup` → `popup.anchored` |
-| Preview close / content | Opacity exit only; all children leave as one surface. | Short opacity only. | Closed target immediately. | `hover-card.content.exit` → `presence.exit` → `exit.fade` |
-| Intentional preview content change / shell | Clamp and animate measured natural dimensions; no bounce. | Final geometry immediately. | Final geometry immediately. | `hover-card.content.resize` → `geometry.compact` → `geometry.resize` |
-| Primitive content replacement / text owner | Changed-run replacement with `stagger: none`. Rich previews defer to their composed text owners. | Changed-run opacity only. | Final text immediately. | `hover-card.text.change` → `text.replace` → target `text.change` |
-| Supplied tokens / content | Scoped background/border/foreground colour transition. | Short colour feedback. | Final colours immediately. | `hover-card.surface.colour` → `state.color` → target `state.color` |
-| Anchor/collision change / positioner | Correct native placement immediately and cancel obsolete approach direction. | Same placement. | Same placement. | `hover-card.position.place` → `engine.native` → Base UI PreviewCard positioning (no new recipe) |
-| Direct numeric Content revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `hover-card.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                           | Full                                                                                              | Reduced                     | None                        | Binding → preset → recipe/form                                                                                                  |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Base UI preview open / content                                                            | Opacity and `distance.xs` approach from the resolved anchor side.                                 | Short opacity only.         | Final surface immediately.  | `hover-card.content.enter` → `presence.popup` → `popup.anchored/presence`                                                       |
+| Preview close / content                                                                   | Opacity exit only; all children leave as one surface.                                             | Short opacity only.         | Closed target immediately.  | `hover-card.content.exit` → `presence.exit` → `exit.fade/opacity`                                                               |
+| Intentional preview content change / shell                                                | Clamp and animate measured natural dimensions; no bounce.                                         | Final geometry immediately. | Final geometry immediately. | `hover-card.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                   |
+| Primitive content replacement / text owner                                                | Changed-run replacement with `stagger: none`. Rich previews defer to their composed text owners.  | Changed-run opacity only.   | Final text immediately.     | `hover-card.text.change` → `text.replace` → `text.change/changed-runs`                                                          |
+| Supplied tokens / content                                                                 | Scoped background/border/foreground colour transition.                                            | Short colour feedback.      | Final colours immediately.  | `hover-card.surface.colour` → `state.color` → `state.color/surface-foreground`                                                  |
+| Anchor/collision change / positioner                                                      | Correct native placement immediately and cancel obsolete approach direction.                      | Same placement.             | Same placement.             | `hover-card.position.place` → `engine.native` → `native/base-ui-preview-card` (Base UI PreviewCard positioning (no new recipe)) |
+| Direct numeric Content revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately.   | Final number immediately.   | `hover-card.quantity.change` → `number.compact` → `number.roll/reels`                                                           |
 
 ## Interruption and lifecycle
 

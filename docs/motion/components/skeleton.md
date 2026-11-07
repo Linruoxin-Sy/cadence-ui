@@ -4,27 +4,40 @@ Status: target design; implementation and verification pending.
 
 Skeleton reserves a loading shape and uses one restrained opacity pulse while work is pending. Its parent owns the decision to replace it with content. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["skeleton#Skeleton"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: skeleton for independent insertion; inherited for a coherent placeholder-region entrance and parent-owned content handoff. |
-| Size | default for explicit owned placeholder dimension changes; inherited for final-content reservation and parent handoff; passive responsive sizing is immediate. |
-| Surface colour | default: skeleton background on authored theme/state target changes; opacity pulse is a separate property owner. |
-| Text colour | not applicable: Skeleton has no textual display part. |
-| Changed text | not applicable: placeholder shapes do not own the eventual text. |
-| Changed numbers | not applicable: Skeleton represents unknown content, not progress or a numeric value. |
+| Capability      | Coverage and owner                                                                                                                                            | References                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Appearance      | default: skeleton for independent insertion; inherited for a coherent placeholder-region entrance and parent-owned content handoff.                           | default: `skeleton.root.enter`, `skeleton.root.exit` |
+| Size            | default for explicit owned placeholder dimension changes; inherited for final-content reservation and parent handoff; passive responsive sizing is immediate. | default: `skeleton.root.resize`                      |
+| Surface colour  | default: skeleton background on authored theme/state target changes; opacity pulse is a separate property owner.                                              | default: `skeleton.root.colour`                      |
+| Text colour     | not applicable: Skeleton has no textual display part.                                                                                                         | not-applicable: `@root`                              |
+| Changed text    | not applicable: placeholder shapes do not own the eventual text.                                                                                              | not-applicable: `@root`                              |
+| Changed numbers | not applicable: Skeleton represents unknown content, not progress or a numeric value.                                                                         | not-applicable: `@root`                              |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent placeholder insertion / root | Opacity entrance hands the same property to the pulse after completion, with no competing writers. Initial SSR/hydration has no hidden entrance. | Short opacity for a later independent insertion, then static visible placeholder. | Visible immediately. | `skeleton.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Visible ongoing placeholder / root opacity | Gentle repeating opacity pulse. | Static final opacity; no loop. | Static final opacity; no loop. | `skeleton.root.busy` → `status.loop` → continuous `data.transition` |
-| Parent handoff / retained placeholder owner | Stop the pulse before fading the placeholder out. | Short fade only. | Immediate removal. | `skeleton.root.exit` → `presence.exit` → `exit.fade` |
-| Explicit dimension/surface target changes / root | Bounded owned geometry and background-colour transition. | Geometry immediate; short colour. | Immediate. | `skeleton.root.resize` → `geometry.compact` → `geometry.resize`; `skeleton.root.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                  | full                                                                                                                                             | reduced                                                                           | none                           | Binding → preset → recipe/form                                                                                                           |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Independent placeholder insertion / root         | Opacity entrance hands the same property to the pulse after completion, with no competing writers. Initial SSR/hydration has no hidden entrance. | Short opacity for a later independent insertion, then static visible placeholder. | Visible immediately.           | `skeleton.root.enter` → `presence.inline` → `data.transition/opacity`                                                                    |
+| Visible ongoing placeholder / root opacity       | Gentle repeating opacity pulse.                                                                                                                  | Static final opacity; no loop.                                                    | Static final opacity; no loop. | `skeleton.root.busy` → `status.loop` → `data.transition/continuous`                                                                      |
+| Parent handoff / retained placeholder owner      | Stop the pulse before fading the placeholder out.                                                                                                | Short fade only.                                                                  | Immediate removal.             | `skeleton.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                             |
+| Explicit dimension/surface target changes / root | Bounded owned geometry and background-colour transition.                                                                                         | Geometry immediate; short colour.                                                 | Immediate.                     | `skeleton.root.resize` → `geometry.compact` → `geometry.resize/measured`; `skeleton.root.colour` → `state.color` → `state.color/surface` |
 
 ## Interruption and lifecycle
 

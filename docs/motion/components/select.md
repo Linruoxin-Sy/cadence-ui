@@ -4,31 +4,57 @@ Status: target design; implementation and verification pending.
 
 Selection preserves unchanged label characters and normally replaces only changed local text. A real-origin handoff is eligible only for one safely mapped contiguous changed run; it is not a multi-run capture system. One presentation owner chooses the eligible handoff or local replacement for each revision. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "trigger": ["select#SelectTrigger"],
+    "content": ["select#SelectContent"],
+    "value": ["select#SelectValue"],
+    "indicator": ["select#SelectItem", "select#SelectTrigger"],
+    "surface": [
+      "select#SelectTrigger",
+      "select#SelectContent",
+      "select#SelectItem",
+      "select#SelectValue",
+      "select#SelectLabel"
+    ],
+    "label": ["select#SelectLabel", "select#SelectItem"],
+    "position": ["select#SelectContent"],
+    "quantity": ["select#SelectItem"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `select-content` owns popup presence; items inherit it. Independently inserted `select-trigger` owns an inline entrance unless an entering field/container already owns that cause. |
-| Size | Default: one width host owns the value change, normally `select-value` with the intrinsic trigger following native layout. A fixed-width trigger needs no outer width tween; no independent trigger spring follows the value. Popup shell owns natural height within Base UI constraints. |
-| Surface colour | Default: trigger, popup, option highlight and selection indicator own their scoped state surfaces. |
-| Text colour | Default: trigger/value, labels and items own selected/placeholder/disabled/highlight foreground changes. |
-| Changed text | Default for known primitive value/item labels: changed graphemes only; the selection presentation owner coordinates handoff versus diff. Render callbacks/rich labels retain explicit composed ownership. |
-| Changed numbers | Composed: an explicit quantity in option content may roll. Selected values, numeric labels and option keys remain identities by default. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                                     | References                                                                                                                          |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `select-content` owns popup presence; items inherit it. Independently inserted `select-trigger` owns an inline entrance unless an entering field/container already owns that cause.                                                                                              | default: `select.trigger.enter`, `select.content.enter`, `select.content.exit`                                                      |
+| Size            | Default: one width host owns the value change, normally `select-value` with the intrinsic trigger following native layout. A fixed-width trigger needs no outer width tween; no independent trigger spring follows the value. Popup shell owns natural height within Base UI constraints. | default: `select.value.resize`, `select.content.resize`                                                                             |
+| Surface colour  | Default: trigger, popup, option highlight and selection indicator own their scoped state surfaces.                                                                                                                                                                                        | default: `select.surface.colour`                                                                                                    |
+| Text colour     | Default: trigger/value, labels and items own selected/placeholder/disabled/highlight foreground changes.                                                                                                                                                                                  | default: `select.surface.colour`                                                                                                    |
+| Changed text    | Default for known primitive value/item labels: changed graphemes only; the selection presentation owner coordinates handoff versus diff. Render callbacks/rich labels retain explicit composed ownership.                                                                                 | default: `select.value.handoff`, `select.value.replace`, `select.value.change`, `select.label.change`; composed: `@value`, `@label` |
+| Changed numbers | Composed: an explicit quantity in option content may roll. Selected values, numeric labels and option keys remain identities by default.                                                                                                                                                  | composed: `select.quantity.change`                                                                                                  |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent trigger insertion / trigger | Opacity entrance unless a parent already owns it; anchor geometry stays fixed. | Short opacity. | Final trigger immediately. | `select.trigger.enter` → `presence.inline` → one-shot `data.transition` |
-| Open/close / content visual owner | Anchor-relative opacity with `scale.in`; shorter opacity exit. | Short opacity only. | Semantic open/closed target immediately. | `select.content.enter` → `presence.popup` → `popup.anchored`; `select.content.exit` → `presence.exit` → `exit.fade` |
-| Eligible selection from a real visible source / selection presentation owner | One contiguous changed safe run may travel from `select-item-text` to its measured destination. Retained target graphemes never join the flight; no per-run cascade or whole-label fallback. | No flight; changed-run local fade. | Final label immediately. | `select.value.handoff` → `handoff.value` → `handoff`; `select.value.replace` → `text.replace` → target `text.change` |
-| External/keyboard change without usable origin, or unsafe source mapping / same owner | Local changed-run replacement, `stagger: none`; no fabricated source and no simultaneous handoff. | Changed-run opacity only. | Final label immediately. | `select.value.change` → `text.replace` → target `text.change` |
-| New value / single width host | Measure final label width once and animate only the selected host within readable bounds; the trigger follows native layout, without a second width writer. | Final geometry immediately. | Final geometry immediately. | `select.value.resize` → `geometry.compact` → `geometry.resize` |
-| Option-set change / popup shell | Clamp measured natural height while preserving current active descendant and scroll. | Final geometry immediately. | Final geometry immediately. | `select.content.resize` → `geometry.compact` → `geometry.resize` |
-| Selection marker / item indicator | Local opacity/`scale.in` feedback; state and focus are already final. | Opacity only. | Final marker immediately. | `select.indicator.select` → `state.indicator` → `state.morph` |
-| State/token/label update / trigger, value, popup and option parts | Scoped surface/foreground colours; owned plain item/group labels replace changed runs with `stagger: none`. | Short colour/changed-run opacity. | Final colours/text immediately. | `select.surface.colour` → `state.color` → target `state.color`; `select.label.change` → `text.replace` → target `text.change` |
-| Anchor/collision/selected-item alignment / positioner | Place immediately using Base UI, including `alignItemWithTrigger`; invalidate obsolete flight coordinates. | Same placement. | Same placement. | `select.position.place` → `engine.native` → Base UI Select positioning (no new recipe) |
-| Explicit composed quantity / child owner | Roll its changed places without treating selected values or option keys as quantities. | Final number immediately. | Final number immediately. | `select.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                       | Full                                                                                                                                                                                         | Reduced                            | None                                     | Binding → preset → recipe/form                                                                                                                  |
+| ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Independent trigger insertion / trigger                                               | Opacity entrance unless a parent already owns it; anchor geometry stays fixed.                                                                                                               | Short opacity.                     | Final trigger immediately.               | `select.trigger.enter` → `presence.inline` → `data.transition/opacity`                                                                          |
+| Open/close / content visual owner                                                     | Anchor-relative opacity with `scale.in`; shorter opacity exit.                                                                                                                               | Short opacity only.                | Semantic open/closed target immediately. | `select.content.enter` → `presence.popup` → `popup.anchored/presence`; `select.content.exit` → `presence.exit` → `exit.fade/opacity`            |
+| Eligible selection from a real visible source / selection presentation owner          | One contiguous changed safe run may travel from `select-item-text` to its measured destination. Retained target graphemes never join the flight; no per-run cascade or whole-label fallback. | No flight; changed-run local fade. | Final label immediately.                 | `select.value.handoff` → `handoff.value` → `handoff/value`; `select.value.replace` → `text.replace` → `text.change/changed-runs`                |
+| External/keyboard change without usable origin, or unsafe source mapping / same owner | Local changed-run replacement, `stagger: none`; no fabricated source and no simultaneous handoff.                                                                                            | Changed-run opacity only.          | Final label immediately.                 | `select.value.change` → `text.replace` → `text.change/changed-runs`                                                                             |
+| New value / single width host                                                         | Measure final label width once and animate only the selected host within readable bounds; the trigger follows native layout, without a second width writer.                                  | Final geometry immediately.        | Final geometry immediately.              | `select.value.resize` → `geometry.compact` → `geometry.resize/measured`                                                                         |
+| Option-set change / popup shell                                                       | Clamp measured natural height while preserving current active descendant and scroll.                                                                                                         | Final geometry immediately.        | Final geometry immediately.              | `select.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                       |
+| Selection marker / item indicator                                                     | Local opacity/`scale.in` feedback; state and focus are already final.                                                                                                                        | Opacity only.                      | Final marker immediately.                | `select.indicator.select` → `state.indicator` → `state.morph/indicator`                                                                         |
+| State/token/label update / trigger, value, popup and option parts                     | Scoped surface/foreground colours; owned plain item/group labels replace changed runs with `stagger: none`.                                                                                  | Short colour/changed-run opacity.  | Final colours/text immediately.          | `select.surface.colour` → `state.color` → `state.color/surface-foreground`; `select.label.change` → `text.replace` → `text.change/changed-runs` |
+| Anchor/collision/selected-item alignment / positioner                                 | Place immediately using Base UI, including `alignItemWithTrigger`; invalidate obsolete flight coordinates.                                                                                   | Same placement.                    | Same placement.                          | `select.position.place` → `engine.native` → `native/base-ui-select` (Base UI Select positioning (no new recipe))                                |
+| Explicit composed quantity / child owner                                              | Roll its changed places without treating selected values or option keys as quantities.                                                                                                       | Final number immediately.          | Final number immediately.                | `select.quantity.change` → `number.compact` → `number.roll/reels`                                                                               |
 
 ## Interruption and lifecycle
 

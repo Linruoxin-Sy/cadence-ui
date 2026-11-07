@@ -4,25 +4,39 @@ Status: target design; implementation and verification pending.
 
 The thumb makes the binary state legible by travelling inside the measured track while the track colour follows the same state transaction. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["switch#Switch"],
+    "thumb": ["switch#Switch"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `switch` owns independent opacity entrance; a containing field may own it instead. Initial thumb position is already correct. |
-| Size | Default for explicit `size` changes: root shell owns the bounded track dimensions. Passive layout changes are immediate; the thumb endpoint is remeasured. |
-| Surface colour | Default: `switch` owns checked, hover, invalid and disabled track/border colours; the thumb owns its background/fill colour through the same state transaction. |
-| Text colour | Not applicable to the stock track/thumb, which contains no text. External labels retain their own text-colour owner; thumb fill is surface feedback. |
-| Changed text | Not applicable: no built-in text slot. External on/off labels are caller composition, not newly added props. |
-| Changed numbers | Not applicable: a boolean switch has no numeric display. |
+| Capability      | Application and owner                                                                                                                                           | References                    |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Appearance      | Default: `switch` owns independent opacity entrance; a containing field may own it instead. Initial thumb position is already correct.                          | default: `switch.root.enter`  |
+| Size            | Default for explicit `size` changes: root shell owns the bounded track dimensions. Passive layout changes are immediate; the thumb endpoint is remeasured.      | default: `switch.root.resize` |
+| Surface colour  | Default: `switch` owns checked, hover, invalid and disabled track/border colours; the thumb owns its background/fill colour through the same state transaction. | default: `switch.root.colour` |
+| Text colour     | Not applicable to the stock track/thumb, which contains no text. External labels retain their own text-colour owner; thumb fill is surface feedback.            | not-applicable: `@root`       |
+| Changed text    | Not applicable: no built-in text slot. External on/off labels are caller composition, not newly added props.                                                    | not-applicable: `@root`       |
+| Changed numbers | Not applicable: a boolean switch has no numeric display.                                                                                                        | not-applicable: `@root`       |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / root | Opacity only; no initial thumb sweep. | Short opacity. | Final state immediately. | `switch.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Checked change / thumb | Travel to measured endpoint with a non-overshooting indicator transition. | Position immediately. | Position immediately. | `switch.thumb.select` → `state.indicator` → `state.morph` |
-| State change / track and thumb | Scoped track, border and thumb colour transition. | Short colour feedback. | Final colours immediately. | `switch.root.colour` → `state.color` → target `state.color` |
-| Explicit size prop change / root geometry owner | Clamp track width/height to final measured size; thumb endpoint uses the same transaction. | Final geometry immediately. | Final geometry immediately. | `switch.root.resize` → `geometry.compact` → `geometry.resize` |
+| Trigger / owner                                 | Full                                                                                       | Reduced                     | None                        | Binding → preset → recipe/form                                         |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------- | --------------------------- | ---------------------------------------------------------------------- |
+| Independent insertion / root                    | Opacity only; no initial thumb sweep.                                                      | Short opacity.              | Final state immediately.    | `switch.root.enter` → `presence.inline` → `data.transition/opacity`    |
+| Checked change / thumb                          | Travel to measured endpoint with a non-overshooting indicator transition.                  | Position immediately.       | Position immediately.       | `switch.thumb.select` → `state.indicator` → `state.morph/indicator`    |
+| State change / track and thumb                  | Scoped track, border and thumb colour transition.                                          | Short colour feedback.      | Final colours immediately.  | `switch.root.colour` → `state.color` → `state.color/surface`           |
+| Explicit size prop change / root geometry owner | Clamp track width/height to final measured size; thumb endpoint uses the same transaction. | Final geometry immediately. | Final geometry immediately. | `switch.root.resize` → `geometry.compact` → `geometry.resize/measured` |
 
 ## Interruption and lifecycle
 

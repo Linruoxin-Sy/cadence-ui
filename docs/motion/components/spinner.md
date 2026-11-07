@@ -4,26 +4,40 @@ Status: target design; implementation and verification pending.
 
 Spinner communicates indeterminate activity through rotation in full mode and a visible, named static symbol in reduced and none. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["spinner#Spinner"],
+    "glyph": ["spinner#Spinner"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: spinner for independent insertion; inherited when Button or a status region owns the same entrance/replacement. |
-| Size | default for an explicit owned icon-size change; inherited for the parent's reserved icon slot; no size work is caused by rotation. |
-| Surface colour | not applicable to the transparent SVG's default surface; a containing badge/button owns its background. |
-| Text colour | default: SVG currentColor/stroke target transitions; inherited when the parent already owns the foreground transition. |
-| Changed text | not applicable to the SVG; aria-label updates are semantic and immediate; visible status copy is composed. |
-| Changed numbers | not applicable: Spinner has no determinate value; a displayed progress quantity is a separate composition. |
+| Capability      | Coverage and owner                                                                                                                 | References                                         |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Appearance      | default: spinner for independent insertion; inherited when Button or a status region owns the same entrance/replacement.           | default: `spinner.root.enter`, `spinner.root.exit` |
+| Size            | default for an explicit owned icon-size change; inherited for the parent's reserved icon slot; no size work is caused by rotation. | default: `spinner.root.resize`                     |
+| Surface colour  | not applicable to the transparent SVG's default surface; a containing badge/button owns its background.                            | not-applicable: `@root`                            |
+| Text colour     | default: SVG currentColor/stroke target transitions; inherited when the parent already owns the foreground transition.             | default: `spinner.glyph.colour`                    |
+| Changed text    | not applicable to the SVG; aria-label updates are semantic and immediate; visible status copy is composed.                         | not-applicable: `@root`                            |
+| Changed numbers | not applicable: Spinner has no determinate value; a displayed progress quantity is a separate composition.                         | not-applicable: `@root`                            |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion/removal / spinner or retained icon-slot owner | Opacity entrance/exit without delaying status availability. | Short opacity with a static glyph. | Immediate. | `spinner.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `spinner.root.exit` → `presence.exit` → `exit.fade` |
-| Visible indeterminate activity / SVG transform | Continuous rotation. | Static glyph, no rotation. | Static glyph, no rotation. | `spinner.glyph.busy` → `status.loop` → continuous `data.transition` |
-| Authored colour/size changes / SVG or parent slot | Scoped stroke colour; bounded owned size change if not controlled by a parent. | Colour may transition; size is immediate. | Immediate. | `spinner.glyph.colour` → `state.color` → target `state.color`; `spinner.root.resize` → `geometry.compact` → `geometry.resize` |
+| Trigger / owner                                                     | full                                                                           | reduced                                   | none                       | Binding → preset → recipe/form                                                                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Independent insertion/removal / spinner or retained icon-slot owner | Opacity entrance/exit without delaying status availability.                    | Short opacity with a static glyph.        | Immediate.                 | `spinner.root.enter` → `presence.inline` → `data.transition/opacity`; `spinner.root.exit` → `presence.exit` → `exit.fade/opacity`          |
+| Visible indeterminate activity / SVG transform                      | Continuous rotation.                                                           | Static glyph, no rotation.                | Static glyph, no rotation. | `spinner.glyph.busy` → `status.loop` → `data.transition/continuous`                                                                        |
+| Authored colour/size changes / SVG or parent slot                   | Scoped stroke colour; bounded owned size change if not controlled by a parent. | Colour may transition; size is immediate. | Immediate.                 | `spinner.glyph.colour` → `state.color` → `state.color/foreground`; `spinner.root.resize` → `geometry.compact` → `geometry.resize/measured` |
 
 ## Interruption and lifecycle
 

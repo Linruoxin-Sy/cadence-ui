@@ -4,27 +4,50 @@ Status: target design; implementation and verification pending.
 
 The consequential message becomes readable quickly and remains visually steady. Motion reinforces the surface and changing explanation without delaying a decision or inventing a warning shake. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["alert-dialog#AlertDialogContent"],
+    "overlay": ["alert-dialog#AlertDialogOverlay"],
+    "title": ["alert-dialog#AlertDialogTitle"],
+    "description": ["alert-dialog#AlertDialogDescription"],
+    "surface": [
+      "alert-dialog#AlertDialogContent",
+      "alert-dialog#AlertDialogMedia",
+      "alert-dialog#AlertDialogTitle",
+      "alert-dialog#AlertDialogDescription"
+    ],
+    "quantity": ["alert-dialog#AlertDialogTitle", "alert-dialog#AlertDialogDescription"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `alert-dialog-content` and overlay own coordinated opacity presence; media, title, description and actions inherit it. |
-| Size | Default: content shell owns natural message changes and explicit `size` changes within existing constraints. |
-| Surface colour | Default: content/media own supplied surface tokens; action/cancel Buttons keep their button state contracts. |
-| Text colour | Default: title/description own foreground token transitions. Urgency is supplied by the caller, not inferred from message text. |
-| Changed text | Default for primitive title/description: preserve unchanged graphemes and replace changed runs. Rich content uses explicit composed owners. |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                    | References                                                                                                                    |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `alert-dialog-content` and overlay own coordinated opacity presence; media, title, description and actions inherit it.                                                                                                                                          | default: `alert-dialog.content.enter`, `alert-dialog.overlay.enter`, `alert-dialog.content.exit`, `alert-dialog.overlay.exit` |
+| Size            | Default: content shell owns natural message changes and explicit `size` changes within existing constraints.                                                                                                                                                             | default: `alert-dialog.content.resize`                                                                                        |
+| Surface colour  | Default: content/media own supplied surface tokens; action/cancel Buttons keep their button state contracts.                                                                                                                                                             | default: `alert-dialog.surface.colour`                                                                                        |
+| Text colour     | Default: title/description own foreground token transitions. Urgency is supplied by the caller, not inferred from message text.                                                                                                                                          | default: `alert-dialog.surface.colour`                                                                                        |
+| Changed text    | Default for primitive title/description: preserve unchanged graphemes and replace changed runs. Rich content uses explicit composed owners.                                                                                                                              | default: `alert-dialog.title.change`, `alert-dialog.description.change`; composed: `@title`                                   |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. | default: `alert-dialog.quantity.change`; composed: `@quantity`                                                                |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Open / content and overlay | Coordinated opacity entrance; no travel, bounce or decorative action stagger. | Short opacity. | Open target immediately. | `alert-dialog.content.enter` → `presence.surface` → `enter.pop`; `alert-dialog.overlay.enter` → `presence.surface` → `enter.pop` |
-| Close / content and overlay | Opacity exit together; message remains stationary. | Short opacity. | Closed target immediately. | `alert-dialog.content.exit` → `presence.exit` → `exit.fade`; `alert-dialog.overlay.exit` → `presence.exit` → `exit.fade` |
-| Message/explicit size change / content shell | Clamped measured width/height, with final typography and no bounce. | Final geometry immediately. | Final geometry immediately. | `alert-dialog.content.resize` → `geometry.panel` → `geometry.resize` |
-| Plain explanation/name update / text owner | Changed-run replacement, `stagger: none`; semantic text is already final. | Short changed-run opacity. | Final text immediately. | `alert-dialog.title.change` → `text.replace` → target `text.change`; `alert-dialog.description.change` → `text.replace` → target `text.change` |
-| Supplied visual state / surface/text owners | Scoped colour transition. | Short colour feedback. | Target colours immediately. | `alert-dialog.surface.colour` → `state.color` → target `state.color` |
-| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `alert-dialog.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                                     | Full                                                                                              | Reduced                     | None                        | Binding → preset → recipe/form                                                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open / content and overlay                                                                          | Coordinated opacity entrance; no travel, bounce or decorative action stagger.                     | Short opacity.              | Open target immediately.    | `alert-dialog.content.enter` → `presence.surface` → `enter.pop/opacity`; `alert-dialog.overlay.enter` → `presence.surface` → `enter.pop/opacity`           |
+| Close / content and overlay                                                                         | Opacity exit together; message remains stationary.                                                | Short opacity.              | Closed target immediately.  | `alert-dialog.content.exit` → `presence.exit` → `exit.fade/opacity`; `alert-dialog.overlay.exit` → `presence.exit` → `exit.fade/opacity`                   |
+| Message/explicit size change / content shell                                                        | Clamped measured width/height, with final typography and no bounce.                               | Final geometry immediately. | Final geometry immediately. | `alert-dialog.content.resize` → `geometry.panel` → `geometry.resize/measured`                                                                              |
+| Plain explanation/name update / text owner                                                          | Changed-run replacement, `stagger: none`; semantic text is already final.                         | Short changed-run opacity.  | Final text immediately.     | `alert-dialog.title.change` → `text.replace` → `text.change/changed-runs`; `alert-dialog.description.change` → `text.replace` → `text.change/changed-runs` |
+| Supplied visual state / surface/text owners                                                         | Scoped colour transition.                                                                         | Short colour feedback.      | Target colours immediately. | `alert-dialog.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                           |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately.   | Final number immediately.   | `alert-dialog.quantity.change` → `number.compact` → `number.roll/reels`                                                                                    |
 
 ## Interruption and lifecycle
 

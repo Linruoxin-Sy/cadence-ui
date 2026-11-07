@@ -26,7 +26,7 @@ The `docs/` directory contains current concepts, contracts and future work for c
 | [docs/parity-plan.md](docs/parity-plan.md)                                                 | Adding a component, choosing compatibility metadata/a batch, or selecting future work.                                                                                            |
 | [docs/overall-design.md](docs/overall-design.md)                                           | Changing the repo layout, registry model, install paths, theming, component API, or build pipeline.                                                                               |
 | [docs/animation-system.md](docs/animation-system.md)                                       | Writing or editing any animation: tokens, recipes, Base UI popup integration, reduced-motion strategy, performance budgets, motion tests.                                         |
-| [docs/motion/README.md](docs/motion/README.md) and [presets](docs/motion/presets.md)          | Designing a component's own choreography, reading its `components/<id>.md` contract, or choosing/refining parameter bindings.                                                      |
+| [docs/motion/README.md](docs/motion/README.md) and [presets](docs/motion/presets.md)       | Designing a component's own choreography, reading its `components/<id>.md` contract, or choosing/refining parameter bindings.                                                     |
 | [docs/animation-system-plan.md](docs/animation-system-plan.md)                             | Implementing motion v2, checking migration dependencies, or claiming a capability is available.                                                                                   |
 | [docs/documentation-site-and-distribution.md](docs/documentation-site-and-distribution.md) | Touching the docs site, the `public/r` endpoints, `llms.txt`, MCP, versioning, or the contribution flow.                                                                          |
 | [docs/adr.md](docs/adr.md)                                                                 | Revisiting an architectural choice (registry-first, Base UI, Tailwind v4, Motion + optional GSAP, mirrored source tree, docs-as-data). Append a new ADR instead of rewriting one. |
@@ -127,7 +127,8 @@ the check compares payloads against source and fails on stale artifacts.
 1. Scaffold it: `node scripts/new-item.mjs --name tooltip --tier T2 --batch B4 --title "Tooltip" --description "…"`.
 2. Put the source in `registry/cadence/<id>/index.tsx` (relative imports only, `data-slot` on every part).
    Before motion implementation, author `docs/motion/components/<id>.md`, add its index entry and resolve
-   preset bindings. The current scaffold does not yet create these design files; its extension is planned.
+   preset bindings. The scaffold creates an unfinished contract and index entry; author its references
+   and choreography before implementation. Placeholder contracts deliberately fail `registry:check`.
 3. Keep the item in `registry.json` with `files[].target` of `@components/cadence/<id>/index.tsx`, plus
    the current compatibility fields `meta.tier`, `meta.batch`, `meta.motion`, `meta.intensity`,
    `meta.complexity`, and `meta.upstream`. Declare implemented recipes only; assess v2 capabilities by

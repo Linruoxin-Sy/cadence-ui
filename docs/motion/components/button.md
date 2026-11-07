@@ -4,28 +4,43 @@ Status: target design; implementation and verification pending.
 
 Button gives immediate press feedback while keeping its label and hit target stable through content changes. It adds no loading, success or request state. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings below are internal design names, not public APIs or recipe IDs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["button#Button"],
+    "feedback": ["button#Button"],
+    "label": ["button#Button"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause. |
-| Size | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent. |
-| Surface colour | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state. |
-| Text colour | default: button foreground; inherited by text and currentColor icons unless explicitly overridden. |
-| Changed text | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot. |
-| Changed numbers | default: direct numeric display children use compact reels when they represent quantities; composed for rich content; numeric identifiers remain text. |
+| Capability      | Coverage and owner                                                                                                                                                  | References                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Appearance      | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause.                                                   | default: `button.root.enter`, `button.root.exit`    |
+| Size            | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent. | default: `button.root.resize`                       |
+| Surface colour  | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state.                                                    | default: `button.root.colour`                       |
+| Text colour     | default: button foreground; inherited by text and currentColor icons unless explicitly overridden.                                                                  | default: `button.root.colour`                       |
+| Changed text    | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot.                                              | default: `button.label.replace`; composed: `@label` |
+| Changed numbers | default: direct numeric display children use compact reels when they represent quantities; composed for rich content; numeric identifiers remain text.              | default: `button.label.roll`; composed: `@label`    |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Dynamic insertion / button | Opacity entry; parent-owned removal retains a fade. | Short opacity only. | Visible or removed immediately. | `button.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `button.root.exit` → `presence.exit` → `exit.fade` |
-| Native press and release / internal feedback visual | scale.press toward the active state, then settle; native root hit geometry and semantics remain immediate. | No scale. | No animation. | `button.feedback.press` → `feedback.press` → `feedback.press` |
-| State change / button | Scoped surface and foreground transition. | Short colour feedback. | Target colours immediately. | `button.root.colour` → `state.color` → target `state.color` |
-| Label or quantity revision / label region | Changed graphemes replace with stagger:none; quantities roll by semantic direction; root width retargets concurrently. | Changed text uses short opacity only; quantity and width are immediate. | All targets immediate. | `button.label.replace` → `text.replace` → target `text.change`; `button.label.roll` → `number.compact` → revised `number.roll`; `button.root.resize` → `geometry.compact` → `geometry.resize` |
-| Explicit size variant or icon-slot occupancy change / root shell | Final typography/spacing commits once; interpolate only owned bounded dimensions. | Final dimensions immediately. | Final dimensions immediately. | `button.root.resize` → `geometry.compact` → `geometry.resize` |
+| Trigger / owner                                                  | full                                                                                                                   | reduced                                                                 | none                            | Binding → preset → recipe/form                                                                                                                                                                             |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dynamic insertion / button                                       | Opacity entry; parent-owned removal retains a fade.                                                                    | Short opacity only.                                                     | Visible or removed immediately. | `button.root.enter` → `presence.inline` → `data.transition/opacity`; `button.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                            |
+| Native press and release / internal feedback visual              | scale.press toward the active state, then settle; native root hit geometry and semantics remain immediate.             | No scale.                                                               | No animation.                   | `button.feedback.press` → `feedback.press` → `feedback.press/scale`                                                                                                                                        |
+| State change / button                                            | Scoped surface and foreground transition.                                                                              | Short colour feedback.                                                  | Target colours immediately.     | `button.root.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                    |
+| Label or quantity revision / label region                        | Changed graphemes replace with stagger:none; quantities roll by semantic direction; root width retargets concurrently. | Changed text uses short opacity only; quantity and width are immediate. | All targets immediate.          | `button.label.replace` → `text.replace` → `text.change/changed-runs`; `button.label.roll` → `number.compact` → `number.roll/reels`; `button.root.resize` → `geometry.compact` → `geometry.resize/measured` |
+| Explicit size variant or icon-slot occupancy change / root shell | Final typography/spacing commits once; interpolate only owned bounded dimensions.                                      | Final dimensions immediately.                                           | Final dimensions immediately.   | `button.root.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                                     |
 
 ## Interruption and lifecycle
 

@@ -4,27 +4,42 @@ Status: target design; implementation and verification pending.
 
 Kbd updates a shortcut hint while preserving the identity of keys that remain in the chord. It is a display component, not a global keyboard listener. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["kbd#Kbd", "kbd#KbdGroup"],
+    "key": ["kbd#Kbd"],
+    "group": ["kbd#KbdGroup"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: kbd or kbd-group for independent insertion; inherited inside a parent-owned hint entrance. |
-| Size | default: each kbd owns changed label width and kbd-group owns membership reflow, with distinct property owners. |
-| Surface colour | default: kbd surface and border; inherited contextual targets, such as Tooltip colour, are transitioned by their declared owner. |
-| Text colour | default: kbd foreground unless a parent owns a shared inherited colour transition. |
-| Changed text | default: direct key labels use changed-only replacement; composed for rich keycap content. |
-| Changed numbers | not applicable to shortcut key labels: numeric keys identify keys, not quantities; unrelated quantity content requires explicit composition. |
+| Capability      | Coverage and owner                                                                                                                           | References                                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Appearance      | default: kbd or kbd-group for independent insertion; inherited inside a parent-owned hint entrance.                                          | default: `kbd.root.enter`, `kbd.key.enter`, `kbd.key.exit` |
+| Size            | default: each kbd owns changed label width and kbd-group owns membership reflow, with distinct property owners.                              | default: `kbd.key.resize`, `kbd.group.resize`              |
+| Surface colour  | default: kbd surface and border; inherited contextual targets, such as Tooltip colour, are transitioned by their declared owner.             | default: `kbd.key.colour`                                  |
+| Text colour     | default: kbd foreground unless a parent owns a shared inherited colour transition.                                                           | default: `kbd.key.colour`                                  |
+| Changed text    | default: direct key labels use changed-only replacement; composed for rich keycap content.                                                   | default: `kbd.key.replace`; composed: `@key`               |
+| Changed numbers | not applicable to shortcut key labels: numeric keys identify keys, not quantities; unrelated quantity content requires explicit composition. | not-applicable: `@root`; composed: `@key`                  |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Hint insertion / group or standalone key | One short opacity entrance. | Opacity only. | Immediate. | `kbd.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Key label changes / kbd | Replace changed graphemes with stagger:none; fit the new intrinsic width. | Short changed-text opacity; width immediate. | Immediate. | `kbd.key.replace` → `text.replace` → target `text.change`; `kbd.key.resize` → `geometry.compact` → `geometry.resize` |
-| Chord membership changes / kbd-group | New keys fade; removed keys fade with retained lifecycle; surviving keys reflow and the owned group axis uses their final boxes. | Layout immediate, short opacity. | Immediate. | `kbd.key.enter` → `presence.inline` → one-shot opacity `data.transition`; `kbd.key.exit` → `presence.exit` → `exit.fade`; `kbd.group.move` → `layout.compact` → `layout.move`; `kbd.group.resize` → `geometry.compact` → `geometry.resize` |
-| Context colours change / declared key or parent owner | Scoped colour transition. | Short colour transition. | Immediate. | `kbd.key.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                       | full                                                                                                                             | reduced                                      | none       | Binding → preset → recipe/form                                                                                                                                                                                                                              |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hint insertion / group or standalone key              | One short opacity entrance.                                                                                                      | Opacity only.                                | Immediate. | `kbd.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                            |
+| Key label changes / kbd                               | Replace changed graphemes with stagger:none; fit the new intrinsic width.                                                        | Short changed-text opacity; width immediate. | Immediate. | `kbd.key.replace` → `text.replace` → `text.change/changed-runs`; `kbd.key.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                         |
+| Chord membership changes / kbd-group                  | New keys fade; removed keys fade with retained lifecycle; surviving keys reflow and the owned group axis uses their final boxes. | Layout immediate, short opacity.             | Immediate. | `kbd.key.enter` → `presence.inline` → `data.transition/opacity`; `kbd.key.exit` → `presence.exit` → `exit.fade/opacity`; `kbd.group.move` → `layout.compact` → `layout.move/position`; `kbd.group.resize` → `geometry.compact` → `geometry.resize/measured` |
+| Context colours change / declared key or parent owner | Scoped colour transition.                                                                                                        | Short colour transition.                     | Immediate. | `kbd.key.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                                                                         |
 
 ## Interruption and lifecycle
 

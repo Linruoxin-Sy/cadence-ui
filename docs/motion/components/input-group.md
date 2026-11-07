@@ -4,28 +4,49 @@ Status: target design; implementation and verification pending.
 
 InputGroup presents a single stable frame while addons, display text and actions change around a native editor. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names. InputGroupText currently has no dedicated data-slot, and InputGroupButton renders Button; these names identify actual parts rather than invented slots.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["input-group#InputGroup"],
+    "addon": ["input-group#InputGroupAddon", "input-group#InputGroupButton"],
+    "text": ["input-group#InputGroupText", "input-group#InputGroupAddon"],
+    "control": ["input-group#InputGroupInput", "input-group#InputGroupTextarea"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: input-group owns one insertion; later addon/action insertion has its own cause; inherited for an enclosing parent entrance. |
-| Size | default: frame owns eligible addon/content-driven outer geometry; controls own native editing growth and direct resizing. Any revision affecting a focused editor's box/scroll extent is immediate; parent-constrained dimensions remain inherited. |
-| Surface colour | default: input-group owns focus/invalid frame chrome; composed InputGroupButton retains Button feedback; controls do not duplicate frame chrome. |
-| Text colour | default: InputGroupText/addon foreground and native control foreground; composed buttons retain their owner. |
-| Changed text | default: direct display strings in InputGroupText and addons; composed rich display children; editable input/textarea values remain native. |
-| Changed numbers | default: direct display quantities in InputGroupText/addons; composed rich counters; editable numbers and identifier-like affixes do not roll. |
+| Capability      | Coverage and owner                                                                                                                                                                                                                                  | References                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Appearance      | default: input-group owns one insertion; later addon/action insertion has its own cause; inherited for an enclosing parent entrance.                                                                                                                | default: `input-group.root.enter`, `input-group.addon.enter`, `input-group.addon.exit` |
+| Size            | default: frame owns eligible addon/content-driven outer geometry; controls own native editing growth and direct resizing. Any revision affecting a focused editor's box/scroll extent is immediate; parent-constrained dimensions remain inherited. | default: `input-group.root.resize`; inherited: `@control`                              |
+| Surface colour  | default: input-group owns focus/invalid frame chrome; composed InputGroupButton retains Button feedback; controls do not duplicate frame chrome.                                                                                                    | default: `input-group.root.colour`                                                     |
+| Text colour     | default: InputGroupText/addon foreground and native control foreground; composed buttons retain their owner.                                                                                                                                        | default: `input-group.text.colour`, `input-group.control.colour`                       |
+| Changed text    | default: direct display strings in InputGroupText and addons; composed rich display children; editable input/textarea values remain native.                                                                                                         | default: `input-group.text.replace`; composed: `@text`                                 |
+| Changed numbers | default: direct display quantities in InputGroupText/addons; composed rich counters; editable numbers and identifier-like affixes do not roll.                                                                                                      | default: `input-group.text.roll`; composed: `@text`                                    |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Group insertion / frame | One opacity entrance for frame and initial parts. | Short opacity. | Immediate. | `input-group.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Addon/action membership change / frame | Fade changed addon; adjust bounded outer size and retained segment positions only when the editor is unfocused and no selection/resize gesture is active. Otherwise commit geometry immediately. | Size/position immediate, opacity only. | Immediate. | `input-group.addon.enter` → `presence.inline` → one-shot opacity `data.transition`; `input-group.addon.exit` → `presence.exit` → `exit.fade`; `input-group.root.resize` → `geometry.compact` → `geometry.resize`; `input-group.addon.move` → `layout.compact` → `layout.move` |
-| Focus/invalid/state change / frame and display owners | Scoped colour/shadow transitions; focus is immediately visible. | Short colour. | Immediate. | `input-group.root.colour` → `state.color` → target `state.color`; `input-group.text.colour` → `state.color` → target `state.color` |
-| Display content revision / InputGroupText or addon | Changed-only text with stagger:none; quantity reels share the frame's geometry transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `input-group.text.replace` → `text.replace` → target `text.change`; `input-group.text.roll` → `number.compact` → revised `number.roll` |
-| Editor changes / input-group-control | Native editing and direct geometry. | Same. | Same. | `input-group.control.edit` → `engine.native` → native Input/Textarea editing (no recipe) |
+| Trigger / owner                                       | full                                                                                                                                                                                             | reduced                                                  | none       | Binding → preset → recipe/form                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Group insertion / frame                               | One opacity entrance for frame and initial parts.                                                                                                                                                | Short opacity.                                           | Immediate. | `input-group.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                                                       |
+| Addon/action membership change / frame                | Fade changed addon; adjust bounded outer size and retained segment positions only when the editor is unfocused and no selection/resize gesture is active. Otherwise commit geometry immediately. | Size/position immediate, opacity only.                   | Immediate. | `input-group.addon.enter` → `presence.inline` → `data.transition/opacity`; `input-group.addon.exit` → `presence.exit` → `exit.fade/opacity`; `input-group.root.resize` → `geometry.compact` → `geometry.resize/measured`; `input-group.addon.move` → `layout.compact` → `layout.move/position` |
+| Focus/invalid/state change / frame and display owners | Scoped colour/shadow transitions; focus is immediately visible.                                                                                                                                  | Short colour.                                            | Immediate. | `input-group.root.colour` → `state.color` → `state.color/surface`; `input-group.text.colour` → `state.color` → `state.color/foreground`; `input-group.control.colour` → `state.color` → `state.color/foreground`                                                                               |
+| Display content revision / InputGroupText or addon    | Changed-only text with stagger:none; quantity reels share the frame's geometry transaction.                                                                                                      | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `input-group.text.replace` → `text.replace` → `text.change/changed-runs`; `input-group.text.roll` → `number.compact` → `number.roll/reels`                                                                                                                                                     |
+| Editor changes / input-group-control                  | Native editing and direct geometry.                                                                                                                                                              | Same.                                                    | Same.      | `input-group.control.edit` → `engine.native` → `native/input` (native Input/Textarea editing (no recipe))                                                                                                                                                                                      |
+
+The `text` bindings own only display Text/Addon regions. The `control.colour` binding owns native
+InputGroupInput/InputGroupTextarea foreground and placeholder paint only; it never receives a text
+diff or reel renderer. InputGroupButton inherits Button once. Group-frame colour replaces conflicting
+control-frame chrome at the composition boundary, while native editing remains the control's owner.
 
 ## Interruption and lifecycle
 

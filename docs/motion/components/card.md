@@ -4,27 +4,43 @@ Status: target design; implementation and verification pending.
 
 Card coordinates content changes as one stable surface. A plain Card is not an interactive control and gains no automatic hover lift. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["card#Card"],
+    "text": ["card#Card", "card#CardTitle", "card#CardDescription", "card#CardContent"],
+    "value": ["card#CardTitle", "card#CardDescription", "card#CardContent"],
+    "surface": ["card#Card", "card#CardHeader", "card#CardFooter"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: card owns one dynamic surface entrance including initial header/content/footer; inherited when a larger parent owns that cause. |
-| Size | default: card owns content-driven block geometry; fit=content also owns intrinsic inline geometry through its existing card-flow arrangement; constrained axes remain inherited. |
-| Surface colour | default: card background/border/shadow and independently styled header/footer surfaces on authored variant/theme changes. |
-| Text colour | default: card foreground and title/description overrides; composed descendants retain explicit colour owners. |
-| Changed text | default: plain CardTitle and CardDescription; plain display content directly owned by CardContent is eligible; composed rich body/action/footer content is not recursively rewritten. |
-| Changed numbers | default: direct quantity values in known plain display parts; composed rich metrics; numeric titles/identifiers remain text. |
+| Capability      | Coverage and owner                                                                                                                                                                    | References                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Appearance      | default: card owns one dynamic surface entrance including initial header/content/footer; inherited when a larger parent owns that cause.                                              | default: `card.root.enter`, `card.root.exit`    |
+| Size            | default: card owns content-driven block geometry; fit=content also owns intrinsic inline geometry through its existing card-flow arrangement; constrained axes remain inherited.      | default: `card.root.resize`                     |
+| Surface colour  | default: card background/border/shadow and independently styled header/footer surfaces on authored variant/theme changes.                                                             | default: `card.surface.colour`                  |
+| Text colour     | default: card foreground and title/description overrides; composed descendants retain explicit colour owners.                                                                         | default: `card.text.colour`                     |
+| Changed text    | default: plain CardTitle and CardDescription; plain display content directly owned by CardContent is eligible; composed rich body/action/footer content is not recursively rewritten. | default: `card.text.replace`; composed: `@text` |
+| Changed numbers | default: direct quantity values in known plain display parts; composed rich metrics; numeric titles/identifiers remain text.                                                          | default: `card.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Dynamic insertion/removal / card | Coherent surface opacity entrance and retained exit, without child cascades. | Short opacity. | Immediate. | `card.root.enter` → `presence.surface` → opacity-only `enter.pop`; `card.root.exit` → `presence.exit` → `exit.fade` |
-| Content/header/footer or explicit size change / card | Retarget measured owned dimensions with final spacing/typography; stable content remains unscaled. | Final geometry immediately. | Immediate. | `card.root.resize` → `geometry.content` → `geometry.resize` |
-| Display revision / title, description or known plain content | Changed-only text with stagger:none or quantity reels, coordinated with card geometry. | Short changed-text opacity; final quantity and geometry immediately. | Immediate. | `card.text.replace` → `text.replace` → target `text.change`; `card.value.roll` → `number.roll` → revised `number.roll` |
-| Surface/foreground target changes / relevant owner | Scoped colour/shadow transition. | Short colour. | Immediate. | `card.surface.colour` → `state.color` → target `state.color`; `card.text.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                              | full                                                                                               | reduced                                                              | none       | Binding → preset → recipe/form                                                                                               |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Dynamic insertion/removal / card                             | Coherent surface opacity entrance and retained exit, without child cascades.                       | Short opacity.                                                       | Immediate. | `card.root.enter` → `presence.surface` → `enter.pop/opacity`; `card.root.exit` → `presence.exit` → `exit.fade/opacity`       |
+| Content/header/footer or explicit size change / card         | Retarget measured owned dimensions with final spacing/typography; stable content remains unscaled. | Final geometry immediately.                                          | Immediate. | `card.root.resize` → `geometry.content` → `geometry.resize/measured`                                                         |
+| Display revision / title, description or known plain content | Changed-only text with stagger:none or quantity reels, coordinated with card geometry.             | Short changed-text opacity; final quantity and geometry immediately. | Immediate. | `card.text.replace` → `text.replace` → `text.change/changed-runs`; `card.value.roll` → `number.roll` → `number.roll/reels`   |
+| Surface/foreground target changes / relevant owner           | Scoped colour/shadow transition.                                                                   | Short colour.                                                        | Immediate. | `card.surface.colour` → `state.color` → `state.color/surface`; `card.text.colour` → `state.color` → `state.color/foreground` |
 
 ## Interruption and lifecycle
 

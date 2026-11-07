@@ -6,26 +6,43 @@ Resizable communicates which separator can be manipulated while leaving panel ge
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). The existing Group/Panel/Separator props and callbacks remain the API.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "panels": ["resizable#ResizablePanelGroup", "resizable#ResizablePanel"],
+    "handle": ["resizable#ResizableHandle"],
+    "grip": ["resizable#ResizableHandle"],
+    "text": ["resizable#ResizablePanel"],
+    "value": ["resizable#ResizablePanel"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: a genuinely inserted handle/grip may receive local opacity when parent presence does not already own insertion. Panel contents inherit/combine their own presence. |
-| Size | Inherited/native: the panel library owns sizing, constraints and direct pointer/keyboard updates. Ordinary programmatic layouts resolve through the same authority; this target adds no second width/height tween. |
-| Surface colour | Default: handle/grip hover, focus-visible and active-state surface/border colours. Focus recognition remains immediate. |
-| Text colour | Inherited from panel content; default scoped feedback for an explicitly changing handle/grip foreground. The separator adds no label text state. |
-| Changed text | Default for a direct plain ResizablePanel display string; composed for rich panel children. Neither path rewrites editor text or scans arbitrary descendant nodes. |
-| Changed numbers | Default for a supported direct Panel display quantity; composed for rich numeric displays. Panel sizes/ids are geometry or identity, not newly introduced animated percentage labels. |
+| Capability      | Applicability and owner                                                                                                                                                                                            | References                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Appearance      | Default: a genuinely inserted handle/grip may receive local opacity when parent presence does not already own insertion. Panel contents inherit/combine their own presence.                                        | default: `resizable.grip.enter`                                 |
+| Size            | Inherited/native: the panel library owns sizing, constraints and direct pointer/keyboard updates. Ordinary programmatic layouts resolve through the same authority; this target adds no second width/height tween. | inherited: `resizable.panels.direct`, `resizable.panels.layout` |
+| Surface colour  | Default: handle/grip hover, focus-visible and active-state surface/border colours. Focus recognition remains immediate.                                                                                            | default: `resizable.handle.colour`                              |
+| Text colour     | Inherited from panel content; default scoped feedback for an explicitly changing handle/grip foreground. The separator adds no label text state.                                                                   | default: `resizable.handle.colour`; inherited: `@text`          |
+| Changed text    | Default for a direct plain ResizablePanel display string; composed for rich panel children. Neither path rewrites editor text or scans arbitrary descendant nodes.                                                 | default: `resizable.text.replace`; composed: `@text`            |
+| Changed numbers | Default for a supported direct Panel display quantity; composed for rich numeric displays. Panel sizes/ids are geometry or identity, not newly introduced animated percentage labels.                              | default: `resizable.value.change`; composed: `@value`           |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Pointer/keyboard resizing; panel library | One-to-one divider movement with native constraints and actual panel reflow. | Same direct operation. | Same direct operation. | `resizable.panels.direct` → `engine.native` → react-resizable-panels Group/Panel/Separator geometry |
-| Programmatic layout or constraint change | Use the same library destination immediately; no independent geometry animation. | Immediate native target. | Immediate native target. | `resizable.panels.layout` → `engine.native` → react-resizable-panels layout ownership |
-| Handle/grip hover, active, foreground or defined disabled state | Scoped colour feedback with an unchanged separator hit area. No cursor-following lag or panel press scale. | Short colour. | Final colour immediately. | `resizable.handle.colour` → `state.color` → planned `state.color` |
-| Independent grip insertion | Opacity only on the decorative grip, without changing panel layout. | Short opacity. | Visible immediately. | `resizable.grip.enter` → `presence.inline` → one-shot `data.transition` |
-| Direct plain Panel display revision | Changed text runs without stagger or changed quantity reels, only while no direct resize/selection owns that display geometry. | Short changed-text opacity; quantity immediately. | Final content immediately. | `resizable.text.replace` → `text.replace` → planned `text.change`; `resizable.value.change` → `number.compact` → `number.roll` |
+| Trigger and owner                                               | Full                                                                                                                           | Reduced                                           | None                       | Binding → preset → recipe                                                                                                                 |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Pointer/keyboard resizing; panel library                        | One-to-one divider movement with native constraints and actual panel reflow.                                                   | Same direct operation.                            | Same direct operation.     | `resizable.panels.direct` → `engine.native` → `native/resizable-panels` (react-resizable-panels Group/Panel/Separator geometry)           |
+| Programmatic layout or constraint change                        | Use the same library destination immediately; no independent geometry animation.                                               | Immediate native target.                          | Immediate native target.   | `resizable.panels.layout` → `engine.native` → `native/resizable-panels` (react-resizable-panels layout ownership)                         |
+| Handle/grip hover, active, foreground or defined disabled state | Scoped colour feedback with an unchanged separator hit area. No cursor-following lag or panel press scale.                     | Short colour.                                     | Final colour immediately.  | `resizable.handle.colour` → `state.color` → `state.color/surface-foreground`                                                              |
+| Independent grip insertion                                      | Opacity only on the decorative grip, without changing panel layout.                                                            | Short opacity.                                    | Visible immediately.       | `resizable.grip.enter` → `presence.inline` → `data.transition/opacity`                                                                    |
+| Direct plain Panel display revision                             | Changed text runs without stagger or changed quantity reels, only while no direct resize/selection owns that display geometry. | Short changed-text opacity; quantity immediately. | Final content immediately. | `resizable.text.replace` → `text.replace` → `text.change/changed-runs`; `resizable.value.change` → `number.compact` → `number.roll/reels` |
 
 ## Interruption and lifecycle
 

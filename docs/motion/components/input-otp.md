@@ -4,25 +4,40 @@ Status: target design; implementation and verification pending.
 
 Only slots whose code characters actually change receive a local replacement cue. Typing, paste, selection and completion remain native and immediate. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["input-otp#InputOTP", "input-otp#InputOTPGroup"],
+    "slot": ["input-otp#InputOTPSlot"],
+    "input": ["input-otp#InputOTP"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: the input container/group owns one entrance; `input-otp-slot` and separators inherit it. |
-| Size | Inherited: slots have fixed boxes and caller-owned grouping. Changing code length changes semantic structure immediately; no per-slot size spring. |
-| Surface colour | Default: each slot owns active, invalid and disabled border/background state. |
-| Text colour | Default: each displayed character inherits its slot foreground; active/disabled colours use scoped transitions. |
-| Changed text | Default: the presentation inside each changed `input-otp-slot` replaces that character only; unchanged slots and focus-only moves do not replay. The real input remains native. |
-| Changed numbers | Not applicable: OTP digits are an identifier, not an integer. No rolling, carry, inferred direction or count-up. |
+| Capability      | Application and owner                                                                                                                                                           | References                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| Appearance      | Default: the input container/group owns one entrance; `input-otp-slot` and separators inherit it.                                                                               | default: `input-otp.root.enter`  |
+| Size            | Inherited: slots have fixed boxes and caller-owned grouping. Changing code length changes semantic structure immediately; no per-slot size spring.                              | inherited: `@root`, `@slot`      |
+| Surface colour  | Default: each slot owns active, invalid and disabled border/background state.                                                                                                   | default: `input-otp.slot.colour` |
+| Text colour     | Default: each displayed character inherits its slot foreground; active/disabled colours use scoped transitions.                                                                 | default: `input-otp.slot.colour` |
+| Changed text    | Default: the presentation inside each changed `input-otp-slot` replaces that character only; unchanged slots and focus-only moves do not replay. The real input remains native. | default: `input-otp.slot.change` |
+| Changed numbers | Not applicable: OTP digits are an identifier, not an integer. No rolling, carry, inferred direction or count-up.                                                                | not-applicable: `@root`          |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / container | One opacity entrance with existing code already rendered. | Short opacity. | Final state immediately. | `input-otp.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Accepted edit/paste / changed slot presentation | Changed character fades out/in in its fixed box; `stagger: none`, including multi-slot paste. | Short opacity only where safe. | Final character immediately. | `input-otp.slot.change` → `text.replace` → target `text.change` |
-| Active/invalid/disabled / slot | Scoped border/background/foreground colour; focus indicator is visible immediately. | Short colour feedback. | Final colours immediately. | `input-otp.slot.colour` → `state.color` → target `state.color` |
-| Caret/selection / native input and active slot | Immediate caret and selection; no authored blinking loop. | Same immediate behavior. | Same immediate behavior. | `input-otp.input.edit` → `engine.native` → input-otp's native input/selection (no new recipe) |
+| Trigger / owner                                 | Full                                                                                          | Reduced                        | None                         | Binding → preset → recipe/form                                                                                     |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Independent insertion / container               | One opacity entrance with existing code already rendered.                                     | Short opacity.                 | Final state immediately.     | `input-otp.root.enter` → `presence.inline` → `data.transition/opacity`                                             |
+| Accepted edit/paste / changed slot presentation | Changed character fades out/in in its fixed box; `stagger: none`, including multi-slot paste. | Short opacity only where safe. | Final character immediately. | `input-otp.slot.change` → `text.replace` → `text.change/changed-runs`                                              |
+| Active/invalid/disabled / slot                  | Scoped border/background/foreground colour; focus indicator is visible immediately.           | Short colour feedback.         | Final colours immediately.   | `input-otp.slot.colour` → `state.color` → `state.color/surface-foreground`                                         |
+| Caret/selection / native input and active slot  | Immediate caret and selection; no authored blinking loop.                                     | Same immediate behavior.       | Same immediate behavior.     | `input-otp.input.edit` → `engine.native` → `native/input-otp` (input-otp's native input/selection (no new recipe)) |
 
 ## Interruption and lifecycle
 

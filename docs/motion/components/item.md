@@ -4,28 +4,54 @@ Status: target design; implementation and verification pending.
 
 Item treats a row's media, copy and actions as one identity, while allowing later changes to each region to remain local. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["item#Item"],
+    "group": ["item#ItemGroup"],
+    "part": ["item#ItemActions", "item#ItemMedia", "item#ItemHeader", "item#ItemFooter"],
+    "media": ["item#ItemMedia"],
+    "text": [
+      "item#Item",
+      "item#ItemTitle",
+      "item#ItemDescription",
+      "item#ItemContent",
+      "item#ItemHeader",
+      "item#ItemFooter"
+    ],
+    "value": ["item#ItemTitle", "item#ItemDescription", "item#ItemContent", "item#ItemHeader", "item#ItemFooter"],
+    "surface": ["item#Item", "item#ItemMedia"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: item for insertion and separately changed media/actions; ItemGroup coordinates group insertion; inherited for a larger parent entrance. |
-| Size | default: item owns content/header/footer-driven block size; item-group owns retained item positions; externally constrained axes remain inherited. |
-| Surface colour | default: item variant/background/border and ItemMedia surface; interaction colours apply only to actual interactive render targets. |
-| Text colour | default: title, description and inherited row foreground; composed independent actions own their states. |
-| Changed text | default: plain ItemTitle and ItemDescription, plus directly owned plain content/header/footer text; composed rich content. |
-| Changed numbers | default: direct quantity values in known display parts; numeric identifiers remain text; composed rich metrics/actions keep their own owner. |
+| Capability      | Coverage and owner                                                                                                                                 | References                                                                        |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Appearance      | default: item for insertion and separately changed media/actions; ItemGroup coordinates group insertion; inherited for a larger parent entrance.   | default: `item.root.enter`, `item.root.exit`, `item.part.enter`, `item.part.exit` |
+| Size            | default: item owns content/header/footer-driven block size; item-group owns retained item positions; externally constrained axes remain inherited. | default: `item.root.resize`                                                       |
+| Surface colour  | default: item variant/background/border and ItemMedia surface; interaction colours apply only to actual interactive render targets.                | default: `item.surface.colour`                                                    |
+| Text colour     | default: title, description and inherited row foreground; composed independent actions own their states.                                           | default: `item.text.colour`                                                       |
+| Changed text    | default: plain ItemTitle and ItemDescription, plus directly owned plain content/header/footer text; composed rich content.                         | default: `item.text.replace`; composed: `@text`                                   |
+| Changed numbers | default: direct quantity values in known display parts; numeric identifiers remain text; composed rich metrics/actions keep their own owner.       | default: `item.value.roll`; composed: `@value`                                    |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Item insertion/removal / item and group | Fade changed item; move retained siblings without remounting. | Positions immediate, short opacity. | Immediate. | `item.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `item.root.exit` → `presence.exit` → `exit.fade`; `item.group.move` → `layout.compact` → `layout.move` |
-| Header/footer/content or explicit size change / item | Resolve final spacing/typography and interpolate measured block size; independently inserted media/actions fade within it. | Size immediate, short opacity. | Immediate. | `item.root.resize` → `geometry.content` → `geometry.resize`; `item.part.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Existing media/action region removed or explicitly replaced / retained local owner | Fade only the changed noninteractive visual while current actions and semantic content commit immediately. | Short opacity. | Final content immediately. | `item.part.exit` → `presence.exit` → `exit.fade`; `item.media.replace` → `data.update` → local opacity `data.transition` |
-| Display text/quantity revision / known display part | Changed-only text, stagger:none, or quantity reels. | Short changed-text opacity; quantities immediate. | Immediate. | `item.text.replace` → `text.replace` → target `text.change`; `item.value.roll` → `number.compact` → revised `number.roll` |
-| Variant or actual interactive state / row/media/text owners | Scoped colour transition. | Short colour. | Immediate. | `item.surface.colour` → `state.color` → target `state.color`; `item.text.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                                                    | full                                                                                                                       | reduced                                           | none                       | Binding → preset → recipe/form                                                                                                                                                             |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Item insertion/removal / item and group                                            | Fade changed item; move retained siblings without remounting.                                                              | Positions immediate, short opacity.               | Immediate.                 | `item.root.enter` → `presence.inline` → `data.transition/opacity`; `item.root.exit` → `presence.exit` → `exit.fade/opacity`; `item.group.move` → `layout.compact` → `layout.move/position` |
+| Header/footer/content or explicit size change / item                               | Resolve final spacing/typography and interpolate measured block size; independently inserted media/actions fade within it. | Size immediate, short opacity.                    | Immediate.                 | `item.root.resize` → `geometry.content` → `geometry.resize/measured`; `item.part.enter` → `presence.inline` → `data.transition/opacity`                                                    |
+| Existing media/action region removed or explicitly replaced / retained local owner | Fade only the changed noninteractive visual while current actions and semantic content commit immediately.                 | Short opacity.                                    | Final content immediately. | `item.part.exit` → `presence.exit` → `exit.fade/opacity`; `item.media.replace` → `data.update` → `data.transition/opacity`                                                                 |
+| Display text/quantity revision / known display part                                | Changed-only text, stagger:none, or quantity reels.                                                                        | Short changed-text opacity; quantities immediate. | Immediate.                 | `item.text.replace` → `text.replace` → `text.change/changed-runs`; `item.value.roll` → `number.compact` → `number.roll/reels`                                                              |
+| Variant or actual interactive state / row/media/text owners                        | Scoped colour transition.                                                                                                  | Short colour.                                     | Immediate.                 | `item.surface.colour` → `state.color` → `state.color/surface`; `item.text.colour` → `state.color` → `state.color/foreground`                                                               |
 
 ## Interruption and lifecycle
 

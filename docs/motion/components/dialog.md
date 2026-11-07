@@ -4,28 +4,46 @@ Status: target design; implementation and verification pending.
 
 The modal surface arrives as one readable unit, then accommodates intentional content changes without moving focus or bouncing the reading plane. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["dialog#DialogContent"],
+    "overlay": ["dialog#DialogOverlay"],
+    "title": ["dialog#DialogTitle"],
+    "description": ["dialog#DialogDescription"],
+    "surface": ["dialog#DialogContent", "dialog#DialogOverlay", "dialog#DialogTitle", "dialog#DialogDescription"],
+    "quantity": ["dialog#DialogTitle", "dialog#DialogDescription"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `dialog-content` owns panel presence and `dialog-overlay` owns backdrop opacity. Header, footer and initial children inherit that entrance. |
-| Size | Default: content shell owns content-driven width/height within existing viewport/max-width constraints; its natural-content measurement is separate. |
-| Surface colour | Default: content/overlay own their supplied background/border tokens; child buttons retain their own state owners. |
-| Text colour | Default: `dialog-title` and `dialog-description` own foreground changes; arbitrary body children inherit or retain component ownership. |
-| Changed text | Default for primitive title/description content: changed runs only. Rich body/title children use composed ownership. |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                    | References                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `dialog-content` owns panel presence and `dialog-overlay` owns backdrop opacity. Header, footer and initial children inherit that entrance.                                                                                                                     | default: `dialog.content.enter`, `dialog.content.exit`, `dialog.overlay.enter`, `dialog.overlay.exit` |
+| Size            | Default: content shell owns content-driven width/height within existing viewport/max-width constraints; its natural-content measurement is separate.                                                                                                                     | default: `dialog.content.resize`                                                                      |
+| Surface colour  | Default: content/overlay own their supplied background/border tokens; child buttons retain their own state owners.                                                                                                                                                       | default: `dialog.surface.colour`                                                                      |
+| Text colour     | Default: `dialog-title` and `dialog-description` own foreground changes; arbitrary body children inherit or retain component ownership.                                                                                                                                  | default: `dialog.surface.colour`                                                                      |
+| Changed text    | Default for primitive title/description content: changed runs only. Rich body/title children use composed ownership.                                                                                                                                                     | default: `dialog.title.change`, `dialog.description.change`; composed: `@title`                       |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. | default: `dialog.quantity.change`; composed: `@quantity`                                              |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Open / content | Opacity with `scale.in`; final centered placement is stable. | Short opacity only. | Open target immediately. | `dialog.content.enter` → `presence.surface` → `enter.pop` |
-| Close / content | Opacity exit only; no delayed child exits. | Short opacity only. | Closed target immediately. | `dialog.content.exit` → `presence.exit` → `exit.fade` |
-| Open/close / overlay | Opacity follows the same open transaction, with its own property owner. | Short opacity. | Target opacity immediately. | `dialog.overlay.enter` → `presence.surface` → `enter.pop`; `dialog.overlay.exit` → `presence.exit` → `exit.fade` |
-| Intentional body/size change / content shell | Measure the final target and animate clamped width/height without bounce. | Final geometry immediately. | Final geometry immediately. | `dialog.content.resize` → `geometry.panel` → `geometry.resize` |
-| Plain title/description update / respective text owner | Stable-grapheme replacement, `stagger: none`; initial text inherits panel entrance. | Changed-run opacity only. | Final text immediately. | `dialog.title.change` → `text.replace` → target `text.change`; `dialog.description.change` → `text.replace` → target `text.change` |
-| Supplied colour token change / relevant parts | Scoped surface/border/foreground transition. | Short colour feedback. | Final colours immediately. | `dialog.surface.colour` → `state.color` → target `state.color` |
-| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `dialog.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                                     | Full                                                                                              | Reduced                     | None                        | Binding → preset → recipe/form                                                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open / content                                                                                      | Opacity with `scale.in`; final centered placement is stable.                                      | Short opacity only.         | Open target immediately.    | `dialog.content.enter` → `presence.surface` → `enter.pop/surface`                                                                              |
+| Close / content                                                                                     | Opacity exit only; no delayed child exits.                                                        | Short opacity only.         | Closed target immediately.  | `dialog.content.exit` → `presence.exit` → `exit.fade/opacity`                                                                                  |
+| Open/close / overlay                                                                                | Opacity follows the same open transaction, with its own property owner.                           | Short opacity.              | Target opacity immediately. | `dialog.overlay.enter` → `presence.surface` → `enter.pop/opacity`; `dialog.overlay.exit` → `presence.exit` → `exit.fade/opacity`               |
+| Intentional body/size change / content shell                                                        | Measure the final target and animate clamped width/height without bounce.                         | Final geometry immediately. | Final geometry immediately. | `dialog.content.resize` → `geometry.panel` → `geometry.resize/measured`                                                                        |
+| Plain title/description update / respective text owner                                              | Stable-grapheme replacement, `stagger: none`; initial text inherits panel entrance.               | Changed-run opacity only.   | Final text immediately.     | `dialog.title.change` → `text.replace` → `text.change/changed-runs`; `dialog.description.change` → `text.replace` → `text.change/changed-runs` |
+| Supplied colour token change / relevant parts                                                       | Scoped surface/border/foreground transition.                                                      | Short colour feedback.      | Final colours immediately.  | `dialog.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                     |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately.   | Final number immediately.   | `dialog.quantity.change` → `number.compact` → `number.roll/reels`                                                                              |
 
 ## Interruption and lifecycle
 

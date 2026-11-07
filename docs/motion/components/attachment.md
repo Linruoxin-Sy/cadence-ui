@@ -4,29 +4,50 @@ Status: target design; implementation and verification pending.
 
 Attachment communicates its supplied idle/uploading/processing/error/done state while keeping filename, preview and independent actions stable. It does not upload, retry or delete files itself. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["attachment#Attachment"],
+    "group": ["attachment#AttachmentGroup"],
+    "part": ["attachment#AttachmentActions", "attachment#AttachmentAction", "attachment#AttachmentMedia"],
+    "media": ["attachment#AttachmentMedia"],
+    "surface": ["attachment#Attachment", "attachment#AttachmentMedia"],
+    "text": ["attachment#AttachmentTitle", "attachment#AttachmentDescription", "attachment#AttachmentMedia"],
+    "title": ["attachment#AttachmentTitle"],
+    "value": ["attachment#AttachmentDescription"],
+    "trigger": ["attachment#AttachmentTrigger"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: attachment owns insertion and later media/action changes; attachment-group coordinates membership; inherited under a parent entrance. |
-| Size | default: attachment owns content/orientation/explicit-size geometry, and group owns visible item positions; native horizontal scrolling remains direct. |
-| Surface colour | default: attachment and attachment-media state/background/border targets; AttachmentAction inherits Button ownership. |
-| Text colour | default: title/description/media foreground on supplied state changes; actions retain their Button owner. |
-| Changed text | default: plain filename and description strings use changed-only replacement; composed rich metadata; filename identity is never interpreted as a number. |
-| Changed numbers | default: direct numeric quantities in descriptive display content; formatted rich metadata/progress uses composition; names, extensions and IDs remain textual. |
+| Capability      | Coverage and owner                                                                                                                                              | References                                                                                                |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Appearance      | default: attachment owns insertion and later media/action changes; attachment-group coordinates membership; inherited under a parent entrance.                  | default: `attachment.root.enter`, `attachment.root.exit`, `attachment.part.enter`, `attachment.part.exit` |
+| Size            | default: attachment owns content/orientation/explicit-size geometry, and group owns visible item positions; native horizontal scrolling remains direct.         | default: `attachment.root.resize`                                                                         |
+| Surface colour  | default: attachment and attachment-media state/background/border targets; AttachmentAction inherits Button ownership.                                           | default: `attachment.surface.colour`                                                                      |
+| Text colour     | default: title/description/media foreground on supplied state changes; actions retain their Button owner.                                                       | default: `attachment.text.colour`                                                                         |
+| Changed text    | default: plain filename and description strings use changed-only replacement; composed rich metadata; filename identity is never interpreted as a number.       | default: `attachment.text.replace`; composed: `@text`                                                     |
+| Changed numbers | default: direct numeric quantities in descriptive display content; formatted rich metadata/progress uses composition; names, extensions and IDs remain textual. | default: `attachment.value.roll`; composed: `@value`                                                      |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Add/remove attachment / root and visible group | Fade changed file tile; retained files reflow. | Positions immediate; short opacity. | Immediate. | `attachment.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `attachment.root.exit` → `presence.exit` → `exit.fade`; `attachment.group.move` → `layout.compact` → `layout.move` |
-| Later media/action insertion, removal or preview replacement / retained local region | Fade only the changed visual; current action semantics and preview identity commit immediately. Initial parts inherit tile entry. | Short opacity. | Final parts immediately. | `attachment.part.enter` → `presence.inline` → one-shot opacity `data.transition`; `attachment.part.exit` → `presence.exit` → `exit.fade`; `attachment.media.replace` → `data.update` → local opacity `data.transition` |
-| Supplied state changes / root/media/description | Scoped colours and preview opacity transition to the actual state. | Short colour/opacity. | Immediate. | `attachment.surface.colour` → `state.color` → target `state.color`; `attachment.text.colour` → `state.color` → target `state.color`; `attachment.media.update` → `data.update` → local opacity `data.transition` |
-| Visible uploading/processing / title opacity | Local pulse only; cancel it and restore resting title opacity before a title replacement, then resume only for the current still-busy revision. | Static title; no loop. | Static title; no loop. | `attachment.title.busy` → `status.loop` → continuous `data.transition` |
-| Filename/metadata or structural revision / display and tile | Changed-only text with stagger:none or quantity reels; retarget owned tile dimensions. | Short text opacity; quantity/geometry immediate. | Immediate. | `attachment.text.replace` → `text.replace` → target `text.change`; `attachment.value.roll` → `number.compact` → revised `number.roll`; `attachment.root.resize` → `geometry.compact` → `geometry.resize` |
-| Trigger activation / internal feedback visual | Press feedback on a visual layer, preserving overlay trigger and action hit targets; AttachmentAction inherits Button press. | No scale. | No animation. | `attachment.trigger.press` → `feedback.press` → `feedback.press` |
+| Trigger / owner                                                                      | full                                                                                                                                            | reduced                                          | none                     | Binding → preset → recipe/form                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add/remove attachment / root and visible group                                       | Fade changed file tile; retained files reflow.                                                                                                  | Positions immediate; short opacity.              | Immediate.               | `attachment.root.enter` → `presence.inline` → `data.transition/opacity`; `attachment.root.exit` → `presence.exit` → `exit.fade/opacity`; `attachment.group.move` → `layout.compact` → `layout.move/position`          |
+| Later media/action insertion, removal or preview replacement / retained local region | Fade only the changed visual; current action semantics and preview identity commit immediately. Initial parts inherit tile entry.               | Short opacity.                                   | Final parts immediately. | `attachment.part.enter` → `presence.inline` → `data.transition/opacity`; `attachment.part.exit` → `presence.exit` → `exit.fade/opacity`; `attachment.media.replace` → `data.update` → `data.transition/opacity`       |
+| Supplied state changes / root/media/description                                      | Scoped colours and preview opacity transition to the actual state.                                                                              | Short colour/opacity.                            | Immediate.               | `attachment.surface.colour` → `state.color` → `state.color/surface`; `attachment.text.colour` → `state.color` → `state.color/foreground`; `attachment.media.update` → `data.update` → `data.transition/opacity`       |
+| Visible uploading/processing / title opacity                                         | Local pulse only; cancel it and restore resting title opacity before a title replacement, then resume only for the current still-busy revision. | Static title; no loop.                           | Static title; no loop.   | `attachment.title.busy` → `status.loop` → `data.transition/continuous`                                                                                                                                                |
+| Filename/metadata or structural revision / display and tile                          | Changed-only text with stagger:none or quantity reels; retarget owned tile dimensions.                                                          | Short text opacity; quantity/geometry immediate. | Immediate.               | `attachment.text.replace` → `text.replace` → `text.change/changed-runs`; `attachment.value.roll` → `number.compact` → `number.roll/reels`; `attachment.root.resize` → `geometry.compact` → `geometry.resize/measured` |
+| Trigger activation / internal feedback visual                                        | Press feedback on a visual layer, preserving overlay trigger and action hit targets; AttachmentAction inherits Button press.                    | No scale.                                        | No animation.            | `attachment.trigger.press` → `feedback.press` → `feedback.press/scale`                                                                                                                                                |
 
 ## Interruption and lifecycle
 

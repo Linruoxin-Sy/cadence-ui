@@ -4,24 +4,38 @@ Status: target design; implementation and verification pending.
 
 The box acknowledges selection through its fill and its local check or mixed-state mark. Its hit area stays fixed. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings below are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["checkbox#Checkbox"],
+    "indicator": ["checkbox#Checkbox"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `checkbox` fades in when independently inserted; inherited when its parent owns entrance. Initial checked state is already correct. |
-| Size | Inherited: fixed box and hit area follow caller layout immediately. Checkbox has no content-driven size change. |
-| Surface colour | Default: `checkbox` owns checked, mixed, hover, invalid and disabled border/background changes. |
-| Text colour | Default: `checkbox-indicator` owns its glyph colour; an external label inherits its own component contract. |
-| Changed text | Not applicable: the check and minus are state glyphs, not text. External labels are composed separately. |
-| Changed numbers | Not applicable: this control has no numeric display. A numeric-looking label is not a counter. |
+| Capability      | Application and owner                                                                                                                        | References                      |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| Appearance      | Default: `checkbox` fades in when independently inserted; inherited when its parent owns entrance. Initial checked state is already correct. | default: `checkbox.root.enter`  |
+| Size            | Inherited: fixed box and hit area follow caller layout immediately. Checkbox has no content-driven size change.                              | inherited: `@root`              |
+| Surface colour  | Default: `checkbox` owns checked, mixed, hover, invalid and disabled border/background changes.                                              | default: `checkbox.root.colour` |
+| Text colour     | Default: `checkbox-indicator` owns its glyph colour; an external label inherits its own component contract.                                  | default: `checkbox.root.colour` |
+| Changed text    | Not applicable: the check and minus are state glyphs, not text. External labels are composed separately.                                     | not-applicable: `@root`         |
+| Changed numbers | Not applicable: this control has no numeric display. A numeric-looking label is not a counter.                                               | not-applicable: `@root`         |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / root | Opacity entrance; no movement of hit area. | Short opacity. | Visible target immediately. | `checkbox.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Checked or mixed changes / indicator | Local opacity and `scale.in` to rest; check-to-minus replaces the glyph in place. | Opacity only. | Final glyph immediately. | `checkbox.indicator.change` → `state.indicator` → `state.morph` |
-| State changes / root and indicator | Scoped background, border and glyph colour transition. | Short colour feedback. | Final colours immediately. | `checkbox.root.colour` → `state.color` → target `state.color` |
+| Trigger / owner                      | Full                                                                              | Reduced                | None                        | Binding → preset → recipe/form                                            |
+| ------------------------------------ | --------------------------------------------------------------------------------- | ---------------------- | --------------------------- | ------------------------------------------------------------------------- |
+| Independent insertion / root         | Opacity entrance; no movement of hit area.                                        | Short opacity.         | Visible target immediately. | `checkbox.root.enter` → `presence.inline` → `data.transition/opacity`     |
+| Checked or mixed changes / indicator | Local opacity and `scale.in` to rest; check-to-minus replaces the glyph in place. | Opacity only.          | Final glyph immediately.    | `checkbox.indicator.change` → `state.indicator` → `state.morph/indicator` |
+| State changes / root and indicator   | Scoped background, border and glyph colour transition.                            | Short colour feedback. | Final colours immediately.  | `checkbox.root.colour` → `state.color` → `state.color/surface-foreground` |
 
 ## Interruption and lifecycle
 

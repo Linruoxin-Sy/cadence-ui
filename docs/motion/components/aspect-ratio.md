@@ -4,25 +4,39 @@ Status: target design; implementation and verification pending.
 
 AspectRatio maintains reserved media space and smooths an intentional ratio change without distorting the media. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["aspect-ratio#AspectRatio"],
+    "layout": ["aspect-ratio#AspectRatio"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: aspect-ratio wrapper for independent insertion; inherited when the media/card parent owns the same entrance. |
-| Size | default: wrapper owns ratio-prop-driven block geometry at the current inline size; inherited parent width and passive resizing resolve immediately. |
-| Surface colour | default when an authored wrapper background/border changes; the default transparent wrapper otherwise has no colour transition to perform. |
-| Text colour | inherited for descendant text; composed if the caller supplies an independent overlay foreground owner. |
-| Changed text | composed: arbitrary children/media overlays are not a text slot owned by AspectRatio. |
-| Changed numbers | not applicable to the ratio prop, which describes geometry; composed for an explicit displayed numeric overlay. |
+| Capability      | Coverage and owner                                                                                                                                  | References                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Appearance      | default: aspect-ratio wrapper for independent insertion; inherited when the media/card parent owns the same entrance.                               | default: `aspect-ratio.root.enter`                                           |
+| Size            | default: wrapper owns ratio-prop-driven block geometry at the current inline size; inherited parent width and passive resizing resolve immediately. | default: `aspect-ratio.root.resize`; inherited: `aspect-ratio.layout.follow` |
+| Surface colour  | default when an authored wrapper background/border changes; the default transparent wrapper otherwise has no colour transition to perform.          | default: `aspect-ratio.root.colour`                                          |
+| Text colour     | inherited for descendant text; composed if the caller supplies an independent overlay foreground owner.                                             | inherited: `@root`; composed: `@root`                                        |
+| Changed text    | composed: arbitrary children/media overlays are not a text slot owned by AspectRatio.                                                               | composed: `@root`                                                            |
+| Changed numbers | not applicable to the ratio prop, which describes geometry; composed for an explicit displayed numeric overlay.                                     | not-applicable: `@root`; composed: `@root`                                   |
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / wrapper | Opacity entrance with final reserved space already present. | Short opacity. | Immediate. | `aspect-ratio.root.enter` → `presence.surface` → opacity-only `enter.pop` |
-| Ratio prop changes / wrapper | Measure available inline size and interpolate the resulting block size. | Final ratio geometry immediately. | Immediate. | `aspect-ratio.root.resize` → `geometry.compact` → `geometry.resize` |
-| Wrapper colour target changes / wrapper | Scoped surface transition if a surface exists. | Short colour. | Immediate. | `aspect-ratio.root.colour` → `state.color` → target `state.color` |
-| Parent resize or media decoding / native layout and media | Reserved geometry tracks parent directly; the child owns any image reveal. | Same. | Same. | `aspect-ratio.layout.follow` → `engine.native` → native CSS layout and caller media (no recipe) |
+| Trigger / owner                                           | full                                                                       | reduced                           | none       | Binding → preset → recipe/form                                                                                        |
+| --------------------------------------------------------- | -------------------------------------------------------------------------- | --------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------- |
+| Independent insertion / wrapper                           | Opacity entrance with final reserved space already present.                | Short opacity.                    | Immediate. | `aspect-ratio.root.enter` → `presence.surface` → `enter.pop/opacity`                                                  |
+| Ratio prop changes / wrapper                              | Measure available inline size and interpolate the resulting block size.    | Final ratio geometry immediately. | Immediate. | `aspect-ratio.root.resize` → `geometry.compact` → `geometry.resize/measured`                                          |
+| Wrapper colour target changes / wrapper                   | Scoped surface transition if a surface exists.                             | Short colour.                     | Immediate. | `aspect-ratio.root.colour` → `state.color` → `state.color/surface`                                                    |
+| Parent resize or media decoding / native layout and media | Reserved geometry tracks parent directly; the child owns any image reveal. | Same.                             | Same.      | `aspect-ratio.layout.follow` → `engine.native` → `native/css-layout` (native CSS layout and caller media (no recipe)) |
 
 ## Interruption and lifecycle
 

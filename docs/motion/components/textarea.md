@@ -4,25 +4,39 @@ Status: target design; implementation and verification pending.
 
 Textarea preserves the immediacy of typing and native resizing, while giving deliberate non-editing geometry changes a controlled transition. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["textarea#Textarea"],
+    "control": ["textarea#Textarea"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: textarea for independent insertion; inherited when an enclosing field enters. |
-| Size | default for explicit rows/owned-dimension revisions while unfocused and outside selection or resize interaction; native field-sizing growth, value-driven reflow and pointer resizing are immediate; parent dimensions are inherited. |
-| Surface colour | default: textarea background, border and scoped focus/invalid shadow. |
-| Text colour | default: foreground and placeholder colour on state changes, without affecting native selection or caret. |
-| Changed text | not applicable to editable value/placeholder: native editing, IME and selection retain ownership; composed helper text is a separate display. |
-| Changed numbers | not applicable to numeric characters in the editable value; a composed counter owns its numeric presentation. |
+| Capability      | Coverage and owner                                                                                                                                                                                                                    | References                                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Appearance      | default: textarea for independent insertion; inherited when an enclosing field enters.                                                                                                                                                | default: `textarea.root.enter`                                      |
+| Size            | default for explicit rows/owned-dimension revisions while unfocused and outside selection or resize interaction; native field-sizing growth, value-driven reflow and pointer resizing are immediate; parent dimensions are inherited. | default: `textarea.root.resize`; inherited: `textarea.control.edit` |
+| Surface colour  | default: textarea background, border and scoped focus/invalid shadow.                                                                                                                                                                 | default: `textarea.root.colour`                                     |
+| Text colour     | default: foreground and placeholder colour on state changes, without affecting native selection or caret.                                                                                                                             | default: `textarea.root.colour`                                     |
+| Changed text    | not applicable to editable value/placeholder: native editing, IME and selection retain ownership; composed helper text is a separate display.                                                                                         | not-applicable: `@root`                                             |
+| Changed numbers | not applicable to numeric characters in the editable value; a composed counter owns its numeric presentation.                                                                                                                         | not-applicable: `@root`                                             |
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Independent insertion / textarea | Opacity entrance. | Short opacity. | Immediate. | `textarea.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Focus/invalid/disabled state / chrome | Scoped colour and shadow feedback; native focus remains immediately evident. | Short colour feedback. | Immediate final chrome. | `textarea.root.colour` → `state.color` → target `state.color` |
-| Explicit rows/owned-dimension revision while unfocused / textarea | Measure the native final block destination and interpolate only when native field-sizing/resize ownership can be preserved. Focused or value-driven geometry is immediate. | Immediate height. | Immediate height. | `textarea.root.resize` → `geometry.content` → `geometry.resize` |
-| Typing, composition, pointer resizing / native textarea | Direct native value and geometry; no easing behind the pointer or caret. | Same. | Same. | `textarea.control.edit` → `engine.native` → native Textarea editing/resizing (no recipe) |
+| Trigger / owner                                                   | full                                                                                                                                                                       | reduced                | none                    | Binding → preset → recipe/form                                                                               |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Independent insertion / textarea                                  | Opacity entrance.                                                                                                                                                          | Short opacity.         | Immediate.              | `textarea.root.enter` → `presence.inline` → `data.transition/opacity`                                        |
+| Focus/invalid/disabled state / chrome                             | Scoped colour and shadow feedback; native focus remains immediately evident.                                                                                               | Short colour feedback. | Immediate final chrome. | `textarea.root.colour` → `state.color` → `state.color/surface-foreground`                                    |
+| Explicit rows/owned-dimension revision while unfocused / textarea | Measure the native final block destination and interpolate only when native field-sizing/resize ownership can be preserved. Focused or value-driven geometry is immediate. | Immediate height.      | Immediate height.       | `textarea.root.resize` → `geometry.content` → `geometry.resize/measured`                                     |
+| Typing, composition, pointer resizing / native textarea           | Direct native value and geometry; no easing behind the pointer or caret.                                                                                                   | Same.                  | Same.                   | `textarea.control.edit` → `engine.native` → `native/textarea` (native Textarea editing/resizing (no recipe)) |
 
 ## Interruption and lifecycle
 

@@ -6,28 +6,46 @@ The motion makes each disclosure feel attached to its own heading: the panel ope
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). Bindings below are design references, not public props or recipe identifiers.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["accordion#AccordionContent"],
+    "indicator": ["accordion#AccordionTrigger"],
+    "trigger": ["accordion#AccordionTrigger"],
+    "label": ["accordion#AccordionTrigger", "accordion#AccordionContent"],
+    "value": ["accordion#AccordionTrigger", "accordion#AccordionContent"],
+    "item": ["accordion#AccordionItem"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Applicability and owner |
-| --- | --- |
-| Appearance | Default: an opened `accordion-content` reveals its owned inner surface. A later inserted item may enter only when its collection has not already supplied presence; SSR items remain visible in their semantic state. |
-| Size | Default: `accordion-content` owns measured block-size for expansion and a known content update while open. The inner slot supplies natural size; the root does not spring after its panels. |
-| Surface colour | Default: trigger/item hover, active or disabled surfaces transition only when the component defines a changed semantic colour. No decorative background is invented. |
-| Text colour | Default: trigger state colour; content inherits its semantic foreground without a second colour writer. |
-| Changed text | Default for directly owned plain trigger and content strings; preserve unchanged graphemes. Arbitrary rich heading/content nodes remain caller-owned and use composed text owners. |
-| Changed numbers | Default for a supported direct numeric quantity in the trigger or content; composed for a nested badge/statistic. Digit-containing strings, item values and numeric section identifiers remain text, not inferred counters. |
+| Capability      | Applicability and owner                                                                                                                                                                                                     | References                                                                           |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Appearance      | Default: an opened `accordion-content` reveals its owned inner surface. A later inserted item may enter only when its collection has not already supplied presence; SSR items remain visible in their semantic state.       | default: `accordion.content.enter`, `accordion.content.exit`, `accordion.item.enter` |
+| Size            | Default: `accordion-content` owns measured block-size for expansion and a known content update while open. The inner slot supplies natural size; the root does not spring after its panels.                                 | default: `accordion.content.resize`                                                  |
+| Surface colour  | Default: trigger/item hover, active or disabled surfaces transition only when the component defines a changed semantic colour. No decorative background is invented.                                                        | default: `accordion.trigger.colour`                                                  |
+| Text colour     | Default: trigger state colour; content inherits its semantic foreground without a second colour writer.                                                                                                                     | default: `accordion.trigger.colour`                                                  |
+| Changed text    | Default for directly owned plain trigger and content strings; preserve unchanged graphemes. Arbitrary rich heading/content nodes remain caller-owned and use composed text owners.                                          | default: `accordion.label.replace`; composed: `@label`                               |
+| Changed numbers | Default for a supported direct numeric quantity in the trigger or content; composed for a nested badge/statistic. Digit-containing strings, item values and numeric section identifiers remain text, not inferred counters. | default: `accordion.value.change`; composed: `@value`                                |
 
 ## Choreography and modes
 
-| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
-| --- | --- | --- | --- | --- |
-| Open/close or known content resize; content shell | Clamped block-size follows current geometry to its new target; opening and closing are reversible. | Final size immediately. | Final size immediately. | `accordion.content.resize` → `geometry.content` → `geometry.resize` |
-| Open/close; inner content paint | Short opacity entry/exit coordinated with the shell, without a second height writer. | Short entry after final open geometry; fully clipped closed body completes immediately. | Semantic visibility immediately. | `accordion.content.enter` → `presence.inline` → one-shot `data.transition`; `accordion.content.exit` → `presence.exit` → `exit.fade` |
-| Expanded state; trigger-icon | The existing indicator changes state locally; no replacement of the trigger or focus node. | Final indicator, permitted short opacity. | Final indicator immediately. | `accordion.indicator.change` → `state.indicator` → `state.morph` |
-| Hover/disabled/state foreground; trigger | Scoped surface and text colour. Focus indication is immediate. | Short colour feedback. | Final colours immediately. | `accordion.trigger.colour` → `state.color` → planned `state.color` |
-| Owned plain trigger/content text changes | Animate only changed graphemes/runs, without stagger; an opening content entrance consumes same-cause text entry. | Short opacity on changed runs only. | Final text immediately. | `accordion.label.replace` → `text.replace` → planned `text.change` |
-| Direct quantity changes; owned display | Roll only changed places and coordinate any content-height change with the existing panel owner. | Final quantity/geometry immediately. | Final quantity/geometry immediately. | `accordion.value.change` → `number.compact` → `number.roll` |
-| Independent item insertion; item paint | Opacity only when a parent has not consumed this cause; initially open content does not run another entry. | Short opacity. | Visible immediately. | `accordion.item.enter` → `presence.inline` → one-shot `data.transition` |
+| Trigger and owner                                 | Full                                                                                                                     | Reduced                                                                                 | None                                 | Binding → preset → recipe                                                                                                                   |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open/close or known content resize; content shell | Clamped block-size follows current geometry to its new target; opening and closing are reversible.                       | Final size immediately.                                                                 | Final size immediately.              | `accordion.content.resize` → `geometry.content` → `geometry.resize/measured`                                                                |
+| Open/close; inner content paint                   | Short opacity entry/exit coordinated with the shell, without a second height writer.                                     | Short entry after final open geometry; fully clipped closed body completes immediately. | Semantic visibility immediately.     | `accordion.content.enter` → `presence.inline` → `data.transition/opacity`; `accordion.content.exit` → `presence.exit` → `exit.fade/opacity` |
+| Expanded state; trigger-icon                      | Crossfade the existing down/up glyphs in place; no rotation, scale, path morph or replacement of the trigger/focus node. | Final indicator, permitted short opacity.                                               | Final indicator immediately.         | `accordion.indicator.change` → `state.indicator` → `state.morph/indicator`                                                                  |
+| Hover/disabled/state foreground; trigger          | Scoped surface and text colour. Focus indication is immediate.                                                           | Short colour feedback.                                                                  | Final colours immediately.           | `accordion.trigger.colour` → `state.color` → `state.color/surface-foreground`                                                               |
+| Owned plain trigger/content text changes          | Animate only changed graphemes/runs, without stagger; an opening content entrance consumes same-cause text entry.        | Short opacity on changed runs only.                                                     | Final text immediately.              | `accordion.label.replace` → `text.replace` → `text.change/changed-runs`                                                                     |
+| Direct quantity changes; owned display            | Roll only changed places and coordinate any content-height change with the existing panel owner.                         | Final quantity/geometry immediately.                                                    | Final quantity/geometry immediately. | `accordion.value.change` → `number.compact` → `number.roll/reels`                                                                           |
+| Independent item insertion; item paint            | Opacity only when a parent has not consumed this cause; initially open content does not run another entry.               | Short opacity.                                                                          | Visible immediately.                 | `accordion.item.enter` → `presence.inline` → `data.transition/opacity`                                                                      |
 
 ## Interruption and lifecycle
 

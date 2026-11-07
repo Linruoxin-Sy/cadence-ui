@@ -4,28 +4,48 @@ Status: target design; implementation and verification pending.
 
 Avatar keeps a stable identity placeholder while the image becomes available, and lets group membership change without shuffling unchanged people. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["avatar#Avatar", "avatar#AvatarGroup"],
+    "badge": ["avatar#AvatarBadge"],
+    "image": ["avatar#AvatarImage"],
+    "group": ["avatar#AvatarGroup"],
+    "member": ["avatar#Avatar"],
+    "text": ["avatar#AvatarFallback", "avatar#AvatarBadge", "avatar#AvatarGroupCount"],
+    "count": ["avatar#AvatarGroupCount"],
+    "surface": ["avatar#Avatar", "avatar#AvatarBadge", "avatar#AvatarFallback", "avatar#AvatarGroupCount"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: avatar, later avatar-image and avatar-badge changes; avatar-group coordinates its own initial membership entrance; inherited under a larger parent entrance. |
-| Size | default: avatar owns explicit size changes and avatar-group owns membership geometry; fixed image/fallback content never changes the root size. |
-| Surface colour | default: avatar-fallback, avatar-badge and avatar-group-count surfaces/borders when their authored state changes. |
-| Text colour | default: fallback, badge and group-count foreground; image pixels are not recoloured by the motion system. |
-| Changed text | default: plain fallback initials, badge copy and group-count labels retain unchanged graphemes; rich fallback/badge/count content is composed. |
-| Changed numbers | default: direct numeric quantities in AvatarGroupCount or an explicitly displayed AvatarBadge quantity. Fallback initials/numeric identities and formatted strings remain text; mixed affix/rich counters use explicit composition. |
+| Capability      | Coverage and owner                                                                                                                                                                                                                  | References                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Appearance      | default: avatar, later avatar-image and avatar-badge changes; avatar-group coordinates its own initial membership entrance; inherited under a larger parent entrance.                                                               | default: `avatar.root.enter`, `avatar.badge.enter`, `avatar.member.enter`, `avatar.member.exit` |
+| Size            | default: avatar owns explicit size changes and avatar-group owns membership geometry; fixed image/fallback content never changes the root size.                                                                                     | default: `avatar.root.resize`, `avatar.group.resize`                                            |
+| Surface colour  | default: avatar-fallback, avatar-badge and avatar-group-count surfaces/borders when their authored state changes.                                                                                                                   | default: `avatar.surface.colour`                                                                |
+| Text colour     | default: fallback, badge and group-count foreground; image pixels are not recoloured by the motion system.                                                                                                                          | default: `avatar.text.colour`                                                                   |
+| Changed text    | default: plain fallback initials, badge copy and group-count labels retain unchanged graphemes; rich fallback/badge/count content is composed.                                                                                      | default: `avatar.text.replace`; composed: `@text`                                               |
+| Changed numbers | default: direct numeric quantities in AvatarGroupCount or an explicitly displayed AvatarBadge quantity. Fallback initials/numeric identities and formatted strings remain text; mixed affix/rich counters use explicit composition. | default: `avatar.count.roll`, `avatar.badge.roll`; composed: `@count`                           |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Avatar/group or independent badge insertion | One coherent opacity entrance; badge may enter later under its own cause. | Short opacity. | Immediate. | `avatar.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `avatar.badge.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Decoded image replaces fallback / image and fallback | Crossfade after the real image is ready, retaining a visible fallback until then. | Short opacity. | Final available image/fallback immediately. | `avatar.image.replace` → `data.update` → local opacity `data.transition` |
-| Explicit size or group membership / avatar and group | Resize the owned box; reflow retained avatars, fading added/removed identities. Group consumes the final member boxes once. | Geometry immediate; short opacity. | Immediate. | `avatar.root.resize` → `geometry.compact` → `geometry.resize`; `avatar.group.resize` → `geometry.compact` → `geometry.resize`; `avatar.group.move` → `layout.compact` → `layout.move`; `avatar.member.enter` → `presence.inline` → one-shot opacity `data.transition`; `avatar.member.exit` → `presence.exit` → `exit.fade` |
-| Fallback/badge/group-count revision / display parts | Changed-only text with stagger:none or explicit quantity reels. | Short changed-text opacity; final quantities immediately. | Immediate. | `avatar.text.replace` → `text.replace` → target `text.change`; `avatar.count.roll` → `number.compact` → revised `number.roll`; `avatar.badge.roll` → `number.compact` → revised `number.roll` |
-| Authored display colour changes / relevant parts | Scoped surface/foreground transition. | Short colour. | Immediate. | `avatar.surface.colour` → `state.color` → target `state.color`; `avatar.text.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                      | full                                                                                                                        | reduced                                                   | none                                        | Binding → preset → recipe/form                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Avatar/group or independent badge insertion          | One coherent opacity entrance; badge may enter later under its own cause.                                                   | Short opacity.                                            | Immediate.                                  | `avatar.root.enter` → `presence.inline` → `data.transition/opacity`; `avatar.badge.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                                             |
+| Decoded image replaces fallback / image and fallback | Crossfade after the real image is ready, retaining a visible fallback until then.                                           | Short opacity.                                            | Final available image/fallback immediately. | `avatar.image.replace` → `data.update` → `data.transition/opacity`                                                                                                                                                                                                                                                                                    |
+| Explicit size or group membership / avatar and group | Resize the owned box; reflow retained avatars, fading added/removed identities. Group consumes the final member boxes once. | Geometry immediate; short opacity.                        | Immediate.                                  | `avatar.root.resize` → `geometry.compact` → `geometry.resize/measured`; `avatar.group.resize` → `geometry.compact` → `geometry.resize/measured`; `avatar.group.move` → `layout.compact` → `layout.move/position`; `avatar.member.enter` → `presence.inline` → `data.transition/opacity`; `avatar.member.exit` → `presence.exit` → `exit.fade/opacity` |
+| Fallback/badge/group-count revision / display parts  | Changed-only text with stagger:none or explicit quantity reels.                                                             | Short changed-text opacity; final quantities immediately. | Immediate.                                  | `avatar.text.replace` → `text.replace` → `text.change/changed-runs`; `avatar.count.roll` → `number.compact` → `number.roll/reels`; `avatar.badge.roll` → `number.compact` → `number.roll/reels`                                                                                                                                                       |
+| Authored display colour changes / relevant parts     | Scoped surface/foreground transition.                                                                                       | Short colour.                                             | Immediate.                                  | `avatar.surface.colour` → `state.color` → `state.color/surface`; `avatar.text.colour` → `state.color` → `state.color/foreground`                                                                                                                                                                                                                      |
 
 ## Interruption and lifecycle
 

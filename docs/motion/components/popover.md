@@ -4,28 +4,46 @@ Status: target design; implementation and verification pending.
 
 The panel appears to belong to its anchor, then grows only when its owned content changes. Collision correction remains immediate and authoritative. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "content": ["popover#PopoverContent"],
+    "position": ["popover#PopoverContent"],
+    "title": ["popover#PopoverTitle"],
+    "description": ["popover#PopoverDescription"],
+    "surface": ["popover#PopoverContent", "popover#PopoverTitle", "popover#PopoverDescription"],
+    "quantity": ["popover#PopoverTitle", "popover#PopoverDescription"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Application and owner |
-| --- | --- |
-| Appearance | Default: `popover-content` owns anchor-relative presence; header/title/description and initial children inherit it. |
-| Size | Default: content shell owns natural width/height changes within positioning and viewport constraints. Base UI retains anchor placement. |
-| Surface colour | Default: content owns background/border tokens; composed controls own their own state surfaces. |
-| Text colour | Default: `popover-title`/`popover-description` own foreground changes; body children keep explicit owners. |
-| Changed text | Default for primitive title/description: replace changed runs only. Rich content is composed, not recursively split. |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
+| Capability      | Application and owner                                                                                                                                                                                                                                                    | References                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| Appearance      | Default: `popover-content` owns anchor-relative presence; header/title/description and initial children inherit it.                                                                                                                                                      | default: `popover.content.enter`, `popover.content.exit`                          |
+| Size            | Default: content shell owns natural width/height changes within positioning and viewport constraints. Base UI retains anchor placement.                                                                                                                                  | default: `popover.content.resize`                                                 |
+| Surface colour  | Default: content owns background/border tokens; composed controls own their own state surfaces.                                                                                                                                                                          | default: `popover.surface.colour`                                                 |
+| Text colour     | Default: `popover-title`/`popover-description` own foreground changes; body children keep explicit owners.                                                                                                                                                               | default: `popover.surface.colour`                                                 |
+| Changed text    | Default for primitive title/description: replace changed runs only. Rich content is composed, not recursively split.                                                                                                                                                     | default: `popover.title.change`, `popover.description.change`; composed: `@title` |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. | default: `popover.quantity.change`; composed: `@quantity`                         |
 
 ## Choreography and modes
 
-| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Open / content visual layer | Opacity and `distance.xs` approach along resolved side, using the anchor origin. | Short opacity only. | Final open surface immediately. | `popover.content.enter` → `presence.popup` → `popup.anchored` |
-| Close / same visual layer | Opacity exit only, without moving the anchor. | Short opacity only. | Closed target immediately. | `popover.content.exit` → `presence.exit` → `exit.fade` |
-| Intentional content change / shell | Measured, clamped natural width/height transition. | Final geometry immediately. | Final geometry immediately. | `popover.content.resize` → `geometry.compact` → `geometry.resize` |
-| Collision flip/anchor movement / positioner | Placement corrects immediately; cancel obsolete approach direction. | Immediate. | Immediate. | `popover.position.place` → `engine.native` → Base UI Popover positioning (no new recipe) |
-| Title/description change / text owner | Retain unchanged graphemes; `stagger: none`. | Changed-run opacity only. | Final text immediately. | `popover.title.change` → `text.replace` → target `text.change`; `popover.description.change` → `text.replace` → target `text.change` |
-| Supplied tokens / surface/text parts | Scoped background/border/foreground transition. | Short colour feedback. | Final colours immediately. | `popover.surface.colour` → `state.color` → target `state.color` |
-| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `popover.quantity.change` → `number.compact` → revised `number.roll` |
+| Trigger / owner                                                                                     | Full                                                                                              | Reduced                     | None                            | Binding → preset → recipe/form                                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Open / content visual layer                                                                         | Opacity and `distance.xs` approach along resolved side, using the anchor origin.                  | Short opacity only.         | Final open surface immediately. | `popover.content.enter` → `presence.popup` → `popup.anchored/presence`                                                                           |
+| Close / same visual layer                                                                           | Opacity exit only, without moving the anchor.                                                     | Short opacity only.         | Closed target immediately.      | `popover.content.exit` → `presence.exit` → `exit.fade/opacity`                                                                                   |
+| Intentional content change / shell                                                                  | Measured, clamped natural width/height transition.                                                | Final geometry immediately. | Final geometry immediately.     | `popover.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                       |
+| Collision flip/anchor movement / positioner                                                         | Placement corrects immediately; cancel obsolete approach direction.                               | Immediate.                  | Immediate.                      | `popover.position.place` → `engine.native` → `native/base-ui-popover` (Base UI Popover positioning (no new recipe))                              |
+| Title/description change / text owner                                                               | Retain unchanged graphemes; `stagger: none`.                                                      | Changed-run opacity only.   | Final text immediately.         | `popover.title.change` → `text.replace` → `text.change/changed-runs`; `popover.description.change` → `text.replace` → `text.change/changed-runs` |
+| Supplied tokens / surface/text parts                                                                | Scoped background/border/foreground transition.                                                   | Short colour feedback.      | Final colours immediately.      | `popover.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                      |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately.   | Final number immediately.       | `popover.quantity.change` → `number.compact` → `number.roll/reels`                                                                               |
 
 ## Interruption and lifecycle
 

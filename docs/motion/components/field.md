@@ -4,28 +4,69 @@ Status: target design; implementation and verification pending.
 
 Field makes helper and error changes readable while preserving the control's location and immediate validation semantics supplied by the caller. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": ["field#Field"],
+    "message": ["field#FieldDescription", "field#FieldError"],
+    "content": ["field#FieldContent", "field#Field", "field#FieldSet"],
+    "group": ["field#FieldGroup"],
+    "text": [
+      "field#FieldLabel",
+      "field#FieldTitle",
+      "field#FieldLegend",
+      "field#FieldDescription",
+      "field#FieldError",
+      "field#FieldSeparator"
+    ],
+    "value": [
+      "field#FieldLabel",
+      "field#FieldTitle",
+      "field#FieldLegend",
+      "field#FieldDescription",
+      "field#FieldError",
+      "field#FieldSeparator"
+    ],
+    "structure": ["field#FieldSet", "field#FieldGroup"],
+    "surface": ["field#FieldLabel", "field#FieldSeparator"],
+    "separator": ["separator#Separator"]
+  }
+}
+```
+
 ## Capability ownership
 
-| Capability | Coverage and owner |
-| --- | --- |
-| Appearance | default: field for independent insertion and later description/error rows; inherited for FieldGroup/FieldSet entrance coordination. |
-| Size | default: field-content/field shell owns helper/error-driven block size; FieldGroup owns sibling position; native control geometry remains with the control. |
-| Surface colour | default: authored FieldLabel surface and FieldSeparator rule when applicable; composed controls retain their own border/background owners. |
-| Text colour | default: legend, label/title, description and error foregrounds respond to supplied invalid/disabled context. |
-| Changed text | default: plain legend, label/title, description, separator caption and error messages; composed rich descendants preserve their structure. |
-| Changed numbers | default: direct quantity displays in those textual parts; composed rich counters; numeric field names/error identifiers remain text. |
+| Capability      | Coverage and owner                                                                                                                                                            | References                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Appearance      | default: field for independent insertion and later description/error rows; inherited for FieldGroup/FieldSet entrance coordination.                                           | default: `field.root.enter`, `field.message.enter`, `field.message.exit`, `field.structure.enter` |
+| Size            | default: field-content/field shell owns helper/error-driven block size; FieldGroup owns sibling position; native control geometry remains with the control.                   | default: `field.content.resize`                                                                   |
+| Surface colour  | Default: authored FieldLabel surface and FieldSeparator caption backing; inherited: the actual Separator child owns its rule colour. Composed controls keep their own chrome. | default: `field.surface.colour`; inherited: `field.separator.colour`                              |
+| Text colour     | default: legend, label/title, description and error foregrounds respond to supplied invalid/disabled context.                                                                 | default: `field.text.colour`                                                                      |
+| Changed text    | default: plain legend, label/title, description, separator caption and error messages; composed rich descendants preserve their structure.                                    | default: `field.text.replace`; composed: `@text`                                                  |
+| Changed numbers | default: direct quantity displays in those textual parts; composed rich counters; numeric field names/error identifiers remain text.                                          | default: `field.value.roll`; composed: `@value`                                                   |
 
 ## Choreography and modes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
-| --- | --- | --- | --- | --- |
-| Field insertion / field or enclosing group | One opacity entrance. | Short opacity. | Immediate. | `field.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
-| Description/error appears or disappears / content and row | Open the measured block space while the changed row fades; retained siblings reflow. | Geometry immediate; short opacity. | Immediate. | `field.message.enter` → `presence.inline` → one-shot opacity `data.transition`; `field.message.exit` → `presence.exit` → `exit.fade`; `field.content.resize` → `geometry.content` → `geometry.resize`; `field.group.move` → `layout.compact` → `layout.move` |
-| Text/quantity revision / actual display part | Changed-only text with stagger:none or quantity rolling; share the size transaction. | Short changed-text opacity; quantity/size immediate. | Immediate. | `field.text.replace` → `text.replace` → target `text.change`; `field.value.roll` → `number.compact` → revised `number.roll` |
-| Standalone field-set/group or legend/label/separator-caption revision / owning display host | One independent opacity entrance for the structure; known text changes consume one measured destination without a second Label/Separator writer. | Short opacity/text feedback; geometry immediate. | Final structure/content immediately. | `field.structure.enter` → `presence.inline` → one-shot opacity `data.transition`; `field.content.resize` → `geometry.content` → `geometry.resize`; `field.text.replace` → `text.replace` → target `text.change` |
-| Invalid/disabled/context change / relevant display surfaces | Scoped colour transition. | Short colour feedback. | Immediate. | `field.surface.colour` → `state.color` → target `state.color`; `field.text.colour` → `state.color` → target `state.color` |
+| Trigger / owner                                                                             | full                                                                                                                                             | reduced                                              | none                                 | Binding → preset → recipe/form                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Field insertion / field or enclosing group                                                  | One opacity entrance.                                                                                                                            | Short opacity.                                       | Immediate.                           | `field.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                                                                                                                                            |
+| Description/error appears or disappears / content and row                                   | Open the measured block space while the changed row fades; retained siblings reflow.                                                             | Geometry immediate; short opacity.                   | Immediate.                           | `field.message.enter` → `presence.inline` → `data.transition/opacity`; `field.message.exit` → `presence.exit` → `exit.fade/opacity`; `field.content.resize` → `geometry.content` → `geometry.resize/measured`; `field.group.move` → `layout.compact` → `layout.move/position` |
+| Text/quantity revision / actual display part                                                | Changed-only text with stagger:none or quantity rolling; share the size transaction.                                                             | Short changed-text opacity; quantity/size immediate. | Immediate.                           | `field.text.replace` → `text.replace` → `text.change/changed-runs`; `field.value.roll` → `number.compact` → `number.roll/reels`                                                                                                                                               |
+| Standalone field-set/group or legend/label/separator-caption revision / owning display host | One independent opacity entrance for the structure; known text changes consume one measured destination without a second Label/Separator writer. | Short opacity/text feedback; geometry immediate.     | Final structure/content immediately. | `field.structure.enter` → `presence.inline` → `data.transition/opacity`; `field.content.resize` → `geometry.content` → `geometry.resize/measured`; `field.text.replace` → `text.replace` → `text.change/changed-runs`                                                         |
+| Invalid/disabled/context change / relevant display surfaces                                 | Scoped colour transition.                                                                                                                        | Short colour feedback.                               | Immediate.                           | `field.surface.colour` → `state.color` → `state.color/surface`; `field.text.colour` → `state.color` → `state.color/foreground`                                                                                                                                                |
+| FieldSeparator rule colour / inherited Separator                                            | Rule background colour through Separator once; caption backing belongs to field.surface.colour.                                                  | Inherited short colour.                              | Final colour immediately.            | `field.separator.colour` → `state.color` → `state.color/surface`                                                                                                                                                                                                              |
+
+FieldSeparator's rule is the actual composed Separator; its caption backing is a distinct painted
+span under FieldSeparator. The rule's inherited colour binding never runs on the caption, and Field
+never writes a second rule background. Standalone FieldSet/FieldGroup entrance anchors identify those
+actual exports; FieldContent is the message/geometry region, not an alias for FieldGroup.
 
 ## Interruption and lifecycle
 
