@@ -90,7 +90,7 @@ the retained runtime token example or CSS compatibility block.
 | `content.switch`      | `data.transition`, local directional content form                      | `duration.base`, `ease.out`, `distance.xs`; opacity and translation on the owned content paint only; axis/sign follow semantic activation order and direction                                   | `data.transition/directional-content`                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `content.month`       | `data.transition`, calendar month-grid form                            | `duration.base`, `ease.out`, `distance.sm`; opacity and translation of the actual month grid, with calendar/RTL direction; no per-day entrance                                                  | `data.transition/month-grid`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `data.update`         | `data.transition`, one-shot or documented data-engine form             | `duration.base`, `ease.out` for one-shot/Recharts forms; Embla uses the documented attraction-unit calibration and option precedence, not a CSS ease; never introduces a second geometry writer | `data.transition/opacity`, `data.transition/embla`, `data.transition/recharts`                                                                                                                                                                                                                                                                                                                                                                                               |
-| `data.progress`       | `data.transition`, determinate progress form                           | `spring.snappy`, bounce 0; coordinate fill with `number.compact` on one committed target/direction/clock, never delay the semantic value                                                        | `data.transition/determinate`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `data.progress`       | `data.transition`, determinate progress form                           | `spring.snappy`, bounce 0; share a bounded monotonic phase with `number.compact`; incompatible retargets show the latest readout immediately, without delaying semantics                        | `data.transition/determinate`                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `status.loop`         | `data.transition`, continuous form                                     | Existing framework `--animate-spin` / `--animate-pulse` theme clock; only while active and visible; no recipe timeScale clock substitution                                                      | `data.transition/continuous`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `handoff.value`       | `handoff`                                                              | `spring.smooth`, physics-defined, real visible origin; destination-only fallback when origin is unavailable                                                                                     | `handoff/value`                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `scroll.navigate`     | `scroll.navigate`                                                      | `duration.page` (450 ms), `ease.inOut`; explicit navigation only, user input cancels                                                                                                            | `scroll.navigate/scroll`                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -121,6 +121,15 @@ native popup positioner, scroll position and any selection marker. A reversal ca
 one-shot path and retargets from the currently displayed offset/opacity without remounting semantic
 content; it does not require velocity continuity. A collision or passive layout correction settles
 placement immediately instead of inventing a navigation direction.
+
+For `data.progress`, a shared bounded monotonic transaction phase coordinates compatible fill/reel
+travel; that phase is animation progress, never an interpolated business percentage. Both participants
+resolve their destinations from the same committed revision. If the visible fill is at 60 while the
+committed value changes from 100 to 80, the fill still moves toward 80 while the readout's semantic
+trend decreases. Do not force them to claim the same direction. When directions or an interrupted
+two-cell reel cannot safely share the phase, show the latest readout immediately and retarget the fill
+independently from its current presentation. Do not fabricate intermediate values, add reel cells or
+retry a queued obsolete transaction. The semantic value is always current.
 
 ### 3.1 Effective modes and clock ownership
 
@@ -210,7 +219,8 @@ remove arbitrary plugin objects, and routing their engine calls through a zero c
 stop an automatic schedule.
 
 Standalone planned `AnimatedText` retains the system's character-stagger default (`stagger.char`,
-12 ms, capped at 120 ms). Built-in `text.replace` bindings deliberately select no stagger so that
+12 ms, with the final start delay capped at 120 ms after effective timeScale and no more than 20
+simultaneously animated elements). Built-in `text.replace` bindings deliberately select no stagger so that
 control labels and rapidly changing display strings arrive together. A component may opt into the
 character rhythm only in its recorded binding; unchanged units never participate and reduced/none
 always remove the delay. This is a binding policy, not a new caller-facing raw timing prop.
@@ -255,7 +265,9 @@ separate host per axis, with no render-time reads or per-frame glyph measurement
 font or ancestor reflow resolves immediately. Components specify destination-width reflow versus
 continuous reflow; text is never scaled to simulate size. Clamp rendered geometry to valid intrinsic,
 closed and available sizes; closing disclosure height may reach zero. Temporary clipping belongs only
-to the content viewport, never to focus outlines or portal positioning.
+to the content viewport, never to focus outlines or portal positioning. Measurement and writes use
+the same box/coordinate space under [the system size rules](../animation-system.md#34-measured-size-and-position);
+transformed viewport rectangles are not directly writable CSS sizes.
 
 Destination-width reflow is a measurement choice, not permission to crop newly committed content.
 If an intermediate smaller shell would hide a required label, a focused control/caret or content
@@ -269,6 +281,10 @@ one named owner or resolve coordinated destinations from the natural layout befo
 starts. A parent must not treat every interpolated child frame as a new content event. If the final
 constraints cannot be resolved without feedback, use immediate native layout for the dependent axis.
 Measurement after hidden/zero-size recovery establishes a baseline; it is not a new entrance/resize.
+
+Text decomposition also preserves existing typography, white-space and inline flow under
+[the changed-text contract](../animation-system.md#36-changed-text); safe run or immediate rendering
+is preferable to introducing a new line-break policy for animation.
 
 Reels retarget their current presentation without replaying an update queue. A place that is unchanged
 stays still. Direction derives from semantic value change, not lexicographic strings or a forced
@@ -297,9 +313,19 @@ not a claim that the existing `number.roll` resolver supplies them.
 
 ### 5.1 Numeric identity and formatting decisions
 
-The renderer receives the original supported numeric value plus its formatter; it never reconstructs
-a quantity from rendered DOM or a string. Comparison uses values of the same supported numeric domain,
-not a lossy conversion of a large integer to Number. These decisions apply to every numeric binding:
+The renderer receives the original supported numeric value and the existing display policy; it never
+reconstructs a quantity from rendered DOM or a string. Built-in integration preserves that policy's
+exact output. In particular, a raw React numeric child keeps `1000`, `1.234567`, `0` for negative zero,
+and `1e+21` where that is the existing output; default Intl grouping, rounding, sign display or exponent
+expansion must not silently replace it. Existing format APIs keep their own formatting. An output
+that cannot be safely decomposed remains exact and immediate. The planned standalone AnimatedNumber's
+explicit formatter remains governed by its API, not a change to existing component defaults.
+
+Existing conditional, placeholder and falsy-content branches run before renderer selection, as in
+[the changed-text contract](../animation-system.md#36-changed-text). Keep the existing font metrics;
+do not add tabular-nums automatically to make reels easier. Comparison uses values of the same
+supported numeric domain, not a lossy conversion of a large integer to Number. These decisions apply
+to every numeric binding:
 
 | Revision                                                                             | Required presentation                                                                                                                                                                   |
 | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

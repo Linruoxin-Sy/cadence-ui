@@ -160,7 +160,9 @@ These obligations are inherited by every file; local action tables make their co
   entrance cause, not later child updates. Decorative viewport reveal is explicitly composed and follows
   its own once/repeat contract; no component secretly scans descendants or re-hides the first screen.
   Focus, activation and find reveal also settle an ordinary entrance when it would conceal or displace
-  the active target. Preserve semantic resting opacity rather than resetting every root to opacity 1.
+  the active target. Default autofocus keeps its original timing; only conflicting entry envelopes
+  settle, while an independent backdrop may continue. Preserve semantic resting opacity rather than
+  resetting every root to opacity 1.
 - **Modes:** full plays the designed action. Reduced keeps permitted short opacity/colour feedback,
   removes travel/scale/layout/reels/stagger and loops, and shows final geometry/numbers immediately.
   None settles every property, delay and loop immediately. Direct operation and semantic state remain
@@ -204,7 +206,8 @@ These obligations are inherited by every file; local action tables make their co
   Explicit disclosure body reveal remains allowed; focus into clipped content forces it visible.
 - **Bounds:** preserve existing item source ceilings, compiled component/runtime/page limits, CLS and
   real-device frame-rate requirements. Stagger scenarios allow at most 20 concurrent moving elements
-  and 400 ms total delay after timeScale. Above 50 list items use visible/manual/paginated strategies,
+  and 400 ms total delay after timeScale; character stagger also has a final 120 ms delay ceiling after
+  timeScale. Above 50 list items use visible/manual/paginated strategies,
   not blanket layout measurement. Bound glyph/reel work and drop visual work on overload, never data.
   The [renderer limits](presets.md#5-geometry-text-and-numerical-limits) apply across one known
   coordinated content revision as well as per slot. Many tiny children cannot bypass the moving-set
@@ -239,7 +242,10 @@ settle the conflicting effect immediately; record the composed boundary. Do not 
 wrapper that breaks direct-child selectors, refs, form/label semantics or event propagation. A nested
 explicit provider and portalled part use their resolved context; cancellation must not leak across
 those ownership boundaries. Shared renderer selection follows the deterministic type/identity rules
-in [changed text](../animation-system.md#36-changed-text).
+in [changed text](../animation-system.md#36-changed-text): preserve existing content/placeholder/falsy
+branches and typography before selecting helpers for actual display slots. Built-in numeric helpers
+preserve the existing display format, with exact immediate output when safe decomposition fails;
+see [numeric formatting decisions](presets.md#51-numeric-identity-and-formatting-decisions).
 
 Direction, writing mode, zoom and font/viewport changes are environment revisions, not navigation.
 Invalidate old rectangles/approach direction and establish current valid placement before another

@@ -300,7 +300,7 @@ part bindings; it does not copy a literal into its implementation or change a ba
 | Control state             | spring.snappy: visualDuration 260 ms   | Preserve native activation and pointer ownership                     |
 | Layout and numeric reels  | spring.smooth: visualDuration 400 ms   | Retarget from the current visual state; document velocity continuity |
 | Measured size             | spring.morph: visualDuration 420 ms    | No authored bounce; clamp the rendered geometry                      |
-| Changed-character stagger | stagger.char: 12 ms; target cap 120 ms | Delay changed units only; bypass under reduced/none                  |
+| Changed-character stagger | stagger.char: 12 ms; target cap 120 ms | Final delay capped after timeScale; bypass under reduced/none        |
 | Cyclic reveal stagger     | target step 55 ms, cycle length 3      | Stable 0/55/110 ms slots, entrance only                              |
 | Blur                      | Off by default                         | An explicitly reviewed small-text recipe may use at most 4 px        |
 
@@ -459,7 +459,10 @@ Reduced keeps opacity and removes travel; none is immediate. This does not creat
 on every render, permit a second engine writer or expand the continuous-loop property allowance.
 `geometry.resize` may select reviewed compact/panel presets while retaining its existing ownership,
 physics conversion and clamping. `data.progress` is a target preset for the determinate form of
-`data.transition`, not an added recipe id, and coordinates its visual clock with numeric readout.
+`data.transition`, not an added recipe id. Fill and readout share the bounded monotonic presentation
+phase defined in the [preset contract](motion/presets.md#3-default-preset-catalogue), not intermediate business
+percentages. If a retarget cannot preserve both that phase and valid reel direction, the readout
+shows the latest value immediately while the fill independently reaches its current target.
 Migrate validators, declarations, public docs and actual mode evidence for each new form together.
 
 The preset catalogue names the directional forms explicitly: `content.switch` for bounded panel
@@ -475,7 +478,9 @@ Carousel uses the engine form of `data.transition`: Embla 8.6.0 exclusively owns
 translation, snap geometry, loop relocation, dragging, focus and resize. Never add a CSS or
 Motion transform writer to its track. Position is state, like the Switch thumb: reduced/none
 retain the selected slide's translate and direct pointer tracking, but every autonomous engine
-interpolation resolves to zero. There is no entrance/exit animation or opacity fallback to add.
+interpolation resolves to zero. Track navigation adds no entrance/exit or opacity fallback. This
+restriction concerns the engine-owned navigation cause; independent root insertion follows the
+[Carousel target presence contract](motion/components/carousel.md) without another track writer.
 
 Resolve `cm.transition("data.transition").duration` in full, retaining
 `duration.base * cm.timeScale` as the base option under reduced/none. The engine options must stay stable
@@ -533,10 +538,13 @@ A stable Month component provides its date to the persistent MonthGrid. A change
 that actual table from signed `distance.sm` to zero and opacity zero to one on the data.transition
 clock through a native WAAPI effect (seconds converted to milliseconds, token easing converted
 to cubic-bezier). Cancelling removes the effect synchronously, including during live downgrades;
-there is no Motion DOM visual-element cache to reapply an interrupted transform. There is no mount reveal, outgoing duplicate, delayed content, layout tween or keyed remount.
+there is no Motion DOM visual-element cache to reapply an interrupted transform. This delivered grid
+adapter has no mount reveal, outgoing duplicate, delayed content, layout tween or keyed remount.
 Rapid changes cancel the previous tween and present the latest month; reversing uses the new direction.
 Reduced uses opacity only; none shows the new table immediately. A live mode or clock change cancels
-and settles both properties. Grid height changes immediately (including variable week counts).
+and settles both properties. The delivered adapter changes actual table height immediately, including
+variable week counts. The [Calendar target contract](motion/components/calendar.md) may coordinate
+measured outer-host geometry; it does not animate the table's height or add a second grid writer.
 Caller components override the corresponding defaults and own their motion; caller styles win.
 DayPicker's optional `animate` API remains forwarded, but its CSS animation engine requires the caller's
 stylesheet; Cadence does not import that stylesheet or activate a second animation clock.
@@ -550,7 +558,9 @@ Toc is T3. One persistent decorative indicator follows the active link using the
 wrapped labels; committed target changes read that cache, not layout. Two Motion values
 represent its top/bottom edges, preserving velocity when retargeted. One native style
 writer converts those edges to translateY/scaleY on a one-pixel base; it clamps both
-edges to the measured rail. No width/height interpolation or list reflow is authored.
+edges to the measured rail. Reading/indicator changes author no width/height interpolation or list
+reflow. Explicit content revisions of the list shell follow the separate
+[Toc target contract](motion/components/toc.md); they do not resize the shell on every active-link change.
 
 Initial placement, reappearance after a cleared selection, reduced, none and zero
 clock all jump. Reduced/none use instant native top/height placement and no transform;
@@ -617,6 +627,11 @@ closed surface or replace Base UI's focus/exit protocol. Decorative outgoing pai
 focus target. Presence and activity return to current semantic resting paint, including disabled or
 caller opacity, as defined in the [preset mode rules](motion/presets.md#31-effective-modes-and-clock-ownership).
 
+Default autofocus still runs at the primitive's existing lifecycle point, with existing caller
+overrides respected. Settle only entry envelopes that would conceal or displace that focus target;
+an independent backdrop or other non-conflicting part may continue. Do not delay autofocus to show
+the full entrance, and do not promise that every popup opening completes every entry effect.
+
 ### 3.4 Measured size and position
 
 geometry.resize is available wherever appropriate, regardless of legacy tier. Observe natural
@@ -655,6 +670,13 @@ natural layout before starting. Ancestors do not reclassify interpolated child f
 content changes. Resolve cyclic constraints immediately rather than starting mutually dependent
 springs. Recovering from hidden/zero measurements establishes current intrinsic baseline first;
 becoming measurable alone does not replay an entrance or manufacture a resize revision.
+
+Measure and write in the same box and coordinate space. Account for `box-sizing`, padding, border
+and scrollbar space exactly once when converting natural dimensions to the CSS width/height target.
+A viewport `getBoundingClientRect()` affected by press, presence or ancestor scale is not directly a
+CSS layout size. Use intrinsic layout dimensions or an explicit safe coordinate conversion; complex
+transforms or rotation without a safe conversion use immediate native layout. This does not permit
+layout reads on every animation frame.
 
 ### 3.5 Colour feedback
 
@@ -699,6 +721,10 @@ units may move to make room but never replay a replacement fade. Default text is
 or scale. Budget changed units and cap stagger. Streaming append uses the prefix fast path; new commits
 replace obsolete targets rather than queue historical transitions.
 
+The standalone character stagger's 120 ms ceiling applies to the final start delay after effective
+timeScale, alongside the 20-element stagger concurrency limit. Clamp delays or present excess units
+immediately rather than scheduling later batches. Built-in display bindings use no stagger.
+
 Intl.Segmenter grapheme boundaries protect combining marks and emoji; Array.from is insufficient.
 Segmentation does not guarantee shaping: preserve connected-script, ligature and bidirectional runs;
 test wrapping and truncation. If safe diff/shaping or animation budgets cannot be maintained, apply
@@ -727,9 +753,19 @@ parts are not exempt just because they belong to an overlay. Screen-reader-only 
 In a generic display slot without an identity classification, a direct numeric child is the explicit
 quantity signal; supply an identifier as a string. No controller guesses intent from a callback,
 label wording or neighbouring data, and no new public numeric-detection prop is implied.
+Resolve existing content, placeholder, falsy and return-null branches before choosing a renderer for
+an actual display slot. Wrapping `0`, `false`, `null`, `undefined` or an empty string must not make an
+absent child truthy, bypass a placeholder or turn a null result into a visible part. For example,
+FieldError keeps its current children/errors precedence before considering replacement animation.
 Changing from string to number or back establishes the new renderer's baseline immediately; do not
 invent a numeric origin or run both renderers on the same content. An unavailable grapheme segmenter
 or unsupported shaping mapping uses exact immediate text, not code-point splitting.
+
+Decomposition must preserve the slot's existing white-space policy, newlines, tabs, text-transform,
+letter/word spacing, font features and inline layout. Do not introduce inline-block wrapping or disable
+ligatures merely to obtain character transforms. Use a safe shaping run when it preserves the original
+rendering; otherwise keep exact immediate text. Animation cannot change wrapping or typography as an
+undeclared side effect of adding spans.
 
 An active native text range or browser find target is a presentation constraint, not permission to
 replace the selection tree. If a split/replacement overlay cannot preserve it, settle that affected
@@ -741,13 +777,15 @@ cancel hidden work without adding per-glyph observers or a document-wide polling
 
 AnimatedNumber implements place-value reels. Interpolating a scalar and formatting each frame is
 counting, not rolling; extra slot-machine turns/random letters are separate optional effects. Initial
-SSR/hydration shows the actual value, never a roll from zero. Intl.NumberFormat.formatToParts separates
-digits, grouping, signs and units.
+SSR/hydration shows the actual value, never a roll from zero. Formatting-aware output can use
+Intl.NumberFormat.formatToParts to separate digits, grouping, signs and units without changing its
+existing display policy.
 
 Integer identities count left from units; fractional identities count right from tenths. 19 → 20
 rolls changed columns in the direction of the whole value; 99 → 100 retains units/tens and introduces
 hundreds. Unchanged digits stay still. Separators/affixes only enter, exit or reposition as needed.
-tabular-nums helps equal-digit widths, not total digit-count changes. One geometry owner sizes the
+An existing tabular-nums style helps equal-digit widths, not total digit-count changes; the helper
+must not add it automatically and change the component's font metrics. One geometry owner sizes the
 surrounding shell; reel movement and shell movement must not fight.
 
 Default direction is trend. Explicit up/down/shortest are alternatives; shortest never silently
@@ -756,6 +794,14 @@ not animate. Locale/format-only changes rearrange formatting, not fictitious gro
 cross-zero/negative-zero, rounding, precision, percentage/currency, compact notation, large integer,
 non-Latin-digit, RTL and NaN/Infinity handling. Unsupported formats show the correct final formatted
 value immediately rather than a corrupted reel.
+
+Built-in numeric integration preserves the exact output of the existing display path, including
+precision, grouping and sign. Raw React numeric children do not acquire Intl defaults, rounding,
+negative-zero signs or expanded exponent notation just to support reels. Existing formatting APIs
+remain authoritative. If the original representation cannot be safely decomposed, show that exact
+representation immediately. The planned standalone AnimatedNumber's explicit formatting belongs to
+its API; this integration rule does not alter public defaults. See the
+[numeric formatting policy](motion/presets.md#51-numeric-identity-and-formatting-decisions).
 
 Numeric slots, including a supported display slot receiving a number directly, opt in. Strings such
 as 00123, phone numbers, versions and dates are never parsed heuristically. Mixed content composes an
@@ -823,9 +869,10 @@ load/fallback, empty-to-content and helper/error rows coordinate presence/size w
 information. Cached images may appear directly.
 
 Charts/progress retain their engine interpolation and semantic final value. A numeric readout shares
-the target, direction and appropriate rhythm; completion/failure never waits for a visual interpolation
-to cross a threshold. Undo/optimistic rollback retargets from current visuals. Native drag follows
-input directly; release motion is separate. Route/theme transitions and large scroll stories remain
+the committed revision and appropriate rhythm; its numeric trend need not match unfinished geometry's
+travel direction. Progress uses the shared-phase/immediate-readout rule in §3.1.0. Completion/failure
+never waits for a visual interpolation to cross a threshold. Undo/optimistic rollback retargets from
+current visuals. Native drag follows input directly; release motion is separate. Route/theme transitions and large scroll stories remain
 application compositions, not automatically installed effects on every part.
 
 For Save → Saved, commit semantic text, retain Save nodes, measure final natural width, then start

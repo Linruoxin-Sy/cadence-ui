@@ -148,7 +148,8 @@ wrap every built-in label to obtain the baseline. Complex user-authored content 
 composition so that links, refs, keys, selection and accessibility remain intact.
 
 The primitive fixtures must exercise the target defaults: changed-character delay is 12 ms with a
-120 ms cap for standalone AnimatedText; built-in `text.replace` bindings explicitly select no stagger.
+final 120 ms delay cap after effective timeScale for standalone AnimatedText, still subject to the
+20-element concurrency bound; built-in `text.replace` bindings explicitly select no stagger.
 RevealGroup defaults to replay once, amount 0.08, top inset 0.03, bottom inset 0.08 and
 stagger none. Insets are fractions of the observation root's height, converted to pixels and updated
 when that root changes size; amount is the target's intersection-area ratio. Explicit cycle stagger
@@ -263,6 +264,26 @@ exact opacity-only surface forms, chevron versus copy-glyph targets, native inpu
 display helpers, and hover/focus/collapse arbitration for accessory controls. Colour checks cover
 fixed shadow topology, immediate focus geometry, pseudo-elements and final cascade restoration;
 none of these design statements establish an implemented capability.
+
+Prove built-in numeric integration preserves the pre-helper display path: raw numeric children such
+as 1000, 1.234567, negative zero and exponent notation must not acquire Intl defaults. Existing format
+APIs remain authoritative; unsafe exact decomposition stays immediate. Exercise falsy/placeholder and
+return-null branches, including FieldError precedence and FieldSeparator content. Text fixtures retain
+white-space/newlines/tabs, text-transform, spacing, font features and inline flow; numeric fixtures
+retain proportional-digit metrics unless the existing style already opts into tabular digits.
+
+Keep default autofocus at its existing lifecycle point while settling only conflicting entry
+envelopes; independent backdrop paint may continue. Geometry fixtures cover non-default box-sizing,
+padding/borders/scrollbars and scaled ancestors, with safe coordinate conversion or immediate native
+fallback. Stagger fixtures apply positive clock changes without exceeding the final delay/concurrency
+ceilings; these are still pending browser and algorithm acceptance.
+
+Progress fixtures distinguish monotonic presentation phase from business percentage: interrupt a
+fill currently at 60 when the committed value changes from 100 to 80, and cover unsafe two-cell reel
+retargets. The latest readout becomes immediate when coordination is invalid; fill may retarget
+independently without invented values or a second owner. Verify that Carousel track navigation,
+Calendar's actual table and Toc's reading indicator retain their engine ownership while independent
+root presence or content-driven outer-host geometry follows the separate target component contracts.
 
 ### Phase 3: Five pilots
 
