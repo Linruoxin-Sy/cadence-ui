@@ -21,14 +21,14 @@ Button gives immediate press feedback while keeping its label and hit target sta
 
 ## Capability ownership
 
-| Capability      | Coverage and owner                                                                                                                                                  | References                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| Appearance      | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause.                                                   | default: `button.root.enter`, `button.root.exit`    |
-| Size            | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent. | default: `button.root.resize`                       |
-| Surface colour  | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state.                                                    | default: `button.root.colour`                       |
-| Text colour     | default: button foreground; inherited by text and currentColor icons unless explicitly overridden.                                                                  | default: `button.root.colour`                       |
-| Changed text    | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot.                                              | default: `button.label.replace`; composed: `@label` |
-| Changed numbers | default: a supported direct numeric child is the quantity signal and uses compact reels without changing its existing output; identifier strings remain text and rich content is composed.              | default: `button.label.roll`; composed: `@label`    |
+| Capability      | Coverage and owner                                                                                                                                                                         | References                                          |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| Appearance      | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause.                                                                          | default: `button.root.enter`, `button.root.exit`    |
+| Size            | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent.                        | default: `button.root.resize`                       |
+| Surface colour  | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state.                                                                           | default: `button.root.colour`                       |
+| Text colour     | default: button foreground; inherited by text and currentColor icons unless explicitly overridden.                                                                                         | default: `button.root.colour`                       |
+| Changed text    | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot.                                                                     | default: `button.label.replace`; composed: `@label` |
+| Changed numbers | default: a supported direct numeric child is the quantity signal and uses compact reels without changing its existing output; identifier strings remain text and rich content is composed. | default: `button.label.roll`; composed: `@label`    |
 
 ## Choreography and modes
 

@@ -21,13 +21,13 @@ Badge makes a compact status or quantity change legible without bouncing the sur
 
 ## Capability ownership
 
-| Capability      | Coverage and owner                                                                                                                                 | References                                         |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Appearance      | default: badge for dynamic insertion; inherited when an enclosing item owns the same entrance.                                                     | default: `badge.root.enter`, `badge.root.exit`     |
-| Size            | default: badge owns intrinsic inline size as its display content changes; constrained or wrapping layout is clamped.                               | default: `badge.root.resize`                       |
-| Surface colour  | default: badge background and border on variant and actual interactive state changes.                                                              | default: `badge.root.colour`                       |
-| Text colour     | default: badge foreground and inheriting currentColor icons.                                                                                       | default: `badge.root.colour`                       |
-| Changed text    | default: direct plain string children use changed-only replacement; composed for rich child content.                                               | default: `badge.label.replace`; composed: `@label` |
+| Capability      | Coverage and owner                                                                                                                                                                             | References                                         |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| Appearance      | default: badge for dynamic insertion; inherited when an enclosing item owns the same entrance.                                                                                                 | default: `badge.root.enter`, `badge.root.exit`     |
+| Size            | default: badge owns intrinsic inline size as its display content changes; constrained or wrapping layout is clamped.                                                                           | default: `badge.root.resize`                       |
+| Surface colour  | default: badge background and border on variant and actual interactive state changes.                                                                                                          | default: `badge.root.colour`                       |
+| Text colour     | default: badge foreground and inheriting currentColor icons.                                                                                                                                   | default: `badge.root.colour`                       |
+| Changed text    | default: direct plain string children use changed-only replacement; composed for rich child content.                                                                                           | default: `badge.label.replace`; composed: `@label` |
 | Changed numbers | default: supported direct numeric children use compact rolling with their existing output; numeric-label/version/identifier strings remain text, and rich quantities use explicit composition. | default: `badge.value.roll`; composed: `@value`    |
 
 ## Choreography and modes

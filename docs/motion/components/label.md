@@ -21,14 +21,14 @@ Label clarifies changes to a control's name without moving the click-to-focus re
 
 ## Capability ownership
 
-| Capability      | Coverage and owner                                                                                                                                                     | References                                       |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Appearance      | default: label for independent insertion; inherited when a Field or other parent owns the same insertion.                                                              | default: `label.root.enter`                      |
-| Size            | default: label owns a content-driven intrinsic box when independently laid out; inherited by a coordinating Field geometry transaction; passive wrapping is immediate. | default: `label.root.resize`                     |
-| Surface colour  | not applicable to the default transparent label surface; composed if the caller deliberately supplies a stateful surface.                                              | not-applicable: `@root`; composed: `@root`       |
-| Text colour     | default: label foreground on authored disabled/invalid/context changes; inherited when a parent owns that foreground property.                                         | default: `label.root.colour`                     |
-| Changed text    | default: direct plain label text uses changed-only replacement; composed for structured rich labels.                                                                   | default: `label.text.replace`; composed: `@text` |
-| Changed numbers | default: a supported direct numeric child is the quantity signal, with existing display output preserved; numeric field names/identifiers supplied as strings remain text, and rich quantities are composed.                | default: `label.value.roll`; composed: `@value`  |
+| Capability      | Coverage and owner                                                                                                                                                                                           | References                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| Appearance      | default: label for independent insertion; inherited when a Field or other parent owns the same insertion.                                                                                                    | default: `label.root.enter`                      |
+| Size            | default: label owns a content-driven intrinsic box when independently laid out; inherited by a coordinating Field geometry transaction; passive wrapping is immediate.                                       | default: `label.root.resize`                     |
+| Surface colour  | not applicable to the default transparent label surface; composed if the caller deliberately supplies a stateful surface.                                                                                    | not-applicable: `@root`; composed: `@root`       |
+| Text colour     | default: label foreground on authored disabled/invalid/context changes; inherited when a parent owns that foreground property.                                                                               | default: `label.root.colour`                     |
+| Changed text    | default: direct plain label text uses changed-only replacement; composed for structured rich labels.                                                                                                         | default: `label.text.replace`; composed: `@text` |
+| Changed numbers | default: a supported direct numeric child is the quantity signal, with existing display output preserved; numeric field names/identifiers supplied as strings remain text, and rich quantities are composed. | default: `label.value.roll`; composed: `@value`  |
 
 ## Choreography and modes
 

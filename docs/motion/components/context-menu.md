@@ -15,10 +15,28 @@ A context menu belongs to the current invocation location. A new right-click or 
     "content": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent"],
     "sub-content": ["context-menu#ContextMenuSubContent"],
     "position": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent"],
-    "item": ["context-menu#ContextMenuItem", "context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem", "context-menu#ContextMenuSubTrigger"],
-    "surface": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent", "context-menu#ContextMenuLabel", "context-menu#ContextMenuShortcut", "context-menu#ContextMenuSeparator"],
+    "item": [
+      "context-menu#ContextMenuItem",
+      "context-menu#ContextMenuCheckboxItem",
+      "context-menu#ContextMenuRadioItem",
+      "context-menu#ContextMenuSubTrigger"
+    ],
+    "surface": [
+      "context-menu#ContextMenuContent",
+      "context-menu#ContextMenuSubContent",
+      "context-menu#ContextMenuLabel",
+      "context-menu#ContextMenuShortcut",
+      "context-menu#ContextMenuSeparator"
+    ],
     "indicator": ["context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem"],
-    "label": ["context-menu#ContextMenuItem", "context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem", "context-menu#ContextMenuSubTrigger", "context-menu#ContextMenuLabel", "context-menu#ContextMenuShortcut"],
+    "label": [
+      "context-menu#ContextMenuItem",
+      "context-menu#ContextMenuCheckboxItem",
+      "context-menu#ContextMenuRadioItem",
+      "context-menu#ContextMenuSubTrigger",
+      "context-menu#ContextMenuLabel",
+      "context-menu#ContextMenuShortcut"
+    ],
     "quantity": ["context-menu#ContextMenuItem", "context-menu#ContextMenuLabel"]
   }
 }
@@ -37,17 +55,17 @@ A context menu belongs to the current invocation location. A new right-click or 
 
 ## Choreography and modes
 
-| Trigger / owner                                                                          | Full                                                                                        | Reduced                                       | None                             | Binding → preset → recipe/form                                                                                                                             |
-| ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trigger / owner                                                                          | Full                                                                                                                                         | Reduced                                              | None                             | Binding → preset → recipe/form                                                                                                                             |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Invocation / root content                                                                | Place at native origin immediately, then opacity entrance with `distance.xs` side approach. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Open target immediately.         | `context-menu.content.enter` → `presence.menu` → `popup.anchored/presence`                                                                                 |
-| Submenu open / sub-content                                                               | Local anchor-relative opacity/side approach; parent stays fixed. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Open target immediately.         | `context-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence`                                                                             |
-| Branch close / corresponding content                                                     | Opacity exit only, no stagger.                                                              | Short opacity.                                | Closed target immediately.       | `context-menu.content.exit` → `presence.exit` → `exit.fade/opacity`; `context-menu.sub-content.exit` → `presence.exit` → `exit.fade/opacity`               |
-| New invocation or collision / Base UI positioner                                         | Cancel old approach and place at the new valid origin; no cross-screen interpolation.       | Immediate.                                    | Immediate.                       | `context-menu.position.place` → `engine.native` → `native/base-ui-context-menu` (Base UI ContextMenu positioning (no new recipe))                          |
-| Pointer state / item                                                                     | Scoped surface/foreground transition; keyboard highlight is immediate.                      | Short colour feedback; keyboard immediate.    | Final state immediately.         | `context-menu.item.colour` → `state.color` → `state.color/surface-foreground`                                                                              |
-| Supplied tokens/disabled/destructive state / popup, label, shortcut and separator owners | Scoped surface/border/foreground colour with one writer per property.                       | Short colour.                                 | Final colours immediately.       | `context-menu.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                           |
-| Checkbox/radio change / item indicator                                                   | Local opacity/`scale.in` marker feedback with immediate semantic checked state.             | Opacity only.                                 | Final marks immediately.         | `context-menu.indicator.select` → `state.indicator` → `state.morph/indicator`                                                                              |
-| Structure/text change / shell and text owners                                            | Measured clamped size; changed plain text runs use `stagger: none`.                         | Geometry immediate; changed-run opacity only. | Final geometry/text immediately. | `context-menu.content.resize` → `geometry.compact` → `geometry.resize/measured`; `context-menu.label.change` → `text.replace` → `text.change/changed-runs` |
-| Explicit composed quantity / child owner                                                 | Roll changed places without parsing action identities or shortcuts as numbers.              | Final number immediately.                     | Final number immediately.        | `context-menu.quantity.change` → `number.compact` → `number.roll/reels`                                                                                    |
+| Submenu open / sub-content                                                               | Local anchor-relative opacity/side approach; parent stays fixed. Entry is subject to the actual-focus gate below.                            | Short opacity only. Entry obeys the same focus gate. | Open target immediately.         | `context-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence`                                                                             |
+| Branch close / corresponding content                                                     | Opacity exit only, no stagger.                                                                                                               | Short opacity.                                       | Closed target immediately.       | `context-menu.content.exit` → `presence.exit` → `exit.fade/opacity`; `context-menu.sub-content.exit` → `presence.exit` → `exit.fade/opacity`               |
+| New invocation or collision / Base UI positioner                                         | Cancel old approach and place at the new valid origin; no cross-screen interpolation.                                                        | Immediate.                                           | Immediate.                       | `context-menu.position.place` → `engine.native` → `native/base-ui-context-menu` (Base UI ContextMenu positioning (no new recipe))                          |
+| Pointer state / item                                                                     | Scoped surface/foreground transition; keyboard highlight is immediate.                                                                       | Short colour feedback; keyboard immediate.           | Final state immediately.         | `context-menu.item.colour` → `state.color` → `state.color/surface-foreground`                                                                              |
+| Supplied tokens/disabled/destructive state / popup, label, shortcut and separator owners | Scoped surface/border/foreground colour with one writer per property.                                                                        | Short colour.                                        | Final colours immediately.       | `context-menu.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                           |
+| Checkbox/radio change / item indicator                                                   | Local opacity/`scale.in` marker feedback with immediate semantic checked state.                                                              | Opacity only.                                        | Final marks immediately.         | `context-menu.indicator.select` → `state.indicator` → `state.morph/indicator`                                                                              |
+| Structure/text change / shell and text owners                                            | Measured clamped size; changed plain text runs use `stagger: none`.                                                                          | Geometry immediate; changed-run opacity only.        | Final geometry/text immediately. | `context-menu.content.resize` → `geometry.compact` → `geometry.resize/measured`; `context-menu.label.change` → `text.replace` → `text.change/changed-runs` |
+| Explicit composed quantity / child owner                                                 | Roll changed places without parsing action identities or shortcuts as numbers.                                                               | Final number immediately.                            | Final number immediately.        | `context-menu.quantity.change` → `number.compact` → `number.roll/reels`                                                                                    |
 
 `item.colour` is the sole surface/foreground controller on Item, CheckboxItem, RadioItem and
 SubTrigger, merging pointer, checked, disabled, destructive and theme targets. Keyboard highlight

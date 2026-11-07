@@ -13,18 +13,61 @@ The bar gives immediate navigation feedback, while each open menu remains attach
   "migration": "legacy",
   "parts": {
     "root": ["menubar#Menubar"],
-    "content": ["menubar#MenubarContent", "dropdown-menu#DropdownMenuContent", "menubar#MenubarSubContent", "dropdown-menu#DropdownMenuSubContent"],
+    "content": [
+      "menubar#MenubarContent",
+      "dropdown-menu#DropdownMenuContent",
+      "menubar#MenubarSubContent",
+      "dropdown-menu#DropdownMenuSubContent"
+    ],
     "sub-content": ["menubar#MenubarSubContent", "dropdown-menu#DropdownMenuSubContent"],
     "trigger": ["menubar#MenubarTrigger"],
-    "item": ["menubar#MenubarItem", "menubar#MenubarCheckboxItem", "menubar#MenubarRadioItem", "menubar#MenubarSubTrigger", "dropdown-menu#DropdownMenuItem", "dropdown-menu#DropdownMenuCheckboxItem", "dropdown-menu#DropdownMenuRadioItem", "dropdown-menu#DropdownMenuSubTrigger"],
-    "indicator": ["menubar#MenubarCheckboxItem", "menubar#MenubarRadioItem", "dropdown-menu#DropdownMenuCheckboxItem", "dropdown-menu#DropdownMenuRadioItem"],
+    "item": [
+      "menubar#MenubarItem",
+      "menubar#MenubarCheckboxItem",
+      "menubar#MenubarRadioItem",
+      "menubar#MenubarSubTrigger",
+      "dropdown-menu#DropdownMenuItem",
+      "dropdown-menu#DropdownMenuCheckboxItem",
+      "dropdown-menu#DropdownMenuRadioItem",
+      "dropdown-menu#DropdownMenuSubTrigger"
+    ],
+    "indicator": [
+      "menubar#MenubarCheckboxItem",
+      "menubar#MenubarRadioItem",
+      "dropdown-menu#DropdownMenuCheckboxItem",
+      "dropdown-menu#DropdownMenuRadioItem"
+    ],
     "triggers": ["menubar#Menubar", "menubar#MenubarTrigger"],
     "label": ["menubar#MenubarTrigger"],
     "surface": ["menubar#Menubar"],
     "position": ["menubar#MenubarContent", "menubar#MenubarSubContent"],
     "quantity": ["menubar#MenubarItem", "menubar#MenubarLabel"],
-    "menu-surface": ["menubar#MenubarContent", "menubar#MenubarSubContent", "menubar#MenubarLabel", "menubar#MenubarShortcut", "menubar#MenubarSeparator", "dropdown-menu#DropdownMenuContent", "dropdown-menu#DropdownMenuSubContent", "dropdown-menu#DropdownMenuLabel", "dropdown-menu#DropdownMenuShortcut", "dropdown-menu#DropdownMenuSeparator"],
-    "menu-label": ["menubar#MenubarItem", "menubar#MenubarCheckboxItem", "menubar#MenubarRadioItem", "menubar#MenubarSubTrigger", "menubar#MenubarLabel", "menubar#MenubarShortcut", "dropdown-menu#DropdownMenuItem", "dropdown-menu#DropdownMenuCheckboxItem", "dropdown-menu#DropdownMenuRadioItem", "dropdown-menu#DropdownMenuSubTrigger", "dropdown-menu#DropdownMenuLabel", "dropdown-menu#DropdownMenuShortcut"]
+    "menu-surface": [
+      "menubar#MenubarContent",
+      "menubar#MenubarSubContent",
+      "menubar#MenubarLabel",
+      "menubar#MenubarShortcut",
+      "menubar#MenubarSeparator",
+      "dropdown-menu#DropdownMenuContent",
+      "dropdown-menu#DropdownMenuSubContent",
+      "dropdown-menu#DropdownMenuLabel",
+      "dropdown-menu#DropdownMenuShortcut",
+      "dropdown-menu#DropdownMenuSeparator"
+    ],
+    "menu-label": [
+      "menubar#MenubarItem",
+      "menubar#MenubarCheckboxItem",
+      "menubar#MenubarRadioItem",
+      "menubar#MenubarSubTrigger",
+      "menubar#MenubarLabel",
+      "menubar#MenubarShortcut",
+      "dropdown-menu#DropdownMenuItem",
+      "dropdown-menu#DropdownMenuCheckboxItem",
+      "dropdown-menu#DropdownMenuRadioItem",
+      "dropdown-menu#DropdownMenuSubTrigger",
+      "dropdown-menu#DropdownMenuLabel",
+      "dropdown-menu#DropdownMenuShortcut"
+    ]
   }
 }
 ```
@@ -42,19 +85,19 @@ The bar gives immediate navigation feedback, while each open menu remains attach
 
 ## Choreography and modes
 
-| Trigger / owner                                           | Full                                                                                                                                                                                            | Reduced                                    | None                            | Binding → preset → recipe/form                                                                                                                                |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Independent bar insertion / root                          | One opacity entrance; triggers are ready together.                                                                                                                                              | Short opacity.                             | Final bar immediately.          | `menubar.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                          |
-| Open menu/submenu / inherited popup writer                | Anchor-relative opacity with `distance.xs` approach at that trigger; no horizontal panel flight. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Final open surface immediately. | `menubar.content.enter` → `presence.menu` → `popup.anchored/presence`; `menubar.sub-content.enter` → `presence.menu` → `popup.anchored/presence`              |
-| Close old menu/branch / inherited popup writer            | Opacity exit only; new menu follows its own semantic open transaction.                                                                                                                          | Short opacity.                             | Closed target immediately.      | `menubar.content.exit` → `presence.exit` → `exit.fade/opacity`; `menubar.sub-content.exit` → `presence.exit` → `exit.fade/opacity`                            |
-| Pointer/open state / trigger and menu items               | Scoped surface/foreground colour feedback; keyboard focus/highlight becomes immediate.                                                                                                          | Short colour feedback; keyboard immediate. | Final state immediately.        | `menubar.trigger.colour` → `state.color` → `state.color/surface-foreground`; `menubar.item.colour` → `state.color` → `state.color/surface-foreground`         |
-| Checkbox/radio change / inherited item indicators         | Local marker feedback, exactly once through the Dropdown Menu owner.                                                                                                                            | Opacity only.                              | Final markers immediately.      | `menubar.indicator.select` → `state.indicator` → `state.morph/indicator`                                                                                      |
-| Trigger label/set change / bar layout owner               | Bounded reflow while all menus are closed. With an open branch, commit anchor-affecting strip layout immediately so no projected trigger drifts away from its popup. Preserve trigger identity. | Final geometry immediately.                | Final geometry immediately.     | `menubar.root.resize` → `geometry.compact` → `geometry.resize/measured`; `menubar.triggers.reflow` → `layout.compact` → `layout.move/position`                |
-| Menu content change / inherited shell owner               | Measured clamped dimensions at the actual current anchor.                                                                                                                                       | Final geometry immediately.                | Final geometry immediately.     | `menubar.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                    |
-| Plain display label / respective text owner               | Changed-run replacement, `stagger: none`.                                                                                                                                                       | Changed-run opacity only.                  | Final text immediately.         | `menubar.label.change` → `text.replace` → `text.change/changed-runs`; `menubar.menu-label.change` → `text.replace` → `text.change/changed-runs`               |
-| Root/popup/label token change / respective surface owners | Scoped surface/border/foreground colour, inherited exactly once for menu parts.                                                                                                                 | Short colour.                              | Final colours immediately.      | `menubar.surface.colour` → `state.color` → `state.color/surface-foreground`; `menubar.menu-surface.colour` → `state.color` → `state.color/surface-foreground` |
-| Anchor/collision change / inherited positioner            | Correct placement immediately with native trigger geometry; no independent anchor-coordinate tween.                                                                                             | Same placement.                            | Same placement.                 | `menubar.position.place` → `engine.native` → `native/base-ui-menu` (Base UI Menu positioning (no new recipe))                                                 |
-| Explicit composed quantity / child owner                  | Roll changed places; command names/shortcuts remain text.                                                                                                                                       | Final number immediately.                  | Final number immediately.       | `menubar.quantity.change` → `number.compact` → `number.roll/reels`                                                                                            |
+| Trigger / owner                                           | Full                                                                                                                                                                                            | Reduced                                              | None                            | Binding → preset → recipe/form                                                                                                                                |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Independent bar insertion / root                          | One opacity entrance; triggers are ready together.                                                                                                                                              | Short opacity.                                       | Final bar immediately.          | `menubar.root.enter` → `presence.inline` → `data.transition/opacity`                                                                                          |
+| Open menu/submenu / inherited popup writer                | Anchor-relative opacity with `distance.xs` approach at that trigger; no horizontal panel flight. Entry is subject to the actual-focus gate below.                                               | Short opacity only. Entry obeys the same focus gate. | Final open surface immediately. | `menubar.content.enter` → `presence.menu` → `popup.anchored/presence`; `menubar.sub-content.enter` → `presence.menu` → `popup.anchored/presence`              |
+| Close old menu/branch / inherited popup writer            | Opacity exit only; new menu follows its own semantic open transaction.                                                                                                                          | Short opacity.                                       | Closed target immediately.      | `menubar.content.exit` → `presence.exit` → `exit.fade/opacity`; `menubar.sub-content.exit` → `presence.exit` → `exit.fade/opacity`                            |
+| Pointer/open state / trigger and menu items               | Scoped surface/foreground colour feedback; keyboard focus/highlight becomes immediate.                                                                                                          | Short colour feedback; keyboard immediate.           | Final state immediately.        | `menubar.trigger.colour` → `state.color` → `state.color/surface-foreground`; `menubar.item.colour` → `state.color` → `state.color/surface-foreground`         |
+| Checkbox/radio change / inherited item indicators         | Local marker feedback, exactly once through the Dropdown Menu owner.                                                                                                                            | Opacity only.                                        | Final markers immediately.      | `menubar.indicator.select` → `state.indicator` → `state.morph/indicator`                                                                                      |
+| Trigger label/set change / bar layout owner               | Bounded reflow while all menus are closed. With an open branch, commit anchor-affecting strip layout immediately so no projected trigger drifts away from its popup. Preserve trigger identity. | Final geometry immediately.                          | Final geometry immediately.     | `menubar.root.resize` → `geometry.compact` → `geometry.resize/measured`; `menubar.triggers.reflow` → `layout.compact` → `layout.move/position`                |
+| Menu content change / inherited shell owner               | Measured clamped dimensions at the actual current anchor.                                                                                                                                       | Final geometry immediately.                          | Final geometry immediately.     | `menubar.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                    |
+| Plain display label / respective text owner               | Changed-run replacement, `stagger: none`.                                                                                                                                                       | Changed-run opacity only.                            | Final text immediately.         | `menubar.label.change` → `text.replace` → `text.change/changed-runs`; `menubar.menu-label.change` → `text.replace` → `text.change/changed-runs`               |
+| Root/popup/label token change / respective surface owners | Scoped surface/border/foreground colour, inherited exactly once for menu parts.                                                                                                                 | Short colour.                                        | Final colours immediately.      | `menubar.surface.colour` → `state.color` → `state.color/surface-foreground`; `menubar.menu-surface.colour` → `state.color` → `state.color/surface-foreground` |
+| Anchor/collision change / inherited positioner            | Correct placement immediately with native trigger geometry; no independent anchor-coordinate tween.                                                                                             | Same placement.                                      | Same placement.                 | `menubar.position.place` → `engine.native` → `native/base-ui-menu` (Base UI Menu positioning (no new recipe))                                                 |
+| Explicit composed quantity / child owner                  | Roll changed places; command names/shortcuts remain text.                                                                                                                                       | Final number immediately.                            | Final number immediately.       | `menubar.quantity.change` → `number.compact` → `number.roll/reels`                                                                                            |
 
 Inherited `item.colour` and `menu-surface.colour` keep Dropdown Menu's disjoint region map:
 all item variants/sub-triggers belong to the item controller; popup shells, labels, shortcuts and
