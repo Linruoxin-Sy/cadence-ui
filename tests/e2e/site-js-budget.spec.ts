@@ -94,6 +94,7 @@ for (const width of [1280, 390]) {
         const scrollY = await page.evaluate(() => window.scrollY);
         Object.assign(report, {
           buildId,
+          buildManifest: manifest,
           roots,
           id,
           width,
@@ -112,6 +113,7 @@ for (const width of [1280, 390]) {
         expect.soft(report.files.length).toBeGreaterThan(0);
         expect.soft(report.files.every((file: { status: number }) => file.status === 200)).toBe(true);
         expect.soft(report.errors).toEqual([]);
+        expect.soft(report.missingResponses).toEqual([]);
         expect.soft(consoleErrors).toEqual([]);
         expect.soft(httpErrors).toEqual([]);
         expect.soft(exampleCount).toBe(examples[id].length);
