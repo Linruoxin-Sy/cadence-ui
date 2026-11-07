@@ -15,28 +15,10 @@ A context menu belongs to the current invocation location. A new right-click or 
     "content": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent"],
     "sub-content": ["context-menu#ContextMenuSubContent"],
     "position": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent"],
-    "item": [
-      "context-menu#ContextMenuItem",
-      "context-menu#ContextMenuCheckboxItem",
-      "context-menu#ContextMenuRadioItem",
-      "context-menu#ContextMenuSubTrigger"
-    ],
-    "surface": [
-      "context-menu#ContextMenuContent",
-      "context-menu#ContextMenuSubContent",
-      "context-menu#ContextMenuLabel",
-      "context-menu#ContextMenuShortcut",
-      "context-menu#ContextMenuSeparator"
-    ],
+    "item": ["context-menu#ContextMenuItem", "context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem", "context-menu#ContextMenuSubTrigger"],
+    "surface": ["context-menu#ContextMenuContent", "context-menu#ContextMenuSubContent", "context-menu#ContextMenuLabel", "context-menu#ContextMenuShortcut", "context-menu#ContextMenuSeparator"],
     "indicator": ["context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem"],
-    "label": [
-      "context-menu#ContextMenuItem",
-      "context-menu#ContextMenuCheckboxItem",
-      "context-menu#ContextMenuRadioItem",
-      "context-menu#ContextMenuSubTrigger",
-      "context-menu#ContextMenuLabel",
-      "context-menu#ContextMenuShortcut"
-    ],
+    "label": ["context-menu#ContextMenuItem", "context-menu#ContextMenuCheckboxItem", "context-menu#ContextMenuRadioItem", "context-menu#ContextMenuSubTrigger", "context-menu#ContextMenuLabel", "context-menu#ContextMenuShortcut"],
     "quantity": ["context-menu#ContextMenuItem", "context-menu#ContextMenuLabel"]
   }
 }
@@ -57,8 +39,8 @@ A context menu belongs to the current invocation location. A new right-click or 
 
 | Trigger / owner                                                                          | Full                                                                                        | Reduced                                       | None                             | Binding → preset → recipe/form                                                                                                                             |
 | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Invocation / root content                                                                | Place at native origin immediately, then opacity entrance with `distance.xs` side approach. | Short opacity only.                           | Open target immediately.         | `context-menu.content.enter` → `presence.menu` → `popup.anchored/presence`                                                                                 |
-| Submenu open / sub-content                                                               | Local anchor-relative opacity/side approach; parent stays fixed.                            | Short opacity only.                           | Open target immediately.         | `context-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence`                                                                             |
+| Invocation / root content                                                                | Place at native origin immediately, then opacity entrance with `distance.xs` side approach. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Open target immediately.         | `context-menu.content.enter` → `presence.menu` → `popup.anchored/presence`                                                                                 |
+| Submenu open / sub-content                                                               | Local anchor-relative opacity/side approach; parent stays fixed. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Open target immediately.         | `context-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence`                                                                             |
 | Branch close / corresponding content                                                     | Opacity exit only, no stagger.                                                              | Short opacity.                                | Closed target immediately.       | `context-menu.content.exit` → `presence.exit` → `exit.fade/opacity`; `context-menu.sub-content.exit` → `presence.exit` → `exit.fade/opacity`               |
 | New invocation or collision / Base UI positioner                                         | Cancel old approach and place at the new valid origin; no cross-screen interpolation.       | Immediate.                                    | Immediate.                       | `context-menu.position.place` → `engine.native` → `native/base-ui-context-menu` (Base UI ContextMenu positioning (no new recipe))                          |
 | Pointer state / item                                                                     | Scoped surface/foreground transition; keyboard highlight is immediate.                      | Short colour feedback; keyboard immediate.    | Final state immediately.         | `context-menu.item.colour` → `state.color` → `state.color/surface-foreground`                                                                              |
@@ -77,6 +59,8 @@ The menu's side approach is selected by this contract, with opacity-only fallbac
 placement or an interaction that requires an immediately stationary target.
 
 ## Interruption and lifecycle
+
+Native context-menu invocation focuses its current menu/list or item according to Base UI. If that target lies in an entering envelope, settle the branch before presenting focus; a default invocation can therefore use immediate panel paint. A pointer-opened submenu whose focus remains outside may still enter. Do not change keyboard/pointer focus or intent timing merely to guarantee the side approach.
 
 - Keep pointer invocation, keyboard Context Menu/Shift+F10, focus, Tab/Escape and close behavior exactly under Base UI. Opening animation never delays action availability.
 - Reinvoking elsewhere invalidates old origin captures and exit completions. Reopening at the same location may reverse current opacity, but never preserve stale item semantics.
@@ -99,3 +83,4 @@ placement or an interaction that requires an immediately stationary target.
 - Pending: update a long action label near an edge while focus moves to it, then deliver async data after dismissal and reinvoke elsewhere; immediate readability and current native lifecycle ownership win over old geometry callbacks.
 
 - Pending: rename CheckboxItem/RadioItem/SubTrigger text and recolour a separator while pointer, disabled and theme state change together; inspect one colour writer per region and both submenu size hosts.
+- Pending: Invoke using pointer and keyboard while initial list/item focus is established, then traverse a submenu; no focused target remains faded or displaced solely to finish entry.

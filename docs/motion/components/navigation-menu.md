@@ -19,17 +19,9 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
     "content": ["navigation-menu#NavigationMenuContent"],
     "indicator": ["navigation-menu#NavigationMenuTrigger"],
     "item": ["navigation-menu#NavigationMenuTrigger", "navigation-menu#NavigationMenuLink"],
-    "label": [
-      "navigation-menu#NavigationMenuTrigger",
-      "navigation-menu#NavigationMenuLink",
-      "navigation-menu#NavigationMenuContent"
-    ],
+    "label": ["navigation-menu#NavigationMenuTrigger", "navigation-menu#NavigationMenuLink", "navigation-menu#NavigationMenuContent"],
     "value": ["navigation-menu#NavigationMenuContent"],
-    "surface": [
-      "navigation-menu#NavigationMenuPositioner",
-      "navigation-menu#NavigationMenuContent",
-      "navigation-menu#NavigationMenuIndicator"
-    ]
+    "surface": ["navigation-menu#NavigationMenuPositioner", "navigation-menu#NavigationMenuContent", "navigation-menu#NavigationMenuIndicator"]
   }
 }
 ```
@@ -43,13 +35,13 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | Surface colour  | Default: trigger/link state surfaces and the actual Positioner-hosted popup, content and optional indicator-arrow surface; no root/provider paint is invented.                              | default: `navigation-menu.item.colour`, `navigation-menu.surface.colour`                               |
 | Text colour     | Default: trigger/link states; descendant content inherits unless its own component owns another state.                                                                                      | default: `navigation-menu.item.colour`, `navigation-menu.surface.colour`                               |
 | Changed text    | Default for direct plain trigger/link/content strings; rich menu content remains composed. An opening/switching content surface consumes same-cause initial text entry.                     | default: `navigation-menu.label.replace`; composed: `@label`                                           |
-| Changed numbers | Default for a supported direct quantity in an owned display part; composed for nested badge/count owners. Numeric-looking navigation labels, item values and route identifiers remain text. | default: `navigation-menu.value.change`; composed: `@value`                                            |
+| Changed numbers | Default for a supported direct quantity in NavigationMenuContent; composed for nested badge/count owners in that content. Numeric-looking navigation labels, item values and route identifiers remain text. | default: `navigation-menu.value.change`; composed: `@value`                                            |
 
 ## Choreography and modes
 
 | Trigger and owner                                                 | Full                                                                                                                                                                     | Reduced                                    | None                                | Binding → preset → recipe                                                                                                                                       |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------ | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| First open/final close; popup paint                               | Opacity and `distance.xs` approach from the resolved side on entry; opacity-only exit. Positioner stays authoritative; no additional scale.                              | Short opacity only.                        | Immediate visibility.               | `navigation-menu.popup.enter` → `presence.menu` → `popup.anchored/presence`; `navigation-menu.popup.exit` → `presence.exit` → `exit.fade/opacity`               |
+| First open/final close; popup paint                               | Opacity and `distance.xs` approach from the resolved side on entry; opacity-only exit. Positioner stays authoritative; no additional scale. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Immediate visibility.               | `navigation-menu.popup.enter` → `presence.menu` → `popup.anchored/presence`; `navigation-menu.popup.exit` → `presence.exit` → `exit.fade/opacity`               |
 | Active item changes; shared viewport                              | Clamped width and height follow the latest destination, without bounce.                                                                                                  | Destination dimensions immediately.        | Destination dimensions immediately. | `navigation-menu.viewport.resize` → `geometry.panel` → `geometry.resize/measured`                                                                               |
 | Active item changes; content paint                                | Opacity with `distance.xs` travel based on actual item order and writing direction. Unknown or simultaneously reordered direction uses opacity only.                     | Short opacity only.                        | Active content immediately.         | `navigation-menu.content.change` → `content.switch` → `data.transition/directional-content`                                                                     |
 | Open state; existing trigger chevron                              | The Trigger chevron turns by `rotation.halfTurn` between closed/open; no opacity or scale effect. Popup geometry and the separate NavigationMenuIndicator remain native. | Final orientation immediately; no fade.    | Final state immediately.            | `navigation-menu.indicator.change` → `state.indicator` → `state.morph/indicator`                                                                                |
@@ -66,17 +58,19 @@ interpolated again on each child.
 
 ## Interruption and lifecycle
 
+Pointer opening can keep focus on a trigger outside the popup and retain the designed surface entry. When keyboard focus or activation reaches a link/control inside the entering or switching content, settle only the affecting popup/content envelope before presenting that target. Keep Base UI's actual focus/intent policy; do not force focus to remain outside merely to play motion.
+
 - Pointer movement across triggers retargets the shared surface; it does not queue panel exits. A close/reopen interrupts from the current surface state with the latest active content.
 - Base UI continues to own hover intent, dismiss timing, focus guards, portal lifecycle and keyboard navigation. No animation timer delays selection, navigation or focus restoration.
 - First opening runs popup presence only; switching an already open item runs content.switch only. Do not multiply popup and content opacity/transform effects for the same cause. NavigationMenuIndicator keeps its actual Base UI Icon role/placement; it is not a fabricated moving selection marker.
 - Outgoing content is visual-only if safely retained by the primitive; it cannot remain an active menu. Closing the root cancels content switches before releasing retained visuals.
-- Unmount, live reduced/none and zero clock cancel every geometry/content writer; anchored placement resolves immediately. Returning to full does not reopen or replay the menu.
+- Unmount cancels all local writers. Live reduced cancels travel/size and resolves permitted opacity under the new mode; none or zero clock reaches the effective mode's current paint/geometry immediately. Complete closing through Base UI's actual protocol, preserving native intent/focus and anchored placement. Returning to full does not reopen or replay the menu.
 
 ## Geometry and performance
 
 Resolve target dimensions from the actual viewport and constrain them to available width/height. Select one shell for each axis; do not animate both popup and viewport toward the same size independently. Anchor collision/viewport changes use Base UI's immediate positioning, not a second position tween. Clip the content transition inside the surface without clipping focus rings, pointer corridors or nested portals. Measure only the active/destination content and retain at most the immediately outgoing visual; no whole-menu layout scan per pointer event.
 
-The natural destination content lays out at its final constrained width before measuring height. A separate shared surface host animates width/height around that content; text does not continuously wrap as the surface changes. Content-switch travel belongs to a visual layer inside that host, never the Positioner or the same transform used for popup entry. When the primitive supplies destination dimensions, consume those measurements rather than observing the interpolated popup box. Supplied custom content that cannot preserve this separation takes immediate native geometry. Destination content exceeding available height uses the actual viewport's scrolling; no hidden copy of the whole menu is measured.
+The natural destination content lays out at its final constrained width before measuring height. A separate shared surface host animates width/height around that content; text does not continuously wrap as the surface changes. Content-switch travel belongs to a visual layer inside that host, never the Positioner or the same transform used for popup entry. When the primitive supplies destination dimensions, consume those measurements rather than observing the interpolated popup box. Supplied custom content that cannot preserve this separation takes immediate native geometry. Destination content exceeding available height uses the existing valid overflow policy; do not add scroll behaviour solely for animation. If an intermediate shell would crop required content/focus beyond that policy, settle the affected axis. A focused native editor also cancels decorative geometry that would shift its caret/content box or scroll. No hidden copy of the whole menu is measured.
 
 ## Acceptance scenarios
 
@@ -87,3 +81,4 @@ The natural destination content lays out at its final constrained width before m
 - Pending: open the first item, switch an already open item, reorder/remove the active item, and update direct text/quantities. Confirm distinct presence/switch causes, no duplicated transform owner, and immediate native scroll/focus for a tall destination.
 
 - Pending: change popup/arrow theme paint and Trigger open state independently; verify the chevron rotates, the native Indicator does not become a shared marker, and only Positioner-hosted popup paint enters.
+- Pending: Hover-open with focus on a trigger, then keyboard-enter a link during surface/content motion; preserve eligible hover animation but immediately settle the envelope that affects the focused link.

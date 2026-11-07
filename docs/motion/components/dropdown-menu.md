@@ -14,28 +14,10 @@ The menu presents available actions together. Local highlighting and selection m
   "parts": {
     "content": ["dropdown-menu#DropdownMenuContent", "dropdown-menu#DropdownMenuSubContent"],
     "sub-content": ["dropdown-menu#DropdownMenuSubContent"],
-    "item": [
-      "dropdown-menu#DropdownMenuItem",
-      "dropdown-menu#DropdownMenuCheckboxItem",
-      "dropdown-menu#DropdownMenuRadioItem",
-      "dropdown-menu#DropdownMenuSubTrigger"
-    ],
-    "surface": [
-      "dropdown-menu#DropdownMenuContent",
-      "dropdown-menu#DropdownMenuSubContent",
-      "dropdown-menu#DropdownMenuLabel",
-      "dropdown-menu#DropdownMenuShortcut",
-      "dropdown-menu#DropdownMenuSeparator"
-    ],
+    "item": ["dropdown-menu#DropdownMenuItem", "dropdown-menu#DropdownMenuCheckboxItem", "dropdown-menu#DropdownMenuRadioItem", "dropdown-menu#DropdownMenuSubTrigger"],
+    "surface": ["dropdown-menu#DropdownMenuContent", "dropdown-menu#DropdownMenuSubContent", "dropdown-menu#DropdownMenuLabel", "dropdown-menu#DropdownMenuShortcut", "dropdown-menu#DropdownMenuSeparator"],
     "indicator": ["dropdown-menu#DropdownMenuCheckboxItem", "dropdown-menu#DropdownMenuRadioItem"],
-    "label": [
-      "dropdown-menu#DropdownMenuItem",
-      "dropdown-menu#DropdownMenuCheckboxItem",
-      "dropdown-menu#DropdownMenuRadioItem",
-      "dropdown-menu#DropdownMenuSubTrigger",
-      "dropdown-menu#DropdownMenuLabel",
-      "dropdown-menu#DropdownMenuShortcut"
-    ],
+    "label": ["dropdown-menu#DropdownMenuItem", "dropdown-menu#DropdownMenuCheckboxItem", "dropdown-menu#DropdownMenuRadioItem", "dropdown-menu#DropdownMenuSubTrigger", "dropdown-menu#DropdownMenuLabel", "dropdown-menu#DropdownMenuShortcut"],
     "position": ["dropdown-menu#DropdownMenuContent", "dropdown-menu#DropdownMenuSubContent"],
     "quantity": ["dropdown-menu#DropdownMenuItem", "dropdown-menu#DropdownMenuLabel"]
   }
@@ -57,7 +39,7 @@ The menu presents available actions together. Local highlighting and selection m
 
 | Trigger / owner                                                                          | Full                                                                                                                                   | Reduced                     | None                        | Binding → preset → recipe/form                                                                                                                               |
 | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Menu/submenu opens / its content                                                         | Opacity with `distance.xs` along resolved side; all items are ready together.                                                          | Short opacity only.         | Open target immediately.    | `dropdown-menu.content.enter` → `presence.menu` → `popup.anchored/presence`; `dropdown-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence` |
+| Menu/submenu opens / its content                                                         | Opacity with `distance.xs` along resolved side; all items are ready together. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Open target immediately.    | `dropdown-menu.content.enter` → `presence.menu` → `popup.anchored/presence`; `dropdown-menu.sub-content.enter` → `presence.menu` → `popup.anchored/presence` |
 | Menu/submenu closes / its content                                                        | Opacity exit only, with no inherited entrance delay.                                                                                   | Short opacity.              | Closed target immediately.  | `dropdown-menu.content.exit` → `presence.exit` → `exit.fade/opacity`; `dropdown-menu.sub-content.exit` → `presence.exit` → `exit.fade/opacity`               |
 | Pointer highlight / active item                                                          | Scoped background/foreground transition local to the item; no travelling row plate.                                                    | Short colour feedback.      | Final colours immediately.  | `dropdown-menu.item.colour` → `state.color` → `state.color/surface-foreground`                                                                               |
 | Supplied tokens/disabled/destructive state / popup, label, shortcut and separator owners | Scoped surface/border/foreground colour; one owner per property and immediate focus visibility.                                        | Short colour.               | Final colours immediately.  | `dropdown-menu.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                            |
@@ -78,6 +60,8 @@ The menu's side approach is selected by this contract, with opacity-only fallbac
 placement or an interaction that requires an immediately stationary target.
 
 ## Interruption and lifecycle
+
+Top-level Base UI Menu opening normally focuses the menu/list or an item. If the actual target would remain inside a faded/displaced entrance, settle that branch's envelope before presenting focus; default opening may therefore omit its approach/fade. Pointer-opened submenus can retain entry while focus remains in the parent, until focus or activation actually reaches the submenu. Do not postpone native focus or alter submenu intent delays to force motion.
 
 - Base UI owns open state, roving focus, typeahead, close-on-click and submenu intent. Actions execute immediately; checkbox/radio persistence follows existing props rather than an animation policy.
 - New highlight/selection replaces the previous target. A submenu opens from its current anchor; switching rows does not move an old popup through the menu.
@@ -101,3 +85,4 @@ placement or an interaction that requires an immediately stationary target.
 - Pending: grow a required action label while keyboard focus enters it, reject a controlled checkbox change, and deliver async items after close; text stays readable and only current native exit/focus completions run.
 
 - Pending: rename CheckboxItem/RadioItem/SubTrigger text and recolour a separator while pointer, disabled and theme state change together; inspect one colour writer per region and both submenu size hosts.
+- Pending: Open a top-level menu by pointer and keyboard, then a pointer-hover submenu; actual list/item focus may settle that branch, without cancelling an unrelated parent or delaying intent/focus.

@@ -16,29 +16,13 @@ Typing stays attached to the native input while the results surface adapts to th
     "input": ["combobox#ComboboxInput", "combobox#ComboboxChipsInput"],
     "chip": ["combobox#ComboboxChip"],
     "chips": ["combobox#ComboboxChips"],
-    "label": [
-      "combobox#ComboboxValue",
-      "combobox#ComboboxChip",
-      "combobox#ComboboxItem",
-      "combobox#ComboboxLabel",
-      "combobox#ComboboxEmpty"
-    ],
-    "surface": [
-      "combobox#ComboboxContent",
-      "combobox#ComboboxItem",
-      "combobox#ComboboxChip",
-      "combobox#ComboboxChips",
-      "combobox#ComboboxValue",
-      "combobox#ComboboxLabel",
-      "combobox#ComboboxEmpty",
-      "combobox#ComboboxTrigger",
-      "combobox#ComboboxInput",
-      "combobox#ComboboxSeparator"
-    ],
+    "label": ["combobox#ComboboxValue", "combobox#ComboboxChip", "combobox#ComboboxItem", "combobox#ComboboxLabel", "combobox#ComboboxEmpty"],
+    "surface": ["combobox#ComboboxContent", "combobox#ComboboxItem", "combobox#ComboboxChip", "combobox#ComboboxChips", "combobox#ComboboxValue", "combobox#ComboboxLabel", "combobox#ComboboxEmpty", "combobox#ComboboxTrigger", "combobox#ComboboxInput", "combobox#ComboboxSeparator"],
     "indicator": ["combobox#ComboboxItem"],
     "position": ["combobox#ComboboxContent"],
     "quantity": ["combobox#ComboboxChip", "combobox#ComboboxItem"],
-    "input-frame": ["input-group#InputGroup"]
+    "input-frame": ["input-group#InputGroup"],
+    "input-control": ["combobox#ComboboxInput", "input-group#InputGroupInput"]
   }
 }
 ```
@@ -50,7 +34,7 @@ Typing stays attached to the native input while the results surface adapts to th
 | Appearance      | Default: `combobox-content` owns popup presence; initial result rows inherit it. Newly committed chips have a local insertion owner within `combobox-chips`.                                            | default: `combobox.content.enter`, `combobox.content.exit`, `combobox.chip.enter`, `combobox.chip.exit` |
 | Size            | Default: content/list share one popup height owner; chip container owns intentional row-wrap height. Input/anchor widths keep existing constraints.                                                     | default: `combobox.content.resize`, `combobox.chips.resize`                                             |
 | Surface colour  | Default: popup, item and chip surfaces own state colours; the composed Input Group owns input-frame chrome.                                                                                             | default: `combobox.surface.colour`; inherited: `@input-frame`                                           |
-| Text colour     | Default: item/value/chip/empty/label parts own display foreground changes; native input styling is inherited from its input owner.                                                                      | default: `combobox.surface.colour`; inherited: `@input-frame`                                           |
+| Text colour     | Default: item/value/chip/empty/label parts own display foreground changes. ComboboxInput's default input inherits InputGroupInput; a `render` replacement delegates foreground to its actual caller input owner. ChipsInput inherits its Chips container foreground. | default: `combobox.surface.colour`; inherited: `@input-control`, `@chips`; composed: `@input` |
 | Changed text    | Default for plain committed `combobox-value`, chip labels, item labels and empty/group labels. Native `ComboboxInput`/`ComboboxChipsInput` text is immediate; rich/render-function content is composed. | default: `combobox.label.change`; composed: `@label`                                                    |
 | Changed numbers | Composed: explicit quantity displays may roll. Option values and query text are not counters; Combobox adds no result-count prop.                                                                       | composed: `combobox.quantity.change`                                                                    |
 
@@ -58,7 +42,7 @@ Typing stays attached to the native input while the results surface adapts to th
 
 | Trigger / owner                                                                  | Full                                                                                                                                 | Reduced                                             | None                              | Binding → preset → recipe/form                                                                                                                                                                           |
 | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Popup open/close / content                                                       | Anchor-relative opacity with `scale.in`; short opacity exit.                                                                         | Short opacity only.                                 | Final semantic state immediately. | `combobox.content.enter` → `presence.popup` → `popup.anchored/presence`; `combobox.content.exit` → `presence.exit` → `exit.fade/opacity`                                                                 |
+| Popup open/close / content                                                       | Anchor-relative opacity with `scale.in`; short opacity exit. Entry is subject to the actual-focus gate below. | Short opacity only. Entry obeys the same focus gate. | Final semantic state immediately. | `combobox.content.enter` → `presence.popup` → `popup.anchored/presence`; `combobox.content.exit` → `presence.exit` → `exit.fade/opacity`                                                                 |
 | Native editing/filtering / Base UI input and list                                | Commit query, results, selection and active descendant immediately; no row-by-row entry stagger.                                     | Same immediate editing.                             | Same immediate editing.           | `combobox.input.edit` → `engine.native` → `native/base-ui-combobox` (Base UI Combobox/native editing (no new recipe))                                                                                    |
 | Result set/empty state changes / popup height owner                              | Measure latest result-region height and clamp; existing keyed rows keep identity and scroll.                                         | Final height immediately.                           | Final height immediately.         | `combobox.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                              |
 | Commit/remove chip / chip group layout owner                                     | Local chip opacity plus bounded group reflow; removed chip cannot retain a remove-button target.                                     | Opacity only; final layout immediately.             | Final chips/layout immediately.   | `combobox.chip.enter` → `presence.inline` → `data.transition/opacity`; `combobox.chip.exit` → `presence.exit` → `exit.fade/opacity`; `combobox.chips.reflow` → `layout.compact` → `layout.move/position` |
@@ -72,7 +56,10 @@ Typing stays attached to the native input while the results surface adapts to th
 The `surface` binding covers separate popup/item/chip/chips-frame and display-foreground regions,
 plus Trigger, the internal clear control hosted by ComboboxInput, and the separator rule. The
 ComboboxInput anchor in that map means its clear-control region, not its Input Group frame or native
-editor. Input Group owns that frame/foreground once; Chips owns its distinct focus/invalid frame.
+editor. InputGroup owns that frame once. ComboboxInput's default input inherits InputGroupInput's
+`control.colour`; a caller `render` replacement delegates foreground to its actual input owner,
+without an extra Combobox writer. A caller-provided InputGroupInput retains its normal inherited
+contract. Chips owns its distinct focus/invalid frame and inherited ChipsInput foreground.
 `label.change` explicitly includes ComboboxValue and Chip's display children, never ChipsInput's
 value or ChipRemove's accessible name. Option/chip identities remain text even when numeric; rich
 quantity accessories use composition. Variant classes alone do not supply Button's press executor.
@@ -80,6 +67,8 @@ ChipRemove has one opacity owner; disabled resting opacity and immediate focus t
 hover feedback, and no decorative glyph can intercept remove activation.
 
 ## Interruption and lifecycle
+
+With the ordinary input outside the popup, focus stays in that editor and popup entry can run without moving it. If an inside-popup input/popup receives native initial focus, or keyboard interaction requires an active result to be immediately visible and stationary, settle the affecting popup envelope first. Preserve Base UI's actual initial-focus policy; do not blur, refocus or delay the editor to guarantee entry.
 
 - Base UI owns input, IME, active descendant, selection, filtering and focus safety. Never remount the input or delay results until outgoing rows finish.
 - Fast typing replaces the pending height target; excessive frequency falls back to immediate size rather than building a queue. A removed highlighted item follows native focus fallback immediately.
@@ -104,3 +93,4 @@ hover feedback, and no decorative glyph can intercept remove activation.
 - Pending: type into a wrapping chips field while adding/removing chips, downgrade mid-edit and deliver async results after close; caret/focused controls stay visible, values remain current and no parent/child size spring competes.
 
 - Pending: rename a retained Value/Chip and group label, hover then focus ChipRemove, and change invalid/theme state on both input and chips compositions; no editor diff, duplicate frame colour or stale remove action is allowed.
+- Pending: Compare the normal outside-input composition with an input inside the popup: retain eligible popup entry without disturbing the outside caret, and settle only the envelope that affects a real inside focus/active target.

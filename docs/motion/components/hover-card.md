@@ -46,6 +46,8 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 
 ## Interruption and lifecycle
 
+Hover/focus on the trigger is outside the preview's content envelope, so it does not by itself cancel preview entry or cause autofocus into the card. If a supported interaction actually reaches a descendant during entry, settle its affecting envelope before presenting that focus/activation. Native preview traversal and intent delays remain unchanged.
+
 - Preserve Preview Card open/close delay, trigger/popup traversal and focus semantics. Animation does not introduce another hover timer or force focus into the preview.
 - Return before close completion reverses the existing surface. Updating a preview never remounts it merely to replay presence.
 - Closing cancels local geometry/text/numeric work. Anchor removal follows Base UI teardown; no retained interactive preview after semantic closure.
@@ -63,6 +65,8 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 
 - Observe a natural-content region distinct from the sizing host and clamp each rendered dimension to valid non-negative intrinsic/closed/available bounds. Nested content and the panel choose one owner for the same size cause; the panel never observes a child's interpolated box as a fresh target.
 - A destination-layout size animation must not newly crop required text, an active descendant or a focused control. Use existing legal scroll/overflow to keep them immediately reachable; otherwise settle that axis before paint. Do not add temporary truncation or hide required content to make the shell animate.
+
+A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
 
 ## Acceptance scenarios
 

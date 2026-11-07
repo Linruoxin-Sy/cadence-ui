@@ -19,7 +19,8 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
     "trigger": ["accordion#AccordionTrigger"],
     "label": ["accordion#AccordionTrigger", "accordion#AccordionContent"],
     "value": ["accordion#AccordionTrigger", "accordion#AccordionContent"],
-    "item": ["accordion#AccordionItem"]
+    "item": ["accordion#AccordionItem"],
+    "item-paint": ["accordion#AccordionItem"]
   }
 }
 ```
@@ -30,7 +31,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Appearance      | Default: an opened `accordion-content` reveals its owned inner surface. A later inserted item may enter only when its collection has not already supplied presence; SSR items remain visible in their semantic state.       | default: `accordion.content.enter`, `accordion.content.exit`, `accordion.item.enter` |
 | Size            | Default: `accordion-content` owns measured block-size for expansion and a known content update while open. The inner slot supplies natural size; the root does not spring after its panels.                                 | default: `accordion.content.resize`                                                  |
-| Surface colour  | Default: trigger/item hover, active or disabled surfaces transition only when the component defines a changed semantic colour. No decorative background is invented.                                                        | default: `accordion.trigger.colour`                                                  |
+| Surface colour  | Default: trigger/item hover, active or disabled surfaces transition only when the component defines a changed semantic colour. No decorative background is invented.                                                        | default: `accordion.trigger.colour`, `accordion.item-paint.colour`                                                  |
 | Text colour     | Default: trigger state colour; content inherits its semantic foreground without a second colour writer.                                                                                                                     | default: `accordion.trigger.colour`                                                  |
 | Changed text    | Default for directly owned plain trigger and content strings; preserve unchanged graphemes. Arbitrary rich heading/content nodes remain caller-owned and use composed text owners.                                          | default: `accordion.label.replace`; composed: `@label`                               |
 | Changed numbers | Default for a supported direct numeric quantity in the trigger or content; composed for a nested badge/statistic. Digit-containing strings, item values and numeric section identifiers remain text, not inferred counters. | default: `accordion.value.change`; composed: `@value`                                |
@@ -46,6 +47,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | Owned plain trigger/content text changes          | Animate only changed graphemes/runs, without stagger; an opening content entrance consumes same-cause text entry.        | Short opacity on changed runs only.                                                     | Final text immediately.              | `accordion.label.replace` → `text.replace` → `text.change/changed-runs`                                                                     |
 | Direct quantity changes; owned display            | Roll only changed places and coordinate any content-height change with the existing panel owner.                         | Final quantity/geometry immediately.                                                    | Final quantity/geometry immediately. | `accordion.value.change` → `number.compact` → `number.roll/reels`                                                                           |
 | Independent item insertion; item paint            | Opacity only when a parent has not consumed this cause; initially open content does not run another entry.               | Short opacity.                                                                          | Visible immediately.                 | `accordion.item.enter` → `presence.inline` → `data.transition/opacity`                                                                      |
+| Item border or defined item surface tokens / item paint | Scoped border/background colour only; no second trigger foreground writer. | Short colour. | Final paint immediately. | `accordion.item-paint.colour` → `state.color` → `state.color/surface` |
 
 ## Interruption and lifecycle
 
@@ -71,3 +73,4 @@ Reduced closing commits the closed block-size immediately. A fully clipped/hidde
 - Pending: change a direct quantity versus a numeric section identifier; insert an initially open item; trigger beforematch while a close is running, then remove the item. No duplicate content entrance or stale close completion survives.
 
 - Pending: close a reduced-mode body during its opacity entry, reopen through focus/beforematch and set zero clock with unchanged open state; no empty exit hold, invisible focused content or stale opacity writer remains.
+- Pending: revise Item border/background tokens independently from Trigger foreground/focus; each painted region has one colour writer and the item controller does not recolour trigger text.

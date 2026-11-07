@@ -46,6 +46,8 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 
 ## Interruption and lifecycle
 
+Focusing the trigger is outside the tooltip's content envelope and does not cancel its short hint fade or introduce autofocus into the tooltip. Preserve its existing description relationship and noninteractive role. If browser find or another supported interaction requires the hint itself to be presented immediately, settle the relevant opacity envelope instead of postponing that interaction.
+
 - Provider delay/open policy remains unchanged; it is interaction behavior, not an added animation delay. None/zero clock introduce no presentation delay after the semantic open/close event.
 - Rapid trigger leave/re-enter reverses the same presentation when Base UI keeps it open. Switching target does not slide one tooltip through other controls.
 - Close cancels text and resize work. The visible tooltip remains one accessible description; outgoing decorative characters are never separately announced.
