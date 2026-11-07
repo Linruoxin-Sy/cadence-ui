@@ -14,7 +14,7 @@ Use the [shared contract](../README.md), [presets](../presets.md) and [Table con
   "target": "motion-v2",
   "migration": "legacy",
   "parts": {
-    "table": ["table#TableRow", "table#TableCell", "table#TableHead"],
+    "table": ["table#Table", "table#TableRow", "table#TableCell", "table#TableHead"],
     "rows": ["data-table#DataTableDemo"],
     "row": ["data-table#DataTableDemo"],
     "region": ["data-table#DataTableDemo"],
@@ -62,10 +62,13 @@ Measure only participating rendered rows on the current page, batching before/af
 
 For region-size continuity, lay the natural table out at its destination width and measure it separately from the bounded outer block-size host. Only that host reflows nearby controls; native cells do not continuously rewrap during its height animation. Column visibility adopts final column geometry immediately before survivor-position motion.
 
+The bounded region fallback is immediate native layout when existing table overflow cannot keep newly committed required rows, a focused control or a pointer-captured row usable. Do not add clipping, sticky-row projection or a moving hit target merely to complete a filter transition. Native selection/copy of affected cells also suppresses their decorative replacement/retained exit paint while semantic filtering remains immediate. A simultaneous amount/status/count update shares the aggregate text/reel budget for the result transaction, not one allowance per cell or footer count.
+
 ## Acceptance scenarios
 
 - Pending: repeatedly sort by email, type a filter quickly, paginate and toggle column visibility while rows move; results and focus update immediately.
 - Pending: change an amount/status for a stable payment id, remove a selected row and reinsert it mid-exit; counts, formatting and text identity remain correct.
 - Pending: exceed the collection animation budget and verify an immediate correct native-table fallback without all-data measurement.
+- Pending: filter/reorder during captured row interaction, native cell selection and a sticky-header constrained viewport; update amounts and result counts together. Unsafe geometry settles immediately, copied values remain exact and the result transaction respects one aggregate moving-content budget.
 - Pending: verify inherited controls and collection behaviour in all modes, live downgrade, zero clock, SSR and unmount during a row/menu transition.
 - Pending: replace the whole data prop while a filter, selected row and actions menu are active; revisit a page and change the column order/visibility. Identity follows payment and column ids, results never wait for exits, and inherited Table text effects do not run twice.

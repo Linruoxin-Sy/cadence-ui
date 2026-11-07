@@ -36,7 +36,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
     ],
     "line": ["code-block#CodeBlockLine"],
     "value": ["code-block#CodeBlockFooter"],
-    "control": ["code-block#CodeBlockCopyButton", "code-block#CodeBlockExpandButton", "code-block#CodeBlockTab"]
+    "control": ["code-block#CodeBlockCopyButton", "code-block#CodeBlockExpandButton", "button#Button"]
   }
 }
 ```
@@ -72,7 +72,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 - Diff the direct source string, not highlighted span keys/classes or line indices. A one-character change cannot fade its entire retained line. A newline insertion/deletion may split or join lines while most glyphs survive: retain those glyphs across the old/new line boundary, and use whole-line entry/exit only for units with no retained identity in the revision. If bounded diff cannot establish safe identity, commit the affected source immediately rather than treating unmatched lines as entirely new.
 - Syntax grammar loading, language changes, theme/token recolouring and asynchronous highlighter results are presentation revisions, not source edits. Tag their result with the current source/language revision, discard stale results and preserve source identities across token boundaries where mapping is safe. Unsupported token/shaping mappings use immediate final paint with no whole-source crossfade.
 - Preserve one current accessible and selectable source tree; outgoing fragments are aria-hidden, nonselectable, noninteractive and excluded from intrinsic sizing. CodeBlockCopyButton continues to copy its explicit value or values[current tab] contract, never innerText from animated/highlighted DOM; a missing tab mapping does not copy another tab. During native selection that intersects changed code, suppress replacement visuals for that scope without rewriting Selection ranges; unchanged nodes and caller editors remain intact.
-- Copy success/error timing remains existing semantic feedback, not an animation timer. Close/unmount cancels active source/geometry/indicator writers and measurement; live reduced/none or zero clock settles before paint. Reopening does not replay previous copy or code changes.
+- Copy success/error timing remains existing semantic feedback, not an animation timer. Bind any asynchronous clipboard result and its visual completion to the activation's captured text and current button lifetime; a result from an old tab/source cannot claim that the currently shown source was copied or restart its feedback. Tab buttons retain their actual native selection semantics; the inherited Button press binding covers CopyButton and ExpandButton only. Close/unmount cancels active source/geometry/indicator writers and measurement; live reduced/none or zero clock settles before paint. Reopening does not replay previous copy or code changes.
 
 ## Geometry and performance
 
@@ -87,4 +87,5 @@ For a large source, inspect only the bounded affected visible lines/runs needed 
 - Pending: copy during source replacement, select text across changed lines, use line numbers/wrap/highlights and keyboard-focus actions; copied and accessible source contain no stale fragments.
 - Pending: verify SSR folding/no-JS readability, all modes, high-frequency updates, live downgrade, zero clock and unmount without retained measurement or visual layers.
 - Pending: split/join a line, insert above repeated identical lines, resolve an old highlighter promise after a newer source/language change, and switch tabs mid-copy. Retained glyphs never receive whole-line fades; copy follows the explicit current value map and grammar/theme changes do not masquerade as source edits.
+- Pending: start two clipboard requests for different tab/source values, resolve the older request last, then unmount/reopen. Only the matching current activation may update its feedback; a rejected/cancelled click creates no motion-only copied state.
 - Pending: select across a changing line, exceed aggregate diff bounds, update an inactive persisted panel, and activate a differently sized panel without a shared host. Source/selection stays exact, work stays bounded, and no hidden zero height or synthetic cross-file diff becomes visible.

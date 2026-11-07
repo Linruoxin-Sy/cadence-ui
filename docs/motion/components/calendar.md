@@ -4,6 +4,8 @@ Status: target design; implementation and verification pending.
 
 Calendar makes a month change readable without rebuilding the day-navigation tree. The actual DayPicker month-grid table receives directional paint motion; selection and range colours stay attached to real date cells. The target also supports a bounded height transition when a committed month changes the number of week rows: this is a v2 extension to the delivered baseline.
 
+The month-grid WAAPI adapter owns table paint only. Target height continuity belongs to a separate outer host; it is not a new height writer on the table or a claim that the delivered adapter already measures that host.
+
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). This preserves `Calendar`, `CalendarDayButton`, DayPicker props, custom components, formatters, locale and native caption dropdowns.
 
 ## Contract references
@@ -55,7 +57,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 
 Measure only the rendered destination month shell(s), outside render, and clamp to actual content/available height. Multiple displayed months use one outer height transaction: measure the real destination row/column arrangement, including captions, navigation and gaps, rather than summing heights for horizontally arranged months or springing the root after each inner shell. Reused date cells retain the primitive's month-slot/date identity, including repeated outside dates in different months. Preserve native table structure, grid hit regions and row order; no decorative duplicate grid participates in selection, accessibility or tab order. Clip only decorative travel, and skip that travel where the focused day would be obscured. Locale/font/viewport changes without a month-navigation cause settle layout immediately. Respect fixedWeeks, numberOfMonths and custom components; only visible affected grids animate, and oversized month collections use immediate paint/geometry under the shared collection bounds.
 
-Lay the new natural grid at destination inline-size before measuring. The separate month/collection shell animates block-size around it; day-cell dimensions and text do not continuously reflow during that height change. An enclosing Popover and Calendar must choose one host for the same committed height cause.
+Lay the new natural grid at destination inline-size before measuring. The separate month/collection shell animates block-size around it; day-cell dimensions and text do not continuously reflow during that height change. An enclosing Popover and Calendar must choose one host for the same committed height cause. Preserve DayPicker's actual table/row DOM, refs and keyboard/focus lifecycle. If caller components/wrappers hide or replace the measurable natural region, a multi-month layout cannot yield one constrained destination, or interpolation would crop a focused day, use immediate native geometry for that axis. Do not insert a wrapper inside table sections, manufacture hidden duplicate calendars, or require a new caller prop merely to force measurement to succeed.
 
 ## Acceptance scenarios
 
@@ -63,4 +65,5 @@ Lay the new natural grid at destination inline-size before measuring. The separa
 - Pending: test single/multiple/range selection, RTL, outside/hidden/disabled days, fixed weeks and multiple months.
 - Pending: supply custom styles/components and external DayPicker animation; verify exactly one paint owner and safe immediate fallback.
 - Pending: verify standalone/popup compositions, all modes, live downgrade, zero clock, initial SSR and popup closure during a month transition.
+- Pending: replace Month/MonthGrid with caller components forwarding custom refs, use an unavailable/cyclic multi-month sizing constraint, and focus a day outside an intermediate host. Fallback is immediate valid geometry with the original DayPicker DOM/ref/focus semantics.
 - Pending: navigate with keyboard across month boundaries while a height transition runs; use several months in a row and a stacked responsive layout with unequal week counts. Check focused-day visibility, aggregate max-versus-sum height, no duplicate date controls and cancellation of caller-owned animation paths.

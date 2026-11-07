@@ -13,7 +13,7 @@ Pagination makes the caller's current-page change visible while keeping every nu
   "migration": "legacy",
   "parts": {
     "content": ["pagination#PaginationContent"],
-    "active": ["pagination#PaginationLink"],
+    "active": ["pagination#PaginationContent", "pagination#PaginationLink"],
     "link": ["pagination#PaginationLink"],
     "item": ["pagination#PaginationItem", "pagination#PaginationEllipsis"],
     "label": ["pagination#PaginationLink", "pagination#PaginationPrevious", "pagination#PaginationNext"],
@@ -63,7 +63,7 @@ Measure mounted visible destinations once per range/selection revision. The acti
 
 One final layout snapshot coordinates range reflow, text-driven dimensions and indicator destination; do not aim the indicator at an independently moving/interpolated rectangle. If a focused/captured link would drift or final-visible copy would be newly clipped, commit affected geometry immediately. Bound measuring/decoration to the visible range; over the shared list budget or without stable destination keys, use local colours and immediate layout. No additional controls, inferred page count or wrapping elements that violate ul/li/anchor semantics are introduced.
 
-First active-marker placement and restoration after an absent/ambiguous active target are immediate. Reordering or resizing links without a semantic active-page change rebases the marker to final layout; it does not invent a selection journey. During a simultaneous actual selection and range change, move only when both source and destination are valid in the same coordinate scope; otherwise use the local active-colour fallback.
+First active-marker placement and restoration after an absent/ambiguous active target are immediate. Reordering or resizing links without a semantic active-page change does not start a selection journey: the single marker writer follows the content transaction's current item/size projection so it stays attached throughout reflow. It must not jump to a final rectangle while that active link is still visually elsewhere. During a simultaneous actual selection and range change, move only when both endpoints are valid in one coordinate scope and the same writer can combine selection with range projection exactly once. Otherwise settle the affected content/marker geometry together or use the local active-colour fallback, rather than run independently timed springs. No per-frame measurement of projected links is introduced.
 
 ## Acceptance scenarios
 
@@ -72,3 +72,5 @@ Target acceptance; not executed: active page changes inside a stable range; elli
 Also pending: resize localized Previous/Next text while the active target leaves the range, interrupt a shared-indicator flight with multiple active links, and modified-click a focused link; there is one active fill owner and immediate correct navigation.
 
 Also pending: initialize or restore the active page after an empty/ambiguous range, and reflow labels without changing the page; no marker travels from an origin rectangle or treats passive layout as navigation.
+
+Also pending: retain the same active page while Previous/Next text changes or visible links reorder, then navigate during reflow. The active decoration remains attached at intermediate frames, with one composed projection or a coordinated immediate fallback.

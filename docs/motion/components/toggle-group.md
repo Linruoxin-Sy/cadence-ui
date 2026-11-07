@@ -68,6 +68,8 @@ both through its current owner before changing between shared and per-item decor
 - Animate only the selected plate plus changed visible items, bounded by the common list/text budget. Overflow follows caller layout; never clip focus outlines.
 - Clamp rendered sizes to valid non-negative constraints. If strip/label growth would temporarily crop required labels or focused items, resolve the affected size axis immediately or preserve existing legal overflow; do not add truncation. Native selection/roving focus continues in reduced/none, including while geometry feedback is cancelled.
 
+For unchanged selected values, the strip transaction projects each selected decoration through the same current item reflow/size coordinates; the shared plate does not independently start layout.selection on a changed rectangle. One plate writer consumes that projection, without per-frame layout reads. Only a committed selection change uses the selection clock. If selection and reflow occur together, that writer combines the selection path and strip projection once, avoiding duplicate source/destination displacement. Multiple-mode decorations remain attached to their own item projections. If a custom render or adapter cannot preserve this coupling, settle the affected strip/item/plate geometry together immediately. Matching final boxes or starting independent smooth/snappy springs together is not adequate coordination.
+
 ## Acceptance scenarios
 
 - Pending: rapidly change single selection while labels and widths change; the one plate reaches the latest selected item.
@@ -76,3 +78,4 @@ both through its current owner before changing between shared and per-item decor
 - Pending: combine press, selection and label/item reflow, empty the selected value array and use a custom-render item; there is no doubled displacement, stale plate or unreadable intermediate label. Exercise an explicit quantitative child separately from numeric option identity.
 
 - Pending: restore a single selection after clearing/removing its origin, and set zero timeScale during a held press. The plate establishes a current baseline; press timing changes without becoming a none-mode scale reset.
+- Pending: keep selection fixed while an earlier item's label grows or items reorder, then select another item during reflow. Check intermediate plate attachment in single and multiple modes; coordinated projection or immediate whole-transaction fallback prevents marker lag and doubled displacement.
