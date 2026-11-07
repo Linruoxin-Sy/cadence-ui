@@ -1,0 +1,50 @@
+# Tabs motion contract
+
+Status: target design; implementation and verification pending.
+
+Tabs links a persistent selection marker to the newly active content. The marker communicates selection; a small directional panel transition explains navigation between neighbours. This covers `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` and the decorative `tabs-indicator`, in horizontal/vertical orientations and both list variants.
+
+Use the [shared contract](../README.md) and [preset definitions](../presets.md). Binding names are local design references.
+
+## Capability ownership
+
+| Capability | Applicability and owner |
+| --- | --- |
+| Appearance | Default: the newly active panel may reveal its paint after an actual selection change. Initial active content is already visible; focus-only movement does not switch or animate panels. |
+| Size | Default where a mounted active panel owns a known intrinsic size change: its content shell uses clamped block-size continuity. Inherited when an enclosing layout coordinates that axis; composed for an explicitly authored shared panel viewport. Separate panel hosts do not imply cross-panel height continuity. |
+| Surface colour | Default: trigger hover/active/disabled surfaces and the indicator's semantic surface. The moving indicator is not a duplicate background on the trigger. |
+| Text colour | Default: trigger selection/disabled foreground, inherited within the panel. Immediate focus visibility is separate. |
+| Changed text | Default for direct plain trigger and active-panel strings; arbitrary rich panel children retain their text owners. Selecting an unchanged panel is presence, not a source-text revision. |
+| Changed numbers | Default for a supported direct quantity in a trigger or panel; composed numeric badges/statistics own their reels. A tab value, index or numeric identifier is not a counter. |
+
+## Choreography and modes
+
+| Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
+| --- | --- | --- | --- | --- |
+| Active value changes; indicator | Move the same local marker to the selected trigger, including its extent, on the list's actual axis. | Marker at destination immediately. | Marker at destination immediately. | `tabs.indicator.select` → `layout.selection` → `layout.shared` |
+| Active panel changes; panel paint | Opacity and `distance.xs` travel following actual activation direction/orientation; unknown/reordered destinations use opacity only. No replay for unrelated renders. | Short opacity, no travel. | Final active panel immediately. | `tabs.panel.change` → `content.switch` → local transform/opacity form of `data.transition` |
+| Active content's known intrinsic size changes | One clamped shell follows the destination block-size, coordinated with panel paint. | Destination size immediately. | Destination size immediately. | `tabs.panel.resize` → `geometry.compact` → `geometry.resize` |
+| Trigger states change | Scoped surface/foreground colour. | Short colour. | Final colours immediately. | `tabs.trigger.colour` → `state.color` → planned `state.color` |
+| Plain trigger/active-panel text changes | Preserve unchanged graphemes; replace changed runs without stagger; panel entry consumes same-cause text entry. | Short opacity on changed runs only. | Final text immediately. | `tabs.label.replace` → `text.replace` → planned `text.change` |
+| Direct display quantity changes | Changed places roll while semantics update immediately. | Final quantity immediately. | Final quantity immediately. | `tabs.value.change` → `number.compact` → `number.roll` |
+
+## Interruption and lifecycle
+
+- Rapid selection retargets the same marker from its current geometry and uses the newest active panel. First placement and selection restored after an absent/removed active trigger place the marker immediately, never from an origin rectangle. Do not queue intermediate tabs or restart marker entry. Reorder/rename preserves trigger value identity rather than using index or label keys.
+- Preserve the caller's mount/persistence policy, form values, focus management, activation mode and custom render. Animation must not remount a panel, force persistence or keep an outgoing interactive panel accessible.
+- If the existing lifecycle provides no safe outgoing visual, the new panel enters alone. Closing an enclosing popup cancels subordinate panel motion rather than delaying the popup's exit.
+- Unmount removes measurement/writers. Live reduced/none and zero clock settle the marker, panel and shell before paint; returning to full does not replay the current selection.
+
+## Geometry and performance
+
+Measure active trigger bounds in list-local coordinates so ancestor transforms are not counted twice. Observe the list/active panel as needed, not every descendant. Dynamic trigger insertion or responsive reflow with no selection cause settles marker geometry directly. If a native layout or outer geometry owner already controls the active shell, do not add a second height animation. Constrain/clamp content height, avoid focus-ring clipping and preserve scroll positions within persisted panels.
+
+When a panel owns size continuity, measure its natural content at destination inline-size and animate a separate bounded shell's block-size. The content does not rewrap every frame; surrounding layout follows that shell. This internal separation must preserve the actual Panel `render`, ref and caller mount policy. If activation replaces one independently sized Panel host with another, the new host starts at its final size; do not animate from zero or borrow an unrelated panel's stale measurement. Cross-panel height continuity requires a surviving explicitly composed viewport with one owner. A hidden/persisted panel is measured only after it becomes measurable; its unknown zero size is not a closing target. Panel travel and any nested layout transform use separate visual layers.
+
+## Acceptance scenarios
+
+- Pending: keyboard automatic and manual activation, rapid reverse selection, both orientations and list variants retain correct focus and marker position.
+- Pending: switch panels containing forms and independently scrolling content under each caller mount policy; values and scroll positions remain consistent with that policy.
+- Pending: change active content size or a trigger label during motion, including nested resizing parents; verify one owner per axis and stable unchanged text.
+- Pending: verify all modes, live downgrade, zero clock, enclosing-popup close and initial SSR without panel replay.
+- Pending: remove/reorder the active trigger, clear then restore selection, and switch between separately mounted panels without a shared viewport; marker placement is immediate when no prior origin exists, and no panel grows from zero or loses persisted state.

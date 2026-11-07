@@ -7,8 +7,15 @@ package: they are distributed as shadcn registry items and copied into the consu
 under `registry/cadence/**` ships as-is and is constrained accordingly.
 
 The library is a **superset of shadcn's catalogue**: same ids, same exports, same props, same `data-slot`
-values, plus a motion contract. The batch conventions, tiers, scope and future work live in
+values, plus a motion contract. The batch conventions, compatibility tiers, scope and future work live in
 [docs/parity-plan.md](docs/parity-plan.md).
+
+The motion v2 target is capability-based: every component is assessed for applicable appearance, geometry,
+colour, text, number and interaction changes, with one owner for each animated property. A tier is not an
+animation allowance. [docs/animation-system.md](docs/animation-system.md) defines that target;
+[docs/animation-system-plan.md](docs/animation-system-plan.md) tracks its implementation. The current runtime,
+registry metadata, MDX and test helpers remain the compatibility surface until migrated together; this design
+update does not make v2 complete or make planned recipes and public helpers installable.
 
 ## Read the design record first
 
@@ -16,9 +23,11 @@ The `docs/` directory contains current concepts, contracts and future work for c
 
 | Document                                                                                   | Read it before                                                                                                                                                                    |
 | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [docs/parity-plan.md](docs/parity-plan.md)                                                 | Adding a component, choosing a motion tier/batch, or selecting future work.                                                                                                       |
+| [docs/parity-plan.md](docs/parity-plan.md)                                                 | Adding a component, choosing compatibility metadata/a batch, or selecting future work.                                                                                            |
 | [docs/overall-design.md](docs/overall-design.md)                                           | Changing the repo layout, registry model, install paths, theming, component API, or build pipeline.                                                                               |
 | [docs/animation-system.md](docs/animation-system.md)                                       | Writing or editing any animation: tokens, recipes, Base UI popup integration, reduced-motion strategy, performance budgets, motion tests.                                         |
+| [docs/motion/README.md](docs/motion/README.md) and [presets](docs/motion/presets.md)          | Designing a component's own choreography, reading its `components/<id>.md` contract, or choosing/refining parameter bindings.                                                      |
+| [docs/animation-system-plan.md](docs/animation-system-plan.md)                             | Implementing motion v2, checking migration dependencies, or claiming a capability is available.                                                                                   |
 | [docs/documentation-site-and-distribution.md](docs/documentation-site-and-distribution.md) | Touching the docs site, the `public/r` endpoints, `llms.txt`, MCP, versioning, or the contribution flow.                                                                          |
 | [docs/adr.md](docs/adr.md)                                                                 | Revisiting an architectural choice (registry-first, Base UI, Tailwind v4, Motion + optional GSAP, mirrored source tree, docs-as-data). Append a new ADR instead of rewriting one. |
 
@@ -35,9 +44,11 @@ These follow from the documents above; the documents are authoritative if they d
 - **No `@/` aliases in shipped source.** Files under `registry/cadence/**` use relative imports only (`../lib/motion`), because the source tree mirrors the install tree. `@/` is fine in site code.
 - **Shared code lives in `registry/cadence/lib/`.** Never reach for a host path such as `@/lib/utils`.
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
-- **Keep the reduced branch.** Every animated component must keep `useCadenceMotion().reduced` and `data-motion`; `data-motion="none"` must fully disable motion.
-- **Animate `transform`, `opacity`, or `filter` only.** Measured width/height goes through the `geometry.resize` recipe (clamped, T3+, never T0–T2), and disclosure height follows the same rule. No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
-- **Audit the animation before calling a component done.** After writing or editing a component, run the [motion conformance check](#motion-conformance-check): the declared recipes, the implementation, and the docs must agree, and all three modes must be proven. `registry:check` only proves that a reduced branch exists, not that it conforms.
+- **Design each component individually.** Maintain its target contract in `docs/motion/components/<id>.md`: six-capability ownership, actions in all modes, interruption, bindings and geometry/performance bounds. Global style guides visual choices; shared execution rules remain mandatory. Parameter assignments belong in `docs/motion/presets.md` and the future shared runtime source, not duplicated component constants. These target files do not declare shipped capabilities.
+- **Keep explicit mode branches.** Every animated component must keep `useCadenceMotion().reduced` and `data-motion`. The v2 target stops continuous loops, including Spinner, under `reduced`, and disables every transition, delay and loop, including colour, under `none`. These are migration requirements, not claims about the unchanged runtime.
+- **Choose capabilities by applicability and ownership.** Use `transform`, `opacity`, or bounded `filter` for visual motion; measured width/height uses clamped `geometry.resize` wherever the component owns content-driven geometry. Disclosures follow the same rule. State colours belong to the planned `state.color` contract. Preserve native editing and direct manipulation, keep one writer per property, and retain the performance budgets. No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
+- **Do not publish plans as capabilities.** `state.color`, `text.change`, the revised numeric rolling behaviour and public motion helpers require implementation, registry entries where applicable, docs and tests before use in install instructions or component metadata. Keep existing schema fields and recipe declarations until their migration is implemented.
+- **Audit the animation before calling a component done.** After writing or editing a component, run the [motion conformance check](#motion-conformance-check): the declared recipes, the implementation, and the docs must agree, and all three modes must be proven. `registry:check` validates declarations and structural evidence; it does not prove runtime conformance.
 - **Base UI `render`, not `asChild`.** Use `data-slot` on every part and merge classes with `cn()` (user classes last).
 - **UI only, no validation (P11).** Never import `zod`, `react-hook-form`, `@hookform/resolvers`, `yup`, `valibot`, `joi`, or `superstruct`; never add `schema` / `resolver` / `validate` props. Render invalid state from `aria-invalid` / `data-invalid` only. `registry:check` enforces this.
 - **Match upstream.** Exports, `data-slot` values, props, and their defaults are copied from shadcn; additions are allowed, renames, removals, and silent default changes are not (`meta.upstream` records the pinned style). A difference the visual style forces is recorded in `meta.parity.props` with a reason — `parity:check` fails on an unrecorded difference and on a record that no longer applies.
@@ -50,41 +61,48 @@ These follow from the documents above; the documents are authoritative if they d
 ## Motion conformance check
 
 Rendering is not the finish line. After writing or editing a component, audit the animation against
-[docs/animation-system.md](docs/animation-system.md) (§3 recipes, §6 modes, §7 budgets, §11 review) before
-`pnpm check`, and fix the source — or the scheme — before opening the PR.
+[docs/animation-system.md](docs/animation-system.md) and its applicable migration step in
+[docs/animation-system-plan.md](docs/animation-system-plan.md) before `pnpm check`. Keep the shipped contract
+accurate while implementing the target; a passing legacy check alone does not establish v2 conformance.
 
 1. **Declared = implemented = documented.** The recipe names in `registry.json` (`meta.motion`), in the
    `motion:` frontmatter of `content/components/<id>.mdx`, in that file's Motion contract table, and in the
    source (`cm.transition("<recipe>")`, or the CSS `data-starting-style` / `data-ending-style` transitions of a
-   CSS-only popup, or the `animate-*` loop of a continuous recipe — see animation-system §3.2) must be the same
+   CSS-only popup, or the `animate-*` loop of a continuous recipe) must be the same
    set. A declared-but-unused recipe, or an animated transition with no recipe behind it, is a defect.
 2. **Tokens only.** No literal duration, easing tuple, distance, scale, or spring values under
    `registry/cadence/**` outside `lib/motion.ts` itself. Motion-driven parts use `cm.transition()`,
    `cm.distance`, `cm.spring`; CSS-only popups use token-backed `duration-*` and `ease-cadence-out` /
-   `ease-cadence-in-out`; continuous loops use the framework's `animate-*` opacity utility, which a project
+   `ease-cadence-in-out`; existing continuous loops use the framework's `animate-*` utility, which a project
    retunes through its `--animate-*` theme token.
-3. **Three modes, three behaviours.** `full` plays the recipe; `reduced` keeps opacity and drops
-   transform/scale/layout; `none` resolves to zero duration (`duration-0`, `{ duration: 0 }`, or no transition
-   at all). Mapping `none` onto the `reduced` branch is a failure, not a shortcut.
+3. **Three modes, explicit capability behaviour.** In v2, `full` plays applicable recipes; `reduced` drops
+   travel/scale/layout, text and number rolling, stagger and continuous loops, while retaining applicable
+   short opacity/colour feedback. Reveal enhancement stays visible without entering its hidden state machine.
+   `none` reaches the semantic target immediately with zero duration and delay for every property, including
+   colour, and no loops. Mapping `none` onto the `reduced` branch is a failure. Existing differences remain
+   explicit migration work until the runtime, declarations, user docs and tests change together.
 4. **The branch is in the tree.** Every animated part has `data-motion={cm.mode}` and reads
    `useCadenceMotion().reduced`; the reduced path is a JSX/class branch, not a media query alone. Under `none`
-   no motion property (transform/opacity/filter) keeps a non-zero transition.
-5. **Properties stay in budget.** Motion touches `transform`, `opacity`, `filter`, plus measured
-   width/height through `geometry.resize` (clamped, T3+, instant under `reduced`/`none`). Colour, border,
-   and shadow transitions are allowed as state feedback, never as motion, and never through
-   `transition: all` or a `setTimeout`.
+   no animated property may keep a non-zero transition in the v2 contract. A live downgrade must cancel
+   the existing writer as well as change its next target.
+5. **Properties stay in budget.** Visual motion uses `transform`, `opacity`, bounded `filter`, and measured
+   width/height through `geometry.resize` (clamped, instant under `reduced`/`none`). Applicable colour,
+   border and shadow feedback must use scoped properties and the v2 mode contract when migrated. Capabilities
+   do not remove source/runtime/page budgets or permit two engines to own the same property.
 6. **Tests prove the modes.** Every animated `tests/components/<id>.test.tsx` must execute the shared
    `expectMotionContract(mode)` after rendering/exercising the actual parts in full, reduced and none.
    The mandatory Vitest reporter counts successful runtime calls, never imports, dead calls or skipped
    tests; `registry:check` requires the test file. Keep meaningful interactions and engine/native WAAPI
-   behavior assertions. The helper respects static placement, instant positional geometry and Spinner's
-   rotation exception (animation-system §9.3); T0 structural components need no helper/provider. Unit
-   adoption does not prove browser first paint, per-frame cancellation or the cross-library live audit.
+   behavior assertions. The current helper still reflects legacy behaviour, including Spinner's reduced-mode
+   rotation exception; revising it belongs to the implementation plan, not a documentation-only change.
+   A component with no implemented animated capability needs no helper/provider solely for its tier label.
+   Adding an animated capability requires mode evidence. Unit adoption does not prove browser first paint,
+   per-frame cancellation, v2 colour/loop guarantees or the cross-library live audit.
 
 This applies to a new component and to any component you touch — do not copy an existing component's
-deviation. If a check fails, fix the component. If the scheme itself is wrong, edit
-[docs/animation-system.md](docs/animation-system.md) first and call the deviation out in the PR. Source and
-scheme must never disagree silently.
+deviation. Fix implementation failures; keep remaining v2 work explicit in the implementation plan rather
+than changing user docs to claim unimplemented behaviour. If the scheme itself needs a change, edit
+[docs/animation-system.md](docs/animation-system.md) first and explain it in the PR.
 
 ## Commands
 
@@ -108,8 +126,12 @@ the check compares payloads against source and fails on stale artifacts.
 
 1. Scaffold it: `node scripts/new-item.mjs --name tooltip --tier T2 --batch B4 --title "Tooltip" --description "…"`.
 2. Put the source in `registry/cadence/<id>/index.tsx` (relative imports only, `data-slot` on every part).
+   Before motion implementation, author `docs/motion/components/<id>.md`, add its index entry and resolve
+   preset bindings. The current scaffold does not yet create these design files; its extension is planned.
 3. Keep the item in `registry.json` with `files[].target` of `@components/cadence/<id>/index.tsx`, plus
-   `meta.tier`, `meta.batch`, `meta.motion`, `meta.intensity`, `meta.complexity`, and `meta.upstream`.
+   the current compatibility fields `meta.tier`, `meta.batch`, `meta.motion`, `meta.intensity`,
+   `meta.complexity`, and `meta.upstream`. Declare implemented recipes only; assess v2 capabilities by
+   applicability and ownership, not tier.
 4. Write `content/components/<id>.mdx` with matching frontmatter: tier-specific membership and order from documentation-site-and-distribution §2,
    including responsiveness/performance at every tier and input data ownership; no fixed heading count.
 5. Add `components/site/previews/<id>.tsx`; the scaffold creates `app/(site)/components/<id>/page.tsx` with its single preview import. Keep that generated entry in sync with `scripts/component-routes.mjs`.

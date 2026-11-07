@@ -1,0 +1,57 @@
+# Drawer motion contract
+
+Status: target design; implementation and verification pending.
+
+The drawer remains attached to Base UI's swipe and snap model. Authored entry, release and content feedback extend that model through its existing owner instead of adding another transform engine. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
+
+## Capability ownership
+
+| Capability | Application and owner |
+| --- | --- |
+| Appearance | Default: `drawer-popup` owns edge presence through the Base UI adapter; `drawer-overlay` follows open/swipe progress. Initial `drawer-content` children inherit entrance. |
+| Size | Default through the native owner: popup height/snap geometry comes from Base UI, including `--drawer-height` and snap offsets. The native adapter receives one measured content destination and coordinates the applicable content-owned dimensions with the active snap offset; no second shell writer. |
+| Surface colour | Default: popup, overlay and optional `drawer-swipe-handle` own supplied surface tokens. |
+| Text colour | Default: `drawer-title`/`drawer-description` own foreground changes. |
+| Changed text | Default for primitive title/description: changed runs only. Rich body content retains composed owners. |
+| Changed numbers | Composed: explicit body quantities may roll; snap point values are geometry, not an implicit numeric display. |
+
+## Choreography and modes
+
+| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
+| --- | --- | --- | --- | --- |
+| Programmatic open/close / native popup adapter | Edge travel by popup extent using sheet clocks; preserve native snap offset and lifecycle. | Opacity only for authored presence. | Final semantic geometry immediately. | `drawer.popup.enter` → `presence.sheet` → `popup.anchored`; `drawer.popup.exit` → `presence.sheet-exit` → ending phase of `popup.anchored` |
+| Programmatic open/close / native overlay channel | Opacity entry/exit without an independent swipe clock; direct swipe takes over that same opacity channel. | Short opacity. | Target opacity immediately. | `drawer.overlay.enter` → `presence.inline` → one-shot `data.transition`; `drawer.overlay.exit` → `presence.exit` → `exit.fade` |
+| Active swipe / Base UI popup and overlay | Follow native movement/progress 1:1 with no interpolation. | Same direct manipulation. | Same direct manipulation; no authored tween. | `drawer.popup.swipe` → `engine.native` → Base UI Drawer swipe/snap owner (no new recipe); `drawer.overlay.swipe` → `engine.native` → Base UI Drawer swipe/snap owner (no new recipe) |
+| Release/snap / Base UI geometry owner | Native snap/release trajectory and clock; do not start an additional spring. | Snap target immediately; no authored post-release travel. | Snap target immediately. | `drawer.popup.snap` → `engine.native` → Base UI Drawer swipe/snap owner (no new recipe) |
+| Intentional content size revision / native geometry owner | One measured destination coordinates content-owned dimensions and active snap offset on a clamped panel clock; during direct swipe, recompute immediately instead of interpolating. | Final measured geometry immediately. | Final measured geometry immediately. | `drawer.popup.resize` → `geometry.panel` → `geometry.resize` (native single-owner adapter) |
+| Explicit snap configuration change / native snap owner | Resolve the latest valid active snap and destination through the native snap transaction, consuming current content bounds without another size spring. | Final snap geometry immediately. | Final snap geometry immediately. | `drawer.popup.configure` → `engine.native` → Base UI Drawer swipe/snap owner (no new recipe) |
+| Primitive title/description / text owner | Stable-grapheme replacement, `stagger: none`; no presence replay. | Changed-run opacity only. | Final text immediately. | `drawer.title.change` → `text.replace` → target `text.change`; `drawer.description.change` → `text.replace` → target `text.change` |
+| Supplied tokens / surface/text parts | Scoped colour transition independent of swipe opacity. | Short colour feedback. | Target colours immediately. | `drawer.surface.colour` → `state.color` → target `state.color` |
+| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `drawer.quantity.change` → `number.compact` → revised `number.roll` |
+
+## Interruption and lifecycle
+
+- Base UI retains swipe threshold, direction, snap points, dismissal, scroll arbitration and focus behavior. `showSwipeHandle` remains its existing presentation option; no new drag API is introduced.
+- Pointer manipulation takes ownership immediately from authored presence/release. Reopen or new snap state retargets the native transaction, preserving the live offset rather than resetting to zero.
+- Close cancels child text/geometry work; viewport, popup and scroll content are not duplicated. `modal=false` retains its existing absence of the modal backdrop.
+- Live reduced/none cancels authored travel/release interpolation without detaching active direct manipulation. While a pointer is active, preserve its instantaneous native offset/capture; settle to the accepted snap/open target without authored travel only when the native gesture ends or actual dismissal supersedes it. The target adapter maps zero recipe clock to cancellation of one-shot presence/geometry/text and authored release settling without overlaying/rescaling the native clock. It does not cancel a required placement/swipe transform.
+- Close/reopen and async content revisions invalidate obsolete exit/size completions. Closed content updates establish the next view without hidden interpolation. A no-motion close still completes through Base UI's actual lifecycle before focus/modality release; native unmount releases capture, observers and callbacks.
+
+## Geometry and performance
+
+- The swipe axis follows `swipeDirection`; popup transform combines native swipe and snap variables once. Do not add Motion drag, FLIP transform or a second observer-driven height spring.
+- `drawer-content` owns scrolling, while `drawer-popup` owns bounded shell geometry and `drawer-viewport` owns placement/hit behavior. Reflow during drag must reconcile through Base UI's owner.
+- For intentional content revisions, lay text at final available width and supply one measured natural-height target to the native owner. Passive viewport/font reflow is immediate; authored interpolation must not trigger intermediate-width rewrapping. Keep focus outlines and child portals outside temporary decorative clipping.
+- Target protocol: measure the natural scroll-content destination at final width, apply content/viewport constraints and resolve the current snap offset against that destination. Supply the dimensions and offset as one revision to the existing native popup geometry owner. For an idle non-dragging content revision, that owner runs the `geometry.panel` clock, clamping each rendered dimension and keeping the active snap relationship coherent; no child/ancestor observes the interpolated box as a new target.
+- During active swipe, content bounds and snap offsets recalculate immediately in that native transaction while preserving the live pointer relationship. Explicit snap selection/release or close takes priority over a content tween, cancels its clock, and consumes the latest content destination in the native target. New content replaces the pending destination; no queued intermediate heights.
+- One popup writer, one backdrop progress channel and bounded child updates. Reuse native measurement or route one natural-content observer into that owner. Access to a cancellable single-owner adapter is an implementation gate; current native immediate resize remains the migration fallback if that integration is unavailable. This specifies target behavior without claiming an existing hook or new public API.
+
+- The natural scrolling content is distinct from the native popup sizing host. Clamp dimensions to valid non-negative content/available bounds and snap offsets to the native permitted interval; an infeasible constraint revision resolves to native final layout, never a negative height or a second correction spring.
+- Preserve DrawerContent's existing scrolling during size changes. Ensure the focused/active child is visible immediately; if an intermediate shell cannot do so, settle that axis. Do not temporarily truncate required text or let a nested size owner feed per-frame measurements back into the popup.
+
+## Acceptance scenarios
+
+- Pending: every supported swipe direction, snap configuration, scroll/drag arbitration and optional handle, including modal/nonmodal behavior.
+- Pending: grow/shrink content at an active snap while idle, then grab mid-resize and change content/snap points during swipe; geometry clamps, the pointer stays attached and only the native owner writes size/offset. Release, reopen and close mid-update without competing transforms or stale destinations.
+- Pending: reduced/none/zero-clock post-release behavior and live downgrade preserve direct manipulation while stopping authored motion; unmount releases native resources.
+- Pending: switch modes or zero clock while the pointer is held, then continue dragging and release; the drawer never jumps to a pre-gesture snap. Test async content after close, focused content near a constrained edge and native exit completion on immediate close.

@@ -1,0 +1,46 @@
+# Button motion contract
+
+Status: target design; implementation and verification pending.
+
+Button gives immediate press feedback while keeping its label and hit target stable through content changes. It adds no loading, success or request state. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings below are internal design names, not public APIs or recipe IDs.
+
+## Capability ownership
+
+| Capability | Coverage and owner |
+| --- | --- |
+| Appearance | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause. |
+| Size | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent. |
+| Surface colour | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state. |
+| Text colour | default: button foreground; inherited by text and currentColor icons unless explicitly overridden. |
+| Changed text | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot. |
+| Changed numbers | default: direct numeric display children use compact reels when they represent quantities; composed for rich content; numeric identifiers remain text. |
+
+## Choreography and modes
+
+The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
+
+| Trigger / owner | full | reduced | none | Binding / preset |
+| --- | --- | --- | --- | --- |
+| Dynamic insertion / button | Opacity entry; parent-owned removal retains a fade. | Short opacity only. | Visible or removed immediately. | button.root.enter → presence.inline; button.root.exit → presence.exit |
+| Native press and release / internal feedback visual | scale.press toward the active state, then settle; native root hit geometry and semantics remain immediate. | No scale. | No animation. | button.feedback.press → feedback.press |
+| State change / button | Scoped surface and foreground transition. | Short colour feedback. | Target colours immediately. | button.root.colour → state.color |
+| Label or quantity revision / label region | Changed graphemes replace with stagger:none; quantities roll by semantic direction; root width retargets concurrently. | Changed text uses short opacity only; quantity and width are immediate. | All targets immediate. | button.label.replace → text.replace; button.label.roll → number.compact; button.root.resize → geometry.compact |
+| Explicit size variant or icon-slot occupancy change / root shell | Final typography/spacing commits once; interpolate only owned bounded dimensions. | Final dimensions immediately. | Final dimensions immediately. | button.root.resize → geometry.compact |
+
+## Interruption and lifecycle
+
+Pointer cancellation, lost capture, blur and disabled changes release the press owner. Repeated label revisions target the newest content without queuing earlier words. Removal requires a surviving parent presence owner; reintroduction reverses from the current visual state. Live reduction cancels scale, reels and width work; none or a zero clock also cancels colour/presence and clears delayed callbacks. An anchored trigger keeps its positioning geometry stable.
+
+A retained exit is decorative and cannot activate or expose an obsolete name. A caller key or native target revision cancels any obsolete label/press transaction even if the visible label matches; Button does not infer business identity from callback internals. Parent close cancels local text/size work; its completion cannot restart press or restore a removed label.
+
+## Geometry and performance
+
+Measure intrinsic inline size after commitment, clamp it to available space, and never stretch the label with root scale-based layout correction. Preserve the existing single-line label policy; changes resolve final truncation before interpolating the host width, rather than rewrapping during travel. Fixed-width buttons skip width measurement. Keep keyboard focus and pointer hit testing available throughout. A composed Spinner owns its rotation; Button does not rotate or replay unchanged label characters.
+
+One natural-content measurement supplies both width and any explicit height destination. If an intermediate shell would additionally hide the final visible label, icon or focus affordance, commit that axis immediately rather than introduce temporary truncation. Parent layout consumes this final destination once, never the changing shell bounds. Bound work to one owned label transaction and one direct quantity group; unsafe shaping or shared work-limit overflow applies affected content immediately. A numeric string is not parsed; mixed quantity/affix JSX uses explicit composition.
+
+## Acceptance scenarios
+
+Target acceptance; not executed: pointer and keyboard press cancellation; repeated Save/Saving/Saved label changes; a quantity crossing a digit boundary; icon-only and constrained-width buttons; rich children; parent insertion without double entrance; live full/reduced/none and zero-clock changes during press and resize.
+
+Also pending: replace an action while its DOM node is retained, change size during press, and grow a localized label inside a narrow clipped parent; no stale activation/name or transient unreadable label is permitted.

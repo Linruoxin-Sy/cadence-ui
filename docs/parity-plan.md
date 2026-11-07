@@ -1,6 +1,6 @@
 # Scope and next work
 
-This is the authority for component scope, tier/batch conventions and unresolved work. Keep it current
+This is the authority for component scope, compatibility/batch conventions and unresolved work. Keep it current
 by replacing resolved tasks. Do not append batch completion logs, test-run counts, commit tables,
 cleanup reports or handoffs. Concepts and contracts live in the other [design documents](README.md).
 
@@ -9,6 +9,16 @@ cleanup reports or handoffs. Concepts and contracts live in the other [design do
 Provide a source-distributed, API-compatible superset of shadcn with purposeful motion. A consumer
 can retain upstream JSX and gain the documented full/reduced/none contract without losing native
 semantics, accessibility, controlled state or source ownership.
+
+The target animation system gives every component its applicable baseline capabilities rather than
+granting them by tier. Its contract is in [animation-system.md](animation-system.md); the pending
+implementation, pilot sequence and full catalogue matrix are in
+[animation-system-plan.md](animation-system-plan.md). The target design does not claim that the
+current source, registry metadata or public component documentation has already migrated.
+
+Every component also has an [individual target motion contract](motion/README.md#5-catalogue).
+Shared style is guidance; common execution requirements remain binding. Per-component files own
+parts, choreography and mode/interruption behavior, and the shared preset catalogue owns parameters.
 
 ## 2. Scope
 
@@ -47,27 +57,37 @@ candidate experiments. Test fixtures retain regression inputs, not previous repo
 Source, registry metadata, MDX and preview use the same id. Follow CONTRIBUTING.md for the scaffold,
 checks and PR contract. Registry payloads follow actual source changes, not every internal-doc edit.
 
+Maintain `docs/motion/components/<id>.md` and its central index entry for each UI/block component.
+This internal target file is distinct from the public MDX's delivered Motion contract. Compound parts
+remain in one component file; shared token values are referenced rather than copied into it.
+
 ### 6.2 Metadata
 
 Each component declares meta.tier, batch, motion, intensity, complexity, since and upstream. MDX
 frontmatter matches registry metadata. Categories: layout/form/navigation/overlay/feedback/data/ai/utility.
-Tier controls source budget and doc membership; complexity is S/M/L; intensity is authored behaviour,
-independent of runtime mode. Recipes and three-mode behaviour follow animation-system.md.
+Existing tier fields temporarily continue to select source budgets and doc membership while the
+schema/tools migrate. They do not grant or prohibit an animation capability. Complexity is S/M/L;
+intensity describes authored behaviour independently of runtime mode. Recipes declare implemented
+behaviour, not the pending target. Follow animation-system.md and its implementation plan.
 
-### 6.3 Motion tiers
+### 6.3 Capability coverage and transitional tiers
 
-| Tier | Definition                  | Examples                                                                  | Allowed recipes                                                                      |
-| ---- | --------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| T0   | Structural, no animation    | input, textarea, label, kbd, table, separator, card, badge                | none (colour/focus transitions only)                                                 |
-| T1   | Micro-interaction           | button, toggle, switch, checkbox, slider, input-otp                       | `feedback.press`, `state.morph`                                                      |
-| T2   | Overlay enter/exit          | dialog, popover, tooltip, menu, select, toast                             | `enter.pop`, `exit.fade`, `popup.anchored`                                           |
-| T3   | Continuity / shared element | tabs, toggle-group, accordion, collapsible, sidebar, navigation-menu, toc | `layout.shared`, `layout.move`, `list.stagger`, `geometry.resize`, `scroll.navigate` |
-| T4   | Data and feedback           | progress, chart, skeleton, spinner, carousel, calendar                    | `number.roll`, `scroll.progress`, `data.transition`                                  |
-| T5   | AI / composite              | attachment, bubble (later message, trace)                                 | reuse T1–T4                                                                          |
+Every component is evaluated for appearance, content-driven size, surface colour, text colour,
+changed-text animation and numeric rolling. Applicable behaviour is integrated by default after
+migration, with ownership at the relevant part or composition. Native editing, arbitrary rich
+children and passive layout changes retain their documented boundaries. Viewport reveal, shared
+selection, gestures and other additional effects follow their own causes and contracts.
+
+T0–T5 remain legacy schema values during migration because the current registry checks, templates
+and source budget mapping use them. They are not motion levels or recipe allowlists in the target
+design. Do not promote a component to a higher tier to enable text, colour or geometry, and do not
+raise a tier merely to obtain a larger budget. Each item's current source ceiling remains in force
+until an independent equivalent budget representation and its checks are implemented.
 
 Disclosure height uses the measured, clamped `geometry.resize` recipe (including its documented
 Base UI CSS form); there is no separate `disclosure.height` recipe. `data.transition` is also
-defined in [animation-system.md](animation-system.md).
+defined in [animation-system.md](animation-system.md). Measured geometry applicability depends on
+ownership, semantic cause and its mode/performance contract, not a T3 threshold.
 
 ### 6.4 Budgets
 
@@ -80,6 +100,9 @@ defined in [animation-system.md](animation-system.md).
 | T4        | 14 KB                                                         |
 | T5        | 12 KB                                                         |
 | Exception | `meta.budget` with a written reason (sidebar, chart, command) |
+
+This is the current source-budget mapping retained for the schema transition, not an animation
+permission table. It remains separate from compiled component, runtime and complete-page budgets.
 
 ### 6.5 Acceptance
 
@@ -150,9 +173,15 @@ changes their role to button. Current parity exceptions otherwise live in regist
 
 ## 8. Next work
 
+Implement the target animation system through the dependency-ordered phases in
+[animation-system-plan.md](animation-system-plan.md). All implementation phases remain pending:
+shared recipes/controllers and checks, the Button/Badge/Card/Tabs/Select pilots, the 59-component
+rollout, the planned public primitives, and full distribution/performance acceptance. Keep actual
+registry declarations and public documentation truthful until each capability is implemented.
+
 The project is not yet performance-accepted. Historical measurements below are diagnostic baselines
 bound to their measured source; subsequent component/site changes require appropriate remeasurement,
-not relabelling old results as current HEAD. Preserve the budgets in animation-system §7.
+not relabelling old results as current HEAD. Preserve the animation system's performance budgets.
 
 1. **Complete-page initial JS ≤120000 bytes.** Resolve the remaining full-route cost with a specifically
    scoped proposal before further architecture work. The complete Button research baseline at source

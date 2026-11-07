@@ -5,21 +5,26 @@ Installed files belong to the consumer. The documentation site uses the same sou
 into a consumer project. [Animation](animation-system.md), [site/distribution](documentation-site-and-distribution.md)
 and [scope/future work](parity-plan.md) define their respective contracts.
 
+The animation system's v2 design is the accepted target; [its rollout plan](animation-system-plan.md)
+separates that target from delivered behaviour. A design decision does not install new recipes,
+primitives or metadata fields. Source, public MDX and executable checks remain an explicit migration
+baseline until each implementation slice lands with its tests and distribution updates.
+
 ## 1. Design principles
 
-| Principle                   | Contract                                                                                |
-| --------------------------- | --------------------------------------------------------------------------------------- |
-| P1 Source ownership         | Ordinary editable source files, no runtime UI package or injected licensing             |
-| P2 No alias assumptions     | Relative imports and bare package names inside shipped source                           |
-| P3 Motion contract          | Every authored animation names its cause, recipe, modes and cancellation behaviour      |
-| P4 Accessibility parity     | Preserve native semantics, keyboard/focus, screen-reader state and reduced motion       |
-| P5 Docs as data             | One component MDX body feeds the site, registry docs and generated AI text              |
-| P6 Light by default         | Declare dependencies explicitly; heavy optional engines never load incidentally         |
-| P7 Traceability             | Item metadata and sourceSha identify distributed source; snapshots identify exact bytes |
-| P8 Superset                 | Same upstream ids, exports, props/defaults and data-slot; additions are documented      |
-| P9 One animation, one cause | State transitions justify motion; structural UI remains static                          |
-| P10 Pinned upstream         | upstream/manifest.json is authoritative; parity is checked against its pin              |
-| P11 UI only                 | Consumers own data, form state and validation                                           |
+| Principle                 | Contract                                                                                |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| P1 Source ownership       | Ordinary editable source files, no runtime UI package or injected licensing             |
+| P2 No alias assumptions   | Relative imports and bare package names inside shipped source                           |
+| P3 Motion contract        | Every component has an individual design; every action names cause, recipe, modes and cancellation |
+| P4 Accessibility parity   | Preserve native semantics, keyboard/focus, screen-reader state and reduced motion       |
+| P5 Docs as data           | One component MDX body feeds the site, registry docs and generated AI text              |
+| P6 Light by default       | Declare dependencies explicitly; heavy optional engines never load incidentally         |
+| P7 Traceability           | Item metadata and sourceSha identify distributed source; snapshots identify exact bytes |
+| P8 Superset               | Same upstream ids, exports, props/defaults and data-slot; additions are documented      |
+| P9 Motion follows meaning | Cover applicable changes with coordinated motion; each property has one owner and cause |
+| P10 Pinned upstream       | upstream/manifest.json is authoritative; parity is checked against its pin              |
+| P11 UI only               | Consumers own data, form state and validation                                           |
 
 ## 2. Architecture
 
@@ -38,6 +43,8 @@ MCP and a distributed agent skill are not implemented product channels.
 | ---------------------------------------------------------- | ------------------------------------------------------------------- |
 | registry/cadence/<id>/index.tsx                            | Component source and public exports                                 |
 | registry/cadence/lib/                                      | Shared helpers, providers and motion tokens                         |
+| docs/motion/README.md, docs/motion/presets.md                | Individual-design index, shared target parameter assignments and binding rules |
+| docs/motion/components/<id>.md                             | One target part-level animation contract per UI/block id            |
 | registry.json                                              | Item types, targets, dependencies, tiers and batches                |
 | upstream/manifest.json                                     | Pinned upstream API surface and visual style                        |
 | content/components/*.mdx                                   | User-facing component content and metadata                          |
@@ -85,6 +92,20 @@ An explicitly scoped Cadence original instead records `meta.upstream.registry: "
 The MDX frontmatter matches registry metadata; the body is injected into registry payloads.
 Categories are layout/form/navigation/overlay/feedback/data/ai/utility. Recipe, intensity and
 complexity describe different things; intensity is authored behaviour, not a runtime multiplier.
+
+For the v2 target, tier remains a compatibility field for the current schema, source budget and
+documentation profile; it is not permission to use or deny an animation capability. Keep the existing
+budget limits. Any obsolete tier-to-recipe checks must migrate explicitly with the corresponding
+implementation, rather than be bypassed by relabelling components or weakening budgets.
+
+The target capability matrix records whether each applicable behaviour is provided by default,
+inherited from an owning part, available through documented composition, or not applicable with a
+reason. These are distinct delivery relationships, not interchangeable claims of automatic support.
+The matrix and any schema/checker changes are rollout work, not existing registry fields. Target
+intensity is reviewed from actual authored behaviour and its scope; it must not be inferred solely
+from a recipe name or prefix. The current intensity policy and catalogue remain the delivered
+baseline until their migration is implemented and verified.
+
 `meta.parity.props` records justified upstream prop/default deviations; stale or missing records
 fail parity. Public export/slot/default changes cannot be hidden in documentation cleanup.
 Description/subtitle and template conventions are in the scope and site documents.
@@ -97,6 +118,12 @@ colours or motion values. Consumer classes win after `cn()` merging. Site brand 
 site chrome and must not leak into installed components or previews. Sidebar semantic colours use
 their sidebar tokens. Theme changes preserve contrast and readable focus states in both themes.
 
+Global animation style guides causality, rhythm and restraint; individual component contracts own
+their choreography. Their bindings select shared presets, including reviewed component-specific
+timing refinements. [The preset catalogue](motion/presets.md) defines the single authored parameter
+source, CSS/Motion output and override order. A new preset does not bypass modes, geometry clamping,
+native semantics or budgets, and does not introduce a consumer-facing configuration object.
+
 ## 8. Component API and ownership
 
 Match upstream compound parts, props, defaults and data-slot. Use Base UI `render`, evaluate its
@@ -107,8 +134,12 @@ ownership must survive wrapper composition; do not let synthetic Motion events c
 
 Render invalid state from aria-invalid/data-invalid and associate descriptions/errors accessibly.
 Do not import validation/form-state libraries or introduce schema/resolver/validate APIs. Applications
-own stable data ids, loading, filtering, retries and validation. T0 structural components do not acquire
-motion providers or data-motion just to satisfy an animated-component convention.
+own stable data ids, loading, filtering, retries and validation. Structural components can own
+applicable animation capabilities under v2; T0 does not prohibit them. A truly static part still needs
+no provider or data-motion solely to satisfy a naming convention. Add those contracts where a writer
+exists, preserve upstream semantics, and account for its dependencies and source budget. Native
+editable content remains immediate; animated text and number presentation must not take over input,
+selection or composition state.
 
 ## 9. Shared runtime
 
@@ -116,6 +147,13 @@ All installable shared code lives in registry/cadence/lib and is referenced thro
 CadenceProvider is optional: standalone components still follow system preference. A provider adds
 inherited mode/clock; a local full override cannot bypass an OS reduced-motion preference.
 Every actual writer owns recipe timing and observes the mode/clock changes needed by its contract.
+The v2 target coordinates CSS state feedback, Motion geometry/content work and existing native or
+third-party engine adapters through the same policy; it does not require a Motion wrapper on every
+DOM node. The target makes none stop all Cadence-authored transitions, including colour feedback,
+and makes reduced stop autonomous continuous motion while preserving a readable static state.
+Existing colour transitions and reduced loops are migration baselines, not permanent exemptions;
+the animation system and rollout plan define their replacement and verification.
+
 MotionConfig is not a promise to control arbitrary caller-authored animations. LazyMotion/m is only
 an optimisation when required features, first paint and interactions remain intact; no blanket
 domAnimation replacement for layout/drag users. See the animation system for the complete lifecycle.

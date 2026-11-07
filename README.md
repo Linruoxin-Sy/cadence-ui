@@ -8,6 +8,19 @@ npx shadcn@latest add @cadence/button
 
 > Scope and future work: [the plan](docs/parity-plan.md). Performance acceptance remains open.
 
+The [motion v2 design](docs/animation-system.md) defines applicable appearance, size, colour, text,
+number and interaction animation capabilities for every component, with explicit ownership instead of
+tier-based animation limits. Its [implementation plan](docs/animation-system-plan.md) is pending work:
+the runtime, registry metadata, MDX and test helpers still describe the current compatibility surface.
+Planned `state.color`, `text.change`, revised numeric rolling and public helpers are not yet installable
+features. The v2 targets of stopping every continuous loop under `reduced` (including Spinner) and
+disabling colour transitions under `none` also require runtime and test migration.
+
+The [individual motion catalogue](docs/motion/README.md) gives every component its own target animation
+design. Global style guides its choreography; shared modes, semantics, ownership and budgets remain
+mandatory. [Preset assignments](docs/motion/presets.md) centralise parameters without making every
+component use an identical effect. These are design documents, not additional shipped features.
+
 ## Install
 
 Register the registry once in `components.json`:
@@ -36,6 +49,9 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 ```
 
 ## Components
+
+The table records currently shipped recipe declarations and compatibility tiers, not v2 completion or
+limits on which capabilities a component may acquire.
 
 | Component                             | Tier | Motion                                                               |
 | ------------------------------------- | ---- | -------------------------------------------------------------------- |
@@ -90,15 +106,17 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 | `date-picker` — calendar composition  | T2   | `feedback.press`, `popup.anchored`, `exit.fade`, `data.transition`   |
 | `navigation-menu` — site navigation   | T3   | `popup.anchored`, `exit.fade`, `geometry.resize`                     |
 
-The remaining scheduled components, their batches, and the motion tier for each are listed in
+Component scope, batches, compatibility tiers and future work are listed in
 [docs/parity-plan.md](docs/parity-plan.md).
 
 ## Rules
 
 - **Same API as shadcn.** Exports, props, and `data-slot` values match upstream; additions are allowed, renames are not.
 - **UI only.** Components render invalid state from `aria-invalid`; they never validate a value, own a schema, or hold form state. See [Field](content/components/field.mdx).
-- **Motion has a contract.** Every animation explains a state change; components that do not need motion stay still.
-- **Reduced motion is a branch, not a patch.** `data-motion="none"` turns everything off.
+- **Motion has a contract.** Assess each component's applicable capabilities, preserve semantic behaviour,
+  and give every animated property one owner. Shipped recipes must match their implementation and user docs.
+- **Reduced motion is a branch, not a patch.** Preserve full/reduced/none behaviour and test live mode
+  changes; the [v2 implementation plan](docs/animation-system-plan.md) tracks the stricter colour and loop guarantees.
 
 ## Development
 
@@ -122,7 +140,7 @@ Upstream source is fetched into `.cache/shadcn/` (gitignored) and summarised in 
 
 - Site: `/docs/installation`, `/docs/theming`, `/docs/motion`, `/docs/motion-modes`, plus a page per component.
 - Machine-readable: `/llms.txt`, `/llms-full.txt`, `/r/registry.json`, `/r/catalog.json`, `/r/<id>.md`.
-- Design record: [overall design](docs/overall-design.md), [animation system](docs/animation-system.md), [documentation site and distribution](docs/documentation-site-and-distribution.md), [parity plan](docs/parity-plan.md), [ADRs](docs/adr.md).
+- Design record: [overall design](docs/overall-design.md), [animation system](docs/animation-system.md), [motion implementation plan](docs/animation-system-plan.md), [documentation site and distribution](docs/documentation-site-and-distribution.md), [parity plan](docs/parity-plan.md), [ADRs](docs/adr.md).
 - Contributing: [CONTRIBUTING.md](CONTRIBUTING.md); agent notes: [AGENTS.md](AGENTS.md).
 
 ## License

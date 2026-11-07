@@ -90,3 +90,84 @@ registry checks keep entries aligned with the catalogue. Shared navigation disab
 destination prefetching to avoid loading other preview graphs before navigation. All current-page
 specimens retain immediate SSR and hydration. This preserves ADR-009 and does not certify performance
 budgets; complete-route requests and functional checks remain required.
+
+## ADR-020 · Capability-based animation system v2
+
+Accepted as the target design, with implementation governed by
+[animation-system.md](animation-system.md) and the [rollout plan](animation-system-plan.md).
+This decision does not claim that the current runtime, registry schema, validators, catalogue or
+public documentation have migrated.
+
+Give every component a reviewed contract for its applicable changes, including appearance/removal,
+geometry, surface/text colour, text replacement, numeric updates and its own interactions. Describe
+each capability as default, inherited, composed or not applicable with a reason. Structural parts
+are eligible for these capabilities; they do not acquire gratuitous effects or duplicate the writer
+of an owning parent. Tier remains a compatibility field for the current schema, source budgets and
+documentation profiles, not a capability gate. Existing budget limits are unchanged. Target authored
+intensity is an explicit judgement about implemented behaviour, not a recipe-prefix inference or a
+runtime multiplier. The matrix and intensity tooling still require migration.
+
+Partially supersedes ADR-004's positioning of Motion as the general default writer: CSS owns ordinary
+state-colour feedback, Motion owns the geometry/content work assigned to it, and Base UI/native or
+third-party engines retain their existing ownership through policy adapters. There is one writer per
+property, coordinated by shared tokens, causes, modes and cancellation. Optional GSAP remains an
+explicit dependency for a justified feature; it is neither loaded globally nor newly certified.
+
+Partially supersedes ADR-013's T3+ permission restriction on interpolated geometry. Capability and
+measured performance justify its use at any tier; measurement, clamping, origin fallback, single
+ownership and immediate reduced/none geometry remain required. ADR-015's distinction between instant
+measurement and interpolation remains valid. Any inference from ADR-015 that structural components
+must remain static is superseded; instant layout still needs no invented motion recipe or provider.
+
+The target none mode stops every Cadence-authored transition, including colour, border and shadow
+feedback, and settles an active writer before paint. The target reduced mode removes autonomous
+continuous animation and preserves the same state through static text, icons or progress. Existing
+reduced spinner/opacity loops and colour transitions outside the current motion gate are migration
+baselines, not permanent exceptions. Direct manipulation and semantic state remain available;
+animation must not delay input, validation, focus, accessibility updates or completion of an action.
+
+Adopt shared text-difference and number-roller primitives rather than rewriting arbitrary child
+trees. Preserve native editing and upstream ids, exports, props/defaults, render/ref/event behaviour
+and data-slot values. Capability coverage must compose without duplicate size or transform writers,
+and updates must interrupt from the current presentation. New recipes and APIs require implemented
+mode branches, cancellation and performance evidence before they enter registry metadata or public
+MDX. Keep the source/declared/documented contract equal throughout staged delivery; target-only APIs
+belong in the internal design and rollout, not generated consumer documentation.
+
+## ADR-021 · Individual component choreography with shared execution rules
+
+Accepted as the target authoring model, extending ADR-020 without claiming implementation.
+
+Design each component's animation independently at the level of real parts, semantic causes and
+coordinated actions. Global animation style provides guidance about causality, rhythm, readability
+and restraint. It does not prescribe one identical entrance, duration or interaction for the catalogue.
+Each component may select reviewed visual presets appropriate to its role. Shared mode behavior,
+native semantics, upstream compatibility, SSR visibility, retained text identity, ownership,
+interruption and performance budgets remain mandatory and cannot be overridden by a local design.
+
+Store the designs in one discoverable directory, split into one maintained Markdown file per current
+UI/block id: `docs/motion/components/<id>.md`. Keep compound parts together so their property and
+lifecycle ownership can be reviewed as a composition. `docs/motion/README.md` owns conventions and
+the complete index; `docs/motion/presets.md` owns parameter assignments and binding precedence.
+This avoids both a monolithic per-action catalogue and scattered design notes alongside implementation.
+These are durable design records, not generated audits or completion logs.
+
+Every individual contract assesses six baseline capabilities, names the responsible parts and
+default/inherited/composed/not-applicable relationships, describes each action in full/reduced/none,
+and specifies rapid updates, reversal/reopen, close/unmount, parameter bindings, geometry constraints
+and workload boundaries. Relevant extra effects are designed individually rather than copied across
+families. Single-active-item indicators and multiple-selection feedback are distinct compositions.
+
+Distinguish tokens, recipes, presets and component bindings. Numeric values and physical constants
+remain authored once in `registry/cadence/lib/motion.ts`; CSS and other executors derive from that
+source. A component binding such as `button.label.replace` selects a documented preset/recipe but
+does not become a Recipe union member, metadata entry or public prop. Compact/panel parameter
+refinements are permitted through reviewed shared presets. This refines the system's default timing
+assignments without weakening the tokens-only rule, introducing a parallel per-component parameter
+database or requiring a whole-catalogue runtime configuration import.
+
+Internal component files own target choreography; the animation system owns shared contracts; the
+rollout plan owns implementation dependencies. Public MDX, metadata and shipped source continue to
+describe implemented behavior. Add preset resolution, capability/reference validation, scaffold
+support and actual component integration through the pending rollout, with corresponding tests and
+distribution changes. Updating these design documents alone changes no runtime or installation claim.

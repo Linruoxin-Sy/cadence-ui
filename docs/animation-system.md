@@ -1,28 +1,127 @@
-# Animation system design
+# Cadence Motion v2 design
 
-> This is the project's core differentiator. The goal is not "more effects" but **motion that composes, degrades, tests, and explains itself**. Every component must honour the Motion Contract defined here.
+Cadence Motion v2 gives every component the motion capabilities appropriate to its content and
+interactions. Components report changes; shared policy coordinates them; recipes and tokens define
+their presentation; CSS, Motion and existing engine adapters execute it. T0–T5 no longer grant or
+deny animation capabilities. Source budgets remain unchanged during migration.
+
+This is the accepted target design, replacing the tier-gated animation design. It is not a claim that
+v2 has shipped. The [implementation plan](animation-system-plan.md) owns rollout dependencies and
+acceptance. ADR-020 records the architectural change. Component source, registry metadata and
+user-facing MDX continue to describe the same delivered behaviour until each implementation changes.
+
+Every component has an [individual motion contract](motion/README.md). Global visual style provides
+guidance; each component owns its particular choreography. Shared execution rules remain mandatory.
+The [preset catalogue](motion/presets.md) centralises parameter assignments, including reviewed local
+refinements of the default timings below. ADR-021 records the storage and authoring boundary.
+
+The existing CSS token block in §2.3 and runtime recipe catalogue/type in §3/§5 are explicitly retained
+compatibility contracts: current checks parse them. New target recipes, APIs and mode changes are
+identified separately below; do not put them into a registry payload before they are implemented.
 
 ---
 
-## 1. Five principles
+## 1. Principles and architecture
 
-| #   | Principle                    | Meaning                                                                                 | Counter-example                                      |
-| --- | ---------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| M1  | Motion explains causality    | Where an element came from, where it went, and why it changed must be legible           | Gratuitous bounce, spin, flicker                     |
-| M2  | One protagonist per action   | Only one element "speaks" at a time                                                     | Translate + scale + rotate + recolour simultaneously |
-| M3  | Duration follows hierarchy   | Small controls fast, panels medium, whole pages slow                                    | 600 ms button, 120 ms page                           |
-| M4  | Interruptible and re-entrant | Re-opening while a close animation runs reverses smoothly                               | Hard cuts with CSS keyframes                         |
-| M5  | Reduced means equivalent     | Under reduced motion no information or state is lost; only translation/scale is removed | State changes become invisible after reduction       |
+| #   | Principle                    | Meaning                                                                                      | Counter-example                                     |
+| --- | ---------------------------- | -------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| M1  | Motion explains causality    | Where an element came from, where it went, and why it changed must be legible                | Gratuitous bounce, spin, flicker                    |
+| M2  | One coordinated change       | Related text, size, icon and colour changes share a cause and property owners                | Parent and child independently spring the same size |
+| M3  | Duration follows hierarchy   | Small controls fast, panels medium, whole pages slow                                         | 600 ms button, 120 ms page                          |
+| M4  | Interruptible and re-entrant | Re-opening while a close animation runs reverses smoothly                                    | Hard cuts with CSS keyframes                        |
+| M5  | Reduced means equivalent     | Preserve information and operation while removing decorative travel, blur, stagger and loops | State changes become invisible after reduction      |
+| M6  | Individually authored components | Design each component's parts, triggers and choreography; use global style as guidance | One generic effect copied across the catalogue |
+
+Semantic state, focus, direct manipulation and final geometry remain available. The complete mode
+policy is in §6.
+
+### 1.1 Four layers and three execution paths
+
+| Layer                   | Owns                                                                              | Must not own                                                 |
+| ----------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Component signals       | Semantic state, change cause, stable identity, direction, content revision and selection of a reviewed part binding | Component-local raw durations, easing curves or physical constants |
+| Policy and coordination | Mode, initial presentation, ownership, group rhythm, cancellation and retargeting | Validation, request state or business success/failure        |
+| Recipes and tokens      | Properties, visual targets, timing, reduction and interruption contracts          | Application state transitions                                |
+| Executors               | CSS transitions/loops, Motion measurement/physics, existing engine adapters       | Independent competing writers or altered native semantics    |
+
+CSS owns colour and suitable simple state/presence transitions. Motion owns measured geometry,
+continuous layout, numeric reels and applicable gesture settling. Base UI, Embla, Recharts and
+native WAAPI integrations retain their actual lifecycle/geometry ownership. A CSS `linear()` spring
+approximation is an easing curve, not a physics spring that inherits velocity when retargeted.
+Components use the same recipe regardless of its executor; there is no public engine selector.
+
+Signals distinguish `presence`, `content`, `value`, `state`, `layout`, `gesture`, `viewport` and
+`environment` causes. A content revision identifies one committed change, not an arbitrary React
+render. Geometry targets come from measurement, never render-time layout reads. This is an internal
+coordination contract, not a new global application event bus.
+
+### 1.2 Capability coverage
+
+Every component/part records the applicable trigger, owner, default response and three-mode policy.
+Coverage is **default** (owned here), **inherited** (coordinated by a parent), **composed** (explicit
+caller composition), or **not applicable** with a reason. An inherited capability is not proof of
+a local recipe implementation. Formal capability metadata and its schema are a plan deliverable;
+these labels are not new fields already accepted by the registry checker.
+
+| Capability              | Existing or target recipes                                | Required outcome                                                             |
+| ----------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Presence                | reveal, enter.pop, exit.fade, exit.shrink, popup.anchored | A meaningful entrance/exit with a surviving lifecycle owner                  |
+| Size                    | geometry.resize                                           | Content/expansion-driven size continuity with one geometry owner             |
+| Position and identity   | layout.move, layout.shared, handoff                       | Stable items move or transfer without remounting their semantic owners       |
+| Surface and text colour | state.color (target addition)                             | Explicit colour properties share token clocks and honour none                |
+| Changed text            | text.change (target addition)                             | Unchanged text identity survives; only changed text gets replacement effects |
+| Changed numbers         | number.roll (resolver exists; reel renderer pending)      | Stable place-value columns roll in the semantic direction                    |
+| Control feedback        | feedback.press, state.morph                               | Native input responds immediately with appropriate visual feedback           |
+| Data and ongoing status | data.transition                                           | Existing engine targets and accessible status survive every mode             |
+
+A Card entrance includes its title, description and controls; those parts do not each replay an
+entrance. Later independent title or control changes still animate. Separator has no numeric value
+to roll. Richness means complete relevant coverage, not identical effects on every DOM node.
+
+### 1.3 Delivery boundary
+
+The shipped catalogue does not yet provide AnimatedText, AnimatedNumber, RevealGroup or Reveal.
+`text.reveal`, `text.split` and `number.roll` being present in the resolver does not mean a component
+implements them. Shared v2 primitives are the planned scope; their final registry items must follow
+the Cadence-original origin and dependency rules. Do not infer the reference library's other 121
+components are added to Cadence's scope.
+
+Known migration differences are explicit: static structural components gain applicable capabilities;
+colour feedback joins the mode contract; reduced continuous loops become static; text diff, reels
+and grouped reveal are new shared implementations. Existing engine/native-event safeguards remain
+requirements. An item is v2-complete only after its source, metadata, examples, docs and tests agree.
+
+### 1.4 Individual choreography, shared execution contract
+
+Each current UI/block id has one maintained design file in `docs/motion/components/<id>.md`, linked
+from the [catalogue](motion/README.md#5-catalogue). Compound parts stay together in that file. Every
+file identifies six-capability applicability and owners, each action in full/reduced/none, rapid
+update/reversal/close handling, parameter bindings, geometry constraints and performance boundaries.
+The shared documents do not replace that individual design with a family-level animation template.
+
+Global visual guidance covers causality, rhythm, restraint, readability and spatial coherence.
+Components choose their own meaningful actions and may select different reviewed presets. Global
+requirements cover semantics and upstream compatibility, mode ceilings, SSR visibility, unchanged
+text identity, one property writer, cancellation and performance. A component cannot make those
+requirements optional in the name of visual customisation. Six applicable baseline capabilities
+remain default integration after migration, not six opt-in switches for every consumer.
+
+Design authority is split deliberately: this file owns the execution contract; individual files own
+choreography; [presets](motion/presets.md) own parameter assignments; the rollout owns pending work.
+Current source/registry/public MDX own delivered claims. Internal target bindings are not runtime
+recipe identifiers or a new public settings API. If a local design needs a shared-contract exception,
+revise this file explicitly first; do not hide it in an individual file or a timing preset.
 
 ---
 
 ## 2. Token system
 
-### 2.1 One authored timing, three runtime modes
+### 2.1 One authored parameter source, three runtime modes
 
-There is no runtime "intensity" multiplier. Durations, distances, easings, and springs are authored
-once in `lib/motion.ts`; the only thing that changes at runtime is the mode (§6), and the system
-preference can force that mode.
+There is no runtime "intensity" multiplier. Durations, distances, easings and springs have one
+authored source in `lib/motion.ts`. Mode (§6) and the supported timeScale clock resolve the active
+presentation; the system preference can force reduction. Target consumer token/theme overrides
+follow the shared preset policy, not a second component-local parameter source or intensity scale.
 
 | Mode      | What changes                                  | Set by                                              |
 | --------- | --------------------------------------------- | --------------------------------------------------- |
@@ -45,9 +144,11 @@ its documented composition), independent of the selected runtime mode, complexit
 - `expressive`: coordinated identity/ownership transfers across surfaces (`handoff`, currently
   Select). This is not a claim that every spring or every T3 component is expressive.
 
-`scripts/catalog-intensity.mjs` enforces this policy against the declared recipe forms and the
-explicit data-geometry owners. Registry/frontmatter equality remains mandatory. A new behaviour
-must update this design and the policy together; never alter motion to obtain a filter label.
+The classification above is the **current compatibility policy**, enforced by
+`scripts/catalog-intensity.mjs` against recipe forms and explicit data-geometry owners. The v2 target
+classifies the authored spatial extent, travel and coordination, not the mere presence of text or
+geometry recipes. Migrate the classifier, metadata and catalogue explanations together; until then
+keep registry/frontmatter equality and do not relabel components to imply an unimplemented effect.
 
 The reduced tween multiplier is exported as `reducedDurationScale` from `lib/motion.ts`.
 CSS popup adapters and `transitionFor()` read that same token rather than repeating the multiplier.
@@ -180,34 +281,82 @@ map, not the bytes.
 
 ---
 
+### 2.4 V2 timing defaults
+
+These are target recipe assignments, not new token exports. Keep the base timings above; add new
+names only with the corresponding resolver/CSS implementation and token-source checks.
+
+Treat these assignments as the shared starting vocabulary, not a requirement that every component
+use the same clock. The [preset catalogue](motion/presets.md#3-default-preset-catalogue) records the
+reviewed compact/panel and purpose-specific assignments. A component selects them through its named
+part bindings; it does not copy a literal into its implementation or change a base token for everyone.
+
+| Purpose                   | Target timing                          | Policy                                                               |
+| ------------------------- | -------------------------------------- | -------------------------------------------------------------------- |
+| Colour feedback           | duration.fast: 160 ms, ease.out        | No stagger; foreground/background share the state commit             |
+| Ordinary entrance         | duration.base: 220 ms                  | Use existing distance.xs/sm (4/8 px) where travel explains the cause |
+| Ordinary exit             | duration.fast: 160 ms                  | No inherited entrance delay                                          |
+| Control state             | spring.snappy: visualDuration 260 ms   | Preserve native activation and pointer ownership                     |
+| Layout and numeric reels  | spring.smooth: visualDuration 400 ms   | Retarget from the current visual state; document velocity continuity |
+| Measured size             | spring.morph: visualDuration 420 ms    | No authored bounce; clamp the rendered geometry                      |
+| Changed-character stagger | stagger.char: 12 ms; target cap 120 ms | Delay changed units only; bypass under reduced/none                  |
+| Cyclic reveal stagger     | target step 55 ms, cycle length 3      | Stable 0/55/110 ms slots, entrance only                              |
+| Blur                      | Off by default                         | An explicitly reviewed small-text recipe may use at most 4 px        |
+
+Spring visualDuration is an authored feel, not an exact completion deadline. Cleanup follows actual
+completion/cancellation, never a matching timeout. Geometry must still clamp a physics spring that
+inherits velocity even when its authored bounce is zero. CSS and JS consume one authored token
+source; generating both outputs is a migration deliverable, not permission to hand-maintain a
+second theme. CSS custom-property delays carry group rhythm without creating per-element timers.
+
+### 2.5 Component bindings and preset refinement
+
+A token supplies a value; a recipe supplies the allowed properties and execution contract; a preset
+selects reviewed token assignments; a component binding chooses that preset for a real part/cause.
+For example, `button.label.replace` is a target binding to `text.replace` / `text.change`, not a new
+recipe. Store the binding's purpose in the individual file and its numeric assignments in the shared
+[preset catalogue](motion/presets.md). No component-local motion constants are introduced.
+
+The catalogue defines override precedence, effective clocks, target compact/panel size tokens and
+the CSS/Motion single-source requirement. Mode and safety constraints always apply after visual
+selection. Built-in display bindings explicitly disable character stagger by default, while the
+standalone planned AnimatedText primitive retains its specified character rhythm. Neither policy
+permits unchanged characters to replay. A changed preset or component binding requires checking
+affected consumers, rather than declaring new `meta.motion` entries for the design names.
+
 ## 3. Recipe catalogue
 
-A recipe is a "reusable motion formula", returned by `useCadenceMotion().transition(recipe, opts)`. Components may only use the recipes below; adding a recipe means editing this document and going through review.
+A recipe is a reusable motion formula resolved through `useCadenceMotion().transition(recipe, opts)`
+or its documented CSS/engine adapter. The table retains the exact **current runtime identifiers**
+for source/document checks. An identifier is not proof of a delivered renderer. V2 additions are
+separated in §3.1.0 and must enter the runtime union, metadata and user docs atomically with their
+implementation. Behaviour sections below define the target; named baseline differences remain
+explicit until their rollout phase completes.
 
-| Recipe            | Purpose                                                                                 | Key parameters                  | Implementation                                                                                                        | reduced behaviour                            |
-| ----------------- | --------------------------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| `reveal`          | Fade and rise on entering the viewport                                                  | `distance`, `delay`             | `whileInView` + `viewport={{once:true}}`                                                                              | Fade only, no translation                    |
-| `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                                                 | Fade only                                    |
-| `exit.fade`       | Element disappearing                                                                    | `duration`                      | opacity to 0                                                                                                          | Same (opacity kept)                          |
-| `exit.shrink`     | Closing a popover                                                                       | `scale`                         | scale to 0.96 + opacity                                                                                               | Fade only                                    |
-| `popup.anchored`  | Base UI popups                                                                          | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                                          | No scale, pure cross-fade                    |
-| `layout.move`     | List/grid reordering                                                                    | `spring`                        | `layout` prop + `LayoutGroup` + physics-defined spring                                                                | Layout disabled, instant jump                |
-| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId` / measured targets   | `layoutId` or a persistent measured indicator (§3.1.4) + physics-defined `spring.morph`                               | Disabled, immediate switch                   |
-| `list.stagger`    | Items appearing one by one                                                              | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                                          | All fade in together (no stagger)            |
-| `gesture.drag`    | Drag / swipe to dismiss                                                                 | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                                                     | Dragging disabled, use a button              |
-| `scroll.progress` | Reading progress, parallax                                                              | `offset`                        | `useScroll` + `useSpring`                                                                                             | Static value (no smoothing)                  |
-| `scroll.navigate` | Navigate to a document section after an explicit link activation                        | measured destination            | Motion number tween writes native scroll offsets; `duration.page` + `ease.inOut` (§3.1.5)                             | Immediate destination                        |
-| `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                                              | End state shown directly                     |
-| `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                 | variants + child spans                                                                                                | Whole block fades in                         |
-| `text.split`      | Character by character (GSAP)                                                           | `type`                          | GSAP SplitText (optional)                                                                                             | Shown as a whole                             |
-| `number.roll`     | Numeric changes                                                                         | `precision`, `spring`           | `useSpring` + `Intl.NumberFormat`                                                                                     | New value shown directly                     |
-| `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                  | continuous: CSS `animate-*` loop, opacity only. One-shot: `cm.transition("data.transition")`                          | Loop kept (opacity only); transforms dropped |
-| `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state                            | Indicator at full size, thumb jumps          |
-| `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                   | `animate()` on a motion value, or the Base UI disclosure CSS form below; measure content and clamp to the closed size | Instant size change, opacity kept            |
-| `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                        | inverse transform from `measureOrigin()` + physics spring                                                             | Cross-fade at the destination                |
-| `feedback.press`  | Press feedback                                                                          | `scale`                         | Native press ownership + committed controls                                                                           | Colour change only                           |
+| Recipe            | Purpose                                                                                 | Key parameters                  | Implementation                                                                                                        | reduced behaviour                                                           |
+| ----------------- | --------------------------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`             | V2 grouped observer and CSS states (§3.8); shared renderer pending                                                    | Bypass decorative controller; visible                                       |
+| `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                                                 | Fade only                                                                   |
+| `exit.fade`       | Element disappearing                                                                    | `duration`                      | opacity to 0                                                                                                          | Same (opacity kept)                                                         |
+| `exit.shrink`     | Closing a popover                                                                       | `scale`                         | scale to 0.96 + opacity                                                                                               | Fade only                                                                   |
+| `popup.anchored`  | Base UI popups                                                                          | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                                          | No scale, pure cross-fade                                                   |
+| `layout.move`     | List/grid reordering                                                                    | `spring`                        | `layout` prop + `LayoutGroup` + physics-defined spring                                                                | Layout disabled, instant jump                                               |
+| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId` / measured targets   | `layoutId` or a persistent measured indicator (§3.1.4) + physics-defined `spring.morph`                               | Disabled, immediate switch                                                  |
+| `list.stagger`    | Items appearing one by one                                                              | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                                          | All fade in together (no stagger)                                           |
+| `gesture.drag`    | Drag / swipe to dismiss                                                                 | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                                                     | Direct operation retained; no inertial travel; button alternative           |
+| `scroll.progress` | Reading progress, parallax                                                              | `offset`                        | `useScroll` + `useSpring`                                                                                             | Static value (no smoothing)                                                 |
+| `scroll.navigate` | Navigate to a document section after an explicit link activation                        | measured destination            | Motion number tween writes native scroll offsets; `duration.page` + `ease.inOut` (§3.1.5)                             | Immediate destination                                                       |
+| `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                                              | End state shown directly                                                    |
+| `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                 | variants + child spans                                                                                                | Whole block fades in                                                        |
+| `text.split`      | Character by character (GSAP)                                                           | `type`                          | GSAP SplitText (optional)                                                                                             | Shown as a whole                                                            |
+| `number.roll`     | Numeric changes                                                                         | `precision`, `spring`           | Resolver exists; place-value reel renderer and formatter integration pending (§3.7)                                   | New value shown directly                                                    |
+| `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                  | CSS continuous form or explicit Motion/engine clock                                                                   | V2 loops static (§3.2); engine geometry instant; permitted one-shot opacity |
+| `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state                            | Indicator at full size, thumb jumps                                         |
+| `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                   | `animate()` on a motion value, or the Base UI disclosure CSS form below; measure content and clamp to the closed size | Instant size change, opacity kept                                           |
+| `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                        | inverse transform from `measureOrigin()` + physics spring                                                             | Cross-fade at the destination                                               |
+| `feedback.press`  | Press feedback                                                                          | `scale`                         | Native press ownership + committed controls                                                                           | Colour change only                                                          |
 
-Four recipes opt into `continuity: "velocity"`: `layout.move`, `layout.shared`, `geometry.resize`, and
+Four recipes currently opt into `continuity: "velocity"`: `layout.move`, `layout.shared`, `geometry.resize`, and
 `handoff`. All four exist to be retargeted while they are still moving (a list reorders twice, a tab
 indicator is clicked mid-flight, a second option is selected before the first label lands), and all
 travel far enough that losing the velocity is visible. Every other spring stays time-defined on
@@ -215,10 +364,11 @@ purpose: `press` is a sub-pixel scale and a popup scales by 4%, where Motion's o
 inherited velocity exists for good reason. A recipe that needs continuity must be argued for in this
 table, not switched on in a component.
 
-`geometry.resize` is also the only recipe that resolves to zero duration under `reduced` instead of
-a short tween: a 160 ms width tween is still layout motion, and the size is information, so it
-jumps. `handoff` keeps the short tween under reduced but the component drops the transform and
-cross-fades at the destination.
+`geometry.resize` resolves to zero duration under `reduced`: a short width tween is still layout
+motion, and the size is information, so it jumps. `scroll.navigate` also jumps. V2 immediate paths
+must remove delay as well as duration. `handoff` may retain a short opacity tween at the destination
+while dropping the transform. V2 numeric reels need their own reviewed continuity policy; the
+existing number.roll resolver's snappy spring alone does not implement that contract.
 
 Theme switching is deliberately absent. A view transition is a document-level operation: it resolves
 to no Motion `Transition`, so it cannot be a recipe and no component declares it. The site's theme
@@ -264,6 +414,10 @@ on later label changes. The synchronous write is the same prepaint fold policy a
 
 ### 3.0 Sidebar composition
 
+This and the following engine/part notes describe the delivered migration baseline. They preserve
+engine and native semantics while the rollout plan schedules additional capabilities; they do not
+exempt these components from v2 coverage.
+
 Sidebar uses `layout.move` for the desktop offcanvas panel's own-width transform. The reserved
 gap and icon-mode widths update immediately; they are functional layout, with no width, left/right,
 margin, padding or height interpolation. Reduced/none use the static off-edge position, with zero
@@ -281,6 +435,38 @@ providers restore their clock. Full/reduced both fade; none removes starting opa
 and sets zero duration, including live cancellation. Text chunks, variants, alignment,
 reactions and resize remain immediate on stable nodes. Static reaction offsets are
 positioning, not motion. Bubble has no streaming runtime or measured geometry.
+
+### 3.1.0 V2 recipe additions
+
+Neither name below is in the shipped Recipe union yet. Do not add it to meta.motion or a component
+Motion contract table until the runtime, implementation recogniser and actual tests support it.
+
+| Target recipe | Properties and cause                                                                                  | Mode/cancellation contract                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| state.color   | Explicit background-color, color, border-color, fill/stroke; declared shadow feedback where needed    | Shorter reduced clock; none clears duration and delay, including a running transition       |
+| text.change   | Changed grapheme/run opacity and small translation; retained-token position delegated to layout owner | Reduced fades changed parts without travel/stagger; none is immediate; latest revision wins |
+
+Do not rename existing recipe ids merely to introduce capabilities. text.reveal/text.split remain
+entrance treatments, not text diff. A supported helper must prove which recipe/form the consuming
+part actually exercises; a dependency containing a recipe is not sufficient evidence.
+
+Target component contracts also refine existing recipe forms without claiming that the current
+implementation recogniser accepts them. A one-shot `data.transition` may use a component-owned
+opacity plus bounded directional transform for an actual content change (for example Tabs panel
+activation or a newly inserted Bubble), with direction and distance recorded in that part's contract.
+Reduced keeps opacity and removes travel; none is immediate. This does not create a generic entrance
+on every render, permit a second engine writer or expand the continuous-loop property allowance.
+`geometry.resize` may select reviewed compact/panel presets while retaining its existing ownership,
+physics conversion and clamping. `data.progress` is a target preset for the determinate form of
+`data.transition`, not an added recipe id, and coordinates its visual clock with numeric readout.
+Migrate validators, declarations, public docs and actual mode evidence for each new form together.
+
+The preset catalogue names the directional forms explicitly: `content.switch` for bounded panel
+content travel and `content.month` for the calendar grid. The generic `data.update` preset does not
+silently add such travel. Sidebar's target `layout.sidebar` binding uses a size-linked `layout.move`
+projection: its transform and the reserved-gap `geometry.resize` share one space-progress coordinator,
+with transform derived from that value. Equal durations on two independent springs are not proof of
+matching geometry. These are target adapter/forms, not additional runtime recipe ids.
 
 ### 3.1.1 `data.transition` for Embla collections
 
@@ -396,60 +582,219 @@ back/forward and no-JS links remain native and never replay the click animation.
 
 ### 3.2 Continuous recipes run in CSS
 
-Some recipes do not end: a placeholder pulse, a shimmer, a marquee. A page can
-render dozens of these at once, and every Motion animation costs a frame callback
-and a tree outside React's control. So the **continuous form of a recipe is CSS**,
-and its timing comes from an `--animate-*` theme token rather than from a literal
-inside the component:
+Continuous status effects use CSS animate-* utilities and framework --animate-* theme tokens. They
+have an active condition and pause when offscreen or the document is hidden. Provider timeScale
+retains its existing meaning: it scales recipe/portal clocks, not continuous theme clocks.
 
-```tsx
-// skeleton: `data.transition`, continuous form
-const pulse = cm.mode === "none" ? "animate-none" : "animate-pulse";
+The **v2 target** stops autonomous loops in both reduced and none, including Spinner rotation and
+Skeleton opacity pulses. A static glyph/text still communicates loading. Full permits local opacity
+status feedback and the single-glyph Spinner rotation; it does not authorize moving marquees,
+shimmer or decorative large-surface loops. Every loop needs cancellation on the existing node.
 
-<div data-slot="skeleton" data-motion={cm.mode} className={cn("bg-accent", pulse)} />;
-```
+The delivered baseline still permits opacity loops and Spinner rotation under reduced; its helper
+and tests encode that behaviour. Migrate source, tests and user-facing contracts together. Independent
+caller autoplay remains caller-owned and needs accessible controls; do not silently remove plugins.
 
-Rules for the continuous form:
+### 3.3 Presence and composition
 
-The loop clock belongs to the framework theme's `--animate-pulse` / `--animate-spin`
-token, including live theme retuning. Provider `timeScale` scales recipes and local
-popup clocks; it does not multiply these continuous theme clocks. Removing the
-animation class under none cancels the loop on the existing node.
+SSR and hydration present final content. A component inserted by a later interaction can enter;
+viewport entry is a separate cause with a separate replay policy (§3.8). Popups follow their real
+open/close lifecycle. Parent presence coordinates the surface; descendants suppress duplicate
+entrance for that same cause and retain later independent content/state animation.
 
-1. **Opacity only** (or `filter`, at ≤ 4px blur). A loop on `transform` or on a
-   layout property keeps the compositor busy forever.
-2. **Gated by `data-motion`**: `none` resolves to `animate-none`, so a screenshot
-   test and a print stylesheet get a still frame.
-3. **Kept under `reduced`** when it is opacity-only: M5 removes travel and scale,
-   not the ability to see that something is loading. A loop that would need motion
-   to read its state must be replaced by a static state under `reduced`.
-4. **Declared, implemented, documented.** `meta.motion` and the docs table name the
-   recipe; the class in the component is the implementation. There is no
-   `cm.transition()` call because there is no JS animation — that is a property of
-   the continuous form, not a missing branch.
+An exit needs an owner that remains mounted until the actual surface finishes. A component cannot
+animate its own removal after its parent unmounts the entire boundary. Keep exiting visual content
+out of the accessible name/tab order without prematurely releasing a modal's lifecycle. Re-entry
+reverses the existing surface without resetting focus/state. Entrance delays never carry into exit.
+Minimum loading duration and delayed application commits are outside the animation system.
 
-#### The one exception: single-element rotation
+### 3.4 Measured size and position
 
-Rule 1 has exactly one carve-out. `spinner` uses `animate-spin`, which loops on
-`transform: rotate`. It qualifies because all five hold, and a component that misses
-one of them does not:
+geometry.resize is available wherever appropriate, regardless of legacy tier. Observe natural
+content and animate a separate shell. One owner measures/writes each axis; ancestors must not spring
+behind every frame of a child's spring. Text/number helpers do not create competing shell-width
+controllers. Position ownership stays separate from intrinsic size.
 
-1. **One element.** Not a row, not a list, not a whole surface.
-2. **Rotation only.** Nothing translates, scales, or changes size, so no layout is
-   read and no neighbour moves.
-3. **The rotation is the information.** A spinner means "work in progress"; a static
-   icon would say the opposite. Under `reduced` it keeps spinning for the same reason
-   an opacity loop does (M5 removes travel and scale, not the ability to see that
-   something is loading) — and the accessible name still carries the state:
-   `role="status"` + `aria-label="Loading"`.
-4. **Still gated by `data-motion`.** `none` resolves to `animate-none`, so a
-   screenshot, a print stylesheet, and a reduced-data page get a still frame.
-5. **Nothing beyond a glyph.** A logo, a hero image, or a card that rotates is
-   decoration and is rejected in review.
+| Cause                                                | Default target behaviour                                          |
+| ---------------------------------------------------- | ----------------------------------------------------------------- |
+| Label/value/icon content revision                    | Animate the affected intrinsic axis from its current visual size  |
+| Expansion, content insertion, panel change           | Animate measured height or both axes within constraints           |
+| Explicit size prop change                            | Shell geometry may animate; typography/spacing use final layout   |
+| Font arrival, viewport resize, passive parent reflow | Re-measure and apply immediately                                  |
+| Direct pointer resize                                | Follow input directly; only an applicable release snap may settle |
+| Unknown resize origin                                | Apply immediately instead of guessing an authored transition      |
 
-Anything else that needs a transform loop — a marquee, a shimmer sliding across a
-surface — stays rejected: those move content, and content that moves forever is the
-compositor tax this section exists to prevent.
+A semantic revision/known expansion starts the measurement transaction. A fixed elapsed window such
+as all resizes within 700 ms cannot reliably distinguish content from font or environment changes.
+Read before writing, ignore hidden zero measurements until valid, and clamp rendered geometry against
+intrinsic minimums, available space and closed-state constraints. A real disclosure may close to zero;
+a label must preserve readability. Reduced/none use current intrinsic geometry before paint, not
+stale cached dimensions. Each part states whether text reflows during width change or is laid out at
+the destination width. Do not solve general resizing by scaling text. Temporary clipping belongs to
+the content viewport, not the focus ring or portals, and is removed when no longer needed.
+
+Destination-width layout must pass a readability check. A smaller intermediate shell must not add
+truncation beyond the component's existing policy or hide the newly committed control label, caret,
+focused control or content required to act. If existing valid overflow cannot preserve that content,
+settle the affected axis immediately. A deliberately collapsed disclosure may progressively reveal
+body content, but moving focus into the hidden region forces sufficient geometry first. A focused
+native editor also takes priority over decorative geometry that would shift its caret, content box
+or scroll position; appearance/colour on disjoint properties can continue.
+
+For compound geometry, name one owner for a same-cause axis or coordinate both destinations from
+natural layout before starting. Ancestors do not reclassify interpolated child frames as semantic
+content changes. Resolve cyclic constraints immediately rather than starting mutually dependent
+springs. Recovering from hidden/zero measurements establishes current intrinsic baseline first;
+becoming measurable alone does not replay an entrance or manufacture a resize revision.
+
+### 3.5 Colour feedback
+
+state.color explicitly names background-color, color, border-color and applicable fill/stroke.
+Shadow feedback requires a declaration; never use transition: all. Semantic theme tokens choose
+colours. Foreground/background share the state commit and compatible clocks; verify intermediate
+readability and make focus immediately recognisable. Inherited text colour has one owner, not another
+interpolation on every descendant. Colour and shadow can repaint; they are not compositor-only.
+
+A theme boundary coordinates document-level changes and suppresses redundant local theme animation
+when appropriate. CSS and Motion may share a node only on disjoint properties. Full uses the token
+clock, reduced a shortened clock, and none zero duration/delay with running transitions cancelled.
+Current colour classes do not universally satisfy this target yet.
+
+### 3.6 Changed text
+
+AnimatedText uses text.change, independently of text.reveal/text.split entrances. The target pipeline
+is grapheme segmentation, common-prefix/suffix fast paths, bounded order-preserving middle diff
+(Myers/LCS or equivalent), then persistent identities for retained content. Never use the entire value
+or array index as identity. Character-plus-occurrence alone mismatches repeated letters; prefix/suffix
+alone misses unchanged middle runs. Even one retained grapheme stays retained.
+
+Contract examples: Save → Saved adds only d; Send → Sent replaces only d; aba → aaba preserves the
+original suffix; aXbYc → aPbQc preserves a/b/c. New/deleted/replaced units receive entry/exit; retained
+units may move to make room but never replay a replacement fade. Default text is sharp, with no blur
+or scale. Budget changed units and cap stagger. Streaming append uses the prefix fast path; new commits
+replace obsolete targets rather than queue historical transitions.
+
+Intl.Segmenter grapheme boundaries protect combining marks and emoji; Array.from is insufficient.
+Segmentation does not guarantee shaping: preserve connected-script, ligature and bidirectional runs;
+test wrapping and truncation. If safe diff/shaping or animation budgets cannot be maintained, apply
+the affected text immediately. Do not replay the whole string as an undisclosed fallback.
+
+CodeBlock may animate newly inserted/deleted lines as units, but a modification within a retained
+line preserves unchanged graphemes/runs. Syntax-highlighting tokens are presentation, not stable text
+identity. A single edited character must not fade the whole retained line; unsafe shaping/diff falls
+back to immediate affected content. High-frequency Bubble appends animate only new content and may
+settle geometry immediately under its documented load policy; this is not an exemption for low-frequency
+message edits, attachment expansion or reaction changes. See their individual component contracts.
+
+Known plain-text component slots opt in by default. Arbitrary React elements, rich text, links and
+render callbacks retain their structure and explicitly compose AnimatedText when desired. Never
+inspect function-component internals/displayName for identity. Input, textarea and contenteditable
+values remain native: caret, selection, IME, undo and autofill are not replaced by animated spans.
+Labels/helper text are separate display slots. Final semantic text updates immediately. Exit copies
+and decorative layers cannot duplicate accessible names or copied text; do not default every update
+to aria-live. Selection, copy and accessible-name behaviour need browser proof.
+
+An active native text range or browser find target is a presentation constraint, not permission to
+replace the selection tree. If a split/replacement overlay cannot preserve it, settle that affected
+slot to exact current text and omit the effect. `aria-hidden` alone does not guarantee outgoing text
+is excluded from selection/copy; verify that separately. Primitive/virtualizer visibility signals
+cancel hidden work without adding per-glyph observers or a document-wide polling loop.
+
+### 3.7 Changed numbers
+
+AnimatedNumber implements place-value reels. Interpolating a scalar and formatting each frame is
+counting, not rolling; extra slot-machine turns/random letters are separate optional effects. Initial
+SSR/hydration shows the actual value, never a roll from zero. Intl.NumberFormat.formatToParts separates
+digits, grouping, signs and units.
+
+Integer identities count left from units; fractional identities count right from tenths. 19 → 20
+rolls changed columns in the direction of the whole value; 99 → 100 retains units/tens and introduces
+hundreds. Unchanged digits stay still. Separators/affixes only enter, exit or reposition as needed.
+tabular-nums helps equal-digit widths, not total digit-count changes. One geometry owner sizes the
+surrounding shell; reel movement and shell movement must not fight.
+
+Default direction is trend. Explicit up/down/shortest are alternatives; shortest never silently
+reverses trend for a large delta. Bound turns and total visual time. Unchanged formatted output does
+not animate. Locale/format-only changes rearrange formatting, not fictitious growth/decline. Define
+cross-zero/negative-zero, rounding, precision, percentage/currency, compact notation, large integer,
+non-Latin-digit, RTL and NaN/Infinity handling. Unsupported formats show the correct final formatted
+value immediately rather than a corrupted reel.
+
+Numeric slots, including a supported display slot receiving a number directly, opt in. Strings such
+as 00123, phone numbers, versions and dates are never parsed heuristically. Mixed content composes an
+explicit numeric part. Semantic final values/aria-valuenow update immediately where applicable. Reels
+retarget from current cell/subpixel offsets. Reduced/none jump with zero delay. The resolver and
+renderer must implement that together; the existing snappy token alone does not provide this contract.
+
+The [preset renderer policy](motion/presets.md#5-geometry-text-and-numerical-limits) defines the bounded
+two-cell travel, trend/up/down/shortest directions, retargeting and formatter fallback. Default reels
+do not count through intermediate values or make extra turns. Apply the shared moving-column limit
+to a known coordinated update as well as an individual display, so splitting a data revision into
+many cells cannot create unbounded work. A data/readout composition such as Progress shares a single
+presentation transaction rather than assuming matching token names synchronize independent engines.
+
+### 3.8 Viewport reveal and rhythm
+
+RevealGroup coordinates registered Reveal targets instead of a global selector whitelist. Share an
+observer for matching root/options, register/unregister dynamic targets and disconnect on cleanup.
+Reduced/none need no decorative hidden state or observer. Target API defaults are in §5.2.
+
+| Signal                 | Meaning                                                                    |
+| ---------------------- | -------------------------------------------------------------------------- |
+| Scope readiness        | Successful enhancement; absent means ordinary visible content              |
+| Target pending/visible | Presentation only; never replace Base UI data-state or semantic open state |
+| Stable rhythm slot     | Assigned to mounted identity; survives reordering and replay               |
+| Element delay variable | Entrance delay; exit, focus reveal and downgrade force zero                |
+
+Default replay is once for readable/interactive content; repeat is explicit for narrative regions.
+The progression is unenhanced-visible → armed-pending → entering → visible; repeat may return to
+pending after leaving. Already-visible SSR content is never re-hidden during initialization. Arm
+eligible offscreen targets after successful setup. Failure/unmount restores visibility. Returning to
+full after a bypassed entrance must not hide or replay consumed content.
+
+Target defaults: amount 0.08, inset top 0.03/bottom 0.08 as fractions of root height converted to pixel
+rootMargin values. Recompute on root resize. Native rootMargin percentages use root width even for
+top/bottom: passing these fractions as percent margins would change their meaning. Check
+intersectionRatio against amount, not only isIntersecting. Large targets need a reachable threshold
+or an appropriate sentinel. Repeat uses distinct enter/leave thresholds to avoid edge flicker; these
+belong to the shared trigger policy, not component timers.
+
+Cyclic stagger is (stable slot modulo 3) × 55 ms, exposed through an element-level CSS delay variable.
+It yields 0/55/110 ms, not a limit of three simultaneous animations. The concurrency/total stagger
+budgets still apply; overflow targets appear immediately or use fewer moving groups. There is no
+unbounded reveal queue. Exit is faster and unstaggered, not a complete time-reversed entrance.
+
+CSS transitions need an established before-change computed style, not a physically presented hidden
+frame. @starting-style can provide initial styles where applicable; it does not implement viewport
+state. Neither single nor double requestAnimationFrame proves paint. Unsupported/failed enhancement
+leaves the final visible state; avoid per-target forced layout and timeout rescue animations. The
+initial-style adapter needs actual browser first-frame proof.
+
+Pending targets cannot accept invisible pointer activation. Focus-in, hash navigation and explicit
+reveal show the target before interaction without delay; repeat cannot hide a focused subtree.
+Essential semantic content stays available to assistive technology. Print and scripting-disabled
+content are visible. This fallback is decorative reveal policy, not a rule to open closed popups.
+
+### 3.9 Other changes and coordinated examples
+
+Collections cover insert/remove/sort/filter with stable IDs and virtualisation boundaries. Within a
+single-active-item scope, a shared selection indicator may move instead of fading independent backgrounds.
+Multi-selection retains independent selected states; radio dots may coordinate local transitions without
+flying between distant controls. Each component records the suitable selection choreography. Icons use
+state.morph; arbitrary SVG path morphing still requires an explicit property-budget review. Media
+load/fallback, empty-to-content and helper/error rows coordinate presence/size without delaying error
+information. Cached images may appear directly.
+
+Charts/progress retain their engine interpolation and semantic final value. A numeric readout shares
+the target, direction and appropriate rhythm; completion/failure never waits for a visual interpolation
+to cross a threshold. Undo/optimistic rollback retargets from current visuals. Native drag follows
+input directly; release motion is separate. Route/theme transitions and large scroll stories remain
+application compositions, not automatically installed effects on every part.
+
+For Save → Saved, commit semantic text, retain Save nodes, measure final natural width, then start
+only d's entry plus shell resize in one transaction. Saving arriving mid-flight cancels obsolete exits
+and completion callbacks. For 99 → 100, commit 100 semantically, roll units/tens upward, introduce
+hundreds and resize the shell; an intervening 98 retargets from current reels rather than restarting.
 
 ---
 
@@ -503,7 +848,30 @@ than remounting its focus owner. A portal resolves the local provider clock, inc
 under outer none subject to the OS preference. Native CSS clock changes do not promise in-flight
 retiming; mode downgrade/none cancellation remains mandatory.
 
+### Coordinating one committed change
+
+A semantic revision can coordinate colour, text, icon and size in parallel. Each property has one
+writer and each size dependency has one owner. Parent presence consumes only the same entrance
+cause; it does not suppress later descendant updates. Never animate the same transform through
+press, layout and reveal independently: compose the transform in one adapter or use a deliberate
+semantics-preserving visual layer. Avoid blanket wrappers that break table structure, refs, selectors,
+Base render callbacks or anchor measurement. Popup anchors must remain stable while their geometry
+is used; move feedback to an appropriate visual part when necessary.
+
+Latest committed target wins. Cancel obsolete completion callbacks and removed-node writes; retain
+current position/velocity where the recipe promises continuity. Direct input takes priority over
+autonomous settling. Live reduced/none and zero-clock changes settle before the next paint even when
+the target did not change. Resuming full does not replay settled or consumed transitions. Business
+state, focus, disabled/error/success and accessible names commit immediately; no animation queue or
+minimum working interval delays them.
+
 ## 5. Composition-layer API
+
+### 5.1 Runtime compatibility surface
+
+This Recipe union is the current exported set, kept in sync with lib/motion.ts by registry:check.
+It does not yet include the two v2 additions or promise their public renderers. The hook's existing
+mode/timeScale inheritance and source-distributed API remain compatible during migration.
 
 ```ts
 export type CadenceMode = "full" | "reduced" | "none";
@@ -535,7 +903,8 @@ export function useCadenceMotion(): {
   reduced: boolean;
   /** `mode === "none"` only: a CSS-driven component must resolve to zero duration */
   disabled: boolean;
-  transition(recipe: Recipe, options?: { delay?: number; distance?: number; timeScale?: number }): Transition;
+  timeScale: number;
+  transition(recipe: Recipe, options?: { delay?: number; duration?: number; timeScale?: number }): Transition;
   distance: typeof distance;
   spring: typeof spring;
 };
@@ -555,23 +924,94 @@ Implementation notes:
   stays disabled;
 - a nested provider inherits the mode and the scale it does not set, so a subtree can slow down (or be
   silenced) without resetting the page to `full`; passing `mode` explicitly is how it opts back in;
-- with no provider, return `full` (components work standalone, wrapping is not mandatory);
+- with no provider, follow the system preference (`reduced` when requested, otherwise `full`);
 - the object returned by `transition()` can be passed straight to Motion's `transition` prop, optionally composed with `delay`.
 
 > `reduced` and `disabled` are deliberately two flags. A component that branches on `reduced` alone
 > will keep a 100ms fade under `none` — that is the failure the two-flag split exists to prevent.
 
+### 5.2 Target public primitives
+
+These are design interfaces, not available imports/install commands. Each public primitive will have
+an independently declared registry item, relative shared imports, namespaced dependencies and its own
+contract tests. They do not require every ordinary consumer to wrap each component manually.
+
+| Primitive      | Minimal target API                                                                                                                           | Ownership                                                       |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| AnimatedText   | value: string; locale?; granularity: auto/grapheme/word (default auto)                                                                       | Changed display text; no independent outer width spring         |
+| AnimatedNumber | value: number/bigint; locales?; format?: Intl.NumberFormatOptions; direction: trend/up/down/shortest (default trend)                         | Place-value reels and final formatted semantics                 |
+| RevealGroup    | replay: once/repeat (default once); amount: 0.08; inset: top 0.03/bottom 0.08; stagger: none/cycle (default none); optional observation root | Observer lifecycle, stable group slots and shared reveal policy |
+| Reveal         | Base-style render composition with a real ref-capable target; children                                                                       | Registers one target, preserving props/refs/DOM semantics       |
+
+Auto granularity preserves safe shaping runs; it is not permission to split connected scripts into
+independent inline blocks. All primitives inherit mode/timeScale. Per-instance raw duration/easing/
+spring knobs are not part of the default API. Overrides use shared recipe/token policy. Read-only
+numeric display is separate from an editable number field; the latter is not added by this design.
+
+Illustrative target composition (not runnable against the current registry):
+
+```tsx
+<CadenceProvider mode="full">
+  <Button>{label}</Button>
+  <Badge>
+    Selected <AnimatedNumber value={count} /> items
+  </Badge>
+  <AnimatedText value={description} locale="en" />
+  <RevealGroup replay="repeat" stagger="cycle">
+    <Reveal render={<Card />}>Narrative content</Reveal>
+  </RevealGroup>
+</CadenceProvider>;
+```
+
+Supported plain-string slots use the text capability internally; number-valued display slots use
+numeric semantics. Mixed JSX explicitly composes the relevant primitive. Arbitrary children and
+render callbacks remain caller-owned. Individual target contracts are in the
+[component catalogue](motion/README.md#5-catalogue); component-family rollout remains in the
+implementation plan. Internal geometry/presence adapters are shared implementation, not
+an obligation to expose more wrapper components or duplicate shadcn APIs.
+
 ---
 
 ## 6. Three-layer strategy for reducing motion
 
-| Layer     | Trigger                                                                      | Effect                                    | Implementation                                                   |
-| --------- | ---------------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
-| System    | `prefers-reduced-motion: reduce`                                             | Disable transform/layout, keep opacity    | `MotionConfig reducedMotion="user"` + CSS media query            |
-| Product   | `data-motion="reduced"`                                                      | Drop transform/scale, tween duration ×0.6 | `transitionFor()` folds it; the CSS variables carry the same 0.6 |
-| Component | `data-motion="none"` (local attribute) or a component's `disableMotion` prop | Force motion off for one component        | Branch on `useCadenceMotion().mode` inside the component         |
+System preference is a ceiling: a full provider cannot bypass OS reduced motion. An explicit none
+stays none. A nested provider inherits omitted mode/clock values; an explicit nested full may override
+an outer none only subject to the OS preference, preserving current provider semantics. Standalone
+components still follow the OS. data-motion exposes the resolved mode to CSS; writing an attribute
+alone is not a universal imperative-engine cancellation API.
 
-**Hard constraint**: a component that expresses a state change _only_ through animation is unacceptable. Toast dismissal, error messages, and success ticks must be perceivable outside the animation via text, an icon, or `aria-live`.
+| Capability                 | Full                                            | Reduced                                               | None                                 |
+| -------------------------- | ----------------------------------------------- | ----------------------------------------------------- | ------------------------------------ |
+| Decorative viewport reveal | Configured once/repeat                          | Bypass controller; visible                            | Bypass controller; visible           |
+| Semantic popup/presence    | Appropriate travel/scale and opacity            | Short opacity only                                    | Immediate lifecycle target           |
+| Size/position              | Measured continuity                             | Immediate geometry, no delay                          | Immediate geometry, no delay         |
+| Colour                     | Token transition                                | Shortened colour transition                           | Immediate; cancel duration and delay |
+| Changed text               | Changed-unit entry/exit; retained-unit movement | Changed-part fade, no travel/blur/stagger             | Immediate text                       |
+| Numeric reels              | Place-value rolling                             | Final value immediately                               | Final value immediately              |
+| Direct manipulation        | Follow input; applicable release settling       | Preserve operation, remove decorative/inertial motion | Preserve necessary direct operation  |
+| Continuous status effects  | Active, visible, pausable CSS loop              | Static equivalent status                              | Static equivalent status             |
+
+This is the v2 target. Current colour feedback and continuous-loop branches must be migrated before
+claiming this matrix for an item. Short tween timing continues to use reducedDurationScale; no extra
+stagger/delay survives an immediate geometry or numeric path. Zero timeScale is immediate recipe
+timing, not a different mode, and does not change the continuous theme-clock contract (§2.2.1/§3.2).
+
+Bypassing the decorative reveal controller never bypasses a semantic state machine: a reduced Dialog
+still opens/closes and a Switch still changes value. A live downgrade cancels active motion, not just
+the next animation. None disables every library-authored transition, including colour/opacity/filter
+and loops. Static placement transforms are permitted when they represent final geometry.
+
+An animation delay is distinct from a primitive's interaction timing or application lifetime.
+None/zero removes presentation delay, stagger and animation-only exit holds; it does not remove
+Tooltip/HoverCard intent delays, Toast lifetime/pause rules, debouncing explicitly owned by the
+application, or the native event order. Do not change those defaults to make a motion mode appear
+instant. Conversely, an interaction timer must never be repurposed to postpone semantic completion
+or keep an otherwise finished visual alive. Reduced/none preserve any ongoing direct native gesture;
+the mode adapter cancels autonomous settling without dropping capture or moving away from input.
+
+Errors, progress, loading and success remain available as text/icons/native state. Announcements are
+intentional; do not add aria-live to every animated string. Reduced motion cannot remove input methods
+without an equivalent accessible operation, nor can it replace native editing with display animation.
 
 ---
 
@@ -589,20 +1029,24 @@ Implementation notes:
 
 Implementation rules:
 
-1. **Animate only `transform` / `opacity` / `filter`**; `filter: blur()` is costly, so use it only on small text areas and at ≤ 4px. The documented exceptions are chart SVG data geometry (§3.1.2), native scroll offsets through `scroll.navigate` (§3.1.5), disclosure height and `geometry.resize`. The latter two are measured, clamped to the closed size, confined to T3 continuity components, and resolve to zero duration under reduced/none.
+1. **Budget properties explicitly.** Spatial presentation uses transform/opacity; optional filter blur is limited to reviewed small text areas at ≤4 px and is off by default. Colour/border/fill/stroke and declared shadow feedback use state.color. Measured width/height uses geometry.resize, clamped and immediate under reduced/none at any legacy tier. Chart SVG geometry (§3.1.2) and explicit native scroll offsets (§3.1.5) retain their documented exceptions. No generic padding/font-size/radius/path animation is implied by a recipe name.
 2. **No layout-read loops**: `getBoundingClientRect` and `offsetWidth` are read inside event/`ResizeObserver` callbacks only, and reads precede writes.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
 4. **`layout` animations trigger layout measurement**: for lists over 50 items, switch to manual transform or paginate.
-5. **Springs must not overshoot**: `bounce ≤ 0.2` for UI elements; larger values are for marketing only. A physics-defined spring that inherits velocity can still cross its target once, so measured geometry also clamps the rendered value (rule 9).
-6. **Lazy-load GSAP**: the `scroll.story` component imports `gsap` dynamically so it never hits first paint.
+5. **Reading surfaces do not bounce**: text, numeric readouts and size recipes author bounce zero. Existing press feedback remains separately tokenised. A physics spring inheriting velocity can still cross its target, so geometry clamps the rendered value (rule 9). More expressive gestures require a separately reviewed recipe and do not become everyday defaults.
+6. **Keep optional engines optional**: any future scroll.story/GSAP item must declare and load that dependency explicitly. No GSAP component is currently shipped; basic v2 capabilities do not require it.
 7. **Keep `AnimatePresence` subtrees small**: wrap only the elements that need an exit, never a whole page.
 8. **Interruptible springs are physics-defined**: a recipe that can be retargeted mid-flight
    (`layout.move`, `layout.shared`, `geometry.resize`, `handoff`) declares `continuity: "velocity"`,
    and `transitionFor()` expands the token into `stiffness`/`damping`/`mass` after `timeScale`.
    Never hand a `visualDuration` spring to an element that must reverse smoothly.
-9. **Measured geometry is clamped**: render `clampMeasuredSize(value, closedSize)` around the
-   animated width/height, so a label never dips under the width it needs. Clamp the rendered value,
-   not the spring: the underlying physics stays continuous.
+9. **Measured geometry is clamped**: use clampMeasuredSize or the documented adapter equivalent
+   against intrinsic/closed/available constraints (§3.4). Clamp the rendered value, not the spring.
+10. **Bound text and group work**: retained characters do not animate again; diff work and moving
+    glyphs have a budget. Reduce moving groups or show final values when limits are exceeded. Cyclic
+    delay does not bound concurrency. Reuse observers where appropriate and do not measure every glyph
+    on every frame. The 400 ms stagger ceiling applies after timeScale; scale/clamp group delay or
+    reduce the moving set to remain within it.
 
 ---
 
@@ -635,14 +1079,20 @@ gates and future work belong to [the plan](parity-plan.md#8-next-work).
 
 ## 8. SSR and hydration
 
-| Rule                                            | Reason                                                                                                 |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `initial={false}` for above-the-fold elements   | Avoids the server rendering the end state and the client replaying the animation, which causes flicker |
-| Do not read `matchMedia`/`window` during render | No value on the server; use `useReducedMotion` (which uses `useSyncExternalStore` internally)          |
-| No random values or times as initial state      | Server and client would disagree                                                                       |
-| `layoutId` only appears client-side             | Use `"use client"` within the RSC boundary                                                             |
-| Popups do not render by default (`open=false`)  | Avoids an extra tree on first paint                                                                    |
-| Every animated component is `"use client"`      | The server never runs animations                                                                       |
+| Rule                                                          | Reason                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `initial={false}` for above-the-fold elements                 | Avoids the server rendering the end state and the client replaying the animation, which causes flicker   |
+| Read system preference through the shared external-store hook | Server/client snapshots agree during hydration; components do not directly query browser state in render |
+| No random values or times as initial state                    | Server and client would disagree                                                                         |
+| Layout ownership stays in a client boundary                   | Preserve deterministic SSR markup and identity; a Client Component can still render on the server        |
+| Popups do not render by default (`open=false`)                | Avoids an extra tree on first paint                                                                      |
+| Every animated component is `"use client"`                    | The server never runs animations                                                                         |
+
+Reveal enhancement never globally hides server-visible content. Text/number initial values, locale,
+formatting and segmentation must agree on server and first client render. Initial values do not
+animate from empty/zero. Stable IDs are deterministic across hydration. CSS media rules protect the
+first paint before the shared system-preference subscription updates; JS policy alone is insufficient.
+No-JS visibility means present readable content, not a promise that Base UI controls work without JS.
 
 ---
 
@@ -688,8 +1138,9 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
 
 Animated component suites must execute `expectMotionContract(mode)` in full, reduced and none.
 `tests/motion-contract-reporter.mjs` (configured in Vitest) enforces successful runtime calls for every
-registry UI/block with a nonempty `meta.motion`; an import, comment, skipped test or dead call does not count. T0 structural suites
-have no provider/helper obligation. The scaffold leaves an intentionally failing contract test until
+registry UI/block with a nonempty `meta.motion`; an import, comment, skipped test or dead call does not count.
+Currently static items need no fabricated provider/helper; an animated capability triggers the
+obligation regardless of legacy tier. The scaffold leaves an intentionally failing contract test until
 the animated fixture is implemented.
 
 The shared unit helper checks mounted `data-motion` parts, CSS state classes and local clocks,
@@ -698,8 +1149,9 @@ contribute runtime metadata; skipped suites do not count.
 `registry:check` requires the named animated test file to exist. Test-only pass-through
 observers preserve real Motion rendering and control methods. Neutral scale/translation is legal;
 Switch/Progress retain positional transforms with an instant clock under reduced/none. Static
-placement transforms and direct pointer geometry are not entrance animations. Spinner alone retains
-its documented single-glyph spin under reduced. Decorative glyph orientation (for example CodeBlock's
+placement transforms and direct pointer geometry are not entrance animations. The current helper's
+Spinner reduced-spin exception is a migration baseline, not the v2 rule; remove it with the source,
+loop policy and consumer docs migration. Decorative glyph orientation (for example CodeBlock's
 expanded chevron) may retain a rotation target with a zero clock; a timed rotation still fails.
 Imperative geometry fixtures opt into `instantImperative` for the reduced clock; none always checks
 observed imperative clocks. Engine and native WAAPI animation tests supply an
@@ -713,11 +1165,31 @@ Computed Tailwind styles, same-target live cancellation, first paint, system pre
 providers, final measured positions and per-frame running geometry still need browser evidence.
 Adopting the helper does not close the cross-library running-mode audit.
 
+V2 extends the recognisers/helper to colour properties, shared helper implementation evidence and
+reduced static loops. A passing legacy helper is not sufficient evidence for a newly promised v2
+capability. Retain negative fixtures so a declared dependency, dead call or wrapper attribute cannot
+masquerade as exercised motion.
+
 ### 9.4 a11y and visual regression
 
 - `@axe-core/playwright`: run once per component page, 0 violations;
 - keyboard script: Tab/Shift+Tab, arrow keys, Esc, Enter/Space;
 - visual regression: screenshot key frames only, threshold `maxDiffPixelRatio: 0.01`, so font differences do not turn everything red.
+
+### 9.5 V2 behaviour acceptance
+
+| Area            | Required evidence                                                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Text            | Retained DOM identity; multiple changed runs; repeated letters; insertion/deletion; emoji/combining characters; connected scripts/RTL; wrapping, copy and final accessible text |
+| Numbers         | 9↔10, 99↔100, cross-zero, rounding, currency/compact formats, unchanged formatted values, locale change, bounded large jumps and direction                                      |
+| Geometry        | Content/size revisions versus passive resize; nested ownership; hidden-zero recovery; intrinsic minimums, wrapping and focus-ring clipping                                      |
+| Reveal          | Correct amount/inset; huge targets; first paint/SSR/no-JS; once/repeat; stable delay after reorder; boundary flicker; focus/hash and failure cleanup                            |
+| Modes/lifecycle | 3 modes × 2 OS preferences; nested overrides; same-target live downgrade/zero clock; rapid reversal; route/unmount cleanup; no detached writes                                  |
+| Colours/loops   | Computed colour clocks and mid-flight none; reduced static status; hidden/offscreen pause; theme-change coordination                                                            |
+| Composition     | Parent/child entrance consumed once; press/resize/reveal properties do not compete; portals and engine/native operations stay correct                                           |
+
+Keep API/parity/keyboard checks and actual engine/native WAAPI assertions. Performance evidence is
+measured separately under §7, including complete routes and real-device frame presentation.
 
 ---
 
@@ -726,32 +1198,42 @@ Adopting the helper does not close the cross-library running-mode audit.
 - ❌ `transition: all 0.3s` (uncontrollable; animates layout properties)
 - ❌ Using `setTimeout` to end an animation (not interruptible, out of sync with the real duration)
 - ❌ Reading `offsetHeight` in `useEffect` and then writing styles (forces synchronous layout)
-- ❌ Driving one element with both CSS transitions and Motion (double-write conflict)
+- ❌ Driving the same property with CSS and Motion/another engine (disjoint properties on one node are allowed)
 - ❌ Spring `bounce > 0.3` on informational UI
 - ❌ Infinite loops (marquee, shimmer) that cannot pause or ignore reduced motion
 - ❌ Hiding critical information behind an animation (errors, load failures)
 - ❌ Unmounting an element outside `AnimatePresence` and expecting an exit animation
 - ❌ Adding `overflow: hidden` to `body`/`html` without cleanup (a common drawer bug)
 - ❌ Relying on `:hover` as the only state indicator (unusable on touch)
+- ❌ Replaying unchanged text, guessing numeric strings, or splitting native editable content
+- ❌ Parent and child springing the same size, or animating every passive ResizeObserver notification
+- ❌ Treating three stagger slots as a concurrency cap, or rAF as proof that a frame was painted
+- ❌ Publishing target recipes/API claims before their source, registry, docs and tests migrate
 
 ---
 
 ## 11. Motion review checklist
 
 - [ ] Which causality does this animation explain? (If you cannot say it in one sentence, delete it.)
-- [ ] Who is the protagonist? Is only one element moving at a time?
+- [ ] Which capability is default, inherited, composed or inapplicable, and who owns each property?
+- [ ] Do related text, size, icon and colour changes share a cause without duplicate parent/child entrances?
 - [ ] Can the close animation be smoothly interrupted by re-opening?
 - [ ] Do the layout springs keep their velocity when retargeted (physics-defined, not `visualDuration`)?
-- [ ] Is every measured size clamped to its closed size, and instant under reduced/none?
+- [ ] Is every measured size constrained appropriately, with current intrinsic geometry and zero delay under reduced/none?
 - [ ] Under reduced motion, is the information complete and the state still recognisable?
-- [ ] Does it animate only transform/opacity/filter? Does it trigger layout?
+- [ ] Are properties explicitly allowed, including colour and any measured/engine exception? What layout/paint work occurs?
 - [ ] Does it use this document's tokens and recipes? Are there new magic numbers?
 - [ ] Is there a matching Playwright assertion or screenshot?
-- [ ] Is it still acceptable on low-end devices (4× CPU throttle)?
+- [ ] Does it pass real-device budgets? CPU throttling is diagnostic and does not replace device evidence.
 - [ ] Does the duration match the element's place in the hierarchy?
 - [ ] Can it be fully disabled with `data-motion="none"`?
+- [ ] Do live downgrade and same-target clock changes cancel running work, including CSS colour and delayed starts?
+- [ ] Are unchanged text/value identities, shaping, native editing and accessible final values preserved?
+- [ ] Does user-facing documentation describe delivered behaviour, with remaining target work in the plan?
 
 ### Data Table composition (B8)
+
+Delivered baseline; row/text/numeric capabilities are scheduled in the v2 plan, not claimed here.
 
 The `registry:block` Data Table is T2 because it composes Button `feedback.press`,
 Checkbox / menu `state.morph`, and Dropdown Menu `popup.anchored` / `exit.fade`.
@@ -766,6 +1248,8 @@ the Data Table composition. Each composition must retain the installed controls'
 
 ### Date Picker composition (B8)
 
+Delivered baseline; value/panel capabilities are scheduled in the v2 plan, not claimed here.
+
 The T2 `registry:block` composes Button `feedback.press`, Popover
 `popup.anchored` / `exit.fade` and Calendar `data.transition`. The date label and
 selection update immediately. Single/range selection never keys the popup or
@@ -778,3 +1262,19 @@ the scale transition on downgrade cancels an active scale immediately. Nested
 full under outer none restores the local clock, subject to OS reduce. Other popups require their own applicable lifecycle proof.
 
 Site DocumentEntrance treats a consumed entrance as shown even when offscreen: restoring full mode after initial none must not re-hide or replay the same document host. SSR hidden, noscript and print restoration stay unchanged.
+
+The DocumentEntrance note describes the existing site adapter. The new Reveal API follows §3.8's
+visible-first enhancement contract; migrate the site adapter explicitly rather than inferring that
+its existing SSR-hidden strategy already satisfies that contract.
+
+## 12. Technical references
+
+- [Base UI animation lifecycle](https://base-ui.com/react/handbook/animation): starting/ending styles and interruption.
+- [Motion transitions](https://motion.dev/docs/react-transitions): tween and physics/duration spring behaviour.
+- [Intersection Observer](https://www.w3.org/TR/intersection-observer/): area thresholds, root margins and delivery.
+- [CSS before-change styles](https://www.w3.org/TR/css-transitions-2/#defining-before-change-style): initial transition styles.
+- [HTML rendering opportunities](https://html.spec.whatwg.org/multipage/webappapis.html#update-the-rendering): rendering and animation-frame callbacks.
+- [Unicode text segmentation](https://www.unicode.org/reports/tr29/) and [Intl.Segmenter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Segmenter): grapheme boundaries.
+- [CSS text boundary shaping](https://www.w3.org/TR/css-text-3/#boundary-shaping): shaping across inline boundaries.
+- [Number format parts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/formatToParts): locale-aware digit/affix parsing.
+- [React hydration](https://react.dev/reference/react-dom/client/hydrateRoot): matching initial server/client output.

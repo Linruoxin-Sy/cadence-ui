@@ -6,12 +6,23 @@ validation.
 
 ## Before you start
 
-- Read the [parity plan](docs/parity-plan.md) for the scope, the batch you are contributing to, and the
-  motion tier of your component.
-- Read the [motion system](content/docs/motion.mdx) and the [architecture overview](docs/overall-design.md).
+- Read the [parity plan](docs/parity-plan.md) for scope, batches, compatibility metadata and budgets.
+- Read the [motion v2 design](docs/animation-system.md), its [implementation plan](docs/animation-system-plan.md),
+  and the [architecture overview](docs/overall-design.md). The [user motion guide](content/docs/motion.mdx)
+  describes the currently shipped surface.
+- Read the component's individual target contract in [the motion catalogue](docs/motion/README.md)
+  and the [preset assignments](docs/motion/presets.md). Design every component's choreography separately;
+  global style guides visual choices while the common execution contract stays mandatory.
 - Check `content/components/` and the open issues to see whether the component already exists; recipes
   are listed in the [animation system](docs/animation-system.md).
 - Search existing issues before opening a new one.
+
+Motion v2 assesses every component for applicable capabilities and assigns one owner to each animated
+property; tiers do not grant or prohibit animation. The current runtime, registry schema, metadata, MDX,
+and test helpers are retained for compatibility until their migration is implemented. Planned
+`state.color`, `text.change`, numeric rolling changes and public helpers are not installable APIs merely
+because they appear in the design. Keep source, declarations and user-facing documentation in sync for
+each migrated component, and leave outstanding implementation work explicit in the plan.
 
 ## Local setup
 
@@ -34,6 +45,12 @@ The script writes the source, docs, preview, and test, registers the preview, an
 item. Use `--input` for new input/data-owning APIs to include Validation and data ownership.
 Then replace the stub body and TODO prose with the upstream API and source-backed documentation.
 
+Also author `docs/motion/components/<id>.md` and its catalogue index entry before implementing motion.
+The current scaffold does not generate these files. Assess six capability owners, each action's three
+modes, rapid update/reversal/close behavior, preset bindings and geometry/performance constraints.
+Keep target design in that file and actual delivered claims in public MDX; parameter values belong
+in the shared catalogue/source, not component-local constants.
+
 ## What a component needs
 
 A pull request is ready when the component has:
@@ -42,7 +59,8 @@ A pull request is ready when the component has:
    on every part, and the same exports and props as shadcn.
 2. **Registry metadata**: `meta.tier`, `meta.batch` (the parity batch from
    [the plan](docs/parity-plan.md#7-batches)), `meta.motion`, `meta.intensity`, `meta.complexity`, and
-   `meta.upstream`. Intra-registry dependencies are namespaced (`@cadence/button`).
+   `meta.upstream`. These remain required compatibility fields until the schema migration lands;
+   declare only implemented recipes. Intra-registry dependencies are namespaced (`@cadence/button`).
 3. **Docs** in `content/components/<id>.mdx` with frontmatter that matches `registry.json`
    (title, description, deps, registryDeps, motion, intensity, complexity, since, tier). Follow the [tier-specific template](docs/documentation-site-and-distribution.md#2-component-page-templates-tier-specific-membership):
    required membership/order, responsiveness/performance at every tier, a motion contract table,
@@ -53,17 +71,23 @@ A pull request is ready when the component has:
 4. **UI only**: no validation imports and no `schema` / `resolver` / `validate` props. Invalid state
    comes from `aria-invalid` / `data-invalid`. See [API and data ownership](docs/overall-design.md#8-component-api-and-ownership).
 5. **Motion conformance**: the recipes declared in `meta.motion`, the MDX frontmatter, and the Motion contract
-   table match what the source actually runs. `full` plays the recipe, `reduced` keeps opacity and drops
-   transform/scale/layout, `none` is instant, and the branch is driven by `useCadenceMotion().reduced` plus
-   `data-motion`. Run the [motion conformance check](AGENTS.md#motion-conformance-check) before the PR.
+   table match what the source actually runs. Audit capability applicability and property ownership, with
+   explicit branches driven by `useCadenceMotion().reduced` and `data-motion`. The v2 target preserves
+   applicable short opacity/colour feedback under `reduced`, removes travel/layout/rolling/stagger and stops
+   all continuous loops, including Spinner. Reveal stays visible without hidden-state enhancement.
+   `none` cancels every animation, transition and delay, including colour. These are migration requirements,
+   not guarantees of the unchanged runtime. Run the [motion conformance check](AGENTS.md#motion-conformance-check)
+   and the checks for the implemented migration step before the PR.
 6. **Accessibility**: roles, keyboard, focus, and a screen-reader story.
 7. **Tests** in `tests/components/<id>.test.tsx` covering the API, the slot, the keyboard path, the `reduced`
    branch, and the `none` mode. Animated suites must execute `expectMotionContract(mode)` from
    `tests/motion-contract.tsx` after rendering/exercising the real parts in all three modes. Vitest's
    mandatory reporter requires successful runtime evidence; importing the helper or skipping its tests
-   fails. Keep behavior assertions for engine/native WAAPI writers and existing interactions. T0
-   structural components need neither a provider nor this helper. See animation-system §9.3 for
-   supported carriers, instant positional geometry and browser-proof limits.
+   fails. Keep behavior assertions for engine/native WAAPI writers and existing interactions. A component
+   with no implemented animated capability needs no provider/helper solely because of a tier label.
+   The current helper's legacy exceptions, including reduced-mode Spinner rotation, remain until the
+   implementation plan migrates them. Passing it does not certify v2 colour, loop or reveal behaviour;
+   retain the design's browser evidence requirements.
 8. **A preview** in `components/site/previews/<id>.tsx`, with its own generated
    `app/(site)/components/<id>/page.tsx` entry. The scaffold writes the entry;
    `registry:check` verifies its single preview import and shared page template.
@@ -86,8 +110,10 @@ running cancellation, first paint, nested providers and measured geometry.
   hand-formatting; `pnpm lint` fails when a file is not formatted.
 - Tailwind v4 utilities and shadcn semantic tokens only. No raw colors, no `transition-all`.
 - Motion presets from `registry/cadence/lib/motion.ts`. No ad-hoc durations.
-- Animate transform, opacity, or filter. Height is allowed for disclosures.
-- Use `data-slot` on each part so consumers can target it.
+- Animate transform, opacity, or bounded filter; use measured, clamped `geometry.resize` for applicable
+  content-driven width/height, instant under reduced/none. Scope colour feedback to explicit properties.
+  Assign one writer per property and preserve native editing, direct manipulation and performance budgets.
+- Use Base UI `render`, `data-slot` on each part, and `cn()` with user classes last.
 - Sentence case in UI copy.
 
 ## Licensing

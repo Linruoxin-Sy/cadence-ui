@@ -1,0 +1,46 @@
+# Item motion contract
+
+Status: target design; implementation and verification pending.
+
+Item treats a row's media, copy and actions as one identity, while allowing later changes to each region to remain local. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
+
+## Capability ownership
+
+| Capability | Coverage and owner |
+| --- | --- |
+| Appearance | default: item for insertion and separately changed media/actions; ItemGroup coordinates group insertion; inherited for a larger parent entrance. |
+| Size | default: item owns content/header/footer-driven block size; item-group owns retained item positions; externally constrained axes remain inherited. |
+| Surface colour | default: item variant/background/border and ItemMedia surface; interaction colours apply only to actual interactive render targets. |
+| Text colour | default: title, description and inherited row foreground; composed independent actions own their states. |
+| Changed text | default: plain ItemTitle and ItemDescription, plus directly owned plain content/header/footer text; composed rich content. |
+| Changed numbers | default: direct quantity values in known display parts; numeric identifiers remain text; composed rich metrics/actions keep their own owner. |
+
+## Choreography and modes
+
+The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
+
+| Trigger / owner | full | reduced | none | Binding / preset |
+| --- | --- | --- | --- | --- |
+| Item insertion/removal / item and group | Fade changed item; move retained siblings without remounting. | Positions immediate, short opacity. | Immediate. | item.root.enter → presence.inline; item.root.exit → presence.exit; item.group.move → layout.compact |
+| Header/footer/content or explicit size change / item | Resolve final spacing/typography and interpolate measured block size; independently inserted media/actions fade within it. | Size immediate, short opacity. | Immediate. | item.root.resize → geometry.content; item.part.enter → presence.inline |
+| Existing media/action region removed or explicitly replaced / retained local owner | Fade only the changed noninteractive visual while current actions and semantic content commit immediately. | Short opacity. | Final content immediately. | item.part.exit → presence.exit; item.media.replace → data.update |
+| Display text/quantity revision / known display part | Changed-only text, stagger:none, or quantity reels. | Short changed-text opacity; quantities immediate. | Immediate. | item.text.replace → text.replace; item.value.roll → number.compact |
+| Variant or actual interactive state / row/media/text owners | Scoped colour transition. | Short colour. | Immediate. | item.surface.colour → state.color; item.text.colour → state.color |
+
+## Interruption and lifecycle
+
+Rapid record updates keep the same Item identity and retarget its dimensions. Reordering does not replay titles/media. Closing/removing a row requires retained parent lifecycle for its exit and immediately removes obsolete actions from keyboard access. Live reduced cancels layout, geometry and reels; none or a zero clock also cancels fades/colour. ItemGroup remains its existing group structure, not a fabricated list or selection model.
+
+Source/key changes invalidate any caller-composed media transition and late completion; Item does not infer record identity from title text or retain arbitrary media DOM with its handlers. Parent close cancels local part/text/size work. If no surviving local region owns a removed part, removal is immediate rather than introducing an implicit child registry.
+
+## Geometry and performance
+
+Measure the changed row after commitment; ItemGroup may animate sibling positions but never also writes row height. Lay out title/description at destination width before row-height interpolation, retaining the description's line clamp; responsive truncation is immediate. Do not animate image intrinsic sizing into row layout. Plain Item has no automatic hover lift/press scale; a rendered link preserves native navigation and focus. Rich interactive descendants are not split into animated text.
+
+ItemGroup uses committed final row boxes, not their interpolated heights. A nested content-size owner delegates that cause or supplies a final destination once. Keep a focused descendant/editor or captured action target stable; affected row/sibling geometry commits immediately, and blur does not replay skipped movement. If a smaller intermediate row adds clipping to final-visible text/actions under existing overflow, settle that axis immediately. Bound work to changed visible rows and known text slots; oversized groups skip blanket measurement/reflow and preserve native scrolling. ItemSeparator inherits Separator without a duplicate group entrance.
+
+## Acceptance scenarios
+
+Target acceptance; not executed: item insertion/reorder; plain div and anchor render; title changes with retained substrings; media/action replacement; header/footer expansion; clamped descriptions; focus during removal; all modes and zero clock with rapid record updates.
+
+Also pending: replace media/actions while reordering, update a row containing a focused input, and remove a local region without a retained owner; no stale media, duplicate action or parent-following-child spring is allowed.

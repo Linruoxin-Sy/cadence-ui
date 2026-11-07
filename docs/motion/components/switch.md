@@ -1,0 +1,48 @@
+# Switch motion contract
+
+Status: target design; implementation and verification pending.
+
+The thumb makes the binary state legible by travelling inside the measured track while the track colour follows the same state transaction. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
+
+## Capability ownership
+
+| Capability | Application and owner |
+| --- | --- |
+| Appearance | Default: `switch` owns independent opacity entrance; a containing field may own it instead. Initial thumb position is already correct. |
+| Size | Default for explicit `size` changes: root shell owns the bounded track dimensions. Passive layout changes are immediate; the thumb endpoint is remeasured. |
+| Surface colour | Default: `switch` owns checked, hover, invalid and disabled track/border colours; the thumb owns its background/fill colour through the same state transaction. |
+| Text colour | Not applicable to the stock track/thumb, which contains no text. External labels retain their own text-colour owner; thumb fill is surface feedback. |
+| Changed text | Not applicable: no built-in text slot. External on/off labels are caller composition, not newly added props. |
+| Changed numbers | Not applicable: a boolean switch has no numeric display. |
+
+## Choreography and modes
+
+| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
+| --- | --- | --- | --- | --- |
+| Independent insertion / root | Opacity only; no initial thumb sweep. | Short opacity. | Final state immediately. | `switch.root.enter` → `presence.inline` → one-shot `data.transition` |
+| Checked change / thumb | Travel to measured endpoint with a non-overshooting indicator transition. | Position immediately. | Position immediately. | `switch.thumb.select` → `state.indicator` → `state.morph` |
+| State change / track and thumb | Scoped track, border and thumb colour transition. | Short colour feedback. | Final colours immediately. | `switch.root.colour` → `state.color` → target `state.color` |
+| Explicit size prop change / root geometry owner | Clamp track width/height to final measured size; thumb endpoint uses the same transaction. | Final geometry immediately. | Final geometry immediately. | `switch.root.resize` → `geometry.compact` → `geometry.resize` |
+
+## Interruption and lifecycle
+
+- Checked semantics/form state update immediately. Rapid toggles reverse the same thumb writer without accumulating travel.
+- The first valid measurement places the thumb immediately. If size changes mid-toggle, retarget the endpoint from the current visual position; do not animate toward an obsolete width.
+- A controlled callback is not a committed checked change. Native form/reset/read-only rules and the caller's actual accepted value remain authoritative in every mode; returning to full does not replay the current position.
+- Parent exit cancels local presentation; no extra closing delay. Read-only/disabled prevents new input without rolling back an accepted state.
+- Live reduced cancels travel/resize; none and zero clock cancel all transitions and delays. Unmount disconnects the existing track/thumb observer and writers.
+
+## Geometry and performance
+
+- Measure natural target track/thumb boxes after commit, separately from the animated root host. Keep endpoint calculation direction-aware; never derive it from a previously transformed thumb rectangle. Clamp travel to a non-negative available track interval; custom sizes with no usable travel settle to valid native geometry instead of producing a negative offset.
+- There is no text reflow inside the fixed track; an explicit size revision supplies final track/thumb boxes before the root host interpolates. External label wrapping remains with its own layout owner. Any temporary root clip excludes its focus outline.
+- One root geometry owner and one thumb transform owner; no independent press deformation or extra observer loop. Size changes must not feed animated dimensions back as new natural targets.
+- During simultaneous size and checked changes, the coordinator constrains the rendered thumb to the currently available track interval using its own size model, not per-frame layout reads. If that cannot be guaranteed, apply the new track size immediately and animate only the valid endpoint change. Thumb fill is a surface colour, not a newly introduced text display.
+- Bound work to one track and one thumb per control. Responsive/font changes settle immediately; fixed hit targets and focus outlines remain outside clipping.
+
+## Acceptance scenarios
+
+- Pending: test checked initial SSR/hydration, both sizes, RTL and first measurement without a false off-to-on sweep.
+- Pending: alternate checked state while changing size and ensure endpoints remain within the track.
+- Pending: exercise all modes, live downgrade, zero clock and parent unmount with no retained observer or delayed state.
+- Pending: apply unusually narrow caller styles while toggling, including a track smaller than the thumb; there is no negative travel, overflow tween or decorative cancellation of native input.

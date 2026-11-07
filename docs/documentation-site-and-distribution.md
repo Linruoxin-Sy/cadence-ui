@@ -2,6 +2,11 @@
 
 > For an open-source component library, documentation is not an accessory — it **is the distribution channel**. This document defines the documentation information architecture, page templates, data flow, registry endpoints, AI channels, versioning strategy, and the contribution process.
 
+The [animation system](animation-system.md) defines the accepted v2 target; the
+[animation rollout plan](animation-system-plan.md) tracks its implementation. Public component MDX,
+guides, previews, registry payloads and generated AI text describe delivered behaviour. Internal
+design approval must not publish proposed recipes or APIs as if they were already installed.
+
 ---
 
 ## 1. Information architecture (IA)
@@ -11,13 +16,13 @@
 /docs
   /docs/installation           Installation (Next / Vite / manual)
   /docs/theming                Theming and tokens
-  /docs/motion                 Motion system (the public version of the Animation system document)
+  /docs/motion                 Delivered motion system, recipes and APIs
   /docs/motion-modes           Full / reduced / none: resolution, usage, test matrix
   /docs/accessibility          Accessibility commitments and checklist
   /docs/registry               Self-hosted registry / private distribution
   /docs/ai                     llms.txt / MCP / Skill
   /docs/changelog              Release notes
-/components                    Catalog: category + motion tier + search
+/components                    Catalog: category + authored intensity + complexity + search
   /components/button
   /components/dialog
   ...
@@ -34,6 +39,13 @@ SSR and no-JS show the complete default directory, with a no-JS explanation. Hyd
 back/forward restores controls/results, unrelated query/hash/history state survive. Hidden results
 remain mounted and cannot receive focus; history that hides a focused result restores search focus.
 Dependencies remain a future catalogue dimension; no optional GSAP entries currently ship.
+
+The v2 target replaces recipe-name/prefix inference of intensity with an explicit review of actual
+authored behaviour. It also introduces capability coverage that distinguishes default, inherited,
+composed and not-applicable behaviour. Neither change has migrated the current catalogue or its
+metadata/checker schema yet. Do not expose hypothetical filters, automatic capabilities or runtime
+intensity controls. Tier remains a compatibility field for source budgets and documentation profiles,
+not a user-facing animation allowance; budget limits remain unchanged.
 
 ---
 
@@ -98,13 +110,15 @@ explain beyond Usage. A compact top preview does not replace the explanation of 
   use `--input`; authors must apply this requirement to any new input API.
 
 T0 coverage explains actual parent sizing, overflow and breakpoint responsibility,
-SSR/native behavior and runtime limits. T0 means no authored animation runtime or
-interpolation, not zero JavaScript: Base UI interaction, react-resizable-panels and
-Card's optional ResizeObserver still need client code. Composed children retain their
-own motion contracts. Performance claims refer to actual APIs and the existing source
-budget (T0: at most 4 KiB gzip per item's own shipped sources, excluding dependencies),
-never a zero-byte bundle or a cross-library certification. SSR markup does not imply
-hydrated interactions work without JavaScript. T1 describes its real motion costs.
+SSR/native behaviour and runtime limits. Under v2, T0 is a source-budget and documentation-profile
+label, not a prohibition on authored animation. Until a component migrates, describe its actual
+static or animated baseline rather than inferring capability from the target. Base UI interaction,
+react-resizable-panels and Card's optional ResizeObserver already demonstrate why T0 never implied
+zero JavaScript. Composed children retain their own motion contracts. Performance claims refer to
+actual APIs and the existing source budget (T0: at most 4 KiB gzip per item's own shipped sources,
+excluding dependencies), never a zero-byte bundle or a cross-library certification. SSR markup does
+not imply hydrated interactions work without JavaScript. Every profile describes its real runtime
+and motion costs; this design does not increase any source or full-route performance allowance.
 
 `scripts/doc-template.mjs` enforces this membership/order through both registry:build
 and registry:check (therefore pnpm check); new-item validates its generated body with
@@ -171,6 +185,36 @@ and checks the `## Recipes` table in `content/docs/motion.mdx` against the runti
 Missing sections/tables, unknown or extra recipes, missing recipes and duplicate declarations
 fail the check. Free prose and phase descriptions remain editorial content. This static gate
 complements the implementation checks and three-mode tests; it does not prove live animation.
+
+For each v2 migration, review a capability matrix alongside this recipe contract. Its rows cover the
+applicable appearance/removal, geometry, surface/text colour, text/number changes and component-specific
+interaction causes defined by the animation system. Each row states its delivery relationship:
+
+| Relationship   | Required explanation                                                                                  |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| Default        | The ordinary component API triggers this implemented behaviour without extra animation wiring.        |
+| Inherited      | Name the owning part or scope and the behaviour it provides; inheritance is not a second writer.      |
+| Composed       | Name the installed dependency and show the composition needed to obtain the behaviour.                |
+| Not applicable | Explain why this part has no such semantic event or why animation would violate its native semantics. |
+
+The target detail lives in `docs/motion/components/<id>.md`, reached through the
+[individual motion catalogue](motion/README.md). Its six-capability ownership table, action/mode
+table, interruption rules, bindings and geometry/performance boundaries are the design input for
+migration. Keep this public MDX table truthful to the implemented subset. Do not embed all internal
+design files in registry payloads or treat their preset/binding names as recipe declarations.
+
+This is a target documentation contract, not an already-enforced frontmatter schema. Introduce any
+machine-readable representation and its validators in the rollout before relying on them. Keep the
+existing flat section order and recipe-set equality while extending the content. Mode rows must
+describe actual full, reduced and none behaviour, including live cancellation and the v2 treatment
+of colour feedback and continuous loops once implemented. A recipe listed in the internal target
+catalogue is not permission to declare an unimplemented transition in public metadata.
+
+In particular, `state.color`, `text.change`, `AnimatedText`, `AnimatedNumber` and `Reveal` are proposed v2
+work, not current installation commands, exports or runnable examples. Update the public motion
+guide and each affected component's API, capability claims and examples only with the corresponding
+source, registry dependencies, tests and rebuilt payloads. Unmigrated components retain truthful
+descriptions of their existing behaviour; the internal rollout owns the gaps.
 
 ### 2.2 Preview capabilities
 
@@ -471,7 +515,9 @@ registryDeps: [cadence-motion, cadence-utils]
 Validation rules:
 
 - `title` / `description` / `category` / `deps` must match `registry.json` exactly;
-- every recipe in `motion` must exist in the recipe table of the Animation system document;
+- every recipe in `motion` must be implemented in the shipped runtime catalogue and documented by
+  the public motion guide, as well as defined by the Animation system document; a target-only recipe
+  cannot satisfy this requirement;
 - `since` must be a released version;
 - the body must contain the §2 sections (a missing one fails the build), in that order, starting with
   `## Installation`; every section is a `##`, and the Examples slot expands to one `##` per example, so the
