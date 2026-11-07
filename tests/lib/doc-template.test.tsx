@@ -54,10 +54,12 @@ const badge = readFileSync(badgePath, "utf8");
 const without = (source: string, title: string) =>
   source.replace(new RegExp(`## ${title}\\n[\\s\\S]*?(?=\\n## |$)`), "");
 
-// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; checker subprocesses take up to 8s under full-suite I/O contention.
+// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; full-catalogue AST/registry subprocesses need startup headroom under full-suite I/O contention.
 describe("real registry template entry", { timeout: 15_000 }, () => {
-  it("accepts all 59 real tier/block bodies", async () => {
+  it("validates all current tier/block bodies directly", async () => {
     expect(await checkDocTemplates(root, registry)).toEqual([]);
+  }, 15_000);
+  it("accepts all 59 real tier/block bodies through the CLI", () => {
     expect(entry(badgePath, badge).status).toBe(0);
   }, 15_000);
   it.each([
@@ -171,58 +173,64 @@ describe("real registry template entry", { timeout: 15_000 }, () => {
 });
 
 describe("real new-item entry", () => {
-  it.each(["T0", "T1", "T2", "T3", "T4", "T5"])("generates legal %s docs with input ownership", (tier) => {
-    const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-template-scaffold-"));
-    try {
-      cpSync(path.join(root, "content"), path.join(temp, "content"), { recursive: true });
-      cpSync(path.join(root, "components"), path.join(temp, "components"), { recursive: true });
-      cpSync(path.join(root, "tests"), path.join(temp, "tests"), { recursive: true });
-      for (const file of ["registry.json", "registry-snapshots.json"])
-        cpSync(path.join(root, file), path.join(temp, file));
-      for (const dir of ["public", "docs"]) symlinkSync(path.join(root, dir), path.join(temp, dir), "junction");
-      cpSync(path.join(root, "app"), path.join(temp, "app"), { recursive: true });
-      cpSync(path.join(root, "registry"), path.join(temp, "registry"), { recursive: true });
-      const result = spawnSync(
-        process.execPath,
-        [
-          path.join(root, "scripts/new-item.mjs"),
-          "--name",
-          "fixture",
-          "--tier",
-          tier,
-          "--batch",
-          "B1",
-          "--description",
-          "Fixture.",
-          "--input",
-          ...(tier === "T0" ? [] : ["--motion", "reveal"]),
-        ],
-        { cwd: temp, encoding: "utf8" },
-      );
-      expect(result.status, result.stderr).toBe(0);
-      const route = readFileSync(path.join(temp, "app/(site)/components/fixture/page.tsx"), "utf8");
-      expect(route).toContain('import { FixturePreview } from "@/components/site/previews/fixture"');
-      expect(route).toContain('<ComponentPage id="fixture" preview={FixturePreview} />');
-      const run = () =>
-        spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], { cwd: temp, encoding: "utf8" });
-      // Stubs intentionally fail implementation/payload checks; the actual entry must accept their body.
-      const accepted = run();
-      expect(accepted.stderr).not.toContain("content/components/fixture.mdx:");
-      const file = path.join(temp, "content/components/fixture.mdx");
-      const doc = readFileSync(file, "utf8");
-      expect(doc).toContain("## Validation and data ownership");
-      expect(doc).toContain('<ComponentExample name="composition" />');
-      expect(
-        JSON.parse(readFileSync(path.join(temp, "components/site/previews/examples.json"), "utf8")).fixture,
-      ).toEqual(["composition"]);
-      writeFileSync(file, without(doc, "Responsiveness and performance"));
-      const rejected = run();
-      expect(rejected.status).toBe(1);
-      expect(rejected.stderr).toContain("content/components/fixture.mdx: expected one ## Responsive behavior");
-    } finally {
-      rmSync(temp, { recursive: true, force: true });
-    }
-  });
+  it.each(["T0", "T1", "T2", "T3", "T4", "T5"])(
+    "generates legal %s docs with input ownership",
+    (tier) => {
+      const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-template-scaffold-"));
+      try {
+        cpSync(path.join(root, "content"), path.join(temp, "content"), { recursive: true });
+        cpSync(path.join(root, "components"), path.join(temp, "components"), { recursive: true });
+        cpSync(path.join(root, "tests"), path.join(temp, "tests"), { recursive: true });
+        for (const file of ["registry.json", "registry-snapshots.json"])
+          cpSync(path.join(root, file), path.join(temp, file));
+        symlinkSync(path.join(root, "public"), path.join(temp, "public"), "junction");
+        // new-item now writes the target index; never point this mutation at the real docs.
+        cpSync(path.join(root, "docs"), path.join(temp, "docs"), { recursive: true });
+        cpSync(path.join(root, "app"), path.join(temp, "app"), { recursive: true });
+        cpSync(path.join(root, "registry"), path.join(temp, "registry"), { recursive: true });
+        const result = spawnSync(
+          process.execPath,
+          [
+            path.join(root, "scripts/new-item.mjs"),
+            "--name",
+            "fixture",
+            "--tier",
+            tier,
+            "--batch",
+            "B1",
+            "--description",
+            "Fixture.",
+            "--input",
+            ...(tier === "T0" ? [] : ["--motion", "reveal"]),
+          ],
+          { cwd: temp, encoding: "utf8" },
+        );
+        expect(result.status, result.stderr).toBe(0);
+        const route = readFileSync(path.join(temp, "app/(site)/components/fixture/page.tsx"), "utf8");
+        expect(route).toContain('import { FixturePreview } from "@/components/site/previews/fixture"');
+        expect(route).toContain('<ComponentPage id="fixture" preview={FixturePreview} />');
+        const run = () =>
+          spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], { cwd: temp, encoding: "utf8" });
+        // Stubs intentionally fail implementation/payload checks; the actual entry must accept their body.
+        const accepted = run();
+        expect(accepted.stderr).not.toContain("content/components/fixture.mdx:");
+        const file = path.join(temp, "content/components/fixture.mdx");
+        const doc = readFileSync(file, "utf8");
+        expect(doc).toContain("## Validation and data ownership");
+        expect(doc).toContain('<ComponentExample name="composition" />');
+        expect(
+          JSON.parse(readFileSync(path.join(temp, "components/site/previews/examples.json"), "utf8")).fixture,
+        ).toEqual(["composition"]);
+        writeFileSync(file, without(doc, "Responsiveness and performance"));
+        const rejected = run();
+        expect(rejected.status).toBe(1);
+        expect(rejected.stderr).toContain("content/components/fixture.mdx: expected one ## Responsive behavior");
+      } finally {
+        rmSync(temp, { recursive: true, force: true });
+      }
+    },
+    15000,
+  ); // Copies writable docs and runs two complete registry/target audits per tier.
 });
 
 function ExampleFixture() {

@@ -1,4 +1,7 @@
-/** Structural docs validation. Only designated table cells declare recipes. */
+/** Installed docs validation. Only designated table cells declare recipes.
+ * Internal capability/part references are checked separately by motion-targets.mjs;
+ * neither those target forms nor their migration marker can populate public MDX.
+ */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";

@@ -48,7 +48,7 @@ function entry(file: string, source: string, fresh = false) {
   }
 }
 
-// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; checker subprocesses take up to 8s under full-suite I/O contention.
+// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; full-catalogue AST/registry subprocesses need startup headroom under full-suite I/O contention.
 describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
   it("requires an animated component's actual test file", () => {
     const file = path.join(fixture, "tests/components/button.test.tsx");
@@ -149,6 +149,7 @@ describe("new-item motion docs scaffold", () => {
     async ({ motion }) => {
       const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-scaffold-"));
       try {
+        cpSync("docs", path.join(temp, "docs"), { recursive: true });
         cpSync("content", path.join(temp, "content"), { recursive: true });
         cpSync("components", path.join(temp, "components"), { recursive: true });
         writeFileSync(path.join(temp, "registry.json"), '{"items":[]}');
@@ -170,6 +171,12 @@ describe("new-item motion docs scaffold", () => {
           { cwd: temp, encoding: "utf8" },
         );
         expect(result.status, result.stderr).toBe(0);
+        const target = readFileSync(path.join(temp, "docs/motion/components/fixture.md"), "utf8");
+        expect(target).toContain('"migration": "legacy"');
+        expect(target).toContain("TODO: assess applicability, actual owner and reason.");
+        expect(readFileSync(path.join(temp, "docs/motion/README.md"), "utf8")).toContain(
+          "[Fixture](components/fixture.md)",
+        );
         const testSource = readFileSync(path.join(temp, "tests/components/fixture.test.tsx"), "utf8");
         if (motion.length) {
           expect(testSource).toContain('import { expectMotionContract } from "../motion-contract"');

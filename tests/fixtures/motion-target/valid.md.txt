@@ -1,0 +1,57 @@
+# Fixture motion contract
+
+Status: target design; implementation and verification pending.
+
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "legacy",
+  "parts": {
+    "root": [
+      "fixture#Fixture"
+    ],
+    "rule": [
+      "separator#Separator"
+    ]
+  }
+}
+```
+
+## Capability ownership
+
+| Capability | Coverage and owner | References |
+| --- | --- | --- |
+| Appearance | Default: independently inserted fixture paint; parent presence consumes the same cause. | default: `fixture.root.enter` |
+| Size | Default: fixture shell owns content-driven bounded size, excluding passive layout. | default: `fixture.root.resize` |
+| Surface colour | Default: fixture background; inherited Separator rule has its own surface writer. | default: `fixture.root.colour`; inherited: `fixture.rule.colour` |
+| Text colour | Default: fixture foreground only; the separator has no text. | default: `fixture.root.colour` |
+| Changed text | Default for the owned string; rich content stays explicitly composed. | default: `fixture.root.replace`; composed: `@root` |
+| Changed numbers | Not applicable: this fixture displays an identity string, never a numeric quantity. | not-applicable: `@root` |
+
+## Choreography and modes
+
+| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
+| --- | --- | --- | --- | --- |
+| Insert / fixture root | Opacity entry from current semantic paint. | Short opacity. | Final visibility immediately. | `fixture.root.enter` → `presence.inline` → `data.transition/opacity` |
+| Content / fixture shell | Clamped natural size continuity. | Final size immediately. | Final size immediately. | `fixture.root.resize` → `geometry.compact` → `geometry.resize/measured` |
+| State / fixture root | Scoped background and foreground transition. | Short colour feedback. | Final colours immediately. | `fixture.root.colour` → `state.color` → `state.color/surface-foreground` |
+| Rule colour / inherited Separator | Separator owns background feedback. | Short colour feedback. | Final colour immediately. | `fixture.rule.colour` → `state.color` → `state.color/surface` |
+| Display revision / fixture string | Retain unchanged graphemes and replace changed runs without stagger. | Short changed-run opacity. | Exact final string immediately. | `fixture.root.replace` → `text.replace` → `text.change/changed-runs` |
+
+## Interruption and lifecycle
+
+Retarget the latest committed revision. Close/unmount invalidates completion callbacks; live reduced,
+none and zero clocks settle their respective targets and clean up only owned property writers.
+
+## Geometry and performance
+
+Measure natural destination content after commitment; size a separate bounded shell. Native focus
+and passive reflow win over decorative geometry. Work is limited to one content transaction.
+
+## Acceptance scenarios
+
+Exercise repeated content changes, parent presence, live mode and zero-clock changes, focused resize
+and unmount. These are target scenarios, not runtime evidence supplied by this fixture.

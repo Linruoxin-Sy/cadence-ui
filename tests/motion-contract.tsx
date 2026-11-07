@@ -1,3 +1,5 @@
+// Legacy runtime assertions. The reporter rejects a v2 marker until stricter
+// colour/text/number/loop observers and migrated source/docs land together.
 import { expect, onTestFinished } from "vitest";
 import { controlSamples, imperativeSamples, motionSamples, type Sample } from "./motion-observer";
 

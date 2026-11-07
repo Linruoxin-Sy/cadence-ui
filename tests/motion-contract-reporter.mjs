@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { migrationProblems, targetMetadata } from "../scripts/motion-migration.mjs";
 
 const registry = JSON.parse(readFileSync(new URL("../registry.json", import.meta.url), "utf8"));
 
@@ -9,6 +10,16 @@ export default class MotionContractReporter {
     for (const module of modules) {
       const id = module.moduleId.replaceAll("\\", "/").match(/\/tests\/components\/([^/]+)\.test\.tsx$/)?.[1];
       const item = registry.items.find((item) => item.name === id);
+      if (item && ["registry:ui", "registry:block"].includes(item.type)) {
+        const target = targetMetadata(
+          readFileSync(new URL(`../docs/motion/components/${id}.md`, import.meta.url), "utf8"),
+        );
+        failures.push(
+          ...[...target.problems, ...migrationProblems(target.metadata?.migration)].map(
+            (problem) => `${id}: ${problem}`,
+          ),
+        );
+      }
       if (!item?.meta?.motion?.length) continue;
       const modes = new Set();
       for (const test of module.children.allTests("passed")) {

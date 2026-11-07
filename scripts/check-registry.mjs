@@ -31,6 +31,7 @@ import {
   normaliseMotion,
   recipeCatalogue,
 } from "./motion-manifest.mjs";
+import { checkMotionTargets } from "./motion-targets.mjs";
 import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
@@ -38,6 +39,9 @@ const root = process.cwd();
 await verifySnapshots(root);
 const registry = JSON.parse(await readFile(path.join(root, "registry.json"), "utf8"));
 const problems = [...checkCatalogIntensity(registry), ...(await checkDocTemplates(root, registry))];
+// Target closure is independent of installed recipe/source/docs evidence below.
+const targets = await checkMotionTargets(root, registry);
+problems.push(...targets.problems);
 
 const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
 problems.push(...(await checkMotionDocs(root, registry, RECIPES)));
@@ -399,4 +403,7 @@ if (problems.length) {
 const componentCount = registry.items.filter(isComponent).length;
 console.log(
   `Registry OK: ${registry.items.length} items (${componentCount} components), ${docFiles.size} docs, ${previewFiles.size} previews, targets and payloads in sync, tier budgets met, P11 clean.`,
+);
+console.log(
+  `Motion targets: ${targets.contracts.size} reference graphs checked; legacy enforcement, no v2 runtime certification.`,
 );

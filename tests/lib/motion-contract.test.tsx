@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fireEvent, render } from "@testing-library/react";
 import { motion } from "motion/react";
@@ -174,13 +174,25 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         switch: `it.each(['full','reduced'])('missing none %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)});`,
         spinner: `it.each(['full','reduced','none'])('positive %s',(mode)=>{render(<CadenceProvider mode={mode}><Spinner/></CadenceProvider>);expectMotionContract(mode)});`,
         badge: `it('T0 needs no helper',()=>{expect(true).toBe(true)});`,
+        label: `it('static v2 cannot bypass the migration gate',()=>{expect(true).toBe(true)});`,
       };
       for (const [id, source] of Object.entries(cases))
         await writeFile(path.join(fixture, `tests/components/${id}.test.tsx`), imports + source);
+      // Run the actual reporter against isolated markers, without mutating the repository.
+      await mkdir(path.join(fixture, "docs/motion/components"), { recursive: true });
+      await mkdir(path.join(fixture, "scripts"), { recursive: true });
+      for (const file of ["registry.json", "scripts/motion-migration.mjs", "tests/motion-contract-reporter.mjs"])
+        await writeFile(path.join(fixture, file), await readFile(path.join(root, file), "utf8"));
+      for (const id of Object.keys(cases)) {
+        let contract = await readFile(path.join(root, `docs/motion/components/${id}.md`), "utf8");
+        if (["spinner", "label"].includes(id))
+          contract = contract.replace('"migration": "legacy"', '"migration": "v2"');
+        await writeFile(path.join(fixture, `docs/motion/components/${id}.md`), contract);
+      }
       const config = path.join(fixture, "vitest.config.mjs");
       await writeFile(
         config,
-        `import react from '@vitejs/plugin-react'; export default {root:${JSON.stringify(fixture)},plugins:[react()],resolve:{alias:{'@':${JSON.stringify(root)}}},test:{environment:'jsdom',globals:true,setupFiles:[${JSON.stringify(path.join(root, "tests/setup.ts"))}],reporters:['default',${JSON.stringify(path.join(root, "tests/motion-contract-reporter.mjs"))}],maxWorkers:1,minWorkers:1,include:['tests/**/*.test.tsx']}}`,
+        `import react from '@vitejs/plugin-react'; export default {root:${JSON.stringify(fixture)},plugins:[react()],resolve:{alias:{'@':${JSON.stringify(root)}}},test:{environment:'jsdom',globals:true,setupFiles:[${JSON.stringify(path.join(root, "tests/setup.ts"))}],reporters:['default',${JSON.stringify(path.join(fixture, "tests/motion-contract-reporter.mjs"))}],maxWorkers:1,minWorkers:1,include:['tests/**/*.test.tsx']}}`,
       );
       const result = spawnSync(
         process.execPath,
@@ -193,6 +205,8 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         expect(output).toContain(`${id}: execute expectMotionContract`);
       expect(output).not.toContain("spinner: execute expectMotionContract");
       expect(output).not.toContain("badge: execute expectMotionContract");
+      for (const id of ["spinner", "label"])
+        expect(output).toContain(`${id}: v2 enforcement is not implemented; legacy evidence cannot certify v2`);
     } finally {
       await rm(fixture, { recursive: true, force: true });
     }

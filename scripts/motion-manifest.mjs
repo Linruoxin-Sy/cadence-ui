@@ -14,7 +14,7 @@
  * sides can be compared.
  */
 
-/** Forms a recipe can take in a component. */
+/** Installed forms only. docs/motion target recipe/form references do not extend this list. */
 export const MOTION_FORMS = ["one-shot", "continuous", "css-transition"];
 
 /**

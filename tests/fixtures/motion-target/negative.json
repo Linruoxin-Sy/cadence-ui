@@ -1,0 +1,98 @@
+[
+  {
+    "name": "inherited owner relabelled default",
+    "from": "inherited: `fixture.rule.colour`",
+    "to": "default: `fixture.rule.colour`",
+    "error": "foreign-only ownership is inherited/composed"
+  },
+  {
+    "name": "absent migration",
+    "from": "  \"migration\": \"legacy\",\n",
+    "to": "",
+    "error": "migration must explicitly"
+  },
+  {
+    "name": "premature migration",
+    "from": "\"migration\": \"legacy\"",
+    "to": "\"migration\": \"v2\"",
+    "error": "legacy evidence cannot certify v2"
+  },
+  {
+    "name": "unknown migration",
+    "from": "\"migration\": \"legacy\"",
+    "to": "\"migration\": \"done\"",
+    "error": "migration must explicitly"
+  },
+  {
+    "name": "unknown schema",
+    "from": "\"schema\": 1",
+    "to": "\"schema\": 2",
+    "error": "schema: 1"
+  },
+  {
+    "name": "unknown metadata",
+    "from": "  \"schema\": 1",
+    "to": "  \"schema\": 1,\n  \"allowLegacy\": true",
+    "error": "unknown motion schema field"
+  },
+  {
+    "name": "incomplete chain",
+    "from": "`presence.inline` → `data.transition/opacity`",
+    "to": "`presence.inline`",
+    "error": "incomplete binding"
+  },
+  {
+    "name": "wrong exact form",
+    "from": "`presence.inline` → `data.transition/opacity`",
+    "to": "`presence.inline` → `data.transition/continuous`",
+    "error": "does not allow exact form"
+  },
+  {
+    "name": "unresolved part",
+    "from": ",\n    \"rule\": [\n      \"separator#Separator\"\n    ]",
+    "to": "",
+    "error": "missing actual part reference"
+  },
+  {
+    "name": "unrelated capability",
+    "from": "default: `fixture.root.resize`",
+    "to": "default: `fixture.root.replace`",
+    "error": "unrelated action"
+  },
+  {
+    "name": "dangling capability",
+    "from": "default: `fixture.root.resize`",
+    "to": "default: `fixture.root.missing`",
+    "error": "dangling action"
+  },
+  {
+    "name": "surface is not text",
+    "from": "Default: fixture foreground only; the separator has no text. | default: `fixture.root.colour`",
+    "to": "Default: fixture foreground only; the separator has no text. | inherited: `fixture.rule.colour`",
+    "error": "surface-only action"
+  },
+  {
+    "name": "missing mode",
+    "from": "| Short opacity. |",
+    "to": "| |",
+    "error": "all mode outcomes required"
+  },
+  {
+    "name": "missing reason",
+    "from": "Not applicable: this fixture displays an identity string, never a numeric quantity.",
+    "to": "",
+    "error": "ownership/applicability reason required"
+  },
+  {
+    "name": "invented default",
+    "from": "default: `fixture.root.resize`",
+    "to": "default: `@root`",
+    "error": "default requires a real action"
+  },
+  {
+    "name": "unnamed inherited owner",
+    "from": "inherited: `fixture.rule.colour`",
+    "to": "inherited: `@parent`",
+    "error": "inherited requires a real part"
+  }
+]

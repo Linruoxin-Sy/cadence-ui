@@ -18,6 +18,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { componentRouteSource } from "./component-routes.mjs";
 import { INPUT_DOCS, validateDocTemplate } from "./doc-template.mjs";
+import { appendMotionIndex, motionTargetTemplate } from "./motion-target-template.mjs";
 
 const root = process.cwd();
 const args = process.argv.slice(2);
@@ -71,6 +72,9 @@ const routePath = path.join(root, "app", "(site)", "components", id, "page.tsx")
 const exampleCatalogPath = path.join(root, "components", "site", "previews", "examples.json");
 const exampleCatalog = JSON.parse(await readFile(exampleCatalogPath, "utf8"));
 const registryPath = path.join(root, "registry.json");
+const targetPath = path.join(root, "docs", "motion", "components", `${id}.md`);
+const targetIndexPath = path.join(root, "docs", "motion", "README.md");
+const targetIndex = appendMotionIndex(await readFile(targetIndexPath, "utf8"), id, title);
 
 const exists = async (file) => {
   try {
@@ -81,7 +85,7 @@ const exists = async (file) => {
   }
 };
 
-for (const file of [sourcePath, docPath, previewPath, testPath, routePath]) {
+for (const file of [sourcePath, docPath, previewPath, testPath, routePath, targetPath]) {
   if (await exists(file)) fail(`${path.relative(root, file)} already exists`);
 }
 
@@ -210,7 +214,7 @@ TODO: caller owns values, validation, errors and submission; render supplied inv
 ## Responsiveness and performance
 
 TODO: describe actual parent sizing, overflow, breakpoint and SSR behavior, installed runtime
-and source budget. T0 has no authored animation/interpolation; this does not mean zero JavaScript.
+and source budget. Tier selects the source ceiling and documentation profile; describe only implemented motion.
 
 ## Notes for AI
 
@@ -270,6 +274,9 @@ ${
 `;
 
 await mkdir(path.dirname(sourcePath), { recursive: true });
+await mkdir(path.dirname(targetPath), { recursive: true });
+await writeFile(targetPath, motionTargetTemplate(id, title, pascal));
+await writeFile(targetIndexPath, targetIndex);
 await mkdir(path.dirname(testPath), { recursive: true });
 await writeFile(sourcePath, source);
 await writeFile(docPath, docs);
@@ -313,4 +320,6 @@ console.log(`✓ ${id} scaffolded
   components/site/previews/${id}.tsx
   app/(site)/components/${id}/page.tsx
   tests/components/${id}.test.tsx
-Next: implement the upstream API, then \`pnpm registry:build && pnpm check\`.`);
+  docs/motion/components/${id}.md and motion index
+Next: author the target contract (placeholders fail registry:check), implement the upstream API,
+then \`pnpm registry:build && pnpm check\`.`);

@@ -140,7 +140,7 @@ export function parseRegistryTheme(item) {
 export function parseDocTokens(markdown) {
   const section = markdown.split("### 2.3 CSS-side exposure")[1];
   if (!section) throw new Error("docs/animation-system.md: cannot find `### 2.3 CSS-side exposure`");
-  const fence = section.match(/```css\n([\s\S]*?)```/);
+  const fence = section.match(/```css\r?\n([\s\S]*?)```/);
   if (!fence) throw new Error("docs/animation-system.md §2.3: no ```css fence");
   return parseCss(fence[1]);
 }

@@ -11,3 +11,7 @@ motion/*.json contain only the old source and hashes needed to reproduce clock/g
 regressions. They are intentionally defective specimens, never installable registry source.
 Keep regression inputs stable; update them only when the corresponding test contract changes.
 Generated samples, logs, traces and audit output belong in ignored .cache/audits, not here or docs.
+
+motion-target/ contains a small authored target reference graph and drift mutations. Tests exercise
+Markdown parsing, part/capability/preset closure, property-scope mistakes and fail-closed migration.
+These fixtures neither install planned recipes nor certify runtime v2 behaviour.

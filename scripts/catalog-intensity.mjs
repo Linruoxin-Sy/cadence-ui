@@ -1,4 +1,7 @@
-/** Authored scope, not a runtime multiplier. See animation-system §2.1. */
+/** Legacy authored scope, not a runtime multiplier. See animation-system §2.1.
+ * V2 needs scope-based classification with metadata/docs migration; target references
+ * do not feed this heuristic. motion-migration rejects premature v2 enforcement.
+ */
 export function catalogIntensity(item) {
   const recipes = (item.meta?.motion ?? []).map((entry) => (typeof entry === "string" ? entry : entry.recipe));
   if (recipes.includes("handoff")) return "expressive";
