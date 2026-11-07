@@ -19,12 +19,12 @@ Kbd updates a shortcut hint while preserving the identity of keys that remain in
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Hint insertion / group or standalone key | One short opacity entrance. | Opacity only. | Immediate. | kbd.root.enter → presence.inline |
-| Key label changes / kbd | Replace changed graphemes with stagger:none; fit the new intrinsic width. | Short changed-text opacity; width immediate. | Immediate. | kbd.key.replace → text.replace; kbd.key.resize → geometry.compact |
-| Chord membership changes / kbd-group | New keys fade; removed keys fade with retained lifecycle; surviving keys reflow and the owned group axis uses their final boxes. | Layout immediate, short opacity. | Immediate. | kbd.key.enter → presence.inline; kbd.key.exit → presence.exit; kbd.group.move → layout.compact; kbd.group.resize → geometry.compact |
-| Context colours change / declared key or parent owner | Scoped colour transition. | Short colour transition. | Immediate. | kbd.key.colour → state.color |
+| Hint insertion / group or standalone key | One short opacity entrance. | Opacity only. | Immediate. | `kbd.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Key label changes / kbd | Replace changed graphemes with stagger:none; fit the new intrinsic width. | Short changed-text opacity; width immediate. | Immediate. | `kbd.key.replace` → `text.replace` → target `text.change`; `kbd.key.resize` → `geometry.compact` → `geometry.resize` |
+| Chord membership changes / kbd-group | New keys fade; removed keys fade with retained lifecycle; surviving keys reflow and the owned group axis uses their final boxes. | Layout immediate, short opacity. | Immediate. | `kbd.key.enter` → `presence.inline` → one-shot opacity `data.transition`; `kbd.key.exit` → `presence.exit` → `exit.fade`; `kbd.group.move` → `layout.compact` → `layout.move`; `kbd.group.resize` → `geometry.compact` → `geometry.resize` |
+| Context colours change / declared key or parent owner | Scoped colour transition. | Short colour transition. | Immediate. | `kbd.key.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

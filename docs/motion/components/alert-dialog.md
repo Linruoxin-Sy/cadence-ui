@@ -13,7 +13,7 @@ The consequential message becomes readable quickly and remains visually steady. 
 | Surface colour | Default: content/media own supplied surface tokens; action/cancel Buttons keep their button state contracts. |
 | Text colour | Default: title/description own foreground token transitions. Urgency is supplied by the caller, not inferred from message text. |
 | Changed text | Default for primitive title/description: preserve unchanged graphemes and replace changed runs. Rich content uses explicit composed owners. |
-| Changed numbers | Composed: only an explicit quantity readout rolls; confirmation codes, dates and identifiers remain text. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -24,7 +24,7 @@ The consequential message becomes readable quickly and remains visually steady. 
 | Message/explicit size change / content shell | Clamped measured width/height, with final typography and no bounce. | Final geometry immediately. | Final geometry immediately. | `alert-dialog.content.resize` → `geometry.panel` → `geometry.resize` |
 | Plain explanation/name update / text owner | Changed-run replacement, `stagger: none`; semantic text is already final. | Short changed-run opacity. | Final text immediately. | `alert-dialog.title.change` → `text.replace` → target `text.change`; `alert-dialog.description.change` → `text.replace` → target `text.change` |
 | Supplied visual state / surface/text owners | Scoped colour transition. | Short colour feedback. | Target colours immediately. | `alert-dialog.surface.colour` → `state.color` → target `state.color` |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `alert-dialog.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `alert-dialog.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -33,6 +33,8 @@ The consequential message becomes readable quickly and remains visually steady. 
 - A removed action or changed message is semantically current immediately. Decorative outgoing text cannot remain an accessible alert or focus target.
 - Live reduced commits geometry; none and zero clock cancel authored clocks and finish the current presence boundary through Base UI's actual completion protocol, without releasing modality/focus early. Unmount releases observers and decorative text resources. Native action/cancel operation remains immediate in every mode.
 - Async message/action changes received while closed establish the next view without starting an entrance. A reopened revision invalidates old exit callbacks; no obsolete callback can close the new alert or restore focus to its prior trigger.
+
+Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -50,3 +52,5 @@ The consequential message becomes readable quickly and remains visually steady. 
 - Pending: test both size variants, long localized messages, zoom and small viewport while preserving readable actions.
 - Pending: rapidly reverse presence, then exercise all modes, live downgrade, zero clock and removal during text/size changes.
 - Pending: grow a required explanation or focus an action during a constrained resize, and deliver async content after close; readability, one size owner and native completion/focus rules remain intact.
+
+- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.

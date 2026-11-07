@@ -19,12 +19,12 @@ Card coordinates content changes as one stable surface. A plain Card is not an i
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Dynamic insertion/removal / card | Coherent surface opacity entrance and retained exit, without child cascades. | Short opacity. | Immediate. | card.root.enter → presence.surface; card.root.exit → presence.exit |
-| Content/header/footer or explicit size change / card | Retarget measured owned dimensions with final spacing/typography; stable content remains unscaled. | Final geometry immediately. | Immediate. | card.root.resize → geometry.content |
-| Display revision / title, description or known plain content | Changed-only text with stagger:none or quantity reels, coordinated with card geometry. | Short changed-text opacity; final quantity and geometry immediately. | Immediate. | card.text.replace → text.replace; card.value.roll → number.roll |
-| Surface/foreground target changes / relevant owner | Scoped colour/shadow transition. | Short colour. | Immediate. | card.surface.colour → state.color; card.text.colour → state.color |
+| Dynamic insertion/removal / card | Coherent surface opacity entrance and retained exit, without child cascades. | Short opacity. | Immediate. | `card.root.enter` → `presence.surface` → opacity-only `enter.pop`; `card.root.exit` → `presence.exit` → `exit.fade` |
+| Content/header/footer or explicit size change / card | Retarget measured owned dimensions with final spacing/typography; stable content remains unscaled. | Final geometry immediately. | Immediate. | `card.root.resize` → `geometry.content` → `geometry.resize` |
+| Display revision / title, description or known plain content | Changed-only text with stagger:none or quantity reels, coordinated with card geometry. | Short changed-text opacity; final quantity and geometry immediately. | Immediate. | `card.text.replace` → `text.replace` → target `text.change`; `card.value.roll` → `number.roll` → revised `number.roll` |
+| Surface/foreground target changes / relevant owner | Scoped colour/shadow transition. | Short colour. | Immediate. | `card.surface.colour` → `state.color` → target `state.color`; `card.text.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

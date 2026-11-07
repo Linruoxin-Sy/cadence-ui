@@ -19,12 +19,12 @@ Alert makes a new message noticeable without delaying its announcement or shakin
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Message insertion/removal / alert and retained parent | Surface opacity entrance/exit; role=alert and committed message are immediate. | Short opacity. | Immediate. | alert.root.enter → presence.surface; alert.root.exit → presence.exit |
-| Message/action content changes / alert | Changed-only text, stagger:none, or quantity reels; measured height adjusts in the same transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | alert.text.replace → text.replace; alert.value.roll → number.compact; alert.root.resize → geometry.content |
-| Variant/context change / root and foreground owners | Scoped colour transition. | Short colour. | Immediate. | alert.surface.colour → state.color; alert.text.colour → state.color |
-| Explicit keyed icon replacement / existing icon child | Bounded opacity crossfade; no automatic SVG path morph. | Short opacity. | Immediate. | alert.icon.replace → data.update |
+| Message insertion/removal / alert and retained parent | Surface opacity entrance/exit; role=alert and committed message are immediate. | Short opacity. | Immediate. | `alert.root.enter` → `presence.surface` → opacity-only `enter.pop`; `alert.root.exit` → `presence.exit` → `exit.fade` |
+| Message/action content changes / alert | Changed-only text, stagger:none, or quantity reels; measured height adjusts in the same transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `alert.text.replace` → `text.replace` → target `text.change`; `alert.value.roll` → `number.compact` → revised `number.roll`; `alert.root.resize` → `geometry.content` → `geometry.resize` |
+| Variant/context change / root and foreground owners | Scoped colour transition. | Short colour. | Immediate. | `alert.surface.colour` → `state.color` → target `state.color`; `alert.text.colour` → `state.color` → target `state.color` |
+| Explicit keyed icon replacement / existing icon child | Bounded opacity crossfade; no automatic SVG path morph. | Short opacity. | Immediate. | `alert.icon.replace` → `data.update` → local opacity `data.transition` |
 
 ## Interruption and lifecycle
 

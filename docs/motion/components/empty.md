@@ -19,13 +19,13 @@ Empty introduces an empty-state explanation calmly and keeps its recovery action
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Empty region appears / root or parent region | One surface opacity entrance, with action available immediately. | Short opacity. | Immediate. | empty.root.enter → presence.surface |
-| Caller replaces empty region / retained parent | Fade the old empty region; the parent owns the destination layout. | Short opacity. | Immediate replacement. | empty.root.exit → presence.exit |
-| Copy/media/action content changes / empty | Changed-only text with stagger:none or quantity reels; measured content dimensions retarget together. | Short changed-text opacity; quantity and dimensions immediate. | Immediate. | empty.text.replace → text.replace; empty.value.roll → number.compact; empty.root.resize → geometry.content |
-| Explicit media replacement within a retained empty state / media visual owner | Local opacity replacement for the changed supplied visual; existing title/action do not re-enter. | Short opacity. | Final visual immediately. | empty.media.replace → data.update |
-| Surface/foreground targets change / actual display owner | Scoped colour transition. | Short colour. | Immediate. | empty.surface.colour → state.color; empty.text.colour → state.color |
+| Empty region appears / root or parent region | One surface opacity entrance, with action available immediately. | Short opacity. | Immediate. | `empty.root.enter` → `presence.surface` → opacity-only `enter.pop` |
+| Caller replaces empty region / retained parent | Fade the old empty region; the parent owns the destination layout. | Short opacity. | Immediate replacement. | `empty.root.exit` → `presence.exit` → `exit.fade` |
+| Copy/media/action content changes / empty | Changed-only text with stagger:none or quantity reels; measured content dimensions retarget together. | Short changed-text opacity; quantity and dimensions immediate. | Immediate. | `empty.text.replace` → `text.replace` → target `text.change`; `empty.value.roll` → `number.compact` → revised `number.roll`; `empty.root.resize` → `geometry.content` → `geometry.resize` |
+| Explicit media replacement within a retained empty state / media visual owner | Local opacity replacement for the changed supplied visual; existing title/action do not re-enter. | Short opacity. | Final visual immediately. | `empty.media.replace` → `data.update` → local opacity `data.transition` |
+| Surface/foreground targets change / actual display owner | Scoped colour transition. | Short colour. | Immediate. | `empty.surface.colour` → `state.color` → target `state.color`; `empty.text.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

@@ -608,6 +608,14 @@ out of the accessible name/tab order without prematurely releasing a modal's lif
 reverses the existing surface without resetting focus/state. Entrance delays never carry into exit.
 Minimum loading duration and delayed application commits are outside the animation system.
 
+An ordinary opacity entrance is also subordinate to interaction. If autofocus, keyboard focus,
+pointer activation or browser find reaches entering content, settle any ancestor entrance envelope
+that would leave that target invisible or displaced before presenting the interaction. Do not hide,
+disable or delay the real control to finish its entrance. This rule does not reopen a semantically
+closed surface or replace Base UI's focus/exit protocol. Decorative outgoing paint is never a second
+focus target. Presence and activity return to current semantic resting paint, including disabled or
+caller opacity, as defined in the [preset mode rules](motion/presets.md#31-effective-modes-and-clock-ownership).
+
 ### 3.4 Measured size and position
 
 geometry.resize is available wherever appropriate, regardless of legacy tier. Observe natural
@@ -660,6 +668,12 @@ when appropriate. CSS and Motion may share a node only on disjoint properties. F
 clock, reduced a shortened clock, and none zero duration/delay with running transitions cancelled.
 Current colour classes do not universally satisfy this target yet.
 
+If the owned foreground/background transition cannot preserve the required readable state throughout
+its intermediate colours, apply that pair's final colours immediately; matching duration tokens alone
+do not prove contrast. A forced-colours environment always uses native semantic paint directly. Do not
+animate an inherited colour again on each glyph, or overwrite caller colour values with sampled inline
+styles left behind after cancellation.
+
 ### 3.6 Changed text
 
 AnimatedText uses text.change, independently of text.reveal/text.split entrances. The target pipeline
@@ -693,6 +707,18 @@ values remain native: caret, selection, IME, undo and autofill are not replaced 
 Labels/helper text are separate display slots. Final semantic text updates immediately. Exit copies
 and decorative layers cannot duplicate accessible names or copied text; do not default every update
 to aria-live. Selection, copy and accessible-name behaviour need browser proof.
+
+Dispatch a known display slot deterministically: a string uses text replacement; a directly supplied
+supported numeric value uses reels unless the component explicitly classifies that slot as identity
+(for example a page number, shortcut, option name or source code). Do not guess from wording or parse
+numeric-looking strings. Rich children/render functions use explicit composition. Title/description
+parts are not exempt just because they belong to an overlay. Screen-reader-only names remain immediate.
+In a generic display slot without an identity classification, a direct numeric child is the explicit
+quantity signal; supply an identifier as a string. No controller guesses intent from a callback,
+label wording or neighbouring data, and no new public numeric-detection prop is implied.
+Changing from string to number or back establishes the new renderer's baseline immediately; do not
+invent a numeric origin or run both renderers on the same content. An unavailable grapheme segmenter
+or unsupported shaping mapping uses exact immediate text, not code-point splitting.
 
 An active native text range or browser find target is a presentation constraint, not permission to
 replace the selection tree. If a split/replacement overlay cannot preserve it, settle that affected
@@ -1013,6 +1039,14 @@ Errors, progress, loading and success remain available as text/icons/native stat
 intentional; do not add aria-live to every animated string. Reduced motion cannot remove input methods
 without an equivalent accessible operation, nor can it replace native editing with display animation.
 
+The effective environment can further suppress decorative work: forced-colours and print present
+current semantic paint/layout immediately while preserving native focus, selection and closed-state
+visibility. Do not force author colours or open closed content for a print snapshot. Document hiding
+or page suspension cancels one-shot work and pauses loops; restoration establishes current geometry
+and does not replay missed revisions. Eligible full-mode activity may resume. These shared signals,
+idempotent cleanup and property-scoped cancellation follow the
+[cross-component lifecycle contract](motion/README.md#31-cancellation-environments-and-renderer-ownership).
+
 ---
 
 ## 7. Performance budgets and implementation rules
@@ -1030,7 +1064,7 @@ without an equivalent accessible operation, nor can it replace native editing wi
 Implementation rules:
 
 1. **Budget properties explicitly.** Spatial presentation uses transform/opacity; optional filter blur is limited to reviewed small text areas at ≤4 px and is off by default. Colour/border/fill/stroke and declared shadow feedback use state.color. Measured width/height uses geometry.resize, clamped and immediate under reduced/none at any legacy tier. Chart SVG geometry (§3.1.2) and explicit native scroll offsets (§3.1.5) retain their documented exceptions. No generic padding/font-size/radius/path animation is implied by a recipe name.
-2. **No layout-read loops**: `getBoundingClientRect` and `offsetWidth` are read inside event/`ResizeObserver` callbacks only, and reads precede writes.
+2. **No layout-read loops**: read `getBoundingClientRect`/`offsetWidth` only in a committed client layout phase, an event measurement transaction or a `ResizeObserver` callback. Batch reads before writes; never read during render, in an abandoned render, or once per animation frame/glyph. A shared layout scheduler may batch a known transaction but must not turn it into polling.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
 4. **`layout` animations trigger layout measurement**: for lists over 50 items, switch to manual transform or paginate.
 5. **Reading surfaces do not bounce**: text, numeric readouts and size recipes author bounce zero. Existing press feedback remains separately tokenised. A physics spring inheriting velocity can still cross its target, so geometry clamps the rendered value (rule 9). More expressive gestures require a separately reviewed recipe and do not become everyday defaults.

@@ -17,12 +17,12 @@ AspectRatio maintains reserved media space and smooths an intentional ratio chan
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent insertion / wrapper | Opacity entrance with final reserved space already present. | Short opacity. | Immediate. | aspect-ratio.root.enter → presence.surface |
-| Ratio prop changes / wrapper | Measure available inline size and interpolate the resulting block size. | Final ratio geometry immediately. | Immediate. | aspect-ratio.root.resize → geometry.compact |
-| Wrapper colour target changes / wrapper | Scoped surface transition if a surface exists. | Short colour. | Immediate. | aspect-ratio.root.colour → state.color |
-| Parent resize or media decoding / native layout and media | Reserved geometry tracks parent directly; the child owns any image reveal. | Same. | Same. | aspect-ratio.layout.follow → engine.native |
+| Independent insertion / wrapper | Opacity entrance with final reserved space already present. | Short opacity. | Immediate. | `aspect-ratio.root.enter` → `presence.surface` → opacity-only `enter.pop` |
+| Ratio prop changes / wrapper | Measure available inline size and interpolate the resulting block size. | Final ratio geometry immediately. | Immediate. | `aspect-ratio.root.resize` → `geometry.compact` → `geometry.resize` |
+| Wrapper colour target changes / wrapper | Scoped surface transition if a surface exists. | Short colour. | Immediate. | `aspect-ratio.root.colour` → `state.color` → target `state.color` |
+| Parent resize or media decoding / native layout and media | Reserved geometry tracks parent directly; the child owns any image reveal. | Same. | Same. | `aspect-ratio.layout.follow` → `engine.native` → native CSS layout and caller media (no recipe) |
 
 ## Interruption and lifecycle
 

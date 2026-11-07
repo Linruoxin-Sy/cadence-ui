@@ -19,11 +19,11 @@ Spinner communicates indeterminate activity through rotation in full mode and a 
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent insertion/removal / spinner or retained icon-slot owner | Opacity entrance/exit without delaying status availability. | Short opacity with a static glyph. | Immediate. | spinner.root.enter → presence.inline; spinner.root.exit → presence.exit |
-| Visible indeterminate activity / SVG transform | Continuous rotation. | Static glyph, no rotation. | Static glyph, no rotation. | spinner.glyph.busy → status.loop |
-| Authored colour/size changes / SVG or parent slot | Scoped stroke colour; bounded owned size change if not controlled by a parent. | Colour may transition; size is immediate. | Immediate. | spinner.glyph.colour → state.color; spinner.root.resize → geometry.compact |
+| Independent insertion/removal / spinner or retained icon-slot owner | Opacity entrance/exit without delaying status availability. | Short opacity with a static glyph. | Immediate. | `spinner.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `spinner.root.exit` → `presence.exit` → `exit.fade` |
+| Visible indeterminate activity / SVG transform | Continuous rotation. | Static glyph, no rotation. | Static glyph, no rotation. | `spinner.glyph.busy` → `status.loop` → continuous `data.transition` |
+| Authored colour/size changes / SVG or parent slot | Scoped stroke colour; bounded owned size change if not controlled by a parent. | Colour may transition; size is immediate. | Immediate. | `spinner.glyph.colour` → `state.color` → target `state.color`; `spinner.root.resize` → `geometry.compact` → `geometry.resize` |
 
 ## Interruption and lifecycle
 

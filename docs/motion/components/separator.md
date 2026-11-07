@@ -19,12 +19,12 @@ Separator quietly marks a structural boundary when that boundary is introduced o
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent insertion/removal / separator | Rule opacity enters or exits within retained parent lifecycle. | Short opacity only. | Immediate. | separator.rule.enter → presence.inline; separator.rule.exit → presence.exit |
-| Explicit length change / rule | Interpolate the owned length toward the clamped target. | Target size immediately. | Immediate. | separator.rule.resize → geometry.compact |
-| Orientation changes / separator | Commit the new orientation and briefly fade the replacement rule; do not rotate it through content. | Short fade or immediate if no retained visual. | Immediate. | separator.rule.replace → presence.inline |
-| Rule colour changes / separator | Scoped background colour transition. | Short colour transition. | Immediate. | separator.rule.colour → state.color |
+| Independent insertion/removal / separator | Rule opacity enters or exits within retained parent lifecycle. | Short opacity only. | Immediate. | `separator.rule.enter` → `presence.inline` → one-shot opacity `data.transition`; `separator.rule.exit` → `presence.exit` → `exit.fade` |
+| Explicit length change / rule | Interpolate the owned length toward the clamped target. | Target size immediately. | Immediate. | `separator.rule.resize` → `geometry.compact` → `geometry.resize` |
+| Orientation changes / separator | Commit the new orientation and briefly fade the replacement rule; do not rotate it through content. | Short fade or immediate if no retained visual. | Immediate. | `separator.rule.replace` → `presence.inline` → one-shot opacity `data.transition` |
+| Rule colour changes / separator | Scoped background colour transition. | Short colour transition. | Immediate. | `separator.rule.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

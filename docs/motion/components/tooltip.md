@@ -13,7 +13,7 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 | Surface colour | Default: popup and arrow share one background/fill token transition, preventing an unmatched arrow. |
 | Text colour | Default: content foreground changes as one scoped token. |
 | Changed text | Default for a primitive hint string: changed runs only, with immediate accessible description. Rich children require explicit composed ownership. |
-| Changed numbers | Composed only for an explicit quantity display. Shortcuts, dates and identifiers in hints are text, not inferred counters. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich hint quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -25,7 +25,7 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 | Primitive hint update / text presentation | Stable-grapheme replacement with `stagger: none`; no replay of unchanged words. | Changed-run opacity only. | Final hint immediately. | `tooltip.text.change` → `text.replace` → target `text.change` |
 | Token change / popup, arrow, foreground | Coordinated scoped colour transition. | Short colour feedback. | Final colours immediately. | `tooltip.surface.colour` → `state.color` → target `state.color` |
 | Anchor/collision change / positioner and arrow | Correct native placement immediately; no arrow/coordinate tween or cross-trigger flight. | Same placement. | Same placement. | `tooltip.position.place` → `engine.native` → Base UI Tooltip positioning (no new recipe) |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `tooltip.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Content revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `tooltip.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -34,6 +34,8 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 - Close cancels text and resize work. The visible tooltip remains one accessible description; outgoing decorative characters are never separately announced.
 - Live reduced removes geometry motion; none/zero clock cancel presentation writers and complete the current Base UI exit protocol without waiting for a presentation timer. Its configured intent delays remain unchanged. Unmount or trigger removal clears measurements and local work.
 - Async hints arriving while closed do not animate offscreen or reopen the tooltip. Reopen/target changes invalidate obsolete exit completions. Native trigger focus/pointer behaviour and its current accessible description remain functional in reduced/none.
+
+Dispatch a direct Content string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -51,3 +53,5 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 - Pending: update part of a visible hint near a collision boundary; unchanged text remains stable and arrow/placement remain attached.
 - Pending: rapid open/close, live downgrade, zero clock, removed trigger and reduced-mode geometry cancellation leave no stale tooltip.
 - Pending: replace a short hint with a long required description inside constrained placement; it is readable immediately without new truncation, and a composed numeric quantity follows its own child contract without turning shortcut digits into a counter.
+
+- Pending: update a direct numeric Content value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.

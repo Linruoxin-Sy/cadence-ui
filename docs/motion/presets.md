@@ -111,7 +111,7 @@ placement immediately instead of inventing a navigation direction.
 Each preset's full-mode parameters above are subject to these property-specific results. A component
 action may use a narrower documented subset, but cannot retain a property that the mode removes.
 
-| Preset family | Reduced | None / zero recipe clock | Full-mode interruption |
+| Preset family | Reduced | None | Full-mode interruption |
 | --- | --- | --- | --- |
 | Presence and directional content | Allowed opacity uses a short tween; all travel/scale is removed | Semantic visibility/geometry immediately, with native lifecycle completion | Retarget current paint; reopening invalidates old exit completion |
 | `state.color` | Same scoped properties, tween clock multiplied by `reducedDurationScale` | Target values immediately; no duration/delay survives | Latest committed colour wins; theme coordination may suppress redundant local work |
@@ -122,8 +122,25 @@ action may use a narrower documented subset, but cannot retain a property that t
 | Numeric reels | Final formatted value immediately, no roll or delay | Final formatted value immediately | Retarget the bounded reel presentation under §5; no intermediate-value queue |
 | `data.update` / `data.progress` | Geometry is immediate; opacity-only data feedback may retain a short tween | Engine/one-shot terminal target before paint | The documented data adapter owns all affected geometry; progress shares one presentation transaction with its readout |
 | `handoff.value` | No flight; changed-part opacity at the destination only | Final destination text/geometry immediately | Captured visible origin and current destination remain valid, otherwise local text fallback |
-| `status.loop` | Static equivalent status; stop the existing animation | None: stop; zero recipe clock alone: theme loop is unchanged | Active/visible condition and theme clock own the loop; reduced/none always take precedence |
+| `status.loop` | Static equivalent status; stop the existing animation | Static equivalent status; stop the existing animation | Active/visible condition and theme clock own the loop; reduced/none always take precedence |
 | `engine.native` | Required direct manipulation remains immediate; stop the documented autonomous decorative/inertial part | Direct input remains available; cancel only authored/autonomous clocks addressed by the adapter | Native engine retains gesture state, capture and geometry ownership |
+
+Zero recipe time is a separate timing decision, **not** the None column. Resolve the effective mode's
+target first, then reach that target immediately with no recipe duration or delay. In full mode a
+held press still reaches `scale.press`; release reaches rest immediately. Reduced/none remove that
+decorative scale. A checked thumb, selected marker, folded panel or native swipe retains its correct
+state/placement in all modes. Zero cancels an existing recipe writer even when its target is unchanged;
+it does not clear a held gesture, cancel a theme-clock loop or bypass native intent/lifetime timers.
+The documented native engine adapter determines which autonomous clocks also observe zero.
+
+Resting paint is the current authored semantic paint, not a universal opacity of 1 or transform of
+none. Disabled opacity, caller transparency and required placement survive entry completion, loop
+cancellation and mode changes. One owner composes the presence/activity envelope with that resting
+paint, using a safe separate layer or its resolved target; two opacity writers on one node are not
+permitted. Disabled-opacity changes are immediate unless a component records a separate approved
+opacity action; `state.color` does not implicitly animate opacity. Only an actual exit targets hidden
+paint. Reduced/none loop cancellation must restore the current static equivalent, not freeze a
+half-faded loading shape or overwrite caller paint.
 
 For reduced opacity-only remnants of spring presets, use `duration.fast` with `ease.out`, scaled by
 `reducedDurationScale` and the effective recipe clock; do not run a residual spring on layout, rotation
@@ -243,6 +260,35 @@ formatter/locale-only revision settles the numeric lane and changes only necessa
 without a growth/decline story. NaN/Infinity and unsupported digit systems display their exact formatter
 output immediately. Nonfinite values are never fed to physics. These are target renderer requirements,
 not a claim that the existing `number.roll` resolver supplies them.
+
+### 5.1 Numeric identity and formatting decisions
+
+The renderer receives the original supported numeric value plus its formatter; it never reconstructs
+a quantity from rendered DOM or a string. Comparison uses values of the same supported numeric domain,
+not a lossy conversion of a large integer to Number. These decisions apply to every numeric binding:
+
+| Revision | Required presentation |
+| --- | --- |
+| Value changes but formatted output is unchanged | Update semantic data only; no reel, affix effect or size measurement solely for that value |
+| First value, string/number renderer change, or unsupported numeric-domain conversion | Exact current formatted baseline immediately; no assumed zero/source value |
+| Positive/negative value change with stable notation | Compare the whole numeric values for trend, including negative-to-negative changes; roll only changed decimal places |
+| Cross zero | Use whole-value trend; sign insertion/removal is changed affix text and never an extra digit column |
+| Negative zero versus positive zero | Equal magnitude supplies no trend; preserve formatter sign policy and change only displayed sign/affix text if needed |
+| Precision or rounding configuration changes | Formatting revision: settle numeric columns immediately, preserve shared place identities where valid and update only affected affixes; no simulated value growth |
+| Same formatter, changed digit count or rounded carry | Preserve surviving units/tens/fractional identities; a newly present column enters from its own bounded edge without inventing a prior zero, and a removed column has no semantic value |
+| Stable percentage/currency/unit notation | Compare original values and keep the same documented formatting scale; affixes are text, with one coordinated shell owner |
+| Compact suffix, exponent, currency/unit or formatting scale changes | Settle the numeric lane immediately and replace only changed affixes; a mantissa in a new scale is not the old place-value reel |
+| Locale, numbering system or direction changes | Re-establish exact formatting/layout immediately; safe changed affixes may use text replacement, never a fictitious trend or cross-script digit morph |
+| NaN, Infinity, unsupported digits/parts or an unsafe formatter | Exact formatter output immediately; no physics, inferred parsing, digit loss or whole-label fallback fade |
+
+Existing rounding/sign/currency options stay authoritative; motion does not choose business precision
+or silently round large values. BigInt and non-Latin rolling support require explicit renderer/API
+evidence before being claimed; otherwise their valid formatted display remains immediate. Currency
+symbols, accounting parentheses, grouping, decimal markers and bidi isolation are preserved. Never
+reverse digit order to implement RTL; the formatter determines logical order and layout, while reel
+travel is vertical. The numeric output remains current and singular for accessibility and copying.
+
+### 5.2 Shared work limits
 
 All bindings inherit [the system budgets](../animation-system.md#7-performance-budgets-and-implementation-rules):
 existing per-item source ceilings, consumer/runtime/page limits, real-device frame rate and CLS.

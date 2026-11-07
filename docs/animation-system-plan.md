@@ -201,6 +201,9 @@ Depends on the target design. All work below is pending.
   exact preset/recipe form, and full/reduced/none plus interruption to observable properties. Include
   directional `content.switch`/`content.month` and size-linked `layout.sidebar` as explicit target forms;
   equal timing tokens alone do not prove coordinated progress or geometry.
+  Reject an incomplete binding chain, conflicting repeated binding or an inherited action with an
+  unnamed actual owner. Validate the full/reduced/none targets independently from zero recipe time;
+  a held full-mode press at zero time must not be mistaken for the none presentation.
 
 - Reconcile recipe/mode/token support in `registry/cadence/lib/motion.ts`, the provider, CSS token
   exports and theme registry item. Introduce target recipe names only with their execution contract.
@@ -237,6 +240,13 @@ Gate: meaningful algorithm, lifecycle and browser fixtures cover repeated charac
 multiline shaping fallback, numeric formatting, rapid retargeting, hidden/zero-size measurement,
 SSR/hydration, nested modes, live downgrades and clean unmount. Do not require per-frame React state
 updates or a persistent observer for a static component without measured content.
+
+Include deterministic string/number/identity dispatch, formatter-only and cross-zero/negative-zero
+changes, unchanged formatted output and compact/exponent scale changes. Prove current disabled/caller
+opacity survives presence/loop cleanup, focused entering controls remain visible, custom render keeps
+refs/direct-child structure, and effect replay/abandoned renders create no duplicate owners. Exercise
+forced-colours, print, document hiding/restoration and nested/portalled contexts. These are pending
+shared gates, not evidence supplied by the design files.
 
 ### Phase 3: Five pilots
 

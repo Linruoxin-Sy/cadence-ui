@@ -19,13 +19,13 @@ InputGroup presents a single stable frame while addons, display text and actions
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Group insertion / frame | One opacity entrance for frame and initial parts. | Short opacity. | Immediate. | input-group.root.enter → presence.inline |
-| Addon/action membership change / frame | Fade changed addon; adjust bounded outer size and retained segment positions only when the editor is unfocused and no selection/resize gesture is active. Otherwise commit geometry immediately. | Size/position immediate, opacity only. | Immediate. | input-group.addon.enter → presence.inline; input-group.addon.exit → presence.exit; input-group.root.resize → geometry.compact; input-group.addon.move → layout.compact |
-| Focus/invalid/state change / frame and display owners | Scoped colour/shadow transitions; focus is immediately visible. | Short colour. | Immediate. | input-group.root.colour → state.color; input-group.text.colour → state.color |
-| Display content revision / InputGroupText or addon | Changed-only text with stagger:none; quantity reels share the frame's geometry transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | input-group.text.replace → text.replace; input-group.text.roll → number.compact |
-| Editor changes / input-group-control | Native editing and direct geometry. | Same. | Same. | input-group.control.edit → engine.native |
+| Group insertion / frame | One opacity entrance for frame and initial parts. | Short opacity. | Immediate. | `input-group.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Addon/action membership change / frame | Fade changed addon; adjust bounded outer size and retained segment positions only when the editor is unfocused and no selection/resize gesture is active. Otherwise commit geometry immediately. | Size/position immediate, opacity only. | Immediate. | `input-group.addon.enter` → `presence.inline` → one-shot opacity `data.transition`; `input-group.addon.exit` → `presence.exit` → `exit.fade`; `input-group.root.resize` → `geometry.compact` → `geometry.resize`; `input-group.addon.move` → `layout.compact` → `layout.move` |
+| Focus/invalid/state change / frame and display owners | Scoped colour/shadow transitions; focus is immediately visible. | Short colour. | Immediate. | `input-group.root.colour` → `state.color` → target `state.color`; `input-group.text.colour` → `state.color` → target `state.color` |
+| Display content revision / InputGroupText or addon | Changed-only text with stagger:none; quantity reels share the frame's geometry transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `input-group.text.replace` → `text.replace` → target `text.change`; `input-group.text.roll` → `number.compact` → revised `number.roll` |
+| Editor changes / input-group-control | Native editing and direct geometry. | Same. | Same. | `input-group.control.edit` → `engine.native` → native Input/Textarea editing (no recipe) |
 
 ## Interruption and lifecycle
 

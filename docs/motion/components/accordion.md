@@ -22,7 +22,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
 | --- | --- | --- | --- | --- |
 | Open/close or known content resize; content shell | Clamped block-size follows current geometry to its new target; opening and closing are reversible. | Final size immediately. | Final size immediately. | `accordion.content.resize` → `geometry.content` → `geometry.resize` |
-| Open/close; inner content paint | Short opacity entry/exit coordinated with the shell, without a second height writer. | Short opacity only. | Semantic visibility immediately. | `accordion.content.enter` → `presence.inline` → one-shot `data.transition`; `accordion.content.exit` → `presence.exit` → `exit.fade` |
+| Open/close; inner content paint | Short opacity entry/exit coordinated with the shell, without a second height writer. | Short entry after final open geometry; fully clipped closed body completes immediately. | Semantic visibility immediately. | `accordion.content.enter` → `presence.inline` → one-shot `data.transition`; `accordion.content.exit` → `presence.exit` → `exit.fade` |
 | Expanded state; trigger-icon | The existing indicator changes state locally; no replacement of the trigger or focus node. | Final indicator, permitted short opacity. | Final indicator immediately. | `accordion.indicator.change` → `state.indicator` → `state.morph` |
 | Hover/disabled/state foreground; trigger | Scoped surface and text colour. Focus indication is immediate. | Short colour feedback. | Final colours immediately. | `accordion.trigger.colour` → `state.color` → planned `state.color` |
 | Owned plain trigger/content text changes | Animate only changed graphemes/runs, without stagger; an opening content entrance consumes same-cause text entry. | Short opacity on changed runs only. | Final text immediately. | `accordion.label.replace` → `text.replace` → planned `text.change` |
@@ -42,6 +42,8 @@ Measure the natural inner block-size outside render, accounting for the actual c
 
 Lay inner text out at its destination inline-size before measuring; the separate panel shell animates only block-size. Surrounding siblings move with the shell, while its text does not repeatedly wrap on each height frame.
 
+Reduced closing commits the closed block-size immediately. A fully clipped/hidden body has no visible exit opacity to retain, so complete that body's decorative exit immediately through the primitive; do not hold empty space just to run a fade. A short opacity entry is permitted after the open geometry is final. On focus/beforematch opening, settle any envelope that would hide the target immediately. This does not replace native persistence, focus or hidden-until-found handling.
+
 ## Acceptance scenarios
 
 - Pending: reverse opening and closing repeatedly, then update controlled values for several items; each ends at the latest size with correct expanded state.
@@ -49,3 +51,5 @@ Lay inner text out at its destination inline-size before measuring; the separate
 - Pending: exercise keyboard focus, custom render, persisted/searchable content and unmount during exit in all modes, including live mode changes and zero clock.
 - Pending: verify SSR/no-JS visibility, first hydration, long content, constrained width and focus-ring/portal clipping.
 - Pending: change a direct quantity versus a numeric section identifier; insert an initially open item; trigger beforematch while a close is running, then remove the item. No duplicate content entrance or stale close completion survives.
+
+- Pending: close a reduced-mode body during its opacity entry, reopen through focus/beforematch and set zero clock with unchanged open state; no empty exit hold, invisible focused content or stale opacity writer remains.

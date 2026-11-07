@@ -19,13 +19,13 @@ Button gives immediate press feedback while keeping its label and hit target sta
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Dynamic insertion / button | Opacity entry; parent-owned removal retains a fade. | Short opacity only. | Visible or removed immediately. | button.root.enter → presence.inline; button.root.exit → presence.exit |
-| Native press and release / internal feedback visual | scale.press toward the active state, then settle; native root hit geometry and semantics remain immediate. | No scale. | No animation. | button.feedback.press → feedback.press |
-| State change / button | Scoped surface and foreground transition. | Short colour feedback. | Target colours immediately. | button.root.colour → state.color |
-| Label or quantity revision / label region | Changed graphemes replace with stagger:none; quantities roll by semantic direction; root width retargets concurrently. | Changed text uses short opacity only; quantity and width are immediate. | All targets immediate. | button.label.replace → text.replace; button.label.roll → number.compact; button.root.resize → geometry.compact |
-| Explicit size variant or icon-slot occupancy change / root shell | Final typography/spacing commits once; interpolate only owned bounded dimensions. | Final dimensions immediately. | Final dimensions immediately. | button.root.resize → geometry.compact |
+| Dynamic insertion / button | Opacity entry; parent-owned removal retains a fade. | Short opacity only. | Visible or removed immediately. | `button.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `button.root.exit` → `presence.exit` → `exit.fade` |
+| Native press and release / internal feedback visual | scale.press toward the active state, then settle; native root hit geometry and semantics remain immediate. | No scale. | No animation. | `button.feedback.press` → `feedback.press` → `feedback.press` |
+| State change / button | Scoped surface and foreground transition. | Short colour feedback. | Target colours immediately. | `button.root.colour` → `state.color` → target `state.color` |
+| Label or quantity revision / label region | Changed graphemes replace with stagger:none; quantities roll by semantic direction; root width retargets concurrently. | Changed text uses short opacity only; quantity and width are immediate. | All targets immediate. | `button.label.replace` → `text.replace` → target `text.change`; `button.label.roll` → `number.compact` → revised `number.roll`; `button.root.resize` → `geometry.compact` → `geometry.resize` |
+| Explicit size variant or icon-slot occupancy change / root shell | Final typography/spacing commits once; interpolate only owned bounded dimensions. | Final dimensions immediately. | Final dimensions immediately. | `button.root.resize` → `geometry.compact` → `geometry.resize` |
 
 ## Interruption and lifecycle
 
@@ -39,8 +39,12 @@ Measure intrinsic inline size after commitment, clamp it to available space, and
 
 One natural-content measurement supplies both width and any explicit height destination. If an intermediate shell would additionally hide the final visible label, icon or focus affordance, commit that axis immediately rather than introduce temporary truncation. Parent layout consumes this final destination once, never the changing shell bounds. Bound work to one owned label transaction and one direct quantity group; unsafe shaping or shared work-limit overflow applies affected content immediately. A numeric string is not parsed; mixed quantity/affix JSX uses explicit composition.
 
+A custom `render` must preserve the native ref/event target, direct-child icon selectors and existing layout. Press decoration requires a safe internal visual layer separate from hit/focus/anchor geometry; if none exists, use the declared colour feedback and omit press scale rather than inserting incompatible wrappers. The same rule applies to icon-only buttons and composed triggers. At full-mode zero timeScale, an accepted held press reaches `scale.press` immediately and release reaches rest immediately; a none/reduced branch remains unscaled. Presence completion restores current disabled/caller opacity, not a hard-coded fully opaque button.
+
 ## Acceptance scenarios
 
 Target acceptance; not executed: pointer and keyboard press cancellation; repeated Save/Saving/Saved label changes; a quantity crossing a digit boundary; icon-only and constrained-width buttons; rich children; parent insertion without double entrance; live full/reduced/none and zero-clock changes during press and resize.
 
 Also pending: replace an action while its DOM node is retained, change size during press, and grow a localized label inside a narrow clipped parent; no stale activation/name or transient unreadable label is permitted.
+
+Also pending: use a custom anchor render with direct SVG children, set timeScale to zero while holding a press, and disable during entry; refs/selectors, native activation, correct static scale and disabled opacity survive.

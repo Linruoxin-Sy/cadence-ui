@@ -13,7 +13,7 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 | Surface colour | Default: content owns background/border tokens; nested components retain their own surface owners. |
 | Text colour | Default: the content popup's foreground token transitions and inherits to plain content; the logical root is not a new painted surface and explicitly styled children retain ownership. |
 | Changed text | Default only for a primitive content string; rich preview children are composed with their own display owners. Hover Card has no title/description part to invent. |
-| Changed numbers | Composed: explicit counts/statistics inside the preview may roll. No automatic number extraction from arbitrary content. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Content: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for rich preview quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -25,7 +25,7 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 | Primitive content replacement / text owner | Changed-run replacement with `stagger: none`. Rich previews defer to their composed text owners. | Changed-run opacity only. | Final text immediately. | `hover-card.text.change` → `text.replace` → target `text.change` |
 | Supplied tokens / content | Scoped background/border/foreground colour transition. | Short colour feedback. | Final colours immediately. | `hover-card.surface.colour` → `state.color` → target `state.color` |
 | Anchor/collision change / positioner | Correct native placement immediately and cancel obsolete approach direction. | Same placement. | Same placement. | `hover-card.position.place` → `engine.native` → Base UI PreviewCard positioning (no new recipe) |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `hover-card.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Content revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `hover-card.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -34,6 +34,8 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 - Closing cancels local geometry/text/numeric work. Anchor removal follows Base UI teardown; no retained interactive preview after semantic closure.
 - Live reduced cancels approach and resizing; none/zero clock cancels presentation clocks and completes the current Base UI exit protocol with no added timer hold. Unmount disconnects measurement and composed-owner registrations. Existing trigger/popup pointer and focus operation stays available in every mode.
 - Async preview content received while closed updates the next view without reopening or starting hidden size work. Reopen and collision/anchor changes invalidate stale exit/direction/size completions; a caller-controlled open value remains authoritative.
+
+Dispatch a direct Content string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -51,3 +53,5 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 - Pending: replace a plain hint and update a rich preview with an image/count; only explicit owners animate and layout remains bounded.
 - Pending: collision flips, anchor removal, all modes, live downgrade and zero-clock closure leave no orphan or stale measurement.
 - Pending: a required preview label grows while a nested child resizes or an action has focus; the panel preserves immediate readability and one geometry owner, including async content after close.
+
+- Pending: update a direct numeric Content value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.

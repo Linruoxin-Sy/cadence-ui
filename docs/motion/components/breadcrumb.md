@@ -19,13 +19,13 @@ Breadcrumb retains ancestor identity while a route adds, removes or renames the 
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent list insertion / breadcrumb-list | One opacity entrance. | Short opacity. | Immediate. | breadcrumb.list.enter → presence.inline |
-| Caller changes path membership / items and list | Fade changed items/separators; retained ancestors reflow toward the final path. | Geometry immediate; short opacity. | Immediate. | breadcrumb.item.enter → presence.inline; breadcrumb.item.exit → presence.exit; breadcrumb.item.move → layout.compact; breadcrumb.list.resize → geometry.compact |
-| Same destination renamed / link/page label | Changed-only text replacement with stagger:none. | Short changed-text opacity only. | Latest text immediately. | breadcrumb.label.replace → text.replace |
-| Rename changes the visible path box / list layout owner | Consume the final renamed label layout once; adjust owned host size and retained crumb positions. | Final geometry immediately. | Final geometry immediately. | breadcrumb.list.resize → geometry.compact; breadcrumb.item.move → layout.compact |
-| Current/hover/theme state / text owners | Scoped foreground transition. | Short colour. | Immediate. | breadcrumb.text.colour → state.color |
+| Independent list insertion / breadcrumb-list | One opacity entrance. | Short opacity. | Immediate. | `breadcrumb.list.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Caller changes path membership / items and list | Fade changed items/separators; retained ancestors reflow toward the final path. | Geometry immediate; short opacity. | Immediate. | `breadcrumb.item.enter` → `presence.inline` → one-shot opacity `data.transition`; `breadcrumb.item.exit` → `presence.exit` → `exit.fade`; `breadcrumb.item.move` → `layout.compact` → `layout.move`; `breadcrumb.list.resize` → `geometry.compact` → `geometry.resize` |
+| Same destination renamed / link/page label | Changed-only text replacement with stagger:none. | Short changed-text opacity only. | Latest text immediately. | `breadcrumb.label.replace` → `text.replace` → target `text.change` |
+| Rename changes the visible path box / list layout owner | Consume the final renamed label layout once; adjust owned host size and retained crumb positions. | Final geometry immediately. | Final geometry immediately. | `breadcrumb.list.resize` → `geometry.compact` → `geometry.resize`; `breadcrumb.item.move` → `layout.compact` → `layout.move` |
+| Current/hover/theme state / text owners | Scoped foreground transition. | Short colour. | Immediate. | `breadcrumb.text.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

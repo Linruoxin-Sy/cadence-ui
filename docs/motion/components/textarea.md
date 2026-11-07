@@ -17,12 +17,12 @@ Textarea preserves the immediacy of typing and native resizing, while giving del
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent insertion / textarea | Opacity entrance. | Short opacity. | Immediate. | textarea.root.enter → presence.inline |
-| Focus/invalid/disabled state / chrome | Scoped colour and shadow feedback; native focus remains immediately evident. | Short colour feedback. | Immediate final chrome. | textarea.root.colour → state.color |
-| Explicit rows/owned-dimension revision while unfocused / textarea | Measure the native final block destination and interpolate only when native field-sizing/resize ownership can be preserved. Focused or value-driven geometry is immediate. | Immediate height. | Immediate height. | textarea.root.resize → geometry.content |
-| Typing, composition, pointer resizing / native textarea | Direct native value and geometry; no easing behind the pointer or caret. | Same. | Same. | textarea.control.edit → engine.native |
+| Independent insertion / textarea | Opacity entrance. | Short opacity. | Immediate. | `textarea.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Focus/invalid/disabled state / chrome | Scoped colour and shadow feedback; native focus remains immediately evident. | Short colour feedback. | Immediate final chrome. | `textarea.root.colour` → `state.color` → target `state.color` |
+| Explicit rows/owned-dimension revision while unfocused / textarea | Measure the native final block destination and interpolate only when native field-sizing/resize ownership can be preserved. Focused or value-driven geometry is immediate. | Immediate height. | Immediate height. | `textarea.root.resize` → `geometry.content` → `geometry.resize` |
+| Typing, composition, pointer resizing / native textarea | Direct native value and geometry; no easing behind the pointer or caret. | Same. | Same. | `textarea.control.edit` → `engine.native` → native Textarea editing/resizing (no recipe) |
 
 ## Interruption and lifecycle
 

@@ -13,7 +13,7 @@ A notification joins the stack, can update in place, and leaves under the manage
 | Surface colour | Default: root owns supplied surface/border tokens; `toast-icon` owns semantic icon colour. Action/close buttons retain their button owners. |
 | Text colour | Default: `toast-title` and `toast-description` own foreground transitions; type/icon feedback does not recolour arbitrary caller content. |
 | Changed text | Default for primitive title/description: preserve unchanged graphemes and replace changed runs on the same toast ID. Rich children are composed. |
-| Changed numbers | Composed: explicit quantity readouts can roll; Toast adds no countdown, inferred progress or timer display. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -27,7 +27,7 @@ A notification joins the stack, can update in place, and leaves under the manage
 | Type/icon changes / icon presentation | Replace only the changed decorative icon with local opacity; keep message semantics immediate. | Short opacity. | Final icon immediately. | `toast.icon.change` → `data.update` → `data.transition` |
 | Loading type / icon | Target default adds a theme-clock loading spin only while active and visible; the delivered baseline currently uses a static glyph. | Static loading icon. | Static loading icon. | `toast.icon.activity` → `status.loop` → continuous `data.transition` |
 | Supplied tokens / root, icon and text | Scoped colour transition. | Short colour feedback. | Target colours immediately. | `toast.surface.colour` → `state.color` → target `state.color` |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `toast.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `toast.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -36,6 +36,8 @@ A notification joins the stack, can update in place, and leaves under the manage
 - Direct swipe cancels any authored positional settling. Closing/unmounting removes all outgoing decorative text and releases native registrations; actions never await exit completion.
 - Live reduced/none stops the loading loop and disallowed movement. Zero recipe clock settles one-shot work only; the loading loop follows its separate theme clock and mode/visibility rules. During an active swipe, retain the instantaneous native offset/capture in every mode; cancel decorative stack/release interpolation, not required direct operation. Post-release authored settling is immediate under reduced/none or zero recipe clock through the native adapter.
 - A no-motion dismissal completes through Base UI's actual toast lifecycle, never an extra timer or an early release of its native focus/registration rules. Async same-ID updates after dismissal cannot resurrect a toast; a genuinely new manager add uses its own current identity. Returning to full does not replay consumed entry.
+
+Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -57,3 +59,5 @@ A notification joins the stack, can update in place, and leaves under the manage
 - Pending: reduced/none stops loading spin; zero recipe clock affects only one-shot work, while theme clock behavior is tested separately. Verify live downgrade and unmount cleanup.
 - Pending: downgrade or set zero clock mid-swipe, continue direct movement and release; also grow a same-ID message while its action has focus. Native swipe, readable content, manager timing and immediate-close completion remain correct.
 - Pending: combine message-height growth with add/remove/limit changes and native stack interaction; inspect intermediate frames for stable ordering/hit regions and prove the immediate-geometry fallback when native channels cannot be coordinated.
+
+- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.

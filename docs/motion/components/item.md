@@ -19,13 +19,13 @@ Item treats a row's media, copy and actions as one identity, while allowing late
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Item insertion/removal / item and group | Fade changed item; move retained siblings without remounting. | Positions immediate, short opacity. | Immediate. | item.root.enter → presence.inline; item.root.exit → presence.exit; item.group.move → layout.compact |
-| Header/footer/content or explicit size change / item | Resolve final spacing/typography and interpolate measured block size; independently inserted media/actions fade within it. | Size immediate, short opacity. | Immediate. | item.root.resize → geometry.content; item.part.enter → presence.inline |
-| Existing media/action region removed or explicitly replaced / retained local owner | Fade only the changed noninteractive visual while current actions and semantic content commit immediately. | Short opacity. | Final content immediately. | item.part.exit → presence.exit; item.media.replace → data.update |
-| Display text/quantity revision / known display part | Changed-only text, stagger:none, or quantity reels. | Short changed-text opacity; quantities immediate. | Immediate. | item.text.replace → text.replace; item.value.roll → number.compact |
-| Variant or actual interactive state / row/media/text owners | Scoped colour transition. | Short colour. | Immediate. | item.surface.colour → state.color; item.text.colour → state.color |
+| Item insertion/removal / item and group | Fade changed item; move retained siblings without remounting. | Positions immediate, short opacity. | Immediate. | `item.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `item.root.exit` → `presence.exit` → `exit.fade`; `item.group.move` → `layout.compact` → `layout.move` |
+| Header/footer/content or explicit size change / item | Resolve final spacing/typography and interpolate measured block size; independently inserted media/actions fade within it. | Size immediate, short opacity. | Immediate. | `item.root.resize` → `geometry.content` → `geometry.resize`; `item.part.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Existing media/action region removed or explicitly replaced / retained local owner | Fade only the changed noninteractive visual while current actions and semantic content commit immediately. | Short opacity. | Final content immediately. | `item.part.exit` → `presence.exit` → `exit.fade`; `item.media.replace` → `data.update` → local opacity `data.transition` |
+| Display text/quantity revision / known display part | Changed-only text, stagger:none, or quantity reels. | Short changed-text opacity; quantities immediate. | Immediate. | `item.text.replace` → `text.replace` → target `text.change`; `item.value.roll` → `number.compact` → revised `number.roll` |
+| Variant or actual interactive state / row/media/text owners | Scoped colour transition. | Short colour. | Immediate. | `item.surface.colour` → `state.color` → target `state.color`; `item.text.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

@@ -17,12 +17,12 @@ Input uses its chrome to explain focus, invalid and disabled state while leaving
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent insertion / input | Opacity entrance with an immediately usable control. | Short opacity only. | Immediate. | input.root.enter → presence.inline |
-| Focus, invalid, disabled or theme change / input chrome | Scoped colour/shadow transition; focus indication is available on the first semantic frame. | Short colour feedback. | Immediate final chrome. | input.root.colour → state.color |
-| Explicit owned size change / input | Bounded box interpolation only while unfocused and outside native selection/gesture interaction; otherwise commit final geometry immediately. | Immediate size. | Immediate size. | input.root.resize → geometry.compact |
-| Typing, autofill, composition or value update / native control | Native update, no visual text surrogate. | Same native update. | Same native update. | input.control.edit → engine.native |
+| Independent insertion / input | Opacity entrance with an immediately usable control. | Short opacity only. | Immediate. | `input.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Focus, invalid, disabled or theme change / input chrome | Scoped colour/shadow transition; focus indication is available on the first semantic frame. | Short colour feedback. | Immediate final chrome. | `input.root.colour` → `state.color` → target `state.color` |
+| Explicit owned size change / input | Bounded box interpolation only while unfocused and outside native selection/gesture interaction; otherwise commit final geometry immediately. | Immediate size. | Immediate size. | `input.root.resize` → `geometry.compact` → `geometry.resize` |
+| Typing, autofill, composition or value update / native control | Native update, no visual text surrogate. | Same native update. | Same native update. | `input.control.edit` → `engine.native` → native Input editing (no recipe) |
 
 ## Interruption and lifecycle
 

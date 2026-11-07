@@ -13,7 +13,7 @@ Determinate progress uses one committed target for its fill and formatted value.
 | Surface colour | Default: `progress-track` and `progress-indicator` own caller-driven semantic surface colours; no completion colour is invented. |
 | Text colour | Default: `progress-label` and `progress-value` own their explicit/inherited foreground token changes. |
 | Changed text | Default for plain `ProgressLabel` content; retain unchanged graphemes. Rich label children use composed ownership. |
-| Changed numbers | Default: `progress-value` owns formatted determinate value changes using the root's value/range/format semantics. `null` has no inferred numeric value. |
+| Changed numbers | Default: `progress-value` owns formatted determinate value changes using the root's value/range/format semantics. A direct numeric quantity supplied to ProgressLabel has its own display owner; it is not inferred to be the progress value. `null` has no inferred numeric value. |
 
 ## Choreography and modes
 
@@ -24,8 +24,9 @@ Determinate progress uses one committed target for its fill and formatted value.
 | Determinate formatted value / value | Roll changed places to the same committed target; final accessible value is immediate. | Final formatted value immediately. | Final formatted value immediately. | `progress.value.change` → `number.compact` → revised `number.roll` |
 | Indeterminate activity / indicator | One low-contrast local opacity pulse, only while indeterminate and visible; no travelling marquee. | Static indeterminate presentation. | Static indeterminate presentation. | `progress.indicator.activity` → `status.loop` → continuous `data.transition` |
 | Plain label / label | Changed-run replacement, `stagger: none`. | Changed-run opacity only. | Final label immediately. | `progress.label.change` → `text.replace` → target `text.change` |
+| Direct numeric label / label display owner | Roll changed places as an independent quantity, with no inferred relation to fill. | Final label quantity immediately. | Final label quantity immediately. | `progress.label.roll` → `number.compact` → revised `number.roll` |
 | Semantic token change / relevant parts | Scoped surface/foreground colour transition. | Short colour feedback. | Final colours immediately. | `progress.surface.colour` → `state.color` → target `state.color` |
-| Label/value wrapping / root shell | Measure final content height and clamp; track keeps its caller constraint. | Final geometry immediately. | Final geometry immediately. | `progress.root.resize` → `geometry.compact` → `geometry.resize` |
+| Known label/value content change / root shell | Measure final content height and clamp; track keeps its caller constraint. Passive wrapping remains immediate. | Final geometry immediately. | Final geometry immediately. | `progress.root.resize` → `geometry.compact` → `geometry.resize` |
 
 ## Interruption and lifecycle
 
@@ -44,6 +45,8 @@ Determinate progress uses one committed target for its fill and formatted value.
 - Clamp non-default ranges and keep visual fill inside the track; labels/focusable composed content stay outside that clipping boundary.
 - If root-height interpolation would temporarily hide its required label/value or a focused composed child, resolve that axis immediately or retain existing legal overflow. Do not add a crop merely to animate progress text. The semantic value/range and any native child operation remain immediate in every mode.
 
+ProgressValue uses the primitive's actual formatted value and determinate/indeterminate status; preserve its children callback and formatter contract. A callback returning rich nodes remains composed. ProgressLabel dispatches a direct string to text replacement or a supported direct quantity to compact reels, never both. Only the actual ProgressValue joins the fill transaction; an unrelated numeric label does not share its magnitude or direction. A range/format change that alters normalization or notation establishes the new fill/value geometry immediately, rather than applying the old numeric direction to a new scale.
+
 ## Acceptance scenarios
 
 - Pending: rapid increasing/decreasing values with non-default min/max and locale formats reach the latest target without overflow or stale digits.
@@ -51,3 +54,5 @@ Determinate progress uses one committed target for its fill and formatted value.
 - Pending: label wrapping and plain/rich content retain semantics and unchanged characters; initial hydration does not count from zero.
 - Pending: update the range and value together, remove the numeric display, or grow its label within a constrained host; fill remains non-negative/bounded and mandatory text never disappears behind an intermediate shell.
 - Pending: compare fill and changed-digit progression during interrupted/reversed updates, proving they share one normalized presentation transaction; verify the immediate-readout fallback if that adapter is unavailable.
+
+- Pending: keep value constant while changing min/max, change formatter scale/locale, provide a rich ProgressValue callback and change a direct numeric ProgressLabel. Preserve native formatted status, one slot writer and no false numeric direction.

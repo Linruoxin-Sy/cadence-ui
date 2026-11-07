@@ -13,7 +13,7 @@ The drawer remains attached to Base UI's swipe and snap model. Authored entry, r
 | Surface colour | Default: popup, overlay and optional `drawer-swipe-handle` own supplied surface tokens. |
 | Text colour | Default: `drawer-title`/`drawer-description` own foreground changes. |
 | Changed text | Default for primitive title/description: changed runs only. Rich body content retains composed owners. |
-| Changed numbers | Composed: explicit body quantities may roll; snap point values are geometry, not an implicit numeric display. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -27,7 +27,7 @@ The drawer remains attached to Base UI's swipe and snap model. Authored entry, r
 | Explicit snap configuration change / native snap owner | Resolve the latest valid active snap and destination through the native snap transaction, consuming current content bounds without another size spring. | Final snap geometry immediately. | Final snap geometry immediately. | `drawer.popup.configure` → `engine.native` → Base UI Drawer swipe/snap owner (no new recipe) |
 | Primitive title/description / text owner | Stable-grapheme replacement, `stagger: none`; no presence replay. | Changed-run opacity only. | Final text immediately. | `drawer.title.change` → `text.replace` → target `text.change`; `drawer.description.change` → `text.replace` → target `text.change` |
 | Supplied tokens / surface/text parts | Scoped colour transition independent of swipe opacity. | Short colour feedback. | Target colours immediately. | `drawer.surface.colour` → `state.color` → target `state.color` |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `drawer.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `drawer.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -36,6 +36,8 @@ The drawer remains attached to Base UI's swipe and snap model. Authored entry, r
 - Close cancels child text/geometry work; viewport, popup and scroll content are not duplicated. `modal=false` retains its existing absence of the modal backdrop.
 - Live reduced/none cancels authored travel/release interpolation without detaching active direct manipulation. While a pointer is active, preserve its instantaneous native offset/capture; settle to the accepted snap/open target without authored travel only when the native gesture ends or actual dismissal supersedes it. The target adapter maps zero recipe clock to cancellation of one-shot presence/geometry/text and authored release settling without overlaying/rescaling the native clock. It does not cancel a required placement/swipe transform.
 - Close/reopen and async content revisions invalidate obsolete exit/size completions. Closed content updates establish the next view without hidden interpolation. A no-motion close still completes through Base UI's actual lifecycle before focus/modality release; native unmount releases capture, observers and callbacks.
+
+Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -55,3 +57,5 @@ The drawer remains attached to Base UI's swipe and snap model. Authored entry, r
 - Pending: grow/shrink content at an active snap while idle, then grab mid-resize and change content/snap points during swipe; geometry clamps, the pointer stays attached and only the native owner writes size/offset. Release, reopen and close mid-update without competing transforms or stale destinations.
 - Pending: reduced/none/zero-clock post-release behavior and live downgrade preserve direct manipulation while stopping authored motion; unmount releases native resources.
 - Pending: switch modes or zero clock while the pointer is held, then continue dragging and release; the drawer never jumps to a pre-gesture snap. Test async content after close, focused content near a constrained edge and native exit completion on immediate close.
+
+- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.

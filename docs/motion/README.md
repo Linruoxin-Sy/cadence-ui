@@ -79,6 +79,12 @@ Optional geometry needs a concrete safe/immediate fallback; "animate if possible
 not a complete design. Bindings with multiple possible recipe forms must select the one actually
 designed for that part. Do not treat an index/filename check as a semantic conformance review.
 
+Every action table spells out `binding -> preset -> recipe/form`, including inherited actions and
+named native engines. Multiple bindings in a cell are distinct part/property responsibilities, not
+permission to combine alternative recipes on the same writer. Repeated references to one binding
+must keep the same preset/form. A local action may narrow a preset's optional properties; it cannot
+quietly widen them. In particular, an opacity-only `presence.surface` action never implies scale.
+
 The six rows are Appearance, Size, Surface colour, Text colour, Changed text and Changed numbers.
 An action such as selected-indicator movement, chart interpolation or a direct gesture can add rows
 in the choreography table; it does not substitute for evaluating the six baseline capabilities.
@@ -104,6 +110,8 @@ These obligations are inherited by every file; local action tables make their co
   not replay a hidden entrance. Later insertion/opening can animate. Parent presence consumes the same
   entrance cause, not later child updates. Decorative viewport reveal is explicitly composed and follows
   its own once/repeat contract; no component secretly scans descendants or re-hides the first screen.
+  Focus, activation and find reveal also settle an ordinary entrance when it would conceal or displace
+  the active target. Preserve semantic resting opacity rather than resetting every root to opacity 1.
 - **Modes:** full plays the designed action. Reduced keeps permitted short opacity/colour feedback,
   removes travel/scale/layout/reels/stagger and loops, and shows final geometry/numbers immediately.
   None settles every property, delay and loop immediately. Direct operation and semantic state remain
@@ -131,6 +139,9 @@ These obligations are inherited by every file; local action tables make their co
   transitions. Reduced and none stop continuous loops regardless of that theme clock.
   Mode/clock changes do not end a live native gesture or discard its pointer capture. During direct
   operation the input owns the current target; after release, permitted settling follows the mode.
+  Zero timeScale changes timing, not the mode's target: a held full-mode press snaps to its press
+  scale and releases instantly; reduced/none have no decorative press scale. Do not clear the native
+  held state merely because its presentation clock becomes zero.
 - **Exit semantics:** a surviving owner may retain an outgoing visual, never an obsolete actionable
   item. Base UI retains modal/focus/portal lifecycle ownership until its native exit protocol completes;
   do not release modality early or resurrect a closed surface from a stale callback. Removal outside a
@@ -149,6 +160,44 @@ These obligations are inherited by every file; local action tables make their co
   The [renderer limits](presets.md#5-geometry-text-and-numerical-limits) apply across one known
   coordinated content revision as well as per slot. Many tiny children cannot bypass the moving-set
   budget. A hidden owner cancels visual work and resumes at current content, not a queued backlog.
+
+### 3.1 Cancellation, environments and renderer ownership
+
+These rules cover every catalogue file and belong to the shared executor acceptance, not 59 private
+implementations. Each controller is scoped to its actual part and committed semantic revision. Only
+committed changes start work: discarded/concurrent React renders and development effect replay must
+not create entrances, duplicate observers or consume a reveal. Cleanup is idempotent and restores only
+the styles/listeners/engine hooks owned by that controller; never cancel every animation on a node or
+erase caller/native transforms. An old completion can release only its own handles, not the new writer.
+
+For the affected property, teardown or an accepted close invalidates subordinate work; direct input
+and focus take precedence over decorative geometry; a passive environment change invalidates stale
+measurements; only then may a current content/value revision animate. Mode and clock restrictions
+apply to the surviving owner. This is property-level arbitration, not a global serial queue or a rule
+to swallow a native input event. Ongoing retained exits still complete through the actual primitive.
+
+Forced-colours and print use the current semantic paint/layout without decorative interpolation;
+do not set forced-color-adjust:none to preserve a designed colour tween. Native focus/selection and
+closed-state visibility remain intact. Printing does not open closed popups/disclosures. Document
+visibility loss or page suspension cancels one-shot work and pauses eligible loops; restoration,
+including a persisted page, establishes current layout before any new revision and never replays
+missed changes. A currently active full-mode status loop may resume under its existing visibility
+policy. Share these environment signals rather than installing document listeners per component.
+
+User render/class/style overrides keep their compatibility contract. If a custom layer, table/SVG
+structure or caller animation makes a safe property owner unavailable, keep exact native content and
+settle the conflicting effect immediately; record the composed boundary. Do not silently insert a
+wrapper that breaks direct-child selectors, refs, form/label semantics or event propagation. A nested
+explicit provider and portalled part use their resolved context; cancellation must not leak across
+those ownership boundaries. Shared renderer selection follows the deterministic type/identity rules
+in [changed text](../animation-system.md#36-changed-text).
+
+Direction, writing mode, zoom and font/viewport changes are environment revisions, not navigation.
+Invalidate old rectangles/approach direction and establish current valid placement before another
+content action; preserve any live native input. A logical-axis or shaping layout the adapter cannot
+support uses immediate geometry/text instead of assuming horizontal Latin layout. Existing explicit
+orientation/size state actions keep their individual contracts, with passive reflow taking precedence
+when the old coordinate frame becomes invalid.
 
 ## 4. Parameter and choreography review
 

@@ -19,12 +19,12 @@ Skeleton reserves a loading shape and uses one restrained opacity pulse while wo
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent placeholder insertion / root | Opacity entrance hands the same property to the pulse after completion, with no competing writers. Initial SSR/hydration has no hidden entrance. | Short opacity for a later independent insertion, then static visible placeholder. | Visible immediately. | skeleton.root.enter → presence.inline |
-| Visible ongoing placeholder / root opacity | Gentle repeating opacity pulse. | Static final opacity; no loop. | Static final opacity; no loop. | skeleton.root.busy → status.loop |
-| Parent handoff / retained placeholder owner | Stop the pulse before fading the placeholder out. | Short fade only. | Immediate removal. | skeleton.root.exit → presence.exit |
-| Explicit dimension/surface target changes / root | Bounded owned geometry and background-colour transition. | Geometry immediate; short colour. | Immediate. | skeleton.root.resize → geometry.compact; skeleton.root.colour → state.color |
+| Independent placeholder insertion / root | Opacity entrance hands the same property to the pulse after completion, with no competing writers. Initial SSR/hydration has no hidden entrance. | Short opacity for a later independent insertion, then static visible placeholder. | Visible immediately. | `skeleton.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Visible ongoing placeholder / root opacity | Gentle repeating opacity pulse. | Static final opacity; no loop. | Static final opacity; no loop. | `skeleton.root.busy` → `status.loop` → continuous `data.transition` |
+| Parent handoff / retained placeholder owner | Stop the pulse before fading the placeholder out. | Short fade only. | Immediate removal. | `skeleton.root.exit` → `presence.exit` → `exit.fade` |
+| Explicit dimension/surface target changes / root | Bounded owned geometry and background-colour transition. | Geometry immediate; short colour. | Immediate. | `skeleton.root.resize` → `geometry.compact` → `geometry.resize`; `skeleton.root.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

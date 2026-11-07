@@ -20,7 +20,7 @@ A single-select group uses one shared selection surface; a multi-select group gi
 | Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
 | Group insertion / root | One opacity entrance without item stagger. | Short opacity. | Final group immediately. | `toggle-group.root.enter` → `presence.inline` → one-shot `data.transition` |
-| Single selection / group selection surface | One shared indicator translates/resizes between committed item boxes; no outgoing duplicate selected plate. | Plate places immediately; short opacity allowed. | Final plate immediately. | `toggle-group.indicator.select` → `layout.selection` → `layout.shared` |
+| Single selection / group selection surface | One shared indicator translates/resizes between committed item boxes; no outgoing duplicate selected plate. | Plate places immediately; no residual selection tween. | Final plate immediately. | `toggle-group.indicator.select` → `layout.selection` → `layout.shared` |
 | Multiple selection / each item indicator | Local indicator opacity and `scale.in` feedback; token colour belongs to the separate colour binding and there is no shared travelling plate. | Opacity only, final indicator geometry. | Final state immediately. | `toggle-group.item.select` → `state.indicator` → `state.morph` |
 | Pointer/keyboard press / item visual owner | `scale.press`, separated from group indicator coordinates. | No scale. | No tween. | `toggle-group.item.press` → `feedback.press` → `feedback.press` |
 | Interaction/variant / surface and text owners | Scoped surface, border and foreground colours. | Short colour feedback. | Final colours immediately. | `toggle-group.item.colour` → `state.color` → target `state.color` |
@@ -30,7 +30,7 @@ A single-select group uses one shared selection surface; a multi-select group gi
 
 ## Interruption and lifecycle
 
-- Committed value arrays and roving focus update immediately; a controlled request is not an accepted selection. Selection, label and item-set changes share the latest committed layout snapshot; an old selection cannot complete over a new item. No selected values means no selected plate, rather than inventing a first selection.
+- Committed value arrays and roving focus update immediately; a controlled request is not an accepted selection. Selection, label and item-set changes share the latest committed layout snapshot; an old selection cannot complete over a new item. No selected values means no selected plate, rather than inventing a first selection. First placement or restoration after no valid selected item is immediate; an absent origin is never a rectangle at zero.
 - Reversal continues from the current indicator geometry. Switching `multiple` cancels the incompatible shared/local presentation before placing the new state.
 - Removing an item unregisters its measurement and press state. Parent exit owns removal; the group does not retain interactive exiting items.
 - Live reduced/none and zero clock cancel selection travel, layout and press as appropriate; unmount releases group registrations and active writers.
@@ -49,3 +49,5 @@ A single-select group uses one shared selection surface; a multi-select group gi
 - Pending: exercise `multiple`, all variants, vertical/RTL, mixed item sizes, disabled items and removal of the selected item.
 - Pending: verify no invented selection on focus, parent-owned entrance, all modes, zero clock and mid-transition mode changes.
 - Pending: combine press, selection and label/item reflow, empty the selected value array and use a custom-render item; there is no doubled displacement, stale plate or unreadable intermediate label. Exercise an explicit quantitative child separately from numeric option identity.
+
+- Pending: restore a single selection after clearing/removing its origin, and set zero timeScale during a held press. The plate establishes a current baseline; press timing changes without becoming a none-mode scale reset.

@@ -22,7 +22,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | Trigger and owner | Full | Reduced | None | Binding → preset → recipe |
 | --- | --- | --- | --- | --- |
 | Open, close or known content update; content shell | Compact clamped block-size continuity from the current size. | Final natural/closed size immediately. | Final size immediately. | `collapsible.content.resize` → `geometry.compact` → `geometry.resize` |
-| Visibility change; inner paint | Opacity entry/exit without vertical translation of reading content. | Short opacity only. | Immediate semantic visibility. | `collapsible.content.enter` → `presence.inline` → one-shot `data.transition`; `collapsible.content.exit` → `presence.exit` → `exit.fade` |
+| Visibility change; inner paint | Opacity entry/exit without vertical translation of reading content. | Short entry after final open geometry; fully clipped closed body completes immediately. | Immediate semantic visibility. | `collapsible.content.enter` → `presence.inline` → one-shot `data.transition`; `collapsible.content.exit` → `presence.exit` → `exit.fade` |
 | Defined trigger state changes | Scoped surface/text colour; focus ring immediately. | Short colour. | Final colour immediately. | `collapsible.trigger.colour` → `state.color` → planned `state.color` |
 | Direct plain trigger/body text changes | Changed graphemes/runs only, no stagger; opening presence consumes same-cause body text entry. | Short opacity on changed runs only. | Final text immediately. | `collapsible.label.replace` → `text.replace` → planned `text.change` |
 | Direct displayed quantity changes | Changed place-value reels only; body geometry stays with the content shell. | Final quantity/geometry immediately. | Final quantity/geometry immediately. | `collapsible.value.change` → `number.compact` → `number.roll` |
@@ -40,6 +40,8 @@ Measure the content-inner natural height and the shell's actual border/padding c
 
 The natural inner content lays out at destination inline-size before measurement. Only the separate outer shell changes block-size, so nearby layout moves without per-frame text wrapping inside the disclosure.
 
+Reduced closing commits the closed block-size immediately. A fully clipped/hidden body has no visible exit opacity to retain, so complete that body's decorative exit immediately through the primitive; do not hold empty space just to run a fade. A short opacity entry is permitted after the open geometry is final. On focus/beforematch opening, settle any envelope that would hide the target immediately. This does not replace native persistence, focus or hidden-until-found handling.
+
 ## Acceptance scenarios
 
 - Pending: reverse rapidly with content growth, then close before the latest content arrives; verify state, height and focus agree.
@@ -47,3 +49,5 @@ The natural inner content lays out at destination inline-size before measurement
 - Pending: test custom trigger/render, persisted/searchable content, border-box styles and unmount during exit.
 - Pending: verify full/reduced/none, live mode changes, zero clock and initially open SSR without a hidden flash.
 - Pending: revise a direct body string/quantity while open and while closed, reopen through beforematch, and close around a focused child; only current visible content participates in animation.
+
+- Pending: close a reduced-mode body during its opacity entry, reopen through focus/beforematch and set zero clock with unchanged open state; no empty exit hold, invisible focused content or stale opacity writer remains.

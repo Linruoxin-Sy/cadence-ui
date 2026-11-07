@@ -10,7 +10,7 @@ ButtonGroup keeps joined controls visually connected when its membership changes
 | --- | --- |
 | Appearance | default: button-group for independent insertion and new segments; inherited for a parent-owned entrance. |
 | Size | default: group owns membership-driven size on its orientation axis and intrinsic ButtonGroupText revisions. Child controls own their content dimensions; one committed destination coordinates the group without tracking animated child bounds. |
-| Surface colour | default: ButtonGroupText and button-group-separator surfaces; composed Button/Input children retain their own state owners. |
+| Surface colour | default: ButtonGroupText surface; inherited: ButtonGroupSeparator uses Separator's rule-colour owner. Composed Button/Input children retain their own state owners. |
 | Text colour | default: ButtonGroupText foreground; composed controls own their foreground changes. |
 | Changed text | default: direct plain text in ButtonGroupText; composed for arbitrary child controls, whose own contracts still apply. |
 | Changed numbers | default: direct quantity values in ButtonGroupText; composed for quantities inside controls; key or option identifiers are not counters. |
@@ -19,13 +19,13 @@ ButtonGroup keeps joined controls visually connected when its membership changes
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Group insertion / button-group | One opacity entrance including its initial segments. | Short fade. | Immediate. | button-group.root.enter → presence.inline |
-| Segment inserted/removed / group and retained segments | Fade the changed segment; reflow stable siblings on the orientation axis. | Fade only; layout commits immediately. | Immediate. | button-group.segment.enter → presence.inline; button-group.segment.exit → presence.exit; button-group.segment.move → layout.compact; button-group.root.resize → geometry.compact |
-| Text or numeric revision / ButtonGroupText | Changed-only text replacement with stagger:none or quantity reels. | Short changed-text opacity; quantities immediate. | Immediate content. | button-group.text.replace → text.replace; button-group.text.roll → number.compact |
-| ButtonGroupText or child destination changes / group geometry coordinator | Consume final segment boxes once; resize the owned group axis and move retained segments without a second child-size writer. | Final geometry immediately. | Final geometry immediately. | button-group.root.resize → geometry.compact; button-group.segment.move → layout.compact |
-| Surface/foreground state / text and separators | Scoped colour transition. | Short colour transition. | Immediate. | button-group.text.colour → state.color; button-group.separator.colour → state.color |
+| Group insertion / button-group | One opacity entrance including its initial segments. | Short fade. | Immediate. | `button-group.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Segment inserted/removed / group and retained segments | Fade the changed segment; reflow stable siblings on the orientation axis. | Fade only; layout commits immediately. | Immediate. | `button-group.segment.enter` → `presence.inline` → one-shot opacity `data.transition`; `button-group.segment.exit` → `presence.exit` → `exit.fade`; `button-group.segment.move` → `layout.compact` → `layout.move`; `button-group.root.resize` → `geometry.compact` → `geometry.resize` |
+| Text or numeric revision / ButtonGroupText | Changed-only text replacement with stagger:none or quantity reels. | Short changed-text opacity; quantities immediate. | Immediate content. | `button-group.text.replace` → `text.replace` → target `text.change`; `button-group.text.roll` → `number.compact` → revised `number.roll` |
+| ButtonGroupText or child destination changes / group geometry coordinator | Consume final segment boxes once; resize the owned group axis and move retained segments without a second child-size writer. | Final geometry immediately. | Final geometry immediately. | `button-group.root.resize` → `geometry.compact` → `geometry.resize`; `button-group.segment.move` → `layout.compact` → `layout.move` |
+| Surface/foreground state / text and inherited Separator rule | Scoped colour transition, with Separator executing its inherited binding once. | Short colour transition. | Immediate. | `button-group.text.colour` → `state.color` → target `state.color`; `button-group.separator.colour` → `state.color` → inherited Separator target `state.color` |
 
 ## Interruption and lifecycle
 

@@ -19,13 +19,13 @@ Avatar keeps a stable identity placeholder while the image becomes available, an
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Avatar/group or independent badge insertion | One coherent opacity entrance; badge may enter later under its own cause. | Short opacity. | Immediate. | avatar.root.enter → presence.inline; avatar.badge.enter → presence.inline |
-| Decoded image replaces fallback / image and fallback | Crossfade after the real image is ready, retaining a visible fallback until then. | Short opacity. | Final available image/fallback immediately. | avatar.image.replace → data.update |
-| Explicit size or group membership / avatar and group | Resize the owned box; reflow retained avatars, fading added/removed identities. Group consumes the final member boxes once. | Geometry immediate; short opacity. | Immediate. | avatar.root.resize → geometry.compact; avatar.group.resize → geometry.compact; avatar.group.move → layout.compact; avatar.member.enter → presence.inline; avatar.member.exit → presence.exit |
-| Fallback/badge/group-count revision / display parts | Changed-only text with stagger:none or explicit quantity reels. | Short changed-text opacity; final quantities immediately. | Immediate. | avatar.text.replace → text.replace; avatar.count.roll → number.compact; avatar.badge.roll → number.compact |
-| Authored display colour changes / relevant parts | Scoped surface/foreground transition. | Short colour. | Immediate. | avatar.surface.colour → state.color; avatar.text.colour → state.color |
+| Avatar/group or independent badge insertion | One coherent opacity entrance; badge may enter later under its own cause. | Short opacity. | Immediate. | `avatar.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `avatar.badge.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Decoded image replaces fallback / image and fallback | Crossfade after the real image is ready, retaining a visible fallback until then. | Short opacity. | Final available image/fallback immediately. | `avatar.image.replace` → `data.update` → local opacity `data.transition` |
+| Explicit size or group membership / avatar and group | Resize the owned box; reflow retained avatars, fading added/removed identities. Group consumes the final member boxes once. | Geometry immediate; short opacity. | Immediate. | `avatar.root.resize` → `geometry.compact` → `geometry.resize`; `avatar.group.resize` → `geometry.compact` → `geometry.resize`; `avatar.group.move` → `layout.compact` → `layout.move`; `avatar.member.enter` → `presence.inline` → one-shot opacity `data.transition`; `avatar.member.exit` → `presence.exit` → `exit.fade` |
+| Fallback/badge/group-count revision / display parts | Changed-only text with stagger:none or explicit quantity reels. | Short changed-text opacity; final quantities immediately. | Immediate. | `avatar.text.replace` → `text.replace` → target `text.change`; `avatar.count.roll` → `number.compact` → revised `number.roll`; `avatar.badge.roll` → `number.compact` → revised `number.roll` |
+| Authored display colour changes / relevant parts | Scoped surface/foreground transition. | Short colour. | Immediate. | `avatar.surface.colour` → `state.color` → target `state.color`; `avatar.text.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

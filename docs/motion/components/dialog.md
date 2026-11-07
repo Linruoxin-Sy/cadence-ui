@@ -13,7 +13,7 @@ The modal surface arrives as one readable unit, then accommodates intentional co
 | Surface colour | Default: content/overlay own their supplied background/border tokens; child buttons retain their own state owners. |
 | Text colour | Default: `dialog-title` and `dialog-description` own foreground changes; arbitrary body children inherit or retain component ownership. |
 | Changed text | Default for primitive title/description content: changed runs only. Rich body/title children use composed ownership. |
-| Changed numbers | Composed: explicit numeric readouts inside the body own rolling; Dialog does not infer quantities from a title or message. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -25,7 +25,7 @@ The modal surface arrives as one readable unit, then accommodates intentional co
 | Intentional body/size change / content shell | Measure the final target and animate clamped width/height without bounce. | Final geometry immediately. | Final geometry immediately. | `dialog.content.resize` → `geometry.panel` → `geometry.resize` |
 | Plain title/description update / respective text owner | Stable-grapheme replacement, `stagger: none`; initial text inherits panel entrance. | Changed-run opacity only. | Final text immediately. | `dialog.title.change` → `text.replace` → target `text.change`; `dialog.description.change` → `text.replace` → target `text.change` |
 | Supplied colour token change / relevant parts | Scoped surface/border/foreground transition. | Short colour feedback. | Final colours immediately. | `dialog.surface.colour` → `state.color` → target `state.color` |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `dialog.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `dialog.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -34,6 +34,8 @@ The modal surface arrives as one readable unit, then accommodates intentional co
 - Closing cancels local text/numeric/geometry work; the exit owner alone retains visual presence until Base UI permits removal. No duplicate interactive or accessible subtree.
 - Live reduced cancels scale/layout; none and zero clock complete the semantic target and cancel presentation delays/exit holds through Base UI's native exit protocol. Unmount removes measurements and all writers.
 - Async content arriving while closed updates the next semantic view without starting geometry/presence. A new open revision invalidates all older completion callbacks; a zero-duration close still completes through Base UI's actual protocol before modality/return-focus ownership is released. Native controls inside the dialog remain operable in reduced/none.
+
+Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -51,3 +53,5 @@ The modal surface arrives as one readable unit, then accommodates intentional co
 - Pending: rapidly reopen during exit, including changed title and lazy body content, with no duplicated panel/name or stale geometry.
 - Pending: SSR-visible open state, small viewport/zoom, parent child entrance suppression, all modes, live downgrade and zero clock.
 - Pending: grow a focused form/message inside a constrained dialog, including a nested disclosure and async content arriving after close; required text stays visible, no parent/child size chase occurs, and only the current close revision completes modality/focus restoration.
+
+- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.

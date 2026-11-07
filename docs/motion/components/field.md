@@ -19,13 +19,13 @@ Field makes helper and error changes readable while preserving the control's loc
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Field insertion / field or enclosing group | One opacity entrance. | Short opacity. | Immediate. | field.root.enter → presence.inline |
-| Description/error appears or disappears / content and row | Open the measured block space while the changed row fades; retained siblings reflow. | Geometry immediate; short opacity. | Immediate. | field.message.enter → presence.inline; field.message.exit → presence.exit; field.content.resize → geometry.content; field.group.move → layout.compact |
-| Text/quantity revision / actual display part | Changed-only text with stagger:none or quantity rolling; share the size transaction. | Short changed-text opacity; quantity/size immediate. | Immediate. | field.text.replace → text.replace; field.value.roll → number.compact |
-| Standalone field-set/group or legend/label/separator-caption revision / owning display host | One independent opacity entrance for the structure; known text changes consume one measured destination without a second Label/Separator writer. | Short opacity/text feedback; geometry immediate. | Final structure/content immediately. | field.structure.enter → presence.inline; field.content.resize → geometry.content; field.text.replace → text.replace |
-| Invalid/disabled/context change / relevant display surfaces | Scoped colour transition. | Short colour feedback. | Immediate. | field.surface.colour → state.color; field.text.colour → state.color |
+| Field insertion / field or enclosing group | One opacity entrance. | Short opacity. | Immediate. | `field.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Description/error appears or disappears / content and row | Open the measured block space while the changed row fades; retained siblings reflow. | Geometry immediate; short opacity. | Immediate. | `field.message.enter` → `presence.inline` → one-shot opacity `data.transition`; `field.message.exit` → `presence.exit` → `exit.fade`; `field.content.resize` → `geometry.content` → `geometry.resize`; `field.group.move` → `layout.compact` → `layout.move` |
+| Text/quantity revision / actual display part | Changed-only text with stagger:none or quantity rolling; share the size transaction. | Short changed-text opacity; quantity/size immediate. | Immediate. | `field.text.replace` → `text.replace` → target `text.change`; `field.value.roll` → `number.compact` → revised `number.roll` |
+| Standalone field-set/group or legend/label/separator-caption revision / owning display host | One independent opacity entrance for the structure; known text changes consume one measured destination without a second Label/Separator writer. | Short opacity/text feedback; geometry immediate. | Final structure/content immediately. | `field.structure.enter` → `presence.inline` → one-shot opacity `data.transition`; `field.content.resize` → `geometry.content` → `geometry.resize`; `field.text.replace` → `text.replace` → target `text.change` |
+| Invalid/disabled/context change / relevant display surfaces | Scoped colour transition. | Short colour feedback. | Immediate. | `field.surface.colour` → `state.color` → target `state.color`; `field.text.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

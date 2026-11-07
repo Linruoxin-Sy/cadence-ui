@@ -17,12 +17,12 @@ Label clarifies changes to a control's name without moving the click-to-focus re
 
 ## Choreography and modes
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent insertion / label | Opacity entrance. | Short opacity. | Immediate. | label.root.enter → presence.inline |
-| Name changes / display text | Replace changed graphemes with stagger:none; keep the native label and semantic name live. | Short changed-text opacity without travel or stagger. | Immediate. | label.text.replace → text.replace |
-| Display quantity changes / numeric content | Roll changed places only. | Final value immediately. | Immediate. | label.value.roll → number.compact |
-| Content box or foreground changes / declared owner | Bounded intrinsic size and scoped colour transition. | Size immediate; short colour. | Immediate. | label.root.resize → geometry.compact; label.root.colour → state.color |
+| Independent insertion / label | Opacity entrance. | Short opacity. | Immediate. | `label.root.enter` → `presence.inline` → one-shot opacity `data.transition` |
+| Name changes / display text | Replace changed graphemes with stagger:none; keep the native label and semantic name live. | Short changed-text opacity without travel or stagger. | Immediate. | `label.text.replace` → `text.replace` → target `text.change` |
+| Display quantity changes / numeric content | Roll changed places only. | Final value immediately. | Immediate. | `label.value.roll` → `number.compact` → revised `number.roll` |
+| Content box or foreground changes / declared owner | Bounded intrinsic size and scoped colour transition. | Size immediate; short colour. | Immediate. | `label.root.resize` → `geometry.compact` → `geometry.resize`; `label.root.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

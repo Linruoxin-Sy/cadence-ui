@@ -19,12 +19,12 @@ Badge makes a compact status or quantity change legible without bouncing the sur
 
 The presence.exit bindings below select the exit.fade recipe, not a popup ending phase.
 
-| Trigger / owner | full | reduced | none | Binding / preset |
+| Trigger / owner | full | reduced | none | Binding → preset → recipe/form |
 | --- | --- | --- | --- | --- |
-| Independent add/remove / badge | Opacity entrance and retained exit. | Short opacity only. | Immediate. | badge.root.enter → presence.inline; badge.root.exit → presence.exit |
-| Status label changes / label | Replace only changed graphemes, stagger:none; resize the badge concurrently. | Short changed-text opacity; size immediate. | Immediate. | badge.label.replace → text.replace; badge.root.resize → geometry.compact |
-| Quantity changes / numeric display | Roll changed places; keep affixes stable and share the width transaction. | Final quantity immediately. | Immediate. | badge.value.roll → number.compact |
-| Variant or actual link interaction / badge | Scoped background, border and foreground transition. | Short colour feedback. | Immediate. | badge.root.colour → state.color |
+| Independent add/remove / badge | Opacity entrance and retained exit. | Short opacity only. | Immediate. | `badge.root.enter` → `presence.inline` → one-shot opacity `data.transition`; `badge.root.exit` → `presence.exit` → `exit.fade` |
+| Status label changes / label | Replace only changed graphemes, stagger:none; resize the badge concurrently. | Short changed-text opacity; size immediate. | Immediate. | `badge.label.replace` → `text.replace` → target `text.change`; `badge.root.resize` → `geometry.compact` → `geometry.resize` |
+| Quantity changes / numeric display | Roll changed places; keep affixes stable and share the width transaction. | Final quantity immediately. | Immediate. | `badge.value.roll` → `number.compact` → revised `number.roll` |
+| Variant or actual link interaction / badge | Scoped background, border and foreground transition. | Short colour feedback. | Immediate. | `badge.root.colour` → `state.color` → target `state.color` |
 
 ## Interruption and lifecycle
 

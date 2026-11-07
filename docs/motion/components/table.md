@@ -25,7 +25,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | Hover/selected or explicitly authored surface state; actual paint owner | Scoped background and defined foreground/border colour. Focus remains immediate. | Short colour. | Final colours immediately. | `table.row.colour` → `state.color` → planned `state.color` |
 | Direct plain cell/head/caption text change | Changed graphemes/runs only, without stagger or full-row replay. | Short opacity on changed runs only. | Final text immediately. | `table.text.replace` → `text.replace` → planned `text.change` |
 | Owned numeric cell changes | Changed place-value reels only; alignment and final formatted value remain correct. | Final number immediately. | Final number immediately. | `table.number.change` → `number.compact` → `number.roll` |
-| Composition requests row reordering/known size transition | Delegate to that collection's single layout/geometry owner; no second primitive effect. | Inherit immediate collection geometry. | Immediate geometry. | `table.collection.delegate` → `engine.native` → native table layout; a composition declares its own `layout.move`/`geometry.resize` binding |
+| Composition requests row reordering/known size transition | Delegate to that collection's single layout/geometry owner; no second primitive effect. | Inherit immediate collection geometry. | Immediate geometry. | `table.collection.delegate` → `engine.native` → native table layout (the composition declares its own `layout.move`/`geometry.resize` binding) |
 
 ## Interruption and lifecycle
 

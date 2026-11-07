@@ -13,7 +13,7 @@ A sheet enters from its configured edge as one panel. Edge travel explains its p
 | Surface colour | Default: content/overlay own supplied background/border tokens; child controls retain their contracts. |
 | Text colour | Default: `sheet-title` and `sheet-description` own foreground changes. |
 | Changed text | Default for primitive title/description: retain unchanged graphemes. Rich body content uses composed owners. |
-| Changed numbers | Composed: explicit numeric body readouts own rolling; titles and arbitrary body children are not parsed for quantities. |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. |
 
 ## Choreography and modes
 
@@ -25,7 +25,7 @@ A sheet enters from its configured edge as one panel. Edge travel explains its p
 | Intentional content/owned size change / shell | Clamped measured natural axis; full-height side sheets keep their scrollable fixed-height layout. | Final geometry immediately. | Final geometry immediately. | `sheet.content.resize` → `geometry.panel` → `geometry.resize` |
 | Primitive title/description / text owner | Changed-run replacement, `stagger: none`. | Changed-run opacity only. | Final text immediately. | `sheet.title.change` → `text.replace` → target `text.change`; `sheet.description.change` → `text.replace` → target `text.change` |
 | Supplied tokens / relevant parts | Scoped colour transition. | Short colour feedback. | Final colours immediately. | `sheet.surface.colour` → `state.color` → target `state.color` |
-| Explicit composed quantity / its child owner | Roll changed places under that child's numeric contract; do not infer quantities from names, codes or rich content. | Final number immediately. | Final number immediately. | `sheet.quantity.change` → `number.compact` → revised `number.roll` |
+| Direct numeric Title/Description revision / owned slot, or explicit composed quantity / child owner | Roll changed places only; the same slot never also runs text replacement on its formatted digits. | Final number immediately. | Final number immediately. | `sheet.quantity.change` → `number.compact` → revised `number.roll` |
 
 ## Interruption and lifecycle
 
@@ -34,6 +34,8 @@ A sheet enters from its configured edge as one panel. Edge travel explains its p
 - Close cancels resize/text work and exits one stable surface. Semantic changes and button actions never wait for the sheet to settle.
 - Live reduced cancels travel/resize; none and zero clock cancel authored clocks and complete the current boundary through Base UI's actual exit protocol, without a timer hold or premature focus/modality release. Unmount releases measurement and local presentation resources. Native inputs/scrolling stay available in every mode.
 - Async content received while closed supplies the next semantic view without offscreen size work. Reopen invalidates the old exit completion; a side change cancels an obsolete edge trajectory rather than reusing it against a new placement.
+
+Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich children and formatting callbacks are composed, and screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
 
 ## Geometry and performance
 
@@ -51,3 +53,5 @@ A sheet enters from its configured edge as one panel. Edge travel explains its p
 - Pending: close during resize, reopen mid-exit and change side while open without stale trajectories or focus loss.
 - Pending: verify inherited child entrance, all modes, live downgrade, zero clock and unchanged non-draggable API behavior.
 - Pending: grow content around a focused field inside a constrained sheet and a nested disclosure, including async updates after close; required content remains reachable without two size owners or stale native completion.
+
+- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
