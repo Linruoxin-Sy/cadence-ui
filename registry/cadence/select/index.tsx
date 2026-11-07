@@ -2,7 +2,7 @@
 
 import { Select as SelectPrimitive } from "@base-ui/react/select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
-import { animate, type HTMLMotionProps, motion, useMotionValue, useTransform } from "motion/react";
+import { animateSingleValue, type HTMLMotionProps, motion, useMotionValue, useTransform } from "motion/react";
 import {
   Children,
   type ComponentProps,
@@ -161,7 +161,7 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       floor.current = next < current ? next : 0;
       if (target.current === next && !clockChanged) return;
       target.current = next;
-      animate(width, next, transition);
+      animateSingleValue(width, next, transition);
     };
     measure();
     const observer = new ResizeObserver(measure);

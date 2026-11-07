@@ -1,6 +1,6 @@
 "use client";
 
-import { animate, type Transition, useMotionValue } from "motion/react";
+import { animateSingleValue, GroupAnimationWithThen, type Transition, useMotionValue } from "motion/react";
 import { type ComponentProps, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "../lib/cn";
 import { useCadenceMotion } from "../lib/provider";
@@ -165,7 +165,11 @@ export function Toc({
     const retime = (transition: Transition) => {
       if (done) return;
       controls?.stop();
-      controls = animate(read(), destination, { ...transition, onUpdate: write, onComplete: finish });
+      const next = new GroupAnimationWithThen([
+        animateSingleValue(read(), destination, { ...transition, onUpdate: write }),
+      ]);
+      next.finished.then(finish);
+      controls = next;
     };
     const current: ScrollFlight = { cancel, finish, retime };
     flight.current = current;
@@ -232,8 +236,8 @@ export function Toc({
       write();
     } else {
       // Explicit velocities survive cancellation/retargeting on the same values.
-      animate(top, placement.top, { ...transition, velocity: top.getVelocity() });
-      animate(bottom, placement.top + placement.height, { ...transition, velocity: bottom.getVelocity() });
+      animateSingleValue(top, placement.top, { ...transition, velocity: top.getVelocity() });
+      animateSingleValue(bottom, placement.top + placement.height, { ...transition, velocity: bottom.getVelocity() });
       write();
     }
     placed.current = true;

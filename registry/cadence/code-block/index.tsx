@@ -4,7 +4,7 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
-import { animate, motion, useMotionValue, useTransform } from "motion/react";
+import { animateSingleValue, motion, useMotionValue, useTransform } from "motion/react";
 import * as React from "react";
 import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
@@ -743,7 +743,7 @@ function CodeBlockContent({
         return;
       }
 
-      animate(height, target, cm.transition("geometry.resize"));
+      animateSingleValue(height, target, cm.transition("geometry.resize"));
     };
 
     measure();
