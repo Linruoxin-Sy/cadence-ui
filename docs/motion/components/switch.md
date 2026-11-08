@@ -56,7 +56,18 @@ The thumb makes the binary state legible by travelling inside the measured track
 - During simultaneous size and checked changes, the coordinator constrains the rendered thumb to the currently available track interval using its own size model, not per-frame layout reads. If that cannot be guaranteed, apply the new track size immediately and animate only the valid endpoint change. Thumb fill is a surface colour, not a newly introduced text display.
 - Bound work to one track and one thumb per control. Responsive/font changes settle immediately; fixed hit targets and focus outlines remain outside clipping.
 
+The thumb endpoint includes required static placement and any supported individual CSS translate
+channel exactly once; a different property spelling is not a second independent travel owner.
+Unsupported caller transform compositions keep the existing native/caller placement immediate rather
+than subtracting an assumed offset or overwriting caller transforms. Finishing a size revision returns
+the track to its current size/caller constraints, without leaving the old pixel width to corrupt a
+later endpoint measurement.
+
 ## Acceptance scenarios
+
+- Pending: apply supported individual-transform placement, change size while toggling, then resize
+  the parent after settling. Verify the checked endpoint and valid travel interval without doubled
+  translation, a frozen track box or old cleanup clearing the caller's current placement.
 
 - Pending: contrast an explicit size-prop revision during a toggle with a passive parent/font resize or direction change. Only the explicit eligible revision uses the coordinated size path; environment recovery establishes the correct endpoint immediately and cannot replay the old toggle.
 

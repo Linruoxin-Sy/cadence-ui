@@ -62,7 +62,18 @@ Series colour remains with the actual Recharts/caller owner: a colour-only updat
 
 Use the shared [Chart data interpolation limit](../presets.md#5-geometry-text-and-numerical-limits) across all animated visible series, with one active interpolation per series. Line/area samples count even when their dots are hidden; sparse visible marks do not exempt a dense path. Above the ceiling, commit the affected geometry immediately without resampling or dropping data. Unknown/unbounded custom geometry cannot claim this bounded default; use a safe immediate engine target or its explicitly caller-owned adapter. This is a conservative design bound pending real-device verification, not a claimed measured threshold. Annotation text/reel work shares the preset catalogue's aggregate changed-glyph/rolling-column budget for the whole data revision, not a fresh allowance per payload item. Do not observe each data point, animate an offscreen chart, or clone the complete SVG/dataset to retain exits; responsive/visibility recovery starts from current data instead of replaying missed revisions.
 
+An adapter invocation with no verified series/work descriptor is unknown work, never a zero-sample
+series. The shared controller must settle that path before starting an interpolation loop, or leave
+it with its explicit caller owner without claiming Cadence's bounded default. The inventory comes
+from supported registrations/data identities, not executing arbitrary React children or formatter
+functions to inspect their return values. A known empty/disabled series may legitimately consume zero.
+
 ## Acceptance scenarios
+
+- Pending: render a caller wrapper containing an otherwise supported series, and invoke the engine
+  controller without a verified work descriptor. Unknown work cannot start a supposedly zero-cost
+  Cadence loop; exact final data and ordinary React invocation semantics survive. Compare a known
+  empty/disabled series and known bounded siblings so the fallback does not globally disable them.
 
 - Pending: start a bounded series update, then change a different series while the first remains active so that their combined interpolation working set exceeds the shared sample limit. Reject the excess before per-sample animation allocation, settle current data without dropping samples, and preserve independent annotation semantics. A retarget of the same stable series/sample must not count as a second copy unless a distinct retained presentation actually exists.
 

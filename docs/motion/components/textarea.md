@@ -50,7 +50,17 @@ Use the actual field-sizing/content box; no default duplicate hidden editor or p
 
 For an eligible explicit revision, resolve the native final block size at the final width in a committed layout read phase, then let one presentation-height owner interpolate to that destination. Never read its interpolated height back as intrinsic content size or add a per-keystroke scrollHeight loop. If browser field-sizing, caller sizing or native DOM/ref constraints prevent a reliable natural destination, settle immediately. Do not introduce a second editor or clip the final visible text/focus outline to manufacture a resize effect. Limit work to one box per eligible revision; passive changes cancel rather than retrigger the tween.
 
+After an eligible size transition, restore the current native rows/field-sizing and caller constraints,
+not the captured height from before the revision. If a user resize takes over, its current native
+height belongs to that interaction: cancelling animation must not clear or replace it. The final
+native box and scroll position must agree with the animation endpoint; otherwise use immediate native
+geometry without installing a persistent pixel lock.
+
 ## Acceptance scenarios
+
+- Pending: finish an unfocused rows change, then edit, wrap at a new parent width and use the native
+  resize handle. Also grab that handle during a height transition and deliver its old cleanup afterward.
+  Field-sizing and the user's actual size remain authoritative with no stale restored height.
 
 Target acceptance; not executed: IME and multiline selection; field-sizing growth; manual resize; rows/programmatic non-editing updates; max-height scrolling; external updates during typing; invalid feedback; full/reduced/none and zero clock mid-resize.
 

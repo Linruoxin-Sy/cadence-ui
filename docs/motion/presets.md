@@ -266,6 +266,12 @@ clock, if any, consumes timeScale. Provider changes do not cancel capture or jum
 pointer/keyboard operation. Native browser scrolling is still direct operation; authored smooth scroll
 is separately governed by `scroll.navigate`. Referencing `engine.native` never declares a recipe.
 
+The native adapter's cancelled inertia means the explicitly named engine's autonomous settling, such
+as Embla release or a Drawer snap. It does not mean cancelling browser/OS touch momentum or native
+scroll-snap behavior in ScrollArea. Those remain direct native operation in every mode; only an
+authored scrolling controller is governed by its own recipe. An adapter must identify its actual
+clock before claiming that reduced, none or zero stops it.
+
 Zero presentation delay does not override an upstream intent delay, Toast lifetime/pause rule or
 application-owned timing. Such state-machine timing is not multiplied by a motion preset or provider
 clock. Once the primitive commits visibility/state, its authored presentation follows the mode table;
@@ -393,6 +399,12 @@ one named owner or resolve coordinated destinations from the natural layout befo
 starts. A parent must not treat every interpolated child frame as a new content event. If the final
 constraints cannot be resolved without feedback, use immediate native layout for the dependent axis.
 Measurement after hidden/zero-size recovery establishes a baseline; it is not a new entrance/resize.
+
+The size preset ends in the current native sizing policy, not a permanently frozen measured pixel
+box. Its executor follows the system's temporary-constraint release and transform-composition rules;
+neither spring completion nor an immediate fallback may erase a newer caller style or required
+placement. A valid empty destination is distinct from an unavailable hidden measurement. These rules
+change no spring assignment or duration and require no component-local cleanup timer.
 
 Text decomposition also preserves existing typography, white-space and inline flow under
 [the changed-text contract](../animation-system.md#36-changed-text); safe run or immediate rendering
@@ -532,6 +544,13 @@ transaction and release obsolete interpolation state; never queue it until older
 Unknown/unbounded caller geometry uses an immediate safe engine target
 or remains explicitly caller-owned; it cannot claim automatic bounded interpolation. The bound is a
 conservative target pending real-device measurement, not a proven frame-rate threshold.
+
+Unknown work is not zero work. A shared engine controller reached without a verified series/work
+descriptor cannot acquire a zero-sample animation allowance; zero is valid only for a known empty or
+nonparticipating set. The eligibility check must cover that entry path before any interpolation loop
+starts. Do not invoke arbitrary React function children or formatters to discover hidden series, or
+clone their trees for counting. Unsupported wrappers retain their existing caller boundary and exact
+final data, without a claim of automatically bounded interpolation.
 
 Enforce the input limit while segmenting, not after allocating or diffing the complete oversized
 string. Known compound/list/update owners aggregate the moving-set limits across their changed slots;

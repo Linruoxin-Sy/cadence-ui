@@ -57,8 +57,19 @@ The existing fit observer supplies destinations to the new shell owner instead o
 
 Destination layout does not authorize new content cropping: if an intermediate shell would conceal required body copy, content needed for the current action, an active editor/action or focus ring beyond the existing overflow rules, settle that axis immediately. Focused editor content boxes/scroll extents remain native. One card-flow measurement and bounded owned title/description/plain-content transactions are sufficient; large/rich body updates keep their own identities and fall back to immediate affected presentation, not recursive text traversal. Media decoding without an intentional content revision is passive reflow.
 
+The size owner releases temporary pixel locks back to Card's current fit/caller layout after settling.
+It must not restore an earlier width, overflow or min/max declaration after a caller revision. A
+measurable empty body uses its actual final box, including remaining header/footer/padding; a hidden
+body's unavailable measurement does not collapse the card. Ancestor presence and nested mode scopes
+remain separate owners: a child in none does not cancel the card's envelope or counter-scale itself.
+
 ## Acceptance scenarios
 
 Target acceptance; not executed: content expansion with header/footer; fit=content width changes; fixed-height and responsive cards; rich forms in content; numeric/plain title updates; nested card/parent entrance; rapid changes, live modes and zero clock with no competing observer writer.
 
 Also pending: nested child resize plus a Card size change, hidden-to-visible fit measurement, an idle focused textarea in a shrinking card, and late image decoding; no double height writer, transient text loss, editor scroll reset or false zero-size entrance.
+
+Also pending: finish/cancel a fit resize, then change parent width without changing content; natural
+layout remains responsive with no retained pixel lock. Change caller min-height/overflow during a
+flight and deliver old cleanup. Compare a genuinely emptied body with a hidden body, and a none-mode
+child inside a full-mode card; only current owners affect their own constraints and animation.

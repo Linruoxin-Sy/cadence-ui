@@ -55,7 +55,16 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 
 Base UI/native scrolling owns both scroll axes, scrollbar ranges and thumb extents. There is no animated measured-size host here: native layout reflows at destination dimensions and immediately updates scroll range. Direct display strings lay out at final width, with replacement paint excluded from scroll-extent measurement; long text beyond shared diff bounds commits immediately. Do not measure every child, observe each line or attach a second scroll-position smoothing loop. The authored moving set consists only of the existing scrollbar paint layers and bounded changed direct content, not a reveal of every visible descendant. Existing viewport clipping is functional overflow, not a decorative text crop. Preserve focus visibility, horizontal/vertical bars, corner occupancy and pointer targets. A child geometry animation may change scroll extent, but this primitive never adds a second height spring or tries to animate thumb extent after it.
 
+Browser/OS momentum and native CSS scroll snapping remain part of the existing scroll owner, including
+after pointer release. They are not Embla/Drawer autonomous clocks and are not cancelled by a generic
+`engine.native` policy. A caller-authored smooth-scroll controller has its own explicit composition
+and mode obligations; ScrollArea does not add one or change a caller's snap policy.
+
 ## Acceptance scenarios
+
+- Pending: switch full/reduced/none and zero clock during a native touch fling and native scroll snap.
+  Authored scrollbar/text effects follow their mode, while native coordinates, capture and snap policy
+  remain intact. Compare an explicitly composed authored navigation controller separately.
 
 - Pending: wheel/touch/keyboard and drag each scrollbar during fade-in/out; scroll and thumb remain synchronized without input lag.
 - Pending: insert content above/below the viewport, resize it, and toggle horizontal overflow; native anchoring/ranges stay correct.

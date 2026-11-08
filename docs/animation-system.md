@@ -897,6 +897,26 @@ CSS layout size. Use intrinsic layout dimensions or an explicit safe coordinate 
 transforms or rotation without a safe conversion use immediate native layout. This does not permit
 layout reads on every animation frame.
 
+Temporary pixel dimensions are presentation constraints, not a new resting layout policy. On
+completion or cancellation, release only the current owner's temporary width/height, min/max and
+overflow declarations to the latest native/caller sizing policy. Preserve `auto`, percentages,
+flex/grid constraints, field-sizing and native user-resize ownership; never restore a stale captured
+style over a newer caller revision. A native adapter that requires a maintained explicit dimension
+keeps that dimension under its existing owner. The release must preserve the destination box; if the
+natural destination and the temporary constraint cannot agree safely, use immediate native layout
+for that axis instead of a second settling animation. A valid measured empty content box may be zero;
+an unavailable measurement from hidden/detached content is unknown, not a zero-size target. Existing
+minimums, padding and borders still determine the actual host box.
+
+Transform ownership includes the effective composition of CSS `translate`, `rotate`, `scale`, the
+`transform` list, origin and SVG transform attributes. Different property spellings do not by
+themselves establish independent coordinate owners. Preserve required placement and caller transforms
+through one reviewed composition or a compatible separate visual layer; otherwise omit the conflicting
+effect. Do not measure an already transformed box as an intrinsic target or clear all transform channels
+on cancellation. A proposed layer must also preserve containing blocks, stacking, fixed/sticky
+descendants, hit regions and native selectors. `will-change` is temporary and owned; it is not permission
+to leave every component promoted or to change those layout relationships at rest.
+
 ### 3.5 Colour feedback
 
 state.color explicitly names background-color, color, border-color and applicable fill/stroke.
@@ -1334,6 +1354,15 @@ stays none. A nested provider inherits omitted mode/clock values; an explicit ne
 an outer none only subject to the OS preference, preserving current provider semantics. Standalone
 components still follow the OS. data-motion exposes the resolved mode to CSS; writing an attribute
 alone is not a universal imperative-engine cancellation API.
+
+Modes apply at the property owner's resolved scope. A full-mode parent envelope can still move or
+fade the subtree containing a nested none-mode child; that child creates no local motion, but cannot
+opt out of its ancestor's rendered geometry or opacity. It must not counter-transform, overpaint or
+cancel the parent's writer. To make the entire presentation immediate, resolve the actual enclosing
+owner to none as well. Conversely, an explicitly full child under a none parent may run an independent
+later update subject to the OS ceiling and its lifecycle; it does not replay a consumed same-cause
+entrance or animate while its parent is semantically closed. This makes owner-local cancellation and
+inherited presence consistent without changing provider precedence.
 
 | Capability                 | Full                                            | Reduced                                               | None                                 |
 | -------------------------- | ----------------------------------------------- | ----------------------------------------------------- | ------------------------------------ |

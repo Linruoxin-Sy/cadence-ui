@@ -48,7 +48,16 @@ Animate only the owned block axis; inline size remains constrained by the parent
 
 Resolve one destination from the final available inline size and a supported finite positive ratio, subject to existing min/max and caller sizing rules; never tween CSS ratio and height simultaneously. Do not invent a fallback ratio for invalid input: preserve the existing native result and skip interpolation. Lay child media/overlays at their final reserved geometry. If intermediate host sizes would stretch caller media, crop final-visible text/controls beyond the existing policy, or disturb a focused descendant, commit height immediately. One inline measurement and one block writer suffice; hidden/unknown dimensions settle when valid without a zero-to-target reveal.
 
+The ratio-derived pixel height is a temporary presentation constraint. Once it settles or yields to
+parent resizing, release it to the existing ratio/caller sizing owner so later inline-size changes
+still recompute native block geometry. Do not leave both the old fixed height and new ratio active,
+or clear a caller's explicit height while restoring native layout.
+
 ## Acceptance scenarios
+
+Also pending: complete a ratio change, then resize only the parent; the ratio remains responsive.
+Interrupt with a caller-provided fixed height and a simultaneous parent-width change; old cleanup
+cannot remove that height or restore the obsolete ratio destination.
 
 Target acceptance; not executed: ratio changes on a stable width; rapid ratio reversals; simultaneous responsive resize; late/cached image load; caller overlays and clipping; SSR reservation; full/reduced/none and zero clock during a ratio change.
 

@@ -59,7 +59,17 @@ For one revision, each control publishes its final intrinsic box; the group calc
 
 ButtonGroupSeparator binds the inherited Separator rule owner; the group wrapper does not create a second background/opacity writer. The same parent-entry cause is consumed once across the composed part.
 
+The group's geometry/presence owner resolves its own scope. A child explicitly in none contributes
+its final intrinsic destination and runs no local motion, but may still move/fade with a full-mode
+group envelope. It does not counter-transform or cancel the group. If the group is none and a child
+is explicitly full, an eligible independent child update may animate under the OS ceiling; the group
+does not replay a consumed entrance or chase that child's interpolated dimensions.
+
 ## Acceptance scenarios
+
+Also pending: exercise full-group/none-child and none-group/full-child during insertion and a later
+label revision, then turn on OS reduction. Inspect actual property owners: no competing inverse
+transform, leaked cancellation, duplicate entrance or parent per-frame resize is permitted.
 
 Target acceptance; not executed: insert and remove a middle button; horizontal and vertical groups; input/button mixtures; ButtonGroupText quantity changes; reorder while a child is pressed; orientation changes; no fabricated selection marker; all modes and zero clock during membership changes.
 

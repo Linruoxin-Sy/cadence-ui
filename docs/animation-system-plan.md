@@ -424,6 +424,16 @@ component code. Continue scoped remediation and affected remeasurement during de
 required performance evidence must pass at final delivery. No framework change, relaxed budget or
 dependency exemption is part of this plan.
 
+Cross-component geometry acceptance also checks the frame after temporary constraints are released:
+natural auto/percentage/flex/grid/ratio/field-sizing remains responsive, valid empty geometry is not
+confused with hidden unknown measurements, and stale cleanup cannot overwrite newer caller sizing.
+Exercise individual CSS translate/rotate/scale together with transform-list/native placement, including
+safe fallback and containing-block/hit-region preservation. Use full-parent/none-child and
+none-parent/full-child fixtures to prove owner-local modes, inherited envelopes and the OS ceiling.
+Chart's unknown-work controller path must not count as zero or invoke caller components for discovery;
+native browser scrolling and snap remain distinct from each engine's authored settling clock. These
+are pending acceptance requirements, not additional presets, public APIs or implementation claims.
+
 For implementation changes, run `pnpm registry:build` before `pnpm check` when shipped source,
 metadata or content changes, then the affected browser/runtime and performance checks. Documentation
 design work alone does not regenerate payloads or claim runtime conformance. Keep regression inputs

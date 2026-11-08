@@ -74,7 +74,17 @@ For a known trigger-label/quantity revision, the list geometry owner uses final 
 
 When the active value is unchanged, derive the marker's current box from the list transaction's current reflow/size projection; do not start an independent layout.selection spring just because its final rectangle changed. The one marker writer follows that projection without per-frame DOM measurements. Only an actual active-value change starts the selection clock. If selection and list reflow happen together, the same writer combines the selection path with the list-local projection exactly once; it does not add displacement already included in either endpoint or retarget a spring from a measured moving rectangle each frame. If the adapter cannot maintain this relationship, the affected list and marker geometry settle together immediately. Sharing only a final snapshot or nominal start time is insufficient.
 
+List-local coordinates include individual CSS translate/scale as well as a transform list. A marker
+cannot count the same offset once in its measured endpoint and again in its animation channel. Where
+the caller's composition cannot be converted safely, settle the affected list/marker transaction
+without deleting caller transforms. Any temporary list/panel pixel dimensions return to their current
+native layout policy when the size owner completes or yields.
+
 ## Acceptance scenarios
+
+- Pending: combine a translated/scaled caller List with trigger reflow, then change that transform
+  and the parent width while the marker moves. No stale coordinate conversion or temporary pixel lock
+  survives; immediate fallback preserves selection, native focus and the caller's final transform.
 
 - Pending: keyboard automatic and manual activation, rapid reverse selection, both orientations and list variants retain correct focus and marker position.
 - Pending: switch panels containing forms and independently scrolling content under each caller mount policy; values and scroll positions remain consistent with that policy.

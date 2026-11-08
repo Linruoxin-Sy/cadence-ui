@@ -312,6 +312,14 @@ support uses immediate geometry/text instead of assuming horizontal Latin layout
 orientation/size state actions keep their individual contracts, with passive reflow taking precedence
 when the old coordinate frame becomes invalid.
 
+Geometry acceptance includes the resting layout after an animation releases its temporary constraints,
+not only the last animated frame. Follow the [size and transform ownership rules](../animation-system.md#34-measured-size-and-position)
+for natural versus unknown zero dimensions, current caller sizing and CSS individual transform channels.
+Check cancellation after a caller changes its dimensions or placement as well as ordinary completion;
+old cleanup must not restore obsolete styles. A nested mode controls that child's own writers, not
+an ancestor envelope. The [scope rule](../animation-system.md#6-three-layer-strategy-for-reducing-motion)
+applies to inherited entrances and coordinated parent/child layout throughout the catalogue.
+
 ## 4. Parameter and choreography review
 
 The system's timing table is a default vocabulary. A Tooltip can select a faster popup preset than a

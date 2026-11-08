@@ -72,7 +72,18 @@ Dispatch a direct Title/Description string to the text owner and a supported dir
 
 A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
 
+The anchored positioner's CSS translate/transform/origin and the content approach are one reviewed
+coordinate composition even if they use different CSS property names. A separate visual layer must
+preserve the existing containing block, fixed/sticky descendants and portal/ref contract. If that
+cannot be established, omit conflicting travel while retaining eligible disjoint opacity. Size
+completion releases temporary constraints to the current available-space and caller sizing rules;
+an old completion cannot restore an earlier anchor transform or measured width.
+
 ## Acceptance scenarios
+
+- Pending: use caller individual `translate`/`scale` styles, change the anchor during entry and resize
+  the available viewport after content resize finishes. Native placement and responsive sizing remain
+  correct; a fallback never removes caller transforms or freezes the old popup width.
 
 - Pending: change only an external callback ref while Content remains the same host and is entering, then genuinely replace the render host. The first transfers ref registration without stopping the valid animation; the second establishes a current baseline and rejects retired writes. Repeat with native retained mounting, actual unmount and close/reopen, checking native completion instead of assuming that every visual exit disconnects its node.
 

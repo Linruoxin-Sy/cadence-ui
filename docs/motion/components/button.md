@@ -61,7 +61,17 @@ One natural-content measurement supplies both width and any explicit height dest
 
 A custom `render` must preserve the native ref/event target, direct-child icon selectors and existing layout. Press decoration requires a safe internal visual layer separate from hit/focus/anchor geometry; if none exists, use the declared colour feedback and omit press scale rather than inserting incompatible wrappers. The same rule applies to icon-only buttons and composed triggers. At full-mode zero timeScale, an accepted held press reaches `scale.press` immediately and release reaches rest immediately; a none/reduced branch remains unscaled. Presence completion restores current disabled/caller opacity, not a hard-coded fully opaque button.
 
+Evaluate press-layer ownership across `scale`, `translate` and the `transform` list together. Native
+anchor placement or a caller transform does not become unowned merely because press uses another
+CSS property. Use a verified independent visual layer or the existing colour-only fallback; release
+only the press channel on cancellation. This requirement does not disable default feedback for ordinary
+layout classes that establish no transform conflict.
+
 ## Acceptance scenarios
+
+Also pending: press a caller-rendered anchored button using CSS individual transforms and interrupt
+with a mode change or node replacement. Hit/focus/anchor geometry and caller transform targets remain
+intact, with no doubled scale, stale restored transform or new containing block around caller content.
 
 Also pending: rerender during entry, press and a label revision with a fresh inline ref and callback
 but the same node/semantic target. Ref cleanup/attachment stays balanced and motion continues without
