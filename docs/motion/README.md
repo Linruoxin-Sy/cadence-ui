@@ -428,12 +428,13 @@ multi-select controls retain independent selected states rather than forcing a s
 
 ## 5. Catalogue
 
-The following 59 files cover the current 57 UI items and two blocks exactly once. All describe the
-target, with implementation and verification still pending. The four planned animation primitives
-are specified in the system/rollout documents and are not added to this existing-catalogue count.
+The original 59 component contracts remain migration targets. The catalogue also includes the
+standalone AnimatedText contract; its delivered text form is documented separately from the global
+v2 marker. AnimatedNumber, Reveal and RevealGroup remain planned.
 
 | Family                        | Individual contracts                                                                                                                                                                                                                                                                                     |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Public motion primitives      | [Animated Text](components/animated-text.md)                                                                                                                                                                                                                                                             |
 | Actions and groups            | [Button](components/button.md), [Button Group](components/button-group.md), [Toggle](components/toggle.md), [Toggle Group](components/toggle-group.md)                                                                                                                                                   |
 | Inline structure              | [Badge](components/badge.md), [Kbd](components/kbd.md), [Label](components/label.md), [Separator](components/separator.md)                                                                                                                                                                               |
 | Editing and fields            | [Input](components/input.md), [Textarea](components/textarea.md), [Input OTP](components/input-otp.md), [Input Group](components/input-group.md), [Field](components/field.md)                                                                                                                           |

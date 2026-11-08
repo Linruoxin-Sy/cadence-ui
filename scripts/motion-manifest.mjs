@@ -29,6 +29,7 @@ export const MOTION_FORMS = [
   "month-grid",
   "size-linked",
   "measured",
+  "changed-runs",
 ];
 
 /**
@@ -86,6 +87,7 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  if (recipe === "text.change") return form === "changed-runs" && textImplementation(source) ? "changed-runs" : null;
   // Structural adoption only; actual completion/cancellation is browser evidence.
   if (recipe === "data.transition" && form === "one-shot" && source.includes("./sidebar-labels"))
     return source.includes("prepareSidebarLabels(labels, transaction, revision)") &&
@@ -178,7 +180,72 @@ export function calledRecipes(source) {
     .concat(
       cssPolicyImplementation(source, "useStateColor") ? ["state.color"] : [],
       cssPolicyImplementation(source, "useContinuousMotion") ? ["data.transition"] : [],
+      textImplementation(source) ? ["text.change"] : [],
     );
+}
+
+/** A connected string adapter, not comments, an unused import or an unmounted call. */
+function textImplementation(source) {
+  if (!source.includes("use-text-presentation")) return false;
+  compiler ??= require("typescript");
+  const ts = compiler;
+  const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const adapters = new Set();
+  for (const statement of tree.statements) {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      !ts.isStringLiteral(statement.moduleSpecifier) ||
+      !/^\.\.?\/.*use-text-presentation$/.test(statement.moduleSpecifier.text) ||
+      statement.importClause?.isTypeOnly
+    )
+      continue;
+    const bindings = statement.importClause?.namedBindings;
+    if (bindings && ts.isNamedImports(bindings))
+      for (const item of bindings.elements)
+        if (!item.isTypeOnly && (item.propertyName?.text ?? item.name.text) === "useTextPresentation")
+          adapters.add(item.name.text);
+  }
+  let found = false;
+  const visit = (node) => {
+    if (ts.isFunctionDeclaration(node) && node.body) {
+      const calls = new Set();
+      const collect = (child) => {
+        if (
+          ts.isVariableDeclaration(child) &&
+          ts.isIdentifier(child.name) &&
+          child.initializer &&
+          ts.isCallExpression(child.initializer) &&
+          ts.isIdentifier(child.initializer.expression) &&
+          adapters.has(child.initializer.expression.text) &&
+          child.initializer.arguments.length >= 4
+        )
+          calls.add(child.name.text);
+        ts.forEachChild(child, collect);
+      };
+      collect(node.body);
+      const mounted = (child) => {
+        if (
+          ts.isJsxElement(child) &&
+          child.openingElement.attributes.properties.some(
+            (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "ref",
+          ) &&
+          child.children.some(
+            (item) =>
+              ts.isJsxExpression(item) &&
+              item.expression &&
+              ts.isIdentifier(item.expression) &&
+              calls.has(item.expression.text),
+          )
+        )
+          found = true;
+        ts.forEachChild(child, mounted);
+      };
+      mounted(node.body);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(tree);
+  return found;
 }
 
 export function cssPolicyCapabilities(source) {

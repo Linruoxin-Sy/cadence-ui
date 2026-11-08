@@ -18,7 +18,10 @@ export function useTextPresentation(
   cm: CadenceMotion,
   entity: unknown,
   options: Partial<
-    Pick<TextPresentationCommit, "locale" | "characterStagger" | "visible" | "capture" | "sourceRetired">
+    Pick<
+      TextPresentationCommit,
+      "locale" | "granularity" | "characterStagger" | "visible" | "capture" | "sourceRetired"
+    >
   > = {},
   supplied?: ReturnType<typeof createMotionTransaction>,
 ) {

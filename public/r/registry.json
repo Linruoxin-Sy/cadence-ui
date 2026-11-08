@@ -22,6 +22,16 @@
       "meta": {}
     },
     {
+      "name": "cadence-text",
+      "type": "registry:lib",
+      "title": "Changed text controller",
+      "description": "Bounded native text planning and changed-only decorative opacity.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
       "name": "cadence-utils",
       "type": "registry:lib",
       "title": "Utilities",
@@ -114,7 +124,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -137,7 +147,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -160,7 +170,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -183,7 +193,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -206,7 +216,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -229,7 +239,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -252,7 +262,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -275,7 +285,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -298,7 +308,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -321,7 +331,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -350,7 +360,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -373,7 +383,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -397,7 +407,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -421,7 +431,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -444,7 +454,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -468,7 +478,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -491,7 +501,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -514,7 +524,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -537,7 +547,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -565,7 +575,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -597,7 +607,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -622,7 +632,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -647,7 +657,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -672,7 +682,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -697,7 +707,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -722,7 +732,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -757,7 +767,7 @@
             }
           ]
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -782,7 +792,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -807,7 +817,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -839,7 +849,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -865,7 +875,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -891,7 +901,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -917,7 +927,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -943,7 +953,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -969,7 +979,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -997,7 +1007,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1024,7 +1034,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1051,7 +1061,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1078,7 +1088,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1105,7 +1115,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1133,7 +1143,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1175,7 +1185,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1201,7 +1211,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1229,7 +1239,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1257,7 +1267,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1289,7 +1299,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1312,7 +1322,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1337,7 +1347,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1360,7 +1370,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1385,7 +1395,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1413,7 +1423,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1443,7 +1453,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1466,7 +1476,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1510,7 +1520,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1540,7 +1550,7 @@
           "path": "apps/v4/examples/base/data-table-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1570,7 +1580,7 @@
           "path": "apps/v4/examples/base/date-picker-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1600,7 +1610,7 @@
           "version": "2026-10",
           "guide": "apps/v4/content/docs/components/base/attachment.mdx"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1625,7 +1635,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
       }
     },
     {
@@ -1652,7 +1662,36 @@
           "version": "0.5.0",
           "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
         },
-        "sourceSha": "ffcdedb7"
+        "sourceSha": "f9815ae3"
+      }
+    },
+    {
+      "name": "animated-text",
+      "type": "registry:ui",
+      "title": "Animated Text",
+      "description": "Replaces changed display text while retaining one current native string.",
+      "categories": [
+        "motion"
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence standalone changed-text primitive; no upstream shadcn equivalent."
+        },
+        "sourceSha": "f9815ae3"
       }
     }
   ]

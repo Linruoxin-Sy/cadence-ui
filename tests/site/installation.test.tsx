@@ -33,11 +33,11 @@ function ProseMarker({ children }: { children: ReactNode }) {
 }
 
 describe("shared installation plan", () => {
-  it("covers all 59 dependency graphs and all files from multi-file libraries", async () => {
+  it("covers all 60 dependency graphs and all files from multi-file libraries", async () => {
     const components = registry.items.filter((item: { type: string }) =>
       ["registry:ui", "registry:block"].includes(item.type),
     );
-    expect(components).toHaveLength(59);
+    expect(components).toHaveLength(60);
     for (const item of components) {
       const plan = installationPlan(registry.items, item.name);
       expect(new Set(plan.files.map((file) => file.target)).size).toBe(plan.files.length);

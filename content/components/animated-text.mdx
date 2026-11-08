@@ -1,0 +1,123 @@
+---
+title: Animated Text
+description: Replaces changed display text while retaining one current native string.
+category: motion
+motion: [text.change]
+intensity: medium
+complexity: S
+tier: T1
+since: 0.6.0
+deps: []
+registryDeps: ["@cadence/cadence-text", "@cadence/cadence-utils"]
+---
+
+## Installation
+
+**Command**
+
+```install
+npx shadcn@latest add @cadence/animated-text
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/animated-text.json)
+
+Keep the complete dependency-first sibling tree and theme setup from the expanded manual instructions.
+The provider is imported by the renderer; wrapping the application is optional.
+
+## Usage
+
+```tsx
+import { AnimatedText } from "@/components/cadence/animated-text";
+
+export function SaveLabel({ saved }: { saved: boolean }) {
+  return <AnimatedText value={saved ? "Saved" : "Save"} />;
+}
+```
+
+The caller owns the committed string. The initial value is visible in server HTML and without JavaScript.
+Updates immediately change one native Text node; only safely mapped changed paint fades. Retained text
+does not replay. Add `"use client"` to callers that own state, events or refs. Serializable props can cross
+the shipped client boundary from a Server Component.
+
+## Word rhythm
+
+```tsx
+import { AnimatedText } from "@/components/cadence/animated-text";
+
+export function Status({ value }: { value: string }) {
+  return <AnimatedText value={value} locale="en" granularity="word" />;
+}
+```
+
+Word mode synchronizes changed grapheme paint within each Intl word segment, including whitespace
+segments. It never fades retained letters simply because another letter in that word changed. Auto and
+grapheme use the character rhythm. Unsupported segmentation or shaping displays exact native text immediately.
+
+## When to use
+
+Use for an explicitly owned plain display string, such as a changing action label or read-only status.
+Compose it next to rich siblings; preserve links and other interactive elements outside its string value.
+
+## When not to use
+
+Keep editable input, textarea and contenteditable values native. This renderer does not rewrite rich
+children, infer numeric quantities, announce every update, animate an initial entrance or move text from
+a captured origin. Use a stable React key for an existing entity boundary; a remount establishes a baseline.
+
+## API
+
+### `AnimatedText`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | required | Current committed native text. |
+| `locale` | `string` | runtime locale | Intl segmentation locale; unsupported values use native fallback. |
+| `granularity` | `"auto" \| "grapheme" \| "word"` | `"auto"` | Rhythm for changed paint, without changing semantic text layout. |
+| Native span props | `ComponentProps<"span">` | — | Includes ref, className, style, events and ARIA; excludes children and dangerouslySetInnerHTML. |
+
+The span has `data-slot="animated-text"` and its effective `data-motion`. Mode and timeScale come from
+the optional CadenceProvider. There are no instance duration, easing, origin or identity props.
+
+## Motion contract
+
+| Recipe | full | reduced | none |
+| --- | --- | --- | --- |
+| `text.change` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |
+
+Appearance, size and colours remain native. Built-in component display bindings use no stagger when
+they opt in; installing this item does not change other components. Rapid revisions cancel previous paint.
+Live downgrade, zero clock, hidden documents and unmount remove decoration; restoring motion does not replay.
+
+Animation requires proven ASCII/default typography at unit device scale and supported CSS Custom Highlight
+and constructable stylesheet APIs. Other DPR/zoom mappings (including DPR2), connected scripts, RTL, emoji,
+advanced font features, foreign highlights, unsupported clipping/layout or unavailable correspondence use
+exact native immediate text. These are deliberate fallbacks, not animated support for those cases.
+
+## Keyboard and accessibility
+
+The span adds no role, tab stop or keyboard commands. Focus and native activation remain on the caller's
+control. The current native text supplies one accessible name, selection, find and clipboard value; pixel-only
+decoration is inert and aria-hidden. Selection, copy and find cancel decoration. Add announcements through a
+separate caller-owned status region only when appropriate. Inherited editing cancels decoration and preserves
+the editor's native text tree, caret, composition and undo ownership; leave live editing to the application.
+
+## Responsiveness and performance
+
+Native whitespace, newlines, typography and wrapping stay intact. Resize, scrolling, font changes or uncertain
+viewport/clipping mappings cancel presentation. No independent width/height spring or extra semantic tree is added.
+Planning caps at 2048 graphemes, 4096 middle comparisons and 64 aggregate live changed graphemes. Raster proof
+and paint cap at 262144 pixels and a 4096-pixel axis; overflow displays affected content immediately. The component
+does not queue historical values. Full-page and copied-dependency performance budgets remain under active work;
+this item does not establish overall Motion v2 performance acceptance.
+
+## Notes for AI
+
+Pass an explicit string; never inspect arbitrary children or turn numeric-looking strings into reels.
+Preserve the original entity key, native host semantics and the entire relative shared dependency tree.
+Do not add motion literals, aria-live, input validation or a second width/height owner.
+
+## Related components
+
+[Button](/components/button), [Label](/components/label), [Motion guide](/docs/motion).

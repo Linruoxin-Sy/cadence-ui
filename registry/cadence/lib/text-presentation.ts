@@ -12,7 +12,7 @@ import {
 import { type MotionEnvironment, subscribeMotionEnvironment } from "./motion-environment";
 import { createMotionTransaction, type MotionLease, type MotionRevision } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
-import { boundTextRevision, createTextSnapshot, diffText, shapeTextDiff } from "./text-diff";
+import { boundTextRevision, changedTextGroups, createTextSnapshot, diffText, shapeTextDiff } from "./text-diff";
 import { nativeTextContext, outgoingTextPaint, proveTextLayout, selectedTextContext } from "./text-layout";
 
 const binding = bindMotionParameters(textReplace, "text.change/changed-runs");
@@ -26,6 +26,7 @@ export interface TextPresentationCommit {
   /** The native owner's existing semantic slot/entity identity. */
   entity: unknown;
   locale?: string;
+  granularity?: "auto" | "grapheme" | "word";
   characterStagger?: boolean;
   visible?: boolean;
   capture?: Capture;
@@ -313,6 +314,8 @@ export function createTextPresentation(
           !revision.current() ||
           cm.reduced !== previous.cm.reduced ||
           cm.mode !== previous.cm.mode ||
+          options.granularity !== previous.granularity ||
+          options.locale !== previous.locale ||
           cm.timeScale === 0 ||
           options.visible === false ||
           clock.kind !== "text" ||
@@ -392,6 +395,23 @@ export function createTextPresentation(
         if (!lease?.current()) return;
         active = proposed;
         const epoch = generation;
+        const word = options.granularity === "word";
+        const groups = changedTextGroups(snapshot, incoming, word, options.locale);
+        if (!groups) {
+          stop();
+          return;
+        }
+        const groupCount = new Set(groups.values()).size;
+        const rhythm = resolveStaggerParameters(
+          groupCount,
+          word ? "word" : "char",
+          cm.mode,
+          cm.timeScale,
+          cm.scope.tokens,
+        );
+        const last = Math.max(0, Math.min(units.length, motionLimits.staggerElements) - 1);
+        // Standalone text keeps the stricter final character-delay cap in word mode too.
+        const step = Math.min(rhythm.step, last ? motionLimits.characterDelay / last : 0);
         const moving =
           options.characterStagger && !cm.reduced
             ? resolveStaggerParameters(units.length, "char", cm.mode, cm.timeScale, cm.scope.tokens)
@@ -430,7 +450,8 @@ export function createTextPresentation(
           if (pixels > textProofLimits.pixels) return;
           canvas.dataset.cadenceTextKind = entering ? "enter" : "exit";
           canvas.dataset.motion = cm.mode;
-          paints.push({ canvas, incoming: entering, index: movingIndex++ });
+          paints.push({ canvas, incoming: entering, index: groups.get(unit.identity) ?? 0 });
+          movingIndex++;
           if (entering) {
             let offset = 0;
             for (const item of snapshot.units ?? []) {
@@ -488,7 +509,7 @@ export function createTextPresentation(
               entering ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 0 }],
               {
                 duration: motionMilliseconds(Number(transition.duration)),
-                delay: motionMilliseconds(entering ? moving.step * index : 0),
+                delay: motionMilliseconds(entering && options.characterStagger && !cm.reduced ? step * index : 0),
                 easing: `cubic-bezier(${cm.scope.tokens.ease[entering ? "out" : "in"].join(",")})`,
                 fill: "both",
               },

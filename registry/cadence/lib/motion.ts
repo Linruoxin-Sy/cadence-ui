@@ -126,6 +126,7 @@ export type Recipe =
   | "scroll.navigate"
   | "scroll.story"
   | "text.reveal"
+  | "text.change"
   | "text.split"
   | "number.roll"
   | "data.transition"
@@ -183,6 +184,7 @@ const recipes: Record<Recipe, RecipeSpec> = {
   "scroll.navigate": { kind: "tween", duration: "page", ease: "inOut", reduced: "jump" },
   "scroll.story": { kind: "tween", duration: "slow", ease: "out" },
   "text.reveal": { kind: "tween", duration: "slow", ease: "out" },
+  "text.change": { kind: "tween", duration: "fast", ease: "out" },
   "text.split": { kind: "tween", duration: "slow", ease: "out" },
   "number.roll": { kind: "spring", spring: "snappy" },
   "data.transition": { kind: "tween", duration: "base", ease: "out" },

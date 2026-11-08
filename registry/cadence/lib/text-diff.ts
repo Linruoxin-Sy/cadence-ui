@@ -10,6 +10,45 @@ export interface TextSnapshot {
   readonly units: readonly TextUnit[] | null;
   readonly unavailable?: "segmenter" | "input";
 }
+/** Presentation groups only: never changes retained grapheme identities or DOM. */
+export function changedTextGroups(
+  snapshot: TextSnapshot,
+  incoming: readonly TextUnit[],
+  word: boolean,
+  locale?: string,
+) {
+  const groups = new Map<object, number>();
+  if (!word) {
+    for (const unit of incoming) groups.set(unit.identity, groups.size);
+    return groups;
+  }
+  if (!snapshot.units || typeof Intl.Segmenter !== "function") return null;
+  try {
+    const changed = new Set(incoming.map((unit) => unit.identity));
+    const segments = new Intl.Segmenter(locale, { granularity: "word" }).segment(snapshot.value);
+    let index = 0,
+      offset = 0,
+      group = 0;
+    for (const segment of segments) {
+      let used = false;
+      const end = segment.index + segment.segment.length;
+      while (index < snapshot.units.length && offset < end) {
+        const unit = snapshot.units[index++];
+        if (!unit) break;
+        if (changed.has(unit.identity)) {
+          groups.set(unit.identity, group);
+          used = true;
+        }
+        offset += unit.text.length;
+      }
+      if (used) group++;
+    }
+    return groups;
+  } catch {
+    return null;
+  }
+}
+
 export interface TextChangeRun {
   readonly outgoing: readonly TextUnit[];
   readonly incoming: readonly TextUnit[];

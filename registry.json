@@ -33,6 +33,36 @@
       ]
     },
     {
+      "name": "cadence-text",
+      "type": "registry:lib",
+      "title": "Changed text controller",
+      "description": "Bounded native text planning and changed-only decorative opacity.",
+      "categories": ["foundation"],
+      "registryDependencies": ["@cadence/cadence-provider", "@cadence/cadence-handoff"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/text-diff.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/text-diff.ts"
+        },
+        {
+          "path": "registry/cadence/lib/text-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/text-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/text-presentation.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/text-presentation.ts"
+        },
+        {
+          "path": "registry/cadence/lib/use-text-presentation.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/use-text-presentation.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-utils",
       "type": "registry:lib",
       "title": "Utilities",
@@ -2281,6 +2311,40 @@
           "style": "native",
           "version": "0.5.0",
           "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
+        }
+      }
+    },
+    {
+      "name": "animated-text",
+      "type": "registry:ui",
+      "title": "Animated Text",
+      "description": "Replaces changed display text while retaining one current native string.",
+      "categories": ["motion"],
+      "registryDependencies": ["@cadence/cadence-text", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/animated-text/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/animated-text/index.tsx"
+        }
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence standalone changed-text primitive; no upstream shadcn equivalent."
         }
       }
     }

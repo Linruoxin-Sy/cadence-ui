@@ -350,7 +350,7 @@ pause/stop and mode integration before claiming conformance. Cadence does not ge
 remove arbitrary plugin objects, and routing their engine calls through a zero clock alone does not
 stop an automatic schedule.
 
-Standalone planned `AnimatedText` retains the system's character-stagger default (`stagger.char`,
+Standalone `AnimatedText` retains the system's character-stagger default (`stagger.char`,
 12 ms, with the final start delay capped at 120 ms after effective timeScale and no more than 20
 simultaneously animated elements). Built-in `text.replace` bindings deliberately select no stagger so that
 control labels and rapidly changing display strings arrive together. A component may opt into the

@@ -4,6 +4,22 @@ import { calledRecipes, cssPolicyCapabilities, implementedForm } from "../../scr
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+describe("installed changed-text form", () => {
+  const text = readFileSync("registry/cadence/animated-text/index.tsx", "utf8");
+  it("recognizes the mounted adapter and rejects absent/dead declarations", () => {
+    expect(implementedForm(text, "text.change", "changed-runs")).toBe("changed-runs");
+    expect(calledRecipes(text)).toContain("text.change");
+    for (const candidate of [
+      text.replace("{text}", "{value}"),
+      text.replace("useTextPresentation(node,", "missing(node,"),
+      text.replace('"../lib/use-text-presentation"', '"@/host/use-text-presentation"'),
+      `// ${text.replaceAll("\n", "\n// ")}`,
+    ])
+      expect(implementedForm(candidate, "text.change", "changed-runs")).toBeNull();
+    expect(implementedForm(text, "text.change", "one-shot")).toBeNull();
+  });
+});
+
 describe("installed content and selection forms", () => {
   const tabs = readFileSync("registry/cadence/lib/tabs-motion.tsx", "utf8");
   const calendar = readFileSync("registry/cadence/calendar/index.tsx", "utf8");

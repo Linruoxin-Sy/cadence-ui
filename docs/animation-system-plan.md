@@ -12,8 +12,8 @@ and the [shared preset catalogue](motion/presets.md). Each component is designed
 global visual style guides its choices while the system execution contract stays mandatory. These
 files specify target behavior and acceptance scenarios, not completed implementation or test evidence.
 
-The existing catalogue remains 59 components. The four public animation primitives described below
-are planned additions to support that catalogue; they are not already shipped items. No third-party
+The original catalogue scope remains 59 components. AnimatedText is an additional shipped primitive;
+the other three public animation primitives below remain planned additions. No third-party
 reference catalogue, new application behaviour or optional animation engine is adopted implicitly.
 
 ## 1. Outcome and boundaries
@@ -78,8 +78,8 @@ scope or content semantics; use CSS tokens for visual tuning.
 ### 2.2 Registry and metadata
 
 `meta.motion` remains a declaration of implemented recipes, not a list of desired future abilities.
-In particular, `state.color` and `text.change` are target additions and must not appear in component
-metadata until their runtime and checks exist. `number.roll` already names a recipe, but that alone
+Shared `state.color` and the explicit AnimatedText `text.change/changed-runs` form are implemented;
+ordinary components may declare them only with their own runtime adoption and checks. `number.roll` already names a recipe, but that alone
 does not provide a digit-wheel primitive or prove any component's rolling implementation.
 
 Tier is no longer permission to animate. During the schema transition, retain existing `meta.tier`
@@ -132,7 +132,7 @@ the current Spinner exception and continuous-loop reduced behaviour have not yet
 The none target stops colour transitions as well as spatial, opacity and loop clocks. Existing colour
 utilities and the current contract helper do not yet prove that broader guarantee.
 
-### 3.1 Planned public primitives
+### 3.1 Public primitives
 
 | Primitive        | Design scope                                                                                   | Integration boundary                                                                                                                     |
 | ---------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -141,9 +141,10 @@ utilities and the current contract helper do not yet prove that broader guarante
 | `Reveal`         | A single surface entering the viewport, with once/repeat behaviour                             | Readable first screen, hydration and no-JS fallback; visibility policy is separate from presence                                         |
 | `RevealGroup`    | Group-owned reveal order and bounded stagger                                                   | Prevent nested duplicate entrances; stable item ids and a total delay/concurrency cap                                                    |
 
-These names describe planned public capabilities, not implemented exports or final registry ids.
-Their exact additive prop surface and install dependencies are a deliverable of Phase 2. Existing
-components integrate the same internal helpers for their owned strings/numbers; consumers need not
+AnimatedText is installed as `@cadence/animated-text`; its string/locale/granularity surface, relative
+dependency tree and conservative native fallback are described in its public MDX. The other names
+remain planned capabilities, with additive props and install dependencies still due in Phase 2.
+Existing components will integrate the same internal helpers for their owned strings/numbers; consumers need not
 wrap every built-in label to obtain the baseline. Complex user-authored content uses explicit
 composition so that links, refs, keys, selection and accessibility remain intact.
 
@@ -158,7 +159,7 @@ separately, including skipped or already consumed first-screen reveals.
 
 ## 4. Catalogue migration matrix
 
-The following mutually exclusive groups cover all 59 current registry UI/block items exactly once.
+The following mutually exclusive groups cover the original 59 registry UI/block items exactly once.
 All groups evaluate the six baseline capabilities in section 1; the final column records the main
 ownership and extra effects to resolve. A group is planning scope, not a replacement motion tier.
 Every row is pending implementation and acceptance.
@@ -292,10 +293,11 @@ native Range proof, bounded pixel-only opacity paint, native selection/editing e
 budgets and live cancellation. The semantic value remains one native Text node; no inline splitting
 or typography override is used. Unknown scripts/features, highlights, layout or clipping stay immediate.
 Existing captured-origin support composes only a complete single-unit destination; partial strings
-remain changed-only local replacements. These modules are not registered or imported by catalogue
-owners. The installable AnimatedText API, recipe/parser/metadata recognition, public guide/examples,
-registry distribution and actual copied-install/production acceptance remain pending together.
-Internal DOM evidence does not publish `text.change` or migrate a component.
+remain changed-only local replacements. The original 59 component owners do not yet import these
+text modules. AnimatedText exposes this controller as a standalone string renderer with its own registry
+item and changed-runs declaration. Original catalogue slot adoption, the other public renderers and
+the overall v2 schema/evidence marker remain separate migration work. Unsupported correspondence
+remains native immediate, including the rejected DPR2 raster mapping.
 
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).

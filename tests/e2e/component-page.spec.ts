@@ -9,17 +9,17 @@ const ids: string[] = registry.items
   .filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type))
   .map((item: { name: string }) => item.name);
 
-test("all 59 SSR routes expose real headings, registry source, ordered navigation and edit path", async ({
+test("all 60 SSR routes expose real headings, registry source, ordered navigation and edit path", async ({
   page,
   request,
 }) => {
   test.setTimeout(120_000);
-  expect(ids).toHaveLength(59);
+  expect(ids).toHaveLength(60);
   for (const [index, id] of ids.entries()) {
     const response = await request.get(`/components/${id}`);
     expect(response.status()).toBe(200);
     const html = await response.text();
-    // Parse SSR HTML without loading 59 client runtimes.
+    // Parse SSR HTML without loading 60 client runtimes.
     const result = await page.evaluate(
       ({ html, id }) => {
         const doc = new DOMParser().parseFromString(html, "text/html");

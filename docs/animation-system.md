@@ -70,7 +70,7 @@ prove installed behaviour; the existing recipe declarations remain the shipped c
 | Size                    | geometry.resize                                           | Content/expansion-driven size continuity with one geometry owner             |
 | Position and identity   | layout.move, layout.shared, handoff                       | Stable items move or transfer without remounting their semantic owners       |
 | Surface and text colour | state.color (target addition)                             | Explicit colour properties share token clocks and honour none                |
-| Changed text            | text.change (target addition)                             | Unchanged text identity survives; only changed text gets replacement effects |
+| Changed text            | text.change                                               | Unchanged text identity survives; only changed text gets replacement effects |
 | Changed numbers         | number.roll (resolver exists; reel renderer pending)      | Stable place-value columns roll in the semantic direction                    |
 | Control feedback        | feedback.press, state.morph                               | Native input responds immediately with appropriate visual feedback           |
 | Data and ongoing status | data.transition                                           | Existing engine targets and accessible status survive every mode             |
@@ -81,7 +81,8 @@ to roll. Richness means complete relevant coverage, not identical effects on eve
 
 ### 1.3 Delivery boundary
 
-The shipped catalogue does not yet provide AnimatedText, AnimatedNumber, RevealGroup or Reveal.
+AnimatedText is installable with the conservative changed-only native text form described in §3.6.
+AnimatedNumber, RevealGroup and Reveal remain planned.
 `text.reveal`, `text.split` and `number.roll` being present in the resolver does not mean a component
 implements them. Shared v2 primitives are the planned scope; their final registry items must follow
 the Cadence-original origin and dependency rules. Do not infer the reference library's other 121
@@ -515,6 +516,7 @@ explicit until their rollout phase completes.
 | `scroll.navigate` | Navigate to a document section after an explicit link activation                        | measured destination            | Motion number tween writes native scroll offsets; `duration.page` + `ease.inOut` (§3.1.5)                             | Immediate destination                                                       |
 | `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                                              | End state shown directly                                                    |
 | `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                 | variants + child spans                                                                                                | Whole block fades in                                                        |
+| `text.change`     | Changed-only native display text                                                        | `locale`, `granularity`         | Bounded native Text raster/Range proof; opacity only                                                                  | Changed-only opacity, no stagger; none immediate                            |
 | `text.split`      | Character by character (GSAP)                                                           | `type`                          | GSAP SplitText (optional)                                                                                             | Shown as a whole                                                            |
 | `number.roll`     | Numeric changes                                                                         | `precision`, `spring`           | Resolver exists; place-value reel renderer and formatter integration pending (§3.7)                                   | New value shown directly                                                    |
 | `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                  | CSS continuous form or explicit Motion/engine clock                                                                   | V2 loops static (§3.2); engine geometry instant; permitted one-shot opacity |
@@ -621,8 +623,9 @@ positioning, not motion. Bubble has no streaming runtime or measured geometry.
 ### 3.1.0 V2 recipe additions
 
 `state.color` is supported by the shared CSS executor and resolver. Component adoption is separate;
-no catalogue item gains it through a dependency. `text.change` has a staged internal plain-string
-controller; its public recipe, distribution and AnimatedText primitive remain pending together.
+no catalogue item gains it through a dependency. `text.change/changed-runs` is implemented by the
+shared native-string controller and installable AnimatedText. Existing component slots adopt it
+explicitly in later tasks; this primitive does not migrate the original 59 components.
 
 | Target recipe | Properties and cause                                                                                  | Mode/cancellation contract                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -1203,7 +1206,7 @@ A temporary empty baseline probe must leave native layout rectangles unchanged a
 Entering editing cancels paint without rewriting its existing tree; leaving editing establishes a
 fresh baseline. The existing captured-origin adapter can compose only when the entire destination
 is its one safe incoming unit; partial-string mappings stay local until a Range-aware handoff exists.
-This internal strategy does not publish AnimatedText or certify a catalogue component. See the
+AnimatedText uses this strategy; it does not certify the remaining catalogue components. See the
 [Custom Highlight model](https://www.w3.org/TR/css-highlight-api-1/) for DOM-independent range styling.
 On Windows, pixel paint can use grayscale antialiasing while resting native text uses LCD subpixel
 antialiasing. This does not authorize a font, geometry or shaping change; browser raster checks
@@ -1491,7 +1494,7 @@ These are target execution and browser-acceptance requirements, not new runtime 
 ### 5.1 Runtime compatibility surface
 
 This Recipe union is the current exported set, kept in sync with lib/motion.ts by registry:check.
-It includes shared `state.color` support; `text.change` and the planned public renderers remain pending. The hook's existing
+It includes shared `state.color` and `text.change` support. AnimatedText is installable; the other public renderers remain pending. The hook's existing
 mode/timeScale inheritance and source-distributed API remain compatible during migration.
 
 ```ts
@@ -1510,6 +1513,7 @@ export type Recipe =
   | "scroll.navigate"
   | "scroll.story"
   | "text.reveal"
+  | "text.change"
   | "text.split"
   | "number.roll"
   | "data.transition"
@@ -1554,7 +1558,11 @@ Implementation notes:
 
 ### 5.2 Target public primitives
 
-These are design interfaces, not available imports/install commands. Each public primitive will have
+AnimatedText is available as `@cadence/animated-text`, exporting `AnimatedText` and its props from
+`cadence/animated-text`. It takes native span props and a string value; it does not accept arbitrary
+children, an origin or an identity prop. Auto/grapheme uses the character clock; word groups only
+changed paint using Intl word segments and the word clock. All retain the same native text and
+conservative proof/fallback policy. The remaining rows are design interfaces. Each primitive has
 an independently declared registry item, relative shared imports, namespaced dependencies and its own
 contract tests. They do not require every ordinary consumer to wrap each component manually.
 
