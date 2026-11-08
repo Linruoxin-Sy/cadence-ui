@@ -284,6 +284,13 @@ APIs, registry dependencies and examples. Separate pure diff/number algorithms f
 measure only the nodes that own content-driven geometry. Reuse existing motion/engine integration
 instead of creating a second rendering runtime.
 
+Internal text planning in `registry/cadence/lib/text-diff.ts` provides bounded grapheme segmentation,
+ordered retained identities, changed-run offsets and pure aggregate preflight. Its shaping gate requires
+an adapter's actual boundary proof; segmentation alone never authorizes splitting text. This module is
+not yet registered or imported by component/runtime owners. DOM eligibility (including inherited native
+editing), shaping/layout proof, rendering, lifecycle integration, distribution and the installable
+AnimatedText primitive remain pending. Pure algorithm evidence does not establish `text.change` support.
+
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).
 Prove rejected requests, equal-target rerenders during a legal flight, batched versus committed
