@@ -44,6 +44,14 @@ function stubMeasurement(contentHeight = 400) {
       lineHeight: { value: "20px" },
       paddingTop: { value: "16px" },
       paddingBottom: { value: "16px" },
+      ...(element.tagName === "PRE"
+        ? {
+            height: { value: `${contentHeight}px` },
+            boxSizing: { value: "border-box" },
+            borderTopWidth: { value: "0px" },
+            borderBottomWidth: { value: "0px" },
+          }
+        : {}),
     });
     return style;
   });
@@ -79,7 +87,12 @@ describe("CodeBlock", () => {
     visible = true;
     act(() => resize?.([], {} as ResizeObserver));
     expect(viewport.style.height).toBe("56px");
-    expectMotionContract(mode);
+    expectMotionContract(mode, {
+      behavior: () => {
+        expect(viewport.style.height).toBe("56px");
+        expect(viewport.getAnimations?.() ?? []).toHaveLength(0);
+      },
+    });
   });
 
   beforeAll(async () => {
@@ -112,8 +125,13 @@ describe("CodeBlock", () => {
         </CadenceProvider>,
       );
       expect(expanded).not.toContain("--code-block-max-lines:");
-      render(tree);
-      expectMotionContract(mode);
+      const { container } = render(tree);
+      expectMotionContract(mode, {
+        behavior: () => {
+          expect(slot(container, "code-block-viewport").style.height).toBe("");
+          expect(slot(container, "code-block-content")).toHaveTextContent("return 1;");
+        },
+      });
     },
   );
 

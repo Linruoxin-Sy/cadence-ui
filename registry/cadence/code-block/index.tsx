@@ -4,14 +4,17 @@
 
 import { cva, type VariantProps } from "class-variance-authority";
 import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
-import { animateSingleValue, motion, useMotionValue, useTransform } from "motion/react";
+import { motion } from "motion/react";
 import * as React from "react";
 import { Button } from "../button";
 import { useHighlightedCode } from "../code-highlight/use-highlighted-code";
 import { cn } from "../lib/cn";
 import { ControlSpan, NativeControlDiv } from "../lib/control-animation";
-import { clampMeasuredSize } from "../lib/geometry";
+import { createMeasuredGeometry } from "../lib/measured-geometry";
 import { scale } from "../lib/motion";
+import { usePresentationScope } from "../lib/motion-presence";
+import { useMotionHostRef } from "../lib/motion-ref";
+import { createMotionTransaction } from "../lib/motion-transaction";
 import { useCadenceMotion } from "../lib/provider";
 
 /** How long the copy button shows its tick before returning to the copy glyph. */
@@ -97,10 +100,6 @@ const CodeBlockContentContext = React.createContext(false);
  */
 const CodeBlockRevealContext = React.createContext(true);
 
-/**
- * A value folded into something an `id` can hold: a tab value is a human word
- * (`pnpm`, `ts`, `@cadence/button`), and the id has to survive all of them.
- */
 function idPart(value: string): string {
   return value.replace(/[^a-zA-Z0-9_-]+/g, "-");
 }
@@ -112,28 +111,11 @@ function useCodeBlockPart(part: string): CodeBlockContextValue {
   return block;
 }
 
-/**
- * The three ids one variant needs. Built in one place because the tab, its panel
- * and the content inside it have to agree, and because a second panel sharing the
- * block's `contentId` would put the same `id` on two `pre` elements.
- */
 function partIds(contentId: string, value: string) {
   const base = `${contentId}-${idPart(value)}`;
   return { tab: `${base}-tab`, panel: `${base}-panel`, content: `${base}-content` };
 }
 
-/**
- * The value of the block's first tab, read from its children.
- *
- * `defaultTab` is the way to choose; this exists so a block that forgets it is not
- * a block with every variant showing at once. The walk goes through the header and
- * any wrapper around the tab list, and stops at a panel, whose content is source
- * rather than a tab.
- *
- * A render-time read rather than an effect, on purpose: a static page is already in
- * the HTML before hydration, and selecting on mount would paint every variant for a
- * frame and then hide all but one.
- */
 function firstTabValue(children: React.ReactNode): string | undefined {
   let found: string | undefined;
 
@@ -203,26 +185,6 @@ export interface CodeBlockProps extends React.ComponentProps<"div">, VariantProp
   onTabChange?: (tab: string) => void;
 }
 
-/**
- * A code surface: header, scrollable source, footer, and a copy button.
- *
- * Highlighting is deliberately not bundled. Upstream splits it into a Shiki hook so
- * a block that only shows tool output stays small; the same split holds here, and
- * the parts take any node — a plain string, the lines a highlighter returns, or
- * `CodeBlockLine`s for a diff.
- *
- * Motion contract:
- * - fold / unfold: the viewport's measured height, `geometry.resize`
- * - floating actions: fade in on hover and focus, `data.transition`
- * - copy tick and chevron: swap in place, `state.morph`
- * - tab indicator: one pill shared between tabs, `layout.shared`
- * - reduced: opacity stays, orientation and height jump (size is information),
- *   and the tab pill changes tabs without travelling
- * - none: every transition resolves to zero duration
- *
- * a11y: the block is a plain region; the source is focusable so a keyboard user can
- * scroll it, and the copy button announces its own result through a live region.
- */
 function CodeBlock({
   className,
   variant = "default",
@@ -696,76 +658,111 @@ function CodeBlockContent({
   id,
   ...props
 }: CodeBlockContentProps) {
-  const cm = useCadenceMotion();
   const block = React.useContext(CodeBlockContext);
-  const preRef = React.useRef<HTMLPreElement>(null);
-  React.useImperativeHandle(ref, () => preRef.current as HTMLPreElement, []);
-  const viewportRef = React.useRef<HTMLDivElement>(null);
-  const height = useMotionValue(0);
-  const floor = React.useRef(0);
-  const renderedHeight = useTransform(height, (value) => clampMeasuredSize(value, floor.current));
+  const { node: preRef, ref: contentRef } = useMotionHostRef<HTMLPreElement>(ref);
+  const { node: viewportRef, ref: viewportCallback } = useMotionHostRef<HTMLDivElement>();
+  const cm = useCadenceMotion(viewportRef);
+  const [localTransaction] = React.useState(createMotionTransaction);
+  const presentation = usePresentationScope();
+  const transaction = presentation?.transaction ?? localTransaction;
+  const geometry = React.useRef<ReturnType<typeof createMeasuredGeometry> | null>(null);
+  const latest = React.useRef({ folded: false, maxLines: undefined as number | undefined });
+  const semantic = React.useRef<{ inputs: unknown[]; target: object } | null>(null);
   const [measured, setMeasured] = React.useState(false);
 
   const maxLines = block?.maxLines;
   const language = languageProp ?? block?.language;
-  // Called unconditionally: a hook cannot be hidden behind `typeof children ===
-  // "string"`, and an empty source costs nothing (the hook returns `null` and never
-  // loads a grammar for it).
   const highlighted = useHighlightedCode(typeof children === "string" ? children : "", language);
   const expanded = block?.expanded ?? true;
   const folded = maxLines !== undefined && !expanded;
   const setOverflowing = block?.setOverflowing;
+  const foldable = maxLines !== undefined;
 
   useIsomorphicLayoutEffect(() => {
+    latest.current = { folded, maxLines };
     const pre = preRef.current;
-    if (!pre || maxLines === undefined) return;
-
-    const measure = () => {
-      if (!pre.getClientRects().length) return;
-      const styles = window.getComputedStyle(pre);
-      const lineHeight = Number.parseFloat(styles.lineHeight);
-      const top = Number.parseFloat(styles.paddingTop);
-      const full = pre.scrollHeight;
-      // Follow computed font metrics. Exclude bottom padding and round down to
-      // keep the fold on a line boundary.
-      const foldedHeight = Number.isFinite(lineHeight) ? top + Math.floor(lineHeight * maxLines) : full;
-      const target = Math.min(folded ? foldedHeight : full, full);
-      floor.current = Math.min(foldedHeight, full);
-
-      setOverflowing?.(full - foldedHeight > 1);
-
-      if (!measured || cm.transition("geometry.resize").duration === 0) {
-        // First measurement is static. Write the fold before paint because Motion
-        // flushes the motion value next frame; showing full height first causes CLS.
-        height.jump(target);
-        if (viewportRef.current) viewportRef.current.style.height = `${target}px`;
+    const viewport = viewportRef.current;
+    if (!pre || !viewportRef.current || !foldable) return;
+    const controller = createMeasuredGeometry(transaction);
+    geometry.current = controller;
+    controller.register({
+      host: viewportRef,
+      content: pre,
+      axes: ["height"],
+      maintained: true,
+      measure: () => {
+        const { folded, maxLines } = latest.current;
+        const styles = pre.ownerDocument.defaultView?.getComputedStyle(pre);
+        if (!styles || maxLines === undefined) return null;
+        const lineHeight = Number.parseFloat(styles.lineHeight);
+        const top = Number.parseFloat(styles.paddingTop) || 0;
+        const borderTop = Number.parseFloat(styles.borderTopWidth) || 0;
+        const edges = [styles.paddingTop, styles.paddingBottom, styles.borderTopWidth, styles.borderBottomWidth].reduce(
+          (sum, value) => sum + (Number.parseFloat(value) || 0),
+          0,
+        );
+        const usedHeight = Number.parseFloat(styles.height);
+        const outerHeight = Number.isFinite(usedHeight)
+          ? usedHeight + (styles.boxSizing === "border-box" ? 0 : edges)
+          : pre.offsetHeight;
+        const hostStyle = viewport?.ownerDocument.defaultView?.getComputedStyle(viewport);
+        const hostEdges =
+          hostStyle?.boxSizing === "border-box"
+            ? [
+                hostStyle.paddingTop,
+                hostStyle.paddingBottom,
+                hostStyle.borderTopWidth,
+                hostStyle.borderBottomWidth,
+              ].reduce((sum, value) => sum + (Number.parseFloat(value) || 0), 0)
+            : 0;
+        const full = Math.max(0, outerHeight + hostEdges);
+        const fold = Math.max(
+          0,
+          Number.isFinite(lineHeight) ? borderTop + top + Math.floor(lineHeight * maxLines) + hostEdges : full,
+        );
+        const focused = pre.contains(pre.ownerDocument.activeElement);
+        const size = Math.min(folded && !focused ? fold : full, full);
+        setOverflowing?.(full - fold > 1);
         setMeasured(true);
-        return;
-      }
-
-      animateSingleValue(height, target, cm.transition("geometry.resize"));
+        return {
+          height: {
+            size,
+            min: Math.min(fold, full),
+            max: full,
+            readable: true,
+            independent: true,
+            resting: folded && !focused ? `${size}px` : "auto",
+          },
+        };
+      },
+    });
+    return () => {
+      controller.dispose();
+      if (viewport) viewport.style.height = "";
+      if (geometry.current === controller) geometry.current = null;
     };
+  }, [foldable, preRef, setOverflowing, transaction, viewportRef]);
 
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(pre);
-    return () => observer.disconnect();
-  }, [cm, folded, height, maxLines, measured, setOverflowing]);
-
-  useIsomorphicLayoutEffect(() => () => height.stop(), [height]);
+  useIsomorphicLayoutEffect(() => {
+    latest.current = { folded, maxLines };
+    // Accepted explicit source/fold props create the semantic revision here,
+    // never a render or a passive observer notification.
+    const inputs = [children, folded, maxLines, wrap];
+    if (!semantic.current || inputs.some((value, index) => !Object.is(value, semantic.current?.inputs[index])))
+      semantic.current = { inputs, target: {} };
+    geometry.current?.commit(transaction.revision("content", semantic.current.target, preRef.current), {
+      reduced: cm.reduced,
+      transition: cm.transition("geometry.resize"),
+      available: presentation?.available(),
+    });
+  });
 
   return (
-    <motion.div
-      ref={viewportRef}
+    <div
+      ref={viewportCallback}
       data-slot="code-block-viewport"
       data-motion={cm.mode}
-      style={
-        measured
-          ? { height: renderedHeight }
-          : folded
-            ? ({ "--code-block-max-lines": maxLines } as React.CSSProperties)
-            : undefined
-      }
+      style={!measured && folded ? ({ "--code-block-max-lines": maxLines } as React.CSSProperties) : undefined}
       className={cn(
         "min-h-0 overflow-hidden",
         // Reserve the initial fold before hydration can move a fragment target.
@@ -779,7 +776,7 @@ function CodeBlockContent({
       )}
     >
       <pre
-        ref={preRef}
+        ref={contentRef}
         data-slot="code-block-content"
         data-wrap={wrap || undefined}
         data-numbered={lineNumbers || undefined}
@@ -817,7 +814,7 @@ function CodeBlockContent({
           </code>
         </CodeBlockContentContext.Provider>
       </pre>
-    </motion.div>
+    </div>
   );
 }
 

@@ -128,7 +128,9 @@ it("CodeBlock caller list ref preserves keyboard context", () => {
 });
 it("CodeBlock caller content ref preserves fold measurement context", () => {
   const ref = createRef<HTMLPreElement>();
-  const scroll = vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(400);
+  const size = vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockImplementation(function (this: HTMLElement) {
+    return this.tagName === "PRE" ? 400 : 0;
+  });
   const rects = vi
     .spyOn(HTMLElement.prototype, "getClientRects")
     .mockReturnValue([new DOMRect()] as unknown as DOMRectList);
@@ -142,7 +144,7 @@ it("CodeBlock caller content ref preserves fold measurement context", () => {
   );
   expect(ref.current).toBe(document.querySelector('[data-slot="code-block-content"]'));
   expect(screen.getByRole("button", { name: "Show all" })).toBeInTheDocument();
-  scroll.mockRestore();
+  size.mockRestore();
   rects.mockRestore();
 });
 

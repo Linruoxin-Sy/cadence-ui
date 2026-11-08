@@ -8,7 +8,7 @@ complexity: M
 tier: T5
 since: 0.5.0
 deps: ["class-variance-authority", "lucide-react", "motion"]
-registryDeps: ["@cadence/button", "@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/code-highlight"]
+registryDeps: ["@cadence/button", "@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/code-highlight", "@cadence/cadence-geometry"]
 ---
 
 ## Installation
@@ -761,6 +761,7 @@ Three notes on the choices:
   clamped to the content so it can never settle above or below the real size.
 - Under reduced motion the height change is a jump on purpose. Unfolding is information — the reader asked to see
   more lines — and a 200 ms layout tween is exactly the motion the reduced mode exists to remove.
+- Explicit source and fold commits may resize in full mode. Font arrival, viewport reflow and unknown observer changes use current natural layout immediately. Hidden content establishes a fresh baseline when measurable; focus inside the source exposes its full height immediately. The source tree is never cloned for measurement, and completed expansion releases the temporary height to `auto`.
 - The tab pill is a shared element only in full mode. Reduced motion drops the `layoutId`, so the pill is painted
   where the selection landed: which tab is current is information, the travel between them is not. A panel change
   never animates its height for the same reason.

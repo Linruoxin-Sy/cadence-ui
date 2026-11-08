@@ -119,6 +119,22 @@
       ]
     },
     {
+      "name": "cadence-geometry",
+      "type": "registry:lib",
+      "title": "Measured geometry",
+      "description": "Internal bounded measured geometry controller for natural content hosts.",
+      "categories": ["foundation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/measured-geometry.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/measured-geometry.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-theme",
       "type": "registry:theme",
       "title": "Cadence theme",
@@ -1497,7 +1513,8 @@
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
         "@cadence/cadence-provider",
-        "@cadence/code-highlight"
+        "@cadence/code-highlight",
+        "@cadence/cadence-geometry"
       ],
       "files": [
         {

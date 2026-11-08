@@ -37,6 +37,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/code-highlight](https://cadence.dev/r/code-highlight.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -60,6 +61,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | code-highlight | `@components/cadence/code-highlight/highlight.tsx` | [JSON files[].content](https://cadence.dev/r/code-highlight.json) |
 | code-highlight | `@components/cadence/code-highlight/use-highlighted-code.tsx` | [JSON files[].content](https://cadence.dev/r/code-highlight.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | code-block | `@components/cadence/code-block/index.tsx` | [JSON files[].content](https://cadence.dev/r/code-block.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -71,6 +73,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 [Source files: button](https://cadence.dev/r/button.json)
 
 [Source files: code-highlight](https://cadence.dev/r/code-highlight.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: code-block](https://cadence.dev/r/code-block.json)
 
@@ -960,6 +964,7 @@ Three notes on the choices:
   clamped to the content so it can never settle above or below the real size.
 - Under reduced motion the height change is a jump on purpose. Unfolding is information — the reader asked to see
   more lines — and a 200 ms layout tween is exactly the motion the reduced mode exists to remove.
+- Explicit source and fold commits may resize in full mode. Font arrival, viewport reflow and unknown observer changes use current natural layout immediately. Hidden content establishes a fresh baseline when measurable; focus inside the source exposes its full height immediately. The source tree is never cloned for measurement, and completed expansion releases the temporary height to `auto`.
 - The tab pill is a shared element only in full mode. Reduced motion drops the `layoutId`, so the pill is painted
   where the selection landed: which tab is current is information, the travel between them is not. A panel change
   never animates its height for the same reason.

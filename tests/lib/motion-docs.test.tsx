@@ -131,7 +131,7 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
       ),
       true,
     );
-    expect(result.status).toBe(0);
+    expect(result.status, result.output).toBe(0);
   });
 
   it("rejects duplicate meta.motion even when frontmatter and table sets agree", async () => {

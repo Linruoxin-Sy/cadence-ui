@@ -262,6 +262,10 @@ acceptance distinction. The design and installed behaviour remain distinguishabl
 
 ### Phase 2: Shared capabilities and primitive contracts
 
+The internal measured-geometry scope has an initial CodeBlock fold adapter. It uses explicit committed revisions, one outer owner per compound axis and natural-layout destinations, with temporary replace effects over native sizing. This limited integration does not migrate CodeBlock's other capabilities or the remaining disclosure, surface and control adapters. Component-level motion v2 markers remain gated by their complete contracts.
+
+Each internal geometry scope coordinates one cause; independent lifetimes use separate scopes and may share the transaction for aggregate budgets. React adapters bind physical cleanup through `useMotionHostRef`. Imperative adapters must dispose their registration/scope from their actual native lifecycle and register a fresh baseline on reconnection; there is no general DOM-removal scanner. A natural-region observer also rejects unavailable boxes defensively, without treating their missing layout as a zero-size destination.
+
 Depends on Phase 1. Implement the workstreams in section 3 and settle the minimal public primitive
 APIs, registry dependencies and examples. Separate pure diff/number algorithms from DOM controllers;
 measure only the nodes that own content-driven geometry. Reuse existing motion/engine integration
