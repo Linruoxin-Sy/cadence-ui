@@ -206,6 +206,15 @@ retry a queued obsolete transaction. The semantic value is always current.
 Each preset's full-mode parameters above are subject to these property-specific results. A component
 action may use a narrower documented subset, but cannot retain a property that the mode removes.
 
+Select an eligible committed cause before resolving a preset's clock. Under the
+[committed-change contract](../animation-system.md#coordinating-one-committed-change), rejected
+requests and uncommitted intermediate targets create no action in any mode. Same-target renders
+preserve eligible in-flight work, while native reset/restoration establishes current control paint
+immediately in full, reduced and none. A delayed direct-input echo retains the direct-operation
+path; unknown correspondence does not grant a programmatic spring or readout reel. These gates do
+not change the preset's duration, add another zero-time preset or bypass same-target mode/clock
+cancellation. A later genuinely independent programmatic revision remains eligible under its binding.
+
 For `state.color`, the assigned tween is conditional on the colour owner's current state and readable
 intermediate paint. When that owner contains native DOM focus (including focus-within) or carries
 invalid state, apply its entire declared paint set immediately in full and reduced as well as none;

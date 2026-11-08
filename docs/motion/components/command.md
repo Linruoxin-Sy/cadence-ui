@@ -77,6 +77,13 @@ An already visible CommandEmpty dispatches a direct string to `label.change` and
 
 ## Interruption and lifecycle
 
+Query-associated results and Empty counts remain query-driven when their accepted update arrives
+after typing stops. Do not use a quiet interval or current focus to turn that response into a discrete
+numeric animation. Known query-related or uncorrelated updates use immediate numeric display in all
+modes; an independently identified visible Empty revision retains `empty.roll` eligibility. Data
+ordering and asynchronous search remain caller-owned. Present what cmdk/caller actually accepts,
+without a motion-owned request queue, filter rerun or rejection of caller data.
+
 CommandDialog inherits Dialog's actual-focus gate as well as its preset. Its native initial focus commonly lands in CommandInput, so the panel entry may settle immediately while Dialog's separate backdrop still fades. Inline Command likewise settles a root entrance that would hide its focused editor. Do not delay autofocus, native editing or command execution to finish a palette entrance.
 
 - cmdk retains filtering, scoring, selection, loop/vim bindings and pointer-selection settings. Enter/click executes immediately; motion adds no business command or artificial loading phase.
@@ -96,6 +103,11 @@ CommandDialog inherits Dialog's actual-focus gate as well as its preset. Its nat
 List-height animation below the editor may continue only while that editor's content box, caret and scroll stay stable. The stock CommandDialog's fixed top placement can satisfy that condition; a caller's centering/wrapping layout that would move the editor must settle the affected dependent axis. Do not freeze native typing or replay the suppressed resize on blur.
 
 ## Acceptance scenarios
+
+- Pending: a delayed query-associated Empty count, an unknown-cause count and an independent visible
+  quantity revision after typing stops. The first two stay immediate; only the last is eligible for
+  its normal reel. Caller-accepted data, cmdk selection and execution stay current in every mode,
+  including after a later response or close invalidates earlier visual callbacks.
 
 - Pending: fast typing/IME, scoring changes, empty results, disabled commands, keyboard/vim navigation and Enter selection remain immediate.
 - Pending: changing partial labels and explicit counts preserves stable rows; shortcut digits and screen-reader-only dialog names never roll.

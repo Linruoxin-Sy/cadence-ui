@@ -1239,6 +1239,37 @@ the target did not change. Resuming full does not replay settled or consumed tra
 state, focus, disabled/error/success and accessible names commit immediately; no animation queue or
 minimum working interval delays them.
 
+Distinguish an input request, an accepted semantic commit and a presentation target. A callback,
+new array/object instance or repeated render is not by itself a new action. Compare the known
+owner's actual state/content and identity, without deep-scanning arbitrary caller trees. Rejected
+controlled requests start no selection, value, text or size animation. Independent accepted press
+feedback may still run. Batched A → B → A with no committed B has no B presentation; if B did commit,
+the later A is a real reversal from current paint. An unchanged semantic target preserves an eligible
+current flight rather than restarting or forcibly settling it. Mode, clock, environment, ownership
+and lifetime changes still apply even when that target is unchanged.
+
+Direct-input provenance survives a delayed controlled echo when the existing primitive/integration
+can identify it. A Slider value accepted after pointer release is not thereby an unrelated
+programmatic animation. The same applies to keyboard edits and composed readouts. Use the native
+accepted revision/cause where available; do not classify by elapsed time, current focus, an event
+handler's identity or equality with an indefinitely retained requested value. If correspondence is
+unknown, preserve native presentation immediately for the affected direct-input geometry/readout.
+This does not disable local indicator feedback on discrete Checkbox, Radio or Switch selections.
+
+A native form reset or browser-restored control state, when actually accepted by the primitive,
+establishes its current presentation immediately in all three modes. It is not a click, selection
+journey, count from zero or a second completion event. Cancel obsolete value/glyph/reel projection
+for that reset, including a same-target flight; retain the native reset cancellation, controlled-value
+and callback rules. A cancelled reset creates no reset boundary; an ordinary equal-value echo creates
+no new motion revision. No animation-only reset handler
+may force state, synthesize change/commit callbacks or clear native gesture ownership.
+
+Latest means latest **accepted commit**, not the newest network-request timestamp. Application data
+ordering remains caller-owned: motion must display a value the caller actually commits even if it
+came from an older request. Reject retired animation/measurement deliveries, not valid caller data.
+An internally owned resource such as an image or highlighter result still checks its actual source
+and owner lifetime. These are internal cause rules, not a new public transaction prop or request queue.
+
 ## 5. Composition-layer API
 
 ### 5.1 Runtime compatibility surface

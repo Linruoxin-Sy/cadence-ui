@@ -119,6 +119,14 @@ An already visible ComboboxEmpty dispatches a direct string to `label.change` an
 
 ## Interruption and lifecycle
 
+An asynchronous result/Empty revision associated with the current query remains query-driven even
+after keystrokes stop; a quiet interval does not make its count a discrete non-query quantity update.
+Keep that query-driven numeric display immediate in all modes. Use an existing known cause, not a
+new request API or timestamp heuristic; unknown correspondence takes the immediate numeric fallback.
+The caller still owns which results it commits. Motion does not reject caller data as stale, run the
+filter again or change active-descendant resolution. A genuinely independent visible Empty quantity
+revision retains the `empty.roll` eligibility above.
+
 With the ordinary input outside the popup, focus stays in that editor and popup entry can run without moving it. If an inside-popup input/popup receives native initial focus, or keyboard interaction requires an active result to be immediately visible and stationary, settle the affecting popup envelope first. Preserve Base UI's actual initial-focus policy; do not blur, refocus or delay the editor to guarantee entry.
 
 - Base UI owns input, IME, active descendant, selection, filtering and focus safety. Never remount the input or delay results until outgoing rows finish.
@@ -137,6 +145,11 @@ With the ordinary input outside the popup, focus stays in that editor and popup 
 - Parent Input Group or a surrounding panel consumes the same committed chip/list destination or delegates that cause; it must not run a second spring chasing either host. Virtualized placement belongs to its actual virtualizer, including recycled item identity; unavailable safe natural measurement uses immediate geometry.
 
 ## Acceptance scenarios
+
+- Pending: deliver query-associated results and an Empty count after typing stops, then deliver a
+  known independent count revision. The query-associated/unknown count remains immediate while the
+  independent revision retains its normal eligibility. A caller-committed older response is still
+  displayed; only retired animation callbacks are rejected, with no library request ordering policy.
 
 - Pending: IME, rapid typing, empty results, clear, keyboard selection and result replacement preserve native caret/focus without stale exits.
 - Pending: multi-chip insertion/removal and wrapping with a popup anchored through `useComboboxAnchor` do not produce competing geometry writers.

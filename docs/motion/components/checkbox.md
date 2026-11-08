@@ -41,6 +41,11 @@ The box acknowledges selection through its fill and its local check or mixed-sta
 
 ## Interruption and lifecycle
 
+- Accepted native reset/restoration places the actual checked/mixed/unchecked glyph immediately in
+  full, reduced and none and retires old indicator work. A cancelled reset or rejected controlled
+  request is not a check/uncheck action. Do not synthesize input/change callbacks or infer a mixed-state
+  reset value independently of Base UI. Equal accepted state preserves an otherwise eligible flight;
+  it does not restart the mark merely because the control rerendered.
 - Checked and indeterminate semantics update before animation. Rapid changes retarget the same indicator; no queued checks or delayed form values.
 - Unchecking reverses from the current visual state. Parent removal owns exit and cancels the local mark transition; Checkbox never delays unmount by itself.
 - Disable/read-only changes preserve the actual checked/mixed state and native form rules; this design adds no separate press-scale animation to cancel. Focus styling becomes visible immediately.
@@ -54,6 +59,10 @@ The box acknowledges selection through its fill and its local check or mixed-sta
 - A list of 20 changing checkboxes must not trigger 20 independent parent entrances. External label layout remains with its owner.
 
 ## Acceptance scenarios
+
+- Pending: reset during a mixed-to-checked flight and compare a prevented reset, unchanged controlled
+  echo and rejected activation. All three modes reflect only accepted native state, with no extra
+  callback, stale mark or replay. A later ordinary accepted selection remains eligible for feedback.
 
 - Pending: toggle checked → mixed → unchecked rapidly; final semantics, form value and mark agree without stale glyphs.
 - Pending: verify keyboard, read-only, invalid and disabled paths in all modes, including a mid-transition downgrade and zero clock.

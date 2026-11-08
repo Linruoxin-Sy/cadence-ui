@@ -74,6 +74,16 @@ Preserve Base UI's actual focus/list-navigation target when the popup opens. If 
 
 The handoff controller is hosted by SelectTrigger and captures one safe source run in SelectItem for the SelectValue destination; it is not owned by a recursively split Value subtree. The item selection marker alone uses `indicator.select`. The Trigger chevron retains its existing static orientation/opacity, and separator/scroll-button paint joins the existing surface controller without a new state animation.
 
+A source capture is a candidate, not an accepted selection. Bind it to the actual requested item and
+owner lifetime; consume it only for the matching accepted revision with still-valid source/destination
+mapping. A rejected, replaced or uncorrelated delayed request cannot lend its origin to a later value
+that happens to compare equal. Do not keep a request queue or infer correspondence from a time window.
+Where acceptance cannot be correlated safely, use the existing local changed-run fallback. This does
+not discard a later value committed by the caller or turn application request ordering into UI policy.
+Native reset/restoration establishes the accepted value, width and marker baseline immediately in
+full, reduced and none; no handoff origin or numeric story is inferred. Cancelled resets retain the
+current accepted presentation and follow the native callback contract.
+
 ## Geometry and performance
 
 - Keep trigger and source anchor rectangles stable while measuring; press transforms cannot distort handoff coordinates. Base UI positioner remains the sole popup placement writer.
@@ -85,6 +95,11 @@ The handoff controller is hosted by SelectTrigger and captures one safe source r
 When `alignItemWithTrigger` gives Base UI active positioner/popup-height control, use that owner's immediate measured target unless a verified single-owner adapter can consume the revision. Do not animate an independent popup shell height while Base UI expands/repositions it for item alignment or scroll-arrow operation. Only a free, safely separated content axis uses `content.resize`. Native scroll-arrow interaction and its required frame/timer work remain available under reduced/none and zero recipe clock; it is not an autonomous decoration.
 
 ## Acceptance scenarios
+
+- Pending: capture a visible option, reject its controlled request, then commit that same value later
+  from an unrelated update; no old-origin flight is allowed. Compare correlated delayed acceptance,
+  closed/replaced source ownership and an accepted/cancelled reset in all modes. Exact current labels,
+  native form state and callback counts survive, with local diff or immediate reset as specified.
 
 - Pending: a safe single changed run can hand off from a real source; multiple runs and a one-character retained island choose local replacement while every retained grapheme remains still.
 - Pending: keyboard/external changes, rich render callbacks, multiple values and absent/offscreen origins choose a safe local presentation without duplicate accessibility text.

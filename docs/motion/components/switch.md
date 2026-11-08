@@ -42,6 +42,10 @@ The thumb makes the binary state legible by travelling inside the measured track
 
 ## Interruption and lifecycle
 
+- Accepted native reset/restoration cancels thumb travel and establishes the current checked endpoint
+  and state paint immediately in full, reduced and none, without a synthetic toggle or callback.
+  A cancelled reset or rejected request is not a checked revision. An equal accepted checked value
+  preserves a valid flight; mode, zero-clock and geometry-invalidating changes still take precedence.
 - Checked semantics/form state update immediately. Rapid toggles reverse the same thumb writer without accumulating travel.
 - The first valid measurement places the thumb immediately. An intentional size-prop revision during a toggle retargets the endpoint from current presentation through the coordinated size transaction below. Passive font/viewport/caller-layout changes or an invalidated direction/coordinate frame instead cancel that obsolete projection and establish the current checked endpoint immediately. A measurement delivery alone never starts another toggle or size spring.
 - A controlled callback is not a committed checked change. Native form/reset/read-only rules and the caller's actual accepted value remain authoritative in every mode; returning to full does not replay the current position.
@@ -64,6 +68,10 @@ the track to its current size/caller constraints, without leaving the old pixel 
 later endpoint measurement.
 
 ## Acceptance scenarios
+
+- Pending: reset during simultaneous thumb/size motion, cancel a reset, reject a controlled toggle
+  and rerender the same checked value in all modes. Use only the native accepted reset state; stale
+  thumb/measurement callbacks cannot restore the old endpoint or emit a second change.
 
 - Pending: apply supported individual-transform placement, change size while toggling, then resize
   the parent after settling. Verify the checked endpoint and valid travel interval without doubled

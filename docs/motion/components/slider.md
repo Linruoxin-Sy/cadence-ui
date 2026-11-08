@@ -45,6 +45,15 @@ The active thumb feels attached to the user's input. Rich feedback comes from th
 
 ## Interruption and lifecycle
 
+- The direct/programmatic distinction follows the accepted value's cause, not whether the pointer
+  happens to be held at commit time. A delayed controlled echo of pointer or keyboard input uses
+  `position.input` and an immediate composed readout, including after release. Unknown correspondence
+  takes that immediate path; it does not guess a new programmatic spring from a cleared dragging flag.
+  Preserve a reliably identified later independent programmatic action's existing eligibility.
+- Native reset/restoration uses the same immediate native geometry/readout path in full, reduced and
+  none, after the primitive accepts the state. Cancel obsolete projections without changing reset
+  cancellation, hidden inputs, thumb identity or callback counts. A rejected request, cancelled reset
+  or equal accepted value creates no new position action; mode/clock restrictions still apply.
 - Dragging or keyboard manipulation cancels any programmatic interpolation before the next position is presented. Values, callbacks, hidden inputs and aria values never wait for motion.
 - A new accepted programmatic target replaces the old target; no out-of-bounds bounce. Preserve `push`, `swap` and `none` collision behavior and the primitive's actual indexed thumb roles. Do not re-key thumbs by their changing numeric values. If thumb count, collision remapping or axis constraints invalidate a positional correspondence, cancel that visual projection and establish the current native placement immediately; a completion from the old role cannot move another thumb.
 - Disabling, losing capture, parent closure or removal clears press state and ends its writer; it must not invent a value commit or extra drag.
@@ -59,6 +68,12 @@ The active thumb feels attached to the user's input. Rich feedback comes from th
 - One active interaction controller, work proportional to rendered thumbs, and no observer or number roller for every pointer event. If a safe native programmatic adapter is unavailable, immediate placement is the accepted fallback.
 
 ## Acceptance scenarios
+
+- Pending: delay a controlled pointer/keyboard echo until after release, then issue a known unrelated
+  programmatic update. The echo and its readout are immediate; the independent update retains eligible
+  full-mode motion. Repeat with unknown correspondence, a rejected request, equal array values in a new
+  array, and accepted/cancelled form reset in all modes. No stale spring, replay or duplicate callback
+  is introduced; existing accepted input and collision semantics remain authoritative.
 
 - Pending: pointer, keyboard, Page/Home/End, vertical and RTL multi-thumb interaction remain 1:1 and preserve collision/minimum-separation behavior.
 - Pending: begin dragging during an external update and verify immediate handover without jump, lag or duplicate value callbacks.

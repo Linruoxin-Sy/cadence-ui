@@ -346,6 +346,14 @@ revision. Add an interruption scenario wherever a local cancellation rule could 
 these distinctions. First appearance of a display slot establishes its exact content baseline;
 numeric replacement applies only to later applicable value revisions, not an invented count from zero.
 
+Review request/commit correspondence under the
+[shared cause rules](../animation-system.md#coordinating-one-committed-change). Include a rejected
+request, an equal-value rerender during a flight, batched versus separately committed A → B → A,
+and delayed controlled direct-input echoes where relevant. Compare accepted native reset/restoration
+with a cancelled reset; neither may create a synthetic change/completion callback. An ordinary
+unrelated update must still animate when eligible. Missing provenance uses the declared immediate
+fallback, not a guessed timeout, a permanent suppression flag or a motion-owned application queue.
+
 Check external ref handoff separately from node/entity replacement: the former preserves an eligible
 in-flight animation, while the latter rejects retired writes. Check inherited bindings against the
 dependency's actual part, preset and property subset, not just against the global list of valid names.

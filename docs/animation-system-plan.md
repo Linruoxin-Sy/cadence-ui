@@ -266,6 +266,15 @@ APIs, registry dependencies and examples. Separate pure diff/number algorithms f
 measure only the nodes that own content-driven geometry. Reuse existing motion/engine integration
 instead of creating a second rendering runtime.
 
+Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
+presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).
+Prove rejected requests, equal-target rerenders during a legal flight, batched versus committed
+A → B → A, delayed controlled pointer/keyboard echoes, and accepted versus cancelled native resets
+in all three modes. Unknown direct-input correspondence takes the immediate native path without
+blocking later independent actions. Motion never rejects caller-committed data as a network-race
+policy or synthesizes reset/change/completion callbacks. Include these cases in the affected control
+and readout migrations; this design review does not claim their execution or introduce a public API.
+
 Implement bounded segmentation/diff and reel work at both the owned slot and known coordinated
 revision scope. Prove overflow fallback, mixed text/numeric transactions, formatter-only changes,
 direction reversal and hidden-owner cancellation without queuing old states. Geometry acceptance

@@ -42,6 +42,11 @@ Only slots whose code characters actually change receive a local replacement cue
 
 ## Interruption and lifecycle
 
+- A delayed accepted echo of an edit still belongs to that native edit; an unchanged code does not
+  replay slots just because the callback or value container was recreated. Native reset/restoration
+  establishes the accepted slot characters immediately in full, reduced and none, cancelling old
+  replacement paint. Preserve the upstream input's actual reset and completion behavior; animation
+  neither adds a reset implementation nor emits `onChange`/`onComplete` from visual completion.
 - `onChange` and `onComplete` fire on accepted input, never after visual completion. IME, paste transformation, read-only and selection behavior remain owned by `input-otp`.
 - A new character retargets the same slot; backspace cancels the outgoing replacement and clears the semantic code immediately. Pasting commits every changed slot in the same transaction.
 - Moving focus or caret does not animate characters. The mirrored active-slot state is not itself DOM focus-within on the slot; it does not globally disable eligible slot colour feedback. Invalid state on that colour owner still forces all its declared paint immediate. Parent close/removal cancels presentation without changing the code or emitting a completion event.
@@ -56,6 +61,11 @@ Only slots whose code characters actually change receive a local replacement cue
 - Clip only each decorative glyph lane. Preserve the input's hit region, focus outline, screen-reader value and copy/paste text without duplicate accessible characters.
 
 ## Acceptance scenarios
+
+- Pending: an equal-code controlled echo during replacement, a delayed accepted paste, and native
+  reset/restoration where supported. Compare a cancelled reset and rejected edit in all modes; slots
+  never replay uncommitted characters or produce a second input/completion event. Preserve the real
+  native selection and existing upstream callback behavior.
 
 - Pending: type, replace one middle character, backspace and paste a full code; unchanged slots remain still and completion timing is unchanged.
 - Pending: verify native selection, read-only, transformed paste and composition input without rolling numeric codes.
