@@ -286,10 +286,16 @@ instead of creating a second rendering runtime.
 
 Internal text planning in `registry/cadence/lib/text-diff.ts` provides bounded grapheme segmentation,
 ordered retained identities, changed-run offsets and pure aggregate preflight. Its shaping gate requires
-an adapter's actual boundary proof; segmentation alone never authorizes splitting text. This module is
-not yet registered or imported by component/runtime owners. DOM eligibility (including inherited native
-editing), shaping/layout proof, rendering, lifecycle integration, distribution and the installable
-AnimatedText primitive remain pending. Pure algorithm evidence does not establish `text.change` support.
+an adapter's actual boundary proof; segmentation alone never authorizes splitting text. An internal
+plain-string DOM controller and React adapter now consume that planning with actual-font raster and
+native Range proof, bounded pixel-only opacity paint, native selection/editing exclusions, transaction
+budgets and live cancellation. The semantic value remains one native Text node; no inline splitting
+or typography override is used. Unknown scripts/features, highlights, layout or clipping stay immediate.
+Existing captured-origin support composes only a complete single-unit destination; partial strings
+remain changed-only local replacements. These modules are not registered or imported by catalogue
+owners. The installable AnimatedText API, recipe/parser/metadata recognition, public guide/examples,
+registry distribution and actual copied-install/production acceptance remain pending together.
+Internal DOM evidence does not publish `text.change` or migrate a component.
 
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).

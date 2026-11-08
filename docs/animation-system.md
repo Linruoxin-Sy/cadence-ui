@@ -621,7 +621,8 @@ positioning, not motion. Bubble has no streaming runtime or measured geometry.
 ### 3.1.0 V2 recipe additions
 
 `state.color` is supported by the shared CSS executor and resolver. Component adoption is separate;
-no catalogue item gains it through a dependency. `text.change` remains unimplemented.
+no catalogue item gains it through a dependency. `text.change` has a staged internal plain-string
+controller; its public recipe, distribution and AnimatedText primitive remain pending together.
 
 | Target recipe | Properties and cause                                                                                  | Mode/cancellation contract                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -1186,6 +1187,32 @@ letter/word spacing, font features and inline layout. Do not introduce inline-bl
 ligatures merely to obtain character transforms. Use a safe shaping run when it preserves the original
 rendering; otherwise keep exact immediate text. Animation cannot change wrapping or typography as an
 undeclared side effect of adding spans.
+
+The internal plain-string controller keeps one native Text node, including its retained content.
+It proves the actual font's whole-string raster against independently painted units and reads the
+real host's native Range boxes only at commits. It never splits the semantic tree to obtain opacity
+targets: native text-run rounding itself can change layout when Text nodes are split. Raster proof
+and aggregate local paint are limited to 262144 pixels and a 4096-pixel axis; unsupported font
+features, scripts, clipping or correspondence remain immediate. A private CSS Custom Highlight range
+temporarily masks only the incoming changed paint while pixel-only canvases own opacity. This is a
+static visibility mask, not a state-colour tween; foreign highlights, selection/find and native editing
+take precedence. Mask removal and canvas cancellation expose the exact current native text together.
+This requires Custom Highlight and constructable stylesheet support, with immediate fallback when
+unavailable. No glyph inline-block, typography override, extra text tree or outer geometry writer is added.
+A temporary empty baseline probe must leave native layout rectangles unchanged and is removed before paint.
+Entering editing cancels paint without rewriting its existing tree; leaving editing establishes a
+fresh baseline. The existing captured-origin adapter can compose only when the entire destination
+is its one safe incoming unit; partial-string mappings stay local until a Range-aware handoff exists.
+This internal strategy does not publish AnimatedText or certify a catalogue component. See the
+[Custom Highlight model](https://www.w3.org/TR/css-highlight-api-1/) for DOM-independent range styling.
+On Windows, pixel paint can use grayscale antialiasing while resting native text uses LCD subpixel
+antialiasing. This does not authorize a font, geometry or shaping change; browser raster checks
+distinguish that coverage difference from shifted or extra glyph pixels.
+The staged raster renderer currently accepts only unit device scale; other DPR/zoom mappings remain
+exact native text. DPR2 raster correspondence failed its actual browser check and is not certified.
+Unknown visual-viewport or containing-block/clipping correspondence also uses native immediate text.
+A native composition injects its dedicated captured-origin coordinator when needed; ordinary text
+does not import that engine. Supplying a capture without that owner uses local replacement.
 
 An active native text range or browser find target is a presentation constraint, not permission to
 replace the selection tree. If a split/replacement overlay cannot preserve it, settle that affected

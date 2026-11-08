@@ -63,6 +63,9 @@ export const motionLimits = {
   pendingTargets: 1,
 } as const;
 
+/** Commit-time text correspondence allocation ceilings; not motion parameters. */
+export const textProofLimits = { pixels: 262144, axis: 4096 } as const;
+
 /**
  * The point at which a spring is ~97% of the way to its target, relative to
  * the authored `visualDuration`. Copied from motion-dom 13.5.1 (`spring.ts`);
