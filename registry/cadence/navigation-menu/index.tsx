@@ -5,8 +5,8 @@ import { cva } from "class-variance-authority";
 import { ChevronDownIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "../lib/cn";
-import { duration, reducedDurationScale } from "../lib/motion";
-import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
+import { popupClockStyle, popupStyle } from "../lib/popup-style";
+import { type CadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 /** Base UI 1.6 focus sentinels are tabbable. They must not be aria-hidden.
  * Empty generic spans need no accessible name and keep their native focus redirection.
@@ -40,11 +40,7 @@ function useNavigationGuards(ref: React.Ref<HTMLElement> | undefined) {
 
 // Portals and explicit nested modes must own their clock, including full inside none.
 function clock(cm: CadenceMotion): React.CSSProperties {
-  const factor = cm.disabled ? 0 : (cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
-  return {
-    "--motion-duration-fast": `${duration.fast * factor}s`,
-    "--motion-duration-slow": `${duration.slow * factor}s`,
-  } as React.CSSProperties;
+  return popupClockStyle(cm);
 }
 
 // Preserve Base UI state callback classes; caller classes always merge last.
@@ -113,11 +109,12 @@ function NavigationMenuTrigger({ className, children, ...props }: NavigationMenu
 }
 
 function NavigationMenuContent({ className, style, ...props }: NavigationMenuPrimitive.Content.Props) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
-  return (
+  return withCadenceScope(
+    cm,
     <NavigationMenuPrimitive.Content
-      style={typeof style === "function" ? (state) => ({ ...clock(cm), ...style(state) }) : { ...clock(cm), ...style }}
+      style={popupStyle(cm, style)}
       data-slot="navigation-menu-content"
       data-motion={cm.mode}
       data-reduced={cm.reduced || undefined}
@@ -130,13 +127,15 @@ function NavigationMenuContent({ className, style, ...props }: NavigationMenuPri
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 
 function NavigationMenuPositioner({
   className,
   ref,
+  style,
   side = "bottom",
   sideOffset = 8,
   align = "start",
@@ -144,44 +143,49 @@ function NavigationMenuPositioner({
   ...props
 }: NavigationMenuPrimitive.Positioner.Props) {
   const guardRef = useNavigationGuards(ref);
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(guardRef);
 
   return (
     <NavigationMenuPrimitive.Portal>
-      <NavigationMenuPrimitive.Positioner
-        ref={guardRef}
-        data-slot="navigation-menu-positioner"
-        data-motion={cm.mode}
-        side={side}
-        sideOffset={sideOffset}
-        align={align}
-        alignOffset={alignOffset}
-        className={classes(
-          "isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width)",
-          className,
-        )}
-        {...props}
-      >
-        <NavigationMenuPrimitive.Popup
-          style={clock(cm)}
-          data-slot="navigation-menu-popup"
+      {withCadenceScope(
+        cm,
+        <NavigationMenuPrimitive.Positioner
+          ref={scopeRef}
+          data-slot="navigation-menu-positioner"
           data-motion={cm.mode}
-          className={cn(
-            "relative h-(--popup-height) w-(--popup-width) min-h-0 min-w-0 max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-md border bg-popover text-popover-foreground shadow-md ease-cadence-out duration-(--motion-duration-fast)",
-            !cm.disabled && "data-ending-style:opacity-0 data-starting-style:opacity-0",
-            cm.disabled
-              ? "transition-none"
-              : cm.reduced
-                ? "transition-opacity"
-                : "transition-[opacity,scale,width,height] duration-[var(--motion-duration-fast),var(--motion-duration-fast),var(--motion-duration-slow),var(--motion-duration-slow)] data-starting-style:scale-(--motion-scale-in) data-ending-style:scale-(--motion-scale-in)",
+          data-cadence-scope=""
+          style={popupStyle(cm, style)}
+          side={side}
+          sideOffset={sideOffset}
+          align={align}
+          alignOffset={alignOffset}
+          className={classes(
+            "isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width)",
+            className,
           )}
+          {...props}
         >
-          <NavigationMenuPrimitive.Viewport
-            data-slot="navigation-menu-viewport"
-            className="relative size-full overflow-auto"
-          />
-        </NavigationMenuPrimitive.Popup>
-      </NavigationMenuPrimitive.Positioner>
+          <NavigationMenuPrimitive.Popup
+            style={clock(cm)}
+            data-slot="navigation-menu-popup"
+            data-motion={cm.mode}
+            className={cn(
+              "relative h-(--popup-height) w-(--popup-width) min-h-0 min-w-0 max-h-(--available-height) max-w-(--available-width) origin-(--transform-origin) rounded-md border bg-popover text-popover-foreground shadow-md ease-cadence-out duration-(--motion-duration-fast)",
+              !cm.disabled && "data-ending-style:opacity-0 data-starting-style:opacity-0",
+              cm.disabled
+                ? "transition-none"
+                : cm.reduced
+                  ? "transition-opacity"
+                  : "transition-[opacity,scale,width,height] duration-[var(--motion-duration-fast),var(--motion-duration-fast),var(--motion-duration-slow),var(--motion-duration-slow)] data-starting-style:scale-(--motion-scale-in) data-ending-style:scale-(--motion-scale-in)",
+            )}
+          >
+            <NavigationMenuPrimitive.Viewport
+              data-slot="navigation-menu-viewport"
+              className="relative size-full overflow-auto"
+            />
+          </NavigationMenuPrimitive.Popup>
+        </NavigationMenuPrimitive.Positioner>,
+      )}
     </NavigationMenuPrimitive.Portal>
   );
 }

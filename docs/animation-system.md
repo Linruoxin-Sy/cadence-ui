@@ -178,10 +178,13 @@ export const spring = {
   travel: { type: "spring", visualDuration: 0.3, bounce: 0 },
   smooth: { type: "spring", visualDuration: 0.4, bounce: 0 },
   morph: { type: "spring", visualDuration: 0.42, bounce: 0 },
+  sizeCompact: { type: "spring", visualDuration: 0.28, bounce: 0 },
+  sizePanel: { type: "spring", visualDuration: 0.36, bounce: 0 },
 } as const;
 
 export const distance = { xs: 4, sm: 8, md: 12, lg: 24, xl: 48 } as const;
 export const scale = { in: 0.96, pop: 1.02, press: 0.97 } as const;
+export const rotation = { halfTurn: 180 } as const;
 export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
 ```
 
@@ -219,45 +222,206 @@ cancellation retains its separate contract.
 ### 2.3 CSS-side exposure
 
 ```css
-/* app/globals.css */
-@theme inline {
+/* Generated from registry/cadence/lib/motion.ts; pnpm motion:tokens. */
+@theme static {
   --ease-cadence-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-cadence-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-cadence-in: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
-:root {
-  --motion-duration-instant: 100ms;
-  --motion-duration-fast: 160ms;
-  --motion-duration-base: 220ms;
-  --motion-duration-slow: 320ms;
-  /* the CSS side of `scale.in`; anchored panels read it for their enter scale */
-  --motion-scale-in: 0.96;
-}
-
-/* the same 0.6 factor transitionFor() applies to tween recipes */
-[data-motion="reduced"] {
-  --motion-duration-instant: 60ms;
-  --motion-duration-fast: 96ms;
-  --motion-duration-base: 132ms;
-  --motion-duration-slow: 192ms;
-}
-
-/* `none` is a forced downgrade: a CSS popup must finish on the first frame */
-[data-motion="none"] {
-  --motion-duration-instant: 0ms;
-  --motion-duration-fast: 0ms;
-  --motion-duration-base: 0ms;
-  --motion-duration-slow: 0ms;
-}
-
-/* no provider, and therefore no data-motion attribute: the OS preference still
-   has to shorten the CSS-only clock */
-@media (prefers-reduced-motion: reduce) {
+@layer base {
   :root {
-    --motion-duration-instant: 60ms;
-    --motion-duration-fast: 96ms;
-    --motion-duration-base: 132ms;
-    --motion-duration-slow: 192ms;
+    --motion-source-version: 1;
+    --motion-source-duration-instant: 0.1s;
+    --motion-source-duration-fast: 0.16s;
+    --motion-source-duration-base: 0.22s;
+    --motion-source-duration-slow: 0.32s;
+    --motion-source-duration-page: 0.45s;
+    --motion-distance-xs: 4px;
+    --motion-distance-sm: 8px;
+    --motion-distance-md: 12px;
+    --motion-distance-lg: 24px;
+    --motion-distance-xl: 48px;
+    --motion-scale-in: 0.96;
+    --motion-scale-pop: 1.02;
+    --motion-scale-press: 0.97;
+    --motion-rotation-half-turn: 180deg;
+    --motion-stagger-char: 0.012s;
+    --motion-stagger-word: 0.035s;
+    --motion-stagger-item: 0.05s;
+    --motion-spring-press-duration: 0.24s;
+    --motion-spring-press-bounce: 0.12;
+    --motion-spring-snappy-duration: 0.26s;
+    --motion-spring-snappy-bounce: 0;
+    --motion-spring-travel-duration: 0.3s;
+    --motion-spring-travel-bounce: 0;
+    --motion-spring-smooth-duration: 0.4s;
+    --motion-spring-smooth-bounce: 0;
+    --motion-spring-morph-duration: 0.42s;
+    --motion-spring-morph-bounce: 0;
+    --motion-spring-size-compact-duration: 0.28s;
+    --motion-spring-size-compact-bounce: 0;
+    --motion-spring-size-panel-duration: 0.36s;
+    --motion-spring-size-panel-bounce: 0;
+    --motion-duration-instant: var(
+      --cadence-effective-instant,
+      calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-fast: var(
+      --cadence-effective-fast,
+      calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-base: var(
+      --cadence-effective-base,
+      calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-slow: var(
+      --cadence-effective-slow,
+      calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-page: var(
+      --cadence-effective-page,
+      calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+  }
+
+  [data-cadence-scope] {
+    --motion-source-duration-instant: var(--cadence-inherited-motion-source-duration-instant, inherit);
+    --motion-source-duration-fast: var(--cadence-inherited-motion-source-duration-fast, inherit);
+    --motion-source-duration-base: var(--cadence-inherited-motion-source-duration-base, inherit);
+    --motion-source-duration-slow: var(--cadence-inherited-motion-source-duration-slow, inherit);
+    --motion-source-duration-page: var(--cadence-inherited-motion-source-duration-page, inherit);
+    --motion-distance-xs: var(--cadence-inherited-motion-distance-xs, inherit);
+    --motion-distance-sm: var(--cadence-inherited-motion-distance-sm, inherit);
+    --motion-distance-md: var(--cadence-inherited-motion-distance-md, inherit);
+    --motion-distance-lg: var(--cadence-inherited-motion-distance-lg, inherit);
+    --motion-distance-xl: var(--cadence-inherited-motion-distance-xl, inherit);
+    --motion-scale-in: var(--cadence-inherited-motion-scale-in, inherit);
+    --motion-scale-pop: var(--cadence-inherited-motion-scale-pop, inherit);
+    --motion-scale-press: var(--cadence-inherited-motion-scale-press, inherit);
+    --motion-rotation-half-turn: var(--cadence-inherited-motion-rotation-half-turn, inherit);
+    --motion-stagger-char: var(--cadence-inherited-motion-stagger-char, inherit);
+    --motion-stagger-word: var(--cadence-inherited-motion-stagger-word, inherit);
+    --motion-stagger-item: var(--cadence-inherited-motion-stagger-item, inherit);
+    --ease-cadence-out: var(--cadence-inherited-ease-cadence-out, inherit);
+    --ease-cadence-in-out: var(--cadence-inherited-ease-cadence-in-out, inherit);
+    --ease-cadence-in: var(--cadence-inherited-ease-cadence-in, inherit);
+    --motion-spring-press-duration: var(--cadence-inherited-motion-spring-press-duration, inherit);
+    --motion-spring-press-bounce: var(--cadence-inherited-motion-spring-press-bounce, inherit);
+    --motion-spring-snappy-duration: var(--cadence-inherited-motion-spring-snappy-duration, inherit);
+    --motion-spring-snappy-bounce: var(--cadence-inherited-motion-spring-snappy-bounce, inherit);
+    --motion-spring-travel-duration: var(--cadence-inherited-motion-spring-travel-duration, inherit);
+    --motion-spring-travel-bounce: var(--cadence-inherited-motion-spring-travel-bounce, inherit);
+    --motion-spring-smooth-duration: var(--cadence-inherited-motion-spring-smooth-duration, inherit);
+    --motion-spring-smooth-bounce: var(--cadence-inherited-motion-spring-smooth-bounce, inherit);
+    --motion-spring-morph-duration: var(--cadence-inherited-motion-spring-morph-duration, inherit);
+    --motion-spring-morph-bounce: var(--cadence-inherited-motion-spring-morph-bounce, inherit);
+    --motion-spring-size-compact-duration: var(--cadence-inherited-motion-spring-size-compact-duration, inherit);
+    --motion-spring-size-compact-bounce: var(--cadence-inherited-motion-spring-size-compact-bounce, inherit);
+    --motion-spring-size-panel-duration: var(--cadence-inherited-motion-spring-size-panel-duration, inherit);
+    --motion-spring-size-panel-bounce: var(--cadence-inherited-motion-spring-size-panel-bounce, inherit);
+  }
+
+  [data-motion="full"] {
+    --motion-duration-instant: var(
+      --cadence-effective-instant,
+      calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-fast: var(
+      --cadence-effective-fast,
+      calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-base: var(
+      --cadence-effective-base,
+      calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-slow: var(
+      --cadence-effective-slow,
+      calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-page: var(
+      --cadence-effective-page,
+      calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+  }
+
+  [data-motion="reduced"] {
+    --motion-duration-instant: var(
+      --cadence-effective-instant,
+      calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-fast: var(
+      --cadence-effective-fast,
+      calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-base: var(
+      --cadence-effective-base,
+      calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-slow: var(
+      --cadence-effective-slow,
+      calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+    --motion-duration-page: var(
+      --cadence-effective-page,
+      calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+    );
+  }
+
+  [data-motion="none"] {
+    --motion-duration-instant: calc(0s + 0s * 1);
+    --motion-duration-fast: calc(0s + 0s * 1);
+    --motion-duration-base: calc(0s + 0s * 1);
+    --motion-duration-slow: calc(0s + 0s * 1);
+    --motion-duration-page: calc(0s + 0s * 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-duration-instant: var(
+        --cadence-effective-instant,
+        calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-fast: var(
+        --cadence-effective-fast,
+        calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-base: var(
+        --cadence-effective-base,
+        calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-slow: var(
+        --cadence-effective-slow,
+        calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-page: var(
+        --cadence-effective-page,
+        calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+    }
+
+    [data-motion="full"] {
+      --motion-duration-instant: var(
+        --cadence-effective-instant,
+        calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-fast: var(
+        --cadence-effective-fast,
+        calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-base: var(
+        --cadence-effective-base,
+        calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-slow: var(
+        --cadence-effective-slow,
+        calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+      --motion-duration-page: var(
+        --cadence-effective-page,
+        calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1)
+      );
+    }
   }
 }
 ```
@@ -274,11 +438,12 @@ them through the shorthand arbitrary value:
 That is the only pattern that keeps `data-motion="none"` honest without a JS branch: the attribute zeroes
 the variables on the element itself, and the transition has nothing left to run.
 
-The block above exists in exactly three places — `app/globals.css`, the `cadence-theme` registry
-item, and this document. They are not kept in sync by hand: `registry:check` parses all three into a
-`scope → variable → value` map (`scripts/motion-tokens.mjs`) and fails on a scope, a variable, or a
-value that differs. Three formats cannot be textually identical, so "equivalent" means that parsed
-map, not the bytes.
+The block above is derived from `lib/motion.ts` by `pnpm motion:tokens` and automatically before
+registry builds. `app/globals.css`, the `cadence-theme` registry item and this fence are generated
+outputs. The generator uses the installed TypeScript compiler, without Node-specific TS loading or
+dependency patches. `registry:check` compares their parsed `scope → variable → value` maps against
+the authored module, so even coordinated drift in all three outputs fails. Generation preserves
+unrelated semantic theme values and is repeatable. The legacy duration names remain effective outputs; authored duration inputs, committed local/provider/portal capture and override precedence are defined in [the preset contract](motion/presets.md#21-authored-inputs-and-effective-compatibility-outputs). This parameter adapter does not establish active-writer cancellation or migrate component capabilities.
 
 ---
 

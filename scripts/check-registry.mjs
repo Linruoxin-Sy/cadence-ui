@@ -32,6 +32,7 @@ import {
   recipeCatalogue,
 } from "./motion-manifest.mjs";
 import { checkMotionTargets } from "./motion-targets.mjs";
+import { authoredCssTokens, loadMotionSource } from "./motion-token-source.mjs";
 import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
@@ -286,6 +287,10 @@ const animationDocs = await readFile(path.join(root, "docs", "animation-system.m
 const themeItem = registry.items.find((item) => item.name === "cadence-theme");
 problems.push(
   ...compareTokenSources([
+    {
+      name: "authored lib/motion.ts",
+      parsed: { tokens: authoredCssTokens(await loadMotionSource(root)), unknown: [] },
+    },
     {
       name: "app/globals.css",
       parsed: parseCss(await readFile(path.join(root, "app", "globals.css"), "utf8")),

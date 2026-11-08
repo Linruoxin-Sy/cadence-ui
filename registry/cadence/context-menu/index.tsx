@@ -9,7 +9,7 @@ import { cn } from "../lib/cn";
 import { ControlSpan } from "../lib/control-animation";
 import { scale } from "../lib/motion";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function ContextMenu({ ...props }: ContextMenuPrimitive.Root.Props) {
   return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />;
@@ -54,7 +54,7 @@ function ContextMenuContent({
   ...props
 }: ContextMenuPrimitive.Popup.Props &
   Pick<ContextMenuPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   return (
     <ContextMenuPrimitive.Portal>
@@ -65,22 +65,27 @@ function ContextMenuContent({
         side={side}
         sideOffset={sideOffset}
       >
-        <ContextMenuPrimitive.Popup
-          data-slot="context-menu-content"
-          data-motion={cm.mode}
-          style={popupStyle(cm, style)}
-          className={popupClasses(
-            cm,
-            cn(
-              "z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden",
-              "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-              !cm.reduced &&
-                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-            ),
-            className,
-          )}
-          {...props}
-        />
+        {withCadenceScope(
+          cm,
+          <ContextMenuPrimitive.Popup
+            data-slot="context-menu-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            style={popupStyle(cm, style)}
+            className={popupClasses(
+              cm,
+              cn(
+                "z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden",
+                "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+                !cm.reduced &&
+                  "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+              ),
+              className,
+            )}
+            {...props}
+            ref={scopeRef}
+          />,
+        )}
       </ContextMenuPrimitive.Positioner>
     </ContextMenuPrimitive.Portal>
   );

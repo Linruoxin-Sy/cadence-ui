@@ -4,7 +4,8 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "../lib/cn";
-import { useCadenceMotion } from "../lib/provider";
+import { popupClockStyle } from "../lib/popup-style";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function BubbleGroup({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="bubble-group" className={cn("flex min-w-0 flex-col gap-2", className)} {...props} />;
@@ -47,12 +48,22 @@ function Bubble({
   VariantProps<typeof bubbleVariants> & {
     align?: "start" | "end";
   }) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
   const clock = cm.transition("data.transition");
-  return (
+  // This native div has no primitive-owned transition shorthand.
+  const { transition: _transition, ...transport } = popupClockStyle(cm);
+  const duration =
+    cm.scope.ready && !cm.scope.supported ? `${clock.duration}s` : `var(--motion-duration-base, ${clock.duration}s)`;
+  return withCadenceScope(
+    cm,
     <div
       data-motion={cm.mode}
-      style={{ transitionDuration: `${clock.duration}s`, ...style }}
+      style={{
+        ...transport,
+        transitionDuration: duration,
+        ...style,
+        ...(cm.disabled || cm.timeScale === 0 ? { transitionDuration: "0s", transitionDelay: "0s" } : {}),
+      }}
       data-slot="bubble"
       data-variant={variant}
       data-align={align}
@@ -63,7 +74,8 @@ function Bubble({
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 

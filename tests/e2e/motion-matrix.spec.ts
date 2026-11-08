@@ -69,7 +69,7 @@ test.describe("dialog", () => {
           await recordScale(page, '[data-slot="dialog-content"]');
           await openComponent(page, "dialog", requested, "dialog-trigger", mode);
 
-          await page.getByRole("button", { name: "Rename project" }).click();
+          await page.locator(scoped("dialog", "button")).filter({ hasText: "Rename project" }).click();
           await expect(page.getByRole("dialog", { name: "Rename project" })).toBeVisible();
           await page.waitForTimeout(300);
 
@@ -100,7 +100,7 @@ test.describe("dialog", () => {
     test("the panel fades without the 0.96 settle", async ({ page }) => {
       await recordScale(page, '[data-slot="dialog-content"]');
       await openComponent(page, "dialog", "reduced", "dialog-trigger");
-      await page.getByRole("button", { name: "Rename project" }).click();
+      await page.locator(scoped("dialog", "button")).filter({ hasText: "Rename project" }).click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await page.waitForTimeout(300);
 
@@ -283,7 +283,7 @@ test.describe("hover-card", () => {
 
         test(`opening: ?motion=${requested} → ${mode}`, async ({ page }) => {
           await recordScale(page, '[data-slot="hover-card-content"]');
-          await openComponent(page, "hover-card", requested, "hover-card-trigger", mode);
+          await openComponent(page, "hover-card", requested, "hover-card-trigger", mode, { inheritedMode: true });
 
           await page.locator(scoped("hover-card", '[data-slot="hover-card-trigger"]')).first().hover();
           await expect(page.locator('[data-slot="hover-card-content"]')).toBeVisible();
@@ -309,7 +309,7 @@ test.describe("hover-card", () => {
 
     test("the panel fades without the 0.96 settle", async ({ page }) => {
       await recordScale(page, '[data-slot="hover-card-content"]');
-      await openComponent(page, "hover-card", "reduced", "hover-card-trigger");
+      await openComponent(page, "hover-card", "reduced", "hover-card-trigger", "reduced", { inheritedMode: true });
       await page.locator(scoped("hover-card", '[data-slot="hover-card-trigger"]')).first().hover();
       await expect(page.locator('[data-slot="hover-card-content"]')).toBeVisible();
       await page.waitForTimeout(300);

@@ -4,7 +4,7 @@ import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { createContext, useContext, useId, useState } from "react";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 /**
  * Base UI's tooltip wires neither `role="tooltip"` nor `aria-describedby`, so a
@@ -82,7 +82,7 @@ function TooltipContent({
   ...props
 }: TooltipPrimitive.Popup.Props &
   Pick<TooltipPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
   const tooltip = useContext(TooltipContext);
 
   return (
@@ -94,33 +94,38 @@ function TooltipContent({
         sideOffset={sideOffset}
         className="isolate z-50"
       >
-        <TooltipPrimitive.Popup
-          id={tooltip?.id}
-          data-slot="tooltip-content"
-          data-motion={cm.mode}
-          style={popupStyle(cm, style)}
-          role="tooltip"
-          className={popupClasses(
-            cm,
-            cn(
-              "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-              !cm.reduced &&
-                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-            ),
-            className,
-          )}
-          {...props}
-        >
-          {children}
-          <TooltipPrimitive.Arrow
-            className={cn(
-              "z-50 size-2.5 rotate-45 rounded-[2px] bg-foreground fill-foreground",
-              "data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1",
-              "data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1",
-              "data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5",
+        {withCadenceScope(
+          cm,
+          <TooltipPrimitive.Popup
+            id={tooltip?.id}
+            data-slot="tooltip-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            style={popupStyle(cm, style)}
+            role="tooltip"
+            className={popupClasses(
+              cm,
+              cn(
+                "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+                !cm.reduced &&
+                  "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+              ),
+              className,
             )}
-          />
-        </TooltipPrimitive.Popup>
+            {...props}
+            ref={scopeRef}
+          >
+            {children}
+            <TooltipPrimitive.Arrow
+              className={cn(
+                "z-50 size-2.5 rotate-45 rounded-[2px] bg-foreground fill-foreground",
+                "data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1",
+                "data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1",
+                "data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5",
+              )}
+            />
+          </TooltipPrimitive.Popup>,
+        )}
       </TooltipPrimitive.Positioner>
     </TooltipPrimitive.Portal>
   );

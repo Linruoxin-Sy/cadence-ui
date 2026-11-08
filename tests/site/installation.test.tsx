@@ -50,9 +50,10 @@ describe("shared installation plan", () => {
       }
     }
     const button = installationPlan(registry.items, "button");
-    expect(button.files).toHaveLength(9);
+    expect(button.files).toHaveLength(10);
     expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/geometry.ts");
-    expect(button.items.find((item) => item.name === "cadence-provider")?.files).toHaveLength(5);
+    expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/motion-scope.tsx");
+    expect(button.items.find((item) => item.name === "cadence-provider")?.files).toHaveLength(6);
     expect(button.dependencies).toEqual(
       expect.arrayContaining(["clsx", "tailwind-merge", "motion", "@base-ui/react", "class-variance-authority"]),
     );
@@ -96,9 +97,11 @@ describe("shared installation plan", () => {
     const theme = registry.items.find((item: { name: string }) => item.name === "cadence-theme");
     const css = installationCss(theme);
     expect(css).toContain("@theme inline");
-    expect(css).toContain("--motion-duration-fast: 160ms;");
+    expect(css).toContain("--motion-source-duration-fast: 0.16s;");
     expect(css).toContain("[data-motion='none'] {");
-    expect(css).toContain("--motion-duration-fast: 0ms;");
+    expect(css).toContain("--motion-duration-fast: calc(0s + 0s * 1);");
+    expect(css).toContain("@theme static");
+    expect(css.indexOf(":root {")).toBeLessThan(css.indexOf("@media (prefers-reduced-motion: reduce)"));
     expect(css).toContain("@media (prefers-reduced-motion: reduce)");
   });
 });
@@ -160,7 +163,7 @@ describe("installation authoring and AST", () => {
   it("retains the separate installation guide path without component method markers", async () => {
     const source = matter(await readFile("content/docs/installation.mdx", "utf8")).content;
     const expanded = expandInstallationGuide(source, registry.items);
-    expect(expanded).toContain("--motion-duration-fast: 0ms;");
+    expect(expanded).toContain("--motion-duration-fast: calc(0s + 0s * 1);");
     expect(expanded).not.toContain("[Cadence theme CSS]");
     const { content } = await compileMDX({
       source: expanded,

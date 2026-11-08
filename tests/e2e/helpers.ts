@@ -31,12 +31,23 @@ export function scoped(id: string, selector: string): string {
  * They differ whenever the system preference forces `reduced` over `full`, so callers
  * that know the cell of the 3 × 2 matrix must pass both.
  */
-export async function openComponent(page: Page, id: string, requested: Mode, slot: string, expected: Mode = requested) {
+export async function openComponent(
+  page: Page,
+  id: string,
+  requested: Mode,
+  slot: string,
+  expected: Mode = requested,
+  readiness: { inheritedMode?: boolean } = {},
+) {
   await page.goto(`/components/${id}?motion=${requested}`);
   // The mode arrives after hydration, and hydration waits for this route's client
   // chunks; under parallel workers that is occasionally slower than the default
   // assertion timeout. The assertion itself stays exact.
-  await expect(page.locator(scoped(id, `[data-slot="${slot}"]`)).first()).toHaveAttribute("data-motion", expected, {
+  // Only explicitly opted-in native triggers inherit their owner's mode. Animated
+  // parts retain the direct attribute assertion; popup assertions follow opening.
+  const part = page.locator(scoped(id, `[data-slot="${slot}"]`)).first();
+  const owner = readiness.inheritedMode ? part.locator("xpath=ancestor-or-self::*[@data-motion][1]") : part;
+  await expect(owner).toHaveAttribute("data-motion", expected, {
     timeout: 15_000,
   });
   // `data-motion` is the *server* value too in the `full` + no-preference cell, so

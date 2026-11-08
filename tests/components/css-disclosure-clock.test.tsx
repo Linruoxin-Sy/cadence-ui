@@ -38,6 +38,9 @@ describe("CSS disclosure local clock ownership", () => {
       expect(panel.className).toContain("duration-0");
       view.rerender(fixture("none"));
       expect(panel.style.getPropertyValue("--motion-duration-slow")).toBe("0s");
+      expect(panel.style.transition).toBe("none");
+      expect(panel.style.transitionDuration).toBe("");
+      expect(panel.style.transitionDelay).toBe("");
       expect(panel).toHaveAttribute("data-motion", "none");
     });
 });

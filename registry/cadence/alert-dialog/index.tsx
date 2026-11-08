@@ -5,7 +5,7 @@ import type * as React from "react";
 import { Button, type ButtonProps } from "../button";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />;
@@ -29,12 +29,14 @@ function AlertDialogPortal({ ...props }: AlertDialogPrimitive.Portal.Props) {
  *   the first frame
  */
 function AlertDialogOverlay({ className, style, ...props }: AlertDialogPrimitive.Backdrop.Props) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
-  return (
+  return withCadenceScope(
+    cm,
     <AlertDialogPrimitive.Backdrop
       data-slot="alert-dialog-overlay"
       data-motion={cm.mode}
+      data-cadence-scope=""
       style={popupStyle(cm, style)}
       className={popupClasses(
         cm,
@@ -44,7 +46,8 @@ function AlertDialogOverlay({ className, style, ...props }: AlertDialogPrimitive
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 
@@ -57,29 +60,34 @@ function AlertDialogContent({
 }: AlertDialogPrimitive.Popup.Props & {
   size?: "default" | "sm";
 }) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
-      <AlertDialogPrimitive.Popup
-        data-slot="alert-dialog-content"
-        data-size={size}
-        data-motion={cm.mode}
-        style={popupStyle(cm, style)}
-        className={popupClasses(
-          cm,
-          cn(
-            "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[size=sm]:max-w-xs data-[starting-style]:opacity-0 data-[size=default]:sm:max-w-lg",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-          ),
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </AlertDialogPrimitive.Popup>
+      {withCadenceScope(
+        cm,
+        <AlertDialogPrimitive.Popup
+          data-slot="alert-dialog-content"
+          data-size={size}
+          data-motion={cm.mode}
+          data-cadence-scope=""
+          style={popupStyle(cm, style)}
+          className={popupClasses(
+            cm,
+            cn(
+              "group/alert-dialog-content fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[size=sm]:max-w-xs data-[starting-style]:opacity-0 data-[size=default]:sm:max-w-lg",
+              !cm.reduced &&
+                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+            ),
+            className,
+          )}
+          {...props}
+          ref={scopeRef}
+        >
+          {children}
+        </AlertDialogPrimitive.Popup>,
+      )}
     </AlertDialogPortal>
   );
 }

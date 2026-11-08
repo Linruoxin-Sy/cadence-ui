@@ -6,7 +6,7 @@ import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 import { popupStyle } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
   return (
@@ -117,8 +117,9 @@ function AccordionSurface({
 }
 
 function AccordionContent({ className, children, render, style, ...props }: AccordionPrimitive.Panel.Props) {
-  const cm = useCadenceMotion();
-  return (
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
+  return withCadenceScope(
+    cm,
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
       data-motion={cm.mode}
@@ -144,7 +145,8 @@ function AccordionContent({ className, children, render, style, ...props }: Acco
         />
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 

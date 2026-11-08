@@ -6,7 +6,7 @@ import type * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -25,12 +25,14 @@ function SheetPortal({ ...props }: SheetPrimitive.Portal.Props) {
 }
 
 function SheetOverlay({ className, style, ...props }: SheetPrimitive.Backdrop.Props) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
-  return (
+  return withCadenceScope(
+    cm,
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
       data-motion={cm.mode}
+      data-cadence-scope=""
       style={popupStyle(cm, style)}
       className={popupClasses(
         cm,
@@ -41,7 +43,8 @@ function SheetOverlay({ className, style, ...props }: SheetPrimitive.Backdrop.Pr
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 
@@ -69,7 +72,7 @@ function SheetContent({
   side?: "top" | "right" | "bottom" | "left";
   showCloseButton?: boolean;
 }) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   const placement =
     side === "right"
@@ -92,35 +95,40 @@ function SheetContent({
   return (
     <SheetPortal>
       <SheetOverlay />
-      <SheetPrimitive.Popup
-        data-slot="sheet-content"
-        data-side={side}
-        data-motion={cm.mode}
-        style={popupStyle(cm, style)}
-        className={popupClasses(
-          cm,
-          cn(
-            "fixed z-50 flex flex-col gap-4 bg-background shadow-lg outline-none transition-[opacity,translate] ease-cadence-out duration-(--motion-duration-base)",
-            placement,
-            !cm.disabled && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-            !cm.reduced && slide,
-          ),
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <SheetPrimitive.Close
-            data-slot="sheet-close"
-            className="absolute top-4 right-4"
-            render={<Button variant="ghost" size="icon-sm" />}
-          >
-            <X />
-            <span className="sr-only">Close</span>
-          </SheetPrimitive.Close>
-        )}
-      </SheetPrimitive.Popup>
+      {withCadenceScope(
+        cm,
+        <SheetPrimitive.Popup
+          data-slot="sheet-content"
+          data-side={side}
+          data-motion={cm.mode}
+          data-cadence-scope=""
+          style={popupStyle(cm, style)}
+          className={popupClasses(
+            cm,
+            cn(
+              "fixed z-50 flex flex-col gap-4 bg-background shadow-lg outline-none transition-[opacity,translate] ease-cadence-out duration-(--motion-duration-base)",
+              placement,
+              !cm.disabled && "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+              !cm.reduced && slide,
+            ),
+            className,
+          )}
+          {...props}
+          ref={scopeRef}
+        >
+          {children}
+          {showCloseButton && (
+            <SheetPrimitive.Close
+              data-slot="sheet-close"
+              className="absolute top-4 right-4"
+              render={<Button variant="ghost" size="icon-sm" />}
+            >
+              <X />
+              <span className="sr-only">Close</span>
+            </SheetPrimitive.Close>
+          )}
+        </SheetPrimitive.Popup>,
+      )}
     </SheetPortal>
   );
 }

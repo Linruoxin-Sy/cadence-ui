@@ -15,7 +15,7 @@ import { cn } from "../lib/cn";
 import { ControlSpan } from "../lib/control-animation";
 import { scale } from "../lib/motion";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 const Combobox = ComboboxPrimitive.Root;
 
@@ -230,7 +230,7 @@ function ComboboxContent({
   ...props
 }: ComboboxPrimitive.Popup.Props &
   Pick<ComboboxPrimitive.Positioner.Props, "side" | "align" | "sideOffset" | "alignOffset" | "anchor">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   return (
     <ComboboxPrimitive.Portal>
@@ -243,24 +243,29 @@ function ComboboxContent({
         anchor={anchor}
         className="isolate z-50"
       >
-        <ComboboxPrimitive.Popup
-          data-slot="combobox-content"
-          data-motion={cm.mode}
-          data-chips={!!anchor}
-          style={popupStyle(cm, style)}
-          className={popupClasses(
-            cm,
-            cn(
-              "group/combobox-content relative flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] flex-col overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-hidden",
-              "origin-(--transform-origin) transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-              !cm.reduced &&
-                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-              "data-[chips=true]:min-w-(--anchor-width)",
-            ),
-            className,
-          )}
-          {...props}
-        />
+        {withCadenceScope(
+          cm,
+          <ComboboxPrimitive.Popup
+            data-slot="combobox-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            data-chips={!!anchor}
+            style={popupStyle(cm, style)}
+            className={popupClasses(
+              cm,
+              cn(
+                "group/combobox-content relative flex max-h-(--available-height) w-(--anchor-width) max-w-(--available-width) min-w-[calc(var(--anchor-width)+--spacing(7))] flex-col overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md outline-hidden",
+                "origin-(--transform-origin) transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+                !cm.reduced &&
+                  "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+                "data-[chips=true]:min-w-(--anchor-width)",
+              ),
+              className,
+            )}
+            {...props}
+            ref={scopeRef}
+          />,
+        )}
       </ComboboxPrimitive.Positioner>
     </ComboboxPrimitive.Portal>
   );

@@ -5,7 +5,7 @@ import * as React from "react";
 import type { TooltipValueType } from "recharts";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "../lib/cn";
-import { ease } from "../lib/motion";
+import { motionMilliseconds } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -95,12 +95,13 @@ function ChartContainer({
 }) {
   const cm = useCadenceMotion();
   const clock = cm.transition("data.transition");
-  const current = React.useRef({ reduced: cm.reduced, duration: clock.duration ?? 0 });
+  const curve = cm.scope.tokens.ease.out;
+  const current = React.useRef({ reduced: cm.reduced, duration: clock.duration ?? 0, easing: cubicBezier(...curve) });
   const running = React.useRef(new Set<() => void>());
   React.useLayoutEffect(() => {
-    current.current = { reduced: cm.reduced, duration: clock.duration ?? 0 };
+    current.current = { reduced: cm.reduced, duration: clock.duration ?? 0, easing: cubicBezier(...curve) };
     if (cm.reduced || clock.duration === 0) for (const finish of running.current) finish();
-  }, [cm.reduced, clock.duration]);
+  }, [cm.reduced, clock.duration, curve]);
   const controller = React.useCallback<RechartsPrimitive.AnimationController>((_timeout, handle, listener) => {
     // Enter the active phase so complete() delivers Recharts' completion callback.
     // Cadence consumes the caller delay; its token clock starts immediately.
@@ -121,11 +122,10 @@ function ChartContainer({
       finish();
       return () => {};
     }
-    const easing = cubicBezier(...ease.out);
     let previous: number | undefined;
     let progress = 0;
     const tick = (now: number) => {
-      const duration = current.current.duration * 1000;
+      const duration = motionMilliseconds(current.current.duration);
       if (duration === 0) return finish();
       progress = Math.min(1, progress + (previous === undefined ? 0 : now - previous) / duration);
       previous = now;
@@ -134,7 +134,7 @@ function ChartContainer({
         return;
       }
       const from = Number(handle.getFrom());
-      listener(from + (Number(handle.getTo()) - from) * easing(progress));
+      listener(from + (Number(handle.getTo()) - from) * current.current.easing(progress));
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);

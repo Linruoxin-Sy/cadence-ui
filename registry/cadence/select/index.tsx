@@ -24,7 +24,7 @@ import { ControlSpan, useControlAnimation } from "../lib/control-animation";
 import { clampMeasuredSize, measureOrigin, type Origin } from "../lib/geometry";
 import { scale } from "../lib/motion";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -359,7 +359,7 @@ function SelectContent({
   ...props
 }: SelectPrimitive.Popup.Props &
   Pick<SelectPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset" | "alignItemWithTrigger">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   return (
     <SelectPrimitive.Portal>
@@ -371,27 +371,32 @@ function SelectContent({
         alignItemWithTrigger={alignItemWithTrigger}
         className="isolate z-50"
       >
-        <SelectPrimitive.Popup
-          data-slot="select-content"
-          data-motion={cm.mode}
-          data-align-trigger={alignItemWithTrigger}
-          style={popupStyle(cm, style)}
-          className={popupClasses(
-            cm,
-            cn(
-              "relative z-50 max-h-(--available-height) w-(--anchor-width) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
-              "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-              !cm.reduced &&
-                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-            ),
-            className,
-          )}
-          {...props}
-        >
-          <SelectScrollUpButton />
-          <SelectPrimitive.List className="p-1">{children}</SelectPrimitive.List>
-          <SelectScrollDownButton />
-        </SelectPrimitive.Popup>
+        {withCadenceScope(
+          cm,
+          <SelectPrimitive.Popup
+            data-slot="select-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            data-align-trigger={alignItemWithTrigger}
+            style={popupStyle(cm, style)}
+            className={popupClasses(
+              cm,
+              cn(
+                "relative z-50 max-h-(--available-height) w-(--anchor-width) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover text-popover-foreground shadow-md outline-none",
+                "transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+                !cm.reduced &&
+                  "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+              ),
+              className,
+            )}
+            {...props}
+            ref={scopeRef}
+          >
+            <SelectScrollUpButton />
+            <SelectPrimitive.List className="p-1">{children}</SelectPrimitive.List>
+            <SelectScrollDownButton />
+          </SelectPrimitive.Popup>,
+        )}
       </SelectPrimitive.Positioner>
     </SelectPrimitive.Portal>
   );

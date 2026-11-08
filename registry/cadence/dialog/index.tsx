@@ -6,7 +6,7 @@ import type * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -34,12 +34,14 @@ function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
  *   the first frame
  */
 function DialogOverlay({ className, style, ...props }: DialogPrimitive.Backdrop.Props) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
-  return (
+  return withCadenceScope(
+    cm,
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       data-motion={cm.mode}
+      data-cadence-scope=""
       style={popupStyle(cm, style)}
       className={popupClasses(
         cm,
@@ -49,7 +51,8 @@ function DialogOverlay({ className, style, ...props }: DialogPrimitive.Backdrop.
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 
@@ -62,38 +65,43 @@ function DialogContent({
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
 }) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   return (
     <DialogPortal>
       <DialogOverlay />
-      <DialogPrimitive.Popup
-        data-slot="dialog-content"
-        data-motion={cm.mode}
-        style={popupStyle(cm, style)}
-        className={popupClasses(
-          cm,
-          cn(
-            "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 sm:max-w-lg",
-            !cm.reduced &&
-              "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-          ),
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="absolute top-4 right-4"
-            render={<Button variant="ghost" size="icon-sm" />}
-          >
-            <X />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Popup>
+      {withCadenceScope(
+        cm,
+        <DialogPrimitive.Popup
+          data-slot="dialog-content"
+          data-motion={cm.mode}
+          data-cadence-scope=""
+          style={popupStyle(cm, style)}
+          className={popupClasses(
+            cm,
+            cn(
+              "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border bg-background p-6 shadow-lg outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-base) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 sm:max-w-lg",
+              !cm.reduced &&
+                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+            ),
+            className,
+          )}
+          {...props}
+          ref={scopeRef}
+        >
+          {children}
+          {showCloseButton && (
+            <DialogPrimitive.Close
+              data-slot="dialog-close"
+              className="absolute top-4 right-4"
+              render={<Button variant="ghost" size="icon-sm" />}
+            >
+              <X />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          )}
+        </DialogPrimitive.Popup>,
+      )}
     </DialogPortal>
   );
 }

@@ -17,10 +17,12 @@ import matter from "gray-matter";
 import { checkDocTemplates } from "./doc-template.mjs";
 import { expandInstallation } from "./installation.mjs";
 import { motionRecipes } from "./motion-manifest.mjs";
+import { generateMotionTokens } from "./motion-token-source.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
 await verifySnapshots(root);
+await generateMotionTokens(root);
 const publicDir = path.join(root, "public");
 const outDir = path.join(publicDir, "r");
 const docsDir = path.join(root, "content", "components");

@@ -31,6 +31,14 @@ Durations are seconds, easings are cubic-bezier tuples, springs use Motion's spr
 | `spring.travel` | visualDuration 0.3, bounce 0 | Value handoffs, travel between two anchors |
 | `spring.smooth` | visualDuration 0.4, bounce 0 | Dialogs, layout |
 | `spring.morph` | visualDuration 0.42, bounce 0 | Shared elements, width changes |
+| `spring.sizeCompact` | visualDuration 0.28, bounce 0 | Internal compact-size parameter selection |
+| `spring.sizePanel` | visualDuration 0.36, bounce 0 | Internal panel-size parameter selection |
+| `rotation.halfTurn` | 180 degrees | Semantic disclosure orientation |
+
+The size refinements and internal purpose-preset resolver select parameters only. Existing components
+keep their documented recipe assignments; these values do not install a new geometry controller,
+text diff, numeric reel or public animation primitive. CSS recipe tokens are generated from the
+shared motion source; theme `--animate-*` loop clocks remain independently tunable.
 
 Do not invent new values. If a component needs a different feel, add a recipe to `lib/motion.ts`
 and document it.

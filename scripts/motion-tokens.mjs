@@ -1,8 +1,7 @@
 /**
- * The CSS motion tokens are declared three times — `app/globals.css`, the
- * `cadence-theme` registry item, and `docs/animation-system.md` §2.3 — and until
- * this module existed nothing compared them, so they drifted (the doc promised a
- * `--animate-shimmer` and a `--motion-scale-in` that no file contained).
+ * Parse the generated CSS token outputs: app/globals.css, cadence-theme and
+ * docs/animation-system.md §2.3. motion-token-source.mjs derives the expected map
+ * from the authored TypeScript module; check-registry compares against it too.
  *
  * Three formats cannot be textually identical, so "equivalent" means the same
  * `scope → variable → value` map. Every parser below produces that shape and
@@ -21,7 +20,7 @@
  */
 
 /** Variables the ecosystem actually reads. Colours and radii are shadcn's. */
-const MOTION_TOKEN = /^--(motion-|ease-cadence-|animate-)/;
+const MOTION_TOKEN = /^--(motion-|ease-cadence-)/;
 
 const REDUCED_MEDIA = /^@media\b.*prefers-reduced-motion/;
 
@@ -30,13 +29,16 @@ const SCOPE_SELECTORS = new Map([
   [":root", "root"],
   ["@theme", "theme"],
   ["@theme inline", "theme"],
+  ["@theme static", "theme"],
+  ["[data-cadence-scope]", "scope"],
+  ['[data-motion="full"]', "full"],
   ['[data-motion="reduced"]', "reduced"],
   ['[data-motion="none"]', "none"],
 ]);
 
 const normaliseSelector = (text) => text.replace(/'/g, '"').replace(/\s+/g, " ").trim();
 
-const normaliseValue = (value) => value.replace(/\s+/g, " ").trim();
+const normaliseValue = (value) => value.replace(/\s+/g, " ").replace(/\(\s+/g, "(").replace(/\s+\)/g, ")").trim();
 
 function stripComments(text) {
   return text.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -79,7 +81,7 @@ function declarationsOf(text) {
 function scopeOf(chain) {
   const selector = normaliseSelector(chain.at(-1) ?? "");
   if (chain.some((header) => REDUCED_MEDIA.test(normaliseSelector(header)))) {
-    return selector === ":root" ? "system-reduced" : null;
+    return selector === ":root" ? "system-reduced" : selector === '[data-motion="full"]' ? "system-reduced-full" : null;
   }
   return SCOPE_SELECTORS.get(selector) ?? null;
 }
@@ -109,7 +111,7 @@ export function parseCss(text) {
 }
 
 /** Serialise the registry item's `cssVars` + `css` back into a stylesheet. */
-function themeItemToCss(item) {
+export function themeItemToCss(item) {
   const declarations = (map = {}) =>
     Object.entries(map)
       .map(([name, value]) => `${name}: ${value};`)

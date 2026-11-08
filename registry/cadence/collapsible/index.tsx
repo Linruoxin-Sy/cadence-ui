@@ -4,7 +4,7 @@ import { Collapsible as CollapsiblePrimitive } from "@base-ui/react/collapsible"
 import { useLayoutEffect, useRef } from "react";
 import { cn } from "../lib/cn";
 import { popupStyle } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function Collapsible({ ...props }: CollapsiblePrimitive.Root.Props) {
   return <CollapsiblePrimitive.Root data-slot="collapsible" {...props} />;
@@ -57,8 +57,9 @@ function CollapsibleBody({ children }: Pick<CollapsiblePrimitive.Panel.Props, "c
 }
 
 function CollapsibleContent({ className, children, style, ...props }: CollapsiblePrimitive.Panel.Props) {
-  const cm = useCadenceMotion();
-  return (
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
+  return withCadenceScope(
+    cm,
     <CollapsiblePrimitive.Panel
       data-slot="collapsible-content"
       data-motion={cm.mode}
@@ -73,9 +74,10 @@ function CollapsibleContent({ className, children, style, ...props }: Collapsibl
         )
       }
       {...props}
+      ref={scopeRef}
     >
       <CollapsibleBody>{children}</CollapsibleBody>
-    </CollapsiblePrimitive.Panel>
+    </CollapsiblePrimitive.Panel>,
   );
 }
 

@@ -3,7 +3,7 @@
 import { PreviewCard as PreviewCardPrimitive } from "@base-ui/react/preview-card";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function HoverCard({ ...props }: PreviewCardPrimitive.Root.Props) {
   return <PreviewCardPrimitive.Root data-slot="hover-card" {...props} />;
@@ -35,7 +35,7 @@ function HoverCardContent({
   ...props
 }: PreviewCardPrimitive.Popup.Props &
   Pick<PreviewCardPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
   return (
     <PreviewCardPrimitive.Portal data-slot="hover-card-portal">
@@ -46,21 +46,26 @@ function HoverCardContent({
         sideOffset={sideOffset}
         className="isolate z-50"
       >
-        <PreviewCardPrimitive.Popup
-          data-slot="hover-card-content"
-          data-motion={cm.mode}
-          style={popupStyle(cm, style)}
-          className={popupClasses(
-            cm,
-            cn(
-              "z-50 w-64 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-              !cm.reduced &&
-                "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-            ),
-            className,
-          )}
-          {...props}
-        />
+        {withCadenceScope(
+          cm,
+          <PreviewCardPrimitive.Popup
+            data-slot="hover-card-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            style={popupStyle(cm, style)}
+            className={popupClasses(
+              cm,
+              cn(
+                "z-50 w-64 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+                !cm.reduced &&
+                  "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+              ),
+              className,
+            )}
+            {...props}
+            ref={scopeRef}
+          />,
+        )}
       </PreviewCardPrimitive.Positioner>
     </PreviewCardPrimitive.Portal>
   );

@@ -14,6 +14,7 @@ import {
 } from "react-day-picker";
 import { type Button, buttonVariants } from "../button";
 import { cn } from "../lib/cn";
+import { motionMilliseconds } from "../lib/motion";
 import { useCadenceMotion } from "../lib/provider";
 
 function Calendar({
@@ -200,7 +201,9 @@ function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
   const scope = React.useRef<HTMLTableElement>(null);
   const { mode, reduced, timeScale } = cm;
   const transition = cm.transition("data.transition");
-  // biome-ignore lint/correctness/useExhaustiveDependencies: recipe and distance derive from mode/clock; caller styles remain authoritative.
+  const milliseconds = motionMilliseconds(transition.duration ?? 0);
+  const easing = Array.isArray(transition.ease) ? `cubic-bezier(${transition.ease.join(",")})` : "linear";
+  // biome-ignore lint/correctness/useExhaustiveDependencies: resolved parameter values cancel the native effect without replaying an unchanged month; caller styles remain authoritative.
   React.useLayoutEffect(() => {
     const changed = previous.current !== month;
     const direction = month > previous.current ? 1 : -1;
@@ -218,11 +221,10 @@ function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
       from.transform = `translateX(${direction * cm.distance.sm}px)`;
       to.transform = "none";
     }
-    const easing = Array.isArray(transition.ease) ? `cubic-bezier(${transition.ease.join(",")})` : "linear";
     // WAAPI owns only this effect: cancel removes it synchronously, revealing caller styles.
-    const animation = element.animate([from, to], { duration: (transition.duration ?? 0) * 1000, easing });
+    const animation = element.animate([from, to], { duration: milliseconds, easing });
     return () => animation.cancel();
-  }, [month, mode, reduced, timeScale, scope, style?.transform, style?.opacity]);
+  }, [month, mode, reduced, timeScale, milliseconds, easing, cm.distance.sm, scope, style?.transform, style?.opacity]);
   return <table ref={scope} data-slot="calendar-month-grid" data-motion={cm.mode} style={style} {...props} />;
 }
 

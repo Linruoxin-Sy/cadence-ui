@@ -2,18 +2,37 @@
 
 import type { Transition } from "motion/react";
 import { MotionConfig } from "motion/react";
-import { createContext, type ReactNode, useContext, useSyncExternalStore } from "react";
+import {
+  createContext,
+  type ReactNode,
+  type Ref,
+  type RefObject,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { cn } from "./cn";
 import {
   type CadenceMode,
-  distance,
-  duration,
-  ease,
   type MotionOptions,
+  type MotionParameterBinding,
+  type MotionParameterOptions,
+  type MotionTokenValues,
   type Recipe,
-  spring,
+  type ResolvedMotionParameters,
+  resolveMotionParameters,
   transitionFor,
 } from "./motion";
+import {
+  defaultMotionScope,
+  disconnectMotionTokenScope,
+  type MotionScopeSnapshot,
+  motionScopeStyle,
+  useLocalMotionScope,
+  useRootMotionScope,
+} from "./motion-scope";
 
 const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -58,23 +77,41 @@ export interface CadenceMotion {
   timeScale: number;
   /** Resolve a recipe into a Motion transition for the current mode. */
   transition: (recipe: Recipe, options?: MotionOptions) => Transition;
-  distance: typeof distance;
-  spring: typeof spring;
+  distance: MotionTokenValues["distance"];
+  spring: MotionTokenValues["spring"];
+  /** Internal committed scope data; not a component migration or an executor. */
+  scope: MotionScopeSnapshot;
+  inheritedScope: MotionScopeSnapshot;
+  parameters: (binding: MotionParameterBinding, options?: MotionParameterOptions) => ResolvedMotionParameters;
 }
 
 const CadenceContext = createContext<CadenceMotion | null>(null);
 
 const FALLBACK_MODE: CadenceMode = "full";
 
-function createMotion(mode: CadenceMode, timeScale = 1): CadenceMotion {
+function createMotion(
+  mode: CadenceMode,
+  timeScale = 1,
+  scope = defaultMotionScope,
+  inheritedScope = scope,
+): CadenceMotion {
   return {
     mode,
     reduced: mode !== "full",
     disabled: mode === "none",
     timeScale,
-    transition: (recipe, options) => transitionFor(recipe, mode, { timeScale, ...options }),
-    distance,
-    spring,
+    transition: (recipe, options) => transitionFor(recipe, mode, { timeScale, ...options }, scope),
+    distance: scope.tokens.distance,
+    spring: scope.tokens.spring,
+    scope,
+    inheritedScope,
+    parameters: (binding, options) =>
+      resolveMotionParameters(binding, mode, {
+        timeScale,
+        tokens: scope.tokens,
+        effectiveDurations: scope.effectiveDurations,
+        ...options,
+      }),
   };
 }
 
@@ -92,7 +129,7 @@ export interface CadenceProviderProps {
    * Multiplies recipe durations, springs and portal clocks. Continuous CSS loops
    * retain the theme's --animate-* timing. `1` (default) is the authored timing;
    * the docs site passes `4` for its 0.25× preview. Additive: it does not change
-   * any token, so a component looks the same at `1`. Omitting it inherits the
+   * authored tokens, so a component looks the same at `1`. Omitting it inherits the
    * enclosing scale. Finite and non-negative; zero is immediate timing, preserving mode.
    */
   timeScale?: number;
@@ -111,23 +148,33 @@ export interface CadenceProviderProps {
  */
 export function CadenceProvider({ mode, timeScale, children, className }: CadenceProviderProps) {
   const parent = useContext(CadenceContext);
+  const rootScope = useRootMotionScope();
+  const inheritedScope = parent?.scope ?? rootScope;
+  const ref = useRef<HTMLDivElement>(null);
+  const scope = useLocalMotionScope(ref, inheritedScope);
   const requested = mode ?? parent?.mode ?? FALLBACK_MODE;
   const scale = timeScale ?? parent?.timeScale ?? 1;
   const systemReduced = useSystemReducedMotion();
   if (!Number.isFinite(scale) || scale < 0) throw new RangeError("timeScale must be finite and non-negative");
   const effective: CadenceMode = requested === "none" ? "none" : systemReduced ? "reduced" : requested;
-  const value = createMotion(effective, scale);
+  const value = createMotion(effective, scale, scope);
 
   return (
     <CadenceContext.Provider value={value}>
       <MotionConfig
         reducedMotion="user"
         transition={{
-          duration: duration.base * scale,
-          ease: ease.out,
+          duration: scope.tokens.duration.base * scale,
+          ease: scope.tokens.ease.out,
         }}
       >
-        <div data-motion={effective} className={cn("contents", className)}>
+        <div
+          ref={ref}
+          data-motion={effective}
+          data-cadence-scope=""
+          style={motionScopeStyle(inheritedScope, scale)}
+          className={cn("contents", className)}
+        >
           {children}
         </div>
       </MotionConfig>
@@ -136,8 +183,49 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
 }
 
 /** The resolved motion config. Falls back to the system preference when no provider is present. */
-export function useCadenceMotion(): CadenceMotion {
+export function useCadenceMotion(ref?: RefObject<HTMLElement | null>): CadenceMotion {
   const context = useContext(CadenceContext);
+  const root = useRootMotionScope();
+  const inherited = context?.scope ?? root;
+  const scope = useLocalMotionScope(ref, inherited);
   const systemReduced = useSystemReducedMotion();
-  return context ?? createMotion(systemReduced ? "reduced" : FALLBACK_MODE);
+  return context && !ref
+    ? context
+    : createMotion(
+        context?.mode ?? (systemReduced ? "reduced" : FALLBACK_MODE),
+        context?.timeScale ?? 1,
+        scope,
+        inherited,
+      );
+}
+
+/** Bind a real part without replacing its caller's React 19 cleanup ref. */
+export function useCadenceMotionScope<T extends HTMLElement>(externalRef?: Ref<T>) {
+  const node = useRef<T | null>(null);
+  const [, attached] = useState<T | null>(null);
+  const cm = useCadenceMotion(node);
+  const ref = useCallback(
+    (element: T | null) => {
+      if (!element) disconnectMotionTokenScope(node);
+      node.current = element;
+      attached(element);
+      const cleanup = typeof externalRef === "function" ? externalRef(element) : undefined;
+      if (externalRef && typeof externalRef !== "function") externalRef.current = element;
+      return () => {
+        node.current = null;
+        disconnectMotionTokenScope(node);
+        attached(null);
+        if (typeof cleanup === "function") cleanup();
+        else if (typeof externalRef === "function") externalRef(null);
+        else if (externalRef) externalRef.current = null;
+      };
+    },
+    [externalRef],
+  );
+  return { cm, ref };
+}
+
+/** Internal part context; keeps render children and nested portals in the owned token scope. */
+export function withCadenceScope(cm: CadenceMotion, child: ReactNode) {
+  return <CadenceContext.Provider value={{ ...cm, inheritedScope: cm.scope }}>{child}</CadenceContext.Provider>;
 }

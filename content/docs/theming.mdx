@@ -21,21 +21,33 @@ follows, in both themes.
 
 ## Motion variables
 
-`cadence-theme` adds the CSS side of the motion tokens:
+`cadence-theme` derives CSS inputs and effective clocks from the shared motion source.
+Tune authored durations through source variables:
 
 ```css
 :root {
-  --motion-duration-instant: 100ms;
-  --motion-duration-fast: 160ms;
-  --motion-duration-base: 220ms;
-  --motion-duration-slow: 320ms;
+  --motion-source-duration-instant: 100ms;
+  --motion-source-duration-fast: 160ms;
+  --motion-source-duration-base: 220ms;
+  --motion-source-duration-slow: 320ms;
 }
 ```
 
-They exist so a CSS-only component — an overlay that animates through Base UI's `data-starting-style`
-/ `data-ending-style` — runs on the same clock as the Motion-driven ones, with no literal duration in
-its class list. `[data-motion="reduced"]` shortens them to 0.6×, `[data-motion="none"]` zeroes them,
-and a bare `prefers-reduced-motion: reduce` does the same for a page with no provider.
+CSS popup clocks and Motion resolve these inputs through the provider's inherited mode/timeScale.
+The generated `--motion-duration-*` outputs retain their existing names. Explicit overrides of those
+legacy outputs are already effective clocks and are not scaled again; source inputs are the preferred
+way to tune a theme while retaining inherited scaling. None and zero recipe time still settle
+immediately. Scope and portal transport preserve local class/style overrides; keep the generated
+theme and provider source updated together.
+
+Easing accepts cubic-bezier curves and standard CSS easing keywords. Spring duration/bounce,
+distance, scale, rotation and stagger inputs are available in the shared parameter layer. Selecting
+a size or text/number parameter does not install the corresponding controller or migrate a component.
+
+Class/style and documented theme attributes, head stylesheet DOM/load changes, font loading and resize
+refresh committed snapshots. After a CSSOM-only change, call `refreshCadenceMotionTokens()` from
+`components/cadence/lib/motion-scope`. Other CSS-only state/media changes need that signal or a
+committed owner update. There is no per-frame theme polling.
 
 The JS presets live in `components/cadence/lib/motion.ts` and are the source of truth for durations,
 easings, springs, and distances.

@@ -3,8 +3,8 @@
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import type * as React from "react";
 import { cn } from "../lib/cn";
-import { duration, reducedDurationScale } from "../lib/motion";
-import { useCadenceMotion } from "../lib/provider";
+import { popupStyle } from "../lib/popup-style";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
@@ -37,11 +37,8 @@ function PopoverContent({
   ...props
 }: PopoverPrimitive.Popup.Props &
   Pick<PopoverPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
-  const clock = {
-    "--motion-duration-fast": `${duration.fast * (cm.disabled ? 0 : cm.reduced ? reducedDurationScale : 1) * cm.timeScale}s`,
-  } as React.CSSProperties;
   const classes = cn(
     "z-50 w-72 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none",
     cm.disabled
@@ -59,15 +56,20 @@ function PopoverContent({
         sideOffset={sideOffset}
         className="isolate z-50"
       >
-        <PopoverPrimitive.Popup
-          data-slot="popover-content"
-          data-motion={cm.mode}
-          className={
-            typeof className === "function" ? (state) => cn(classes, className(state)) : cn(classes, className)
-          }
-          style={typeof style === "function" ? (state) => ({ ...clock, ...style(state) }) : { ...clock, ...style }}
-          {...props}
-        />
+        {withCadenceScope(
+          cm,
+          <PopoverPrimitive.Popup
+            data-slot="popover-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            className={
+              typeof className === "function" ? (state) => cn(classes, className(state)) : cn(classes, className)
+            }
+            style={popupStyle(cm, style)}
+            {...props}
+            ref={scopeRef}
+          />,
+        )}
       </PopoverPrimitive.Positioner>
     </PopoverPrimitive.Portal>
   );

@@ -6,7 +6,7 @@ import type * as React from "react";
 import { Button } from "../button";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 const toast = ToastPrimitive.createToastManager();
 
@@ -37,11 +37,13 @@ function ToastViewport({ className, ...props }: ToastPrimitive.Viewport.Props) {
  * Stack geometry updates instantly: T2 never transitions height or bottom.
  */
 function Toast({ className, style, ...props }: ToastPrimitive.Root.Props) {
-  const cm = useCadenceMotion();
-  return (
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
+  return withCadenceScope(
+    cm,
     <ToastPrimitive.Root
       data-slot="toast"
       data-motion={cm.mode}
+      data-cadence-scope=""
       style={popupStyle(cm, style)}
       className={popupClasses(
         cm,
@@ -54,7 +56,8 @@ function Toast({ className, style, ...props }: ToastPrimitive.Root.Props) {
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 

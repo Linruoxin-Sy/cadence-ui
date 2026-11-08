@@ -4,7 +4,7 @@ import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { createContext, useContext } from "react";
 import { cn } from "../lib/cn";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 /**
  * Upstream's Base UI drawer carries a context for four things: whether snap points
@@ -70,12 +70,14 @@ function DrawerClose({ ...props }: DrawerPrimitive.Close.Props) {
  * the token one; while swiping it is zero, because the variable already moved.
  */
 function DrawerOverlay({ className, style, ...props }: DrawerPrimitive.Backdrop.Props) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
 
-  return (
+  return withCadenceScope(
+    cm,
     <DrawerPrimitive.Backdrop
       data-slot="drawer-overlay"
       data-motion={cm.mode}
+      data-cadence-scope=""
       style={popupStyle(cm, style)}
       className={popupClasses(
         cm,
@@ -85,7 +87,8 @@ function DrawerOverlay({ className, style, ...props }: DrawerPrimitive.Backdrop.
         className,
       )}
       {...props}
-    />
+      ref={scopeRef}
+    />,
   );
 }
 
@@ -119,7 +122,7 @@ function DrawerSwipeHandle({ className, ...props }: React.ComponentProps<"div">)
  * its own size.
  */
 function DrawerContent({ className, style, children, ...props }: DrawerPrimitive.Popup.Props) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
   const { hasSnapPoints, modal, showSwipeHandle, swipeDirection } = useDrawer();
   const swipeAxis = swipeDirection === "down" || swipeDirection === "up" ? "y" : "x";
 
@@ -149,38 +152,43 @@ function DrawerContent({ className, style, children, ...props }: DrawerPrimitive
         data-modal={modal}
         className="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto"
       >
-        <DrawerPrimitive.Popup
-          data-slot="drawer-popup"
-          data-swipe-axis={swipeAxis}
-          data-snap-points={hasSnapPoints ? "" : undefined}
-          data-motion={cm.mode}
-          style={popupStyle(cm, style)}
-          className={popupClasses(
-            cm,
-            cn(
-              "pointer-events-auto fixed z-50 flex flex-col overflow-hidden border bg-background text-foreground shadow-lg outline-none",
-              "transition-[transform,opacity] ease-cadence-out duration-(--motion-duration-slow) data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-swiping:duration-0",
-              "transform-[translate3d(var(--translate-x,0px),var(--translate-y,0px),0)]",
-              "data-[swipe-axis=y]:[--translate-y:calc(var(--drawer-snap-point-offset,0px)_+_var(--drawer-swipe-movement-y))]",
-              "data-[swipe-axis=x]:[--translate-x:var(--drawer-swipe-movement-x)]",
-              "data-[swipe-axis=y]:max-h-[calc(100dvh_-_3rem)] data-[swipe-axis=y]:data-snap-points:h-(--drawer-height)",
-              placement,
-              !cm.reduced && closedTransform,
-              !cm.reduced &&
-                "data-[starting-style]:transform-(--closed-transform) data-[ending-style]:transform-(--closed-transform)",
-            ),
-            className,
-          )}
-          {...props}
-        >
-          {showSwipeHandle && <DrawerSwipeHandle />}
-          <DrawerPrimitive.Content
-            data-slot="drawer-content"
-            className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-4"
+        {withCadenceScope(
+          cm,
+          <DrawerPrimitive.Popup
+            data-slot="drawer-popup"
+            data-swipe-axis={swipeAxis}
+            data-snap-points={hasSnapPoints ? "" : undefined}
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            style={popupStyle(cm, style)}
+            className={popupClasses(
+              cm,
+              cn(
+                "pointer-events-auto fixed z-50 flex flex-col overflow-hidden border bg-background text-foreground shadow-lg outline-none",
+                "transition-[transform,opacity] ease-cadence-out duration-(--motion-duration-slow) data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-swiping:duration-0",
+                "transform-[translate3d(var(--translate-x,0px),var(--translate-y,0px),0)]",
+                "data-[swipe-axis=y]:[--translate-y:calc(var(--drawer-snap-point-offset,0px)_+_var(--drawer-swipe-movement-y))]",
+                "data-[swipe-axis=x]:[--translate-x:var(--drawer-swipe-movement-x)]",
+                "data-[swipe-axis=y]:max-h-[calc(100dvh_-_3rem)] data-[swipe-axis=y]:data-snap-points:h-(--drawer-height)",
+                placement,
+                !cm.reduced && closedTransform,
+                !cm.reduced &&
+                  "data-[starting-style]:transform-(--closed-transform) data-[ending-style]:transform-(--closed-transform)",
+              ),
+              className,
+            )}
+            {...props}
+            ref={scopeRef}
           >
-            {children}
-          </DrawerPrimitive.Content>
-        </DrawerPrimitive.Popup>
+            {showSwipeHandle && <DrawerSwipeHandle />}
+            <DrawerPrimitive.Content
+              data-slot="drawer-content"
+              className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain p-4"
+            >
+              {children}
+            </DrawerPrimitive.Content>
+          </DrawerPrimitive.Popup>,
+        )}
       </DrawerPrimitive.Viewport>
     </DrawerPortal>
   );

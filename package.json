@@ -16,6 +16,7 @@
     "format:check": "biome format .",
     "typecheck": "tsc --noEmit",
     "registry:build": "node scripts/build-registry.mjs",
+    "motion:tokens": "node scripts/generate-motion-tokens.mjs",
     "registry:check": "node scripts/check-registry.mjs",
     "upstream:sync": "node scripts/sync-upstream.mjs",
     "parity:check": "node scripts/parity.mjs",

@@ -7,14 +7,9 @@ import type * as React from "react";
 import { createContext, type HTMLProps, useContext } from "react";
 import { cn } from "../lib/cn";
 import { ControlSpan } from "../lib/control-animation";
-import { duration, reducedDurationScale, scale } from "../lib/motion";
-import { stateClasses } from "../lib/popup-style";
-import { type CadenceMotion, useCadenceMotion } from "../lib/provider";
-
-function popupClock(cm: CadenceMotion): React.CSSProperties {
-  const factor = cm.disabled ? 0 : (cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
-  return { "--motion-duration-fast": `${duration.fast * factor}s` } as React.CSSProperties;
-}
+import { scale } from "../lib/motion";
+import { popupStyle, stateClasses } from "../lib/popup-style";
+import { useCadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -50,7 +45,7 @@ function DropdownMenuContent({
   style,
   ...props
 }: MenuPrimitive.Popup.Props & Pick<MenuPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
   const popupClasses = cn(
     "z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-hidden",
     cm.disabled
@@ -69,21 +64,22 @@ function DropdownMenuContent({
         side={side}
         sideOffset={sideOffset}
       >
-        <MenuPrimitive.Popup
-          data-slot="dropdown-menu-content"
-          data-motion={cm.mode}
-          className={
-            typeof className === "function"
-              ? (state) => cn(popupClasses, className(state))
-              : cn(popupClasses, className)
-          }
-          style={
-            typeof style === "function"
-              ? (state) => ({ ...popupClock(cm), ...style(state) })
-              : { ...popupClock(cm), ...style }
-          }
-          {...props}
-        />
+        {withCadenceScope(
+          cm,
+          <MenuPrimitive.Popup
+            data-slot="dropdown-menu-content"
+            data-motion={cm.mode}
+            data-cadence-scope=""
+            className={
+              typeof className === "function"
+                ? (state) => cn(popupClasses, className(state))
+                : cn(popupClasses, className)
+            }
+            style={popupStyle(cm, style)}
+            {...props}
+            ref={scopeRef}
+          />,
+        )}
       </MenuPrimitive.Positioner>
     </MenuPrimitive.Portal>
   );

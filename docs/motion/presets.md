@@ -1,11 +1,11 @@
 # Motion presets and component bindings
 
-Status: target design; implementation and verification pending.
+Status: parameter foundation implemented; component choreography and executor migration remain pending.
 
 This document owns the target parameter assignments used by the individual
 [component contracts](README.md). The [animation system](../animation-system.md) owns recipe
-semantics, base tokens, execution modes and budgets. Names in this document are design identifiers,
-not additional exported APIs, registry items, CSS variables or `Recipe` union members.
+semantics, base tokens, execution modes and budgets. Preset names are design identifiers with
+internal static bindings, not additional public APIs, registry items or `Recipe` union members.
 
 ## 1. Tokens, recipes, presets and bindings
 
@@ -29,7 +29,7 @@ Component prose may narrow a form (for example opacity-only surface presence), n
 
 ## 2. Shared parameter source and distribution
 
-The future authored runtime values and preset definitions belong in
+The authored runtime values and preset definitions live in
 `registry/cadence/lib/motion.ts`, consistent with the existing tokens-only rule. CSS output and
 Motion/engine adapters must derive from that source. Do not add a second set of constants in
 `registry/cadence/<id>/motion.ts`, MDX, site previews, theme CSS or a JSON animation database.
@@ -43,15 +43,84 @@ requires a separately documented layout decision and identical single-source and
 
 Documentation remains split by responsibility: the component file records `binding -> preset ->
 recipe` references without copying numeric values; this catalogue records the preset assignments.
-The exact TypeScript representation, generated CSS names and registry dependency entries remain
-implementation work. No public `motionPreset` prop, engine selector or arbitrary settings object is
-introduced by this design.
+The parameter layer uses individually exported preset objects in `lib/motion.ts`. A static
+`bindMotionParameters(preset, form)` selects one of that preset's exact forms;
+`resolveMotionParameters(binding, mode, options)` resolves parameters only. These are internal
+building blocks, not additional `Recipe` identifiers or executors. A resolved transition cannot
+establish that text diffing, reels, geometry measurement/clamping, cancellation or a component
+integration exists. No public `motionPreset` prop or engine selector is introduced.
+
+The CSS compatibility block is generated from that same TypeScript source. The generator loads
+the type-erased module using the installed TypeScript compiler; it requires neither Node's optional
+TypeScript stripping nor modifications to dependencies. `registry:check` compares every generated
+copy with the authored source, including the case where all three copies drift together.
+
+### 2.1 Authored inputs and effective compatibility outputs
+
+Duration inputs use `--motion-source-duration-<name>`; the existing
+`--motion-duration-<name>` variables remain effective CSS clocks. Other parameters are authored
+inputs: `--ease-cadence-<name>`, `--motion-spring-<name>-duration` / `-bounce`,
+`--motion-distance-<name>`, `--motion-scale-<name>`, `--motion-rotation-half-turn` and
+`--motion-stagger-<name>`. Names use kebab case. CSS output derives from the same module as JS.
+Easing utilities use dynamic theme variables rather than inlining the curve.
+
+Generated duration outputs reserve the identity suffix `+ 0s * 1` inside `calc()`. Transported
+effective overrides reserve `+ 0s * 2`. These valid CSS identities do not change timing. They identify
+library-owned output syntax after CSS variable substitution; they are not numeric heuristics or
+an inverse mode calculation. Consumer duration expressions must not use these reserved suffixes.
+An unmarked legacy duration override is already effective: preserve it exactly, without applying
+mode/timeScale again. It takes precedence over authored duration input. None and zero recipe clock
+still settle immediately. This compatibility entry does not make an authored duration twice as slow;
+consumers wanting inherited mode/clock scaling should tune the new source-duration input instead.
+Legacy reduced spring/tween differences remain the installed recipe contract, not v2 completion.
+
+Providers transport their parent's inputs through private CSS fallback variables; the provider's
+own class remains the local override surface. Portals transport the owning scope's inputs and
+effective overrides through the same fallback variables, so local popup class/style overrides still
+win. Only actual provider/portal boundaries reset those aliases; ordinary DOM descendants retain
+native CSS inheritance. Generated rules live in the base layer, so Tailwind utility overrides win.
+Explicit nested mode/clock overrides resolve from authored inputs, never a parent's generated
+zero. A missing provider uses one shared document-root snapshot. Internal part adapters may pass
+their real element ref to `useCadenceMotion(ref)` to resolve a deeper local scope. Base UI parts use
+`useCadenceMotionScope(callerRef)`: its attach signal reconnects delayed/replaced portal nodes, and
+its cleanup stops observation immediately while preserving caller and render refs. A scope snapshot
+is published to that owned part's React subtree without a DOM wrapper, including custom render
+children. Nested portals therefore inherit the actual part's committed parameters. A physical
+portal descendant resolves from its nearest transport boundary rather than unrelated body/root
+overrides; ancestor origin-2 values are already-effective inputs, while its own transported output
+is ignored to prevent feedback after an override is removed. A scope snapshot
+does not imply that all legacy components have migrated their part-level bindings.
+
+Computed style is sampled only after a client commit or a scope/environment event. Root/scoped
+class/public-token style changes, `data-motion`/`data-theme`/`data-color-scheme`, font context/loading,
+head stylesheet DOM/load changes and viewport resize refresh snapshots. Transform/opacity frame writes
+and private transport writes do not resample tokens. A stylesheet
+edited solely through CSSOM, or an application-specific theme signal without a DOM/resize event,
+must dispatch the explicit `refreshCadenceMotionTokens()` signal; this also covers unrelated CSS
+media/pseudo-class changes without a committed owner update. No CSSOM monkeypatch, per-frame
+polling or global per-glyph scan is used. The updated theme is an explicit provider registry
+dependency; source-only consumers must update the generated theme together with the scope adapter.
+Inputs must resolve to finite non-negative times, lengths or scalar values in their documented unit;
+percentage geometry is not a parameter input. Cubic-bezier curves and standard CSS easing keywords
+are supported, not arbitrary steps/linear() functions. Relative font lengths are resolved in the
+committed owner's font context. Portal transport uses normalized seconds/pixels/degrees, and a local
+public override establishes its own context. A bounded isolated shadow probe in the document head
+resolves calc/font units without inserting children into the sampled part. Unrepresentable physics
+or native-unit conversions throw rather than return Infinity or Motion fallback physics.
+Scope parameter correctness does not establish S04 active-writer cancellation.
+
+`resolveGeometryBounds` reports an infeasible interval when available space is below the measured
+intrinsic/readability minimum; it never lowers that minimum to fabricate an animatable range.
+The owning geometry controller must use immediate native layout/valid overflow in that case.
+This parameter result is not a rendered clamp. Theme-owned `--animate-*` clocks are outside the
+CSS recipe generator's ownership and remain intact when tokens are regenerated.
 
 ## 3. Default preset catalogue
 
 All times here are full-mode, unit-clock values. `visualDuration` describes spring feel, not an exact
 completion deadline. Existing token values remain owned by animation-system §2.2; numbers below make
-the assignments reviewable. The following tokens are target additions only:
+the assignments reviewable. The following parameter tokens exist in the shared source; component
+adoption and rendered geometry enforcement remain rollout work:
 
 | Target token         | Authored value                  | Reason                                                               |
 | -------------------- | ------------------------------- | -------------------------------------------------------------------- |
@@ -61,8 +130,9 @@ the assignments reviewable. The following tokens are target additions only:
 
 The size springs are alternatives to `spring.morph`, not replacements for its existing value. Both must use the
 same velocity-continuity conversion and rendered-size clamping as `geometry.resize`. They may enter
-the shared source only with resolver, CSS/adapter and token-source tests. This document does not change
-the retained runtime token example or CSS compatibility block.
+the shared source with parameter and token-source tests. Their pure resolver does not establish
+rendered-size clamping, provider overrides or a component migration. Existing legacy recipe
+assignments remain unchanged, and the CSS compatibility block retains its existing exposed values.
 
 | Preset key            | Recipe / execution contract                                            | Parameter assignment and intended scope                                                                                                                                                         | Target forms                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | --------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
