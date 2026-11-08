@@ -135,7 +135,7 @@ it("dropdown-menu preserves typed callbacks, render, refs, events, controlled up
     expect(node).toHaveAttribute("data-motion", mode);
     if (mode === "none") {
       expect(node.className).toContain("transition-none");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
     }
     if (mode === "reduced") expect(node.className).toContain("transition-opacity");
@@ -184,7 +184,7 @@ it("context-menu preserves typed callbacks, render, refs, events, controlled upd
     expect(node).toHaveAttribute("data-motion", mode);
     if (mode === "none") {
       expect(node.className).toContain("transition-none");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
     }
     if (mode === "reduced") expect(node.className).toContain("transition-opacity");
@@ -235,7 +235,7 @@ it("menubar preserves typed callbacks, render, refs, events, controlled updates 
     expect(node).toHaveAttribute("data-motion", mode);
     if (mode === "none") {
       expect(node.className).toContain("transition-none");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
     }
     if (mode === "reduced") expect(node.className).toContain("transition-opacity");
@@ -288,7 +288,7 @@ it("select preserves typed callbacks, render, refs, events, controlled updates a
     expect(node).toHaveAttribute("data-motion", mode);
     if (mode === "none") {
       expect(node.className).toContain("transition-none");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
     }
     if (mode === "reduced") expect(node.className).toContain("transition-opacity");
@@ -341,7 +341,7 @@ it("combobox preserves typed callbacks, render, refs, events, controlled updates
     expect(node).toHaveAttribute("data-motion", mode);
     if (mode === "none") {
       expect(node.className).toContain("transition-none");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
     }
     if (mode === "reduced") expect(node.className).toContain("transition-opacity");

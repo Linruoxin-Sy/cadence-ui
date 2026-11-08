@@ -48,6 +48,10 @@ npm install clsx tailwind-merge motion recharts@3.10.1
 | cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | chart | `@components/cadence/chart/index.tsx` | [JSON files[].content](https://cadence.dev/r/chart.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -973,12 +977,13 @@ plus either color or a complete light/dark theme map. Helpers require ChartConta
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Series enter / data update | SVG data geometry (T4 engine form) | `data.transition` | Recharts retargets from its series state |
+| Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition` | Recharts retargets from its series state |
 | Tooltip / legend | Immediate placement; no wrapper reveal | — | Immediate |
 | Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition` | Running controller completes |
 | None | Zero animation duration; final data | `data.transition` | Running controller completes |
 
-The full clock is duration.base / ease.out, scaled by provider timeScale. Reduced adds no fade
+The initial chart presents final geometry without an entrance. The full update clock is
+duration.base / ease.out, scaled by provider timeScale. Reduced adds no fade
 because comparison must remain legible. Static SVG coordinate transforms are retained in all
 modes. This is not a DOM layout animation. Mode changes do not remount the chart.
 
@@ -988,6 +993,9 @@ after immediate presentation keeps the same data still; the next data revision c
 Supported completion callbacks use the latest committed function. Callback availability, render
 functions, shapes, children and refs otherwise follow the pinned Recharts API.
 Hidden/offscreen, print and forced-colours settle owned work without replaying missed updates.
+Participating samples across active series share a 200-sample bound; overflow commits the
+complete current data geometry immediately. Stable series keep their own action when another
+series is inserted. Opted-out series and explicit nested caller controllers retain native ownership.
 
 ## Accessibility
 

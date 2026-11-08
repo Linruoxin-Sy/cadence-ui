@@ -4,6 +4,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 import { cn } from "../lib/cn";
+import { usePresenceEntrance } from "../lib/motion-presence";
 import { popupClockStyle } from "../lib/popup-style";
 import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
@@ -48,7 +49,8 @@ function Bubble({
   VariantProps<typeof bubbleVariants> & {
     align?: "start" | "end";
   }) {
-  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
+  const { cm, ref: scopeRef, node } = useCadenceMotionScope(props.ref);
+  usePresenceEntrance(node, cm, "data.transition");
   const clock = cm.transition("data.transition");
   // This native div has no primitive-owned transition shorthand.
   const { transition: _transition, ...transport } = popupClockStyle(cm);
@@ -69,7 +71,7 @@ function Bubble({
       data-align={align}
       className={cn(
         bubbleVariants({ variant }),
-        cm.disabled ? "transition-none duration-0" : "transition-opacity ease-cadence-out starting:opacity-0",
+        cm.disabled ? "transition-none duration-0" : "transition-opacity ease-cadence-out",
         cm.reduced && "transform-none",
         className,
       )}

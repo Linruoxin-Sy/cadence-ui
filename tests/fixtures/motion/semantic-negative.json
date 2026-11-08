@@ -1,0 +1,14 @@
+{
+  "initial-presentation": {
+    "file": "motion-presence.tsx",
+    "find": "const later =",
+    "replace": "const later = true ||",
+    "expected": "natural SSR hydration never hides first screen; real Calendar input is immediate"
+  },
+  "retired-presence": {
+    "file": "motion-presence.tsx",
+    "find": "registration.dispose();",
+    "replace": "void registration;",
+    "expected": "same ref with actual tag replacement retires old animation/listeners and preserves caller resting opacity"
+  }
+}

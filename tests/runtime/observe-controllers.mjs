@@ -5,7 +5,7 @@ export const observeControllers = {
   transform(code, id) {
     if (!/(?:registry|components)\/cadence\/chart\/index\.tsx$/.test(id.replaceAll("\\", "/"))) return;
     const head = /(\(_timeout,\s*handle,\s*listener(?:,\s*phase)?\)\s*=>\s*\{)/;
-    if (!head.test(code)) throw new Error("Missing public Chart controller");
+    if ((code.match(new RegExp(head, "g"))?.length ?? 0) !== 1) throw new Error("Expected one public Chart controller");
     code = code.replace(
       head,
       `$1
@@ -15,13 +15,24 @@ const observed = {handle, phase:typeof phase === "undefined" ? null : phase, ori
 const installedListener = listener;
 listener = value => {observed.updates.push({value,time:performance.now(),phaseProgress:observed.phase?.progress});return installedListener(value);};`,
     );
-    code = code.replace("handle.complete();", 'observed.state="finished"; handle.complete();');
-    code = code.replace(/(return \(\) => \{\s*)done = true;/, '$1observed.state="cancelled"; done = true;');
-    code = code.replace(/(const tick = \(now[^)]*\) => \{)/, "$1 observed.ticks.push(now);");
-    code = code.replace(
-      "const from = Number(handle.getFrom());",
-      "observed.applied.push({time:now,duration,progress}); const from = Number(handle.getFrom());",
-    );
+    const completions = code.match(/handle\.complete\(\)/g)?.length ?? 0;
+    if (completions < 1 || completions > 2) throw new Error(`Unsupported native completion sites: ${completions}`);
+    code = code.replaceAll("handle.complete()", '(observed.state="finished", handle.complete())');
+    const retire = /const retire = \(settle = false(?:, terminal\?: MotionSettlement)?\) => \{/g;
+    const cleanup = /(return \(\) => \{\s*)done = true;/g;
+    const retireCount = code.match(retire)?.length ?? 0,
+      cleanupCount = code.match(cleanup)?.length ?? 0;
+    if (retireCount + cleanupCount !== 1)
+      throw new Error(`Expected one native retirement site: ${retireCount}/${cleanupCount}`);
+    code = retireCount
+      ? code.replace(retire, '$& if (observed.state !== "finished") observed.state="cancelled";')
+      : code.replace(cleanup, '$1observed.state="cancelled"; done = true;');
+    const tick = /(const tick = \(now[^)]*\) => \{)/g;
+    const from = "const from = Number(handle.getFrom());";
+    if ((code.match(tick)?.length ?? 0) !== 1 || code.split(from).length !== 2)
+      throw new Error("Expected one native tick and interpolation site");
+    code = code.replace(tick, "$1 observed.ticks.push(now);");
+    code = code.replace(from, `observed.applied.push({time:now,duration,progress}); ${from}`);
     return code;
   },
 };

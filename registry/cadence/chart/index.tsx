@@ -5,7 +5,13 @@ import * as React from "react";
 import type { TooltipValueType } from "recharts";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "../lib/cn";
-import { motionMilliseconds } from "../lib/motion";
+import { motionLimits, motionMilliseconds } from "../lib/motion";
+import {
+  createMotionTransaction,
+  type MotionLease,
+  type MotionRevision,
+  type MotionSettlement,
+} from "../lib/motion-transaction";
 import { useCadenceMotionScope, useEngineEnvironment, withCadenceScope } from "../lib/provider";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
@@ -187,38 +193,62 @@ type ChartPhase = {
   easing?: (progress: number) => number;
   started: boolean;
   completed: boolean;
+  work?: number;
+  entity?: object;
+  target?: object;
+  alive?: boolean;
+  dispose?: () => void;
 };
 type ChartController = (
   ...args: [...Parameters<RechartsPrimitive.AnimationController>, ChartPhase?]
 ) => ReturnType<RechartsPrimitive.AnimationController>;
-const SeriesController = React.createContext<{ controller: ChartController; target: object } | null>(null);
+type SeriesRegistration = { type: unknown; entity: object };
+type SeriesOwner = {
+  controller: ChartController;
+  target: object;
+  register(path: string, type: unknown, entity: object): () => void;
+};
+const SeriesController = React.createContext<SeriesOwner | null>(null);
 function ChartSeriesOwner({
   element,
   instant,
+  samples,
+  context,
+  identity,
 }: {
   element: React.ReactElement<Record<string, unknown>>;
   instant: boolean;
+  samples: number;
+  context: React.ReactNode;
+  identity: string;
 }) {
   const owner = React.useContext(SeriesController);
+  const entity = React.useRef({}).current;
+  const register = owner?.register;
+  React.useInsertionEffect(
+    () => register?.(identity, element.type, entity),
+    [register, identity, element.type, entity],
+  );
   const latest = React.useRef(element.props);
   const committed = React.useRef({
-    target: owner?.target,
+    element,
+    context,
     phase: { progress: 0, started: false, completed: false } as ChartPhase,
   });
   const phase =
-    committed.current.target === owner?.target
+    sameChartTarget(committed.current.element, element) && sameChartTarget(committed.current.context, context)
       ? committed.current.phase
       : ({ progress: 0, started: false, completed: false } as ChartPhase);
   const callbacks = React.useMemo(
     () => ({
       onAnimationStart: () => {
-        if (committed.current.phase !== phase || phase.started) return;
+        if (!phase.alive || committed.current.phase !== phase || phase.started) return;
         phase.started = true;
         const callback = latest.current.onAnimationStart;
         if (typeof callback === "function") callback();
       },
       onAnimationEnd: () => {
-        if (committed.current.phase !== phase || phase.completed) return;
+        if (!phase.alive || committed.current.phase !== phase || phase.completed) return;
         phase.completed = true;
         const callback = latest.current.onAnimationEnd;
         if (typeof callback === "function") callback();
@@ -230,11 +260,24 @@ function ChartSeriesOwner({
   // arbitrary shape props and native refs pass straight through to Recharts.
   React.useInsertionEffect(() => {
     latest.current = element.props;
-    committed.current = { target: owner?.target, phase };
-  }, [element.props, owner?.target, phase]);
+    phase.work = samples;
+    phase.entity = entity;
+    phase.target ??= {};
+    committed.current = { element, context, phase };
+  }, [element, context, phase, samples, entity]);
+  React.useInsertionEffect(() => {
+    phase.alive = true;
+    return () => {
+      phase.alive = false;
+      phase.dispose?.();
+    };
+  }, [phase]);
   const controller = owner?.controller;
   const nativeController = React.useCallback<RechartsPrimitive.AnimationController>(
-    (timeout, handle, listener) => controller?.(timeout, handle, listener, phase) ?? (() => {}),
+    (timeout, handle, listener) =>
+      phase.alive && committed.current.phase === phase
+        ? (controller?.(timeout, handle, listener, phase) ?? (() => {}))
+        : () => {},
     [controller, phase],
   );
   const authored = element.props.animationInterpolateFn as SeriesInterpolator | undefined;
@@ -251,14 +294,31 @@ function ChartSeriesOwner({
     </RechartsPrimitive.AnimationControllerProvider>
   );
 }
-function chartSeries(element: React.ReactElement, instant: boolean): React.ReactElement {
+function chartSeries(
+  element: React.ReactElement,
+  instant: boolean,
+  inheritedData?: unknown,
+  context: React.ReactNode[] = [],
+  identity = "root",
+): React.ReactElement {
   if (element.type === RechartsPrimitive.AnimationControllerProvider) return element;
+  const props = element.props as Record<string, unknown>;
+  const data = props.data ?? inheritedData;
   if (animatedSeries.has(element.type))
     return (
       <ChartSeriesOwner
         key={element.key}
         element={element as React.ReactElement<Record<string, unknown>>}
         instant={instant}
+        context={context}
+        identity={identity}
+        samples={
+          props.hide || props.isAnimationActive === false
+            ? 0
+            : Array.isArray(data)
+              ? data.length
+              : motionLimits.chartSamples + 1
+        }
       />
     );
   const child = element as React.ReactElement<{
@@ -269,12 +329,61 @@ function chartSeries(element: React.ReactElement, instant: boolean): React.React
   return React.cloneElement(child, {
     ...(child.props.children !== undefined && typeof child.props.children !== "function"
       ? {
-          children: React.Children.map(child.props.children, (nested) =>
-            React.isValidElement(nested) ? chartSeries(nested, instant) : nested,
+          children: React.Children.map(child.props.children, (nested, index) =>
+            React.isValidElement(nested)
+              ? chartSeries(
+                  nested,
+                  instant,
+                  data,
+                  [
+                    ...context,
+                    React.cloneElement(element as React.ReactElement<{ children?: React.ReactNode }>, {
+                      children: undefined,
+                    }),
+                  ],
+                  JSON.stringify([identity, nested.key ?? index]),
+                )
+              : nested,
           ),
         }
       : {}),
   });
+}
+
+/** Read only known data lengths and committed series registrations, never samples. */
+function chartWorkExceeds(
+  element: React.ReactElement,
+  registrations: ReadonlyMap<string, SeriesRegistration>,
+  active: Map<unknown, number>,
+) {
+  let proposed = 0;
+  const visit = (element: React.ReactElement, inheritedData?: unknown, identity = "root") => {
+    if (element.type === RechartsPrimitive.AnimationControllerProvider) return;
+    const props = element.props as Record<string, unknown>;
+    const data = props.data ?? inheritedData;
+    if (animatedSeries.has(element.type)) {
+      const count =
+        props.hide || props.isAnimationActive === false
+          ? 0
+          : Array.isArray(data)
+            ? data.length
+            : motionLimits.chartSamples + 1;
+      const previous = registrations.get(identity);
+      const entity = previous?.type === element.type ? previous.entity : undefined;
+      // Native React child addresses identify the existing series host. Recharts
+      // retains sample correspondence and its source/target endpoint pairs.
+      proposed += Math.max(count, entity ? (active.get(entity) ?? 0) : 0);
+      if (entity) active.delete(entity);
+      return;
+    }
+    if (typeof props.children !== "function")
+      React.Children.forEach(props.children as React.ReactNode, (nested, index) => {
+        if (React.isValidElement(nested)) visit(nested, data, JSON.stringify([identity, nested.key ?? index]));
+      });
+  };
+  visit(element);
+  for (const count of active.values()) proposed += count;
+  return proposed > motionLimits.chartSamples;
 }
 
 function ChartContainer({
@@ -297,6 +406,17 @@ function ChartContainer({
   const curve = cm.scope.tokens.ease.out;
   const current = React.useRef({ reduced: cm.reduced, duration: clock.duration ?? 0, easing: cubicBezier(...curve) });
   const running = React.useRef(new Set<() => void>());
+  const [transaction] = React.useState(createMotionTransaction);
+  const series = React.useRef(new Map<string, SeriesRegistration>());
+  const registerSeries = React.useCallback((identity: string, type: unknown, entity: object) => {
+    const registration = { type, entity };
+    series.current.set(identity, registration);
+    return () => {
+      if (series.current.get(identity) === registration) series.current.delete(identity);
+    };
+  }, []);
+  const registrations = React.useRef(new WeakMap<ChartPhase, ReturnType<typeof transaction.register>>());
+  const committedTarget = React.useRef<{ target: object; revision: MotionRevision } | null>(null);
   const settle = React.useCallback(() => {
     for (const finish of [...running.current]) finish();
   }, []);
@@ -314,9 +434,12 @@ function ChartContainer({
   // Callback, formatter, shape and ref revisions still forward their latest props;
   // they cannot turn restoration of already-present data into another data action.
   const instant =
+    prior === null ||
     cm.reduced ||
     clock.duration === 0 ||
     environment.unavailable ||
+    (React.isValidElement(source) &&
+      chartWorkExceeds(source, series.current, transaction.activeWork("chartSamples"))) ||
     Boolean(prior?.instant && sameChartTarget(prior.source, source));
   const tree =
     sameSource && prior.instant === instant
@@ -324,6 +447,12 @@ function ChartContainer({
       : React.isValidElement(source)
         ? chartSeries(source, instant)
         : source;
+  React.useInsertionEffect(() => {
+    committedTarget.current = { target, revision: transaction.revision("content", target) };
+    return () => {
+      transaction.revision("content", {});
+    };
+  }, [target, transaction]);
   React.useLayoutEffect(() => {
     cached.current = { source, instant, tree, target };
   }, [source, instant, tree, target]);
@@ -333,25 +462,73 @@ function ChartContainer({
   }, [cm.reduced, clock.duration, curve, environment.blocked, settle]);
   const controller = React.useCallback<ChartController>(
     (_timeout, handle, listener, phase) => {
-      // Enter the active phase so complete() delivers Recharts' completion callback.
-      // Cadence consumes the caller delay; its token clock starts immediately.
-      handle.tick(0);
-      handle.tick(handle.getAnimationBegin());
       let frame = 0;
       let done = false;
       const playback: ChartPhase = phase ?? { progress: 0, started: false, completed: false };
+      const revision = phase?.target
+        ? transaction.revision("content", phase.target, phase)
+        : committedTarget.current?.revision;
+      if (!revision) return () => {};
+      const currentPhase = () => revision.current() && (!phase || phase.alive);
+      let registration = registrations.current.get(playback);
+      if (!registration) {
+        registration = transaction.register(playback, playback.entity ?? playback);
+        registrations.current.set(playback, registration);
+        const owned = registration;
+        playback.dispose = () => {
+          owned.dispose();
+          registrations.current.delete(playback);
+        };
+      }
+      let lease: MotionLease | null;
+      let finish: () => void = () => {};
+      const retire = (settle = false, terminal?: MotionSettlement) => {
+        done = true;
+        cancelAnimationFrame(frame);
+        running.current.delete(finish);
+        if (!settle) return;
+        if (!terminal?.current()) return;
+        playback.progress = 1;
+        listener(handle.getTo());
+        if (terminal.current() && currentPhase()) handle.complete();
+      };
+      const immediateNative = !phase || playback.work === undefined;
+      lease = registration.begin(
+        revision,
+        ["chart-geometry"],
+        immediateNative ? {} : { chartSamples: playback.work },
+        retire,
+      );
+      const overflow = !lease;
+      if (!lease) lease = registration.begin(revision, ["chart-geometry"], {}, retire);
+      if (!lease?.current()) return () => {};
+      // Required native callbacks remain synchronous. They can themselves replace
+      // data or unmount the chart, so recheck authority after every callout.
+      handle.tick(0);
+      if (!lease.current()) {
+        lease.cancel();
+        return () => {};
+      }
+      handle.tick(handle.getAnimationBegin());
+      if (!lease.current()) {
+        lease.cancel();
+        return () => {};
+      }
       const origin = playback.progress;
-      const finish = () => {
-        if (done) return;
+      finish = () => {
+        if (done || !lease?.current()) return;
         done = true;
         playback.progress = 1;
         cancelAnimationFrame(frame);
         running.current.delete(finish);
         listener(handle.getTo());
-        handle.complete();
+        if (lease.current() && currentPhase()) handle.complete();
+        lease.finish();
       };
       running.current.add(finish);
       if (
+        overflow ||
+        immediateNative ||
         current.current.reduced ||
         current.current.duration === 0 ||
         environment.blocked.current ||
@@ -359,11 +536,12 @@ function ChartContainer({
         typeof handle.getFrom() !== "number"
       ) {
         finish();
-        return () => {};
+        const completed = lease;
+        return () => completed.cancel();
       }
       let progress = playback.progress;
       const tick = (now: number) => {
-        if (done) return;
+        if (done || !lease?.current()) return;
         // The first visual frame follows committed local-token resolution.
         // Later frames and replacement handles retain this action's curve.
         if (!playback.easing) playback.easing = current.current.easing;
@@ -385,16 +563,14 @@ function ChartContainer({
         if (endPaint === startPaint) return finish();
         const remaining = (easing(progress) - startPaint) / (endPaint - startPaint);
         listener(from + (Number(handle.getTo()) - from) * remaining);
-        frame = requestAnimationFrame(tick);
+        if (lease.current()) frame = requestAnimationFrame(tick);
       };
       frame = requestAnimationFrame(tick);
       return () => {
-        done = true;
-        cancelAnimationFrame(frame);
-        running.current.delete(finish);
+        lease?.cancel();
       };
     },
-    [environment.blocked],
+    [environment.blocked, transaction],
   );
   const uniqueId = React.useId();
   const chartId = `chart-${id ?? uniqueId.replace(/:/g, "")}`;
@@ -414,7 +590,7 @@ function ChartContainer({
         ref={scopeRef}
       >
         <ChartStyle id={chartId} config={config} />
-        <SeriesController.Provider value={{ controller, target }}>
+        <SeriesController.Provider value={{ controller, target, register: registerSeries }}>
           <RechartsPrimitive.AnimationControllerProvider value={controller}>
             <RechartsPrimitive.ResponsiveContainer initialDimension={initialDimension}>
               {tree}

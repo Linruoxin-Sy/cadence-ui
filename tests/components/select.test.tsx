@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { useState } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import {
   Select,
@@ -40,7 +41,85 @@ async function openSelect(trigger: HTMLElement) {
   await waitFor(() => expect(screen.getByRole("listbox")).toBeInTheDocument());
 }
 
+type ObjectOption = { id: string; label: string };
+function ObjectDemo({
+  next,
+  remix,
+  request,
+  format,
+}: {
+  next: ObjectOption;
+  remix: ObjectOption;
+  request: (item: ObjectOption | null) => void;
+  format: (item: ObjectOption | null) => string;
+}) {
+  const [value, setValue] = useState(next);
+  return (
+    <Select
+      value={value}
+      isItemEqualToValue={(a, b) => a.id === b.id}
+      itemToStringValue={(item) => item.id}
+      onValueChange={(item) => {
+        request(item);
+        if (item) setValue({ ...item });
+      }}
+      modal={false}
+    >
+      <SelectTrigger aria-label="Object framework">
+        <SelectValue>{format}</SelectValue>
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value={next}>Next.js</SelectItem>
+        <SelectItem value={remix}>Remix</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+}
+
 describe("Select", () => {
+  it("retains native object equality, formatter arguments and explicit undefined uncontrolled values", async () => {
+    const next = { id: "next", label: "Next.js" },
+      remix = { id: "remix", label: "Remix" };
+    const request = vi.fn();
+    const format = vi.fn((value: typeof next | null) => value?.label ?? "Choose");
+    const view = render(<ObjectDemo next={next} remix={remix} request={request} format={format} />);
+    const trigger = screen.getByRole("combobox", { name: "Object framework" });
+    await openSelect(trigger);
+    const source = screen.getByRole("option", { name: "Remix" });
+    const rect = (left: number) =>
+      ({ x: left, y: 100, left, top: 100, right: left + 60, bottom: 120, width: 60, height: 20 }) as DOMRect;
+    Object.defineProperty(source.querySelector('[data-slot="select-item-text"]'), "getBoundingClientRect", {
+      value: () => rect(20),
+    });
+    Object.defineProperty(
+      trigger.querySelector('[data-slot="select-value"]')?.firstElementChild,
+      "getBoundingClientRect",
+      { value: () => rect(200) },
+    );
+    await userEvent.click(source);
+    expect(request).toHaveBeenCalledOnce();
+    expect(request).toHaveBeenCalledWith(remix);
+    expect(trigger).toHaveTextContent("Remix");
+    expect(format).toHaveBeenLastCalledWith({ id: "remix", label: "Remix" });
+    expect(document.querySelector('[data-slot="select-handoff"]')).toBeInTheDocument();
+    view.unmount();
+    render(
+      <Select value={undefined} defaultValue="next" modal={false}>
+        <SelectTrigger aria-label="Undefined framework">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="next">Next.js</SelectItem>
+          <SelectItem value="remix">Remix</SelectItem>
+        </SelectContent>
+      </Select>,
+    );
+    const uncontrolled = screen.getByRole("combobox", { name: "Undefined framework" });
+    expect(uncontrolled).toHaveTextContent("Next.js");
+    await openSelect(uncontrolled);
+    await userEvent.click(screen.getByRole("option", { name: "Remix" }));
+    expect(uncontrolled).toHaveTextContent("Remix");
+  });
   it("renders the trigger with the selected label and the upstream slots", () => {
     const { container } = render(<Demo />);
     const trigger = screen.getByRole("combobox", { name: "Framework" });
@@ -141,7 +220,11 @@ describe("Select", () => {
 
     const clone = document.querySelector('[data-slot="select-handoff"]');
     expect(clone).toBeInTheDocument();
-    expect(clone).toHaveTextContent("Remix");
+    expect(clone).toHaveAttribute("data-cadence-flight-text", "Remix");
+    expect(clone).toHaveAttribute("aria-hidden", "true");
+    expect(clone?.textContent).toBe("");
+    expect(trigger).toHaveTextContent("Remix");
+    expect(trigger.textContent?.match(/Remix/g)).toHaveLength(1);
     expect(clone).toHaveStyle({ left: "200px", top: "100px" });
   });
 

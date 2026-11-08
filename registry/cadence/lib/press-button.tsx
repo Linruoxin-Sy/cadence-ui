@@ -4,6 +4,7 @@ import { type MotionProps, motion } from "motion/react";
 import { type ComponentProps, type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useControlAnimation } from "./control-animation";
 import type { CadenceMode } from "./motion";
+import { useMotionHostRef } from "./motion-ref";
 
 type NativeEvents = Pick<ComponentProps<"button">, "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd">;
 
@@ -78,6 +79,8 @@ export function PressButton({
     "data-motion"?: string;
   }) {
   const [pressed, setPressed] = useState(false);
+  const button = useMotionHostRef(ref);
+  const content = useRef<HTMLSpanElement>(null);
   const owner = useRef<number | "Enter" | null>(null);
   const release = useCallback(() => {
     owner.current = null;
@@ -108,6 +111,8 @@ export function PressButton({
     { scale: pressed && !disabled && typeof pressScale === "number" ? pressScale : 1 },
     disabled || !whileTap ? { duration: 0 } : transition,
     mode as CadenceMode,
+    undefined,
+    contentOnly ? content : button.node,
   );
   return (
     <MotionNativeButton
@@ -145,12 +150,13 @@ export function PressButton({
         props.onBlur?.(event);
         release();
       }}
-      nativeRef={ref}
+      nativeRef={button.ref}
       nativeEvents={{ onAnimationStart, onDrag, onDragStart, onDragEnd }}
     >
       {decoration}
       {contentOnly ? (
         <motion.span
+          ref={content}
           data-slot="press-button-content"
           data-motion={mode}
           className="relative z-10 inline-flex items-center justify-center gap-[inherit]"

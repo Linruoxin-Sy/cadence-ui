@@ -1,12 +1,13 @@
+import { act, render } from "@testing-library/react";
+import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { DocumentEntrance } from "@/components/site/document-entrance";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
-import { controlSamples } from "../motion-observer";
 
-describe("DocumentEntrance server state", () => {
-  for (const as of ["article", "section", "div"] as const) {
-    it.each(["full", "reduced", "none"] as const)(`${as} renders the explicit %s initial state`, (mode) => {
+describe("DocumentEntrance natural presentation", () => {
+  for (const as of ["article", "section", "div"] as const)
+    it.each(["full", "reduced", "none"] as const)(`${as} keeps %s server content readable`, (mode) => {
       const html = renderToString(
         <CadenceProvider mode={mode}>
           <DocumentEntrance as={as}>Readable</DocumentEntrance>
@@ -17,128 +18,89 @@ describe("DocumentEntrance server state", () => {
       const host = root.querySelector<HTMLElement>(`${as}[data-document-entrance]`);
       expect(host).not.toBeNull();
       expect(host?.dataset.motion).toBe(mode);
-      expect(host?.style.opacity).toBe(mode === "none" ? "1" : "0");
-      expect(host?.style.filter).toBe(mode === "full" ? "blur(4px)" : "none");
-      expect(host?.style.clipPath).toBe(mode === "full" ? "inset(0% 0% 100% 0%)" : "none");
+      for (const property of ["opacity", "filter", "clipPath", "transform"] as const)
+        expect(host?.style[property]).toBe("");
+      expect(host?.textContent).toBe("Readable");
     });
-  }
-});
 
-import { act, render } from "@testing-library/react";
-
-describe("DocumentEntrance intersection trigger", () => {
-  it.each(["article", "section", "div"] as const)("observes the unclipped layout box around %s", (as) => {
-    let deliver: IntersectionObserverCallback | undefined;
-    const observe = vi.fn();
-    const unobserve = vi.fn();
-    const disconnect = vi.fn();
-    vi.stubGlobal(
-      "IntersectionObserver",
-      class {
-        constructor(callback: IntersectionObserverCallback) {
-          deliver = callback;
-        }
-        observe = observe;
-        unobserve = unobserve;
-        disconnect = disconnect;
-      },
-    );
-    try {
-      const { container, rerender, unmount } = render(
-        <CadenceProvider mode="full">
-          <DocumentEntrance as={as} className="document-layout">
-            <input aria-label="Draft" defaultValue="Keep me" />
-          </DocumentEntrance>
-        </CadenceProvider>,
+  it.each(["full", "reduced", "none"] as const)(
+    "first CSR in %s stays natural and preserves native editor identity",
+    (mode) => {
+      const tree = (text: string) => (
+        <StrictMode>
+          <CadenceProvider mode={mode}>
+            <DocumentEntrance as="article">
+              <input aria-label="Draft" defaultValue="keep this" />
+              <p>{text}</p>
+            </DocumentEntrance>
+          </CadenceProvider>
+        </StrictMode>
       );
-      const host = container.querySelector<HTMLElement>("[data-document-entrance]");
-      const frame = container.querySelector<HTMLElement>("[data-document-entrance-frame]");
-      const input = container.querySelector("input");
-      expect(host?.tagName.toLowerCase()).toBe(as);
-      expect(host).toHaveClass("document-layout");
-      expect(frame).toBe(host?.parentElement);
-      expect(frame?.style.clipPath).toBe("");
-      expect(observe).toHaveBeenCalledWith(frame);
-      expect(observe).not.toHaveBeenCalledWith(host);
-      if (!frame) throw new Error("Missing entrance frame");
-      const entry = (isIntersecting: boolean): IntersectionObserverEntry => ({
-        target: frame,
-        isIntersecting,
-        intersectionRatio: isIntersecting ? 1 : 0,
-        boundingClientRect: new DOMRect(),
-        intersectionRect: new DOMRect(),
-        rootBounds: null,
-        time: 0,
-      });
-      act(() => deliver?.([entry(false)], {} as IntersectionObserver));
-      expect([...controlSamples.values()].at(-1)?.target.opacity).toBe(0);
-      act(() => deliver?.([entry(true)], {} as IntersectionObserver));
-      expect([...controlSamples.values()].at(-1)?.target.opacity).toBe(1);
-      expect(unobserve).toHaveBeenCalledWith(frame);
+      const { container, rerender } = render(tree("First"));
+      const article = container.querySelector("article"),
+        input = container.querySelector("input");
       input?.focus();
-      rerender(
-        <CadenceProvider mode="none">
-          <DocumentEntrance as={as} className="document-layout">
-            <input aria-label="Draft" defaultValue="Keep me" />
-          </DocumentEntrance>
-        </CadenceProvider>,
-      );
-      expect(container.querySelector("[data-document-entrance]")).toBe(host);
+      rerender(tree("Latest"));
+      expect(container.querySelector("article")).toBe(article);
       expect(container.querySelector("input")).toBe(input);
       expect(input).toHaveFocus();
-      expect([...controlSamples.values()].at(-1)?.target).toMatchObject({
-        opacity: 1,
-        filter: "none",
-        clipPath: "none",
+      expect(input?.value).toBe("keep this");
+      expect(article?.style.opacity).toBe("");
+      expect(article?.style.clipPath).toBe("");
+    },
+  );
+
+  it("cancels only its handle on zero/ref replacement; old completion cannot clear a replacement", async () => {
+    const handles: { cancel: ReturnType<typeof vi.fn>; resolve(): void }[] = [];
+    const animate = vi.fn(() => {
+      let resolve = () => {};
+      const finished = new Promise<void>((done) => {
+        resolve = done;
       });
+      const handle = { cancel: vi.fn(), resolve, finished };
+      handles.push(handle);
+      return handle as unknown as Animation;
+    });
+    const original = HTMLElement.prototype.animate;
+    HTMLElement.prototype.animate = animate;
+    try {
+      const tree = (show: boolean, as: "article" | "section" = "article", clock = 8) => (
+        <CadenceProvider mode="full" timeScale={clock}>
+          {show && (
+            <DocumentEntrance as={as}>
+              <input aria-label="Draft" />
+            </DocumentEntrance>
+          )}
+        </CadenceProvider>
+      );
+      const { container, rerender, unmount } = render(tree(false));
+      rerender(tree(true));
+      expect(animate).toHaveBeenCalledOnce();
+      const old = handles[0];
+      if (!old) throw new Error("Missing native entrance handle");
+      const node = container.querySelector("article");
+      rerender(tree(true, "section"));
+      expect(old.cancel).toHaveBeenCalledOnce();
+      expect(node?.isConnected).toBe(false);
+      const replacement = container.querySelector("section");
+      await act(async () => {
+        old.resolve();
+        await Promise.resolve();
+      });
+      expect(container.querySelector("section")).toBe(replacement);
+      expect(animate).toHaveBeenCalledOnce();
+      replacement?.querySelector("input")?.focus();
+      expect(replacement?.style.opacity).toBe("");
+      rerender(tree(false));
+      rerender(tree(true));
+      const active = handles.at(-1);
+      expect(animate).toHaveBeenCalledTimes(2);
+      rerender(tree(true, "article", 0));
+      expect(active?.cancel).toHaveBeenCalledOnce();
       unmount();
-      expect(disconnect).toHaveBeenCalled();
+      expect(active?.cancel).toHaveBeenCalledOnce();
     } finally {
-      vi.unstubAllGlobals();
-    }
-  });
-});
-
-describe("DocumentEntrance hash destinations without an intersection delivery", () => {
-  it.each(["full", "reduced", "none"] as const)("reveals a cold deep link in %s", (mode) => {
-    window.history.replaceState(null, "", "#entrance-target");
-    try {
-      render(
-        <CadenceProvider mode={mode}>
-          <DocumentEntrance as="article">
-            <h2 id="entrance-target">Example</h2>
-          </DocumentEntrance>
-        </CadenceProvider>,
-      );
-      const targets = [...controlSamples.values()].map((sample) => sample.target);
-      expect(targets.some((target) => target.opacity === 1 && target.clipPath !== "inset(0% 0% 100% 0%)")).toBe(true);
-    } finally {
-      window.history.replaceState(null, "", window.location.pathname);
-    }
-  });
-
-  it("ignores unrelated and malformed hashes, then responds to an in-document destination", () => {
-    window.history.replaceState(null, "", "#outside");
-    try {
-      render(
-        <DocumentEntrance as="article">
-          <h2 id="entrance-target">Example</h2>
-        </DocumentEntrance>,
-      );
-      const opacity = () => [...controlSamples.values()].at(-1)?.target.opacity;
-      expect(opacity()).toBe(0);
-      act(() => {
-        window.history.replaceState(null, "", "#%bad");
-        window.dispatchEvent(new HashChangeEvent("hashchange"));
-      });
-      expect(opacity()).toBe(0);
-      act(() => {
-        window.history.replaceState(null, "", "#entrance-target");
-        window.dispatchEvent(new HashChangeEvent("hashchange"));
-      });
-      expect(opacity()).toBe(1);
-    } finally {
-      window.history.replaceState(null, "", window.location.pathname);
+      HTMLElement.prototype.animate = original;
     }
   });
 });

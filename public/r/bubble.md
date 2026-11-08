@@ -54,6 +54,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | bubble | `@components/cadence/bubble/index.tsx` | [JSON files[].content](https://cadence.dev/r/bubble.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -546,12 +550,15 @@ and data-align. No additional message-state or validation API is introduced.
 
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
-| New Bubble enters | `data.transition` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Opacity 1 on first frame, zero duration |
+| Later client insertion | `data.transition` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Current resting opacity immediately |
 
-CSS @starting-style performs a one-shot entry. The duration resolves locally through
-cm.transition("data.transition"), including provider timeScale, so an inner full
+Server HTML, hydration and the first client presentation retain natural paint. A later
+client insertion may use one native opacity animation. A known entering parent consumes
+only that shared entrance cause; a later independent insertion remains eligible.
+The duration resolves locally through cm.transition("data.transition"), including provider timeScale, so an inner full
 scope restores its clock inside outer none. Reduced drops animated transforms;
-this recipe uses opacity in full too. Live none cancels entry on the same node.
+this recipe uses opacity in full too. Focus, activation, selection or a live none/zero
+clock cancels the owned entry to the current cascade without remounting content.
 Existing text, variants, alignment, reactions and resize update immediately. Removal
 is immediate; there is no exit or layout animation. Caller-provided motion is caller-owned.
 

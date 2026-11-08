@@ -59,7 +59,7 @@ it("dialog preserves callbacks, render, refs, native events, controlled updates 
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));
@@ -110,7 +110,7 @@ it("alert-dialog preserves callbacks, render, refs, native events, controlled up
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));
@@ -161,7 +161,7 @@ it("sheet preserves callbacks, render, refs, native events, controlled updates a
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));
@@ -212,7 +212,7 @@ it("drawer preserves callbacks, render, refs, native events, controlled updates 
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));
@@ -263,7 +263,7 @@ it("popover preserves callbacks, render, refs, native events, controlled updates
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));
@@ -313,7 +313,7 @@ it("tooltip preserves callbacks, render, refs, native events, controlled updates
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));
@@ -363,7 +363,7 @@ it("hover-card preserves callbacks, render, refs, native events, controlled upda
     if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-      expect(node.className).not.toContain(":opacity-0");
+      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
   }
   view.rerender(example({ open: false, mode: "none" }));

@@ -243,8 +243,9 @@ existing performance task is a final delivery dependency, not a development prer
 - Existing engine adapters preserve native geometry, direct gestures and ref/event ownership while
   cancelling their autonomous work. Embla retains actual effective option precedence; Recharts retains
   per-series action progress across native handle recreation; Calendar and Toc retain their distinct
-  cancellation clocks. This shared support does not migrate their complete component contracts, initial
-  full-mode series presentation, annotation/content capabilities or the remaining popup/geometry work.
+  cancellation clocks. Initial chart presentation is terminal; later series/data changes retain native
+  interpolation. This shared support does not migrate their complete component contracts,
+  annotation/content capabilities or the remaining popup/geometry work.
 - Target reference metadata explicitly records `migration: "legacy"`; absent/unknown state fails.
   Registry checking and the runtime reporter reject `v2` until strict enforcement support exists.
   Legacy items still prove their documented baseline. Next, enable shared target assertion support,
@@ -313,7 +314,7 @@ moving-set limit together. Count retained active work, release obsolete decorati
 immediate latest-content fallback without waiting for capacity. Also prove that this cleanup leaves
 caller-persisted panels, unchanged text identity and independent list-item lifecycles intact.
 
-Implement and verify the target automatic-collection participant bound from presets §5.2 before
+Adopt the internal transaction identity bound and preflight from presets §5.2 in each collection adapter before
 per-member measurement or retained-visual allocation. Exercise the exact bound and overflow,
 including measured/projected retained siblings, earlier active revisions and outgoing visuals;
 an oversized identity set must reject decoration before reading all member boxes. Prove that a
@@ -324,11 +325,11 @@ Count participating shells/markers too: a transaction with 49 row visuals and on
 already at the target bound; an additional distinct outgoing visual must take the immediate fallback.
 Multiple bindings on the same member visual do not multiply that participant or its allowance.
 
-Verify known library presence and colour on the same actual node with one transition-family
+Extend the internal known-popup presence and colour composition to each applicable component with one transition-family
 composition and disjoint property ownership. Default library presence must not cause colour to
 yield as though it were an unknown caller family. Cover immediate whole-palette focus/invalid paint,
 entry interaction with an independent backdrop, three distinct modes, live cancellation, native
-completion and unknown caller overrides. This integration remains pending until source, declarations,
+completion and unknown caller overrides. Component adoption remains pending until source, declarations,
 public docs and executed evidence agree.
 
 Prove ordinary layout/colour classes and supported class/style/render callbacks retain default

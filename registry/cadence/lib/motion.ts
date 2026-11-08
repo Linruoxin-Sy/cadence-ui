@@ -59,6 +59,7 @@ export const motionLimits = {
   diffComparisons: 4096,
   numericColumns: 12,
   chartSamples: 200,
+  collectionVisuals: 50,
   pendingTargets: 1,
 } as const;
 
@@ -247,6 +248,21 @@ export function transitionFor(
     ease: [...(scope?.tokens?.ease?.[spec.ease] ?? ease[spec.ease])] as [number, number, number, number],
     delay,
   };
+}
+
+/** Resolve a CSS form's own token clock without substituting another recipe. */
+export function cssDurationFor(
+  token: keyof typeof duration,
+  mode: CadenceMode,
+  timeScale: number,
+  scope?: { tokens?: MotionParameterTokens; effectiveDurations?: EffectiveMotionDurations },
+) {
+  if (mode === "none" || timeScale === 0) return 0;
+  const seconds =
+    scope?.effectiveDurations?.[token] ??
+    (scope?.tokens?.duration?.[token] ?? duration[token]) * (mode === "reduced" ? reducedDurationScale : 1) * timeScale;
+  motionMilliseconds(seconds);
+  return nonNegative(seconds, "effective CSS duration");
 }
 
 /**

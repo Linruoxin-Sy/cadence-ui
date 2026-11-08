@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "old-completion": {
-    "find": "generation.current === epoch && current.current",
+    "find": "lease.current() && owner.current === record && generation.current === epoch && current.current",
     "replace": "current.current",
-    "expected": "old completion cannot mark its synchronously started successor settled"
+    "expected": "explicit late delivery of captured actual Promise continuation is rejected after target replacement"
   }
 }

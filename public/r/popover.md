@@ -51,6 +51,10 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -774,6 +778,10 @@ and four per-side classes, and it moves the edge the positioner just lined up aw
 the class list carries a token and not a number.
 
 ## Keyboard interactions
+
+Focus, activation or find/selection inside an entering popup settles its owned entrance
+to the current resting paint immediately. Base UI keeps portal, focus and completion ownership;
+closing the popup leaves independent updates on its external trigger intact.
 
 | Keys | Action |
 | --- | --- |

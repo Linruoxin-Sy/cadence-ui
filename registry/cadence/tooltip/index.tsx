@@ -3,6 +3,7 @@
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 import { createContext, useContext, useId, useState } from "react";
 import { cn } from "../lib/cn";
+import { hasCallerTransition, usePopupPresence } from "../lib/popup-presence";
 import { popupClasses, popupStyle } from "../lib/popup-style";
 import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
@@ -82,7 +83,9 @@ function TooltipContent({
   ...props
 }: TooltipPrimitive.Popup.Props &
   Pick<TooltipPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
+  const { cm, ref: scopeRef, node } = useCadenceMotionScope(props.ref);
+  const callerFamily = hasCallerTransition(className, style);
+  const presence = usePopupPresence(node, ["opacity", "scale"], callerFamily, cm, "fast");
   const tooltip = useContext(TooltipContext);
 
   return (
@@ -96,35 +99,38 @@ function TooltipContent({
       >
         {withCadenceScope(
           cm,
-          <TooltipPrimitive.Popup
-            id={tooltip?.id}
-            data-slot="tooltip-content"
-            data-motion={cm.mode}
-            data-cadence-scope=""
-            style={popupStyle(cm, style)}
-            role="tooltip"
-            className={popupClasses(
-              cm,
-              cn(
-                "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
-                !cm.reduced &&
-                  "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
-              ),
-              className,
-            )}
-            {...props}
-            ref={scopeRef}
-          >
-            {children}
-            <TooltipPrimitive.Arrow
-              className={cn(
-                "z-50 size-2.5 rotate-45 rounded-[2px] bg-foreground fill-foreground",
-                "data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1",
-                "data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1",
-                "data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5",
+          presence(
+            <TooltipPrimitive.Popup
+              id={tooltip?.id}
+              data-slot="tooltip-content"
+              data-motion={cm.mode}
+              data-cadence-scope=""
+              style={popupStyle(cm, style, callerFamily)}
+              role="tooltip"
+              className={popupClasses(
+                cm,
+                cn(
+                  "z-50 w-fit max-w-xs origin-(--transform-origin) rounded-md bg-foreground px-3 py-1.5 text-xs text-balance text-background outline-none transition-[opacity,scale] ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:not-data-[cadence-entry-settled]:opacity-0",
+                  !cm.reduced &&
+                    "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:not-data-[cadence-entry-settled]:scale-(--motion-scale-in)",
+                ),
+                className,
+                callerFamily,
               )}
-            />
-          </TooltipPrimitive.Popup>,
+              {...props}
+              ref={scopeRef}
+            >
+              {children}
+              <TooltipPrimitive.Arrow
+                className={cn(
+                  "z-50 size-2.5 rotate-45 rounded-[2px] bg-foreground fill-foreground",
+                  "data-[side=bottom]:top-1 data-[side=left]:top-1/2! data-[side=left]:-right-1",
+                  "data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1",
+                  "data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5",
+                )}
+              />
+            </TooltipPrimitive.Popup>,
+          ),
         )}
       </TooltipPrimitive.Positioner>
     </TooltipPrimitive.Portal>

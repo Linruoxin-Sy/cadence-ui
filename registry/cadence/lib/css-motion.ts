@@ -4,6 +4,12 @@ import { type Ref, useCallback, useEffect, useInsertionEffect, useLayoutEffect, 
 import { type CadenceMode, transitionFor } from "./motion";
 import { type MotionEnvironment, subscribeMotionEnvironment } from "./motion-environment";
 import { motionScopeStyle } from "./motion-scope";
+import {
+  cssTransitionList,
+  knownPresenceProperties,
+  registerColorTransition,
+  subscribePresenceProperties,
+} from "./popup-presence";
 import type { CadenceMotion } from "./provider";
 
 const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -16,6 +22,8 @@ type FamilyOwner = {
   applied: Record<string, string>;
   allowed: boolean;
   request?: string;
+  base?: Record<string, string[]>;
+  restore?: string;
 };
 
 /** Inspect the actual connection without adding a prop to a DOM spread. */
@@ -36,10 +44,29 @@ function familyStyle(text: string | null, family: "transition" | "animation") {
 
 function releaseFamily(owner: FamilyOwner | null) {
   if (!owner) return;
+  const intact = Object.entries(owner.applied).every(
+    ([key, value]) => owner.node.style.getPropertyValue(key) === value,
+  );
   for (const [key, value] of Object.entries(owner.applied))
     if (owner.node.style.getPropertyValue(key) === value) owner.node.style.removeProperty(key);
   owner.applied = {};
   owner.allowed = false;
+  if (intact && owner.restore) owner.node.style.transition = owner.restore;
+}
+
+const cssList = cssTransitionList;
+function composeTransition(values: Record<string, string>, base?: Record<string, string[]>) {
+  if (!base) return values;
+  const count = (values["transition-property"] ?? "").split(",").length;
+  return Object.fromEntries(
+    Object.entries(values).map(([key, value]) => [
+      key,
+      [
+        ...(base[key] ?? []),
+        ...Array.from({ length: count }, (_, index) => cssList(value)[index % cssList(value).length]),
+      ].join(", "),
+    ]),
+  );
 }
 
 /** Own only an otherwise unclaimed CSS family; preserve caller declarations. */
@@ -65,21 +92,51 @@ function acquireFamily(
     previous.allowed &&
     previous.classes === classes &&
     Object.entries(previous.applied).every(([key, value]) => node.style.getPropertyValue(key) === value);
-  if (!intact) {
+  let base = intact ? previous?.base : undefined;
+  let restore = intact ? previous?.restore : undefined;
+  if (!intact || (base && previous?.request !== JSON.stringify(values))) {
     releaseFamily(previous);
     const css = node.ownerDocument.defaultView?.getComputedStyle(node);
+    const presence = family === "transition" ? knownPresenceProperties(node) : undefined;
+    const shared =
+      presence &&
+      css &&
+      (css.transitionProperty === "none" ||
+        cssList(css.transitionProperty).every((property) => presence.includes(property)));
+    restore = shared && node.style.transition === "none" ? "none" : undefined;
     const conflict =
-      keys.some((key) => node.style.getPropertyValue(key) !== "") ||
+      (keys.some((key) => node.style.getPropertyValue(key) !== "") && !restore) ||
       (family === "animation"
         ? css?.animationName.split(",").some((name) => name.trim() !== "" && name.trim() !== "none")
         : css?.transitionProperty !== "none" &&
-          css?.transitionDuration.split(",").some((time) => parseFloat(time) > 0));
+          css?.transitionDuration.split(",").some((time) => parseFloat(time) > 0) &&
+          !shared);
     if (conflict) return { node, classes, applied: {}, allowed: false };
+    const baseProperties =
+      css?.transitionProperty === "none" ? (presence ?? []) : css ? cssList(css.transitionProperty) : [];
+    base = shared
+      ? Object.fromEntries(
+          keys
+            .filter((key) => key !== "transition-behavior")
+            .map((key) => {
+              const list = cssList(css.getPropertyValue(key));
+              return [
+                key,
+                baseProperties.map((property, index) =>
+                  key === "transition-property"
+                    ? property
+                    : list[index % list.length] || (key === "transition-timing-function" ? "ease" : "0s"),
+                ),
+              ];
+            }),
+        )
+      : undefined;
+    if (restore) node.style.removeProperty("transition");
   }
   const request = JSON.stringify(values);
   const probe = node.ownerDocument.createElement("span").style;
   if (!intact || previous?.request !== request)
-    for (const [key, value] of Object.entries(values)) probe.setProperty(key, value);
+    for (const [key, value] of Object.entries(composeTransition(values, base))) probe.setProperty(key, value);
   const canonical =
     intact && previous?.request === request
       ? previous.applied
@@ -91,6 +148,8 @@ function acquireFamily(
     classes,
     allowed: true,
     request,
+    base,
+    restore,
     applied: Object.fromEntries(Object.keys(values).map((key) => [key, node.style.getPropertyValue(key)])),
   };
 }
@@ -108,7 +167,9 @@ function useCssConnection<T extends MotionElement>(
   const reconcile = () => {
     const config = configuration.current;
     if (connection.current?.node === node.current && connection.current?.signature === config?.signature) return;
-    connection.current?.disconnect(false);
+    const old = connection.current;
+    connection.current = null;
+    old?.disconnect(false);
     connection.current =
       node.current && config
         ? { node: node.current, signature: config.signature, disconnect: config.connect(node.current) }
@@ -120,8 +181,9 @@ function useCssConnection<T extends MotionElement>(
   });
   committed(
     () => () => {
-      connection.current?.disconnect();
+      const old = connection.current;
       connection.current = null;
+      old?.disconnect();
     },
     [],
   );
@@ -129,25 +191,28 @@ function useCssConnection<T extends MotionElement>(
     (element: T | null) => {
       const identity = {};
       lease.current = identity;
-      connection.current?.disconnect();
+      const old = connection.current;
       connection.current = null;
+      old?.disconnect();
       node.current = element;
       attached(element);
       const cleanup = typeof externalRef === "function" ? externalRef(element) : undefined;
       if (externalRef && typeof externalRef !== "function") externalRef.current = element;
       const config = configuration.current;
-      if (element && config)
+      if (element && config && lease.current === identity && node.current === element)
         connection.current = { node: element, signature: config.signature, disconnect: config.connect(element) };
       return () => {
         if (lease.current === identity) {
-          connection.current?.disconnect();
+          const old = connection.current;
           connection.current = null;
           node.current = null;
+          old?.disconnect();
           attached(null);
         }
         if (typeof cleanup === "function") cleanup();
         else if (typeof externalRef === "function") externalRef(null);
-        else if (externalRef && externalRef.current === element) externalRef.current = null;
+        else if (externalRef && lease.current === identity && externalRef.current === element)
+          externalRef.current = null;
       };
     },
     [externalRef],
@@ -244,14 +309,29 @@ export function useStateColor<T extends MotionElement>(
       env?.immediate ||
       env?.themeOwned;
     const seconds = suppress ? 0 : (cm.transition("state.color").duration ?? 0);
-    if (node.style.getPropertyValue("transition-duration") !== `${seconds}s`)
-      node.style.setProperty("transition-duration", `${seconds}s`);
+    const duration = composeTransition(
+      { "transition-property": property, "transition-duration": `${seconds}s` },
+      record.base,
+    )["transition-duration"];
+    if (node.style.getPropertyValue("transition-duration") !== duration)
+      node.style.setProperty("transition-duration", duration ?? "0s");
     record.applied["transition-duration"] = node.style.getPropertyValue("transition-duration");
   });
   const owner = useCssConnection(externalRef, signature, (node) => {
+    let alive = true;
+    const forgetColor = registerColorTransition(node, owned, () => {
+      const record = ownership.current;
+      return (
+        alive &&
+        record?.node === node &&
+        record.allowed &&
+        Object.entries(record.applied).every(([key, value]) => node.style.getPropertyValue(key) === value)
+      );
+    });
     let environment: MotionEnvironment;
     let focus = node === node.ownerDocument.activeElement || node.contains(node.ownerDocument.activeElement);
     const update = (env: MotionEnvironment) => {
+      if (!alive) return;
       environment = env;
       environmentRef.current = env;
       const mode: CadenceMode = cm.disabled ? "none" : env.reduced ? "reduced" : cm.mode;
@@ -281,13 +361,15 @@ export function useStateColor<T extends MotionElement>(
       previousMode.current = mode;
     };
     const checkShadows = () => {
-      if (ownership.current?.allowed) cancelUnsafeShadows(node, owned);
+      if (alive && ownership.current?.node === node && ownership.current.allowed) cancelUnsafeShadows(node, owned);
     };
     const focusIn = () => {
+      if (!alive) return;
       focus = true;
       update(environment);
     };
     const focusOut = () => {
+      if (!alive) return;
       focus = false;
       update(environment);
     };
@@ -295,7 +377,11 @@ export function useStateColor<T extends MotionElement>(
     node.addEventListener("focusin", focusIn);
     node.addEventListener("focusout", focusOut);
     const unsubscribe = subscribeMotionEnvironment(node.ownerDocument, update);
+    const stopPresence = subscribePresenceProperties(node, () => {
+      if (alive) update(environment);
+    });
     const observer = new MutationObserver((records) => {
+      if (!alive) return;
       if (
         records.some(
           (record) =>
@@ -311,7 +397,10 @@ export function useStateColor<T extends MotionElement>(
       attributeFilter: ["aria-invalid", "data-invalid", "class", "style"],
     });
     return (release = true) => {
+      alive = false;
+      forgetColor();
       observer.disconnect();
+      stopPresence();
       unsubscribe();
       node.removeEventListener("transitionrun", checkShadows);
       node.removeEventListener("focusin", focusIn);
@@ -347,6 +436,7 @@ export function useContinuousMotion<T extends MotionElement>(
   const ownership = useRef<FamilyOwner | null>(null);
   const signature = JSON.stringify([cm.mode, animation, active]);
   const owner = useCssConnection(externalRef, signature, (node) => {
+    let alive = true;
     const view = node.ownerDocument.defaultView;
     if (!view) return () => {};
     let visible = false;
@@ -356,6 +446,7 @@ export function useContinuousMotion<T extends MotionElement>(
     let restingOpacity = 1;
     let themeOwned = false;
     const update = () => {
+      if (!alive) return;
       // Framework pulse keyframes assume resting opacity one. Keep semantic
       // caller dimming static rather than replacing it with a brighter loop.
       const classes = node.getAttribute("class");
@@ -403,6 +494,7 @@ export function useContinuousMotion<T extends MotionElement>(
       rect.left < view.innerWidth;
     update();
     const observer = new IntersectionObserver((entries) => {
+      if (!alive) return;
       const entry = entries.find((entry) => entry.target === node);
       if (entry) {
         visible = entry.isIntersecting && entry.intersectionRatio > 0;
@@ -411,6 +503,7 @@ export function useContinuousMotion<T extends MotionElement>(
     });
     observer.observe(node);
     const changes = new MutationObserver((records) => {
+      if (!alive) return;
       if (
         records.some(
           (record) =>
@@ -422,6 +515,7 @@ export function useContinuousMotion<T extends MotionElement>(
     });
     changes.observe(node, { attributes: true, attributeOldValue: true, attributeFilter: ["class", "style"] });
     return (release = true) => {
+      alive = false;
       observer.disconnect();
       changes.disconnect();
       unsubscribe();

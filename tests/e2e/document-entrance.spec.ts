@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 for (const mode of ["full", "reduced", "none"] as const) {
   for (const reducedMotion of ["no-preference", "reduce"] as const) {
-    test(`cold deep scroll before hydration reveals the document ${mode}/${reducedMotion}`, async ({ page }, info) => {
+    test(`cold deep scroll before hydration keeps the document readable ${mode}/${reducedMotion}`, async ({
+      page,
+    }, info) => {
       await page.emulateMedia({ reducedMotion });
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
@@ -47,8 +49,9 @@ for (const mode of ["full", "reduced", "none"] as const) {
         });
         expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(1000);
         expect(new URL(page.url()).hash).toBe("");
-        await expect(article).toHaveCSS("opacity", "0");
-        await expect(article).toHaveCSS("clip-path", "inset(0% 0% 100%)");
+        await expect(article).toHaveCSS("opacity", "1");
+        await expect(article).toHaveCSS("clip-path", "none");
+        await expect(article).toHaveCSS("transform", "none");
       } finally {
         release();
       }
@@ -87,12 +90,8 @@ for (const mode of ["full", "reduced", "none"] as const) {
       expect(proof.sameGrid).toBe(true);
       expect(proof.focusInDocument).toBe(true);
       expect(proof.animations).toBe(0);
-      if (mode === "full" && reducedMotion === "no-preference") {
-        expect(proof.frames.some((f) => Number(f.opacity) > 0 && Number(f.opacity) < 1 && f.transform !== "none")).toBe(
-          true,
-        );
-      }
-      for (const frame of proof.frames.filter((f) => f.mode === "none")) {
+      expect(proof.frames.length).toBeGreaterThan(0);
+      for (const frame of proof.frames) {
         expect(frame.opacity).toBe("1");
         expect(frame.transform).toBe("none");
       }
@@ -104,7 +103,7 @@ for (const mode of ["full", "reduced", "none"] as const) {
 for (const reducedMotion of ["no-preference", "reduce"] as const) {
   test.describe(`document entrance ${reducedMotion}`, () => {
     test.use({ reducedMotion });
-    test("actual article cancels partial entrance at the first none paint", async ({ page }, info) => {
+    test("actual client navigation article cancels entry at the first none paint", async ({ page }, info) => {
       await page.addInitScript(() => {
         const samples: unknown[] = [];
         Object.assign(window, { entranceSamples: samples });
@@ -126,9 +125,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         };
         requestAnimationFrame(tick);
       });
-      await page.goto("/components/button?motion=full&speed=0.25", { waitUntil: "domcontentloaded" });
+      await page.goto("/components/label?motion=full&speed=0.25", { waitUntil: "networkidle" });
+      await page.getByRole("link", { name: "Button", exact: true }).first().click();
+      await page.waitForURL("**/components/button*");
       const article = page.locator("article[data-document-entrance]");
-      await expect.poll(() => article.evaluate((e) => Number(getComputedStyle(e).opacity))).toBeGreaterThan(0);
+      await expect.poll(() => article.evaluate((e) => e.getAnimations().length)).toBeGreaterThan(0);
       await article.evaluate((e) => Object.assign(window, { entranceIdentity: e }));
       await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: "none", exact: true }).click();
       await expect(article).toHaveAttribute("data-motion", "none");

@@ -18,26 +18,77 @@ const require = createRequire(import.meta.url);
 const vite = require.resolve("vite", { paths: [require.resolve("vitest/node")] });
 const { build } = await import(pathToFileURL(require.resolve("esbuild", { paths: [vite] })));
 const environment = process.env.CADENCE_MOTION_REACT_ENV ?? "production";
+const theme = process.env.CADENCE_POLICY_THEME ?? "light";
+const consumerRoot = process.env.CADENCE_POLICY_CONSUMER_ROOT;
+const reactRoot = process.env.CADENCE_POLICY_REACT_ROOT;
+const expectedReact = JSON.parse(
+  await readFile(require.resolve("react/package.json", reactRoot ? { paths: [reactRoot] } : undefined), "utf8"),
+).version;
 let fault;
+let observedContinuation;
 const plugins = [];
-if (process.env.CADENCE_POLICY_FAULT) {
-  const definitions = JSON.parse(await readFile("tests/fixtures/motion/policy-negative.json", "utf8"));
-  const definition = definitions[process.env.CADENCE_POLICY_FAULT];
-  assert(definition, "known policy fault");
+plugins.push({
+  name: "actual-policy-installation",
+  setup(builder) {
+    if (consumerRoot)
+      builder.onResolve({ filter: /registry[\\/]cadence[\\/]/ }, (args) => {
+        const source = args.path.replaceAll("\\", "/");
+        const target = path.resolve(
+          consumerRoot,
+          "components/cadence",
+          source.slice(source.indexOf("registry/cadence/") + "registry/cadence/".length),
+        );
+        const file = [target, `${target}.tsx`, `${target}.ts`, path.join(target, "index.tsx")].find(
+          (file) => existsSync(file) && /\.[jt]sx?$/.test(file),
+        );
+        assert(file, "required installed policy target; no workspace fallback");
+        return { path: file };
+      });
+    if (reactRoot)
+      builder.onResolve({ filter: /^(react|react-dom)(\/.*)?$/ }, (args) => ({
+        path: require.resolve(args.path, { paths: [reactRoot] }),
+      }));
+  },
+});
+{
+  const definition = process.env.CADENCE_POLICY_FAULT
+    ? JSON.parse(await readFile("tests/fixtures/motion/policy-negative.json", "utf8"))[process.env.CADENCE_POLICY_FAULT]
+    : null;
+  if (process.env.CADENCE_POLICY_FAULT) assert(definition, "known policy fault");
   plugins.push({
     name: "owned-policy-fault",
     setup(builder) {
       builder.onLoad({ filter: /control-animation\.tsx$/ }, async (args) => {
         const original = await readFile(args.path, "utf8");
-        assert.equal(original.split(definition.find).length, 2, "exact fault anchor");
-        const executed = original.replace(definition.find, definition.replace);
-        await writeFile(path.join(output, "fault-control.tsx"), executed);
-        fault = {
-          id: process.env.CADENCE_POLICY_FAULT,
-          ...definition,
+        let executed = original;
+        if (definition) {
+          assert.equal(original.split(definition.find).length, 2, "exact fault anchor");
+          executed = original.replace(definition.find, definition.replace);
+          await writeFile(path.join(output, "fault-control.tsx"), executed);
+          fault = {
+            id: process.env.CADENCE_POLICY_FAULT,
+            matches: original.split(definition.find).length - 1,
+            ...definition,
+            source: args.path,
+            originalSHA: createHash("sha256").update(original).digest("hex"),
+            executedSHA: createHash("sha256").update(executed).digest("hex"),
+          };
+        }
+        const start = "void controls.start(target, timing).then(() => {";
+        const newline = executed.includes("\r\n") ? "\r\n" : "\n";
+        const end = `          complete.current?.(target);${newline}        }${newline}      });`;
+        assert.equal(executed.split(start).length, 2, "one actual controls.start continuation");
+        assert.equal(executed.split(end).length, 2, "one continuation end");
+        executed = executed
+          .replace(start, "void controls.start(target, timing).then(observeContinuation(target, () => {")
+          .replace(end, end.replace("});", "}));"));
+        executed += `\nfunction observeContinuation(target, callback) { const record={target,callback,deliveries:0}; (window.policyContinuations??=[]).push(record); return (...args)=>{record.deliveries++;return callback(...args);}; }\n`;
+        observedContinuation = {
           source: args.path,
           originalSHA: createHash("sha256").update(original).digest("hex"),
-          executedSHA: createHash("sha256").update(executed).digest("hex"),
+          observedSHA: createHash("sha256").update(executed).digest("hex"),
+          mechanism:
+            "Capture the real controls.start Promise continuation without replacing its native delivery; one adversarial case explicitly delivers the captured continuation after committed replacement.",
         };
         return { contents: executed, loader: "tsx", resolveDir: path.dirname(args.path) };
       });
@@ -69,6 +120,11 @@ await writeFile(path.join(output, "compiled.css"), css);
 await writeFile(path.join(output, "runner.mjs"), await readFile(new URL(import.meta.url)));
 await writeFile(path.join(output, "fixture.jsx"), await readFile(entry));
 const report = {
+  theme,
+  consumerRoot,
+  reactRoot,
+  expectedReact,
+  observedContinuation,
   environment,
   fault,
   entry,
@@ -103,7 +159,7 @@ const server = http.createServer((request, response) => {
   } else {
     response.setHeader("content-type", "text/html");
     response.end(
-      `<!doctype html><html><head><link rel="stylesheet" href="/fixture.css"></head><body><div id="root"></div><script>window.policyInitial=${url.searchParams.get("state") ?? "{}"};window.policyStrict=${environment === "development"};window.firstFrames=[];function capture(){const n=document.querySelector('[data-slot="loop"]');if(n&&window.firstFrames.length<5){window.firstFrames.push({mode:n.dataset.motion,name:getComputedStyle(n).animationName,colorDuration:getComputedStyle(document.querySelector('[data-slot="color"]')).transitionDuration});}if(window.firstFrames.length<5)requestAnimationFrame(capture)}requestAnimationFrame(capture);</script><script src="/fixture.js"></script></body></html>`,
+      `<!doctype html><html class="${theme === "dark" ? "dark" : ""}"><head><link rel="stylesheet" href="/fixture.css"></head><body><div id="root"></div><script>window.policyInitial=${url.searchParams.get("state") ?? "{}"};window.policyStrict=${environment === "development"};window.firstFrames=[];function capture(){const n=document.querySelector('[data-slot="loop"]');if(n&&window.firstFrames.length<5){window.firstFrames.push({mode:n.dataset.motion,name:getComputedStyle(n).animationName,colorDuration:getComputedStyle(document.querySelector('[data-slot="color"]')).transitionDuration});}if(window.firstFrames.length<5)requestAnimationFrame(capture)}requestAnimationFrame(capture);</script><script src="/fixture.js"></script></body></html>`,
     );
   }
 });
@@ -168,6 +224,7 @@ try {
       await page.locator('[data-slot="color"]').waitFor();
       await frame(5);
       report.reactVersion = await page.evaluate(() => window.policyReactVersion);
+      assert.equal(report.reactVersion, expectedReact, "actual policy React version");
       if (process.env.CADENCE_EXPECT_REACT) assert.equal(report.reactVersion, process.env.CADENCE_EXPECT_REACT);
       const effective = mode === "none" ? "none" : os === "reduce" ? "reduced" : mode;
       await record(`${mode}/${os} first paint`, (s) => {
@@ -636,6 +693,28 @@ try {
     await patch({ mode: "full", clock: 8, target: 500 });
     await frame(2);
   };
+  await startPhysics();
+  const queued = await page.evaluate(() => {
+    const records = window.policyContinuations;
+    const index = records.findLastIndex((record) => record.target.x === 500 && !("opacity" in record.target));
+    if (index < 0) throw new Error("Missing actual native Promise continuation");
+    window.retiredContinuation = records[index];
+    return { index, target: records[index].target, deliveries: records[index].deliveries };
+  });
+  const retiredBefore = await physicsCount();
+  await patch({ target: 700 });
+  await frame(2);
+  await page.evaluate(() => window.retiredContinuation.callback());
+  assert.equal(
+    await physicsCount(),
+    retiredBefore,
+    "retired real Promise continuation cannot complete a committed successor",
+  );
+  report.cases.push({
+    label: "explicit late delivery of captured actual Promise continuation is rejected after target replacement",
+    queued,
+    mechanism: observedContinuation.mechanism,
+  });
   await startPhysics();
   const naturalBefore = await physicsCount();
   const retiming = await page.evaluate(() => {

@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "./cn";
-import { duration, reducedDurationScale } from "./motion";
+import { cssDurationFor, duration } from "./motion";
 import { defaultMotionScope, motionScopeStyle } from "./motion-scope";
 import type { CadenceMotion } from "./provider";
 
@@ -14,11 +14,13 @@ export function popupClockStyle(cm: CadenceMotion): CSSProperties {
   const clock = cm.disabled || cm.timeScale === 0 ? { ...transport, transition: "none" } : transport;
   if (scope.supported || !scope.ready) return clock;
   // Existing source-only consumers without the updated generated theme keep their defaults.
-  const factor = (cm.disabled ? 0 : cm.reduced ? reducedDurationScale : 1) * cm.timeScale;
   return {
     ...clock,
     ...Object.fromEntries(
-      Object.entries(duration).map(([key, seconds]) => [`--motion-duration-${key}`, `${seconds * factor}s`]),
+      Object.keys(duration).map((key) => [
+        `--motion-duration-${key}`,
+        `${cssDurationFor(key as keyof typeof duration, cm.mode, cm.timeScale, cm.scope)}s`,
+      ]),
     ),
   } as CSSProperties;
 }
@@ -29,23 +31,30 @@ export function stateClasses<S>(base: string, value: string | ((state: S) => str
 }
 
 /** Each portal owns its effective clock, including full inside a none scope. */
-export function popupStyle(cm: CadenceMotion, value: CSSProperties | undefined): CSSProperties;
+export function popupStyle(cm: CadenceMotion, value: CSSProperties | undefined, callerFamily?: boolean): CSSProperties;
 export function popupStyle<S>(
   cm: CadenceMotion,
   value: (state: S) => CSSProperties | undefined,
+  callerFamily?: boolean,
 ): (state: S) => CSSProperties;
 export function popupStyle<S>(
   cm: CadenceMotion,
   value: CSSProperties | ((state: S) => CSSProperties | undefined) | undefined,
+  callerFamily?: boolean,
 ): CSSProperties | ((state: S) => CSSProperties);
 export function popupStyle<S>(
   cm: CadenceMotion,
   value: CSSProperties | ((state: S) => CSSProperties | undefined) | undefined,
+  callerFamily?: boolean,
 ) {
-  const clock = popupClockStyle(cm);
+  const { transition, ...transport } = popupClockStyle(cm);
+  // Explicitly coordinated surfaces use token-backed CSS for their own none/zero
+  // policy. An inline shorthand would outrank arbitrary caller CSS families.
+  const clock =
+    callerFamily === undefined ? { ...transport, ...(transition === undefined ? {} : { transition }) } : transport;
   const merge = (caller: CSSProperties | undefined): CSSProperties => {
     const merged = { ...clock, ...caller };
-    if (cm.disabled || cm.timeScale === 0) {
+    if (callerFamily === undefined && (cm.disabled || cm.timeScale === 0)) {
       // Base UI temporarily writes the transition shorthand during popup mounting.
       // Keep that family in one shorthand instead of conflicting longhand writers.
       delete merged.transitionDuration;
@@ -65,16 +74,38 @@ export function popupClasses<S>(
   cm: CadenceMotion,
   base: string,
   value: string | ((state: S) => string | undefined) | undefined,
+  callerFamily = false,
 ) {
-  const classes = cm.disabled
+  const token = base.match(/duration-\(--motion-duration-(\w+)\)/)?.[1] as keyof typeof duration | undefined;
+  const localClock = token ? (cm.scope.effectiveDurations[token] ?? cm.scope.tokens.duration[token]) : undefined;
+  const immediate = cm.disabled || cm.timeScale === 0 || localClock === 0;
+  const baseClasses = callerFamily
     ? base
         .split(" ")
-        // Suppress entry/exit fades, while preserving visibility states such as Toast limited.
-        .filter((part) => !/^data-(?:\[(?:starting|ending)-style\]|(?:starting|ending)-style):opacity-0$/.test(part))
+        .filter(
+          (part) =>
+            !/^(?:(?:transition|duration|delay|ease)(?:-|$)|data-\[(?:starting|ending)-style\]:.*(?:opacity-0|scale-\S+|translate-\S+)$)/.test(
+              part,
+            ),
+        )
         .join(" ")
     : base;
+  const classes = immediate
+    ? baseClasses
+        .split(" ")
+        // Enter visibly, but retain the semantic closed opacity of a native
+        // keep-mounted popup. Its exit endpoint is immediate, not an entrance pose.
+        .filter(
+          (part) =>
+            /^data-(?:\[ending-style\]|ending-style):opacity-0$/.test(part) ||
+            !/^data-(?:\[(?:starting|ending)-style\]|(?:starting|ending)-style):.*(?:opacity-0|scale-\S+|translate-\S+)$/.test(
+              part,
+            ),
+        )
+        .join(" ")
+    : baseClasses;
   return stateClasses(
-    cn(classes, cm.disabled ? "transition-none" : cm.reduced ? "transition-opacity" : undefined),
+    cn(classes, !callerFamily && (immediate ? "transition-none" : cm.reduced ? "transition-opacity" : undefined)),
     value,
   );
 }

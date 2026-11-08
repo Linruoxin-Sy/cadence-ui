@@ -531,12 +531,15 @@ and measurement. A budget fallback never truncates content or delays its accessi
 | General text diff input   | At most 2048 graphemes per compared owned display string; streaming uses the append fast path                                                                                 | Show final affected content immediately; code/large-document owners may work on bounded visible lines, never split a shaping run merely to fit |
 | Middle-diff work          | At most 4096 candidate comparisons after prefix/suffix trimming                                                                                                               | Abort the visual diff and commit final affected text; no synchronous quadratic work beyond the cap                                             |
 | Numeric moving set        | At most 12 changed place-value columns per numeric display and across one known coordinated content transaction                                                               | Show the complete final formatted value immediately; never drop significant digits                                                             |
-| Chart data interpolation  | At most 200 participating samples/marks in one chart, including still-active visible series from earlier revisions                                                                              | Commit final data geometry immediately; do not resample, omit data or queue the excess                                                         |
+| Chart data interpolation  | At most 200 participating samples/marks in one chart, including still-active visible series from earlier revisions                                                            | Commit final data geometry immediately; do not resample, omit data or queue the excess                                                         |
 | Pending targets           | One latest committed target per owner                                                                                                                                         | Replace the obsolete target; no queue of intermediate text, digits or measurements                                                             |
 
-The collection bound is a target for the shared coordinator; it is not an implemented runtime
-parameter/export or a measured performance allowance. Count the members whose automatic collection
-presence, position or size presentation actually participates, including retained siblings measured
+The internal transaction coordinator provides the 50-visual identity bound and bounded preflight.
+Individual collection adapters still require explicit adoption; this is not a public collection API
+or a measured performance allowance. Its preflight accepts a known, finite identity Set and rejects
+an oversized `size` before enumerating members; adapters normalize duplicate bindings into that
+set without a DOM scan. Count the members whose automatic collection presence, position or size
+presentation actually participates, including retained siblings measured
 or projected to move. Presence plus position/size on the same member visual counts once, not once
 per binding or property; this never permits competing writers on a property. A retargeted stable
 member counts once; a distinct outgoing decorative copy also occupies capacity until retired.

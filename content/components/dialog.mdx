@@ -539,6 +539,10 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 The panel stays mounted while its exit transition runs; Base UI delays unmount until the
 transition ends, so reopening mid-exit reverses cleanly.
+Focus, activation or find/selection inside an entering panel settles that panel to its current
+resting paint immediately; an independent backdrop may continue. Base UI retains focus,
+portal and completion ownership, including `preventUnmountOnClose` and actions-based unmount.
+Closing the panel retires its child work; a visible external trigger keeps independent updates.
 
 ## Keyboard interactions
 

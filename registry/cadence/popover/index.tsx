@@ -3,7 +3,8 @@
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import type * as React from "react";
 import { cn } from "../lib/cn";
-import { popupStyle } from "../lib/popup-style";
+import { hasCallerTransition, usePopupPresence } from "../lib/popup-presence";
+import { popupClasses, popupStyle } from "../lib/popup-style";
 import { useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
@@ -37,15 +38,18 @@ function PopoverContent({
   ...props
 }: PopoverPrimitive.Popup.Props &
   Pick<PopoverPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
-  const { cm, ref: scopeRef } = useCadenceMotionScope(props.ref);
+  const { cm, ref: scopeRef, node } = useCadenceMotionScope(props.ref);
+  const callerFamily = hasCallerTransition(className, style);
+  const presence = usePopupPresence(node, ["opacity", "scale"], callerFamily, cm, "fast");
 
   const classes = cn(
     "z-50 w-72 origin-(--transform-origin) rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none",
     cm.disabled
       ? "transition-none duration-0"
-      : "ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:opacity-0",
+      : "ease-cadence-out duration-(--motion-duration-fast) data-[ending-style]:opacity-0 data-[starting-style]:not-data-[cadence-entry-settled]:opacity-0",
     !cm.disabled && (cm.reduced ? "transition-opacity" : "transition-[opacity,scale]"),
-    !cm.reduced && "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:scale-(--motion-scale-in)",
+    !cm.reduced &&
+      "data-[ending-style]:scale-(--motion-scale-in) data-[starting-style]:not-data-[cadence-entry-settled]:scale-(--motion-scale-in)",
   );
   return (
     <PopoverPrimitive.Portal>
@@ -58,17 +62,17 @@ function PopoverContent({
       >
         {withCadenceScope(
           cm,
-          <PopoverPrimitive.Popup
-            data-slot="popover-content"
-            data-motion={cm.mode}
-            data-cadence-scope=""
-            className={
-              typeof className === "function" ? (state) => cn(classes, className(state)) : cn(classes, className)
-            }
-            style={popupStyle(cm, style)}
-            {...props}
-            ref={scopeRef}
-          />,
+          presence(
+            <PopoverPrimitive.Popup
+              data-slot="popover-content"
+              data-motion={cm.mode}
+              data-cadence-scope=""
+              className={popupClasses(cm, classes, className, callerFamily)}
+              style={popupStyle(cm, style, callerFamily)}
+              {...props}
+              ref={scopeRef}
+            />,
+          ),
         )}
       </PopoverPrimitive.Positioner>
     </PopoverPrimitive.Portal>

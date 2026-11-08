@@ -52,6 +52,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | dialog | `@components/cadence/dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/dialog.json) |
 
@@ -729,6 +733,10 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 The panel stays mounted while its exit transition runs; Base UI delays unmount until the
 transition ends, so reopening mid-exit reverses cleanly.
+Focus, activation or find/selection inside an entering panel settles that panel to its current
+resting paint immediately; an independent backdrop may continue. Base UI retains focus,
+portal and completion ownership, including `preventUnmountOnClose` and actions-based unmount.
+Closing the panel retires its child work; a visible external trigger keeps independent updates.
 
 ## Keyboard interactions
 

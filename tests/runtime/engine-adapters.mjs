@@ -277,25 +277,23 @@ const visit = async (spec, mode = "full", os = "no-preference") => {
   await frames(page, 3);
 };
 try {
+  const nativeTerminals = new Map();
   for (const os of ["no-preference", "reduce"])
     for (const mode of ["full", "reduced", "none"]) {
       const full = mode === "full" && os === "no-preference";
       for (const series of ["Bar", "Line", "Area", "Pie", "Scatter", "Radar", "RadialBar", "Funnel"]) {
         if (process.env.CADENCE_ENGINE_FILTER && !`chart/${series}`.includes(process.env.CADENCE_ENGINE_FILTER))
           continue;
+        if (!nativeTerminals.has(series)) {
+          await visit({ kind: "chart", series, optOut: "true", native: "true" });
+          const native = await sample(page);
+          assert(native.geometry.some((part) => part.d?.length || Number(part.width) > 0));
+          nativeTerminals.set(series, native.geometry);
+        }
         await visit({ kind: "chart", series }, mode, os);
-        await check("actual series first terminal geometry in immediate modes", async () => {
-          if (full) {
-            const initial = await sample(page);
-            const observed = initial.controllers.filter((c) => c.phaseEase !== undefined);
-            assert(observed.length > 0, "an actual full action curve was sampled");
-            assert(observed.every((c) => Math.abs(c.phaseEase - cubicBezier(0.1, 0.2, 0.8, 0.9)(0.5)) < 1e-9));
-            return {
-              legacy:
-                "Full series entrance remains its existing data.transition; catalogue first-render migration is separate.",
-            };
-          }
+        await check("actual series first paint is terminal in every mode", async () => {
           const before = await sample(page);
+          assert.deepEqual(before.geometry, nativeTerminals.get(series));
           await frames(page, 8);
           assert.equal(geometry(await sample(page)), geometry(before));
           idle(before);
@@ -303,7 +301,7 @@ try {
           assert(inserted.length);
           for (const first of inserted.filter((s) => s.geometry.length))
             assert.equal(geometry(first), geometry(before));
-          return inserted;
+          return { inserted, native: nativeTerminals.get(series) };
         });
         await patch(page, { clock: 0 });
         await patch(page, { clock: 2, revision: 1 });
@@ -316,6 +314,7 @@ try {
             assert(active.length);
             assert(active.every((c) => Math.abs(c.duration - 1.2) < 0.00001));
             assert(active.every((c) => c.easingType === "function"));
+            assert(active.every((c) => Math.abs(c.phaseEase - cubicBezier(0.1, 0.2, 0.8, 0.9)(0.5)) < 1e-9));
             assert(!before.events.some((e) => e.type === "caller-easing"));
             assert(active.some((c) => c.updates.some((u) => u.value > 0 && u.value < 1)));
           } else idle(before);
@@ -453,7 +452,7 @@ try {
         await visit({ kind: "calendar" }, mode, os);
         await check("real month table WAAPI tokens and captured handle cancellation", async () => {
           const before = await sample(page);
-          await patch(page, { revision: 1 });
+          await patch(page, { revision: 2 });
           const active = await sample(page);
           assert.equal(active.grid.id, before.grid.id);
           if (mode !== "none") {
@@ -1005,6 +1004,8 @@ try {
       await check(
         "same data with fresh caller closures does not replay on restoration; next data still animates",
         async () => {
+          await patch(page, { revision: -1 });
+          await frames(page, 3);
           const initial = await sample(page);
           const current = initial.controllers.filter((c) => c.state === "running").at(-1);
           assert(current);
@@ -1035,7 +1036,7 @@ try {
               .first()
               .waitFor();
           }
-          await patch(page, { revision: 1 });
+          await patch(page, { revision: 2 });
           await frames(page, 4);
           const active = await sample(page);
           assert(active.registered > 0);

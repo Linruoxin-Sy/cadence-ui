@@ -28,6 +28,7 @@ import {
   transitionFor,
 } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
+import { MotionPresentation } from "./motion-presence";
 import {
   defaultMotionScope,
   disconnectMotionTokenScope,
@@ -178,7 +179,7 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
           style={motionScopeStyle(inheritedScope, scale)}
           className={cn("contents", className)}
         >
-          {children}
+          <MotionPresentation>{children}</MotionPresentation>
         </div>
       </MotionConfig>
     </CadenceContext.Provider>
@@ -205,27 +206,33 @@ export function useCadenceMotion(ref?: RefObject<HTMLElement | SVGElement | null
 /** Bind a real part without replacing its caller's React 19 cleanup ref. */
 export function useCadenceMotionScope<T extends HTMLElement | SVGElement>(externalRef?: Ref<T>) {
   const node = useRef<T | null>(null);
+  const connection = useRef<object | null>(null);
   const [element, attached] = useState<T | null>(null);
   const cm = useCadenceMotion(node);
   const ref = useCallback(
     (element: T | null) => {
+      const identity = {};
+      connection.current = identity;
       if (!element) disconnectMotionTokenScope(node);
       node.current = element;
       attached(element);
       const cleanup = typeof externalRef === "function" ? externalRef(element) : undefined;
       if (externalRef && typeof externalRef !== "function") externalRef.current = element;
       return () => {
-        node.current = null;
-        disconnectMotionTokenScope(node);
-        attached(null);
+        const current = connection.current === identity;
+        if (current) {
+          node.current = null;
+          disconnectMotionTokenScope(node);
+          attached(null);
+        }
         if (typeof cleanup === "function") cleanup();
         else if (typeof externalRef === "function") externalRef(null);
-        else if (externalRef) externalRef.current = null;
+        else if (externalRef && current && externalRef.current === element) externalRef.current = null;
       };
     },
     [externalRef],
   );
-  return { cm, ref, element };
+  return { cm, ref, element, node };
 }
 
 // A command can follow scrollIntoView before IO delivers its new record. Resolve

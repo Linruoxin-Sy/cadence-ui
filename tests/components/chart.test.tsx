@@ -110,11 +110,10 @@ describe("Chart", () => {
       });
       expectMotionContract(mode, {
         behavior: () => {
-          if (mode === "full") expect(handle.getState()).not.toBe("completed");
-          else {
-            expect(listener).toHaveBeenLastCalledWith(1);
-            expect(handle.getState()).toBe("completed");
-          }
+          // This injected entry has no ChartSeriesOwner/work descriptor. It
+          // must settle in every mode rather than claim a zero-sample loop.
+          expect(listener).toHaveBeenLastCalledWith(1);
+          expect(handle.getState()).toBe("completed");
         },
       });
       expect(container.querySelector('[data-slot="chart"]')).toHaveAttribute("data-motion", mode);
@@ -152,7 +151,7 @@ describe("Chart", () => {
     expect(container.textContent).toBe("");
   });
   it.each(["none", "zero"] as const)(
-    "uses the token clock, cancels on %s and honours completion callbacks",
+    "settles an unknown controller entry before scheduling work and retains completion on %s",
     (ending) => {
       const callbacks: FrameRequestCallback[] = [];
       vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
@@ -184,8 +183,9 @@ describe("Chart", () => {
         callbacks.shift()?.(0);
         callbacks.shift()?.(110);
       });
-      expect(listener.mock.lastCall?.[0]).toBeGreaterThan(0.5);
-      expect(listener.mock.lastCall?.[0]).toBeLessThan(1);
+      expect(listener).toHaveBeenLastCalledWith(1);
+      expect(callbacks).toHaveLength(0);
+      expect(onEnd).toHaveBeenCalledOnce();
       act(() =>
         rerender(
           <CadenceProvider mode={ending === "none" ? "none" : "full"} timeScale={ending === "zero" ? 0 : 1}>

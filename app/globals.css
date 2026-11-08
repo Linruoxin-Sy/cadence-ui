@@ -166,22 +166,6 @@
 .typeset-docs :where([data-slot="code-block"]) {
   margin-block-start: var(--typeset-flow);
 }
-
-/* Print never scrolls, so `DocumentEntrance`'s observer would leave a clipped
-   body blank below the fold. The entrance is screen feedback, not content.
-   `!important` is required because the hidden state is an inline style. */
-@media print {
-  [data-document-entrance] {
-    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
-    clip-path: none !important;
-    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
-    filter: none !important;
-    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
-    opacity: 1 !important;
-    /* biome-ignore lint/complexity/noImportantStyles: the hidden state is an inline style */
-    transform: none !important;
-  }
-}
 @layer base {
 }
 /* Generated from registry/cadence/lib/motion.ts; pnpm motion:tokens. */

@@ -95,6 +95,26 @@
           "path": "registry/cadence/lib/motion-environment.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/motion-environment.ts"
+        },
+        {
+          "path": "registry/cadence/lib/motion-transaction.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/motion-transaction.ts"
+        },
+        {
+          "path": "registry/cadence/lib/motion-presence.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/motion-presence.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/popup-presence.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/popup-presence.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/motion-ref.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/motion-ref.ts"
         }
       ]
     },
