@@ -21,6 +21,16 @@ describe("installed content and selection forms", () => {
 
 describe("installed size-linked geometry forms", () => {
   const sidebar = readFileSync("registry/cadence/lib/sidebar-geometry.ts", "utf8");
+  it("requires the actual label gate and geometry completion callback", () => {
+    expect(implementedForm(sidebar, "data.transition")).toBe("one-shot");
+    for (const anchor of [
+      "prepareSidebarLabels(labels, transaction, revision)",
+      "labelGate.start()",
+      "labelGate?.complete()",
+      "projection.commit(",
+    ])
+      expect(implementedForm(sidebar.replaceAll(anchor, "missing("), "data.transition")).toBeNull();
+  });
   it.each([
     ["layout.move", "size-linked"],
     ["geometry.resize", "measured"],

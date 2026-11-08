@@ -91,6 +91,11 @@ for (const os of [false, true])
       const icon = wrappers.nth(1);
       expect((await panel(icon).boundingBox())?.width).toBeCloseTo(48, 0);
       await trigger(icon).click();
+      if (effective === "full") {
+        // Icon width is now authored geometry. Preserve the resting-width assertion
+        // after the actual owner completes; reduced/none still assert immediately.
+        await expect.poll(() => panel(icon).evaluate((node) => node.getAnimations().length)).toBe(0);
+      }
       expect((await panel(icon).boundingBox())?.width).toBeGreaterThan(180);
       const staticShell = wrappers.nth(2);
       await trigger(staticShell).click();

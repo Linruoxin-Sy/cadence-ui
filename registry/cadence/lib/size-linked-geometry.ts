@@ -5,8 +5,8 @@ import { subscribeMotionEnvironment } from "./motion-environment";
 import type { MotionHostRef } from "./motion-ref";
 import { createMotionTransaction, type MotionLease, type MotionRevision } from "./motion-transaction";
 
-/** Native offcanvas endpoints, in the common shell's physical CSS-pixel space. */
-export type SizeLinkedDestination = { gap: number; width: number; sign: -1 | 1 };
+/** Native desktop endpoints, in the common shell's physical CSS-pixel space. */
+export type SizeLinkedDestination = { gap: number; width: number; sign: -1 | 1; icon?: boolean };
 
 /**
  * One physical size scalar, two disjoint property owners. The panel projects
@@ -33,6 +33,7 @@ export function createSizeLinkedGeometry(
   let alive = true;
   let restricted = false;
   let bounds = [0, 0];
+  let path: { start: number; width: number } | null = null;
   let gapEffect: Animation | null = null,
     panelEffect: Animation | null = null;
   let gapLease: MotionLease | null = null,
@@ -46,6 +47,10 @@ export function createSizeLinkedGeometry(
     gap.isConnected &&
     panel.isConnected;
   const rendered = () => Math.max(bounds[0] ?? 0, Math.min(bounds[1] ?? 0, size.get()));
+  const projected = () =>
+    baseline?.icon && path
+      ? path.width + ((rendered() - path.start) / (baseline.gap - path.start)) * (baseline.width - path.width)
+      : (baseline?.width ?? 0);
   const release = () => {
     running = false;
     size.stop();
@@ -62,9 +67,11 @@ export function createSizeLinkedGeometry(
     if (!current() || !gapLease?.current() || !panelLease?.current() || !baseline) return;
     const visible = rendered();
     (gapEffect?.effect as KeyframeEffect | null)?.setKeyframes({ width: `${visible}px` });
-    (panelEffect?.effect as KeyframeEffect | null)?.setKeyframes({
-      transform: `translateX(${-baseline.sign * (visible - baseline.gap)}px)`,
-    });
+    (panelEffect?.effect as KeyframeEffect | null)?.setKeyframes(
+      baseline.icon
+        ? { width: `${projected()}px` }
+        : { transform: `translateX(${-baseline.sign * (visible - baseline.gap)}px)` },
+    );
   };
   const off = size.on("change", write);
   const unsubscribe = subscribeMotionEnvironment(panel.ownerDocument, (environment) => {
@@ -76,12 +83,12 @@ export function createSizeLinkedGeometry(
   });
   return {
     /** Must run before measuring native destinations, including active/outgoing work. */
-    prepare(revision: MotionRevision, transition: Transition, immediate: boolean) {
+    prepare(revision: MotionRevision, transition: Transition, immediate: boolean, visuals = new Set([gap, panel])) {
       if (previous === revision && signature === JSON.stringify(transition) && !immediate && !restricted) return null;
       const sample = running
-        ? { size: rendered(), velocity: size.get() === rendered() ? size.getVelocity() : 0 }
+        ? { size: rendered(), width: projected(), velocity: size.get() === rendered() ? size.getVelocity() : 0 }
         : null;
-      const permitted = transaction.preflightVisuals(new Set([gap, panel]));
+      const permitted = transaction.preflightVisuals(visuals);
       release();
       return { sample, permitted };
     },
@@ -90,7 +97,9 @@ export function createSizeLinkedGeometry(
       destination: SizeLinkedDestination | null,
       transition: Transition,
       immediate: boolean,
-      prepared: { sample: { size: number; velocity: number } | null; permitted: boolean },
+      prepared: { sample: { size: number; width: number; velocity: number } | null; permitted: boolean },
+      complete?: () => void,
+      visuals = new Set([gap, panel]),
     ) {
       if (
         destination &&
@@ -113,7 +122,8 @@ export function createSizeLinkedGeometry(
       if (
         !origin ||
         (same && (!retime || !prepared.sample)) ||
-        origin.width !== width ||
+        origin.icon !== destination.icon ||
+        (!destination.icon && origin.width !== width) ||
         origin.sign !== sign ||
         !prepared.permitted ||
         immediate ||
@@ -134,8 +144,9 @@ export function createSizeLinkedGeometry(
       if (start === target) return;
       bounds = [Math.min(start, target), Math.max(start, target)];
       size.jump(start);
-      gapLease = gapOwner.begin(revision, ["width"], { collectionVisuals: new Set([gap, panel]) }, release);
-      panelLease = panelOwner.begin(revision, ["transform"], {}, release);
+      path = { start, width: prepared.sample?.width ?? origin.width };
+      gapLease = gapOwner.begin(revision, ["width"], { collectionVisuals: visuals }, release);
+      panelLease = panelOwner.begin(revision, [destination.icon ? "width" : "transform"], {}, release);
       if (!gapLease || !panelLease) {
         release();
         return;
@@ -152,8 +163,10 @@ export function createSizeLinkedGeometry(
         onComplete() {
           if (!current() || !permit.current() || !projectionPermit.current()) return;
           release();
+          complete?.();
         },
       });
+      return true;
     },
     invalidate() {
       release();

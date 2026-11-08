@@ -141,6 +141,11 @@
           "path": "registry/cadence/lib/sidebar-geometry.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/sidebar-geometry.ts"
+        },
+        {
+          "path": "registry/cadence/lib/sidebar-labels.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/sidebar-labels.ts"
         }
       ]
     },
@@ -2061,7 +2066,8 @@
         "batch": "B7",
         "motion": [
           { "recipe": "layout.move", "form": "size-linked" },
-          { "recipe": "geometry.resize", "form": "measured" }
+          { "recipe": "geometry.resize", "form": "measured" },
+          { "recipe": "data.transition", "form": "one-shot" }
         ],
         "intensity": "medium",
         "complexity": "L",

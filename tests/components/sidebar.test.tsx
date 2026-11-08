@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import {
   Sidebar,
+  SidebarGroupLabel,
   SidebarInput,
   SidebarInset,
   SidebarMenuButton,
@@ -183,5 +184,53 @@ describe("Sidebar", () => {
     act(() => unmount());
     expect(remove).toHaveBeenCalledWith("keydown", expect.any(Function));
     remove.mockRestore();
+  });
+  it.each(["full", "reduced", "none"] as const)("preserves real icon label/ref/input semantics in %s", async (mode) => {
+    const cleanup = vi.fn();
+    const ref = vi.fn(() => cleanup);
+    const { container, rerender, unmount } = render(
+      <CadenceProvider mode={mode}>
+        <SidebarProvider>
+          <Sidebar collapsible="icon">
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarMenuButton ref={ref} render={<a href="#destination" />}>
+              <svg aria-hidden="true" />
+              <span>Projects</span>
+            </SidebarMenuButton>
+            <SidebarInput aria-label="Persistent draft" />
+          </Sidebar>
+          <SidebarTrigger />
+        </SidebarProvider>
+      </CadenceProvider>,
+    );
+    const link = screen.getByRole("link", { name: "Projects" });
+    const input = screen.getByRole("textbox");
+    await userEvent.type(input, "draft");
+    await userEvent.click(screen.getByRole("button", { name: "Toggle Sidebar" }));
+    expect(container.querySelector('[data-slot="sidebar"]')).toHaveAttribute("data-collapsible", "icon");
+    expect(link).toHaveAttribute("data-motion", mode);
+    expect(link).not.toHaveAttribute("aria-hidden");
+    expectMotionContract(mode, {
+      behavior: () => {
+        expect(input).toHaveValue("draft");
+        expect(screen.getByRole("link", { name: "Projects" })).toBe(link);
+      },
+    });
+    expect(ref).toHaveBeenCalledWith(link);
+    // Replacing an actual render host must retire its physical registration.
+    rerender(
+      <CadenceProvider mode={mode}>
+        <SidebarProvider>
+          <Sidebar collapsible="icon">
+            <SidebarMenuButton render={<button type="button" />}>
+              <svg aria-hidden="true" />
+              <span>Replacement</span>
+            </SidebarMenuButton>
+          </Sidebar>
+        </SidebarProvider>
+      </CadenceProvider>,
+    );
+    expect(cleanup).toHaveBeenCalledOnce();
+    unmount();
   });
 });

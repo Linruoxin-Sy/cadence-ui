@@ -12,11 +12,12 @@ const output = path.resolve(
 );
 await mkdir(output, { recursive: false });
 const baseline = "3bc2bb880e92a598eaaa97135d9de3969c98d7d3";
+const previous = process.env.SIDEBAR_COST_PREVIOUS ?? "1be0ebda851a3b9b62e3d9018a5a1f0f6c65df59";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 const require = createRequire(import.meta.url);
 const vite = require.resolve("vite", { paths: [require.resolve("vitest/node")] });
 const { build } = await import(pathToFileURL(require.resolve("esbuild", { paths: [vite] })));
-const report = { baseline, runnerSHA: hash(await readFile(new URL(import.meta.url))), phases: {}, costs: [] };
+const report = { baseline, previous, runnerSHA: hash(await readFile(new URL(import.meta.url))), phases: {}, costs: [] };
 await writeFile(path.join(output, "runner.mjs"), await readFile(new URL(import.meta.url)));
 for (const phase of ["baseline", "previous", "current"]) {
   const target = path.join(output, phase);
@@ -31,11 +32,10 @@ for (const phase of ["baseline", "previous", "current"]) {
     const location = `public/r/${name}.json`;
     const source =
       phase !== "current"
-        ? spawnSync(
-            "git",
-            ["show", `${phase === "previous" ? "1be0ebda851a3b9b62e3d9018a5a1f0f6c65df59" : baseline}:${location}`],
-            { encoding: "utf8", maxBuffer: 16 * 1024 * 1024 },
-          )
+        ? spawnSync("git", ["show", `${phase === "previous" ? previous : baseline}:${location}`], {
+            encoding: "utf8",
+            maxBuffer: 16 * 1024 * 1024,
+          })
         : null;
     if (source) assert.equal(source.status, 0, source.stderr);
     const bytes = source ? source.stdout : await readFile(location, "utf8");

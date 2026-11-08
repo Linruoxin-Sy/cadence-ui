@@ -64,6 +64,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 | cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | code-block | `@components/cadence/code-block/index.tsx` | [JSON files[].content](https://cadence.dev/r/code-block.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)

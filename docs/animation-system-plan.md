@@ -244,7 +244,9 @@ existing performance task is a final delivery dependency, not a development prer
   in Tabs and Calendar. One finite content phase derives opacity/travel across actual month slots;
   one list-local marker owns its transform, with immediate unsafe/filled placement. These integrations
   keep native sizes. A separate desktop offcanvas adapter projects layout.sidebar from one actual
-  gap-size scalar; icon width/label coordination remains pending. Neither integration establishes
+  gap-size scalar; icon gap/container widths and safe plain-label destination layout now share that
+  owner with completion-gated opacity reveal. Unsupported label layouts stay immediate. Neither
+  integration establishes
   captured-origin handoff, coordinated trigger reflow, text/number/colour adoption or full
   component-v2 conformance. Those
   dependencies and the global budget gates remain pending.

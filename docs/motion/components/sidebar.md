@@ -1,6 +1,6 @@
 # Sidebar motion contract
 
-Status: target design; limited desktop offcanvas size-linked projection is implemented. Icon geometry/label choreography and the remaining capabilities/acceptance are pending; migration remains legacy.
+Status: target design; desktop offcanvas/icon size-linked projection and a safe completion-gated plain-label envelope are implemented. The remaining capabilities/acceptance are pending; migration remains legacy.
 
 Sidebar preserves spatial orientation while changing how much navigation is exposed. Offcanvas mode moves the existing desktop container; icon mode changes the occupied width and reveals labels only when space is usable. Mobile delegates to its existing Sheet composition. Route changes do not replay the sidebar.
 
@@ -110,6 +110,13 @@ their own visual work. Reversal invalidates the old pending reveal/fade and reas
 from the current coupled geometry. Reduced/none or zero recipe clock establishes final layout first
 and reconciles only paint still eligible in that mode; no stale completion can reveal a collapsed
 label. There is one label-envelope owner, with no per-frame label measurements or new duration token.
+The current adapter chooses the conservative completion gate: plain GroupLabel text uses an internal
+display span within its temporary text-only clip; a MenuButton uses an icon, its existing final plain
+span and overflow viewport. These real regions lay out at the destination width. Unsupported rich
+or interactive label shapes use immediate native expansion; known composed submenus keep their
+required content on immediate native geometry. Current collapse semantics remove the
+safe label lane immediately, so label paint settles rather than prolonging a fade. This limited
+adoption does not implement changed-run text, reels, action hover or colour.
 
 The continuous page-inset reflow below remains subordinate to the shared focused-editor rule.
 Before a known collapse transaction, check the actual owned Sidebar/Inset focus region: if the

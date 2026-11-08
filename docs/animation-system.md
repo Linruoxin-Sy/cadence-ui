@@ -593,8 +593,11 @@ including physical side and floating/inset padding. Temporary width/transform re
 released together. Reduced/none/zero clock and affected focused editors/native capture settle the
 whole transaction; passive constraints and unsupported coordinates establish an immediate baseline.
 Initial/missing/restored geometry never invents an origin. No content clone or frame-time layout
-read is used. Icon widths and labels still update immediately; their coupled destination-width
-label adapter remains pending. Mobile retains Sheet; inherited controls keep their own recipes.
+read is used. Icon gap/container widths project from that same owner, including distinct padded
+endpoints. Explicitly registered plain labels keep destination-width text layout and use actual size
+completion before opacity reveal. Collapse removes an unusable label lane immediately; unsupported
+rich/interactive label shapes and composed submenus use native immediate geometry. Mobile retains
+Sheet; inherited controls keep their own recipes.
 
 ### 3.0.1 Bubble surface entry
 
@@ -647,8 +650,8 @@ content travel and `content.month` for the calendar grid. The generic `data.upda
 silently add such travel. Sidebar's `layout.sidebar` binding uses a size-linked `layout.move`
 projection: its transform and the reserved-gap `geometry.resize` share one space-progress coordinator,
 with transform derived from that value. Equal durations on two independent springs are not proof of
-matching geometry. The installed size-linked form currently covers desktop offcanvas only; icon
-label/width coordination remains target work. These forms add no runtime recipe ids.
+matching geometry. The installed size-linked form covers desktop offcanvas and icon widths; its plain-label
+completion gate does not establish the remaining Sidebar text/number/colour capabilities. These forms add no runtime recipe ids.
 
 ### 3.1.1 `data.transition` for Embla collections
 

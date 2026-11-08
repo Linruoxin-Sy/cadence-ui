@@ -12,6 +12,7 @@ import { useIsMobile } from "../lib/hooks/use-mobile";
 import { useMotionHostRef } from "../lib/motion-ref";
 import { useCadenceMotion } from "../lib/provider";
 import { useSidebarGeometry } from "../lib/sidebar-geometry";
+import { SidebarLabels, useSidebarLabel } from "../lib/sidebar-labels";
 import { Separator } from "../separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../sheet";
 import { Skeleton } from "../skeleton";
@@ -156,12 +157,13 @@ function Sidebar({
   const offcanvas = state === "collapsed" && collapsible === "offcanvas";
   const panel = useMotionHostRef(ref);
   const gap = useMotionHostRef<HTMLDivElement>();
-  useSidebarGeometry(
+  const labels = useSidebarGeometry(
     gap.node,
     panel.node,
     state,
     `${side}/${variant}/${collapsible}/${isMobile}`,
-    !isMobile && collapsible === "offcanvas" && style?.transform === undefined,
+    !isMobile && collapsible !== "none" && style?.transform === undefined,
+    collapsible === "icon",
   );
 
   if (collapsible === "none") {
@@ -256,7 +258,7 @@ function Sidebar({
           data-slot="sidebar-inner"
           className="flex size-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
         >
-          {children}
+          <SidebarLabels.Provider value={labels}>{children}</SidebarLabels.Provider>
         </div>
       </div>
     </div>
@@ -408,12 +410,22 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
 function SidebarGroupLabel({
   className,
   render,
+  ref,
+  children,
   ...props
 }: useRender.ComponentProps<"div"> & React.ComponentProps<"div">) {
+  const label = useSidebarLabel(ref, true);
   return useRender({
     defaultTagName: "div",
     props: mergeProps<"div">(
       {
+        ref: label.ref,
+        children:
+          typeof children === "string" || typeof children === "number" ? (
+            <span data-motion={label.cm.mode}>{children}</span>
+          ) : (
+            children
+          ),
         className: cn(
           "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
           "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
@@ -426,6 +438,7 @@ function SidebarGroupLabel({
     state: {
       slot: "sidebar-group-label",
       sidebar: "group-label",
+      motion: label.cm.mode,
     },
   });
 }
@@ -519,6 +532,7 @@ function SidebarMenuButton({
   size = "default",
   tooltip,
   className,
+  ref,
   ...props
 }: useRender.ComponentProps<"button"> &
   React.ComponentProps<"button"> & {
@@ -526,10 +540,12 @@ function SidebarMenuButton({
     tooltip?: string | React.ComponentProps<typeof TooltipContent>;
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar();
+  const label = useSidebarLabel(ref);
   const comp = useRender({
     defaultTagName: "button",
     props: mergeProps<"button">(
       {
+        ref: label.ref,
         className: cn(sidebarMenuButtonVariants({ variant, size }), className),
       },
       props,
@@ -540,6 +556,7 @@ function SidebarMenuButton({
       sidebar: "menu-button",
       size,
       active: isActive,
+      motion: label.cm.mode,
     },
   });
 
@@ -646,9 +663,12 @@ function SidebarMenuSkeleton({
   );
 }
 
-function SidebarMenuSub({ className, ...props }: React.ComponentProps<"ul">) {
+function SidebarMenuSub({ className, ref, ...props }: React.ComponentProps<"ul">) {
+  // Composed submenu content has no proven destination-width label lane.
+  const content = useSidebarLabel(ref, false, true);
   return (
     <ul
+      ref={content.ref}
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(

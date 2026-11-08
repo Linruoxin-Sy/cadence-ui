@@ -21637,6 +21637,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority s
 | cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | code-block | `@components/cadence/code-block/index.tsx` | [JSON files[].content](https://cadence.dev/r/code-block.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -31355,6 +31356,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | use-mobile | `@components/cadence/lib/hooks/use-mobile.ts` | [JSON files[].content](https://cadence.dev/r/use-mobile.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
@@ -31593,9 +31595,9 @@ containing transform and absolute desktop panels in these embedded examples
 are local layout choices. Caller `style.transform` on Sidebar takes ownership
 of desktop positioning and suppresses its offcanvas motion.
 
-Sidebar animates only desktop offcanvas translation with `layout.move` in full;
-reduced and none update position immediately. Gaps and icon widths always
-change immediately. Mobile Sheet, buttons, tooltips and loading skeletons keep
+Sidebar coordinates desktop offcanvas translation and icon widths from the occupied gap in full;
+reduced and none update geometry immediately. Unsupported layouts use native immediate geometry. Mobile Sheet, buttons, tooltips and loading
+skeletons keep
 their own inherited motion contracts; install their helpers even if you only
 use desktop navigation.
 
@@ -31730,7 +31732,7 @@ export function Example() {
 
 ## Icon navigation
 
-The fixed icon rail starts collapsed on desktop. Keep icon and text in each button; the text still names the link, and the string tooltip appears on focus or hover. Rail widths and labels change immediately; only offcanvas travel uses the Sidebar recipe. Search remains a real filter when expanded; the compact rail hides its header text, search and footer text.
+The fixed icon rail starts collapsed on desktop. Keep icon and text in each button; the text still names the link, and the string tooltip appears on focus or hover. Rail and container widths share one size owner. Supported plain labels wait for actual expansion completion before fading in; unsupported label layouts expand immediately. Search remains a real filter when expanded; the compact rail hides its header text, search and footer text.
 
 <ComponentExample name="icon-navigation" />
 
@@ -33381,11 +33383,17 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Desktop offcanvas position | transform projected from actual occupied width | `layout.move` | Yes, one shared size scalar. |
-| Desktop offcanvas gap | measured, clamped width | `geometry.resize` | Yes, current size and velocity retarget. |
+| Desktop offcanvas gap and icon gap/container | measured, clamped widths | `geometry.resize` | Yes, one scalar maps both icon endpoints. |
+| Safe icon label reveal | opacity after actual size completion | `data.transition` | Yes, cancelled on reversal, input or invalidation. |
 
 Full drives the actual gap and panel position from one clamped size spring. Initial state is native;
-there is no mounting reveal. Reduced, none and zero clock reach both destinations immediately. Icon
-widths, labels and visibility still update immediately. Native CSS supplies the resting widths and
+there is no mounting reveal. Reduced, none and zero clock reach the current destinations immediately.
+Icon gap/container widths use the same scalar, including floating/inset endpoint differences. Plain
+GroupLabel text and a MenuButton with an icon and a final plain text span use destination-width label
+layout. The label stays hidden until the size owner actually completes, then may fade in. Collapse
+establishes compact visibility immediately and never waits for paint. Rich or interactive label
+layouts and known composed submenus use immediate geometry. Labels keep their accessible names
+and controls are never copied. Native CSS supplies the resting widths and
 positions; temporary effects are released on completion or cancellation. Caller `style.transform`
 owns panel placement and suppresses this coupled animation. Unsupported or unavailable geometry
 uses immediate native layout. Focused editing in the Sidebar/Inset, native pointer capture, passive
@@ -33422,13 +33430,15 @@ Default mobile closing unmounts content. Store drafts outside Sidebar if they mu
 
 Desktop offcanvas uses one measured size scalar for its gap and panel projection. Reads occur at
 committed changes and invalidation, never on animation frames; no interactive content is cloned.
-Icon layout remains immediate. There is no persistent will-change or animation timer. Child input
+Icon labels use explicit part registrations and bounded destination reads. Their known paint and
+viewport regions join the shared 50-visual preflight before measurement. There is no persistent
+will-change or animation timer. Child input
 values survive desktop state and motion-mode updates. Render only the navigation items the application needs.
 
 ## Notes for AI
 
 Keep the provider, navigation landmark and main content together. Use `render`, never `asChild`.
-Do not assume the cookie is read or desktop `open` controls the mobile sheet. Icon width/label choreography remains pending; preserve its immediate path.
+Do not assume the cookie is read or desktop `open` controls the mobile sheet. Use an icon plus a plain final span for MenuButton labels to enable the safe expansion envelope. Rich labels retain immediate native expansion. Other v2 capabilities remain pending.
 
 # Data Table
 

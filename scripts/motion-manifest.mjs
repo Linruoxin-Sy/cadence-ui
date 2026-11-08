@@ -86,6 +86,14 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  // Structural adoption only; actual completion/cancellation is browser evidence.
+  if (recipe === "data.transition" && form === "one-shot" && source.includes("./sidebar-labels"))
+    return source.includes("prepareSidebarLabels(labels, transaction, revision)") &&
+      source.includes("labelGate.start()") &&
+      source.includes("labelGate?.complete()") &&
+      source.includes("projection.commit(")
+      ? "one-shot"
+      : null;
   if ((recipe === "layout.move" && form === "size-linked") || (recipe === "geometry.resize" && form === "measured"))
     return source.includes("./size-linked-geometry") &&
       source.includes("createSizeLinkedGeometry(") &&
