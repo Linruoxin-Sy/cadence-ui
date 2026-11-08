@@ -346,6 +346,13 @@ interruption, CSS/JS equivalence and cost together. Update this catalogue and th
 bindings first; then implement all affected runtime/declaration/docs checks in the rollout. Do not
 create 59 copies of an easing curve or use a new preset name to avoid a recipe's safety contract.
 
+A composition-level assignment may refine an inherited owner without creating a new preset, but
+record the upstream binding, replacement binding, cause and consumed child geometry together.
+Do not infer an override from a general preset's intended scope: Popover explicitly selects
+`geometry.compact`, and DatePicker inherits that same binding. The existence of `geometry.panel`
+does not assign it to every popup. An actual override changes rhythm, never ownership, mode ceilings,
+readability or native completion rules.
+
 Resolve timing from the actual binding's selected form and phase. Sharing a duration token does not
 make two recipes interchangeable: an opacity exit can use `ease.in` while an entry using the same
 duration uses `ease.out`. Do not borrow an unrelated recipe's transition merely because its current
@@ -473,7 +480,7 @@ and measurement. A budget fallback never truncates content or delays its accessi
 | General text diff input   | At most 2048 graphemes per compared owned display string; streaming uses the append fast path                                                                                 | Show final affected content immediately; code/large-document owners may work on bounded visible lines, never split a shaping run merely to fit |
 | Middle-diff work          | At most 4096 candidate comparisons after prefix/suffix trimming                                                                                                               | Abort the visual diff and commit final affected text; no synchronous quadratic work beyond the cap                                             |
 | Numeric moving set        | At most 12 changed place-value columns per numeric display and across one known coordinated content transaction                                                               | Show the complete final formatted value immediately; never drop significant digits                                                             |
-| Chart data interpolation  | At most 200 participating samples/marks across all animated visible series in one chart revision                                                                              | Commit final data geometry immediately; do not resample, omit data or queue the excess                                                         |
+| Chart data interpolation  | At most 200 participating samples/marks in one chart, including still-active visible series from earlier revisions                                                                              | Commit final data geometry immediately; do not resample, omit data or queue the excess                                                         |
 | Pending targets           | One latest committed target per owner                                                                                                                                         | Replace the obsolete target; no queue of intermediate text, digits or measurements                                                             |
 
 The collection bound is a target for the shared coordinator; it is not an implemented runtime
@@ -513,7 +520,16 @@ Diff work limits count analysis of the changed middle; linear input/formatting a
 subject to the component's own visible-work and full-page performance requirements.
 
 The chart bound counts interpolation work, including line/area samples whose dots are hidden, not
-only visible SVG node count. Unknown/unbounded caller geometry uses an immediate safe engine target
+only visible SVG node count. Count the proposed work together with still-active visible series from
+earlier revisions in the same chart; a new revision or a different series does not reset the allowance.
+Retargeting the same sample under one replacement controller counts once, including its source/target
+endpoint pair; a distinct concurrently interpolated outgoing series/sample consumes its own capacity.
+Establish the working set from the adapter's known series/data identities and lengths before
+allocating interpolation state or invoking per-sample
+animation work. This is separate from Recharts' necessary final data rendering, which is never omitted.
+If safe counting is unavailable or the combined set exceeds the bound, settle the affected chart-data
+transaction and release obsolete interpolation state; never queue it until older series finish.
+Unknown/unbounded caller geometry uses an immediate safe engine target
 or remains explicitly caller-owned; it cannot claim automatic bounded interpolation. The bound is a
 conservative target pending real-device measurement, not a proven frame-rate threshold.
 

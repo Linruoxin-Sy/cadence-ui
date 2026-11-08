@@ -60,7 +60,7 @@ otherwise permitted short opacity or colour feedback.
 - Committed value arrays and roving focus update immediately; a controlled request is not an accepted selection. Selection, label and item-set changes share the latest committed layout snapshot; an old selection cannot complete over a new item. No selected values means no selected plate, rather than inventing a first selection. First placement or restoration after no valid selected item is immediate; an absent origin is never a rectangle at zero.
 - Reversal continues from the current indicator geometry. Switching `multiple` cancels the incompatible shared/local presentation before placing the new state.
 - Removing an item unregisters its measurement and press state. Parent exit owns removal; the group does not retain interactive exiting items.
-- Live reduced/none and zero clock cancel selection travel, layout and press as appropriate; unmount releases group registrations and active writers.
+- Live reduced/none settles selection/layout and removes decorative press scale. A zero recipe clock in full mode instead reaches the current selection/layout immediately and keeps an accepted held item at `scale.press`, with immediate release to rest. Neither policy clears native capture or the accepted value array. Unmount releases group registrations and active writers.
 
 ## Geometry and performance
 
@@ -73,6 +73,8 @@ otherwise permitted short opacity or colour feedback.
 For unchanged selected values, the strip transaction projects each selected decoration through the same current item reflow/size coordinates; the shared plate does not independently start layout.selection on a changed rectangle. One plate writer consumes that projection, without per-frame layout reads. Only a committed selection change uses the selection clock. If selection and reflow occur together, that writer combines the selection path and strip projection once, avoiding duplicate source/destination displacement. Multiple-mode decorations remain attached to their own item projections. If a custom render or adapter cannot preserve this coupling, settle the affected strip/item/plate geometry together immediately. Matching final boxes or starting independent smooth/snappy springs together is not adequate coordination.
 
 ## Acceptance scenarios
+
+- Pending: hold an item while a label/selection update runs, set timeScale to zero, then release. Full-mode held scale persists at its immediate target; reduced/none remain unscaled, and no mode/clock change clears native held state or invents a selected value.
 
 - Pending: rapidly change single selection while labels and widths change; the one plate reaches the latest selected item.
 - Pending: exercise `multiple`, all variants, vertical/RTL, mixed item sizes, disabled items and removal of the selected item.

@@ -312,6 +312,12 @@ For retained native popups, distinguish visual completion, a connected closed ho
 under the primitive's existing policy. Preserve caller handles on the same surviving host, allow
 native removal to end them, and never use an infinite caller loop as an added Cadence exit hold.
 
+Review inherited parameter assignments at their actual dependency owner. DatePicker's inherited
+compact size binding must match Popover's actual compact binding and execute at that single host,
+without running a second Calendar size writer. Chart interpolation preflight must include
+still-active series from earlier revisions before per-sample animation allocation; final data rendering
+is mandatory even when decoration exceeds the bound. These remain implementation acceptance gates.
+
 Gate: meaningful algorithm, lifecycle and browser fixtures cover repeated characters, Unicode,
 multiline shaping fallback, numeric formatting, rapid retargeting, hidden/zero-size measurement,
 SSR/hydration, nested modes, live downgrades and clean unmount. Do not require per-frame React state

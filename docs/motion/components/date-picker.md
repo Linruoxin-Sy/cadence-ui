@@ -49,6 +49,14 @@ Button, Popover and each Calendar day/navigation region retain their distinct co
 
 ## Interruption and lifecycle
 
+The month/week-count action aliases `popover.content.resize` through `date-picker.popup.resize`:
+both select `geometry.compact` and `geometry.resize/measured` at the same Popover size host. It is
+unchanged inheritance, not a local preset override. Calendar supplies its final natural destination
+and consumes its own size animation for that cause. The general `geometry.panel` preset does not
+automatically replace a component's explicitly selected compact binding merely because it is a popup.
+Passive `contentProps` layout changes still use immediate native geometry; they do not become calendar
+revisions. Reduced/none/zero and focus, overflow, cancellation and readability constraints stay unchanged.
+
 - Rapid selections/deselections or incomplete range updates replace only the changing label parts. Selection stays open as in the actual block; callbacks never wait for label or popup animation.
 - Preserve present-but-undefined controlled values, locale/time-zone configuration and caller open state. An external value update does not key/remount the Calendar or override the caller/DayPicker navigation policy. Plain formatted-label integration is the trigger's sole text owner; Button does not apply another diff to the same label. Fixed date fragments do not roll as counters.
 - Closing/reopening Popover uses its existing lifecycle and latest value. Closing cancels its Calendar/content geometry and hidden decoration, and reopening invalidates old popup completions. The retained visible Button trigger has a separate label/width owner: its latest eligible update continues through popup close, subject to native return-focus and readability gates. No old value or stale range is replayed on reopen.
@@ -56,13 +64,15 @@ Button, Popover and each Calendar day/navigation region retain their distinct co
 
 ## Geometry and performance
 
-Measure the owned label only when its known value changes and the trigger actually owns intrinsic inline-size. Preserve `max-w-full`, truncation and caller styles; do not force width to the full untruncated string. Button feedback uses its internal visual layer, preserving the actual Popover anchor geometry. Popover placement and collision coordinates remain Base UI-owned. Calendar's natural destination height feeds the default Popover geometry.compact host; the Calendar shell takes its destination directly for that transaction. A caller's custom content can explicitly delegate back to Calendar with the Popover size writer disabled for that cause, but cannot leave both active. Range mode measures the actual multi-month arrangement; no per-day size observers.
+Measure the owned label only when its known value changes and the trigger actually owns intrinsic inline-size. Preserve `max-w-full`, truncation and caller styles; do not force width to the full untruncated string. Button feedback uses its internal visual layer, preserving the actual Popover anchor geometry. Popover placement and collision coordinates remain Base UI-owned. Calendar's natural destination height feeds the Popover host under the exact inherited compact binding above; the Calendar shell takes its destination directly for that transaction. A caller's custom content can explicitly delegate back to Calendar with the Popover size writer disabled for that cause, but cannot leave both active. Range mode measures the actual multi-month arrangement; no per-day size observers.
 
 The existing DatePicker composition explicitly supplies available-height/width constraints and `overflow-auto` to PopoverContent; generic PopoverContent does not create that scrolling viewport. Preserve this actual default and any `contentProps` class/style overrides. If the caller removes or changes that overflow policy, animation must not add it back or introduce clipping to fit a geometry interval; an infeasible readable size uses immediate native layout under the caller's current constraints.
 
 Measure the natural trigger-label region separately from the Button's size host, at destination constrained inline-size. Keep the label's destination layout/truncation stable while the shell changes width; do not repeatedly wrap text or scale glyphs. Calendar applies its own destination-width grid layout before an owned height transition.
 
 ## Acceptance scenarios
+
+- Pending: compare standalone Popover content growth with DatePicker month-row growth. Both use the exact compact binding at their actual Popover host; DatePicker additionally consumes Calendar's same-cause size animation. Changing only passive contentProps layout constraints settles native geometry immediately without starting another calendar transaction.
 
 - Pending: select, clear and rapidly replace single/range values, including a partial range and controlled undefined; only changed label graphemes move and selection stays open.
 - Pending: change locale/placeholder, constrain trigger width and pass caller trigger/content overrides; formatting, truncation and placement remain correct.

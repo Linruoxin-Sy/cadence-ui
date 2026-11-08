@@ -64,6 +64,8 @@ Use the shared [Chart data interpolation limit](../presets.md#5-geometry-text-an
 
 ## Acceptance scenarios
 
+- Pending: start a bounded series update, then change a different series while the first remains active so that their combined interpolation working set exceeds the shared sample limit. Reject the excess before per-sample animation allocation, settle current data without dropping samples, and preserve independent annotation semantics. A retarget of the same stable series/sample must not count as a second copy unless a distinct retained presentation actually exists.
+
 - Pending: update each supported series repeatedly and change mode mid-interpolation; verify latest terminal geometry and preserved custom interpolators/keys.
 - Pending: scrub tooltip with pointer and keyboard while data changes; position and values remain current without reel queues.
 - Pending: test plain/rich formatters, legend changes, localized quantities, missing payloads and responsive resize; only owned content animates.

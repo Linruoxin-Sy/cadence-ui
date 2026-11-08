@@ -43,7 +43,7 @@ The thumb makes the binary state legible by travelling inside the measured track
 ## Interruption and lifecycle
 
 - Checked semantics/form state update immediately. Rapid toggles reverse the same thumb writer without accumulating travel.
-- The first valid measurement places the thumb immediately. If size changes mid-toggle, retarget the endpoint from the current visual position; do not animate toward an obsolete width.
+- The first valid measurement places the thumb immediately. An intentional size-prop revision during a toggle retargets the endpoint from current presentation through the coordinated size transaction below. Passive font/viewport/caller-layout changes or an invalidated direction/coordinate frame instead cancel that obsolete projection and establish the current checked endpoint immediately. A measurement delivery alone never starts another toggle or size spring.
 - A controlled callback is not a committed checked change. Native form/reset/read-only rules and the caller's actual accepted value remain authoritative in every mode; returning to full does not replay the current position.
 - Parent exit cancels local presentation; no extra closing delay. Read-only/disabled prevents new input without rolling back an accepted state.
 - Live reduced cancels travel/resize; none and zero clock cancel all transitions and delays. Unmount disconnects the existing track/thumb observer and writers.
@@ -57,6 +57,8 @@ The thumb makes the binary state legible by travelling inside the measured track
 - Bound work to one track and one thumb per control. Responsive/font changes settle immediately; fixed hit targets and focus outlines remain outside clipping.
 
 ## Acceptance scenarios
+
+- Pending: contrast an explicit size-prop revision during a toggle with a passive parent/font resize or direction change. Only the explicit eligible revision uses the coordinated size path; environment recovery establishes the correct endpoint immediately and cannot replay the old toggle.
 
 - Pending: test checked initial SSR/hydration, both sizes, RTL and first measurement without a false off-to-on sweep.
 - Pending: alternate checked state while changing size and ensure endpoints remain within the track.
