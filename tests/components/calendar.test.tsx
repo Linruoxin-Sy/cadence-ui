@@ -30,7 +30,12 @@ describe("Calendar", () => {
   });
   for (const mode of ["full", "reduced", "none"] as const) {
     it(`preserves navigation and focus in ${mode}`, async () => {
-      const animation = vi.fn(() => ({ cancel: vi.fn() }));
+      const keyframes = vi.fn();
+      const cancellation = vi.fn();
+      const animation = vi.fn(() => ({ cancel: cancellation, effect: { setKeyframes: keyframes } }));
+      const boxes = vi
+        .spyOn(Element.prototype, "getClientRects")
+        .mockReturnValue([new DOMRect(0, 0, 400, 240)] as unknown as DOMRectList);
       const oldAnimate = Element.prototype.animate;
       Element.prototype.animate = animation as unknown as typeof Element.prototype.animate;
       const user = userEvent.setup();
@@ -50,10 +55,13 @@ describe("Calendar", () => {
           if (mode === "none") expect(animation).not.toHaveBeenCalled();
           else {
             expect(animation).toHaveBeenCalledOnce();
-            const [frames, timing] = animation.mock.calls[0] as unknown as [Keyframe[], KeyframeAnimationOptions];
-            expect(timing.duration).toBe(mode === "full" ? 220 : 132);
-            expect(frames[0]?.opacity).toBe(0);
-            expect(Boolean(frames[0]?.transform)).toBe(mode === "full");
+            const [, timing] = animation.mock.calls[0] as unknown as [Keyframe[], KeyframeAnimationOptions];
+            // A held native effect receives frames from the group's one phase.
+            expect(timing.duration).toBe(0);
+            expect(timing.fill).toBe("both");
+            expect(keyframes.mock.calls[0]?.[0]?.[0]?.opacity).toBe(0);
+            // jsdom's equal root/grid boxes cannot prove a safe travel lane.
+            expect(keyframes.mock.calls[0]?.[0]?.[0]?.transform).toBeUndefined();
           }
         },
       });
@@ -65,7 +73,9 @@ describe("Calendar", () => {
       );
       expect(screen.getByRole("grid")).toBe(grid);
       expect(grid.style.transform).toBe("");
+      if (mode !== "none") expect(cancellation).toHaveBeenCalled();
       Element.prototype.animate = oldAnimate;
+      boxes.mockRestore();
     });
   }
   it("forwards selection, disabled dates, overrides and controlled month updates", async () => {

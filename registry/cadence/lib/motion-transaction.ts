@@ -73,6 +73,15 @@ export function createMotionTransaction() {
     if (errors.length) throw new AggregateError(errors, "Motion disposal failed");
   };
   return {
+    /** Include still-active work before an adapter measures or allocates paint. */
+    preflightVisuals(proposed: ReadonlySet<object>) {
+      const known = collectMotionVisuals(proposed);
+      const visuals = new Set(known ?? []);
+      for (const item of active) for (const visual of item.work.collectionVisuals ?? []) visuals.add(visual);
+      if (known && collectMotionVisuals(visuals)) return true;
+      stop([...active].filter((item) => Boolean(item.work.collectionVisuals?.length)));
+      return false;
+    },
     activeWork(kind: "changedGraphemes" | "numericColumns" | "chartSamples") {
       const totals = new Map<unknown, number>();
       for (const item of active) {

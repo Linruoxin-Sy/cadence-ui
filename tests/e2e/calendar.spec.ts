@@ -50,7 +50,9 @@ for (const os of [false, true])
       const frames = await top.evaluate(async (el) => {
         const table = el.querySelector("table");
         if (!table) throw new Error("Missing calendar grid");
-        (el.querySelector('[aria-label="Go to the Next Month"]') as HTMLButtonElement).click();
+        const next = el.querySelector('[aria-label="Go to the Next Month"]') as HTMLButtonElement;
+        next.focus();
+        next.click();
         const samples = [];
         for (let i = 0; i < 50; i++) {
           await new Promise(requestAnimationFrame);
@@ -71,10 +73,13 @@ for (const os of [false, true])
       const cancellation = await top.evaluate(async (el) => {
         const table = el.querySelector("table");
         if (!table) throw new Error("Missing calendar grid");
-        (el.querySelector('[aria-label="Go to the Previous Month"]') as HTMLButtonElement).click();
+        const previous = el.querySelector('[aria-label="Go to the Previous Month"]') as HTMLButtonElement;
+        previous.focus();
+        previous.click();
         await new Promise(requestAnimationFrame);
         await new Promise(requestAnimationFrame);
-        const active = table.getAnimations().filter((a) => a.playState === "running").length;
+        // The native effect is held while the shared scalar updates its frames.
+        const active = table.getAnimations().length;
         const button = document.querySelector(
           '[role="group"][aria-label="Motion mode"] button[data-mode="none"]',
         ) as HTMLButtonElement | null;
@@ -381,59 +386,75 @@ test("Calendar running reverse, header cancellation and live system preference r
   await open(page, "full");
   const c = card(page, "controlled-month-and-date"),
     grid = c.getByRole("grid");
-  await day(c, "November 12th").focus();
+  await grid.scrollIntoViewIfNeeded();
   const frames = await c.evaluate(async (el) => {
     const table = el.querySelector("table");
     if (!table) throw new Error("Missing calendar grid");
-    (el.querySelector('[aria-label="Go to the Next Month"]') as HTMLButtonElement).click();
+    const next = el.querySelector('[aria-label="Go to the Next Month"]') as HTMLButtonElement;
+    const previous = el.querySelector('[aria-label="Go to the Previous Month"]') as HTMLButtonElement;
+    next.focus();
+    next.click();
     await new Promise(requestAnimationFrame);
     await new Promise(requestAnimationFrame);
     const first = table.getAnimations()[0];
-    if (!first) throw new Error("Month motion did not start");
+    if (!first)
+      throw new Error(
+        `Month motion did not start: ${JSON.stringify({ rect: table.getBoundingClientRect().toJSON(), mode: table.getAttribute("data-motion"), focus: document.activeElement?.outerHTML.slice(0, 300) })}`,
+      );
     const before = getComputedStyle(table).transform;
-    (el.querySelector('[aria-label="Go to the Previous Month"]') as HTMLButtonElement).click();
+    const opacity = Number(getComputedStyle(table).opacity);
+    previous.focus();
+    previous.click();
     await new Promise(requestAnimationFrame);
     await new Promise(requestAnimationFrame);
     return {
       before,
+      opacity,
       oldState: first.playState,
       after: getComputedStyle(table).transform,
-      running: table.getAnimations().filter((a) => a.playState === "running").length,
+      afterOpacity: Number(getComputedStyle(table).opacity),
+      owned: table.getAnimations().length,
       same: table === el.querySelector("table"),
     };
   });
   expect(frames.before).not.toBe("none");
   expect(frames.after).not.toBe("none");
   expect(frames.oldState).toBe("idle");
-  expect(frames.running).toBe(1);
+  expect(frames.owned).toBe(1);
   expect(frames.same).toBe(true);
   expect(Number(frames.before.split(",")[4])).toBeGreaterThan(0);
-  expect(Number(frames.after.split(",")[4])).toBeLessThan(0);
+  // Reversal retains current paint rather than restarting at a negative offset.
+  expect(Number(frames.after.split(",")[4])).toBeGreaterThanOrEqual(0);
+  expect(Number(frames.after.split(",")[4])).toBeLessThanOrEqual(Number(frames.before.split(",")[4]) + 0.05);
+  expect(frames.afterOpacity).toBeGreaterThanOrEqual(frames.opacity);
   await testInfo.attach("reverse", { body: JSON.stringify(frames), contentType: "application/json" });
-  await expect
-    .poll(() => grid.evaluate((el) => el.getAnimations().filter((a) => a.playState === "running").length))
-    .toBe(0);
+  await expect.poll(() => grid.evaluate((el) => el.getAnimations().length)).toBe(0);
   await day(c, "November 12th").focus();
   await page.keyboard.press("PageDown");
   await expect(day(c, "December 12th")).toBeFocused();
-  // Prove running motion before the OS downgrade, then sample all later frames.
-  expect(await grid.evaluate((el) => el.getAnimations().some((a) => a.playState === "running"))).toBe(true);
+  // Focus-driven crossings expose the actual day immediately.
+  expect(await grid.evaluate((el) => el.getAnimations().length)).toBe(0);
+  const next = c.getByRole("button", { name: /next month/i });
+  await next.focus();
+  await next.press("Enter");
+  expect(await grid.evaluate((el) => el.getAnimations().length)).toBe(1);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await expect(grid).toHaveAttribute("data-motion", "reduced");
-  await expect(day(c, "December 12th")).toBeFocused();
+  await expect(next).toBeFocused();
   await expect.poll(() => grid.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
   await expect.poll(() => grid.evaluate((el) => el.getAnimations().length)).toBe(0);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await expect(grid).toHaveAttribute("data-motion", "full");
-  await day(c, "December 12th").press("PageUp");
-  expect(await grid.evaluate((el) => el.getAnimations().some((a) => a.playState === "running"))).toBe(true);
+  expect(await grid.evaluate((el) => el.getAnimations().length)).toBe(0);
+  await next.press("Enter");
+  expect(await grid.evaluate((el) => el.getAnimations().length)).toBe(1);
   await page
     .getByRole("group", { name: "Motion mode" })
     .getByRole("button", { name: "reduced", exact: true })
     .evaluate((el) => (el as HTMLButtonElement).click());
   await expect(grid).toHaveAttribute("data-motion", "reduced");
   await expect.poll(() => grid.evaluate((el) => el.getAnimations().length)).toBe(0);
-  await expect(day(c, "November 12th")).toBeFocused();
+  await expect(next).toBeFocused();
 });
 
 for (const theme of ["light", "dark"])

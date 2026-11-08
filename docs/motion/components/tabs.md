@@ -2,6 +2,15 @@
 
 Status: target design; implementation and verification pending.
 
+Scoped installed support: TabsList retains one physical marker and uses the selection projection
+owner for safe underline travel. Filled/uncertain mappings use native selected paint immediately.
+TabsContent uses one finite content.switch phase for permitted incoming opacity/travel; only an
+existing root-padding corridor permits travel. No outgoing subtree, new viewport or cross-panel
+height owner is created. The list's style/constraint invalidation is native fallback, not a reflow
+projection. Coordinated strip/size geometry, text/number/colour and complete v2 acceptance remain
+pending. This partial integration does not change the legacy migration marker.
+
+
 Tabs links a persistent selection marker to the newly active content. The marker communicates selection; a small directional panel transition explains navigation between neighbours. This covers `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` and the decorative `tabs-indicator`, in horizontal/vertical orientations and both list variants.
 
 Use the [shared contract](../README.md) and [preset definitions](../presets.md). Binding names are local design references.

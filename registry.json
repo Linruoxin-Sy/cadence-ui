@@ -135,6 +135,38 @@
       ]
     },
     {
+      "name": "cadence-selection",
+      "type": "registry:lib",
+      "title": "Selection projection",
+      "description": "Internal bounded committed selection projection owner.",
+      "categories": ["foundation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/selection-projection.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/selection-projection.ts"
+        }
+      ]
+    },
+    {
+      "name": "cadence-content",
+      "type": "registry:lib",
+      "title": "Content phase",
+      "description": "Internal bounded committed content phase owner.",
+      "categories": ["foundation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/content-transition.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/content-transition.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-theme",
       "type": "registry:theme",
       "title": "Cadence theme",
@@ -1705,19 +1737,39 @@
       "description": "Switch between peer views with a shared selection indicator.",
       "categories": ["navigation"],
       "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-content",
+        "@cadence/cadence-selection"
+      ],
       "files": [
         {
           "path": "registry/cadence/tabs/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/tabs/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/tabs-motion.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/tabs-motion.tsx"
         }
       ],
       "meta": {
         "since": "0.4.0",
         "tier": "T3",
         "batch": "B6",
-        "motion": ["layout.shared"],
+        "motion": [
+          {
+            "recipe": "layout.shared",
+            "form": "selection"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "directional-content"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -1859,7 +1911,8 @@
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
         "@cadence/cadence-provider",
-        "@cadence/button"
+        "@cadence/button",
+        "@cadence/cadence-content"
       ],
       "files": [
         {
@@ -1872,7 +1925,12 @@
         "since": "0.5.0",
         "tier": "T4",
         "batch": "B7",
-        "motion": ["data.transition"],
+        "motion": [
+          {
+            "recipe": "data.transition",
+            "form": "month-grid"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "L",
         "upstream": {

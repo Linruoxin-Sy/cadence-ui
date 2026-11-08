@@ -33,6 +33,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -54,6 +55,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -63,6 +65,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
 
 [Source files: calendar](https://cadence.dev/r/calendar.json)
 
@@ -217,7 +221,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten target files, including Button and every shared helper, into the
+Copy every target file in Calendar and its recursive dependencies, including Button and the content phase helper, into the
 same `cadence/` tree. Preserve relative imports and shipped `"use client"`
 directives. Button is already a recursive dependency, including its full npm
 dependencies and source; the Controlled month and date example needs no
@@ -984,7 +988,14 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 The same grid responds to buttons, native dropdowns, keyboard navigation and external controlled
 month updates. Week-count height changes immediately. Caller transform/opacity styles take
 precedence over the corresponding animation property. No outgoing duplicate steals focus.
-Any live clock edit cancels the current grid effect; the next month change uses the new local token
+Each actual grid retains its local token scope. Equal policies share the phase; incompatible
+per-grid clocks use native paint together. A grid-local zero cancels the group before paint.
+Changing month count or replacing a host establishes a current baseline. Same-count reorder with
+unknown direction fades changed grids without invented travel.
+All actual month slots share one bounded scalar phase for opacity and signed translation, including RTL.
+A missing safe root-padding corridor uses opacity only. Focus-driven month crossings stay immediately
+visible. The known month set is preflighted before per-grid reads; over 50 visuals use native paint.
+Any live clock edit cancels the current grid effects; the next month change uses the new local token
 clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the owned WAAPI
 handle, and restoring visibility or full motion does not replay the current month.
 
@@ -1023,8 +1034,9 @@ customizing cells, week numbers or month counts. The preview is checked at 390px
 
 ## Performance
 
-No layout measurements, duplicate month DOM or animation timers. Only the changing month grid
-animates; dates and keyboard focus remain managed by DayPicker. The dependency is pinned to
+Committed navigation reads only the actual root/grid paint corridor after bounded preflight; there
+are no render/frame layout reads, duplicate month trees or animation timers. One shared phase drives
+the changing grids; dates and keyboard focus remain managed by DayPicker. The dependency is pinned to
 9.13.2 with date-fns 4.1.0. Pass an explicit defaultMonth/today/timeZone when server and client
 must agree across timezone or date boundaries. For SSR dropdown captions, pass an explicit locale
 (e.g. enUS from date-fns/locale): the pinned upstream formatter uses the environment locale

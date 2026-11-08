@@ -203,7 +203,7 @@ describe("Tabs", () => {
       fireEvent.click(screen.getByRole("tab", { name: "Charlie" }));
       expect(screen.getByRole("tab", { name: "Charlie" })).toHaveAttribute("aria-selected", "true");
       const indicator = container.querySelector('[data-slot="tabs-indicator"]');
-      expect(indicator?.parentElement).toBe(screen.getByRole("tab", { name: "Charlie" }));
+      expect(indicator?.parentElement).toBe(container.querySelector('[data-slot="tabs-list"]'));
       expectMotionContract(mode, {
         behavior: () => {
           if (mode !== "full") expect(indicator).not.toHaveAttribute("style");

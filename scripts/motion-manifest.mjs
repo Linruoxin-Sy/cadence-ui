@@ -20,7 +20,14 @@ const require = createRequire(import.meta.url);
 let compiler;
 
 /** Installed forms only. docs/motion target recipe/form references do not extend this list. */
-export const MOTION_FORMS = ["one-shot", "continuous", "css-transition"];
+export const MOTION_FORMS = [
+  "one-shot",
+  "continuous",
+  "css-transition",
+  "selection",
+  "directional-content",
+  "month-grid",
+];
 
 /**
  * Recipes that a popup may implement in pure CSS. Base UI runs the enter/exit by
@@ -77,6 +84,26 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  if (recipe === "layout.shared" && form === "selection")
+    return source.includes("./selection-projection") &&
+      source.includes("createSelectionProjection(") &&
+      source.includes("projection.commit(") &&
+      source.includes("layout.shared/selection")
+      ? form
+      : null;
+  if (recipe === "data.transition" && form === "directional-content")
+    return source.includes("./content-transition") &&
+      source.includes("paint.commit(") &&
+      source.includes("TabsPanelSurface")
+      ? form
+      : null;
+  if (recipe === "data.transition" && form === "month-grid")
+    return source.includes("../lib/content-transition") &&
+      source.includes("createContentTransition(") &&
+      source.includes("paint.commit(") &&
+      source.includes("calendar-month-grid")
+      ? form
+      : null;
   if (recipe === "state.color")
     return form === "css-transition" && cssPolicyImplementation(source, "useStateColor") ? "css-transition" : null;
   const called = source.includes(`transition("${recipe}")`) || source.includes(`transition('${recipe}')`);

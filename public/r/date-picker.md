@@ -40,6 +40,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — transitive registry dependency.
 - [@cadence/calendar](https://cadence.dev/r/calendar.json) — direct registry dependency.
 - [@cadence/popover](https://cadence.dev/r/popover.json) — direct registry dependency.
 
@@ -63,6 +64,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 | date-picker | `@components/cadence/date-picker/index.tsx` | [JSON files[].content](https://cadence.dev/r/date-picker.json) |
@@ -74,6 +76,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
 
 [Source files: calendar](https://cadence.dev/r/calendar.json)
 

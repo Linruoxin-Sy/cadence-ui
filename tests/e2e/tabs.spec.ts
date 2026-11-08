@@ -8,8 +8,17 @@ async function aligned(tab: Locator, line = false, vertical = false) {
       tab.evaluate(
         (el, options) => {
           const a = el.getBoundingClientRect();
-          const indicator = el.querySelector('[data-slot="tabs-indicator"]');
+          const indicator = el
+            .closest('[data-slot="tabs-list"]')
+            ?.querySelector<HTMLElement>('[data-slot="tabs-indicator"]');
           if (!indicator) return 999;
+          if (indicator.hidden) {
+            const selected = el.getAttribute("aria-selected") === "true";
+            const paint = options.line
+              ? getComputedStyle(el, "::after").opacity === "1"
+              : getComputedStyle(el).backgroundColor !== "rgba(0, 0, 0, 0)";
+            return selected && paint ? 0 : 999;
+          }
           const b = indicator.getBoundingClientRect();
           return options.line
             ? options.vertical
@@ -43,9 +52,24 @@ async function straightSelection(tab: Locator, vertical = false) {
     const position = () => {
       const indicator = list.querySelector('[data-slot="tabs-indicator"]');
       if (!indicator) throw Error("missing indicator");
-      const rect = indicator.getBoundingClientRect();
+      const active = list.querySelector('[aria-selected="true"]') ?? indicator;
+      const rect = (indicator as HTMLElement).hidden
+        ? active.getBoundingClientRect()
+        : indicator.getBoundingClientRect();
       const origin = list.getBoundingClientRect();
-      return { x: rect.x - origin.x, y: rect.y - origin.y };
+      let x = rect.x,
+        y = rect.y;
+      if ((indicator as HTMLElement).hidden) {
+        const css = getComputedStyle(active),
+          pseudo = getComputedStyle(active, "::after");
+        x += Number.parseFloat(css.borderLeftWidth);
+        y += Number.parseFloat(css.borderTopWidth);
+        if (list.getAttribute("data-variant") === "line") {
+          if (vertical) x = rect.right - Number.parseFloat(css.borderRightWidth) - Number.parseFloat(pseudo.width);
+          else y = rect.bottom - Number.parseFloat(css.borderBottomWidth) - Number.parseFloat(pseudo.height);
+        }
+      }
+      return { x: x - origin.x, y: y - origin.y };
     };
     const before = position();
     (el as HTMLElement).click();
@@ -108,7 +132,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             if (!root) throw Error("missing root");
             const first = root.querySelector('[role="tab"]') as HTMLElement;
             const position = () => {
-              const active = root.querySelector('[aria-selected="true"] [data-slot="tabs-indicator"]');
+              const active = root.querySelector('[data-slot="tabs-list"] [data-slot="tabs-indicator"]');
               if (!active) throw Error("missing indicator");
               const r = active.getBoundingClientRect();
               return { x: r.x, y: r.y, transform: getComputedStyle(active).transform };
@@ -132,15 +156,16 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           await expect(activity).toHaveAttribute("aria-selected", "true");
           await aligned(activity);
           if (mode !== "full") {
-            const styles = await activity.locator('[data-slot="tabs-indicator"]').evaluate((el) => {
+            const styles = await project.locator('[data-slot="tabs-indicator"]').evaluate((el) => {
               const s = getComputedStyle(el);
               return { transform: s.transform, transition: s.transitionDuration, animation: s.animationName };
             });
             expect(styles).toEqual({ transform: "none", transition: "0s", animation: "none" });
           }
           if (mode === "full") {
-            expect(trace.points.some((p) => p.transform !== "none")).toBe(true);
-            expect(Math.hypot(trace.before.x - trace.immediate.x, trace.before.y - trace.immediate.y)).toBeLessThan(2);
+            // Filled markers use immediate placement to preserve selected-label contrast.
+            expect(trace.points.every((p) => p.transform === "none")).toBe(true);
+            await aligned(activity);
           } else {
             expect(trace.points.every((p) => p.transform === "none")).toBe(true);
           }

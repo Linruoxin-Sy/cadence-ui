@@ -4,6 +4,21 @@ import { calledRecipes, cssPolicyCapabilities, implementedForm } from "../../scr
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+describe("installed content and selection forms", () => {
+  const tabs = readFileSync("registry/cadence/lib/tabs-motion.tsx", "utf8");
+  const calendar = readFileSync("registry/cadence/calendar/index.tsx", "utf8");
+  it("requires the actual coordinator adoption for each installed form", () => {
+    expect(implementedForm(tabs, "layout.shared", "selection")).toBe("selection");
+    expect(implementedForm(tabs, "data.transition", "directional-content")).toBe("directional-content");
+    expect(implementedForm(calendar, "data.transition", "month-grid")).toBe("month-grid");
+    expect(implementedForm(tabs.replaceAll("projection.commit(", "missing("), "layout.shared", "selection")).toBeNull();
+    expect(
+      implementedForm(calendar.replaceAll("paint.commit(", "missing("), "data.transition", "month-grid"),
+    ).toBeNull();
+    expect(implementedForm('cm.transition("data.transition")', "data.transition", "month-grid")).toBeNull();
+  });
+});
+
 describe("disclosure motion manifest", () => {
   it("requires an explicit CSS geometry form", () => {
     expect(implementedForm(source, "geometry.resize", "css-transition")).toBe("css-transition");

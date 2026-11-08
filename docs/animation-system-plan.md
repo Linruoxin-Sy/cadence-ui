@@ -240,6 +240,12 @@ existing performance task is a final delivery dependency, not a development prer
   disconnected refs, missing capability evidence and legacy loop drift. Finite shared owners cancel
   restrictions and capture positive clocks; physics owners retime. Individual component adoption
   and text/number enforcement remain pending; the total v2 marker remains fail-closed.
+- Internal content.switch/content.month and persistent selection projection have scoped integrations
+  in Tabs and Calendar. One finite content phase derives opacity/travel across actual month slots;
+  one list-local marker owns its transform, with immediate unsafe/filled placement. These integrations
+  keep native sizes and do not establish size-linked layout.sidebar, captured-origin handoff,
+  coordinated trigger reflow, text/number/colour adoption or full component-v2 conformance. Those
+  dependencies and the global budget gates remain pending.
 - Existing engine adapters preserve native geometry, direct gestures and ref/event ownership while
   cancelling their autonomous work. Embla retains actual effective option precedence; Recharts retains
   per-series action progress across native handle recreation; Calendar and Toc retain their distinct

@@ -52,6 +52,26 @@
       "meta": {}
     },
     {
+      "name": "cadence-selection",
+      "type": "registry:lib",
+      "title": "Selection projection",
+      "description": "Internal bounded committed selection projection owner.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
+      "name": "cadence-content",
+      "type": "registry:lib",
+      "title": "Content phase",
+      "description": "Internal bounded committed content phase owner.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
       "name": "cadence-theme",
       "type": "registry:theme",
       "title": "Cadence theme",
@@ -84,7 +104,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -107,7 +127,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -130,7 +150,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -153,7 +173,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -176,7 +196,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -199,7 +219,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -222,7 +242,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -245,7 +265,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -268,7 +288,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -291,7 +311,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -320,7 +340,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -343,7 +363,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -367,7 +387,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -391,7 +411,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -414,7 +434,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -438,7 +458,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -461,7 +481,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -484,7 +504,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -507,7 +527,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -535,7 +555,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -567,7 +587,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -592,7 +612,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -617,7 +637,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -642,7 +662,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -667,7 +687,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -692,7 +712,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -727,7 +747,7 @@
             }
           ]
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -752,7 +772,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -777,7 +797,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -809,7 +829,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -835,7 +855,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -861,7 +881,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -887,7 +907,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -913,7 +933,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -939,7 +959,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -967,7 +987,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -994,7 +1014,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1021,7 +1041,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1048,7 +1068,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1075,7 +1095,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1103,7 +1123,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1145,7 +1165,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1171,7 +1191,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1199,7 +1219,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1227,7 +1247,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1243,7 +1263,14 @@
         "tier": "T3",
         "batch": "B6",
         "motion": [
-          "layout.shared"
+          {
+            "recipe": "layout.shared",
+            "form": "selection"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "directional-content"
+          }
         ],
         "intensity": "medium",
         "complexity": "M",
@@ -1252,7 +1279,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1275,7 +1302,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1300,7 +1327,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1323,7 +1350,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1348,7 +1375,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1364,7 +1391,10 @@
         "tier": "T4",
         "batch": "B7",
         "motion": [
-          "data.transition"
+          {
+            "recipe": "data.transition",
+            "form": "month-grid"
+          }
         ],
         "intensity": "subtle",
         "complexity": "L",
@@ -1373,7 +1403,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1403,7 +1433,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1426,7 +1456,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1459,7 +1489,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1489,7 +1519,7 @@
           "path": "apps/v4/examples/base/data-table-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1519,7 +1549,7 @@
           "path": "apps/v4/examples/base/date-picker-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1549,7 +1579,7 @@
           "version": "2026-10",
           "guide": "apps/v4/content/docs/components/base/attachment.mdx"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1574,7 +1604,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     },
     {
@@ -1601,7 +1631,7 @@
           "version": "0.5.0",
           "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
         },
-        "sourceSha": "84f57000"
+        "sourceSha": "bcdb3ada"
       }
     }
   ]

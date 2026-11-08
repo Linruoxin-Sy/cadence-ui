@@ -632,6 +632,14 @@ percentages. If a retarget cannot preserve both that phase and valid reel direct
 shows the latest value immediately while the fill independently reaches its current target.
 Migrate validators, declarations, public docs and actual mode evidence for each new form together.
 
+The installed internal content executor uses one bounded finite scalar phase for opacity and
+permitted directional translation across actual committed participants. Tabs panel activation and
+Calendar month slots adopt these forms; neither retains arbitrary outgoing trees. Calendar shares
+that phase across its visible month slots. Native dimensions remain immediate in these integrations:
+this does not claim a shared size-host projection or Sidebar support. Tabs retains one list marker
+with a separate single transform writer; filled or unsafe paths use immediate native selected paint.
+The catalogue remains legacy until its other applicable capabilities and acceptance migrate.
+
 The preset catalogue names the directional forms explicitly: `content.switch` for bounded panel
 content travel and `content.month` for the calendar grid. The generic `data.update` preset does not
 silently add such travel. Sidebar's target `layout.sidebar` binding uses a size-linked `layout.move`
@@ -740,13 +748,13 @@ for the engine controller. Review the public controller integration on Recharts 
 ### 3.1.3 `data.transition` for calendar month grids
 
 Calendar keeps DayPicker 9.13.2 in charge of selection, displayed months and keyboard focus.
-A stable Month component provides its date to the persistent MonthGrid. A changed month moves
-that actual table from signed `distance.sm` to zero and opacity zero to one on the data.transition
-clock through a native WAAPI effect (seconds converted to milliseconds, token easing converted
-to cubic-bezier). Cancelling removes the effect synchronously, including during live downgrades;
+A stable Month component provides its date to the persistent MonthGrid. Committed tables register
+with their actual Calendar root. A changed month uses one shared content.month phase to derive
+opacity and signed distance.sm travel for all eligible month slots, through held native WAAPI paint
+effects. Root padding must provide a safe travel corridor; otherwise opacity remains. Cancelling removes the effect synchronously, including during live downgrades;
 there is no Motion DOM visual-element cache to reapply an interrupted transform. This delivered grid
 adapter has no mount reveal, outgoing duplicate, delayed content, layout tween or keyed remount.
-Rapid changes cancel the previous tween and present the latest month; reversing uses the new direction.
+Rapid changes replace the previous phase from current owned paint and present the latest month.
 Reduced uses opacity only; none shows the new table immediately. A live mode or clock change cancels
 and settles both properties. The delivered adapter changes actual table height immediately, including
 variable week counts. The [Calendar target contract](motion/components/calendar.md) may coordinate

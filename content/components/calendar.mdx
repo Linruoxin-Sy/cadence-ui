@@ -8,7 +8,7 @@ complexity: L
 tier: T4
 since: 0.5.0
 deps: ["react-day-picker@9.13.2", "date-fns@4.1.0", "lucide-react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/button"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/button", "@cadence/cadence-content"]
 ---
 
 ## Installation
@@ -23,7 +23,7 @@ npx shadcn@latest add @cadence/calendar
 
 [Manual installation files](https://cadence.dev/r/calendar.json)
 
-Copy all ten target files, including Button and every shared helper, into the
+Copy every target file in Calendar and its recursive dependencies, including Button and the content phase helper, into the
 same `cadence/` tree. Preserve relative imports and shipped `"use client"`
 directives. Button is already a recursive dependency, including its full npm
 dependencies and source; the Controlled month and date example needs no
@@ -790,7 +790,14 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 The same grid responds to buttons, native dropdowns, keyboard navigation and external controlled
 month updates. Week-count height changes immediately. Caller transform/opacity styles take
 precedence over the corresponding animation property. No outgoing duplicate steals focus.
-Any live clock edit cancels the current grid effect; the next month change uses the new local token
+Each actual grid retains its local token scope. Equal policies share the phase; incompatible
+per-grid clocks use native paint together. A grid-local zero cancels the group before paint.
+Changing month count or replacing a host establishes a current baseline. Same-count reorder with
+unknown direction fades changed grids without invented travel.
+All actual month slots share one bounded scalar phase for opacity and signed translation, including RTL.
+A missing safe root-padding corridor uses opacity only. Focus-driven month crossings stay immediately
+visible. The known month set is preflighted before per-grid reads; over 50 visuals use native paint.
+Any live clock edit cancels the current grid effects; the next month change uses the new local token
 clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the owned WAAPI
 handle, and restoring visibility or full motion does not replay the current month.
 
@@ -829,8 +836,9 @@ customizing cells, week numbers or month counts. The preview is checked at 390px
 
 ## Performance
 
-No layout measurements, duplicate month DOM or animation timers. Only the changing month grid
-animates; dates and keyboard focus remain managed by DayPicker. The dependency is pinned to
+Committed navigation reads only the actual root/grid paint corridor after bounded preflight; there
+are no render/frame layout reads, duplicate month trees or animation timers. One shared phase drives
+the changing grids; dates and keyboard focus remain managed by DayPicker. The dependency is pinned to
 9.13.2 with date-fns 4.1.0. Pass an explicit defaultMonth/today/timeZone when server and client
 must agree across timezone or date boundaries. For SSR dropdown captions, pass an explicit locale
 (e.g. enUS from date-fns/locale): the pinned upstream formatter uses the environment locale

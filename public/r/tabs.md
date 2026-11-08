@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/tabs`
 - Type: registry:ui
 - Since: 0.4.0
-- Motion recipes: layout.shared
+- Motion recipes: layout.shared, data.transition
 
 ## Installation
 
@@ -32,6 +32,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — direct registry dependency.
+- [@cadence/cadence-selection](https://cadence.dev/r/cadence-selection.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -52,13 +54,20 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
+| cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | tabs | `@components/cadence/tabs/index.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
+| tabs | `@components/cadence/lib/tabs-motion.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
+
+[Source files: cadence-selection](https://cadence.dev/r/cadence-selection.json)
 
 [Source files: tabs](https://cadence.dev/r/tabs.json)
 
@@ -213,7 +222,7 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, keeping `tabs/index.tsx` and the shared `lib/`
+Copy every target file in the Tabs and dependency payloads, keeping `tabs/index.tsx` and the shared `lib/`
 directory in the same `cadence/` tree. Preserve relative imports and the
 sources' `"use client"` directives. Copy every file in the motion, utilities
 and provider payloads, including helpers not imported by Tabs directly.
@@ -224,10 +233,10 @@ Complete the base theme setup linked above and ensure Tailwind scans the
 copied files. No additional item-specific CSS or external asset is required.
 Standalone components follow the system motion preference; use
 `CadenceProvider` to choose a product mode or override an inherited scope.
-Each list scopes its own shared selection indicator. Full mode moves it
-using `layout.shared`; reduced, none and a zero clock place it immediately.
-Panels switch without a fade or height animation. The caller chooses list
-width, scrolling and orientation; preserve the indicator children and refs
+Each list retains one decorative selection indicator. Full mode moves a safe line indicator;
+filled markers place immediately to preserve label contrast. Reduced, none and a zero clock place
+markers immediately. A newly active panel can fade and, where existing root padding provides a safe
+paint corridor, travel by distance.xs. Panel size stays native. Preserve merged children and refs
 when supplying a custom trigger render.
 
 Controlled and List sizing need a client caller for their state and event
@@ -235,8 +244,8 @@ handlers. Refs, event handlers and function-valued `render`, `className`
 or `style` props also require a client caller. Usage, Vertical, Line style,
 Custom elements and persistent panels, and Disabled use serializable props
 and children and can be composed in a Server Component. Element-valued
-`render` is supported there; synchronous `useId` inside TabsList does not
-itself require a client caller.
+`render` is supported there; internal motion hooks do not
+require a client caller.
 
 Controlled and List sizing additionally use `@cadence/button`. Install it
 separately, or copy every target and recursive dependency from its Manual
@@ -533,23 +542,30 @@ merge last. The added `tabs-indicator` slot is decorative and aria-hidden.
 ### `TabsContent`
 
 `value` links to the corresponding trigger. `keepMounted` defaults to false. All Base UI Panel props,
-render/ref and state callbacks remain available. Panels switch immediately without size or entrance motion.
+render/ref and state callbacks remain available. Semantic activation is immediate; eligible incoming paint uses the content phase without changing native size or mount policy.
 
 ## Motion contract
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Selection | Shared indicator transform via FLIP | `layout.shared`, physics-defined `spring.morph` | Yes, inherits velocity |
-| Initial selection | Static indicator at selected trigger | — | — |
-| Reduced | Static indicator, no layout/transform | No motion | Instant |
-| None | Static indicator, no transform or animation | Zero duration | Instant |
+| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared`, physics-defined smooth selection spring | Yes; current geometry and velocity |
+| Panel activation | Incoming opacity and safe directional transform | `data.transition`, directional content preset, distance.xs | Latest accepted panel |
+| Initial selection | Native selected paint, then measured marker placement | — | No entrance |
+| Reduced | Marker geometry immediate; panel opacity only | Reduced data clock | Running travel settles before paint |
+| None / zero clock | Current marker and panel paint immediately | Zero duration and delay | Running effects cancelled |
 
-Each list has a unique LayoutGroup. Default and line indicators follow both axes; independent and nested
-lists cannot exchange indicators. Shared-layout measurements use list-local coordinates, so panel reflow,
-parent recentering and page scrolling do not add a sideways or vertical detour to the selection path.
-The primitive owns active state, cancellation, disabled fallback and
-mounting. Reduced and none render a plain span with no layoutId. Parent size changes leave the indicator
-anchored to the selected trigger. There is no panel fade, height animation or extra recipe.
+Each list owns one span throughout selection, including null/restored values. Measurements occur
+in committed layout work, never during render or animation frames. Missing origins and restored
+hosts place immediately. Passive constraint/style changes yield to the trigger's native selected
+paint; they do not invent a selection revision. Common ancestor scrolling keeps valid local paths.
+Sibling and nested instances cannot exchange marker identity or completion authority.
+
+The panel's actual primitive tree remains mounted according to keepMounted. There is no outgoing
+copy, speculative measurement or cross-panel height interpolation. A safe existing paint corridor
+permits directional travel; otherwise incoming opacity remains. Focus/editing cancels a conflicting
+entrance immediately. Repeated targets retain their current phase. Live reduced removes travel and
+reconciles permitted opacity; none and zero recipe time retire the phase before paint. Full restoration
+does not replay consumed work. Colour/text/number capabilities remain pending their migrations.
 
 ## Accessibility
 
@@ -570,13 +586,15 @@ render must preserve supplied semantics, refs and children. Persistent hidden pa
 ## Responsive behavior
 
 No breakpoint changes selection or orientation. The caller chooses layout and may constrain or scroll
-long lists. The indicator is inset within its active trigger and follows changes in label and parent size.
+long lists. Passive reflow uses current native selected paint until the next safe committed placement. No decorative marker creates extra scroll extent.
 
 ## Performance
 
-T3 source budget: 12 KB gzip. Only the active indicator participates in shared layout projection;
-there are no measurement observers or animation timers in this component. Server output includes the
-initial selected indicator; initial=false avoids an entrance replay. Keep large lists and panels small.
+T3 source budget: 12 KB gzip. Only the list's active target is measured; bounded style ancestry
+checks avoid guessing transformed coordinates. Resize/mutation observations invalidate passive work.
+The marker uses one transform writer; panel opacity and translation share one finite scalar phase.
+The native selected background/underline remains readable in SSR without JavaScript. The aggregate
+50-visual transaction limit includes marker and content participants, with immediate fallback.
 
 ## Notes for AI
 

@@ -2,6 +2,20 @@
 
 Status: target design; implementation and verification pending.
 
+Scoped installed support: actual month slots register with their surviving Calendar root and share
+one content.month phase for opacity and permitted signed travel. Existing root padding supplies the
+paint corridor; unsupported/caller-owned paths yield locally. Navigation preflights the known grid
+set and active transaction visuals before per-grid measurements. Dimensions remain native; no
+height owner, outgoing grid, caption replacement or day/navigation capability migration is claimed.
+The component remains legacy pending its remaining target and browser acceptance.
+Grid-local policy remains authoritative: one compatible clock drives the group, and incompatible
+policies settle native paint. Slot-count/physical-host changes establish baselines, while unknown
+same-count reorder direction retains only changed-grid opacity. Corridor assessment uses the
+content owner's current offset to recover natural geometry; unsupported scaled mappings use
+opacity without deleting caller transforms.
+
+
+
 Calendar makes a month change readable without rebuilding the day-navigation tree. The actual DayPicker month-grid table receives directional paint motion; selection and range colours stay attached to real date cells. The target also supports a bounded height transition when a committed month changes the number of week rows: this is a v2 extension to the delivered baseline.
 
 The month-grid WAAPI adapter owns table paint only. Target height continuity belongs to a separate outer host; it is not a new height writer on the table or a claim that the delivered adapter already measures that host.

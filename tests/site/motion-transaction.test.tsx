@@ -6,6 +6,21 @@ import {
 } from "@/registry/cadence/lib/motion-transaction";
 
 describe("committed motion ownership", () => {
+  it("preflights proposed shells/markers against still-active visuals before adapter reads", () => {
+    const scope = createMotionTransaction();
+    const host = {},
+      marker = {};
+    const visuals = new Set(Array.from({ length: 50 }, () => ({})));
+    const dispose = vi.fn();
+    const lease = scope
+      .register(host)
+      .begin(scope.revision("content", 1), ["opacity"], { collectionVisuals: visuals }, dispose);
+    expect(scope.preflightVisuals(new Set([visuals.values().next().value as object]))).toBe(true);
+    expect(scope.preflightVisuals(new Set([marker]))).toBe(false);
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(lease?.current()).toBe(false);
+    expect(scope.preflightVisuals(new Set([marker]))).toBe(true);
+  });
   it("keeps independent causes and stable entities; A→B→A invalidates the first A", () => {
     const scope = createMotionTransaction();
     const a = {},
