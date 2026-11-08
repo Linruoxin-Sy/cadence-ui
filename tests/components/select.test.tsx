@@ -101,7 +101,7 @@ describe("Select", () => {
     expect(request).toHaveBeenCalledWith(remix);
     expect(trigger).toHaveTextContent("Remix");
     expect(format).toHaveBeenLastCalledWith({ id: "remix", label: "Remix" });
-    expect(document.querySelector('[data-slot="select-handoff"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-slot="select-handoff"]')).not.toBeInTheDocument();
     view.unmount();
     render(
       <Select value={undefined} defaultValue="next" modal={false}>
@@ -202,30 +202,14 @@ describe("Select", () => {
     await waitFor(() => expect(value.style.width).toBe("96px"));
   });
 
-  it("flies the label from the item to the trigger on pointer selection", async () => {
+  it("does not invent a flight from rectangles without visible native layout or replay retained label text", async () => {
     render(<Demo />);
     const trigger = screen.getByRole("combobox", { name: "Framework" });
     await openSelect(trigger);
-
-    const itemText = screen.getByRole("option", { name: "Remix" }).querySelector('[data-slot="select-item-text"]');
-    const value = trigger.querySelector('[data-slot="select-value"]');
-    const valueText = value?.firstElementChild as HTMLElement;
-
-    const rect = (left: number, top: number, width: number, height: number) =>
-      ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top }) as DOMRect;
-    Object.defineProperty(itemText as HTMLElement, "getBoundingClientRect", { value: () => rect(20, 300, 48, 20) });
-    Object.defineProperty(valueText, "getBoundingClientRect", { value: () => rect(200, 100, 60, 20) });
-
     await userEvent.click(screen.getByRole("option", { name: "Remix" }));
-
-    const clone = document.querySelector('[data-slot="select-handoff"]');
-    expect(clone).toBeInTheDocument();
-    expect(clone).toHaveAttribute("data-cadence-flight-text", "Remix");
-    expect(clone).toHaveAttribute("aria-hidden", "true");
-    expect(clone?.textContent).toBe("");
+    expect(document.querySelector('[data-slot="select-handoff"]')).not.toBeInTheDocument();
     expect(trigger).toHaveTextContent("Remix");
     expect(trigger.textContent?.match(/Remix/g)).toHaveLength(1);
-    expect(clone).toHaveStyle({ left: "200px", top: "100px" });
   });
 
   it("skips the flight under reduced motion", async () => {

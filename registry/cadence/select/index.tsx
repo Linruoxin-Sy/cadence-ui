@@ -17,32 +17,26 @@ import {
   useRef,
   useState,
 } from "react";
-import { createPortal } from "react-dom";
+import { captureHandoffOrigin, createCapturedHandoff } from "../lib/captured-handoff";
 import { cn } from "../lib/cn";
-import { ControlSpan, useControlAnimation } from "../lib/control-animation";
-import { clampMeasuredSize, measureOrigin, type Origin } from "../lib/geometry";
-import { scale } from "../lib/motion";
+import { ControlSpan } from "../lib/control-animation";
+import { clampMeasuredSize } from "../lib/geometry";
+import { motionLimits, scale } from "../lib/motion";
 import { subscribeMotionEnvironment } from "../lib/motion-environment";
 import { useMotionHostRef } from "../lib/motion-ref";
+import { createMotionTransaction } from "../lib/motion-transaction";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
 import { useCadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 interface HandoffSource {
-  rect: DOMRect;
-  text: string;
+  capture: ReturnType<typeof captureHandoffOrigin>;
   value: unknown;
-  source: HTMLElement;
   trigger: HTMLElement | null;
   event: Event;
   approved: boolean;
-}
-
-interface HandoffFlight extends HandoffSource {
-  id: number;
-  origin: Origin;
-  destination: HTMLElement;
+  taken?: boolean;
 }
 
 interface SelectContextValue {
@@ -52,8 +46,6 @@ interface SelectContextValue {
   trigger: { current: HTMLElement | null };
   pending: HandoffSource | null;
   setPending: (pending: HandoffSource | null) => void;
-  flying: boolean;
-  setFlying: (flying: boolean) => void;
   labels: Map<unknown, ReactNode> | null;
 }
 
@@ -89,15 +81,14 @@ function collectLabels(children: ReactNode, labels = new Map<unknown, ReactNode>
  *   check mark appears at full size; the popup still cross-fades.
  * - none: every transition resolves to zero duration.
  *
- * The label is laid out at its final width inside a clipped slot. Animating the slot's
- * width therefore folds the surface without re-wrapping the text, and the handoff's
- * portal follows the destination while the surrounding layout settles.
+ * The slot keeps one native label. A captured plain replacement may transfer only
+ * when it has no retained units; unsafe/missing origins remain immediate. A flight
+ * never chases a moved destination or replays a cancelled revision.
  */
 function Select<Value, Multiple extends boolean | undefined = false>(
   props: SelectPrimitive.Root.Props<Value, Multiple>,
 ) {
   const [pending, setPending] = useState<HandoffSource | null>(null);
-  const [flying, setFlying] = useState(false);
   // This follows the primitive's accepted uncontrolled setter. Controlled
   // requests remain requests until the caller actually commits its value prop.
   const [nativeValue, setNativeValue] = useState<unknown>(() => props.defaultValue ?? (props.multiple ? [] : null));
@@ -105,9 +96,11 @@ function Select<Value, Multiple extends boolean | undefined = false>(
   const trigger = useRef<HTMLElement | null>(null);
   const candidate = useRef<HandoffSource | null>(null);
   const capture = (next: HandoffSource | null) => {
+    if (!candidate.current?.taken) candidate.current?.capture?.dispose();
     candidate.current = next;
     setPending(next);
   };
+  useIsomorphicLayoutEffect(() => () => candidate.current?.capture?.dispose(), []);
   const labels = props.items ? null : collectLabels(props.children);
   const value = {
     value: controlled && props.value !== undefined ? props.value : nativeValue,
@@ -119,8 +112,6 @@ function Select<Value, Multiple extends boolean | undefined = false>(
     trigger,
     pending,
     setPending: capture,
-    flying,
-    setFlying,
     labels,
   };
 
@@ -236,7 +227,7 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       ref={hostRef}
       data-slot="select-value"
       data-motion={cm.mode}
-      style={{ width: rendered, opacity: context?.flying ? 0 : 1 }}
+      style={{ width: rendered }}
       className="relative block min-w-0 overflow-hidden whitespace-nowrap"
     >
       <SelectPrimitive.Value {...props} className={stateClasses("block w-max", className)}>
@@ -266,155 +257,116 @@ function SelectTrigger({
       if (context.trigger.current === node) context.trigger.current = null;
     };
   });
-  const [flight, setFlight] = useState<HandoffFlight | null>(null);
-  const sequence = useRef(0);
-  const activeFlight = useRef<HandoffFlight | null>(null);
+  const coordinator = useRef<ReturnType<typeof createCapturedHandoff> | null>(null);
+  const transaction = useRef(createMotionTransaction());
+  const latest = useRef(context);
+  const semanticValue = useRef(context?.value);
+  const active = useRef<Parameters<ReturnType<typeof createCapturedHandoff>["commit"]>[0] | null>(null);
+  const ready = useRef(false);
   useIsomorphicLayoutEffect(() => {
-    activeFlight.current = flight;
+    const owner = createCapturedHandoff(transaction.current);
+    coordinator.current = owner;
+    triggerRef.invalidate = () => owner.cancel();
     return () => {
-      activeFlight.current = null;
+      owner.dispose();
+      active.current?.capture?.dispose();
+      active.current = null;
+      coordinator.current = null;
     };
-  }, [flight]);
-
+  }, [triggerRef]);
   useIsomorphicLayoutEffect(() => {
-    if (!context?.pending) return;
-    const source = context.pending;
-    // Consume only this event's first accepted commit. A controlled refusal or
-    // uncorrelated delayed echo cannot lend an old origin to an equal value.
-    if (
-      cm.reduced ||
-      !source.approved ||
-      !context.equal(context.value, source.value) ||
-      !source.source.isConnected ||
-      source.trigger !== triggerRef.current
-    ) {
-      context.setPending(null);
-      return;
-    }
-
+    latest.current = context;
     const trigger = triggerRef.current;
-    const slot = trigger?.querySelector<HTMLElement>('[data-slot="select-value"]');
-    const text = slot?.firstElementChild as HTMLElement | null;
-    const destination = text ?? slot;
-    const rect = destination?.getBoundingClientRect();
-    if (!destination || !rect?.width) {
-      context.setPending(null);
+    if (!context || !trigger) {
+      coordinator.current?.cancel();
       return;
     }
-
-    sequence.current++;
-    setFlight({
-      ...source,
-      id: sequence.current,
-      origin: measureOrigin(context.pending.rect, rect),
-      text: context.pending.text,
-      rect,
-      destination,
-    });
-    context.setFlying(true);
-    context.setPending(null);
-  }, [context, cm.reduced]);
-
-  useIsomorphicLayoutEffect(() => {
-    if (flight && (cm.reduced || !context?.equal(context.value, flight.value))) {
-      setFlight(null);
-      context?.setFlying(false);
+    if (!context.equal(semanticValue.current, context.value)) semanticValue.current = context.value;
+    const revision = transaction.current.revision("value", semanticValue.current, trigger);
+    if (active.current && active.current.revision !== revision) {
+      coordinator.current?.cancel();
+      active.current?.capture?.dispose();
+      active.current = null;
     }
-  }, [cm.reduced, flight, context]);
-
-  const finish = () => {
-    if (!flight || activeFlight.current !== flight) return;
-    setFlight(null);
-    context?.setFlying(false);
-  };
+    const source = context.pending;
+    if (source) {
+      const destination = trigger.querySelector<HTMLElement>('[data-slot="select-value"]')
+        ?.firstElementChild as HTMLElement | null;
+      source.taken = true;
+      context.setPending(null);
+      if (
+        !source.approved ||
+        !context.equal(context.value, source.value) ||
+        source.trigger !== trigger ||
+        !destination
+      ) {
+        source.capture?.dispose();
+        return;
+      }
+      const identity = triggerRef.identity;
+      active.current = {
+        revision,
+        slot: "select-handoff",
+        capture: source.capture,
+        destination,
+        transition: cm.transition("handoff"),
+        immediate: cm.reduced,
+        sourceRetired: true,
+        current: () =>
+          triggerRef.current === trigger &&
+          triggerRef.identity === identity &&
+          Boolean(latest.current?.equal(latest.current.value, source.value)),
+        fallback() {
+          active.current = null;
+        },
+        terminal() {
+          if (active.current?.revision === revision) active.current = null;
+        },
+      };
+      // Base UI commits Value from its own store. Assess the actual label after
+      // this commit's layout work, never by hiding the previous display or by
+      // keeping a missing origin pending for a future content revision.
+      ready.current = false;
+      const accepted = active.current;
+      queueMicrotask(() => {
+        if (active.current !== accepted) return;
+        ready.current = true;
+        coordinator.current?.commit(accepted);
+      });
+    }
+    if (active.current) {
+      active.current.transition = cm.transition("handoff");
+      active.current.immediate = cm.reduced;
+      if (ready.current) coordinator.current?.commit(active.current);
+    }
+  });
 
   return (
-    <>
-      <SelectPrimitive.Trigger
-        ref={mergedRef}
-        data-slot="select-trigger"
-        data-size={size}
-        data-motion={cm.mode}
-        className={stateClasses(
-          cn(
-            "relative flex h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 pr-8 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none",
-            "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
-            "disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20",
-            "data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8",
-            "[&_[data-placeholder]]:text-muted-foreground",
-            "dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40",
-          ),
-          className,
-        )}
-        {...props}
-      >
-        {children}
-        <SelectPrimitive.Icon
-          render={
-            <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 opacity-50" />
-          }
-        />
-      </SelectPrimitive.Trigger>
-      {flight && typeof document !== "undefined"
-        ? createPortal(<SelectHandoff key={flight.id} flight={flight} onComplete={finish} />, document.body)
-        : null}
-    </>
-  );
-}
-
-function SelectHandoff({ flight, onComplete }: { flight: HandoffFlight; onComplete: () => void }) {
-  const cm = useCadenceMotion();
-  const hostRef = useRef<HTMLSpanElement>(null);
-  const transition = cm.transition("handoff");
-  const controls = useControlAnimation({ x: 0, y: 0 }, transition, cm.mode, onComplete, hostRef, onComplete);
-  useIsomorphicLayoutEffect(() => {
-    let alive = true;
-    const followDestination = () => {
-      if (!alive || !flight.destination.isConnected) return;
-      const rect = flight.destination.getBoundingClientRect();
-      const host = hostRef.current;
-      if (!host) return;
-      host.style.left = `${rect.left}px`;
-      host.style.top = `${rect.top}px`;
-      host.style.height = `${rect.height}px`;
-    };
-    const observer = new ResizeObserver(followDestination);
-    observer.observe(flight.destination);
-    const trigger = flight.destination.closest('[data-slot="select-trigger"]');
-    if (trigger) observer.observe(trigger);
-    followDestination();
-    window.addEventListener("resize", followDestination);
-    window.addEventListener("scroll", followDestination, true);
-    return () => {
-      alive = false;
-      observer.disconnect();
-      window.removeEventListener("resize", followDestination);
-      window.removeEventListener("scroll", followDestination, true);
-    };
-  }, [flight]);
-  useIsomorphicLayoutEffect(() => {
-    if (transition.duration === 0) onComplete();
-  }, [transition.duration, onComplete]);
-  return (
-    <motion.span
-      ref={hostRef}
-      aria-hidden
+    <SelectPrimitive.Trigger
+      ref={mergedRef}
+      data-slot="select-trigger"
+      data-size={size}
       data-motion={cm.mode}
-      data-slot="select-handoff"
-      initial={{ x: flight.origin.x, y: flight.origin.y }}
-      animate={controls}
-      data-cadence-flight-text={flight.text}
-      style={{
-        position: "fixed",
-        left: flight.rect.left,
-        top: flight.rect.top,
-        height: flight.rect.height,
-      }}
-      // Base UI can commit the new label after the destination is measured.
-      // Use that rect only for placement: its width may still belong to the
-      // previous label, and must never clip the incoming text.
-      className="pointer-events-none z-[60] flex w-max items-center text-sm whitespace-nowrap select-none before:content-[attr(data-cadence-flight-text)]"
-    />
+      className={stateClasses(
+        cn(
+          "relative flex h-9 w-fit items-center justify-between gap-2 overflow-hidden rounded-md border border-input bg-transparent px-3 pr-8 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none select-none",
+          "focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+          "disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20",
+          "data-[placeholder]:text-muted-foreground data-[size=default]:h-9 data-[size=sm]:h-8",
+          "[&_[data-placeholder]]:text-muted-foreground",
+          "dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:ring-destructive/40",
+        ),
+        className,
+      )}
+      {...props}
+    >
+      {children}
+      <SelectPrimitive.Icon
+        render={
+          <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 opacity-50" />
+        }
+      />
+    </SelectPrimitive.Trigger>
   );
 }
 
@@ -509,12 +461,29 @@ function SelectItem({ className, children, onClick, ...props }: SelectPrimitive.
         if (event.defaultPrevented || event.currentTarget.hasAttribute("data-selected")) return;
 
         const text = event.currentTarget.querySelector<HTMLElement>('[data-slot="select-item-text"]');
-        const rect = (text ?? event.currentTarget).getBoundingClientRect();
+        const previous = context?.trigger.current?.querySelector('[data-slot="select-value"]')?.textContent ?? "";
+        const next = text?.textContent ?? "";
+        // Until the changed-run renderer is integrated, only a completely new,
+        // bounded plain ASCII run can transfer. Any potentially retained unit,
+        // rich label, shaping or editable content stays native and immediate.
+        const disjoint =
+          previous.length > 0 &&
+          previous.length + next.length <= motionLimits.changedGraphemes &&
+          /^[\x21-\x7e]+$/.test(previous) &&
+          /^[\x21-\x7e]+$/.test(next) &&
+          ![...previous].some((unit) => next.includes(unit));
+        const capture =
+          text && disjoint && event.detail > 0 && !cm.reduced
+            ? captureHandoffOrigin(
+                text,
+                next,
+                null,
+                event.currentTarget.closest<HTMLElement>('[data-slot="select-content"]') ?? text,
+              )
+            : null;
         context?.setPending({
-          rect,
-          text: text?.textContent?.trim() ?? "",
+          capture,
           value: props.value,
-          source: event.currentTarget,
           trigger: context?.trigger.current ?? null,
           event: event.nativeEvent,
           approved: false,

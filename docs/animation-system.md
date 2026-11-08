@@ -580,6 +580,16 @@ an older queued Motion render to overwrite React's auto. Keep the numeric measur
 in the target ref; full resolves its first auto measurement instantly, then springs
 on later label changes. The synchronous write is the same prepaint fold policy as CodeBlock.
 
+Select's internal captured-origin adapter only transfers bounded plain disjoint labels until the
+changed-run renderer is integrated. Capture belongs to the accepted native selection event and is
+consumed once; missing/unsafe or formatter-incompatible labels stay immediate. A frozen source may
+retire under its popup's actual lifetime. The paint-only clipped layer owns no interactive subtree
+or scroll extent. A lost source/destination mapping cancels the transfer and exposes the current
+native destination without a second replacement effect; it never follows a moving item or trigger.
+A genuinely local frame may retain common outer scrolling because both endpoints and its layer move
+together. Viewport, differential scroll and passive placement corrections invalidate cross-space
+captures. These hooks and the conservative pilot do not implement text diffing or full Select v2.
+
 ### 3.0 Sidebar composition
 
 This and the following engine/part notes describe the delivered migration baseline. They preserve

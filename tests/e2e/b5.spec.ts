@@ -517,7 +517,10 @@ for (const preference of ["no-preference", "reduce"] as const)
           contentType: "application/json",
         });
         if (expected === "full") {
-          expect(frames.some((f) => f.flight && f.moving)).toBe(true);
+          // Next.js -> Astro retains text. Whole-label transfer must stay off
+          // until changed-run integration; the disjoint-label pilot has separate
+          // executed engine coverage in tests/runtime/captured-handoff.mjs.
+          expect(frames.every((f) => !f.flight)).toBe(true);
           expect(frames.some((f) => Math.abs(f.width - f.natural) > 1)).toBe(true);
         } else {
           expect(frames.every((f) => !f.flight)).toBe(true);

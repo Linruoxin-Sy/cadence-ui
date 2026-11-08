@@ -246,10 +246,13 @@ existing performance task is a final delivery dependency, not a development prer
   keep native sizes. A separate desktop offcanvas adapter projects layout.sidebar from one actual
   gap-size scalar; icon gap/container widths and safe plain-label destination layout now share that
   owner with completion-gated opacity reveal. Unsupported label layouts stay immediate. Neither
-  integration establishes
-  captured-origin handoff, coordinated trigger reflow, text/number/colour adoption or full
-  component-v2 conformance. Those
-  dependencies and the global budget gates remain pending.
+  integration establishes coordinated trigger reflow, text/number/colour adoption or full
+  component-v2 conformance. An internal captured-origin coordinator supplies one-use capture,
+  aggregate shell/paint preflight and immediate cancellation without destination replay. Select
+  adopts it only for bounded disjoint plain ASCII labels; retained/shaped/rich labels remain native
+  until the changed-run renderer can supply exact eligibility. Invalid mapping exposes the current
+  destination rather than tracking the retired source. These scoped forms do not establish full
+  Select migration. The remaining dependencies and global budget gates stay pending.
 - Existing engine adapters preserve native geometry, direct gestures and ref/event ownership while
   cancelling their autonomous work. Embla retains actual effective option precedence; Recharts retains
   per-series action progress across native handle recreation; Calendar and Toc retain their distinct

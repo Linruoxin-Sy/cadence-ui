@@ -8,7 +8,7 @@ complexity: L
 tier: T3
 since: 0.4.0
 deps: ["@base-ui/react", "lucide-react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/cadence-handoff"]
 ---
 
 ## Installation
@@ -473,16 +473,19 @@ export function Placement() {
 | reduced | width jumps, no flight, no scale; opacity stays | – | – |
 | none | every duration is zero | – | – |
 
-The trigger's label is laid out at its final width inside a clipped slot. Animating that slot's width
-folds the surface without re-wrapping the label. The portalled label follows the live destination
-as the trigger resizes, including shifts in centered or right-aligned rows, so the flight and real
-label meet at the same position. Keyboard selection has no origin, so it changes the width and lets the label swap
-without a flight; the pointer keeps the spatial handoff.
-The portalled flight label uses its natural text width, so a longer selection stays fully visible
-even if Base UI has not yet committed the destination label when its position is measured.
-Hiding the document or printing settles the current transfer internally and restores the value's
-intrinsic width and visibility. Selection, focus and native timing remain unchanged; restoring the
-page does not replay the consumed flight.
+The trigger keeps one native label laid out at its destination width. A pointer selection may
+transfer a bounded plain ASCII label only when the previous and next labels share no character.
+Labels with retained characters, shaping, rich content or an unavailable visible origin use the
+current native value immediately. This conservative path does not implement changed-text diffing.
+Keyboard selection has no captured pointer origin and remains immediate.
+
+The flight uses a clipped, paint-only layer with no text node, DOM id, form control or second
+component tree. It adds no scroll extent, scroll anchor or snap target. A moved destination,
+differential scrolling, viewport correction or invalid placement cancels the flight and exposes the
+already-current value; the layer never chases either endpoint. Native popup retirement may outlive
+the captured source. Hiding the document, printing, reduced/none mode or a zero handoff clock also
+settles the transfer. Restoration does not replay the consumed revision. Trigger reflow can therefore
+omit the transfer while the separate legacy width animation continues.
 
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
@@ -509,7 +512,7 @@ separately from the animated outer slot, including content and viewport changes.
 - The selected item keeps `aria-selected="true"`; the check is a visual duplicate, not the only signal.
 - Under reduced motion the value still changes and the check still appears; nothing is conveyed by
   the flight alone.
-- The handoff clone is `aria-hidden`: screen readers hear the value once, from the trigger.
+- The handoff paint is inert and `aria-hidden`: screen readers hear the value once, from the trigger.
 
 ## Validation and data ownership
 

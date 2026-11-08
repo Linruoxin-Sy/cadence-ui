@@ -182,6 +182,22 @@
       ]
     },
     {
+      "name": "cadence-handoff",
+      "type": "registry:lib",
+      "title": "Captured handoff",
+      "description": "Internal one-revision captured-origin presentation owner.",
+      "categories": ["foundation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/captured-handoff.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/captured-handoff.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-theme",
       "type": "registry:theme",
       "title": "Cadence theme",
@@ -1400,7 +1416,12 @@
       "description": "Choosing one value from a short list of options.",
       "categories": ["form"],
       "dependencies": ["@base-ui/react", "lucide-react", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-handoff"
+      ],
       "files": [
         {
           "path": "registry/cadence/select/index.tsx",
@@ -2065,9 +2086,18 @@
         "tier": "T3",
         "batch": "B7",
         "motion": [
-          { "recipe": "layout.move", "form": "size-linked" },
-          { "recipe": "geometry.resize", "form": "measured" },
-          { "recipe": "data.transition", "form": "one-shot" }
+          {
+            "recipe": "layout.move",
+            "form": "size-linked"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
