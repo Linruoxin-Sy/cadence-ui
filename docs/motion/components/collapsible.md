@@ -50,7 +50,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 - Reverse from the in-flight block-size on a repeated toggle. A close during asynchronous content replacement targets the current valid closed size; subsequent content cannot reopen it.
 - Preserve Base UI state, callbacks, custom render, persistence and hidden-until-found behaviour. Do not add an arrow or impose a delay before a committed action.
 - Descendant geometry updates do not make the ancestor follow every spring frame. Hand off the affected axis or let the ancestor adopt the child's destination immediately.
-- Exit retention never creates accessible or focusable duplicate content. Base UI handles focus and hidden-until-found/beforematch semantics before decorative cleanup; a browser-initiated reopen invalidates the close completion. Unmount cancels observers/writers. A live reduced/none switch or zero clock synchronously reaches semantic size and visibility; re-enabling animation does not replay an already open body.
+- Exit retention never creates accessible or focusable duplicate content. Base UI handles focus and hidden-until-found/beforematch semantics before decorative cleanup; a browser-initiated reopen invalidates the close completion. Unmount cancels observers/writers. Live reduced settles shell geometry and reels before paint; permitted opacity on still-drawable content/changed runs and eligible trigger colour follow their reduced contracts. A closed fully clipped body completes its invisible decorative exit immediately. None or zero recipe clock settles all one-shot work to the effective mode's current visibility/paint; re-enabling animation does not replay an already open body.
 
 ## Geometry and performance
 
@@ -69,3 +69,4 @@ Reduced closing commits the closed block-size immediately. A fully clipped/hidde
 - Pending: revise a direct body string/quantity while open and while closed, reopen through beforematch, and close around a focused child; only current visible content participates in animation.
 
 - Pending: close a reduced-mode body during its opacity entry, reopen through focus/beforematch and set zero clock with unchanged open state; no empty exit hold, invisible focused content or stale opacity writer remains.
+- Pending: switch to reduced while an open body's size, changed-run opacity and trigger colour are active. Geometry/reels settle while still-drawable permitted paint follows reduced mode; close to a fully clipped body, then apply none/zero without an empty fade hold or replay.

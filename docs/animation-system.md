@@ -941,8 +941,8 @@ border geometry are not animated. Shadows require matching computed geometry/lis
 or changing topology settles to the cascade target. The host does not scan pseudo-elements; a named
 pseudo region still requires its own authored rule and future adoption proof.
 
-Each hook requires an otherwise unclaimed CSS transition/animation family. A caller class or inline
-family makes the hook yield, preserving that writer through mode/clock changes. Removing the
+The delivered staged hooks require an otherwise unclaimed CSS transition/animation family. A caller
+class or inline family makes the hook yield, preserving that writer through mode/clock changes. Removing the
 override re-establishes the current policy. Only the hook's own declarations/handles are removed;
 disjoint user/native WAAPI or Motion properties survive. Unknown caller class changes are checked
 in a committed style transaction, never by frame polling. No wrapper is inserted.
@@ -953,6 +953,16 @@ reduced/none or hidden/offscreen policy, and resume eligible full activity with 
 Framework pulse assumes resting opacity one: caller dimming from inline style or the cascade uses
 a static fallback, with class/environment changes sampled only at their committed boundary.
 Legacy Spinner/Skeleton callers retain their documented baseline until individually migrated.
+
+The target coordinator must distinguish that conservative caller boundary from Cadence's own known
+presence owner. When library presence and `state.color` share a real node, combine their declared
+disjoint property sets in one transition-family composition, retaining each property's mode, clock
+and cancellation rules. The library's default presence family must not silently disable its colour
+capability. Focus/invalid settles the colour owner's whole palette; entry interaction settles only
+the conflicting entry envelope, leaving an independent backdrop or other property owner eligible.
+Unknown caller families keep their authority; if safe composition is unavailable, omit the conflicting
+library effect without inserting an incompatible wrapper or cancelling caller animations. This is a
+pending integration/verification requirement, not a claim that the staged hooks deliver it today.
 
 ### 3.6 Changed text
 
@@ -1372,7 +1382,7 @@ Implementation rules:
 1. **Budget properties explicitly.** Spatial presentation uses transform/opacity; optional filter blur is limited to reviewed small text areas at ≤4 px and is off by default. Colour/border/fill/stroke and declared shadow feedback use state.color. Measured width/height uses geometry.resize, clamped and immediate under reduced/none at any legacy tier. Chart SVG geometry (§3.1.2) and explicit native scroll offsets (§3.1.5) retain their documented exceptions. No generic padding/font-size/radius/path animation is implied by a recipe name.
 2. **No layout-read loops**: read `getBoundingClientRect`/`offsetWidth` only in a committed client layout phase, an event measurement transaction or a `ResizeObserver` callback. Batch reads before writes; never read during render, in an abandoned render, or once per animation frame/glyph. A shared layout scheduler may batch a known transaction but must not turn it into polling.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
-4. **`layout` animations trigger layout measurement**: for lists over 50 items, switch to manual transform or paginate.
+4. **Bound automatic collection work before measurement**: use the participant limit and counting rules in [presets §5.2](motion/presets.md#52-shared-work-limits), including still-active earlier revisions and retained outgoing decoration. Reject an oversized set before per-member layout reads or copy allocation and use immediate native presentation. Manual, paginated or virtualized compositions require their own bounded adapter and performance evidence; changing the execution technique is not an unlimited exemption.
 5. **Reading surfaces do not bounce**: text, numeric readouts and size recipes author bounce zero. Existing press feedback remains separately tokenised. A physics spring inheriting velocity can still cross its target, so geometry clamps the rendered value (rule 9). More expressive gestures require a separately reviewed recipe and do not become everyday defaults.
 6. **Keep optional engines optional**: any future scroll.story/GSAP item must declare and load that dependency explicitly. No GSAP component is currently shipped; basic v2 capabilities do not require it.
 7. **Keep `AnimatePresence` subtrees small**: wrap only the elements that need an exit, never a whole page.

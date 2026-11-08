@@ -45,7 +45,9 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 
 ## Interruption and lifecycle
 
-Stable child identity survives reorder and rapid membership changes. Reinserted segments resume from their current geometry, not a stale exit. A child removed by the caller needs retained parent lifecycle for an exit. A live mode downgrade or zero clock cancels group geometry and outstanding segment effects; child motion owners receive the same policy. Focus removal follows application/native semantics without motion delays.
+Stable child identity survives reorder and rapid membership changes. Reinserted segments resume from their current geometry, not a stale exit. A child removed by the caller needs retained parent lifecycle for an exit. Live reduced settles group/segment geometry before paint while permitted segment and changed-run opacity and eligible colour reconcile under their reduced contracts. None or zero recipe clock settles one-shot work to the effective mode's current target. Focus removal follows application/native semantics without motion delays.
+
+Each child uses its actually resolved provider/mode and clock, including explicit nested overrides subject to the OS ceiling; the group does not force its mode across that boundary. Actual parent closure/removal still invalidates subordinate lifecycle work. Positive clock edits follow the shared capture-or-retime policy, and returning to full never replays a consumed membership change.
 
 Child inputs keep native nodes, value, selection and IME state. When a structural revision affects a focused editor's box or a captured pointer target, commit the affected geometry immediately and discard the superseded movement; blur/release does not replay it. Removing a segment cancels its measurement/press registration before an outgoing decorative copy can complete.
 
@@ -53,7 +55,7 @@ Child inputs keep native nodes, value, selection and IME state. When a structura
 
 Measure the group and changed segment after commitment. Animate only the affected axis; orientation changes settle to a measured final layout rather than rotating controls. Preserve each child's existing single-line/truncation policy; any multiline member lays out at destination width before group-height interpolation. Responsive reflow remains immediate. Group geometry never writes child press transforms, and joined borders/corner masks update with the committed membership. No blanket scaling or per-child entrance cascade.
 
-For one revision, each control publishes its final intrinsic box; the group calculates its destination from those boxes and either owns the outer axis or leaves it natural. It never springs after a child's interpolated size. Sibling displacement uses a visual owner separate from each child's press/anchor transform. One group measurement pass covers visible changed segments; if identities, safe layers or the visible-work budget are unavailable, commit group layout immediately. A smaller intermediate shell cannot add clipping to a final-visible label, editor or focus ring.
+For one revision, each control publishes its final intrinsic box; the group calculates its destination from those boxes and either owns the outer axis or leaves it natural. It never springs after a child's interpolated size. Sibling displacement uses a visual owner separate from each child's press/anchor transform. Count changed and measured/projected retained segments, distinct outgoing visuals and any participating group shell against the [automatic collection bound](../presets.md#52-shared-work-limits) before member measurement. A single whole-group entrance counts once rather than once per descendant. If identities, safe layers or that working set are unavailable, commit affected collection presence/layout immediately. A smaller intermediate shell cannot add clipping to a final-visible label, editor or focus ring.
 
 ButtonGroupSeparator binds the inherited Separator rule owner; the group wrapper does not create a second background/opacity writer. The same parent-entry cause is consumed once across the composed part.
 
@@ -62,3 +64,5 @@ ButtonGroupSeparator binds the inherited Separator rule owner; the group wrapper
 Target acceptance; not executed: insert and remove a middle button; horizontal and vertical groups; input/button mixtures; ButtonGroupText quantity changes; reorder while a child is pressed; orientation changes; no fabricated selection marker; all modes and zero clock during membership changes.
 
 Also pending: a child label and ButtonGroupText change in the same revision, plus membership changes while an input is focused/composing; verify one final destination, stable native selection and no delayed motion after blur.
+
+Also pending: downgrade during simultaneous segment reflow, safe segment/text opacity and colour; geometry becomes immediate while permitted paint follows reduced mode. Repeat with an explicit nested child mode, then none/zero and parent removal, preserving the actual context, current semantic target and lifetime boundary.

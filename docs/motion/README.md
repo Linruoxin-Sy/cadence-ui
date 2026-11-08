@@ -207,9 +207,13 @@ These obligations are inherited by every file; local action tables make their co
 - **Bounds:** preserve existing item source ceilings, compiled component/runtime/page limits, CLS and
   real-device frame-rate requirements. Stagger scenarios allow at most 20 concurrent moving elements
   and 400 ms total delay after timeScale; character stagger also has a final 120 ms delay ceiling after
-  timeScale. Above 50 list items use visible/manual/paginated strategies,
-  not blanket layout measurement. Bound glyph/reel work and drop visual work on overload, never data.
-  The [renderer limits](presets.md#5-geometry-text-and-numerical-limits) apply across one known
+  timeScale. Automatic collection presence/layout uses the
+  [participant bound](presets.md#52-shared-work-limits), determined before per-member measurement or
+  copy allocation; retained moving siblings and still-active earlier revisions count. A whole-group
+  envelope does not count every descendant. Oversized sets use immediate native presentation; a
+  manual/paginated/virtualized composition needs its own bounded adapter and evidence, not an exemption.
+  Bound glyph/reel work and drop visual work on overload, never data.
+  The [renderer limits](presets.md#52-shared-work-limits) apply across one known
   coordinated content revision as well as per slot. Many tiny children cannot bypass the moving-set
   budget. A hidden owner cancels visual work and resumes at current content, not a queued backlog.
 

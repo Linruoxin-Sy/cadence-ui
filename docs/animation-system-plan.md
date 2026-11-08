@@ -277,6 +277,24 @@ moving-set limit together. Count retained active work, release obsolete decorati
 immediate latest-content fallback without waiting for capacity. Also prove that this cleanup leaves
 caller-persisted panels, unchanged text identity and independent list-item lifecycles intact.
 
+Implement and verify the target automatic-collection participant bound from presets §5.2 before
+per-member measurement or retained-visual allocation. Exercise the exact bound and overflow,
+including measured/projected retained siblings, earlier active revisions and outgoing visuals;
+an oversized identity set must reject decoration before reading all member boxes. Prove that a
+whole-group envelope is counted once, actual month grids are not confused with date cells, and
+chart samples/native scrolling retain their separate limits. Manual/paginated/virtualized adapters
+need an explicit bounded working set and independent performance evidence, not an automatic waiver.
+Count participating shells/markers too: a transaction with 49 row visuals and one sizing shell is
+already at the target bound; an additional distinct outgoing visual must take the immediate fallback.
+Multiple bindings on the same member visual do not multiply that participant or its allowance.
+
+Verify known library presence and colour on the same actual node with one transition-family
+composition and disjoint property ownership. Default library presence must not cause colour to
+yield as though it were an unknown caller family. Cover immediate whole-palette focus/invalid paint,
+entry interaction with an independent backdrop, three distinct modes, live cancellation, native
+completion and unknown caller overrides. This integration remains pending until source, declarations,
+public docs and executed evidence agree.
+
 Gate: meaningful algorithm, lifecycle and browser fixtures cover repeated characters, Unicode,
 multiline shaping fallback, numeric formatting, rapid retargeting, hidden/zero-size measurement,
 SSR/hydration, nested modes, live downgrades and clean unmount. Do not require per-frame React state

@@ -449,14 +449,45 @@ The following are target shared renderer work limits, not proof of measured perf
 in the same future shared source and may be tightened per component; relaxing them requires review
 and measurement. A budget fallback never truncates content or delays its accessible value.
 
-| Target limit             | Bound                                                                                                                                     | Overflow behavior                                                                                                                              |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Changed-text moving set  | At most 64 changed graphemes per owned slot/revision and across one known coordinated content transaction, grouped into safe shaping runs | Apply affected text immediately; retained content does not replay                                                                              |
-| General text diff input  | At most 2048 graphemes per compared owned display string; streaming uses the append fast path                                             | Show final affected content immediately; code/large-document owners may work on bounded visible lines, never split a shaping run merely to fit |
-| Middle-diff work         | At most 4096 candidate comparisons after prefix/suffix trimming                                                                           | Abort the visual diff and commit final affected text; no synchronous quadratic work beyond the cap                                             |
-| Numeric moving set       | At most 12 changed place-value columns per numeric display and across one known coordinated content transaction                           | Show the complete final formatted value immediately; never drop significant digits                                                             |
-| Chart data interpolation | At most 200 participating samples/marks across all animated visible series in one chart revision                                          | Commit final data geometry immediately; do not resample, omit data or queue the excess                                                         |
-| Pending targets          | One latest committed target per owner                                                                                                     | Replace the obsolete target; no queue of intermediate text, digits or measurements                                                             |
+| Target limit              | Bound                                                                                                                                                                         | Overflow behavior                                                                                                                              |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Automatic collection work | At most 50 participating collection visuals (members, distinct outgoing copies and participating shells/markers) in one known scope, including still-active earlier revisions | Apply the affected collection presence/layout immediately; preserve all semantic items and native layout, without a queued batch               |
+| Changed-text moving set   | At most 64 changed graphemes per owned slot/revision and across one known coordinated content transaction, grouped into safe shaping runs                                     | Apply affected text immediately; retained content does not replay                                                                              |
+| General text diff input   | At most 2048 graphemes per compared owned display string; streaming uses the append fast path                                                                                 | Show final affected content immediately; code/large-document owners may work on bounded visible lines, never split a shaping run merely to fit |
+| Middle-diff work          | At most 4096 candidate comparisons after prefix/suffix trimming                                                                                                               | Abort the visual diff and commit final affected text; no synchronous quadratic work beyond the cap                                             |
+| Numeric moving set        | At most 12 changed place-value columns per numeric display and across one known coordinated content transaction                                                               | Show the complete final formatted value immediately; never drop significant digits                                                             |
+| Chart data interpolation  | At most 200 participating samples/marks across all animated visible series in one chart revision                                                                              | Commit final data geometry immediately; do not resample, omit data or queue the excess                                                         |
+| Pending targets           | One latest committed target per owner                                                                                                                                         | Replace the obsolete target; no queue of intermediate text, digits or measurements                                                             |
+
+The collection bound is a target for the shared coordinator; it is not an implemented runtime
+parameter/export or a measured performance allowance. Count the members whose automatic collection
+presence, position or size presentation actually participates, including retained siblings measured
+or projected to move. Presence plus position/size on the same member visual counts once, not once
+per binding or property; this never permits competing writers on a property. A retargeted stable
+member counts once; a distinct outgoing decorative copy also occupies capacity until retired.
+Count active work from earlier revisions in that same scope,
+not just the new commit. A single whole-group opacity envelope is one participant, not every
+descendant. A collection shell/selection marker with its own writer is counted as its own visual
+when it participates; nested representations of the same member do not create fresh allowances.
+
+Determine eligibility from the known rendered/registered identities or the existing virtualizer's
+visible range before per-member layout reads or retained-copy allocation. Bounded collection may
+stop at limit + 1 and reject the effect; measuring every row first and then falling back is not
+bounded work. At the bound, only a set whose retained and proposed work still fits is eligible.
+Above it, settle the affected automatic collection transaction immediately, releasing superseded
+decoration without removing real content, changing pagination or waiting for capacity. Manual
+transforms, pagination and virtualisation are not unlimited exemptions: a composed adapter must
+declare its own bounded visible working set, one placement owner and independent performance proof.
+Without that adapter, use immediate native layout and content.
+
+The counting unit follows the actual collection adapter: payment rows in DataTable, participating
+source-line presentations in CodeBlock, avatar/count tiles and known-group image appearance in AvatarGroup, segments/keycaps/crumbs
+or chips in their groups, and actual month-grid presentations in Calendar. One moved month-grid
+table counts as one unit, not each date cell; independently animated cell/list parts count when
+they have their own collection writer. Native Embla track geometry, scrolling and Recharts sample
+interpolation retain their separate contracts; the chart limit is not replaced by this item count.
+The independent text/reel limits still apply within a permitted collection, and the 20-element cap
+remains specific to stagger concurrency. None of these bounds certifies full-page cost or frame rate.
 
 For very long append-only messages, the append detector may use an explicit content revision/chunk
 boundary instead of scanning or segmenting the entire historical message for each token. That boundary

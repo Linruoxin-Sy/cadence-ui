@@ -50,8 +50,10 @@ A single-select group uses one shared selection surface; a multi-select group gi
 Root track colour belongs to `root.colour`; each actual selected-decoration layer belongs to
 `indicator.colour` in both single and multiple modes. Item colour owns item foreground and any
 remaining non-indicator surface only. It never adds another selected background under the plate.
-Selection opacity/scale and colour are disjoint properties on the decoration; mode changes cancel
-both through its current owner before changing between shared and per-item decoration.
+Selection opacity/scale and colour are disjoint properties on the decoration. Changing the
+single/multiple selection mode cancels the incompatible shared/per-item decoration through its
+current owner before establishing the new form; this does not mean a motion-mode reduction cancels
+otherwise permitted short opacity or colour feedback.
 
 ## Interruption and lifecycle
 

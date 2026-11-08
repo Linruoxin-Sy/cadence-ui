@@ -59,7 +59,7 @@ aggregate `control` anchor remains the shared foreground and editable-content bo
 
 ## Interruption and lifecycle
 
-Rapid addon changes keep the latest structure without replaying the editor. Clicking an addon preserves the existing native focus path. During composition, selection or pointer resize, frame geometry yields to editor stability. Removed actions retain no duplicate tab stop. Live mode changes cancel the corresponding frame/text owners; none or a zero clock also cancels colours, fades and delays. Parent removal consumes descendant exits.
+Rapid addon changes keep the latest structure without replaying the editor. Clicking an addon preserves the existing native focus path. During composition, selection or pointer resize, frame geometry yields to editor stability. Removed actions retain no duplicate tab stop. Live reduced settles frame/addon geometry and quantity reels while permitted addon/changed-run opacity and eligible colour reconcile under their reduced contracts. None or a zero recipe clock settles one-shot work to the effective mode's current target. Each inherited Button/Input/Textarea owner uses its actually resolved context; a group mode does not override an explicit nested provider. Parent removal still invalidates descendant lifecycle work, and restoring full does not replay cancelled structure/content changes.
 
 The focus event itself cancels geometry that affects the native editor before paint; idle focus is not permission to animate its content box. Display text/colour may still update, but native value, caret and scroll extents remain immediate. Blur never replays suppressed addon motion. A button/addon that transfers focus uses the native target first, and removal releases its press/measurement registration before any decorative exit.
 
@@ -76,3 +76,5 @@ Target acceptance; not executed: prefix/suffix and block addons; changing displa
 Also pending: focus before typing during a suffix resize, update a quantity while selecting text, and remove a block action while a textarea is scrolled; native selection/scroll survive and blur does not start deferred movement.
 
 Also pending: exercise InputGroupInput and InputGroupTextarea separately in all modes and at zero clock; each retains its native editing engine and immediate geometry, including the textarea's existing field-sizing and resize policy. Focus either editor during frame/foreground colour feedback: those owners settle fully, while an unrelated addon can retain an eligible transition.
+
+Also pending: switch to reduced during addon reflow, changed text, a quantity and eligible unfocused colour. Only geometry/reels become immediate; permitted paint follows reduced mode. Compare none/zero and an explicit nested Button mode, preserving native editor/capture and each actual inherited context without a deferred replay.
