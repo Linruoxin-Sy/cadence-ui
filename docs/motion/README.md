@@ -228,11 +228,30 @@ not create entrances, duplicate observers or consume a reveal. Cleanup is idempo
 the styles/listeners/engine hooks owned by that controller; never cancel every animation on a node or
 erase caller/native transforms. An old completion can release only its own handles, not the new writer.
 
+Invalidate the owner lifetime before disconnecting observers or invoking disposal that can call back
+into the component. Queued observer deliveries, animation frames, microtasks, image completions and
+native-engine callbacks must check both their registration lifetime and the applicable committed
+revision before writing or cancelling anything. Disconnecting a resource alone is not evidence that
+an already queued callback cannot run. A shared ref pointing at a new node does not transfer the old
+callback's authority; reusing the same node for another semantic entity does not preserve it either.
+Recheck authority after a caller/native callback that can synchronously close, replace or unmount the
+owner. This guards decorative work, not permission to suppress the primitive's required semantic
+callbacks. Acceptance must include a retired delivery after replacement and after close/reopen,
+with the new owner's current animation and native interaction still intact.
+
 For the affected property, teardown or an accepted close invalidates subordinate work; direct input
 and focus take precedence over decorative geometry; a passive environment change invalidates stale
 measurements; only then may a current content/value revision animate. Mode and clock restrictions
 apply to the surviving owner. This is property-level arbitration, not a global serial queue or a rule
 to swallow a native input event. Ongoing retained exits still complete through the actual primitive.
+
+Cancellation follows the affected surface/property, not every part of a compound component. Closing
+a popup cancels its subordinate content work and starts its owned exit; a still-mounted, visible
+trigger keeps its independent label, quantity and colour revision. Likewise, an activated native
+navigation has the connected destination/scroll-host lifetime specified by its adapter, rather than
+the visibility of the control that originally triggered it. Unmount or an actual enclosing close
+still invalidates work owned by that boundary. Local contracts must distinguish these cases instead
+of using an unqualified "close cancels all" rule.
 
 Forced-colours and print use the current semantic paint/layout without decorative interpolation;
 do not set forced-color-adjust:none to preserve a designed colour tween. Native focus/selection and
@@ -240,7 +259,8 @@ closed-state visibility remain intact. Printing does not open closed popups/disc
 visibility loss or page suspension cancels one-shot work and pauses eligible loops; restoration,
 including a persisted page, establishes current layout before any new revision and never replays
 missed changes. A currently active full-mode status loop may resume under its existing visibility
-policy. Share these environment signals rather than installing document listeners per component.
+policy with a fresh theme-clock phase, not an old paused phase or an entrance replay. Share these
+environment signals rather than installing document listeners per component.
 
 User render/class/style overrides keep their compatibility contract. If a custom layer, table/SVG
 structure or caller animation makes a safe property owner unavailable, keep exact native content and
@@ -276,6 +296,15 @@ distinguish the immediate focus/invalid owner from eligible colour transitions. 
 sharing one preset across parts does not make them one owner. Acceptance must include gaining focus
 or becoming invalid during an existing colour flight, as well as an unrelated owner that may keep
 animating. A complete reference table cannot prove either behavior.
+
+Review live mode changes against the action's mode cells as well as its initial render. Reduction
+cancels spatial/layout/reel work and loops, then resolves any still-applicable short opacity/colour
+feedback through the reduced policy. It is not a blanket None branch. A same-target zero clock must
+cancel recipe work, while a positive-to-positive clock change follows the
+[executor clock policy](presets.md#31-effective-modes-and-clock-ownership), not an invented semantic
+revision. Add an interruption scenario wherever a local cancellation rule could otherwise erase
+these distinctions. First appearance of a display slot establishes its exact content baseline;
+numeric replacement applies only to later applicable value revisions, not an invented count from zero.
 
 Local contracts may coordinate outgoing visuals, incoming visuals and geometry without delaying the
 semantic commit. Distinguish visual sequencing from delaying an actual action. In particular, replacement

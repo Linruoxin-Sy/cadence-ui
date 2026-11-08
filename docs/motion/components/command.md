@@ -27,6 +27,7 @@ The search input responds natively while the current command set changes immedia
     ],
     "label": ["command#CommandItem", "command#CommandGroup", "command#CommandEmpty", "command#CommandShortcut"],
     "quantity": ["command#CommandItem", "command#CommandEmpty"],
+    "empty": ["command#CommandEmpty"],
     "input-frame": ["input-group#InputGroup"],
     "input-control": ["command#CommandInput", "input-group#InputGroupInput"]
   }
@@ -42,7 +43,7 @@ The search input responds natively while the current command set changes immedia
 | Surface colour  | Default: command/item surfaces, CommandInput's outer wrapper border and CommandSeparator's rule own their supplied paint; the composed Input Group frame retains its existing owner.                             | default: `command.item.colour`, `command.surface.colour`; inherited: `@input-frame`                       |
 | Text colour     | Default: item, group heading, empty state and shortcut foreground changes. The default input inherits InputGroupInput; an `asChild` replacement delegates foreground to its actual caller input owner.           | default: `command.item.colour`, `command.surface.colour`; inherited: `@input-control`; composed: `@input` |
 | Changed text    | Default for owned primitive item/heading/empty/shortcut strings. Native `CommandInput` edits stay immediate; rich labels use composed ownership. Screen-reader-only dialog title/description update immediately. | default: `command.label.change`; composed: `@label`                                                       |
-| Changed numbers | Composed: an explicit result count or quantity may roll; there is no built-in count slot, and shortcuts/command IDs are not counters.                                                                            | composed: `command.quantity.change`                                                                       |
+| Changed numbers | Default: eligible visible Empty revisions of supported direct numeric children. Composed: rich quantities; command names, shortcuts and query text remain identities. No count prop is added.                    | default: `command.empty.roll`; composed: `command.quantity.change`                                        |
 
 ## Choreography and modes
 
@@ -55,6 +56,7 @@ The search input responds natively while the current command set changes immedia
 | Pointer selection/state / item                                         | Scoped surface/foreground transition; keyboard selected highlight appears immediately. Colour eligibility and immediate-owner priority follow the rule below.                         | Short colour feedback; keyboard immediate. Colour obeys the same owner priority. | Final state immediately.          | `command.item.colour` → `state.color` → `state.color/surface-foreground`                                                         |
 | Supplied tokens/disabled state / root and non-item display-text owners | Scoped surface/border/foreground colour, respecting the inherited Input Group owner and immediate caret/focus. Colour eligibility and immediate-owner priority follow the rule below. | Short colour. Colour obeys the same owner priority.                              | Final colours immediately.        | `command.surface.colour` → `state.color` → `state.color/surface-foreground`                                                      |
 | Primitive display update / text owner                                  | Changed-run replacement with `stagger: none`; unchanged keyed rows stay still.                                                                                                        | Changed-run opacity only.                                                        | Final text immediately.           | `command.label.change` → `text.replace` → `text.change/changed-runs`                                                             |
+| Visible Empty numeric revision / owned display                         | Roll changed places only; no simultaneous text replacement on those digits. First display and query/filter-driven updates are immediate.                                              | Final number immediately.                                                        | Final number immediately.         | `command.empty.roll` → `number.compact` → `number.roll/reels`                                                                    |
 | Explicit composed quantity / quantity owner                            | Roll changed numeric places; never animate shortcut digits as a quantity.                                                                                                             | Final number immediately.                                                        | Final number immediately.         | `command.quantity.change` → `number.compact` → `number.roll/reels`                                                               |
 
 `item.colour` alone merges hover, selected, disabled and theme paint for each CommandItem.
@@ -70,6 +72,8 @@ CommandItem's generated check glyph keeps immediate visibility from the existing
 infer a checked state from cmdk selection or add a new toggle action.
 
 Colour eligibility is per actual root, item or display region. DOM focus/focus-within or that region's own invalid state cancels its colour clock and settles all its declared paint immediately. Thus input focus settles the containing Command root and inherited input-frame/control owners, not every result item's palette. cmdk selection/active-descendant is not DOM focus; the immediate keyboard highlight above is an explicit selection policy. Other colour interpolation requires a verified readable palette.
+
+An already visible CommandEmpty dispatches a direct string to `label.change` and a supported direct numeric child to `empty.roll`, preserving the existing output and cmdk visibility behavior. First display, a renderer-type change, and updates arriving while hidden establish the latest value immediately; they do not invent a numeric origin. Only a discrete non-query/filter revision while Empty remains visible may roll. Query/filter-driven updates or overlapping revisions settle its current number immediately without a queue or deferred replay, and hiding/closing cancels its visual work. Rich children keep composed ownership; command names, shortcuts and native query text remain identities. The Empty transaction uses the existing list size owner and shared aggregate text/reel budget.
 
 ## Interruption and lifecycle
 
@@ -98,3 +102,5 @@ List-height animation below the editor may continue only while that editor's con
 - Pending: inline versus CommandDialog composition, result-height changes while closing, all modes, live downgrade and zero clock have exactly one presence/geometry owner.
 - Pending: move active selection into newly added results while the viewport changes size, deliver async results after close and reject a controlled query update; native current state and readable commands win over stale animation targets.
 - Pending: Autofocus CommandInput as CommandDialog opens, then type while results resize; the input never waits for surface entry and geometry only animates while its caret/content box stays stable.
+
+- Pending: while CommandEmpty stays visible, revise a supported direct numeric child, then compare a numeric-looking string and rich quantity content. Verify exact output including zero, one renderer, immediate string/number baselines, and no new count API. Hide/reveal Empty, update during query filtering or overlapping revisions, close mid-roll and change modes/zero clock; the latest semantic value is immediate with no stale reel or delayed replay.

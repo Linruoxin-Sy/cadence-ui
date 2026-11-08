@@ -248,6 +248,13 @@ opacity action; `state.color` does not implicitly animate opacity. Only an actua
 paint. Reduced/none loop cancellation must restore the current static equivalent, not freeze a
 half-faded loading shape or overwrite caller paint.
 
+For `status.loop`, "pause while hidden" means release the active visual writer and keep the current
+static equivalent. A still-active owner may start a fresh theme-clock phase when full-mode visibility
+returns; it does not resume the old phase, replay presence or process missed status revisions. A
+completed, removed or still-reduced owner cannot restart from a stale visibility/presence callback.
+This is the same loop policy for Spinner, Skeleton, loading text and composed status parts, with their
+individual active conditions retained; it does not turn zero recipe timeScale into a loop stop.
+
 For reduced opacity-only remnants of spring presets, use `duration.fast` with `ease.out`, scaled by
 `reducedDurationScale` and the effective recipe clock; do not run a residual spring on layout, rotation
 or scale. Existing tween presets retain their assigned tween with the same multiplier. `text.replace`
