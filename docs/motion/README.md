@@ -246,6 +246,10 @@ An ordinary inline ref can change on every render. Old registration cleanup must
 registration or cancel the continuing visual owner. Actual node replacement or an explicit semantic
 identity change does revoke the old visual authority and establishes the new owner's current baseline.
 Do not infer that identity change from ref, event-handler or render-function identity alone.
+Content helpers also apply the [semantic slot boundary](../animation-system.md#36-changed-text):
+reusing a popup/display node for a different known trigger or record establishes a new baseline,
+while an ordinary same-entity edit retains its changed units. Host continuity alone cannot authorize
+a reel between unrelated quantities; the component's declared cause remains authoritative.
 Recheck authority after a caller/native callback that can synchronously close, replace or unmount the
 owner. This guards decorative work, not permission to suppress the primitive's required semantic
 callbacks. Acceptance must include a retired delivery after replacement and after close/reopen,
@@ -289,6 +293,11 @@ Retained native presence is distinct from a decorative copy. A primitive's suppo
 prevent-unmount policy may leave its original closed subtree connected after its visual exit; preserve
 that policy's visibility, focus and completion semantics. Do not force removal, synthesize a completion
 at an assumed deadline or require a callback that the native policy defers until actual unmount.
+Any additional visual copy follows the [paint-only retention contract](../animation-system.md#33-presence-and-composition),
+including DOM ids, form participation and resource/effect lifetime, not only focus and accessibility.
+Natural-size measurement follows the [single real content-tree rule](../animation-system.md#34-measured-size-and-position).
+If safe paint retention or an exact natural destination is unavailable, omit only that effect; never
+duplicate a caller subtree or alter its mount policy to make a design binding executable.
 When comparing caller-owned animation handles, require continuity only while the same actual host
 survives. Native removal legitimately ends that host's animations; reopening on a new node establishes
 new handles. An infinite caller animation is not an extra Cadence exit hold, and must not be cancelled

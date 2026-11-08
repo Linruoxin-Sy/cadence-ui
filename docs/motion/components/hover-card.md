@@ -48,6 +48,12 @@ A preview arrives as a coherent surface anchored to its trigger. Its richer cont
 
 ## Interruption and lifecycle
 
+If an existing shared/caller composition assigns the surviving preview to another trigger or record,
+establish the new direct text/number baseline immediately in all modes and retire the prior entity's
+decoration. Use existing trigger/payload identity or the composition's keys, never label equality or
+object allocation. A same-record edit stays eligible; a collision correction for the same anchor
+does not invent a new record. Unknown correspondence uses immediate content without a new public API.
+
 Hover/focus on the trigger is outside the preview's content envelope, so it does not by itself cancel preview entry or cause autofocus into the card. If a supported interaction actually reaches a descendant during entry, settle its affecting envelope before presenting that focus/activation. Native preview traversal and intent delays remain unchanged.
 
 - Preserve Preview Card open/close delay, trigger/popup traversal and focus semantics. Animation does not introduce another hover timer or force focus into the preview.
@@ -62,6 +68,10 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 
 - Base UI positioner owns placement; content visual layer owns approach/opacity; a single shell owner owns measured dimensions. Collision flips and passive asset/font/viewport changes are immediate.
 - One content observer per open preview. Image dimensions should be reserved by the content owner; do not chase every image decoding frame with the shell.
+- Measure the real preview content once, never a hidden second rendering of its controls/media.
+  Additional outgoing preview paint must satisfy the shared paint-only retention contract; when
+  a rich preview cannot be isolated safely, replace it immediately without remounting or duplicating
+  its editor, media session, refs or effects. Native kept-mounted content keeps its existing policy.
 - Text lays out at final target width before natural-height measurement. Animate the shell around that destination layout, not repeated intermediate text wrapping.
 - Bound decoration to one panel and changed visible text/readouts under common budgets. Focusable descendants and portalled children stay outside decorative clipping.
 
@@ -71,6 +81,11 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
 
 ## Acceptance scenarios
+
+- Pending: reuse one open preview for another known record, then edit that record and deliver an old
+  completion. No cross-record count trend, stale description or unwanted reopen is allowed. Include
+  named form controls and stateful media/custom content: measurement and replacement introduce no
+  second registration, DOM id, form entry, resource instance or component-effect lifecycle.
 
 - Pending: move between trigger and preview while open/close transitions are active; existing interaction delays and focus behavior remain intact.
 - Pending: replace a plain hint and update a rich preview with an image/count; only explicit owners animate and layout remains bounded.

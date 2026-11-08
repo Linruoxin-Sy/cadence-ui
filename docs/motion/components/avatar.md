@@ -58,6 +58,13 @@ Preserve Base UI's image/fallback availability and caller-supplied timing rather
 
 ## Geometry and performance
 
+A retained Image/Fallback layer is decorative paint under the
+[shared retention contract](../../animation-system.md#33-presence-and-composition), not a second
+mount of caller fallback/image children. Do not duplicate ids, names or caller load/ref/effect
+registration, or issue another image request solely to create outgoing paint. Reusing an already
+available safe layer remains eligible; unsupported rich fallback/custom-render content swaps
+immediately while Base UI's current image/fallback availability stays authoritative.
+
 Image and fallback share the reserved root box. Keep initials and compact count content in their resolved single-line boxes; their text replacement never drives wrapping or image size. Measure only explicit size or group membership changes, not image decode dimensions. Group overlap and badges keep existing clipping/stacking semantics; do not crop the corner badge with a newly introduced wrapper. Limit active image transitions to changed visible avatars and never replay unchanged initials.
 
 The group consumes each member's final size destination rather than observing a size tween. A member's group displacement and image crossfade use distinct property owners; explicit root resizing does not scale initials. The count tile remains its reserved size, including existing group-size styling. If new count/fallback content cannot fit safely, retain caller truncation rules and show the final content immediately instead of clipping through a reel. `+3` as a string stays text; a mixed plus sign/quantity needs explicit numeric composition, not a new count prop. At most one outgoing/ready image pair per changed visible avatar is retained; unavailable safe layering swaps immediately, without holding requests or hiding identities.
@@ -67,6 +74,11 @@ For automatic group presence/reflow and known-group image appearance, use the [c
 The known AvatarGroup coordinator uses its registered member/source identities and active handles, not a DOM image scanner. If that live image set cannot fit or cannot be determined safely, swap the affected current available image/fallback immediately and release obsolete outgoing decoration. Never queue decode results, delay a request, change Base UI availability or hide a current identity to wait for capacity. Outside a known group, the local one-pair limit and component/page budgets remain mandatory; no unbounded retained-image queue is introduced. Text/reel work retains its independent limits.
 
 ## Acceptance scenarios
+
+Also pending: crossfade a loaded image with an id-linked or stateful custom fallback/render part.
+Only the current original keeps its semantic relationships and callbacks; retention cannot add a
+second child mount or request. When no safe outgoing layer exists, current availability swaps
+immediately with no fabricated fallback, duplicate announcement or delayed image readiness.
 
 Target acceptance; not executed: slow, cached and failed images; identity swap before decode; badge changes; group reorder/removal with overflow count; count affixes; explicit size change; parent entrance; live modes and zero clock during image replacement.
 

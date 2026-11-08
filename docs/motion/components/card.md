@@ -58,6 +58,12 @@ Rapid content changes retarget the current card dimensions, not queued old heigh
 
 ## Geometry and performance
 
+The separate natural region is Card's existing real content tree. Measuring its destination must
+not mount a second hidden copy of caller forms, editors or rich children. Where the actual fit/caller
+layout cannot expose a safe natural destination, use immediate native geometry for that axis under
+the [shared measurement rule](../../animation-system.md#34-measured-size-and-position), preserving
+children's refs, effects and resource lifetime. A skipped/unmeasurable region is not an empty card.
+
 Observe committed content, using card-flow where it exists and the equivalent owned content box otherwise. First lay out wrapping content at the destination available width, then animate the host's block size; a fit=content inline-size transition does not continuously rewrap the measured content. Clamp dimensions to external min/max constraints; do not animate a fill-parent axis or passive responsive reflow. Crop only a noninteractive measurement/reveal region when required, never focus rings or popups. One card-size transaction covers simultaneous title, action and body changes; unchanged text never replays.
 
 The existing fit observer supplies destinations to the new shell owner instead of retaining its independent imperative height writer. A child already animating geometry either delegates the shared cause to Card or supplies its final destination once; Card does not follow its intermediate boxes. Explicit `size` changes use final padding/typography before measurement, not animated padding. Hidden zero measurements retain intrinsic layout until a valid target exists; reappearance does not grow from zero.
@@ -71,6 +77,10 @@ body's unavailable measurement does not collapse the card. Ancestor presence and
 remain separate owners: a child in none does not cancel the card's envelope or counter-scale itself.
 
 ## Acceptance scenarios
+
+- Pending: resize a card containing named inputs, id-linked labels and a stateful child, then repeat
+  with an unavailable natural region. Measurement adds no DOM ids, form entries, ref/effect calls or
+  hidden child instances; the unavailable case keeps native geometry and later establishes a baseline.
 
 Also pending: render plain and numeric CardContent inside inherited editable and plaintext-only
 contexts, change editability during a display transition, then return to display. Native content,

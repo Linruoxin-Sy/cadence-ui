@@ -851,12 +851,33 @@ animation; replacing that host or entity revokes the old writer. Native keep-mou
 semantics also remain authoritative after visual exit. The detailed registration, retention and
 caller-animation boundaries are in [the common lifecycle contract](motion/README.md#31-cancellation-environments-and-renderer-ownership).
 
+Decorative retention is a paint-only representation, not permission to mount another copy of caller
+children. It must introduce no duplicate DOM ids or label/ARIA reference targets, form association,
+submission/reset/validation participation, live region, event/ref registration or component effects.
+`aria-hidden`, `inert` and pointer suppression alone do not establish that contract. Build only the
+known bounded visual representation whose semantics and resource lifetime the owner can isolate;
+never recursively clone an arbitrary row, panel or React subtree. Rich media, canvas, embedded content
+and custom elements are immediate replacements unless their existing owner supplies a safe bounded
+visual. Do not remount them, replay media or create new loading/decoding work solely to retain an exit.
+If no safe representation exists, omit that outgoing effect while committing the current content and
+retaining eligible incoming/disjoint effects. This does not remove or sanitize a primitive's original
+subtree retained by its supported native presence policy.
+
 ### 3.4 Measured size and position
 
 geometry.resize is available wherever appropriate, regardless of legacy tier. Observe natural
 content and animate a separate shell. One owner measures/writes each axis; ancestors must not spring
 behind every frame of a child's spring. Text/number helpers do not create competing shell-width
 controllers. Position ownership stays separate from intrinsic size.
+
+The separate natural-content region is the one real rendered content tree, not a second hidden render
+of its children. A measurement must not repeat hooks, refs, callbacks, resource requests or native
+form/control registration. Use the existing natural region, supported native destination measurements
+or an explicitly safe bounded display-only probe. If these cannot provide an exact destination under
+the existing DOM/layout contract, use immediate native geometry. No measurement clone of a form,
+editor, arbitrary panel or media subtree is authorized. A host without an eligible measurable box,
+including a skipped-layout region, supplies no synthetic zero target and no reason to force hidden
+content into layout; establish a baseline when it legitimately becomes measurable.
 
 | Cause                                                | Default target behaviour                                          |
 | ---------------------------------------------------- | ----------------------------------------------------------------- |
@@ -1075,6 +1096,16 @@ FieldError keeps its current children/errors precedence before considering repla
 Changing from string to number or back establishes the new renderer's baseline immediately; do not
 invent a numeric origin or run both renderers on the same content. An unavailable grapheme segmenter
 or unsupported shaping mapping uses exact immediate text, not code-point splitting.
+
+Display continuity also requires the same semantic slot/entity, not merely the same host and value
+type. A shared popup retargeted to another trigger or a recycled display assigned to another record
+establishes exact current text/number baselines and retires the old entity's decoration. Use the
+primitive's existing trigger/payload identity or the composition's existing keys/revision boundary;
+do not infer identity from matching labels, object allocation or array index, and do not invent a
+public identity API. An unavailable cross-entity correspondence uses the immediate content fallback.
+Ordinary edits to the same identified slot retain changed-only replacement, and an accepted Select
+value change remains its explicitly designed selection/handoff cause rather than a generic entity
+reset. This content decision does not reopen or remount a surviving popup.
 
 Decomposition must preserve the slot's existing white-space policy, newlines, tabs, text-transform,
 letter/word spacing, font features and inline layout. Do not introduce inline-block wrapping or disable

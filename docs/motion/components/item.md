@@ -60,11 +60,22 @@ Source/key changes invalidate any caller-composed media transition and late comp
 
 ## Geometry and performance
 
+Outgoing row/part paint follows the shared
+[paint-only retention rule](../../animation-system.md#33-presence-and-composition). Do not clone the
+Item's rich child tree, link/action ids, native form controls or media solely for exit or measurement.
+If safe bounded paint is unavailable, remove that visual immediately while preserving eligible
+retained-row reflow; no duplicate ref/effect registration or altered caller mount policy is allowed.
+
 Measure the changed row after commitment; ItemGroup may animate sibling positions but never also writes row height. Lay out title/description at destination width before row-height interpolation, retaining the description's line clamp; responsive truncation is immediate. Do not animate image intrinsic sizing into row layout. Plain Item has no automatic hover lift/press scale; a rendered link preserves native navigation and focus. Rich interactive descendants are not split into animated text.
 
 ItemGroup uses committed final row boxes, not their interpolated heights. A nested content-size owner delegates that cause or supplies a final destination once. Keep a focused descendant/editor or captured action target stable; affected row/sibling geometry commits immediately, and blur does not replay skipped movement. If a smaller intermediate row adds clipping to final-visible text/actions under existing overflow, settle that axis immediately. Bound work to changed visible rows and known text slots; oversized groups skip blanket measurement/reflow and preserve native scrolling. ItemSeparator inherits Separator without a duplicate group entrance.
 
 ## Acceptance scenarios
+
+Also pending: remove/reinsert a row with an id-linked action, named input and rich media child while
+the group reflows. The single live row retains native form/ref/resource behavior; no hidden measurement
+mount or outgoing interactive copy is created. Unsafe outgoing paint falls back independently from
+the surviving rows' eligible movement.
 
 Target acceptance; not executed: item insertion/reorder; plain div and anchor render; title changes with retained substrings; media/action replacement; header/footer expansion; clamped descriptions; focus during removal; all modes and zero clock with rapid record updates.
 

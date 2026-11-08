@@ -46,6 +46,13 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 
 ## Interruption and lifecycle
 
+When an existing shared/caller composition reuses Content for a different trigger or hint entity,
+retire the old text/reel transaction and establish the new exact display baseline in every mode.
+Use the already known trigger/entity identity; matching text, a reused Content node or two numeric
+values do not authorize cross-trigger replacement or rolling. A rename/value revision for the same
+hint keeps its normal eligibility. Passive movement of that same anchor is a placement revision,
+not a new hint identity. Do not add a trigger registry or remount the popup to enforce this rule.
+
 Focusing the trigger is outside the tooltip's content envelope and does not cancel its short hint fade or introduce autofocus into the tooltip. Preserve its existing description relationship and noninteractive role. If browser find or another supported interaction requires the hint itself to be presented immediately, settle the relevant opacity envelope instead of postponing that interaction.
 
 - Provider delay/open policy remains unchanged; it is interaction behavior, not an added animation delay. None/zero clock introduce no presentation delay after the semantic open/close event.
@@ -67,6 +74,11 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 - A destination-layout size animation must not newly crop required text, an active descendant or a focused control. Use existing legal scroll/overflow to keep them immediately reachable; otherwise settle that axis before paint. Do not add temporary truncation or hide required content to make the shell animate.
 
 ## Acceptance scenarios
+
+- Pending: reuse an open Content node for two known trigger identities with equal, partially shared
+  and numeric hints. The second hint starts at its exact baseline; old completions cannot restore the
+  first hint. Then update the same hint and move its anchor separately: content retains ordinary
+  changed-only eligibility and placement stays native, without ref churn being treated as identity.
 
 - Pending: preserve configured provider delay, focus/pointer behavior and existing description linkage in every mode.
 - Pending: update part of a visible hint near a collision boundary; unchanged text remains stable and arrow/placement remain attached.

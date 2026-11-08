@@ -69,11 +69,22 @@ One title opacity owner arbitrates activity and text replacement. Entering a rep
 
 ## Geometry and performance
 
+Media replacement retains only a safe visual supplied by its existing owner. It must not clone or
+remount an arbitrary video, embedded preview, canvas or custom media subtree to crossfade it; use
+immediate replacement when no bounded paint-only layer exists. Likewise, an outgoing tile/action
+visual cannot duplicate ids, native form participation or caller ref/effect registrations. These are
+eligibility checks before the collection budget, not an upload, media-loading or playback API.
+
 For a deliberate orientation/size change, lay out metadata at the destination width first, then animate the tile's owned box; do not animate font size or continuously rewrap a truncated filename. Preview reservation stays stable. Only visible changed group members are measured; native horizontal scroll/snap is never eased by a second engine. Keep action focus rings and overlay hit geometry outside any temporary content clipping. A title pulse has one local opacity owner and no travelling shimmer. Full-mode zero timeScale snaps a held trigger/action feedback layer to its current press target and releases instantly; reduced/none omit scale without changing native held state or persistent application state.
 
 The group consumes final tile destinations once; its layout displacement never writes the same transform as the internal trigger-press visual. While native scrolling/snap or a captured trigger/action interaction is active, commit affected group geometry immediately instead of interpolating under that interaction; do not replay it afterwards. If intermediate tile dimensions add clipping to the final visible filename/action, settle that axis immediately. Async media decode without an intentional content revision is passive layout, not a new tile-growth cause. Use one measurement per changed visible tile and bounded title/description/preview work; oversized groups skip blanket measurement and offscreen decoration. Numeric filename strings and already formatted metadata remain text unless explicitly composed as a quantity.
 
 ## Acceptance scenarios
+
+Also pending: replace/remove an attachment containing an active media preview and a named action
+control during group reflow. No second media instance, playback restart, ref/effect mount or form/id
+registration is created for measurement or exit; unsafe outgoing paint is omitted without disabling
+eligible sibling reflow or delaying the accepted file/preview state.
 
 Target acceptance; not executed: uploading to processing/error/done; quick state reversals; filename diff and numeric metadata; horizontal/vertical layouts; preview decode race; overlay trigger versus action; group removal while scrolling; live modes and separate zero recipe/theme-loop clocks.
 

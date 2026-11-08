@@ -287,6 +287,20 @@ returning to display establishes a baseline without replay. Query/filter-derived
 immediate through delayed accepted updates, while independently identified quantities retain their
 ordinary eligibility. Verify DataTable alongside Command/Combobox and direct chart/slider readouts.
 
+Also prove content baselines when an existing shared tooltip/preview host changes semantic trigger
+or record. Same-host/same-type values cannot create a cross-entity reel or text history; same-entity
+edits retain their ordinary eligibility, and ref churn or passive anchor movement is not an identity
+change. Use already available identity boundaries and immediate fallback for unknown correspondence,
+without adding a public identity API or changing the explicit Select handoff cause.
+
+Presence and geometry adoption must prove that decorative retention and destination measurement do
+not mount a second caller content tree. Include DataTable/Item exits, Tabs panel switches, Card sizing
+and Avatar/Attachment/preview replacement with named controls, id-linked labels, refs/effects and
+stateful media. Verify unique live ids, unchanged native form submission/reset participation and no
+extra component/resource lifetime. Preserve native original keep-mounted policies; unsafe visual
+copies or unavailable natural measurements use their local immediate fallback before allocation.
+The collection count bound is additional to these eligibility checks, not a cloning allowance.
+
 Palette acceptance covers different owner clocks and immediate focus/invalid paint, not only matching
 full-mode colour tweens. For Tabs, ToggleGroup and Pagination, inspect intermediate selected-plate
 travel behind labels. If the rendered combinations cannot stay readable, prove immediate placement

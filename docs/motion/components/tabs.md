@@ -66,6 +66,13 @@ Apply the [shared owner precedence](../presets.md#31-effective-modes-and-clock-o
 
 ## Geometry and performance
 
+A natural Panel measurement must use its one real content tree or a supported destination supplied
+by the existing owner. Do not mount inactive panels, render a second hidden form/editor, or clone
+caller children to discover a target height. A safe outgoing display follows the
+[paint-only retention contract](../../animation-system.md#33-presence-and-composition); unavailable
+outgoing paint is omitted without changing keep-mounted semantics. Preserve any inactive original
+panel's existing form/state behavior rather than altering it to make motion possible.
+
 For a filled selected marker behind trigger text, `indicator.select` also follows the
 [rendered-colour constraint](../../animation-system.md#35-colour-feedback). Verify label readability
 over both track and moving fill, including immediately settled focused foreground and independently
@@ -89,6 +96,11 @@ without deleting caller transforms. Any temporary list/panel pixel dimensions re
 native layout policy when the size owner completes or yields.
 
 ## Acceptance scenarios
+
+- Pending: switch between panels with named form controls, id-linked descriptions, an uncontrolled
+  editor and a stateful child while height/content transitions are interrupted. Compare the original
+  persistence policy: no extra form entries, duplicate ids, mount/ref effects, reset behavior or
+  media instances may appear for measurement/exit. Unsafe retention falls back without remounting.
 
 - Pending: move the filled marker under labels while theme/selected colours change and focus settles
   one trigger's foreground immediately; compare the underline variant and nested clocks. Intermediate

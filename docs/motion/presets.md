@@ -422,6 +422,13 @@ neither spring completion nor an immediate fallback may erase a newer caller sty
 placement. A valid empty destination is distinct from an unavailable hidden measurement. These rules
 change no spring assignment or duration and require no component-local cleanup timer.
 
+All presence/layout/geometry presets inherit the system's
+[paint-only retention](../animation-system.md#33-presence-and-composition) and
+[single real content-tree measurement](../animation-system.md#34-measured-size-and-position) rules.
+The numeric work bounds below are ceilings after eligibility, not permission to clone up to that many
+interactive rows, panels or media instances. Unknown/unsafe representation or unavailable natural
+geometry uses the affected immediate fallback before allocation, even when the item count is small.
+
 Text decomposition also preserves existing typography, white-space and inline flow under
 [the changed-text contract](../animation-system.md#36-changed-text); safe run or immediate rendering
 is preferable to introducing a new line-break policy for animation.
@@ -471,6 +478,7 @@ to every numeric binding:
 | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Value changes but formatted output is unchanged                                      | Update semantic data only; no reel, affix effect or size measurement solely for that value                                                                                              |
 | First value, string/number renderer change, or unsupported numeric-domain conversion | Exact current formatted baseline immediately; no assumed zero/source value                                                                                                              |
+| Existing display reassigned to another known semantic entity                         | Exact current formatted baseline immediately, even when both entities supply numbers; no cross-record trend or inherited reel history                                                   |
 | Positive/negative value change with stable notation                                  | Compare the whole numeric values for trend, including negative-to-negative changes; roll only changed decimal places                                                                    |
 | Cross zero                                                                           | Use whole-value trend; sign insertion/removal is changed affix text and never an extra digit column                                                                                     |
 | Negative zero versus positive zero                                                   | Equal magnitude supplies no trend; preserve formatter sign policy and change only displayed sign/affix text if needed                                                                   |

@@ -73,6 +73,14 @@ replay because result membership changed. A later independent eligible revision 
 
 ## Geometry and performance
 
+Row exit retention uses a bounded paint-only representation under the
+[shared retention contract](../../animation-system.md#33-presence-and-composition). It is not a
+second rendered/cloned row containing Checkbox, menu triggers, named inputs, DOM ids or ref/effect
+registrations. Keep the one live semantic table and its native form/header relationships. If a row's
+rich cells cannot supply safe outgoing paint, remove that row visually immediately; surviving rows
+may still use their independently eligible bounded reflow. This fallback does not change sorting,
+filtering, selection or the native lifecycle of a menu already being dismissed.
+
 Measure only participating rendered rows on the current page, batching before/after reads; do not scan off-page data. Count changed and measured/projected retained row identities, distinct outgoing visuals and any participating result-region shell under the [automatic collection bound](../presets.md#52-shared-work-limits), including still-active earlier revisions. Establish that set before member measurements/copy allocation. If it cannot fit, commit the affected row presence/positions and dependent region geometry immediately rather than measuring every record or staggering a backlog. Preserve real table sections, column sizing, row hit regions and overflow. Retained exit paint must not require invalid table wrappers, retain stale selection/copy text, or change semantic result height; omit it if it cannot be isolated safely. Native destination layout determines row geometry; one row-position owner handles the sorting/filtering transaction, and Table adds no second effect. A table-region host coordinates final aggregate height without sampling moving rows each frame. For a simultaneous height/reorder transaction, each row projection excludes displacement already produced by that same shell, avoiding doubled vertical travel. A future virtualized consumer must delegate item placement to its virtualizer and animate only safe visible paint within an explicitly bounded working set, not add a second position engine or bypass the bound by calling it manual.
 
 For region-size continuity, lay the natural table out at its destination width and measure it separately from the bounded outer block-size host. Only that host reflows nearby controls; native cells do not continuously rewrap during its height animation. Column visibility adopts final column geometry immediately before survivor-position motion.
@@ -80,6 +88,11 @@ For region-size continuity, lay the natural table out at its destination width a
 The bounded region fallback is immediate native layout when existing table overflow cannot keep newly committed required rows, a focused control or a pointer-captured row usable. Do not add clipping, sticky-row projection or a moving hit target merely to complete a filter transition. Native selection/copy of affected cells also suppresses their decorative replacement/retained exit paint while semantic filtering remains immediate. A simultaneous amount/status/count update shares the aggregate text/reel budget for the result transaction, not one allowance per cell or footer count.
 
 ## Acceptance scenarios
+
+- Pending: filter/remove a row containing a named checkbox, an id-linked label and a rich cell with
+  a mount/ref side effect. During retained exits and region measurement, verify unique live ids,
+  unchanged form submission/reset behavior and exactly the original component/ref lifecycle. An
+  unsafe row has no outgoing copy; safe surviving-row movement remains independently eligible.
 
 - Pending: type and clear a filter while a result-count reel is running, accept a delayed result,
   and update an independent amount/selection count in the same commit. Filter-derived counts reach
