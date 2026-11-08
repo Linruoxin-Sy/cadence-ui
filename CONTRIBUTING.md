@@ -19,10 +19,12 @@ validation.
 
 Motion v2 assesses every component for applicable capabilities and assigns one owner to each animated
 property; tiers do not grant or prohibit animation. The current runtime, registry schema, metadata, MDX,
-and test helpers are retained for compatibility until their migration is implemented. Planned
-`state.color`, `text.change`, numeric rolling changes and public helpers are not installable APIs merely
-because they appear in the design. Keep source, declarations and user-facing documentation in sync for
-each migrated component, and leave outstanding implementation work explicit in the plan.
+and test helpers retain compatibility while migration continues. Shared `state.color` and CSS loop
+executors have support; each component must still adopt the real owner, declare its implemented forms
+and prove the corresponding policies in all three modes. The overall v2 marker remains gated.
+Planned `text.change`, numeric rolling changes and public primitives are not installable APIs merely
+because they appear in the design. Keep source, declarations and user-facing documentation in sync
+for each migrated component, and leave outstanding implementation work explicit in the plan.
 
 ## Local setup
 

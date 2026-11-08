@@ -23,6 +23,7 @@ import { cn } from "../lib/cn";
 import { ControlSpan, useControlAnimation } from "../lib/control-animation";
 import { clampMeasuredSize, measureOrigin, type Origin } from "../lib/geometry";
 import { scale } from "../lib/motion";
+import { subscribeMotionEnvironment } from "../lib/motion-environment";
 import { popupClasses, popupStyle, stateClasses } from "../lib/popup-style";
 import { useCadenceMotion, useCadenceMotionScope, withCadenceScope } from "../lib/provider";
 
@@ -119,6 +120,7 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   const floor = useRef(0);
   const clock = JSON.stringify(cm.transition("geometry.resize"));
   const activeClock = useRef(clock);
+  const environment = useRef(false);
   const rendered = useTransform(width, (value) =>
     typeof value === "number" ? clampMeasuredSize(value, floor.current) : value,
   );
@@ -143,12 +145,12 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
       const transition = cm.transition("geometry.resize");
       const clockChanged = activeClock.current !== clock;
       activeClock.current = clock;
-      if (current === "auto" || cm.reduced || transition.duration === 0) {
+      if (current === "auto" || cm.reduced || environment.current || transition.duration === 0) {
         floor.current = 0;
         // Keep one MotionValue owner across mode changes. Switching from a
         // MotionValue to a React width prop lets queued Motion renders restore
         // the old numeric width after React has committed `auto`.
-        const resting = cm.reduced ? "auto" : next;
+        const resting = cm.reduced || environment.current ? "auto" : next;
         width.jump(resting);
         host.style.width = typeof resting === "number" ? `${resting}px` : resting;
         target.current = next;
@@ -170,6 +172,18 @@ function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
   });
 
   useIsomorphicLayoutEffect(() => () => width.stop(), [width]);
+  useIsomorphicLayoutEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    return subscribeMotionEnvironment(host.ownerDocument, (next) => {
+      environment.current = next.hidden || next.immediate;
+      if (environment.current) {
+        floor.current = 0;
+        width.jump("auto");
+        host.style.width = "auto";
+      }
+    });
+  }, [width]);
 
   return (
     <motion.span
@@ -291,7 +305,7 @@ function SelectHandoff({ flight, onComplete }: { flight: HandoffFlight; onComple
   const cm = useCadenceMotion();
   const hostRef = useRef<HTMLSpanElement>(null);
   const transition = cm.transition("handoff");
-  const controls = useControlAnimation({ x: 0, y: 0 }, transition);
+  const controls = useControlAnimation({ x: 0, y: 0 }, transition, cm.mode, onComplete);
   useIsomorphicLayoutEffect(() => {
     const followDestination = () => {
       const rect = flight.destination.getBoundingClientRect();

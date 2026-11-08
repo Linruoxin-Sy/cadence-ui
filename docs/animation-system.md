@@ -215,9 +215,10 @@ press still has its press scale, reached immediately. It does not set `reduced`
 or `disabled`, and it does not stop continuous CSS `--animate-*` loops. Newly
 started or retargeted recipe animations use the resolved clock. An existing
 consumer must observe clock changes to cancel a same-target flight; the resolver
-alone cannot guarantee that every writer does so. Native CSS transitions already
-in flight are not promised live retiming on clock changes; forced `none`
-cancellation retains its separate contract.
+alone cannot guarantee that every writer does so. Shared finite owners capture a
+positive action clock until completion; physics owners retime from current paint.
+Their zero/mode downgrade cancels the current writer before paint. Other callers
+and engine adapters still require their own adoption evidence.
 
 ### 2.3 CSS-side exposure
 
@@ -518,6 +519,7 @@ explicit until their rollout phase completes.
 | `number.roll`     | Numeric changes                                                                         | `precision`, `spring`           | Resolver exists; place-value reel renderer and formatter integration pending (§3.7)                                   | New value shown directly                                                    |
 | `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                  | CSS continuous form or explicit Motion/engine clock                                                                   | V2 loops static (§3.2); engine geometry instant; permitted one-shot opacity |
 | `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state                            | Indicator at full size, thumb jumps                                         |
+| `state.color`     | Explicit surface/foreground colour feedback                                             | scoped properties, fast tween   | CSS owner with active cancellation; no delayed focus geometry                                                         | Short colour tween; none cancels duration and delay                         |
 | `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                   | `animate()` on a motion value, or the Base UI disclosure CSS form below; measure content and clamp to the closed size | Instant size change, opacity kept                                           |
 | `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                        | inverse transform from `measureOrigin()` + physics spring                                                             | Cross-fade at the destination                                               |
 | `feedback.press`  | Press feedback                                                                          | `scale`                         | Native press ownership + committed controls                                                                           | Colour change only                                                          |
@@ -604,8 +606,8 @@ positioning, not motion. Bubble has no streaming runtime or measured geometry.
 
 ### 3.1.0 V2 recipe additions
 
-Neither name below is in the shipped Recipe union yet. Do not add it to meta.motion or a component
-Motion contract table until the runtime, implementation recogniser and actual tests support it.
+`state.color` is supported by the shared CSS executor and resolver. Component adoption is separate;
+no catalogue item gains it through a dependency. `text.change` remains unimplemented.
 
 | Target recipe | Properties and cause                                                                                  | Mode/cancellation contract                                                                  |
 | ------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -872,6 +874,40 @@ State and theme revisions affecting the same region feed one colour controller, 
 hover/theme/selection transitions. Cancellation restores the current cascade rather than leaving
 sampled colours or temporary transition overrides pinned inline.
 
+The shared provider library supplies `useStateColor` and `useContinuousMotion` as staged execution
+support. Spread their returned bindings, including the managed callback ref, onto the real HTML/SVG
+owner. The callback connects delayed portals and replacement render nodes and preserves object,
+callback and React 19 cleanup refs. Discarding it is not adoption. This does not migrate catalogue
+components or deliver the four planned public primitives.
+
+Disjoint colour and loop owners can share one node without a wrapper: create `loop` with the
+external ref, pass `loop.ref` as the colour hook's ref, and spread the final colour bindings onto
+the actual SVG/root. Both callbacks then own their cleanup. Declaration recognition follows that
+managed-ref chain and runtime evidence must execute both policies in all three modes. An arbitrary
+replacement ref or a discarded intermediate ref is not a supported composition.
+
+`useStateColor` accepts unique explicit background/color, individual border colours, fill/stroke,
+text-decoration colour and declared box/text shadows. Foreground/background paint is immediate
+unless the caller selects `readability: "verified"` for a palette reviewed throughout its intermediate
+states. `readability: "immediate"` or `immediate: true` is the safe fallback, not automatic contrast
+certification. Focus and invalid paint synchronously suppress that owner's colour clock; outline and
+border geometry are not animated. Shadows require matching computed geometry/list topology; unknown
+or changing topology settles to the cascade target. The host does not scan pseudo-elements; a named
+pseudo region still requires its own authored rule and future adoption proof.
+
+Each hook requires an otherwise unclaimed CSS transition/animation family. A caller class or inline
+family makes the hook yield, preserving that writer through mode/clock changes. Removing the
+override re-establishes the current policy. Only the hook's own declarations/handles are removed;
+disjoint user/native WAAPI or Motion properties survive. Unknown caller class changes are checked
+in a committed style transaction, never by frame polling. No wrapper is inserted.
+`coordinateMotionTheme` brackets a synchronous theme commit and folds local colour effects before
+restoring their clock. Shared document signals handle print, forced-colours, visibility and page
+suspension; restoration has no missed-revision queue. Loops use spin/pulse theme clocks, stop under
+reduced/none or hidden/offscreen policy, and resume eligible full activity with a fresh clock.
+Framework pulse assumes resting opacity one: caller dimming from inline style or the cascade uses
+a static fallback, with class/environment changes sampled only at their committed boundary.
+Legacy Spinner/Skeleton callers retain their documented baseline until individually migrated.
+
 ### 3.6 Changed text
 
 AnimatedText uses text.change, independently of text.reveal/text.split entrances. The target pipeline
@@ -1119,7 +1155,7 @@ minimum working interval delays them.
 ### 5.1 Runtime compatibility surface
 
 This Recipe union is the current exported set, kept in sync with lib/motion.ts by registry:check.
-It does not yet include the two v2 additions or promise their public renderers. The hook's existing
+It includes shared `state.color` support; `text.change` and the planned public renderers remain pending. The hook's existing
 mode/timeScale inheritance and source-distributed API remain compatible during migration.
 
 ```ts
@@ -1142,6 +1178,7 @@ export type Recipe =
   | "number.roll"
   | "data.transition"
   | "state.morph"
+  | "state.color"
   | "geometry.resize"
   | "handoff"
   | "feedback.press";

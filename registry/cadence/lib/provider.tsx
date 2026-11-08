@@ -183,7 +183,7 @@ export function CadenceProvider({ mode, timeScale, children, className }: Cadenc
 }
 
 /** The resolved motion config. Falls back to the system preference when no provider is present. */
-export function useCadenceMotion(ref?: RefObject<HTMLElement | null>): CadenceMotion {
+export function useCadenceMotion(ref?: RefObject<HTMLElement | SVGElement | null>): CadenceMotion {
   const context = useContext(CadenceContext);
   const root = useRootMotionScope();
   const inherited = context?.scope ?? root;
@@ -200,7 +200,7 @@ export function useCadenceMotion(ref?: RefObject<HTMLElement | null>): CadenceMo
 }
 
 /** Bind a real part without replacing its caller's React 19 cleanup ref. */
-export function useCadenceMotionScope<T extends HTMLElement>(externalRef?: Ref<T>) {
+export function useCadenceMotionScope<T extends HTMLElement | SVGElement>(externalRef?: Ref<T>) {
   const node = useRef<T | null>(null);
   const [, attached] = useState<T | null>(null);
   const cm = useCadenceMotion(node);

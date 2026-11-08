@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "old-completion": {
+    "find": "generation.current === epoch && current.current",
+    "replace": "current.current",
+    "expected": "old completion cannot mark its synchronously started successor settled"
+  }
+}

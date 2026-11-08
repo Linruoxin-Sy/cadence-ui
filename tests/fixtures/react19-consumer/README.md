@@ -19,8 +19,13 @@ mock hooks, or patch dependencies. `main.tsx.txt` is an executable fixture templ
 to main.tsx during preparation, outside the host TypeScript compilation.
 
 The production browser runner tests StrictMode, three adapters, actual OTP typing, all
-three modes and both OS settings, running cancellation, same-target clock changes,
+three modes and both OS settings, running cancellation, same-target physics clock changes,
 unrelated committed renders, stable DOM/focus, native drag and ref cleanup. It records
 real WAAPI state for the adapters and computed per-frame OTP behavior (OTP uses Motion's
 JS driver here). It does not certify all React versions or the whole library. Use the
 normal B3 suite for the Next SSR/hydration paths under installed React 19.3.1.
+
+The generic adapters deliberately select `layout.move` physics so the retained positive-clock
+assertion proves full-mode retiming. Its reduced finite opacity fallback instead retains its running
+handle on a positive clock edit. Finite action clocks capture their start timing; the shared policy browser
+fixture in `tests/runtime/motion-policy.mjs` covers that separate contract and composed CSS owners.

@@ -126,6 +126,7 @@ export type Recipe =
   | "number.roll"
   | "data.transition"
   | "state.morph"
+  | "state.color"
   | "geometry.resize"
   | "handoff"
   | "feedback.press";
@@ -182,6 +183,7 @@ const recipes: Record<Recipe, RecipeSpec> = {
   "number.roll": { kind: "spring", spring: "snappy" },
   "data.transition": { kind: "tween", duration: "base", ease: "out" },
   "state.morph": { kind: "spring", spring: "morph" },
+  "state.color": { kind: "tween", duration: "fast", ease: "out" },
   "geometry.resize": { kind: "spring", spring: "morph", continuity: "velocity", reduced: "jump" },
   handoff: { kind: "spring", spring: "travel", continuity: "velocity" },
   "feedback.press": { kind: "spring", spring: "press" },
@@ -205,7 +207,7 @@ export function transitionFor(
   const timeScale = options.timeScale ?? 1;
   if (!Number.isFinite(timeScale) || timeScale < 0) throw new RangeError("timeScale must be finite and non-negative");
   if (timeScale === 0) return { duration: 0, delay: 0 };
-  const delay = nonNegative((options.delay ?? 0) * timeScale, "effective delay");
+  const delay = recipe === "state.color" ? 0 : nonNegative((options.delay ?? 0) * timeScale, "effective delay");
   motionMilliseconds(delay);
   const spec = recipes[recipe];
 

@@ -215,6 +215,12 @@ These obligations are inherited by every file; local action tables make their co
 
 ### 3.1 Cancellation, environments and renderer ownership
 
+The shared colour/loop hooks provide staged execution support. Their managed ref must reach the
+actual HTML/SVG owner, including delayed portals and render replacements. Colour palettes require
+verified intermediate readability or immediate fallback; focus/invalid paint is immediate. Shared
+policy evidence does not enable a component `v2` marker while text/number and per-item gates remain
+pending. See [colour adoption](../animation-system.md#35-colour-feedback).
+
 These rules cover every catalogue file and belong to the shared executor acceptance, not 59 private
 implementations. Each controller is scoped to its actual part and committed semantic revision. Only
 committed changes start work: discarded/concurrent React renders and development effect replay must

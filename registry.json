@@ -85,6 +85,16 @@
           "path": "registry/cadence/lib/motion-scope.tsx",
           "type": "registry:lib",
           "target": "@components/cadence/lib/motion-scope.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/css-motion.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/css-motion.ts"
+        },
+        {
+          "path": "registry/cadence/lib/motion-environment.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/motion-environment.ts"
         }
       ]
     },

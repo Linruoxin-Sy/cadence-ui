@@ -46,6 +46,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | toggle | `@components/cadence/toggle/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)

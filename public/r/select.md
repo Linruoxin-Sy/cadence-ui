@@ -46,6 +46,8 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 | cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | select | `@components/cadence/select/index.tsx` | [JSON files[].content](https://cadence.dev/r/select.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -664,6 +666,9 @@ label meet at the same position. Keyboard selection has no origin, so it changes
 without a flight; the pointer keeps the spatial handoff.
 The portalled flight label uses its natural text width, so a longer selection stays fully visible
 even if Base UI has not yet committed the destination label when its position is measured.
+Hiding the document or printing settles the current transfer internally and restores the value's
+intrinsic width and visibility. Selection, focus and native timing remain unchanged; restoring the
+page does not replay the consumed flight.
 
 Each portal resolves token durations from its local provider, including `full` nested inside
 `none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel

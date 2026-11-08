@@ -167,6 +167,8 @@ import {Button} from '@/registry/cadence/button';
 import {Spinner} from '@/registry/cadence/spinner';
 import {CadenceProvider} from '@/registry/cadence/lib/provider';
 import {expectMotionContract} from '@/tests/motion-contract';\n`;
+      const colorImports = `import {useRef} from 'react';import {useStateColor} from '@/registry/cadence/lib/css-motion';import {useCadenceMotion} from '@/registry/cadence/lib/provider';function Color(){const ref=useRef(null);const cm=useCadenceMotion(ref);const color=useStateColor(ref,cm,['color']);return <span {...color} data-slot="local-color">State</span>}`;
+      const loopImports = `import {useContinuousMotion} from '@/registry/cadence/lib/css-motion';import {useCadenceMotion} from '@/registry/cadence/lib/provider';function Loop(){const cm=useCadenceMotion();const loop=useContinuousMotion(undefined,cm,'pulse');return <div {...loop} data-slot="local-loop">Loading</div>}`;
       const cases = {
         button: `it('unused import',()=>{expect(true).toBe(true)});`,
         toggle: `it('dead call',()=>{if(false) expectMotionContract('full'); expect(true).toBe(true)});`,
@@ -175,14 +177,40 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         spinner: `it.each(['full','reduced','none'])('positive %s',(mode)=>{render(<CadenceProvider mode={mode}><Spinner/></CadenceProvider>);expectMotionContract(mode)});`,
         badge: `it('T0 needs no helper',()=>{expect(true).toBe(true)});`,
         label: `it('static v2 cannot bypass the migration gate',()=>{expect(true).toBe(true)});`,
+        card: `it.each(['full','reduced','none'])('another recipe cannot certify new colour %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
+        input:
+          colorImports +
+          `it.each(['full','reduced','none'])('executed colour needs explicit policy evidence %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button><Color/></CadenceProvider>);expectMotionContract(mode)});`,
+        skeleton:
+          loopImports +
+          `it.each(['full','reduced','none'])('undeclared loop cannot bypass policy %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button><Loop/></CadenceProvider>);expectMotionContract(mode)});`,
       };
       for (const [id, source] of Object.entries(cases))
         await writeFile(path.join(fixture, `tests/components/${id}.test.tsx`), imports + source);
       // Run the actual reporter against isolated markers, without mutating the repository.
       await mkdir(path.join(fixture, "docs/motion/components"), { recursive: true });
       await mkdir(path.join(fixture, "scripts"), { recursive: true });
-      for (const file of ["registry.json", "scripts/motion-migration.mjs", "tests/motion-contract-reporter.mjs"])
+      for (const file of [
+        "registry.json",
+        "scripts/motion-migration.mjs",
+        "scripts/motion-manifest.mjs",
+        "tests/motion-contract-reporter.mjs",
+      ])
         await writeFile(path.join(fixture, file), await readFile(path.join(root, file), "utf8"));
+      const stagedRegistry = JSON.parse(await readFile(path.join(fixture, "registry.json"), "utf8"));
+      for (const id of ["card", "input"])
+        stagedRegistry.items.find((item: { name: string }) => item.name === id).meta.motion = [
+          { recipe: "state.color", form: "css-transition" },
+        ];
+      const loopItem = stagedRegistry.items.find((item: { name: string }) => item.name === "skeleton");
+      loopItem.meta.motion = [];
+      loopItem.files = [{ path: "registry/cadence/skeleton/index.tsx" }];
+      await mkdir(path.join(fixture, "registry/cadence/skeleton"), { recursive: true });
+      await writeFile(
+        path.join(fixture, "registry/cadence/skeleton/index.tsx"),
+        'import {useContinuousMotion} from "../lib/css-motion";function Part(){const loop=useContinuousMotion(ref,cm,"pulse");return <div {...loop} data-slot="skeleton"/>}',
+      );
+      await writeFile(path.join(fixture, "registry.json"), JSON.stringify(stagedRegistry));
       for (const id of Object.keys(cases)) {
         let contract = await readFile(path.join(root, `docs/motion/components/${id}.md`), "utf8");
         if (["spinner", "label"].includes(id))
@@ -207,6 +235,9 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       expect(output).not.toContain("badge: execute expectMotionContract");
       for (const id of ["spinner", "label"])
         expect(output).toContain(`${id}: v2 enforcement is not implemented; legacy evidence cannot certify v2`);
+      for (const id of ["card", "input"])
+        expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
+      expect(output).toContain("skeleton: execute loop policy in full, reduced, none");
     } finally {
       await rm(fixture, { recursive: true, force: true });
     }

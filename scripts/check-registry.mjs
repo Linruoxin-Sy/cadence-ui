@@ -242,7 +242,7 @@ for (const item of registry.items) {
     const called = [...new Set(sources.flatMap(calledRecipes))];
 
     for (const { recipe, form } of declared) {
-      const implemented = [...sources, ...dependencySources]
+      const implemented = (recipe === "state.color" ? sources : [...sources, ...dependencySources])
         .map((source) => implementedForm(source, recipe, form))
         .find(Boolean);
       if (!implemented) {

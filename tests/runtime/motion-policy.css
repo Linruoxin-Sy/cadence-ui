@@ -1,0 +1,97 @@
+body {
+  margin: 20px;
+  background: white;
+  color: #111;
+}
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+.paint {
+  background: #fff;
+  color: #111;
+  border: 2px solid #666;
+  box-shadow: 0 0 0 2px rgb(100 100 100 / 0.1);
+  padding: 12px;
+  fill: #111;
+  stroke: #333;
+}
+.paint[data-paint="true"] {
+  background: #eee;
+  color: #222;
+  border-bottom-color: #444;
+  box-shadow: 0 0 0 2px rgb(30 30 30 / 0.3);
+  fill: #333;
+  stroke: #555;
+}
+.paint:focus {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+  border-bottom-color: #dc2626;
+  box-shadow: 0 0 0 5px rgb(20 20 20 / 0.5);
+}
+.paint[aria-invalid="true"] {
+  border-bottom-color: #dc2626;
+}
+.activity {
+  width: 40px;
+  height: 40px;
+  background: #ddd;
+  fill: none;
+  stroke: #111;
+}
+.css-popup {
+  opacity: 1;
+  scale: 1;
+}
+.css-popup[data-starting-style] {
+  opacity: 0;
+  scale: 0.96;
+}
+.css-popup[data-motion="reduced"] {
+  scale: 1;
+}
+.css-popup[data-motion="none"] {
+  opacity: 1;
+  scale: 1;
+}
+.dark .paint {
+  background: #242424;
+  color: #eee;
+}
+.dark .paint[data-paint="true"] {
+  background: #181818;
+  color: #ddd;
+}
+
+.foreign-color {
+  transition: transform 2s linear 0.2s;
+}
+.foreign-loop {
+  animation: foreign-orbit 3s linear infinite;
+}
+@keyframes foreign-orbit {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(20px);
+  }
+}
+
+.paint.class-paint {
+  background: #eee;
+  color: #222;
+  border-bottom-color: #444;
+  box-shadow: 0 0 0 2px rgb(30 30 30 / 0.3);
+}
+
+.dim-status {
+  opacity: 0.35;
+}
+
+.paint.unsafe-shadow {
+  box-shadow: 0 0 0 14px rgb(30 30 30 / 0.3);
+}

@@ -14,6 +14,11 @@
  * sides can be compared.
  */
 
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+let compiler;
+
 /** Installed forms only. docs/motion target recipe/form references do not extend this list. */
 export const MOTION_FORMS = ["one-shot", "continuous", "css-transition"];
 
@@ -72,9 +77,12 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  if (recipe === "state.color")
+    return form === "css-transition" && cssPolicyImplementation(source, "useStateColor") ? "css-transition" : null;
   const called = source.includes(`transition("${recipe}")`) || source.includes(`transition('${recipe}')`);
 
   if (form === "continuous") {
+    if (recipe === "data.transition" && cssPolicyImplementation(source, "useContinuousMotion")) return "continuous";
     const loop = /\banimate-(?!none\b)[a-z][a-z-]*\b/.test(source);
     const gated = /\banimate-none\b/.test(source);
     return loop && gated ? "continuous" : null;
@@ -119,5 +127,120 @@ export function implementedForm(source, recipe, form = "one-shot") {
 
 /** Every `cm.transition("<recipe>")` call in a source file. */
 export function calledRecipes(source) {
-  return [...source.matchAll(/transition\(\s*["']([a-z][a-z.]*)["']/g)].map((match) => match[1]);
+  return [...source.matchAll(/transition\(\s*["']([a-z][a-z.]*)["']/g)]
+    .map((match) => match[1])
+    .concat(
+      cssPolicyImplementation(source, "useStateColor") ? ["state.color"] : [],
+      cssPolicyImplementation(source, "useContinuousMotion") ? ["data.transition"] : [],
+    );
+}
+
+export function cssPolicyCapabilities(source) {
+  return [
+    ...(cssPolicyImplementation(source, "useStateColor") ? ["color"] : []),
+    ...(cssPolicyImplementation(source, "useContinuousMotion") ? ["loop"] : []),
+  ];
+}
+
+/** Structural local adoption only; successful runtime evidence remains mandatory. */
+function cssPolicyImplementation(source, helper) {
+  if (!source.includes("css-motion")) return false;
+  compiler ??= require("typescript");
+  const ts = compiler;
+  const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const imports = new Map();
+  for (const statement of tree.statements) {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      !ts.isStringLiteral(statement.moduleSpecifier) ||
+      !/(?:^|\/)css-motion$/.test(statement.moduleSpecifier.text) ||
+      !statement.moduleSpecifier.text.startsWith(".")
+    )
+      continue;
+    const bindings = statement.importClause?.namedBindings;
+    if (bindings && ts.isNamedImports(bindings))
+      for (const item of bindings.elements) {
+        const kind = item.propertyName?.text ?? item.name.text;
+        if (["useStateColor", "useContinuousMotion"].includes(kind) && !item.isTypeOnly)
+          imports.set(item.name.text, kind);
+      }
+  }
+  const owners = new Map();
+  const colors = new Set([
+    "background-color",
+    "color",
+    "border-top-color",
+    "border-right-color",
+    "border-bottom-color",
+    "border-left-color",
+    "fill",
+    "stroke",
+    "text-decoration-color",
+    "box-shadow",
+    "text-shadow",
+  ]);
+  const walk = (node) => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      ts.isCallExpression(node.initializer) &&
+      ts.isIdentifier(node.initializer.expression) &&
+      imports.has(node.initializer.expression.text)
+    ) {
+      const kind = imports.get(node.initializer.expression.text);
+      const selected = node.initializer.arguments[2];
+      const valid =
+        kind === "useStateColor"
+          ? selected &&
+            ts.isArrayLiteralExpression(selected) &&
+            selected.elements.length &&
+            selected.elements.every((value) => ts.isStringLiteral(value) && colors.has(value.text)) &&
+            new Set(selected.elements.map((value) => value.text)).size === selected.elements.length
+          : selected && ts.isStringLiteral(selected) && ["spin", "pulse"].includes(selected.text);
+      const external = node.initializer.arguments[0];
+      const parent =
+        external &&
+        ts.isPropertyAccessExpression(external) &&
+        external.name.text === "ref" &&
+        ts.isIdentifier(external.expression)
+          ? external.expression.text
+          : null;
+      if (valid) owners.set(node.name.text, { kind, parent });
+    }
+    ts.forEachChild(node, walk);
+  };
+  walk(tree);
+  let used = false;
+  const jsx = (node) => {
+    if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))
+      for (const owner of owners.keys()) {
+        const attrs = node.attributes.properties;
+        const spread = attrs.findIndex(
+          (attr) => ts.isJsxSpreadAttribute(attr) && ts.isIdentifier(attr.expression) && attr.expression.text === owner,
+        );
+        if (spread < 0) continue;
+        const override = attrs
+          .slice(spread + 1)
+          .some(
+            (attr) =>
+              ts.isJsxSpreadAttribute(attr) ||
+              (ts.isJsxAttribute(attr) &&
+                attr.name.getText(tree) === "ref" &&
+                attr.initializer?.getText(tree) !== `{${owner}.ref}`),
+          );
+        if (override) continue;
+        const visited = new Set();
+        let current = owner;
+        while (current && owners.has(current) && !visited.has(current)) {
+          visited.add(current);
+          const entry = owners.get(current);
+          if (entry.kind === helper) used = true;
+          current = entry.parent;
+        }
+      }
+    ts.forEachChild(node, jsx);
+  };
+  jsx(tree);
+  return used;
 }

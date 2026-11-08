@@ -1,11 +1,16 @@
-// Legacy runtime assertions. The reporter rejects a v2 marker until stricter
-// colour/text/number/loop observers and migrated source/docs land together.
+// Staged colour/loop evidence does not certify pending text/number/component adoption.
+import { readFileSync } from "node:fs";
 import { expect, onTestFinished } from "vitest";
-import { controlSamples, imperativeSamples, motionSamples, type Sample } from "./motion-observer";
+import { targetMetadata } from "../scripts/motion-migration.mjs";
+import { controlSamples, cssPolicySamples, imperativeSamples, motionSamples, type Sample } from "./motion-observer";
+
+const legacySpinner =
+  targetMetadata(readFileSync("docs/motion/components/spinner.md", "utf8")).metadata?.migration === "legacy";
 
 declare module "vitest" {
   interface TaskMeta {
     cadenceModes?: string[];
+    cadencePolicy?: Record<string, string[]>;
   }
 }
 
@@ -39,10 +44,11 @@ export function expectMotionContract(
     parts?: (Element | null)[];
     /** Required for engine/imperative writers that cannot be read from DOM/Motion props. */
     behavior?: () => void;
+    policy?: ("color" | "loop")[];
   } = {},
 ) {
   for (const part of options.parts ?? []) expect(part).toBeInTheDocument();
-  const nodes = [...(options.root ?? document).querySelectorAll<HTMLElement>("[data-motion][data-slot]")];
+  const nodes = [...(options.root ?? document).querySelectorAll<HTMLElement | SVGElement>("[data-motion][data-slot]")];
   expect(nodes.length, "render an animated part before asserting its contract").toBeGreaterThan(0);
   for (const node of nodes) {
     expect(node).toHaveAttribute("data-motion", mode);
@@ -60,7 +66,8 @@ export function expectMotionContract(
       expect(
         loops.every(
           (c) =>
-            ["animate-pulse", "animate-none"].includes(c) || (c === "animate-spin" && node.dataset.slot === "spinner"),
+            ["animate-pulse", "animate-none"].includes(c) ||
+            (c === "animate-spin" && node.dataset.slot === "spinner" && legacySpinner),
         ),
       ).toBe(true);
     if (
@@ -108,7 +115,10 @@ export function expectMotionContract(
   }
   const css = nodes.some((n) => /animate-|duration-0|transition-(opacity|\[|none)/.test(n.getAttribute("class") ?? ""));
   expect(
-    observed > 0 || css || Boolean(options.behavior),
+    observed > 0 ||
+      css ||
+      Boolean(options.behavior) ||
+      [...cssPolicySamples.values()].some((sample) => sample.ref.current && nodes.includes(sample.ref.current)),
     "no observable motion writer; supply an engine/imperative behavior assertion",
   ).toBe(true);
   if (options.behavior) {
@@ -116,8 +126,48 @@ export function expectMotionContract(
     options.behavior();
     expect(expect.getState().assertionCalls, "behavior must execute assertions").toBeGreaterThan(before);
   }
+  for (const kind of options.policy ?? []) {
+    const samples = [...cssPolicySamples.values()].filter(
+      (sample) => sample.kind === kind && sample.ref.current && nodes.includes(sample.ref.current),
+    );
+    expect(samples.length, `execute an actual ${kind} owner before claiming policy evidence`).toBeGreaterThan(0);
+    const ownership = new Map<HTMLElement | SVGElement, Set<string>>();
+    for (const sample of samples) {
+      const node = sample.ref.current as HTMLElement | SVGElement;
+      expect(sample.controller()?.node, `actual ${kind} connection`).toBe(node);
+      expect(sample.controller()?.allowed, `active ${kind} owner; caller CSS cannot certify shared execution`).toBe(
+        true,
+      );
+      expect(sample.mode).toBe(mode);
+      const owned = ownership.get(node) ?? new Set<string>();
+      for (const property of sample.properties) {
+        expect(owned.has(property), `duplicate ${property} owner`).toBe(false);
+        owned.add(property);
+      }
+      ownership.set(node, owned);
+      const style = getComputedStyle(node);
+      if (kind === "color") {
+        expect(style.transitionProperty.split(/,\s*/), "explicit colour properties").toEqual(sample.properties);
+        expect(style.transitionDelay).toBe("0s");
+        expect(style.transitionProperty).not.toContain("all");
+        const immediate =
+          node === node.ownerDocument.activeElement ||
+          node.contains(node.ownerDocument.activeElement) ||
+          node.matches('[aria-invalid="true"], [data-invalid]:not([data-invalid="false"])');
+        expect(parseFloat(style.transitionDuration)).toBe(mode === "none" || immediate ? 0 : sample.seconds);
+        expect(style.transitionProperty).not.toMatch(/outline|border-width|filter|opacity/);
+      } else if (mode !== "full") {
+        expect(node.style.animation, "v2 reduced/none status is static").toBe("none");
+        expect((node.getAnimations?.() ?? []).filter((animation) => "animationName" in animation)).toHaveLength(0);
+      } else expect(node.style.animation).toMatch(/^(?:none|var\(--animate-(?:spin|pulse)\))$/);
+    }
+  }
   onTestFinished(({ task }) => {
     const modes = (task.meta.cadenceModes ?? []) as string[];
     task.meta.cadenceModes = [...new Set([...modes, mode])];
+    for (const kind of options.policy ?? []) {
+      task.meta.cadencePolicy ??= {};
+      task.meta.cadencePolicy[kind] = [...new Set([...(task.meta.cadencePolicy[kind] ?? []), mode])];
+    }
   });
 }

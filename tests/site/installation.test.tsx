@@ -50,10 +50,12 @@ describe("shared installation plan", () => {
       }
     }
     const button = installationPlan(registry.items, "button");
-    expect(button.files).toHaveLength(10);
+    expect(button.files).toHaveLength(12);
     expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/geometry.ts");
     expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/motion-scope.tsx");
-    expect(button.items.find((item) => item.name === "cadence-provider")?.files).toHaveLength(6);
+    expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/css-motion.ts");
+    expect(button.files.map((file) => file.target)).toContain("@components/cadence/lib/motion-environment.ts");
+    expect(button.items.find((item) => item.name === "cadence-provider")?.files).toHaveLength(8);
     expect(button.dependencies).toEqual(
       expect.arrayContaining(["clsx", "tailwind-merge", "motion", "@base-ui/react", "class-variance-authority"]),
     );

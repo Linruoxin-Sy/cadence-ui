@@ -17,6 +17,8 @@ import {
   motionTokenEntries,
 } from "./motion";
 
+type MotionElement = HTMLElement | SVGElement;
+
 const entries = motionTokenEntries();
 const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
 const TOKEN_EVENT = "cadence:motion-tokens";
@@ -24,12 +26,12 @@ const probes = new WeakMap<Document, { host: HTMLElement; probe: HTMLElement }>(
 const localConnections = new WeakMap<object, () => void>();
 
 /** Ref cleanup is immediate even when a primitive detaches inside its own commit. */
-export function disconnectMotionTokenScope(ref: RefObject<HTMLElement | null>) {
+export function disconnectMotionTokenScope(ref: RefObject<MotionElement | null>) {
   localConnections.get(ref)?.();
   localConnections.delete(ref);
 }
 
-function isolatedProbe(doc: Document, context: CSSStyleDeclaration, owner: HTMLElement) {
+function isolatedProbe(doc: Document, context: CSSStyleDeclaration, owner: MotionElement) {
   let value = probes.get(doc);
   if (!value) {
     const host = doc.createElement("span");
@@ -61,7 +63,7 @@ export interface MotionScopeSnapshot {
   effectiveDurations: EffectiveMotionDurations;
   supported: boolean;
   signature: string;
-  owner: HTMLElement | null;
+  owner: MotionElement | null;
   ready: boolean;
 }
 
@@ -69,7 +71,7 @@ function snapshot(
   tokens: MotionTokenValues,
   effectiveDurations: EffectiveMotionDurations,
   supported: boolean,
-  owner: HTMLElement | null = null,
+  owner: MotionElement | null = null,
   ready = true,
 ): MotionScopeSnapshot {
   return {
@@ -115,7 +117,7 @@ const simpleNumber = /^[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i;
 const simpleUnit = /^([-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)\s*(ms|s|px|deg)$/i;
 
 /** Committed client read only. No rectangle reads, rendering engines or animation writers. */
-export function readMotionTokenScope(element: HTMLElement, inherited = defaultMotionScope): MotionScopeSnapshot {
+export function readMotionTokenScope(element: MotionElement, inherited = defaultMotionScope): MotionScopeSnapshot {
   const view = element.ownerDocument.defaultView;
   if (!view) return inherited;
   const css = view.getComputedStyle(element);
@@ -182,7 +184,7 @@ export function readMotionTokenScope(element: HTMLElement, inherited = defaultMo
       }
     }
     const effectiveDurations = { ...inherited.effectiveDurations };
-    const ancestors: HTMLElement[] = [];
+    const ancestors: MotionElement[] = [];
     // A portal's physical document ancestors must not override its logical owner.
     const transport = element.closest<HTMLElement>("[data-cadence-scope]");
     const boundary = inherited.owner
@@ -190,7 +192,7 @@ export function readMotionTokenScope(element: HTMLElement, inherited = defaultMo
         ? inherited.owner
         : (transport ?? element).parentElement
       : null;
-    for (let node: HTMLElement | null = element; node && node !== boundary; node = node.parentElement)
+    for (let node: MotionElement | null = element; node && node !== boundary; node = node.parentElement)
       ancestors.push(node);
     for (const node of ancestors.reverse()) {
       const style = node === element ? css : view.getComputedStyle(node);
@@ -216,7 +218,7 @@ function tokenStyle(text: string | null) {
     .join(";");
 }
 
-function observeScope(element: HTMLElement, refresh: () => void, root = false) {
+function observeScope(element: MotionElement, refresh: () => void, root = false) {
   const doc = element.ownerDocument;
   const view = doc.defaultView;
   if (!view) return () => {};
@@ -230,7 +232,7 @@ function observeScope(element: HTMLElement, refresh: () => void, root = false) {
     )
       refresh();
   });
-  for (let node: HTMLElement | null = element; node; node = node.parentElement)
+  for (let node: MotionElement | null = element; node; node = node.parentElement)
     observer.observe(node, {
       attributes: true,
       attributeOldValue: true,
@@ -330,11 +332,11 @@ function localScopeStore(initial: MotionScopeSnapshot) {
   };
 }
 
-export function useLocalMotionScope(ref: RefObject<HTMLElement | null> | undefined, inherited: MotionScopeSnapshot) {
+export function useLocalMotionScope(ref: RefObject<MotionElement | null> | undefined, inherited: MotionScopeSnapshot) {
   const [store] = useState(() => localScopeStore(inherited));
   const value = useSyncExternalStore(store.subscribe, store.read, store.server);
   const parent = useRef(inherited);
-  const observed = useRef<{ node: HTMLElement; stop: () => void } | null>(null);
+  const observed = useRef<{ node: MotionElement; stop: () => void } | null>(null);
   committed(() => {
     parent.current = inherited;
     const node = ref?.current;

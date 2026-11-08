@@ -1,12 +1,18 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useStateColor } from "@/registry/cadence/lib/css-motion";
+import { coordinateMotionTheme } from "@/registry/cadence/lib/motion-environment";
+import { useCadenceMotion } from "@/registry/cadence/lib/provider";
 
 /** Toggles the `dark` class and remembers the choice. Safe before and after hydration. */
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
   const [dark, setDark] = useState(false);
+  const ref = useRef<HTMLButtonElement>(null);
+  const cm = useCadenceMotion(ref);
+  const color = useStateColor(ref, cm, ["background-color", "color"]);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -19,7 +25,7 @@ export function ThemeToggle() {
   const toggle = () => {
     const next = !dark;
     setDark(next);
-    document.documentElement.classList.toggle("dark", next);
+    coordinateMotionTheme(document, () => document.documentElement.classList.toggle("dark", next));
     try {
       localStorage.setItem("cadence-theme", next ? "dark" : "light");
     } catch {
@@ -29,11 +35,12 @@ export function ThemeToggle() {
 
   return (
     <button
+      {...color}
       type="button"
       onClick={toggle}
       aria-label="Toggle color theme"
       aria-pressed={dark}
-      className="inline-flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="inline-flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {mounted && dark ? <Sun aria-hidden="true" className="size-4" /> : <Moon aria-hidden="true" className="size-4" />}
     </button>

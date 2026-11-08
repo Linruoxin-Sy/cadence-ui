@@ -72,9 +72,27 @@ writing durations inline.
 | `number.roll` | numeric values | snappy spring |
 | `data.transition` | skeletons, loading surfaces | opacity loop (CSS), 0.22s when one-shot |
 | `state.morph` | checkbox, radio, switch, input-otp | morph spring |
+| `state.color` | Scoped background, foreground, border and SVG colour feedback | Explicit CSS properties; reduced shortens timing; none cancels active duration/delay |
 | `geometry.resize` | accordion, button width, select trigger | morph spring, physics, clamped |
 | `handoff` | select value, toast origin | travel spring, physics |
 | `feedback.press` | buttons | press spring |
+
+## Scoped colour and status policy
+
+The provider library includes shared CSS execution support for `state.color` and theme-clock
+spin/pulse status. Components adopt it individually; each component's Motion contract remains the
+source of its delivered behavior. AnimatedText, AnimatedNumber, Reveal and RevealGroup remain planned.
+
+A colour owner names its background, foreground, individual borders or SVG fill/stroke. Focus and
+invalid indicators update immediately. Foreground/background animation requires a reviewed palette
+with readable intermediate colours; the executor defaults to immediate paint without that proof.
+Shadow feedback retains fixed geometry. A conflicting caller CSS transition/animation family keeps
+its writer through mode/clock edits; removing the override restores shared ownership.
+
+Migrated continuous owners use theme `--animate-*` clocks independently of provider timeScale.
+They stop in reduced/none and while hidden/offscreen, then resume eligible full activity without
+replaying missed work. Caller dimming remains static. Spinner and Skeleton still document their
+legacy reduced behavior. Native intent delays, Toast lifetime, focus and direct input keep their timing.
 
 ## Reduced motion
 
@@ -115,10 +133,13 @@ export function Example() {
 Five rules for new components:
 
 1. Import presets from `../lib/motion`; never hard-code a duration.
-2. Animate transform, opacity, or filter only. Height is allowed for disclosures, and measured
-   width/height only through `geometry.resize` (clamped to the closed size, instant under reduced).
-   Explicit section navigation may animate native scroll offsets through `scroll.navigate`.
-3. Give every animation a reduced branch (opacity only, or none).
+2. Use explicit recipe properties: transform, opacity or bounded filter for visual motion,
+   clamped `geometry.resize` for measured width/height, and `scroll.navigate` for section offsets.
+   Shared `state.color` owns its declared colour/shadow properties, with verified readability or
+   immediate fallback. Never use `transition: all`.
+3. Give every animation an explicit reduced branch: applicable short opacity/colour feedback,
+   immediate spatial targets and static migrated loops. None cancels owned duration and delay.
+   Shared support does not certify an unmigrated component or install the planned public primitives.
 4. Use `data-slot` on each part so consumers can target it with CSS.
 5. Add a Motion contract table to the component's docs.
 
@@ -165,20 +186,27 @@ resetting the header's mode:
 
 | Metric | Budget |
 | --- | --- |
-| Motion runtime | ≈ 43 KB gzip (Motion full); optional LazyMotion path ~30 KB |
-| Per-component JS | by tier: T0 4 KB, T1 6 KB, T2 10 KB, T3 12 KB, T4 14 KB gzip (`meta.tier`) |
+| Initial Motion runtime | ≤ 48000 B gzip |
+| Component addition | ≤ 8000 B gzip, declared shared runtime excluded |
+| Complete-page initial JS | ≤ 120000 B gzip, including automatic async loads |
+| Copied source | by tier: T0 4 KB, T1 6 KB, T2 10 KB, T3 12 KB, T4 14 KB gzip (`meta.tier`) |
+| Layout stability | CLS < 0.02 |
+| Presented frame rate | ≥ 55 fps on a real midrange mobile device |
 | Concurrent animated elements | ≤ 20 |
 | Total stagger | ≤ 400 ms |
-| Animated properties | transform, opacity, filter |
+| Animated properties | explicit recipe properties: visual transform/opacity/bounded filter, measured geometry and scoped colour; documented native engine/scroll exceptions |
 
 Run `pnpm registry:check` before opening a pull request; it enforces the per-item size budget
 and the reduced-motion branch.
+
+These are acceptance limits. Existing complete-route JavaScript failures and missing real-device
+evidence remain unresolved; shared policy support does not certify performance acceptance.
 
 `timeScale` accepts finite non-negative numbers. `0` makes newly started or retargeted
 recipes immediate (including springs and delays), while preserving the mode and its
 target pose. It inherits through nested providers and can override a positive clock
 on a nested provider or a single `cm.transition()` call. Negative and non-finite
 clock values throw `RangeError`. Continuous CSS loops retain their theme clock.
-Existing native CSS transitions are not promised live retiming on clock changes;
-`none` retains its separate cancellation behavior. A Motion consumer must observe
-clock changes to retarget an unchanged target; see the runtime audit for proven scope.
+Shared executors cancel existing owned writers at zero or a mode downgrade, including unchanged
+targets. Finite positive action clocks stay captured; physics owners retime from current paint.
+Other component/engine adapters still need their own adoption evidence.

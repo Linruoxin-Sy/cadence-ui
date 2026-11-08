@@ -8,6 +8,9 @@ export default defineConfig({
     alias: { "@": path.resolve(process.cwd()) },
   },
   test: {
+    // Registry CLI fixtures and the nested real Vitest run share CPU and disk
+    // with this pool. Bound contention; retain their original deadlines.
+    maxWorkers: 4,
     reporters: ["default", "./tests/motion-contract-reporter.mjs"],
     environment: "jsdom",
     globals: true,

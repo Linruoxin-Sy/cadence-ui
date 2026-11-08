@@ -236,8 +236,10 @@ existing performance task is a final delivery dependency, not a development prer
 - Pending runtime migration: update `scripts/motion-manifest.mjs`, `scripts/motion-docs.mjs`, `scripts/check-registry.mjs`,
   `scripts/catalog-intensity.mjs`, scaffold/template checks and corresponding fixtures for the new
   recipe forms and temporary tier/budget semantics. Preserve source/metadata/docs equality.
-- Pending runtime migration: extend `tests/motion-contract.tsx`, the observer and reporter to cover colours, text/number
-  controllers, continuous reduced cancellation and actual successful mode assertions.
+- Shared colour/loop policy has executed-hook observer/helper/reporter support, including rejected
+  disconnected refs, missing capability evidence and legacy loop drift. Finite shared owners cancel
+  restrictions and capture positive clocks; physics owners retime. Individual component adoption
+  and text/number enforcement remain pending; the total v2 marker remains fail-closed.
 - Target reference metadata explicitly records `migration: "legacy"`; absent/unknown state fails.
   Registry checking and the runtime reporter reject `v2` until strict enforcement support exists.
   Legacy items still prove their documented baseline. Next, enable shared target assertion support,

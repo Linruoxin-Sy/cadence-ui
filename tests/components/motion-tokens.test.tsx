@@ -159,6 +159,7 @@ const allRecipes: Recipe[] = [
   "number.roll",
   "data.transition",
   "state.morph",
+  "state.color",
   "geometry.resize",
   "handoff",
   "feedback.press",
@@ -170,6 +171,16 @@ it.each(allRecipes)("%s has a real zero clock without spring fallback or delay",
 });
 it("direct physical zero duration never divides by zero", () => {
   expect(physicalSpring(0)).toEqual({ duration: 0 });
+});
+it("state.color uses explicit short token clocks and never a presentation delay", () => {
+  expect(transitionFor("state.color", "full", { timeScale: 4, delay: 9 })).toMatchObject({
+    duration: duration.fast * 4,
+    delay: 0,
+  });
+  expect(transitionFor("state.color", "reduced", { delay: 9 })).toMatchObject({
+    duration: duration.fast * 0.6,
+    delay: 0,
+  });
 });
 it.each([-1, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])("rejects invalid clock %s", (clock) => {
   expect(() => physicalSpring(clock)).toThrow(RangeError);

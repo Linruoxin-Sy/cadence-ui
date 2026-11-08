@@ -3,6 +3,7 @@
 import { type MotionProps, motion } from "motion/react";
 import { type ComponentProps, type ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useControlAnimation } from "./control-animation";
+import type { CadenceMode } from "./motion";
 
 type NativeEvents = Pick<ComponentProps<"button">, "onAnimationStart" | "onDrag" | "onDragStart" | "onDragEnd">;
 
@@ -106,6 +107,7 @@ export function PressButton({
   const controls = useControlAnimation(
     { scale: pressed && !disabled && typeof pressScale === "number" ? pressScale : 1 },
     disabled || !whileTap ? { duration: 0 } : transition,
+    mode as CadenceMode,
   );
   return (
     <MotionNativeButton
