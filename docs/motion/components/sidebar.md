@@ -95,11 +95,29 @@ Each actual shell/inset/submenu, item/action/rail and label/badge paint region f
 
 ## Geometry and performance
 
+The continuous page-inset reflow below remains subordinate to the shared focused-editor rule.
+Before a known collapse transaction, check the actual owned Sidebar/Inset focus region: if the
+coupled change would move an editor's caret/content box/scroll extent, clip its required content or
+displace a captured native control, settle the affected container/gap/inset transaction together.
+Settling only the gap while the container keeps travelling breaks their one-scalar contract. A
+stationary toggle outside that affected geometry does not automatically suppress the transition.
+Do not scan arbitrary application descendants, move focus or replay the suppressed toggle on blur;
+an unsupported caller layout takes the existing immediate geometry fallback.
+Focus or capture acquired during an active collapse applies the same gate before the next paint;
+native editing/input does not wait for the coupled scalar to finish.
+
 Use the existing sidebar width variables and side/variant rules, not text measurement or new width constants. One coordinator commits the gap and visible-container targets together: geometry.compact owns the width result and layout.sidebar projects the corresponding translation from that same scalar, with one writer per property. Neither uses the other's intermediate layout as a new target. Icon collapse uses the same transaction to map container/gap widths, including floating/inset padding and borders. A passive viewport, side, available-space or width-token change cancels obsolete projections and resolves current semantic geometry immediately; a subsequent deliberate toggle starts from that valid geometry. Desktop width change is an explicit shell resize, not observation of every menu row. Clip labels within their own region while keeping the rail, trigger focus rings and portals usable. Submenu and content owners do not cause the sidebar shell to chase their intermediate heights. Preserve scrolling and native input editing.
 
 Navigation labels lay out at their destination inline-size before the separate shell/gap changes width; do not rewrap them on every frame. The page inset may continuously reflow with the changing occupied gap because it must reflect the actual available page width; do not scale its text or add a second inset spring. Mobile delegates natural-content measurement and reflow policy to Sheet.
 
 ## Acceptance scenarios
+
+- Pending: collapse from an external control while a SidebarInput or known Inset editor remains
+  focused, and toggle during a captured resize/control interaction. The dependent scalar settles
+  without caret/scroll drift or mismatched gap/container geometry. Compare a stationary trigger
+  with no affected editor: its eligible collapse still runs. Blur never replays a discarded toggle.
+  Also acquire editor focus midway through an otherwise eligible collapse and verify cancellation
+  of all dependent geometry without delaying that focus or clearing the native interaction.
 
 - Pending: reverse offcanvas/icon transitions for both sides and all variants; inspect matching container and page gap geometry.
 - Pending: resize across the mobile breakpoint during motion, reopen Sheet and navigate a route; no double entrance or stale transform remains.

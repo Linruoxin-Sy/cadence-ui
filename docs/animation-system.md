@@ -863,6 +863,15 @@ If no safe representation exists, omit that outgoing effect while committing the
 retaining eligible incoming/disjoint effects. This does not remove or sanitize a primitive's original
 subtree retained by its supported native presence policy.
 
+Paint-only retention must also be absent from scrollable overflow, native scroll-anchor selection
+and snap destinations. Absolute positioning or a transform alone does not prove that isolation.
+An outgoing row, translated text run or digit cell must not add a scrollbar, enlarge the scroll range
+or cause a second scroll correction when it retires. Use an already safe decorative clip/layer without
+clipping live content, focus outlines or portals; otherwise omit that outgoing/travelling paint.
+Current semantic content still determines natural size and scroll extent. This does not suppress the
+legitimate extent change of a disclosure, size host or native kept-mounted subtree under its existing
+layout policy, and it does not authorize `overflow-anchor: none` on a consumer's whole scroll region.
+
 ### 3.4 Measured size and position
 
 geometry.resize is available wherever appropriate, regardless of legacy tier. Observe natural
@@ -917,6 +926,24 @@ A viewport `getBoundingClientRect()` affected by press, presence or ancestor sca
 CSS layout size. Use intrinsic layout dimensions or an explicit safe coordinate conversion; complex
 transforms or rotation without a safe conversion use immediate native layout. This does not permit
 layout reads on every animation frame.
+
+Position and handoff snapshots also identify their coordinate owner: local layout space, relevant
+scroll host, placement/transform context and current viewport mapping. Never subtract rectangles
+captured in incompatible spaces or reuse an endpoint after its relationship to that owner changes.
+A shared ancestor scrolling both endpoints together does not invalidate a genuinely local selection
+path and does not create a new selection. Differential scrolling, sticky relocation, a portal/anchor
+change or visual-viewport movement that changes the mapping invalidates affected cached projections.
+Settle a local decoration at its current valid native destination; cancel a cross-surface flight and
+expose its already-current destination instead of chasing it or replaying a text effect. Preserve
+native scrolling, capture and scroll restoration. The separately owned `scroll.navigate` flight keeps
+its explicit cancellation rules; its own scroll writes are not a reason to cancel itself.
+
+Use the existing positioning/scroll/visibility owner or a bounded subscription for the active geometry
+scope. Refresh a dirty snapshot in a batched read phase when needed, not by measuring all children or
+both endpoints every animation frame. If the adapter cannot establish a safe conversion, use the
+affected immediate fallback. A keyboard/zoom-driven visual-viewport correction is environment layout,
+not a new content-size or entrance cause. These rules apply to the captured source as well as the
+destination and preserve valid local work on unrelated owners.
 
 Temporary pixel dimensions are presentation constraints, not a new resting layout policy. On
 completion or cancellation, release only the current owner's temporary width/height, min/max and
@@ -1746,15 +1773,17 @@ calendar by the selected value. Month movement follows §3.1.3 unchanged.
 Popover resolves duration.fast locally through the portal with timeScale and
 reducedDurationScale; caller callback classes/styles are evaluated and merged
 last. Full uses opacity and scale, reduced transitions opacity only, none uses
-transition-none/duration-0 and removes hidden starting/ending opacity. Removing
-the scale transition on downgrade cancels an active scale immediately. Nested
+transition-none/duration-0 and removes decorative hidden starting opacity. A closed
+host retained by native policy keeps its correct closed ending paint; `none` does
+not make it visible. Removing the scale transition on downgrade cancels an active
+scale immediately. Nested
 full under outer none restores the local clock, subject to OS reduce. Other popups require their own applicable lifecycle proof.
 
-Site DocumentEntrance treats a consumed entrance as shown even when offscreen: restoring full mode after initial none must not re-hide or replay the same document host. SSR hidden, noscript and print restoration stay unchanged.
-
-The DocumentEntrance note describes the existing site adapter. The new Reveal API follows §3.8's
-visible-first enhancement contract; migrate the site adapter explicitly rather than inferring that
-its existing SSR-hidden strategy already satisfies that contract.
+Site DocumentEntrance follows §3.3's readable SSR/no-JS/hydration baseline. Only a later eligible
+client insertion may enter; returning to full after an initial none or restoring an offscreen document
+must not re-hide or replay that consumed host. Print retains current semantic visibility. An SSR-hidden
+strategy with a noscript repair is not this target contract. Site adoption and browser evidence remain
+tracked by the rollout plan; they do not establish delivery of §3.8's separately planned Reveal API.
 
 ## 12. Technical references
 

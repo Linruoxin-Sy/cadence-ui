@@ -73,6 +73,13 @@ Caller message keys/content revision boundaries define identity; a recycled node
 
 ## Geometry and performance
 
+Appended current text legitimately changes conversation height; outgoing fragments/reaction paint
+must not add a second contribution to scroll overflow or anchoring. In a parent-owned follow/anchor
+composition, that owner consumes current semantic content and the one approved size transaction,
+never obsolete decorative bounds. Without a safe paint lane, replace the affected fragment immediately.
+Bubble does not disable native anchoring, restore an old offset or add an automatic scroll-to-end
+policy to conceal retirement of a visual copy.
+
 Lay out changed text at the destination available width before animating host height, keeping text unscaled and unchanged graphemes stable. Dense append, passive wrapping and viewport/font changes use immediate height. Preserve BubbleContent's existing clipping and wrapping; do not clip the separately positioned reaction overlay or focus outline. Image/attachment reservations prevent decode-driven jumps where the composed child supplies dimensions. Bound text diff to changed safe shaping runs and visible content; rich-renderer identity and the parent conversation's scroll anchoring remain external owners.
 
 Choose BubbleContent or its message host as the size writer for a revision, never both. A nested Attachment or other size owner delegates the cause or supplies its final destination once. If the shell would additionally clip required retained message text, selected text, focused content or copy needed for the current action, apply that axis immediately; geometry is not permission to hide message history. Reaction overlay width/height consumes one final layout; side/align positioning cannot compete with its existing anchor translation or cause the bubble to chase overlay dimensions.
@@ -80,6 +87,10 @@ Choose BubbleContent or its message host as the size writer for a revision, neve
 Long appends use the known append/revision boundary without rescanning the full history; without such a boundary, the shared bounded diff falls back to immediate affected content. There is one message-size measurement and one independent reaction-overlay measurement, no observer per token/reaction. Media readiness follows its composed owner's identity and passive-layout policy. If parent scroll anchoring or viewport constraints make a position transition unsafe, message/reaction placement is immediate; no hidden scroll correction or full-message opacity fallback is allowed.
 
 ## Acceptance scenarios
+
+Also pending: append, edit and remove text while the reader is at the end and while reading older
+messages, then remove outgoing decoration. Compare with the parent's actual follow/anchor policy;
+the current message changes height once, with no extra range or scroll correction from old fragments.
 
 Also pending: switch a plain message between display, inherited editable and plaintext-only contexts
 during append/replacement, then leave editing. Native content/selection/undo survives with no replay

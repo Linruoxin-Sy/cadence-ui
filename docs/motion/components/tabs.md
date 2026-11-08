@@ -66,6 +66,14 @@ Apply the [shared owner precedence](../presets.md#31-effective-modes-and-clock-o
 
 ## Geometry and performance
 
+A scrolling TabsList keeps the marker in the same local content coordinate space as its triggers.
+Do not subtract viewport rectangles and then apply the list's scroll offset again. Native focus-reveal
+scrolling and page scrolling do not constitute a new active-value revision. A valid shared local path
+may continue; a changed sticky/portal/transform mapping settles the affected list/marker projection
+together at its current native destination. Preserve scroll position and use bounded owner-level
+invalidation, not per-frame trigger reads. Marker and outgoing panel paint must not extend scrollable
+overflow or introduce new snap targets; an unsafe decorative path uses immediate placement.
+
 A natural Panel measurement must use its one real content tree or a supported destination supplied
 by the existing owner. Do not mount inactive panels, render a second hidden form/editor, or clone
 caller children to discover a target height. A safe outgoing display follows the
@@ -96,6 +104,11 @@ without deleting caller transforms. Any temporary list/panel pixel dimensions re
 native layout policy when the size owner completes or yields.
 
 ## Acceptance scenarios
+
+- Pending: select in an overflowing horizontal/RTL or vertical list while focus scrolls a trigger
+  into view, then scroll a common ancestor and change a sticky/transform context. Check one local
+  coordinate conversion, no fabricated selection replay and no extra scroll range from the marker
+  or outgoing panel. Repeat under reduced/none and cancel mid-flight.
 
 - Pending: switch between panels with named form controls, id-linked descriptions, an uncontrolled
   editor and a stateful child while height/content transitions are interrupted. Compare the original

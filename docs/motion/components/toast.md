@@ -71,6 +71,20 @@ The private ToastIcon is rendered by ToastList inside the exported Toaster, so `
 
 ## Geometry and performance
 
+The manager's visible limit is configurable and does not replace the
+[automatic collection bound](../presets.md#52-shared-work-limits). Before per-toast animation measurement or
+outgoing-copy allocation, count participating visible toast presentations, projected retained siblings,
+distinct outgoing paint and any participating stack host, including still-active earlier revisions.
+Count a toast's combined presence/size/reflow presentation once, not once per property. If the known
+set is unavailable or over the bound, settle affected automatic collection presence/layout and discard
+obsolete decoration immediately. Preserve every manager-owned toast, ordering, limit, timer and
+live swipe; never dismiss messages, reduce the caller's limit or queue entry to fit the budget.
+Native measurement needed for current semantic layout remains available; this bounds added animation
+work rather than omitting the manager's required final layout.
+Text/reel limits still aggregate over the same coordinated manager revision. Stack projections and
+outgoing paint must also preserve the viewport's native overflow and hit-testing policy without
+introducing another scrollbar or stale snap/anchor target.
+
 - The native root owns swipe transform and stack offsets. Any target stack animation must reconcile native measurements in that owner; no FLIP overlay, independent `bottom` tween or nested shell spring.
 - Lay out changed text at final available width once, measure the natural target height, then let the native stack transaction consume it. Passive viewport/font changes settle immediately.
 - Target protocol: reconcile visible IDs and measured final heights in one native stack revision. The native owner applies final logical offsets immediately, animates the height channel with `geometry.compact`, and composes bounded visual stack displacement with its swipe channel using `layout.compact`; never write a second root transform or animate `bottom` independently. Parent stack targets use committed destination heights, not children's per-frame sizes.
@@ -83,6 +97,11 @@ The private ToastIcon is rendered by ToastList inside the exported Toaster, so `
 - A smaller intermediate toast shell must not crop the newly committed message or action/close control. Preserve existing legal overflow or settle its height immediately; never introduce a truncation/scroll policy just to keep a height tween. Focused actions are immediately visible.
 
 ## Acceptance scenarios
+
+- Pending: configure a visible stack above the shared bound, then batch add/update/dismiss while
+  earlier exits and a swipe are active. Verify bounded preflight before decorative measurements,
+  immediate affected geometry, no queued entries and unchanged manager timing/limits/semantics.
+  Repeat at the bound with an additional distinct outgoing copy; scroll overflow remains native.
 
 - Pending: same-ID loading → success/error and text updates retain the manager's timer/pause semantics without remounting or repeated announcements.
 - Pending: add/remove/update several visible toasts during swipe; stack, limits, actions and native dismissal remain consistent.

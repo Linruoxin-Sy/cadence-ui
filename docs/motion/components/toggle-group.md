@@ -64,6 +64,12 @@ otherwise permitted short opacity or colour feedback.
 
 ## Geometry and performance
 
+For a caller-scrollable group, item projections and the shared/local selected decorations use one
+group-content coordinate space. Native focus-reveal/page scrolling is not another value change;
+keep valid common-space motion, and settle the coupled projection when a relative scroll/sticky or
+transform change invalidates that space. Do not compensate scroll twice, chase projected rectangles
+or reset the user's offset. Selected decoration must not enlarge scroll extent or add snap targets.
+
 - The single-select plate must satisfy the [rendered-colour constraint](../../animation-system.md#35-colour-feedback)
   beneath every affected item label, including immediate focused foreground against independently
   timed plate paint. If the path is unsafe or unverified, place the plate and affected known paint
@@ -80,6 +86,10 @@ otherwise permitted short opacity or colour feedback.
 For unchanged selected values, the strip transaction projects each selected decoration through the same current item reflow/size coordinates; the shared plate does not independently start layout.selection on a changed rectangle. One plate writer consumes that projection, without per-frame layout reads. Only a committed selection change uses the selection clock. If selection and reflow occur together, that writer combines the selection path and strip projection once, avoiding duplicate source/destination displacement. Multiple-mode decorations remain attached to their own item projections. If a custom render or adapter cannot preserve this coupling, settle the affected strip/item/plate geometry together immediately. Matching final boxes or starting independent smooth/snappy springs together is not adequate coordination.
 
 ## Acceptance scenarios
+
+- Pending: change selection and labels in a scrollable RTL/vertical group while native focus scrolls
+  an item into view. Scroll a shared ancestor, then invalidate the local mapping. The decoration stays
+  attached or settles with its items, without a second selection, scrollbar or pointer/capture change.
 
 - Pending: change selection, focus and track/plate/label colours together in single mode, then switch
   to multiple. Verify readable intermediate combinations or immediate affected placement/paint, with

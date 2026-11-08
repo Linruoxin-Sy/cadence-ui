@@ -403,6 +403,14 @@ to the content viewport, never to focus outlines or portal positioning. Measurem
 the same box/coordinate space under [the system size rules](../animation-system.md#34-measured-size-and-position);
 transformed viewport rectangles are not directly writable CSS sizes.
 
+`layout.reflow`, `layout.compact`, `layout.selection`, `content.switch`, `content.month` and
+`handoff.value` inherit the system's coordinate-validity and decorative-overflow rules. A distance
+token does not authorize travel outside a safe paint lane or through stale portal/scroll coordinates.
+Keep a valid local path when a common ancestor merely scrolls it; invalidate only the affected
+mapping when endpoints move relative to their owner. Use the prescribed immediate/cancel fallback,
+not a new duration, a tracking spring or a replayed text replacement. Outgoing text/reel cells and
+collection copies must not enlarge native scroll extent, even when excluded from intrinsic sizing.
+
 Destination-width reflow is a measurement choice, not permission to crop newly committed content.
 If an intermediate smaller shell would hide a required label, a focused control/caret or content
 needed for the current action beyond the existing overflow/truncation policy, settle that axis

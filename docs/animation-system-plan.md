@@ -470,6 +470,16 @@ Chart's unknown-work controller path must not count as zero or invoke caller com
 native browser scrolling and snap remain distinct from each engine's authored settling clock. These
 are pending acceptance requirements, not additional presets, public APIs or implementation claims.
 
+Position acceptance distinguishes page scrolling that preserves a local marker coordinate space from
+differential scroll, sticky relocation, portal movement and visual-viewport corrections that invalidate
+it. Exercise Select's captured flight, scrolling selection strips, row projections and Toc's separate
+document-navigation owner without adding per-frame endpoint reads or stealing native scroll control.
+Inspect scrollWidth/scrollHeight, current offsets and snap/anchor behavior during and after outgoing
+row/text/reel paint; decorative retention must not create a second layout shift or scrollbar. Sidebar
+must settle its coupled gap/container transaction when it would disturb a known focused editor, and
+Toast's configurable visible limit must not bypass the shared active-collection work bound. These are
+pending browser acceptance cases; structural Markdown validation does not prove them.
+
 For implementation changes, run `pnpm registry:build` before `pnpm check` when shipped source,
 metadata or content changes, then the affected browser/runtime and performance checks. Documentation
 design work alone does not regenerate payloads or claim runtime conformance. Keep regression inputs

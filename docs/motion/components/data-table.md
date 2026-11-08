@@ -73,6 +73,13 @@ replay because result membership changed. A later independent eligible revision 
 
 ## Geometry and performance
 
+Row projections and retained exits must not contribute extra scrollable overflow, anchor candidates
+or snap targets beyond the current semantic table. An absolute outgoing row is not sufficient proof.
+Use a safe existing decorative boundary or omit its exit; never add a blanket scroll-anchor override,
+reset the table offset or clip live rows to hide the extra range. If scrolling/sticky-row relocation
+invalidates a row projection's coordinate mapping, settle the affected projection to native layout.
+Common-ancestor scrolling that preserves local row coordinates does not replay sorting or presence.
+
 Row exit retention uses a bounded paint-only representation under the
 [shared retention contract](../../animation-system.md#33-presence-and-composition). It is not a
 second rendered/cloned row containing Checkbox, menu triggers, named inputs, DOM ids or ref/effect
@@ -88,6 +95,11 @@ For region-size continuity, lay the natural table out at its destination width a
 The bounded region fallback is immediate native layout when existing table overflow cannot keep newly committed required rows, a focused control or a pointer-captured row usable. Do not add clipping, sticky-row projection or a moving hit target merely to complete a filter transition. Native selection/copy of affected cells also suppresses their decorative replacement/retained exit paint while semantic filtering remains immediate. A simultaneous amount/status/count update shares the aggregate text/reel budget for the result transaction, not one allowance per cell or footer count.
 
 ## Acceptance scenarios
+
+- Pending: filter, reorder and remove rows at the end of a horizontally/vertically scrolled table,
+  with sticky cells and outgoing decoration. During and after the effect, scroll range follows only
+  current native content/owned shell geometry; retiring a copy adds no second jump or scrollbar.
+  Native input wins over invalid projections without replaying the result transaction.
 
 - Pending: filter/remove a row containing a named checkbox, an id-linked label and a rich cell with
   a mount/ref side effect. During retained exits and region measurement, verify unique live ids,

@@ -84,6 +84,13 @@ CopyButton and ExpandButton retain the existing Button surface/foreground owner,
 
 ## Geometry and performance
 
+The tab marker belongs to the tab strip's content coordinates, independently of the code viewport's
+horizontal scroll. Scrolling code cannot reposition the marker; native strip focus-reveal scrolling
+is not a tab selection. Keep a valid shared local path and immediately rebase when its mapping becomes
+invalid, without a scroll reset or per-frame tab measurement. Outgoing code runs/lines must not expand
+the code viewport's scroll range or become scroll-anchor/snap targets. Use a safe decorative lane or
+immediate affected source paint, preserving current source, selection and native overflow policy.
+
 The tab strip has no authored size or item-reflow action in this contract. A retained active value
 with changed tab labels, order, visibility or available width therefore uses native final strip
 layout and immediately rebases `indicator.select` to the current active tab. Cancel any obsolete
@@ -98,6 +105,11 @@ Measure natural `code-block-content`/code layout separately from the clipped vie
 For a large source, inspect only the bounded affected visible lines/runs needed for the current revision. Automatic line presence/layout counts participating line presentations, any measured/projected retained lines, distinct outgoing visuals and a participating collection shell under the [collection bound](../presets.md#52-shared-work-limits), before member layout reads or retained-copy allocation. A whole-block envelope counts once, not once per syntax token or glyph. The shared diff-work and aggregate changed-glyph/reel limits apply once to the whole block revision, not once per line or token. Avoid re-tokenizing solely for animation, per-glyph layout reads, hidden full-document clones and work on every persisted inactive panel. Newline/duplicate-line ambiguity or a working set that cannot fit uses immediate affected source/layout, without truncating the file or queuing later batches. Nested parent geometry adopts the committed destination rather than chasing every height frame.
 
 ## Acceptance scenarios
+
+- Pending: edit a long line or remove lines while horizontally/vertically scrolled near the end;
+  compare the scroll extent with the exact current source during and after replacement. Independently
+  scroll the tab strip and code viewport during selection. No stale-copy scrollbar, second anchoring
+  correction, marker drift or source/tab replay is permitted.
 
 - Pending: retain the selected tab while renaming/reordering tabs, hide its origin and change strip
   width during marker motion. The native strip and marker rebase together with no false selection

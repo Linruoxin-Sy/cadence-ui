@@ -62,6 +62,13 @@ The `link.colour` and `text.colour` bindings name disjoint properties of one act
 
 ## Geometry and performance
 
+If the caller makes the visible range scrollable, measure links and active decoration in that same
+content coordinate space. A common ancestor scroll preserves a valid local path; native focus scroll
+does not create a page selection. A relative scroll/sticky/transform correction that invalidates the
+mapping settles content/marker geometry together or uses the existing local-colour fallback. Never
+reset scroll, navigate again or measure projected links every frame. Retained links and marker paint
+must not enlarge the live range's scroll extent or supply stale anchor/snap targets.
+
 The active decoration moves behind destination labels only when the
 [rendered-colour constraint](../../animation-system.md#35-colour-feedback) remains valid over both
 track and decoration. Include immediately settled focused link paint and independently changing
@@ -78,6 +85,10 @@ One final layout snapshot coordinates range reflow, text-driven dimensions and i
 First active-marker placement and restoration after an absent/ambiguous active target are immediate. Reordering or resizing links without a semantic active-page change does not start a selection journey: the single marker writer follows the content transaction's current item/size projection so it stays attached throughout reflow. It must not jump to a final rectangle while that active link is still visually elsewhere. During a simultaneous actual selection and range change, move only when both endpoints are valid in one coordinate scope and the same writer can combine selection with range projection exactly once. Otherwise settle the affected content/marker geometry together or use the local active-colour fallback, rather than run independently timed springs. No per-frame measurement of projected links is introduced.
 
 ## Acceptance scenarios
+
+Also pending: change the visible range in a scrollable caller layout during focus-reveal scrolling
+and an active-marker flight. Verify current href/aria-current, one coordinate conversion, unchanged
+native scroll control and no second scrollbar or navigation when retained decoration is removed.
 
 Also pending: focus/activate a link while marker fill and foreground use different effective clocks,
 including a theme change during travel. The label remains readable over every crossed background,

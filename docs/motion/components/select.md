@@ -86,6 +86,18 @@ current accepted presentation and follow the native callback contract.
 
 ## Geometry and performance
 
+The captured item run and trigger destination can belong to different scroll/portal spaces. Record
+their mapping at the accepted revision under the [shared coordinate rule](../../animation-system.md#34-measured-size-and-position).
+Native popup auto-scroll, scroll-arrow operation, ancestor scrolling or visual-viewport correction
+that changes that mapping cancels the flight and reveals the already-current destination; do not
+start a second local fade for the same consumed change. Closing the source popup alone still permits
+the already captured flight under its surviving owner when that mapping remains valid. No per-frame
+source tracking is added. Flight/retained glyph paint must not enlarge either scroll region.
+Once captured, the departing paint belongs to the flight layer's recorded coordinate space, not to
+the old item's live DOM. Scrolling/removing that item alone does not revoke a still-valid frozen
+capture; it invalidates a candidate before acceptance, or a flight only when its actual paint-layer/
+destination mapping changes. Never require a closed popup to stay mounted just to track its origin.
+
 - Keep trigger and source anchor rectangles stable while measuring; press transforms cannot distort handoff coordinates. Base UI positioner remains the sole popup placement writer.
 - Value text lays out at final natural no-wrap width in a measurement region separate from its width host; animate only that host, not glyph scale. Popup text uses final available width before its separate height host is measured. Preserve current no-wrap/truncation/wrapping policies and do not add wrapping to obtain a geometry effect.
 - Clamp sizes to valid non-negative content/available constraints. With the existing clipped value lane, growth that would temporarily truncate the committed label settles immediately; shrinking cannot go below the final readable width. Fixed-width caller constraints retain their existing legal truncation policy without extra clipping. Popup focus/active descendants stay visible through existing scrolling, otherwise its affected size axis settles immediately.
@@ -95,6 +107,11 @@ current accepted presentation and follow the native callback contract.
 When `alignItemWithTrigger` gives Base UI active positioner/popup-height control, use that owner's immediate measured target unless a verified single-owner adapter can consume the revision. Do not animate an independent popup shell height while Base UI expands/repositions it for item alignment or scroll-arrow operation. Only a free, safely separated content axis uses `content.resize`. Native scroll-arrow interaction and its required frame/timer work remain available under reduced/none and zero recipe clock; it is not an autonomous decoration.
 
 ## Acceptance scenarios
+
+- Pending: accept a visible-source selection, then scroll the popup list, a trigger ancestor or the
+  document independently while its captured flight runs. Invalidate only a changed source/destination
+  mapping, expose the current destination immediately, and keep native scrolling/selection intact.
+  No stale flight, repeated local fade or extra scrollbar survives cancellation or close/reopen.
 
 - Pending: capture a visible option, reject its controlled request, then commit that same value later
   from an unrelated update; no old-origin flight is allowed. Compare correlated delayed acceptance,

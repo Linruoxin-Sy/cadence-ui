@@ -321,6 +321,15 @@ support uses immediate geometry/text instead of assuming horizontal Latin layout
 orientation/size state actions keep their individual contracts, with passive reflow taking precedence
 when the old coordinate frame becomes invalid.
 
+The [position coordinate contract](../animation-system.md#34-measured-size-and-position) distinguishes
+common-ancestor scrolling from a changed source/destination mapping. Review local selection markers,
+projected rows and portalled handoffs separately: a valid local path need not stop when the page scrolls,
+but stale cross-space endpoints cannot keep flying. No correction may seize native scroll control or
+replay a consumed label update. The [retained-paint contract](../animation-system.md#33-presence-and-composition)
+also excludes decoration from scroll extent, anchoring and snap targets, not just natural sizing.
+Measure the real scroll range during replacement/exit and after cleanup; an accessibility-hidden,
+absolutely positioned copy is not automatically layout-safe.
+
 Geometry acceptance includes the resting layout after an animation releases its temporary constraints,
 not only the last animated frame. Follow the [size and transform ownership rules](../animation-system.md#34-measured-size-and-position)
 for natural versus unknown zero dimensions, current caller sizing and CSS individual transform channels.

@@ -53,6 +53,13 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 
 ## Geometry and performance
 
+An optional child's outgoing text, reels or row paint is excluded from scrollable overflow as well
+as intrinsic size under the shared retention rule. Its transform/absolute position must not lengthen
+the range, create another scrollbar or become a scroll-anchor/snap target. Preserve the legitimate
+extent change of current content and any existing native child-size owner. If no safe paint boundary
+exists, that child omits the decorative effect; ScrollArea does not hide the problem by resetting the
+offset, disabling anchoring or adding another scroll controller.
+
 Base UI/native scrolling owns both scroll axes, scrollbar ranges and thumb extents. There is no animated measured-size host here: native layout reflows at destination dimensions and immediately updates scroll range. Direct display strings lay out at final width, with replacement paint excluded from scroll-extent measurement; long text beyond shared diff bounds commits immediately. Do not measure every child, observe each line or attach a second scroll-position smoothing loop. The authored moving set consists only of the existing scrollbar paint layers and bounded changed direct content, not a reveal of every visible descendant. Existing viewport clipping is functional overflow, not a decorative text crop. Preserve focus visibility, horizontal/vertical bars, corner occupancy and pointer targets. A child geometry animation may change scroll extent, but this primitive never adds a second height spring or tries to animate thumb extent after it.
 
 Browser/OS momentum and native CSS scroll snapping remain part of the existing scroll owner, including
@@ -61,6 +68,11 @@ after pointer release. They are not Embla/Drawer autonomous clocks and are not c
 and mode obligations; ScrollArea does not add one or change a caller's snap policy.
 
 ## Acceptance scenarios
+
+- Pending: replace a direct long string/quantity and remove a composed child near both scroll ends.
+  Inspect scroll extents and offsets during the effect and after cleanup, including native snap and
+  touch momentum. Only current content/owned geometry changes the range; decorative cleanup does
+  not cause a second scroll correction or reset native input.
 
 - Pending: switch full/reduced/none and zero clock during a native touch fling and native scroll snap.
   Authored scrollbar/text effects follow their mode, while native coordinates, capture and snap policy

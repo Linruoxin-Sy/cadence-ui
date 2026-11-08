@@ -62,6 +62,13 @@ Each link and the separate rail/indicator paint region follow the [shared owner 
 
 ## Geometry and performance
 
+The rail and link endpoints share the Toc list's local content coordinates, including a caller's
+overflowing navigation container. Scrolling that container must not be mistaken for a changed active
+heading or a document-navigation request. If endpoints share its content plane, preserve the valid
+local path; otherwise settle an invalid mapping with one batched refresh. Rail paint adds no scroll
+extent or snap target. Keep this decoration invalidation separate from the connected destination/
+scroll-host authority of an already active `document.navigate` flight.
+
 Read destination geometry once per explicit activation and clamp to the real scroll host's range, preserving its other scroll axis. Do not animate article transforms, pair native smooth scrolling with another clock, or read every heading on each animation frame. Indicator measurements are local to the track and active link; cached entry bounds refresh on relevant layout/content changes, not on every scroll tick. Passive font/layout changes update indicator geometry directly and cancel a navigation flight whose destination became stale; they never settle to the abandoned coordinate. Bound the animated set to one indicator and one scroll flight. Long entry lists retain native accessible links without per-frame all-heading measurement or mandatory list animation.
 
 The endpoint indicator adapter still performs no list-size interpolation. The separate target list-shell action runs only for known items/label content revisions, never as a response to passive reading, indicator travel or document scroll. Its entries already use final natural layout and have no independent item-position tween: an unchanged active id therefore rebases the indicator to that final link box immediately while only the outer host height changes. This is not a new reading-selection spring.
@@ -69,6 +76,11 @@ The endpoint indicator adapter still performs no list-size interpolation. The se
 For known list-size changes, lay natural entries out at destination inline-size and measure that region separately from the changing block-size host. Only surrounding layout follows the shell; link text does not continuously rewrap. Preserve rail/link focus outlines outside any temporary content clipping.
 
 ## Acceptance scenarios
+
+- Pending: scroll an overflowing Toc list while the document has a separate active navigation flight;
+  then change the list's sticky/coordinate context. Only invalid local indicator geometry settles.
+  Native list scroll remains direct, the valid document flight follows its own cancellation rules,
+  and no extra navigation, heading focus or scroll range is introduced.
 
 - Pending: scroll manually across headings and verify that only the rail/foreground change; controlled active id does not start scrolling.
 - Pending: navigate twice rapidly, interrupt with every direct input path, and use history/hash navigation; no delayed writer steals control.
