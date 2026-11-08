@@ -17,7 +17,12 @@ Attachment communicates its supplied idle/uploading/processing/error/done state 
     "part": ["attachment#AttachmentActions", "attachment#AttachmentAction", "attachment#AttachmentMedia"],
     "media": ["attachment#AttachmentMedia"],
     "surface": ["attachment#Attachment", "attachment#AttachmentMedia"],
-    "text": ["attachment#AttachmentTitle", "attachment#AttachmentDescription", "attachment#AttachmentMedia"],
+    "text": [
+      "attachment#Attachment",
+      "attachment#AttachmentTitle",
+      "attachment#AttachmentDescription",
+      "attachment#AttachmentMedia"
+    ],
     "title": ["attachment#AttachmentTitle"],
     "value": ["attachment#AttachmentDescription"],
     "trigger": ["attachment#AttachmentTrigger"],
@@ -29,14 +34,14 @@ Attachment communicates its supplied idle/uploading/processing/error/done state 
 
 ## Capability ownership
 
-| Capability      | Coverage and owner                                                                                                                                              | References                                                                                                |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Appearance      | default: attachment owns insertion and later media/action changes; attachment-group coordinates membership; inherited under a parent entrance.                  | default: `attachment.root.enter`, `attachment.root.exit`, `attachment.part.enter`, `attachment.part.exit` |
-| Size            | default: attachment owns content/orientation/explicit-size geometry, and group owns visible item positions; native horizontal scrolling remains direct.         | default: `attachment.root.resize`                                                                         |
-| Surface colour  | default: attachment and attachment-media state/background/border targets; AttachmentAction inherits Button ownership.                                           | default: `attachment.surface.colour`; inherited: `@action`                                                |
-| Text colour     | default: title/description/media foreground on supplied state changes; actions retain their Button owner.                                                       | default: `attachment.text.colour`; inherited: `@action`                                                   |
-| Changed text    | default: plain filename and description strings use changed-only replacement; composed rich metadata; filename identity is never interpreted as a number.       | default: `attachment.label.replace`; composed: `@label`; inherited: `@action`                             |
-| Changed numbers | default: direct numeric quantities in descriptive display content; formatted rich metadata/progress uses composition; names, extensions and IDs remain textual. | default: `attachment.value.roll`; composed: `@value`; inherited: `@action`                                |
+| Capability      | Coverage and owner                                                                                                                                                                         | References                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Appearance      | default: attachment owns insertion and later media/action changes; attachment-group coordinates membership; inherited under a parent entrance.                                             | default: `attachment.root.enter`, `attachment.root.exit`, `attachment.part.enter`, `attachment.part.exit` |
+| Size            | default: attachment owns content/orientation/explicit-size geometry, and group owns visible item positions; native horizontal scrolling remains direct.                                    | default: `attachment.root.resize`                                                                         |
+| Surface colour  | default: attachment and attachment-media state/background/border targets; AttachmentAction inherits Button ownership.                                                                      | default: `attachment.surface.colour`; inherited: `@action`                                                |
+| Text colour     | default: root foreground and explicit title/description/media targets on state/theme changes; inheriting title/content paint follows the root once, and actions retain their Button owner. | default: `attachment.text.colour`; inherited: `@action`                                                   |
+| Changed text    | default: plain filename and description strings use changed-only replacement; composed rich metadata; filename identity is never interpreted as a number.                                  | default: `attachment.label.replace`; composed: `@label`; inherited: `@action`                             |
+| Changed numbers | default: direct numeric quantities in descriptive display content; formatted rich metadata/progress uses composition; names, extensions and IDs remain textual.                            | default: `attachment.value.roll`; composed: `@value`; inherited: `@action`                                |
 
 ## Choreography and modes
 
@@ -52,7 +57,7 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | Trigger activation / internal feedback visual                                        | Press feedback on a safe internal tile visual, preserving the actual overlay trigger and sibling action hit targets; omit scale when no such layer exists. | No scale.                                        | No animation.                        | `attachment.trigger.press` → `feedback.press` → `feedback.press/scale`                                                                                                                                                 |
 | AttachmentAction activation / inherited Button feedback owner                        | Run the Button contract once on its supported feedback layer; no second Attachment press writer.                                                           | Inherited no-scale feedback.                     | Native activation without animation. | `attachment.action.press` → `feedback.press` → `feedback.press/scale` (inherited Button)                                                                                                                               |
 
-`label` binds only filename/description text replacement. `text` binds foreground paint on Title, Description and Media, never an inferred media-text renderer. AttachmentAction delegates its colour/text/quantity behavior to [Button](button.md) at the same existing owner; the action press binding is an alias, not an additional controller.
+`label` binds only filename/description text replacement. `text` coordinates the root foreground and explicit Title/Description/Media overrides, never an inferred media-text renderer. An inheriting Title or Content follows the root colour once; it does not start a second tween for the same inherited property. Root/Media surface and foreground bindings use one actual CSS colour controller per host, with disjoint declared paint. AttachmentAction delegates its colour/text/quantity behavior to [Button](button.md) at the same existing owner; the action press binding is an alias, not an additional controller.
 
 ## Interruption and lifecycle
 
@@ -73,3 +78,5 @@ The group consumes final tile destinations once; its layout displacement never w
 Target acceptance; not executed: uploading to processing/error/done; quick state reversals; filename diff and numeric metadata; horizontal/vertical layouts; preview decode race; overlay trigger versus action; group removal while scrolling; live modes and separate zero recipe/theme-loop clocks.
 
 Also pending: rename during a busy pulse, complete/error before the replacement finishes, and replace preview/actions while scroll snapping or pressing; no obsolete pulse restart, duplicate action, competing opacity/transform writer or false filename count is permitted.
+
+Also pending: change root theme foreground while Title/Content inherit it and Description/Media keep explicit colours, then focus the overlay trigger or an action. Inherited paint follows one root controller, independent paint retains its actual owner, and no duplicate colour tween or text replay appears.

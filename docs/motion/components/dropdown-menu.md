@@ -85,7 +85,7 @@ Top-level Base UI Menu opening normally focuses the menu/list or an item. If the
 
 - Base UI owns open state, roving focus, typeahead, close-on-click and submenu intent. Actions execute immediately; checkbox/radio persistence follows existing props rather than an animation policy.
 - New highlight/selection replaces the previous target. A submenu opens from its current anchor; switching rows does not move an old popup through the menu.
-- Closing a branch cancels its text/size/indicator work; root closure invalidates all nested exit callbacks. Reopening reverses only the current boundary, without resurrecting stale descendants.
+- Closing a branch cancels its text/size/indicator work; root closure invalidates obsolete nested decoration callbacks, not the current Base UI exit protocol. A surviving closing branch still completes its required native cleanup; a retired completion cannot reopen a branch, restore stale focus or affect a newer owner. Reopening reverses only the current boundary, without resurrecting stale descendants.
 - Live reduced cancels travel/size/scale; none and zero clock cancel authored clocks and finish the current branch through Base UI's actual exit-completion protocol. Native keyboard/pointer/scroll operation is retained, not cancelled with presentation. Unmount unregisters anchors and observations.
 - Async availability/label changes received while closed update the next menu without replaying hidden work. Controlled checked/open state changes only when accepted; new open revisions invalidate stale callbacks. An exiting submenu cannot restore old focus or selection over a reopened parent.
 
@@ -106,3 +106,4 @@ Top-level Base UI Menu opening normally focuses the menu/list or an item. If the
 
 - Pending: rename CheckboxItem/RadioItem/SubTrigger text and recolour a separator while pointer, disabled and theme state change together; inspect one colour writer per region and both submenu size hosts.
 - Pending: Open a top-level menu by pointer and keyboard, then a pointer-hover submenu; actual list/item focus may settle that branch, without cancelling an unrelated parent or delaying intent/focus.
+- Pending: close the root while a submenu is already exiting, both with and without an immediate reopen. Current native exit cleanup still completes in every mode and at zero clock; a retired submenu completion cannot remove or refocus the newer branch, leave an orphan portal or extend an animation-only hold.
