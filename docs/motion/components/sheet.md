@@ -66,6 +66,16 @@ Dispatch a direct Title/Description string to the text owner and a supported dir
 
 ## Geometry and performance
 
+An edge flight's distance is bound to the physical extent of its current panel, not a separately
+cached text or viewport dimension. If a known content/explicit-size revision changes that extent
+during opening, retire the conflicting edge envelope and establish the open placement before
+assessing the new size transaction; do not keep a stale pixel slide or multiply a percentage slide
+by a concurrently changing shell. A disjoint backdrop may continue. During closing, update current
+content without starting a size tween; if native/environment layout changes the flight's extent,
+settle that exit through the existing lifecycle rather than flying toward an obsolete edge.
+Same-size content edits retain their independent eligible text/colour owners. This is a conditional
+fallback for the existing edge preset, not a new clock or a delay to the content commit.
+
 - Edge translation uses the sheet's own width/height, not a fixed distance token. Positioning, translation and measured content axes have separate owners/properties.
 - Measure one natural content region for applicable axes; preserve the side's actual sizing constraints and any existing internal scroll region. Default SheetContent does not create a scrolling viewport. If its readable bounds are infeasible without a new overflow policy, use immediate native layout rather than adding scrolling or clipping for animation. Never animate viewport height on keyboard/resize events.
 - Reflow content once at the final bounded width before measuring its height; animate only the applicable shell axis. Do not couple text rewrapping to every edge-travel or resize frame.
@@ -77,6 +87,12 @@ Dispatch a direct Title/Description string to the text owner and a supported dir
 A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
 
 ## Acceptance scenarios
+
+- Pending: change a top/bottom panel's content height or a side panel's owned width during opening,
+  then close/reopen before completion. Cancel the obsolete edge path, preserve the current native
+  placement and assess size only under its current owner. Repeat with independent clock overrides,
+  reduced/none, zero clock and passive viewport changes; no stale edge completion removes a reopened
+  panel or resets the independently owned backdrop.
 
 - Pending: all four sides, top/bottom content growth, side-sheet scrolling, narrow viewport and soft-keyboard resize remain bounded.
 - Pending: close during resize, reopen mid-exit and change side while open without stale trajectories or focus loss.

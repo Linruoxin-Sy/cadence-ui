@@ -965,6 +965,20 @@ on cancellation. A proposed layer must also preserve containing blocks, stacking
 descendants, hit regions and native selectors. `will-change` is temporary and owned; it is not permission
 to leave every component promoted or to change those layout relationships at rest.
 
+Dimension names must retain their meaning across coordinate conversions. CSS width/height and an
+aspect ratio expressed as width divided by height are physical dimensions; inline/block sizes depend
+on the owner's writing mode. Record the actual controlled axis and convert once before applying its
+bounds. Do not divide an inline size by a physical aspect ratio and assume the result is block size
+in every writing mode. Where the existing native sizing rules cannot provide one definite destination,
+use immediate native geometry. This adds no promise of vertical-layout support to an upstream control.
+
+Visual sequencing is conditional on usable geometry, not an assumed ordering of preset durations.
+A label fade must not postpone semantic collapse, focus availability or a size commit until its tween
+ends. If the available clip becomes insufficient first, settle the affected label paint immediately;
+an expansion can reveal it once its destination-visible content fits. Consume the geometry owner's
+known projection or completion signal, not per-frame text measurements, a private percentage threshold
+or a new timeout. Clock overrides and reversals must preserve this rule. Independent paint may continue.
+
 ### 3.5 Colour feedback
 
 state.color explicitly names background-color, color, border-color and applicable fill/stroke.

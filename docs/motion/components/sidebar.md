@@ -67,7 +67,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Desktop offcanvas open state; container and gap coordinator | Side-aware container translation is projected from the same clamped gap progress; one scalar/transaction preserves matching visible and occupied space.    | Final position/gap immediately.                                                        | Final position/gap immediately. | `sidebar.container.offcanvas` → `layout.sidebar` → `layout.move/size-linked`; `sidebar.gap.resize` → `geometry.compact` → `geometry.resize/measured`                                                             |
 | Desktop icon collapse; occupied-width coordinator           | Clamped width transition to actual expanded/icon geometry.                                                                                                 | Final widths immediately.                                                              | Final widths immediately.       | `sidebar.container.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                                                                     |
-| Icon collapse/expand; existing group/menu label paint       | Fade before clipping on collapse; reveal once destination space is usable. This is geometry coordination, not a semantic delay.                            | Final layout with short opacity where useful.                                          | Final visibility immediately.   | `sidebar.labels.enter` → `presence.inline` → `data.transition/opacity`; `sidebar.labels.exit` → `presence.exit` → `exit.fade/opacity`                                                                            |
+| Icon collapse/expand; existing group/menu label paint       | Fade only while the label lane is usable; settle paint if clipping overtakes it. Reveal on expansion once destination-visible content fits.                | Final layout with short opacity where useful.                                          | Final visibility immediately.   | `sidebar.labels.enter` → `presence.inline` → `data.transition/opacity`; `sidebar.labels.exit` → `presence.exit` → `exit.fade/opacity`                                                                            |
 | Mobile open/close; composed Sheet                           | Inherit Sheet entry/exit; no desktop animation runs as well.                                                                                               | Inherit Sheet opacity-only path.                                                       | Immediate Sheet target.         | `sidebar.mobile.enter` → `presence.sheet` → `popup.anchored/edge`; `sidebar.mobile.exit` → `presence.sheet-exit` → `popup.anchored/edge-exit`                                                                    |
 | Menu/rail state; owned labels/counts                        | Eligible scoped colour under the actual-region gate below, changed label runs, and place-value rolling for numeric badges.                                 | Eligible short colour under the same gate and changed-run opacity; counts immediately. | All immediately.                | `sidebar.item.colour` → `state.color` → `state.color/surface-foreground`; `sidebar.label.replace` → `text.replace` → `text.change/changed-runs`; `sidebar.badge.change` → `number.compact` → `number.roll/reels` |
 | Sidebar/inset/submenu and label/badge token changes         | Eligible scoped surface/border/foreground colour on the actual region under the gate below; inherited Input/Button/Separator/Skeleton paint executes once. | Eligible short colour under the same gate.                                             | Final paint immediately.        | `sidebar.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                      |
@@ -95,6 +95,22 @@ Each actual shell/inset/submenu, item/action/rail and label/badge paint region f
 
 ## Geometry and performance
 
+Label visibility uses the coupled size owner's usable-space decision, not a comparison between the
+exit/entry duration and `geometry.compact`. On collapse, start an eligible label fade concurrently
+with the accepted size change; if the safe label lane disappears before that fade ends, finish its
+paint immediately. Do not hold the gap open until a fade completes. Preserve the existing icon-only
+accessible name and tooltip semantics without leaving a hidden interactive label. On expansion,
+use the destination-visible label's known box and the same size projection to reveal it only when
+that content fits under the current truncation policy; without a safe projection, wait for the size
+owner's actual completion signal, not a timer or a guessed percentage. Focus/activation that needs
+the expanded label settles the affecting geometry/paint immediately under the shared input rule.
+
+While a label is semantically hidden, text/reel updates establish current content without starting
+their own visual work. Reversal invalidates the old pending reveal/fade and reassesses usable space
+from the current coupled geometry. Reduced/none or zero recipe clock establishes final layout first
+and reconciles only paint still eligible in that mode; no stale completion can reveal a collapsed
+label. There is one label-envelope owner, with no per-frame label measurements or new duration token.
+
 The continuous page-inset reflow below remains subordinate to the shared focused-editor rule.
 Before a known collapse transaction, check the actual owned Sidebar/Inset focus region: if the
 coupled change would move an editor's caret/content box/scroll extent, clip its required content or
@@ -111,6 +127,12 @@ Use the existing sidebar width variables and side/variant rules, not text measur
 Navigation labels lay out at their destination inline-size before the separate shell/gap changes width; do not rewrap them on every frame. The page inset may continuously reflow with the changing occupied gap because it must reflect the actual available page width; do not scale its text or add a second inset spring. Mobile delegates natural-content measurement and reflow policy to Sheet.
 
 ## Acceptance scenarios
+
+- Pending: independently slow the label fade and accelerate the size preset, then reverse collapse
+  while labels change. The shell never waits for opacity; unusable label paint settles, the latest
+  hidden text does not animate, and a retired reveal cannot expose collapsed content. Repeat with
+  full-mode zero clock, live reduction and a focus action during expansion, preserving accessible
+  names and the same coupled container/gap owner.
 
 - Pending: collapse from an external control while a SidebarInput or known Inset editor remains
   focused, and toggle during a captured resize/control interaction. The dependent scalar settles

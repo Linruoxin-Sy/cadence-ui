@@ -47,11 +47,15 @@ The SVG's rotation writer never owns entry/exit opacity or slot positioning. Hid
 
 ## Geometry and performance
 
-Use the reserved square icon box and no per-frame measurement. Do not use the rotation transform for simultaneous layout movement; a parent may position the slot. Avoid attaching a layout observer merely because an SVG exists. Parent Button label/width changes share a cause without restarting the spinner entrance. Accessible names are never passed through animated text layers.
+Use the existing reserved icon box, square by default, and no per-frame measurement. Do not normalize caller width/height or override the SVG's aspect-ratio policy to manufacture a square. Do not use the rotation transform for simultaneous layout movement; a parent may position the slot. Avoid attaching a layout observer merely because an SVG exists. Parent Button label/width changes share a cause without restarting the spinner entrance. Accessible names are never passed through animated text layers.
 
-An explicit owned icon-size revision uses one final square width/height destination, independent of rotation; a parent-reserved slot owns the size instead when present. No extra measurement is needed for token-resolved dimensions. Keep stroke and clipping consistent with the SVG viewBox and caller overflow; do not use a second scale transform for sizing. Bound active rotation to visible current spinners using shared visibility ownership where available; overload may show the same named static glyph rather than introduce more observers or delay activity state.
+An explicit owned icon-size revision uses the final native width/height destination, independent of rotation; a parent-reserved slot owns the size instead when present. No extra measurement is needed for token-resolved dimensions. Keep stroke and clipping consistent with the SVG viewBox and caller overflow; do not use a second scale transform for sizing. Bound active rotation to visible current spinners using shared visibility ownership where available. Any stricter composed loop limit must identify its scope and bound; exceeding it shows the same named static glyph without delaying activity state, and does not silently reinterpret the collection or stagger limit as a global spinner count.
 
 ## Acceptance scenarios
+
+Also pending: supply unequal caller width/height and a parent-controlled icon slot, then change size
+during rotation and downgrade to reduced/none. Preserve the final native SVG box/aspect policy and
+current caller dimensions; rotation and cleanup must not square, scale or resize the reserved slot.
 
 Target acceptance; not executed: standalone and Button-composed loading; caller label changes; hide/show and removal during rotation; explicit icon-size change; live full to reduced/none and zero clock; static glyph still conveys loading with its accessible name.
 

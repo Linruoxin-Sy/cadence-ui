@@ -87,7 +87,7 @@ without a motion-owned request queue, filter rerun or rejection of caller data.
 CommandDialog inherits Dialog's actual-focus gate as well as its preset. Its native initial focus commonly lands in CommandInput, so the panel entry may settle immediately while Dialog's separate backdrop still fades. Inline Command likewise settles a root entrance that would hide its focused editor. Do not delay autofocus, native editing or command execution to finish a palette entrance.
 
 - cmdk retains filtering, scoring, selection, loop/vim bindings and pointer-selection settings. Enter/click executes immediately; motion adds no business command or artificial loading phase.
-- Fast input coalesces height targets; overload uses immediate geometry, not a backlog. Rows disappearing from filtering cease to be actionable immediately and cannot retain active descendant references through an exit.
+- Fast input replaces the one pending height destination without debouncing query/results or waiting for typing to stop. Retarget when measurement and interaction remain safe; otherwise use immediate geometry under the shared bounds, not a private update-rate cutoff. Rows disappearing from filtering cease to be actionable immediately and cannot retain active descendant references through an exit.
 - Closing CommandDialog cancels list/text/number work; Dialog alone owns exit and focus restoration. Reopening shows current query/results without replaying old filtering transitions.
 - Live reduced cancels layout/reels; none/zero clock cancels remaining authored clocks and lets the inherited Dialog finish through Base UI's actual native completion protocol. Native editing, scrolling, selection and execution remain available. Unmount releases measurement and inherited dialog resources without duplicate cancellation wrappers.
 - Async result updates received while closed become current data without hidden interpolation or reopening. A new accepted query/open revision invalidates stale height/exit callbacks; returning to full does not replay filtered-out results. Preserve controlled query/selection semantics rather than optimistically accepting callbacks.
@@ -96,13 +96,18 @@ CommandDialog inherits Dialog's actual-focus gate as well as its preset. Its nat
 
 - Lay result text at final available width, then measure the natural result region and size one list viewport. Keep the existing max-height/scroll contract; passive font/viewport reflow is immediate.
 - In CommandDialog, list-height changes update the panel's natural layout; the panel does not separately animate or observe the same interpolated cause. Other explicit dialog changes still use the Dialog contract.
-- One list measurement, stable item identities, no observer or FLIP animation per filtered row. Above the visible-list budget, skip blanket measurement/animation and keep native filtering/scrolling.
+- One natural result-region measurement, stable item identities, no observer or FLIP animation per filtered row. The automatic collection limit counts participating animation visuals, not every result under this single height host. Native filtering/scrolling and final layout remain available for large result sets; unsafe or unavailable natural measurement uses immediate height. Changed-text work retains its own aggregate limits.
 - Clip only the scroll/result region; preserve input caret/focus rings, group structure, cmdk semantics and descendant portals. No rolling or text splitting in the native editor.
 - Natural result content and its sizing viewport are separate regions; clamp the rendered height to valid non-negative bounds. Keep the active command immediately visible through the existing scroll contract, otherwise settle the viewport's height. Required command labels/shortcuts cannot gain temporary truncation or hidden focus targets for a geometry effect. Do not add a new virtualizer or search for offscreen rows to decorate.
 
 List-height animation below the editor may continue only while that editor's content box, caret and scroll stay stable. The stock CommandDialog's fixed top placement can satisfy that condition; a caller's centering/wrapping layout that would move the editor must settle the affected dependent axis. Do not freeze native typing or replay the suppressed resize on blur.
 
 ## Acceptance scenarios
+
+- Pending: rapidly filter a result set larger than the automatic collection limit while only its
+  single height shell participates. No per-row animation measurement or arbitrary row-count/Hz
+  cutoff is introduced. Change the actual measurement or focus constraints during the flight:
+  the affected shell settles immediately, without delaying execution or replaying on input idle.
 
 - Pending: a delayed query-associated Empty count, an unknown-cause count and an independent visible
   quantity revision after typing stops. The first two stay immediate; only the last is eligible for

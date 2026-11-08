@@ -130,7 +130,7 @@ revision retains the `empty.roll` eligibility above.
 With the ordinary input outside the popup, focus stays in that editor and popup entry can run without moving it. If an inside-popup input/popup receives native initial focus, or keyboard interaction requires an active result to be immediately visible and stationary, settle the affecting popup envelope first. Preserve Base UI's actual initial-focus policy; do not blur, refocus or delay the editor to guarantee entry.
 
 - Base UI owns input, IME, active descendant, selection, filtering and focus safety. Never remount the input or delay results until outgoing rows finish.
-- Fast typing replaces the pending height target; excessive frequency falls back to immediate size rather than building a queue. A removed highlighted item follows native focus fallback immediately.
+- Fast typing replaces the pending height target through the same owner, without waiting for a quiet interval. Use immediate size when the latest destination cannot be measured safely, interaction/readability requires it, or the applicable shared work limit is exceeded; interruption alone is not overload. A removed highlighted item follows native focus fallback immediately.
 - Close cancels list/chip presentation inside the popup. Reopen uses current results without replaying stale rows; chip removal returns focus according to Base UI, not after its visual exit.
 - Live reduced cancels size/reflow/scale; none/zero clock also cancels remaining presentation and completes a closing popup through Base UI's actual native protocol. Native caret, selection, chip removal and scrolling remain available. Unmount releases observers, native handlers and outgoing decorative chip copies.
 - Async results received after close update the current data without hidden size animation or reopening. A new open/query revision invalidates obsolete size/exit callbacks. Popup closure does not reset an outside chip collection or cancel a native input edit; controlled values follow actual accepted state.
@@ -145,6 +145,11 @@ With the ordinary input outside the popup, focus stays in that editor and popup 
 - Parent Input Group or a surrounding panel consumes the same committed chip/list destination or delegates that cause; it must not run a second spring chasing either host. Virtualized placement belongs to its actual virtualizer, including recycled item identity; unavailable safe natural measurement uses immediate geometry.
 
 ## Acceptance scenarios
+
+- Pending: repeatedly update a large result list with only one popup-height owner, then exceed the
+  separate chip collection or changed-text bound. Row count alone does not trigger a fictitious
+  collection cutoff or all-row measurement; actual added work determines the fallback. Results and
+  active-descendant visibility remain immediate, without an idle timer or a delayed replay.
 
 - Pending: deliver query-associated results and an Empty count after typing stops, then deliver a
   known independent count revision. The query-associated/unknown count remains immediate while the

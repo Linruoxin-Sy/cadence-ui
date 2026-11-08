@@ -203,6 +203,13 @@ retry a queued obsolete transaction. The semantic value is always current.
 
 ### 3.1 Effective modes and clock ownership
 
+Preset clocks do not establish sequencing dependencies. Sidebar's label presence uses its size
+owner's usable-space gate even when independent token overrides reverse the relative durations.
+Sheet's edge distance belongs to its current physical panel extent; an extent-changing revision
+during entry follows Sheet's settle-then-assess-size rule instead of combining stale travel with a
+second size clock. Drawer retains its distinct native swipe/snap coordinator. These component gates
+narrow the existing forms; they introduce no delay token, alternate preset or generic engine override.
+
 Each preset's full-mode parameters above are subject to these property-specific results. A component
 action may use a narrower documented subset, but cannot retain a property that the mode removes.
 
@@ -512,6 +519,20 @@ never acquire reels merely because the supplied child has a numeric type. These 
 rules, not additional presets, duration values or runtime availability claims.
 
 ### 5.2 Shared work limits
+
+References to a "list budget", "visible-list budget" or "overload" in component prose mean the
+applicable limits below, not an additional unspecified item count or update-rate threshold. The
+50-visual bound applies to added collection presence/layout work, not to the number of semantic rows
+inside one naturally measured scrolling surface. Measuring that one destination does not grant
+permission to measure or animate every row. Text, numeric and chart work retain their separate bounds.
+
+Coalescing retains at most the latest committed destination per owner; it never debounces semantic
+state or waits for a quiet interval. Rapid updates alone do not disable an otherwise valid retarget.
+Use immediate geometry when provenance, a safe measurement, current bounds, interaction safety or
+the applicable work bound fails. A component-specific cadence fallback must state its observable
+condition, as Bubble does for overlapping append/height work; do not invent private Hz thresholds,
+timers or a rule that every interrupted tween is overload. Reassess a later independent revision
+normally, without replaying suppressed changes.
 
 All bindings inherit [the system budgets](../animation-system.md#7-performance-budgets-and-implementation-rules):
 existing per-item source ceilings, consumer/runtime/page limits, real-device frame rate and CLS.

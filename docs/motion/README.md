@@ -386,6 +386,15 @@ dependency's actual part, preset and property subset, not just against the globa
 A deliberate composition override must state the original assignment, replacement, cause and same
 owner; the structural reference checker alone cannot distinguish that override from accidental drift.
 
+Review sequencing with independently overridden preset clocks, not just factory durations. A promise
+such as "fade before clipping" needs a geometry-based eligibility/fallback rule; a faster nominal fade
+is not synchronization. Check opening while content changes size, a reversal before that fade finishes,
+and a zero or reduced clock while paint waits for usable space. No pending reveal may expose a now
+closed region. Follow the system's physical/logical dimension rule when reviewing ratio, orientation
+and writing-mode changes. Treat vague frequency or list-limit language through the exact
+[shared work limits](presets.md#52-shared-work-limits), without turning a one-shell measurement into
+an all-row measurement requirement or assigning an undocumented numeric cutoff.
+
 Local contracts may coordinate outgoing visuals, incoming visuals and geometry without delaying the
 semantic commit. Distinguish visual sequencing from delaying an actual action. In particular, replacement
 labels do not wait for a success animation, filter results do not wait for old rows to fade, and a
