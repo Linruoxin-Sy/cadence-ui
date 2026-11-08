@@ -337,6 +337,10 @@ layout is read during render. Navigation uses one token-backed tween, with no se
 smooth-scroll clock. Wheel, touch, pointer input, scrolling keys, resizing, history traversal and
 external hash changes cancel it at the current position. Positive clock changes retime the current
 trip; reduced/none or zero clock complete it immediately. No interrupted trip restarts later.
+Removed/replaced targets and passive scroll-host geometry changes cancel a trip before it can focus
+or snap to an obsolete destination. Hidden/offscreen links settle their reading indicator while a
+valid user-activated trip retains its target and focus. Document hiding, print and forced-colours
+cancel navigation; restoration does not resume an abandoned trip.
 The site's mobile disclosure stays instant. Initial hashes, reload, history traversal and no-JS
 links keep native behavior; only an explicit unmodified section link activation starts the recipe.
 

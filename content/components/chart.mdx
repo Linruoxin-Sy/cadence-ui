@@ -796,6 +796,13 @@ The full clock is duration.base / ease.out, scaled by provider timeScale. Reduce
 because comparison must remain legible. Static SVG coordinate transforms are retained in all
 modes. This is not a DOM layout animation. Mode changes do not remount the chart.
 
+Local tokens supply the clock and easing. Positive clock edits preserve each series' data action,
+including when ordinary callbacks or custom paint props are created inline. Restoring full motion
+after immediate presentation keeps the same data still; the next data revision can animate.
+Supported completion callbacks use the latest committed function. Callback availability, render
+functions, shapes, children and refs otherwise follow the pinned Recharts API.
+Hidden/offscreen, print and forced-colours settle owned work without replaying missed updates.
+
 ## Accessibility
 
 Give the chart an accessible name, keep Recharts accessibilityLayer enabled, and provide a

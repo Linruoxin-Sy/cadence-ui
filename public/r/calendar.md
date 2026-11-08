@@ -958,7 +958,7 @@ All DayPicker 9.13.2 props and discriminated selection types are preserved.
 | numberOfMonths / fixedWeeks / showWeekNumber | number / boolean / boolean | 1 / false / false | Grid layout options. |
 | className / classNames / style / styles | DayPicker styles | — | Caller overrides win. |
 | formatters / labels / components | DayPicker overrides | — | Override individual formatters, accessible labels or entire parts. |
-| animate | boolean | false | Forwarded upstream API; external DayPicker animation CSS is caller-owned. Do not combine a second CSS clock with Cadence motion. |
+| animate | boolean | false | Forwarded upstream API; selecting it yields Cadence grid paint to the caller-owned DayPicker animation stylesheet. |
 
 ### `CalendarDayButton`
 
@@ -980,6 +980,9 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 The same grid responds to buttons, native dropdowns, keyboard navigation and external controlled
 month updates. Week-count height changes immediately. Caller transform/opacity styles take
 precedence over the corresponding animation property. No outgoing duplicate steals focus.
+Any live clock edit cancels the current grid effect; the next month change uses the new local token
+clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the owned WAAPI
+handle, and restoring visibility or full motion does not replay the current month.
 
 ## Accessibility
 

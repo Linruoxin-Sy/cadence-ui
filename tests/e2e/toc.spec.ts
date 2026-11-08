@@ -1,4 +1,3 @@
-import { mkdir } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
@@ -240,7 +239,7 @@ test("deep links select the matching heading in every motion mode", async ({ pag
 });
 
 for (const theme of ["light", "dark"] as const) {
-  test(`upper right Toc tracks headings and keyboard fragments in ${theme}`, async ({ page }) => {
+  test(`upper right Toc tracks headings and keyboard fragments in ${theme}`, async ({ page }, info) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/components/button?motion=none");
     await page.waitForLoadState("networkidle");
@@ -251,7 +250,6 @@ for (const theme of ["light", "dark"] as const) {
     const body = await article.boundingBox();
     expect(rail && body && rail.x > body.x + body.width).toBeTruthy();
     expect(rail?.y).toBeLessThan(140);
-    await mkdir(".cache/toc-proof", { recursive: true });
     for (const width of [1440, 1920]) {
       await page.setViewportSize({ width, height: 900 });
       const alignment = await page.evaluate(() => {
@@ -273,7 +271,7 @@ for (const theme of ["light", "dark"] as const) {
       expect(alignment.width).toBe(224);
       expect(alignment.articleWidth).toBeLessThanOrEqual(768);
       expect(alignment.gap).toBeGreaterThanOrEqual(64);
-      await page.screenshot({ path: `.cache/toc-proof/right-sidebar-${theme}-${width}.png` });
+      await page.screenshot({ path: info.outputPath(`right-sidebar-${theme}-${width}.png`) });
     }
     await page.setViewportSize({ width: 1440, height: 900 });
     const api = toc.getByRole("link", { name: "API", exact: true });
@@ -292,13 +290,12 @@ for (const theme of ["light", "dark"] as const) {
     expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual(
       [],
     );
-    await mkdir(".cache/toc-proof", { recursive: true });
-    await page.screenshot({ path: `.cache/toc-proof/desktop-${theme}.png` });
+    await page.screenshot({ path: info.outputPath(`desktop-${theme}.png`) });
   });
 }
 
 for (const javaScriptEnabled of [true, false]) {
-  test(`mobile Toc works with JavaScript ${javaScriptEnabled}`, async ({ browser, baseURL }) => {
+  test(`mobile Toc works with JavaScript ${javaScriptEnabled}`, async ({ browser, baseURL }, info) => {
     const context = await browser.newContext({ javaScriptEnabled, viewport: { width: 390, height: 844 } });
     try {
       const page = await context.newPage();
@@ -310,8 +307,7 @@ for (const javaScriptEnabled of [true, false]) {
       const toc = disclosure.getByRole("navigation", { name: "On this page" });
       await expect(toc).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await mkdir(".cache/toc-proof", { recursive: true });
-      await page.screenshot({ path: `.cache/toc-proof/mobile-js-${javaScriptEnabled}.png` });
+      await page.screenshot({ path: info.outputPath(`mobile-js-${javaScriptEnabled}.png`) });
       await toc.getByRole("link", { name: "API", exact: true }).click();
       await expect(page.locator("h2#api")).toBeInViewport();
       await expect(page).toHaveURL(/#api$/);

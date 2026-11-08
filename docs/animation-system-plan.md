@@ -240,6 +240,11 @@ existing performance task is a final delivery dependency, not a development prer
   disconnected refs, missing capability evidence and legacy loop drift. Finite shared owners cancel
   restrictions and capture positive clocks; physics owners retime. Individual component adoption
   and text/number enforcement remain pending; the total v2 marker remains fail-closed.
+- Existing engine adapters preserve native geometry, direct gestures and ref/event ownership while
+  cancelling their autonomous work. Embla retains actual effective option precedence; Recharts retains
+  per-series action progress across native handle recreation; Calendar and Toc retain their distinct
+  cancellation clocks. This shared support does not migrate their complete component contracts, initial
+  full-mode series presentation, annotation/content capabilities or the remaining popup/geometry work.
 - Target reference metadata explicitly records `migration: "legacy"`; absent/unknown state fails.
   Registry checking and the runtime reporter reject `v2` until strict enforcement support exists.
   Legacy items still prove their documented baseline. Next, enable shared target assertion support,

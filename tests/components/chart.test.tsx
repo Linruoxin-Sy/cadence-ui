@@ -1,10 +1,13 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { createContext, createRef } from "react";
 import { Bar, BarChart, JavascriptAnimation } from "recharts";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ChartContainer, ChartLegendContent, ChartStyle, ChartTooltipContent } from "@/registry/cadence/chart";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
+
+beforeEach(visibleEngineViewport);
 
 const engine = vi.hoisted(() => ({ controller: null as import("recharts").AnimationController | null }));
 vi.mock("recharts", async (original) => {

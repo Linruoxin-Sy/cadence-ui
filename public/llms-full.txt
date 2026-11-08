@@ -27333,7 +27333,11 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 | None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
 | Buttons | — | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
 
-A mode downgrade settles the existing target without resetting selection. Engine friction,
+A mode downgrade settles autonomous navigation without resetting selection. A held drag keeps its
+native position and ownership; its release reaches the current engine target immediately. Local authored
+tokens and effective overrides supply the default clock, while real API reInit/breakpoint/plugin options
+retain their native precedence. Mode and clock edits keep the instance and plugin identities.
+Hidden/offscreen, print and forced-colours cancel owned settling without replay on restoration. Engine friction,
 geometry and momentum destinations remain Embla-owned. Independent plugin animations remain
 caller-owned. Removing the track transform would display the wrong slide and is not reduction.
 
@@ -28779,6 +28783,13 @@ The full clock is duration.base / ease.out, scaled by provider timeScale. Reduce
 because comparison must remain legible. Static SVG coordinate transforms are retained in all
 modes. This is not a DOM layout animation. Mode changes do not remount the chart.
 
+Local tokens supply the clock and easing. Positive clock edits preserve each series' data action,
+including when ordinary callbacks or custom paint props are created inline. Restoring full motion
+after immediate presentation keeps the same data still; the next data revision can animate.
+Supported completion callbacks use the latest committed function. Callback availability, render
+functions, shapes, children and refs otherwise follow the pinned Recharts API.
+Hidden/offscreen, print and forced-colours settle owned work without replaying missed updates.
+
 ## Accessibility
 
 Give the chart an accessible name, keep Recharts accessibilityLayer enabled, and provide a
@@ -29767,7 +29778,7 @@ All DayPicker 9.13.2 props and discriminated selection types are preserved.
 | numberOfMonths / fixedWeeks / showWeekNumber | number / boolean / boolean | 1 / false / false | Grid layout options. |
 | className / classNames / style / styles | DayPicker styles | — | Caller overrides win. |
 | formatters / labels / components | DayPicker overrides | — | Override individual formatters, accessible labels or entire parts. |
-| animate | boolean | false | Forwarded upstream API; external DayPicker animation CSS is caller-owned. Do not combine a second CSS clock with Cadence motion. |
+| animate | boolean | false | Forwarded upstream API; selecting it yields Cadence grid paint to the caller-owned DayPicker animation stylesheet. |
 
 ### `CalendarDayButton`
 
@@ -29789,6 +29800,9 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 The same grid responds to buttons, native dropdowns, keyboard navigation and external controlled
 month updates. Week-count height changes immediately. Caller transform/opacity styles take
 precedence over the corresponding animation property. No outgoing duplicate steals focus.
+Any live clock edit cancels the current grid effect; the next month change uses the new local token
+clock. Zero starts no effect. Hidden/offscreen, print and forced-colours cancel only the owned WAAPI
+handle, and restoring visibility or full motion does not replay the current month.
 
 ## Accessibility
 
@@ -36736,6 +36750,10 @@ layout is read during render. Navigation uses one token-backed tween, with no se
 smooth-scroll clock. Wheel, touch, pointer input, scrolling keys, resizing, history traversal and
 external hash changes cancel it at the current position. Positive clock changes retime the current
 trip; reduced/none or zero clock complete it immediately. No interrupted trip restarts later.
+Removed/replaced targets and passive scroll-host geometry changes cancel a trip before it can focus
+or snap to an obsolete destination. Hidden/offscreen links settle their reading indicator while a
+valid user-activated trip retains its target and focus. Document hiding, print and forced-colours
+cancel navigation; restoration does not resume an abandoned trip.
 The site's mobile disclosure stays instant. Initial hashes, reload, history traversal and no-JS
 links keep native behavior; only an explicit unmodified section link activation starts the recipe.
 

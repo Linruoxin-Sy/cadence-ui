@@ -649,21 +649,45 @@ interpolation resolves to zero. Track navigation adds no entrance/exit or opacit
 restriction concerns the engine-owned navigation cause; independent root insertion follows the
 [Carousel target presence contract](motion/components/carousel.md) without another track writer.
 
-Resolve `cm.transition("data.transition").duration` in full, retaining
-`duration.base * cm.timeScale` as the base option under reduced/none. The engine options must stay stable
-across mode changes; the policy clamps the runtime clock. Convert with the shared
+Resolve the full `data.transition` base from the actual local token scope even while reduced/none
+clamps execution. Authored and already-effective duration overrides retain their documented precedence;
+never reconstruct the full base from a reduced result or a default constant. Keep the native React
+options seed stable across mode/clock changes; update only a library-owned effective default without
+reinitializing. Convert with the shared
 `carouselClock.unitsPerSecond` calibration (100 engine attraction units per authored second,
 not milliseconds or a wall-clock guarantee). Default full timing is therefore duration.base →
 22 attraction units; timeScale scales this value. Explicit `opts.duration`, including breakpoint
-values, remains caller-owned in full mode. On pointer release, use the engine's effective base
+values, remains caller-owned in full mode. Read effective values from the real engine, preserving
+native global/breakpoint merges, explicit API `reInit` options and plugin option changes. A private
+instance `reInit` adapter tracks default provenance without replacing Embla's merge. On pointer release, use the engine's effective base
 duration instead of DragHandler's hard-coded 25/43-unit release clock. Embla retains its native
 friction, momentum target and interruption from the current location/velocity.
 
-A private lifecycle plugin wraps each fresh engine's `scrollBody.useDuration`: full passes values
+A private lifecycle plugin wraps each fresh engine's `scrollBody.useDuration` and `useBaseDuration`: full passes values
 through; reduced/none clamp all calls to zero, including drag tracking/release, API calls with
 `jump=false`, focus and user plugins using the engine. Restore on destroy and reattach on reInit.
 Apply the current mode through a ref so mode changes do not reinitialize or reset selection;
-when downgrading in flight, flush the engine's existing target through update/render immediately.
+when downgrading autonomous settling, flush the engine's existing target through update/render immediately.
+While a pointer owns the drag, preserve its position and ownership; release resolves its current valid
+native target immediately. Destroy restores only this adapter's methods/listeners and reInit attaches
+to the fresh engine. Hidden/offscreen, print and forced-colours cancel the owned autonomous work;
+restoration starts from current state without a navigation replay. Cancel the actual queued native RAF;
+an idle policy edit emits no synthetic settle event. Native callbacks may synchronously reInit or start
+a successor action, so every remaining flush step checks the engine lifetime and action generation
+before touching the shared track or stopping a clock.
+At a new native navigation command, a cached viewport block may be stale after synchronous scrolling.
+Carousel revalidates ordinary axis-aligned rectangular overflow and inset clips against the viewport,
+bounded to 32 ancestor styles and their clipping boxes. Pointer hitability and unrelated overlays do not
+define intersection visibility. Unsupported complex clipping conservatively retains cached suspension.
+Document suspension still wins. This runs at a new index/distance command, never on positive duration
+setters, animation frames or every scroll. A positive-area IO threshold reports edge-touching zero-area
+clips, and the newest timed record wins. Older records cannot cancel an action solely from stale geometry.
+Successful recovery re-arms native observation, so a hide in the same frame still produces an initial
+record. An older negative delivery checks current bounded geometry before cancellation; this also
+handles a frame timestamp preceding a command inside that frame.
+Cleanup retires the observer/subscription lifetime before draining records and disconnecting. A queued
+callback from an old element cannot mutate the replacement owner's policy or cancel its new native action.
+The threshold/record rule follows the [Intersection Observer processing algorithm](https://www.w3.org/TR/intersection-observer/#update-intersection-observations-algo).
 Plugins that create independent CSS/WAAPI animations or automatic advance own those behaviours;
 callers must stop autonomous plugins for reduced/none and provide pause controls for autoplay.
 Do not silently remove user plugins. Navigation buttons inherit Button's `feedback.press` recipe;
@@ -689,7 +713,22 @@ series animationDuration, animationBegin and animationEasing cannot extend or by
 isAnimationActive=false still opts out. Reduced and none complete geometry immediately: fading
 an entire chart would obscure comparison, so neither adds an opacity fallback. Static positional
 SVG transforms remain in every mode because they encode data coordinates, not animation.
-Recharts starts controllers in a passive effect. For its eight installed series, Cadence also supplies a terminal `animationInterpolateFn` in reduced/none or at zero clock, so their first rendered data geometry does not depend on that passive callback. Traversal preserves element types and keys, custom shapes and other props; full mode preserves the caller interpolator, and instantaneous modes call a custom interpolator at its terminal progress. A running downgrade or zero recipe clock completes every registered animation without remounting the chart. Positive live clock changes integrate subsequent frame deltas against the current token duration, preserving numeric progress. Updates
+Recharts starts controllers in a passive effect. For its eight installed series, Cadence supplies a terminal
+`animationInterpolateFn` and bypasses new autonomous handles in reduced/none or at zero clock, so first
+rendered data geometry does not depend on that passive callback. A private React owner adds no DOM,
+retains the real series type/key/children and forwards render functions, shapes and native refs directly.
+Full preserves the caller interpolator; instantaneous rendering calls it at terminal progress. A running
+downgrade or zero clock completes registered handles before paint. Already-present data remains static
+on restoration even when a consumer creates new callback/formatter/shape props. A genuine data/geometry
+revision re-enables its full-mode action. Callback availability remains the installed engine's own API.
+
+Each series retains one semantic action phase. Positive clocks integrate subsequent deltas against the
+current token duration; that action retains its starting easing, and the next data action takes a changed
+easing token. Recharts may recreate a handle from current geometry when ordinary props change;
+that handle consumes the original easing curve's remaining segment and remaining phase, not a fresh
+duration/ease or a second geometry writer. Start/end callbacks for a supported native channel use the
+latest committed function once per action; an obsolete action cannot complete its successor. Environment
+gates cancel hidden/offscreen, print and forced-colours work without accumulating revisions. Updates
 and resize must preserve axes, legend and keyboard tooltip state. No SSR replay wrapper is used.
 
 ChartTooltip disables Recharts' positional CSS animation in every mode; pointer/focus changes
@@ -713,6 +752,8 @@ and settles both properties. The delivered adapter changes actual table height i
 variable week counts. The [Calendar target contract](motion/components/calendar.md) may coordinate
 measured outer-host geometry; it does not animate the table's height or add a second grid writer.
 Caller components override the corresponding defaults and own their motion; caller styles win.
+An explicit DayPicker `animate` owner yields Cadence's grid effect. Zero duration starts no WAAPI handle;
+environment cancellation removes only the owned effect and restoration never replays the same month.
 DayPicker's optional `animate` API remains forwarded, but its CSS animation engine requires the caller's
 stylesheet; Cadence does not import that stylesheet or activate a second animation clock.
 Day buttons retain native button semantics and static selection/range styling, using buttonVariants
@@ -757,6 +798,11 @@ focuses the heading without another scroll, preserving any caller tabindex. Modi
 clicks, caller-cancelled events and missing targets retain native link behavior.
 Keep URL query/history state and hashchange notifications. Initial hashes, reload,
 back/forward and no-JS links remain native and never replay the click animation.
+
+The trigger and scroll flight have distinct visibility owners. An offscreen/hidden Toc settles its
+indicator; it does not abandon an already activated trip merely because scrolling moves the links out
+of view. The connected target and measured scroll host own that trip. Document hiding, print and forced
+colours cancel it, as do the native input, target identity and geometry invalidations above.
 
 ### 3.2 Continuous recipes run in CSS
 

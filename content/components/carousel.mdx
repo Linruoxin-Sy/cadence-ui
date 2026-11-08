@@ -694,7 +694,11 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 | None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
 | Buttons | — | Composed Button owns its declared feedback.press recipe; reduced/none remove press scale. Static control placement/vertical rotation are layout. |
 
-A mode downgrade settles the existing target without resetting selection. Engine friction,
+A mode downgrade settles autonomous navigation without resetting selection. A held drag keeps its
+native position and ownership; its release reaches the current engine target immediately. Local authored
+tokens and effective overrides supply the default clock, while real API reInit/breakpoint/plugin options
+retain their native precedence. Mode and clock edits keep the instance and plugin identities.
+Hidden/offscreen, print and forced-colours cancel owned settling without replay on restoration. Engine friction,
 geometry and momentum destinations remain Embla-owned. Independent plugin animations remain
 caller-owned. Removing the track transform would display the wrong slide and is not reduction.
 

@@ -4,11 +4,13 @@ import { frame } from "motion/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Toc } from "@/registry/cadence/toc";
+import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
 import { imperativeControls, imperativeSamples } from "../motion-observer";
 
 const observers = new Set<ResizeObserverCallback>();
 beforeEach(() => {
+  visibleEngineViewport();
   observers.clear();
   window.history.replaceState({ kept: true }, "", "/components/toc?keep=yes");
   vi.stubGlobal(

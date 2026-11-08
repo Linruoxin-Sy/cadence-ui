@@ -3,10 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
 import { CalendarDay, type DateRange, type DayButtonProps } from "react-day-picker";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar, CalendarDayButton } from "@/registry/cadence/calendar";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
+
+beforeEach(visibleEngineViewport);
 
 const month = new Date(2026, 10, 1);
 describe("Calendar", () => {

@@ -9,6 +9,8 @@ import {
   type RefObject,
   useCallback,
   useContext,
+  useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -25,6 +27,7 @@ import {
   resolveMotionParameters,
   transitionFor,
 } from "./motion";
+import { subscribeMotionEnvironment } from "./motion-environment";
 import {
   defaultMotionScope,
   disconnectMotionTokenScope,
@@ -202,7 +205,7 @@ export function useCadenceMotion(ref?: RefObject<HTMLElement | SVGElement | null
 /** Bind a real part without replacing its caller's React 19 cleanup ref. */
 export function useCadenceMotionScope<T extends HTMLElement | SVGElement>(externalRef?: Ref<T>) {
   const node = useRef<T | null>(null);
-  const [, attached] = useState<T | null>(null);
+  const [element, attached] = useState<T | null>(null);
   const cm = useCadenceMotion(node);
   const ref = useCallback(
     (element: T | null) => {
@@ -222,7 +225,181 @@ export function useCadenceMotionScope<T extends HTMLElement | SVGElement>(extern
     },
     [externalRef],
   );
-  return { cm, ref };
+  return { cm, ref, element };
+}
+
+// A command can follow scrollIntoView before IO delivers its new record. Resolve
+// ordinary rectangular clips without using pointer hitability as visibility.
+function currentEngineVisibility(element: HTMLElement | SVGElement): boolean | null {
+  const view = element.ownerDocument.defaultView;
+  if (!view) return false;
+  if (view.top !== view) return null;
+  const bounds = element.getBoundingClientRect();
+  let left = Math.max(0, bounds.left),
+    right = Math.min(view.innerWidth, bounds.right),
+    top = Math.max(0, bounds.top),
+    bottom = Math.min(view.innerHeight, bounds.bottom);
+  if (right <= left || bottom <= top) return false;
+  const ancestors: { node: Element; style: CSSStyleDeclaration }[] = [];
+  let aligned = true;
+  for (let node: Element | null = element; node; node = node.parentElement) {
+    if (ancestors.length === 32) return null;
+    const style = view.getComputedStyle(node);
+    if (
+      style.display === "none" ||
+      (node === element && style.visibility !== "visible") ||
+      style.contentVisibility === "hidden"
+    )
+      return false;
+    if (style.rotate !== "none" && Number.parseFloat(style.rotate) !== 0) aligned = false;
+    if (style.perspective !== "none" || style.offsetPath !== "none") aligned = false;
+    if (style.transform !== "none") {
+      const matrix = new DOMMatrixReadOnly(style.transform);
+      if (!matrix.is2D || matrix.b !== 0 || matrix.c !== 0 || matrix.a <= 0 || matrix.d <= 0) aligned = false;
+    }
+    if (style.scale !== "none" && style.scale.split(" ").some((value) => Number(value) <= 0)) aligned = false;
+    ancestors.push({ node, style });
+  }
+  if (ancestors[ancestors.length - 1]?.node !== element.ownerDocument.documentElement) return null;
+  for (const { node, style } of ancestors) {
+    if (style.display === "contents") continue;
+    const paintContainment = /paint|strict|content/.test(style.contain);
+    const x = node !== element && (style.overflowX !== "visible" || paintContainment),
+      y = node !== element && (style.overflowY !== "visible" || paintContainment);
+    const path = style.clipPath;
+    if (!x && !y && path === "none" && style.clip === "auto") continue;
+    if (!aligned || style.clip !== "auto") return null;
+    if (!(node instanceof HTMLElement)) return null;
+    const rect = node === element ? bounds : node.getBoundingClientRect();
+    const scaleX = node.offsetWidth ? rect.width / node.offsetWidth : 1,
+      scaleY = node.offsetHeight ? rect.height / node.offsetHeight : 1;
+    if (x) {
+      const edge = rect.left + node.clientLeft * scaleX;
+      left = Math.max(left, edge);
+      right = Math.min(right, edge + node.clientWidth * scaleX);
+    }
+    if (y) {
+      const edge = rect.top + node.clientTop * scaleY;
+      top = Math.max(top, edge);
+      bottom = Math.min(bottom, edge + node.clientHeight * scaleY);
+    }
+    if (path !== "none") {
+      const match = /^inset\(([^()]+)\)$/.exec(path);
+      const values = match?.[1]?.split(/\s+/);
+      if (!values || values.length > 4 || values.some((value) => !/^-?(?:\d+\.?\d*|\.\d+)(?:px|%)$/.test(value)))
+        return null;
+      const a = values[0];
+      if (!a) return null;
+      const b = values[1] ?? a,
+        c = values[2] ?? a,
+        d = values[3] ?? b;
+      const length = (value: string, size: number, scale: number) =>
+        Number.parseFloat(value) * (value.endsWith("%") ? size / 100 : scale);
+      left = Math.max(left, rect.left + length(d, rect.width, scaleX));
+      right = Math.min(right, rect.right - length(b, rect.width, scaleX));
+      top = Math.max(top, rect.top + length(a, rect.height, scaleY));
+      bottom = Math.min(bottom, rect.bottom - length(c, rect.height, scaleY));
+    }
+    if (right <= left || bottom <= top) return false;
+  }
+  return true;
+}
+
+/** Internal engine lifetime gate. Cancellation runs in the signal, before React's next paint. */
+export function useEngineEnvironment(
+  element: HTMLElement | SVGElement | null,
+  cancel: () => void,
+  observeViewport = true,
+) {
+  const blocked = useRef(false);
+  const revalidate = useRef(() => blocked.current);
+  const [unavailable, setUnavailable] = useState(false);
+  const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
+  committed(() => {
+    if (!element) return;
+    let visible = true;
+    let suspended = false;
+    let sampledAt = Number.NEGATIVE_INFINITY;
+    let alive = true;
+    const ownsEnvironment = () => alive;
+    const update = () => {
+      if (!ownsEnvironment()) return;
+      blocked.current = suspended || !visible;
+      if (blocked.current) cancel();
+      if (ownsEnvironment()) setUnavailable(blocked.current);
+    };
+    const unsubscribe = subscribeMotionEnvironment(element.ownerDocument, (environment) => {
+      if (!ownsEnvironment()) return;
+      suspended = environment.hidden || environment.immediate;
+      update();
+    });
+    if (!observeViewport)
+      return () => {
+        alive = false;
+        unsubscribe();
+      };
+    const rect = element.getBoundingClientRect();
+    const view = element.ownerDocument.defaultView;
+    visible = Boolean(
+      view &&
+        rect.width &&
+        rect.height &&
+        rect.bottom > 0 &&
+        rect.right > 0 &&
+        rect.top < view.innerHeight &&
+        rect.left < view.innerWidth,
+    );
+    update();
+    const recover = () => {
+      if (!ownsEnvironment()) return true;
+      if (!blocked.current || suspended) return blocked.current;
+      const current = currentEngineVisibility(element);
+      if (current === null) return true;
+      sampledAt = view?.performance.now() ?? sampledAt;
+      if (current !== visible) {
+        visible = current;
+        if (current) {
+          observer.takeRecords();
+          observer.unobserve(element);
+          observer.observe(element);
+        }
+        update();
+      }
+      return ownsEnvironment() ? blocked.current : true;
+    };
+    revalidate.current = recover;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!ownsEnvironment()) return;
+        let latest: IntersectionObserverEntry | undefined;
+        for (const entry of entries)
+          if (entry.target === element && (!latest || entry.time >= latest.time)) latest = entry;
+        if (!latest) return;
+        if (latest.time < sampledAt) {
+          // An IO frame timestamp can precede a command within that frame.
+          // Retain fresh visible actions, but never discard a real newer hide.
+          if ((!latest.isIntersecting || latest.intersectionRatio === 0) && currentEngineVisibility(element) !== true) {
+            visible = false;
+            update();
+          }
+          return;
+        }
+        sampledAt = latest.time;
+        visible = latest.isIntersecting && latest.intersectionRatio > 0;
+        update();
+      },
+      { threshold: Number.EPSILON },
+    );
+    observer.observe(element);
+    return () => {
+      alive = false;
+      observer.takeRecords();
+      observer.disconnect();
+      unsubscribe();
+      if (revalidate.current === recover) revalidate.current = () => blocked.current;
+    };
+  }, [element, cancel, observeViewport]);
+  return { unavailable, blocked, revalidate };
 }
 
 /** Internal part context; keeps render children and nested portals in the owned token scope. */

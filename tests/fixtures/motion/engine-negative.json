@@ -1,0 +1,67 @@
+{
+  "engine-retired-owner": {
+    "file": "registry/cadence/lib/provider.tsx",
+    "find": "const ownsEnvironment = () => alive;",
+    "replace": "const ownsEnvironment = () => true;"
+  },
+  "engine-stale-record": {
+    "file": "registry/cadence/lib/provider.tsx",
+    "find": "if (latest.time < sampledAt) {",
+    "replace": "if (false) {"
+  },
+  "engine-observation-rearm": {
+    "file": "registry/cadence/lib/provider.tsx",
+    "find": "observer.unobserve(element);\n          observer.observe(element);",
+    "replace": "void observer;"
+  },
+  "engine-latest-record": {
+    "file": "registry/cadence/lib/provider.tsx",
+    "find": "(!latest || entry.time >= latest.time)",
+    "replace": "!latest"
+  },
+  "engine-zero-area": {
+    "file": "registry/cadence/lib/provider.tsx",
+    "find": "{ threshold: Number.EPSILON }",
+    "replace": "{ threshold: 0 }"
+  },
+  "toc-trigger-owner": {
+    "file": "registry/cadence/toc/index.tsx",
+    "find": "useEngineEnvironment(element, cancelFlight.current, false)",
+    "replace": "useEngineEnvironment(element, cancelFlight.current, true)"
+  },
+  "carousel-mode": {
+    "file": "registry/cadence/carousel/index.tsx",
+    "find": "restricted || blocked ? 0 : value",
+    "replace": "value"
+  },
+  "carousel-stale-visibility": {
+    "file": "registry/cadence/carousel/index.tsx",
+    "find": "!environment.revalidate.current()",
+    "replace": "false"
+  },
+  "chart-phase-reset": {
+    "file": "registry/cadence/chart/index.tsx",
+    "find": "const origin = playback.progress;",
+    "replace": "playback.progress = 0; playback.previous = undefined; playback.easing = undefined; const origin = playback.progress;"
+  },
+  "chart-curve": {
+    "file": "registry/cadence/chart/index.tsx",
+    "find": "(easing(progress) - startPaint) / (endPaint - startPaint)",
+    "replace": "easing((progress-origin)/(1-origin))"
+  },
+  "calendar-cancel": {
+    "file": "registry/cadence/calendar/index.tsx",
+    "find": "animation.cancel();",
+    "replace": "void animation;"
+  },
+  "carousel-reentry": {
+    "file": "registry/cadence/carousel/index.tsx",
+    "find": "const valid = () =>",
+    "replace": "const valid = () => true ||"
+  },
+  "carousel-idle": {
+    "file": "registry/cadence/carousel/index.tsx",
+    "find": "if (!current?.running && engine.scrollBody.settled()) {",
+    "replace": "if (false) {"
+  }
+}

@@ -15,7 +15,7 @@ import {
 import { type Button, buttonVariants } from "../button";
 import { cn } from "../lib/cn";
 import { motionMilliseconds } from "../lib/motion";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, useEngineEnvironment, withCadenceScope } from "../lib/provider";
 
 function Calendar({
   className,
@@ -34,94 +34,96 @@ function Calendar({
 
   return (
     <LocaleContext value={locale}>
-      <DayPicker
-        showOutsideDays={showOutsideDays}
-        className={cn(
-          "group/calendar bg-background p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
-          String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-          String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
-          className,
-        )}
-        captionLayout={captionLayout}
-        locale={locale}
-        formatters={{
-          formatMonthDropdown: (date) => date.toLocaleString(locale?.code, { month: "short" }),
-          ...formatters,
-        }}
-        classNames={{
-          root: cn("w-fit", defaultClassNames.root),
-          months: cn("relative flex flex-col gap-4 md:flex-row", defaultClassNames.months),
-          month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
-          nav: cn("absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1", defaultClassNames.nav),
-          button_previous: cn(
-            buttonVariants({ variant: buttonVariant }),
-            "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
-            defaultClassNames.button_previous,
-          ),
-          button_next: cn(
-            buttonVariants({ variant: buttonVariant }),
-            "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
-            defaultClassNames.button_next,
-          ),
-          month_caption: cn(
-            "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)",
-            defaultClassNames.month_caption,
-          ),
-          dropdowns: cn(
-            "flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium",
-            defaultClassNames.dropdowns,
-          ),
-          dropdown_root: cn(
-            "relative rounded-md border border-input shadow-xs has-focus:border-ring has-focus:ring-[3px] has-focus:ring-ring/50",
-            defaultClassNames.dropdown_root,
-          ),
-          dropdown: cn("absolute inset-0 bg-popover opacity-0", defaultClassNames.dropdown),
-          caption_label: cn(
-            "font-medium select-none",
-            captionLayout === "label"
-              ? "text-sm"
-              : "flex h-8 items-center gap-1 rounded-md pr-1 pl-2 text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground",
-            defaultClassNames.caption_label,
-          ),
-          month_grid: cn("w-full border-collapse", defaultClassNames.month_grid),
-          weekdays: cn("flex", defaultClassNames.weekdays),
-          weekday: cn(
-            "flex-1 rounded-md text-[0.8rem] font-normal text-muted-foreground select-none",
-            defaultClassNames.weekday,
-          ),
-          week: cn("mt-2 flex w-full", defaultClassNames.week),
-          week_number_header: cn("w-(--cell-size) select-none", defaultClassNames.week_number_header),
-          week_number: cn("text-[0.8rem] text-muted-foreground select-none", defaultClassNames.week_number),
-          day: cn(
-            "group/day relative aspect-square h-full w-full p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-md",
-            props.showWeekNumber
-              ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-md"
-              : "[&:first-child[data-selected=true]_button]:rounded-l-md",
-            defaultClassNames.day,
-          ),
-          range_start: cn("rounded-l-md bg-accent", defaultClassNames.range_start),
-          range_middle: cn("rounded-none", defaultClassNames.range_middle),
-          range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
-          today: cn(
-            "rounded-md bg-accent text-accent-foreground data-[selected=true]:rounded-none",
-            defaultClassNames.today,
-          ),
-          outside: cn("text-muted-foreground aria-selected:text-muted-foreground", defaultClassNames.outside),
-          disabled: cn("text-muted-foreground opacity-50", defaultClassNames.disabled),
-          hidden: cn("invisible", defaultClassNames.hidden),
-          ...classNames,
-        }}
-        components={{
-          Root: CalendarRoot,
-          Month: CalendarMonth,
-          MonthGrid: CalendarMonthGrid,
-          Chevron: CalendarChevron,
-          DayButton: LocalDayButton,
-          WeekNumber: CalendarWeekNumber,
-          ...components,
-        }}
-        {...props}
-      />
+      <NativeAnimationContext value={Boolean(props.animate)}>
+        <DayPicker
+          showOutsideDays={showOutsideDays}
+          className={cn(
+            "group/calendar bg-background p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+            String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
+            String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+            className,
+          )}
+          captionLayout={captionLayout}
+          locale={locale}
+          formatters={{
+            formatMonthDropdown: (date) => date.toLocaleString(locale?.code, { month: "short" }),
+            ...formatters,
+          }}
+          classNames={{
+            root: cn("w-fit", defaultClassNames.root),
+            months: cn("relative flex flex-col gap-4 md:flex-row", defaultClassNames.months),
+            month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
+            nav: cn("absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1", defaultClassNames.nav),
+            button_previous: cn(
+              buttonVariants({ variant: buttonVariant }),
+              "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
+              defaultClassNames.button_previous,
+            ),
+            button_next: cn(
+              buttonVariants({ variant: buttonVariant }),
+              "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
+              defaultClassNames.button_next,
+            ),
+            month_caption: cn(
+              "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)",
+              defaultClassNames.month_caption,
+            ),
+            dropdowns: cn(
+              "flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium",
+              defaultClassNames.dropdowns,
+            ),
+            dropdown_root: cn(
+              "relative rounded-md border border-input shadow-xs has-focus:border-ring has-focus:ring-[3px] has-focus:ring-ring/50",
+              defaultClassNames.dropdown_root,
+            ),
+            dropdown: cn("absolute inset-0 bg-popover opacity-0", defaultClassNames.dropdown),
+            caption_label: cn(
+              "font-medium select-none",
+              captionLayout === "label"
+                ? "text-sm"
+                : "flex h-8 items-center gap-1 rounded-md pr-1 pl-2 text-sm [&>svg]:size-3.5 [&>svg]:text-muted-foreground",
+              defaultClassNames.caption_label,
+            ),
+            month_grid: cn("w-full border-collapse", defaultClassNames.month_grid),
+            weekdays: cn("flex", defaultClassNames.weekdays),
+            weekday: cn(
+              "flex-1 rounded-md text-[0.8rem] font-normal text-muted-foreground select-none",
+              defaultClassNames.weekday,
+            ),
+            week: cn("mt-2 flex w-full", defaultClassNames.week),
+            week_number_header: cn("w-(--cell-size) select-none", defaultClassNames.week_number_header),
+            week_number: cn("text-[0.8rem] text-muted-foreground select-none", defaultClassNames.week_number),
+            day: cn(
+              "group/day relative aspect-square h-full w-full p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-md",
+              props.showWeekNumber
+                ? "[&:nth-child(2)[data-selected=true]_button]:rounded-l-md"
+                : "[&:first-child[data-selected=true]_button]:rounded-l-md",
+              defaultClassNames.day,
+            ),
+            range_start: cn("rounded-l-md bg-accent", defaultClassNames.range_start),
+            range_middle: cn("rounded-none", defaultClassNames.range_middle),
+            range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
+            today: cn(
+              "rounded-md bg-accent text-accent-foreground data-[selected=true]:rounded-none",
+              defaultClassNames.today,
+            ),
+            outside: cn("text-muted-foreground aria-selected:text-muted-foreground", defaultClassNames.outside),
+            disabled: cn("text-muted-foreground opacity-50", defaultClassNames.disabled),
+            hidden: cn("invisible", defaultClassNames.hidden),
+            ...classNames,
+          }}
+          components={{
+            Root: CalendarRoot,
+            Month: CalendarMonth,
+            MonthGrid: CalendarMonthGrid,
+            Chevron: CalendarChevron,
+            DayButton: LocalDayButton,
+            WeekNumber: CalendarWeekNumber,
+            ...components,
+          }}
+          {...props}
+        />
+      </NativeAnimationContext>
     </LocaleContext>
   );
 }
@@ -183,6 +185,7 @@ function CalendarWeekNumber({ children, week: _week, ...props }: WeekNumberProps
 }
 // Stable component identities keep DayPicker's navigation and focus tree mounted.
 const MonthContext = React.createContext(0);
+const NativeAnimationContext = React.createContext(false);
 function CalendarMonth({ calendarMonth, displayIndex: _displayIndex, ...props }: MonthProps) {
   return (
     <MonthContext value={calendarMonth.date.getTime()}>
@@ -191,14 +194,20 @@ function CalendarMonth({ calendarMonth, displayIndex: _displayIndex, ...props }:
   );
 }
 function CalendarRoot({ rootRef, ...props }: React.ComponentProps<"div"> & { rootRef?: React.Ref<HTMLDivElement> }) {
-  const cm = useCadenceMotion();
-  return <div data-slot="calendar" data-motion={cm.mode} ref={rootRef} {...props} />;
+  const { cm, ref } = useCadenceMotionScope(rootRef);
+  return withCadenceScope(cm, <div data-slot="calendar" data-motion={cm.mode} {...props} ref={ref} />);
 }
 function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
-  const cm = useCadenceMotion();
+  const { cm, ref, element } = useCadenceMotionScope<HTMLTableElement>();
+  const nativeAnimation = React.useContext(NativeAnimationContext);
   const month = React.useContext(MonthContext);
   const previous = React.useRef(month);
-  const scope = React.useRef<HTMLTableElement>(null);
+  const active = React.useRef<Animation | null>(null);
+  const cancel = React.useCallback(() => {
+    active.current?.cancel();
+    active.current = null;
+  }, []);
+  const environment = useEngineEnvironment(element, cancel);
   const { mode, reduced, timeScale } = cm;
   const transition = cm.transition("data.transition");
   const milliseconds = motionMilliseconds(transition.duration ?? 0);
@@ -208,8 +217,8 @@ function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
     const changed = previous.current !== month;
     const direction = month > previous.current ? 1 : -1;
     previous.current = month;
-    const element = scope.current;
-    if (!element || !changed || mode === "none") return;
+    if (!element || !changed || mode === "none" || milliseconds === 0 || nativeAnimation || environment.blocked.current)
+      return;
     if (!element.animate) return;
     const from: Keyframe = {};
     const to: Keyframe = {};
@@ -217,15 +226,37 @@ function CalendarMonthGrid({ style, ...props }: MonthGridProps) {
       from.opacity = 0;
       to.opacity = 1;
     }
-    if (!reduced && !style?.transform) {
+    if (!reduced && style?.transform === undefined) {
       from.transform = `translateX(${direction * cm.distance.sm}px)`;
       to.transform = "none";
     }
+    if (Object.keys(from).length === 0) return;
     // WAAPI owns only this effect: cancel removes it synchronously, revealing caller styles.
     const animation = element.animate([from, to], { duration: milliseconds, easing });
-    return () => animation.cancel();
-  }, [month, mode, reduced, timeScale, milliseconds, easing, cm.distance.sm, scope, style?.transform, style?.opacity]);
-  return <table ref={scope} data-slot="calendar-month-grid" data-motion={cm.mode} style={style} {...props} />;
+    active.current = animation;
+    animation.onfinish = () => {
+      if (active.current === animation) active.current = null;
+    };
+    return () => {
+      animation.onfinish = null;
+      animation.cancel();
+      if (active.current === animation) active.current = null;
+    };
+  }, [
+    month,
+    mode,
+    reduced,
+    timeScale,
+    milliseconds,
+    easing,
+    cm.distance.sm,
+    element,
+    style?.transform,
+    style?.opacity,
+    nativeAnimation,
+    environment.unavailable,
+  ]);
+  return <table ref={ref} data-slot="calendar-month-grid" data-motion={cm.mode} style={style} {...props} />;
 }
 
 export { Calendar, CalendarDayButton };

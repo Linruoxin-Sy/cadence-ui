@@ -3,7 +3,7 @@ export const observeAnimate = {
   name: "w2-observe-public-animate",
   enforce: "pre",
   transform(code, id) {
-    if (!/registry[\\/]cadence[\\/](select|code-block|sidebar|toc)[\\/]index\.tsx$/.test(id)) return;
+    if (!/(?:registry|components)[\\/]cadence[\\/](select|code-block|sidebar|toc)[\\/]index\.tsx$/.test(id)) return;
     const owner = id.replaceAll("\\", "/").split("/").at(-2);
     const observed = [];
     const transformed = code.replace(/import\s*\{([^}]+)\}\s*from\s*["']motion\/react["']/g, (statement, names) => {

@@ -1,4 +1,4 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
@@ -10,6 +10,17 @@ const day = (scope: Locator, name: string) => scope.getByRole("button", { name: 
 async function open(page: Page, mode = "none") {
   await page.goto(`/components/calendar?motion=${mode}`);
   await page.waitForLoadState("networkidle");
+  // Native focus/select calls can reach a deeply clipped example before the
+  // page's entrance has made it visible. Exercise the actual visible calendar;
+  // its environment owner correctly cancels work while that clip still hides it.
+  await expect
+    .poll(() =>
+      page
+        .locator("[data-document-entrance]")
+        .first()
+        .evaluate((node) => getComputedStyle(node).clipPath),
+    )
+    .toBe("none");
 }
 async function setHeader(page: Page, mode: string) {
   await page.getByRole("group", { name: "Motion mode" }).getByRole("button", { name: mode, exact: true }).click();
@@ -435,7 +446,7 @@ for (const theme of ["light", "dark"])
         [],
       );
     });
-    test(`Calendar named examples geometry and screenshots ${theme}/${width}`, async ({ page }) => {
+    test(`Calendar named examples geometry and screenshots ${theme}/${width}`, async ({ page }, info) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.addInitScript((value) => localStorage.setItem("cadence-theme", value), theme);
       await open(page);
@@ -449,7 +460,6 @@ for (const theme of ["light", "dark"])
         .getByRole("button", { name: /next month/i })
         .click();
       await expect(grids.nth(0)).toHaveAttribute("aria-label", "January 2027");
-      await mkdir(".cache/calendar-proof", { recursive: true });
       // Document clips leave the real sticky header at page top, outside these cards.
       // Recentring a tall element screenshot can paint the header over its first row.
       for (const name of ["top", ...names]) {
@@ -459,7 +469,7 @@ for (const theme of ["light", "dark"])
           const r = el.getBoundingClientRect();
           return { x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height };
         });
-        await page.screenshot({ path: `.cache/calendar-proof/${name}-${theme}-${width}.png`, fullPage: true, clip });
+        await page.screenshot({ path: info.outputPath(`${name}-${theme}-${width}.png`), fullPage: true, clip });
       }
     });
   }

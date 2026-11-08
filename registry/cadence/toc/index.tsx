@@ -3,7 +3,7 @@
 import { animateSingleValue, GroupAnimationWithThen, type Transition, useMotionValue } from "motion/react";
 import { type ComponentProps, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "../lib/cn";
-import { useCadenceMotion } from "../lib/provider";
+import { useCadenceMotionScope, useEngineEnvironment, withCadenceScope } from "../lib/provider";
 
 const useCommittedEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 type Placement = { id: string; top: number; height: number; railHeight: number };
@@ -38,7 +38,7 @@ export function Toc({
   onClick,
   ...props
 }: TocProps) {
-  const cm = useCadenceMotion();
+  const { cm, ref: scopeRef, element } = useCadenceMotionScope(props.ref);
   const [trackedId, setTrackedId] = useState<string>();
   const [trackingReady, setTrackingReady] = useState(false);
   const track = useRef<HTMLDivElement>(null);
@@ -49,12 +49,21 @@ export function Toc({
   const bottom = useMotionValue(0);
   const placed = useRef(false);
   const flight = useRef<ScrollFlight | null>(null);
+  const settleIndicator = useRef(() => {});
+  const cancelFlight = useRef(() => {
+    flight.current?.cancel();
+    settleIndicator.current();
+  });
+  const cancelIndicator = useRef(() => settleIndicator.current());
+  const environment = useEngineEnvironment(element, cancelIndicator.current);
+  const navigationEnvironment = useEngineEnvironment(element, cancelFlight.current, false);
   const restoreFocus = useRef<(() => void) | null>(null);
   const currentId = activeId ?? (items.some(({ id }) => id === trackedId) ? trackedId : items[0]?.id);
   const navigation = cm.transition("scroll.navigate");
   const navigationClock = JSON.stringify(navigation);
   useCommittedEffect(() => {
-    if (cm.reduced || navigation.duration === 0) flight.current?.finish();
+    if (navigationEnvironment.blocked.current) flight.current?.cancel();
+    else if (cm.reduced || navigation.duration === 0) flight.current?.finish();
     else flight.current?.retime(navigation);
   }, [cm.reduced, navigationClock]);
   useCommittedEffect(
@@ -133,20 +142,45 @@ export function Toc({
       if (scroller) scroller.scrollTo(options);
       else window.scrollTo(options);
     };
-    if (cm.reduced || navigation.duration === 0) {
+    if (cm.reduced || navigation.duration === 0 || navigationEnvironment.blocked.current) {
       write(destination);
       focusHeading(target);
       return;
     }
 
     let controls: { stop: () => void } | undefined;
+    let generation = 0;
+    const valid = () =>
+      target.isConnected &&
+      document.getElementById(link.dataset.tocId ?? "") === target &&
+      (!scroller || scroller.isConnected);
+    const observer = new ResizeObserver(() => {
+      if (!valid() || geometry() !== bounds) cancel();
+    });
+    const geometry = () =>
+      JSON.stringify([
+        target.getBoundingClientRect().top + read() - (scroller?.getBoundingClientRect().top ?? 0),
+        target.offsetHeight,
+        scroller?.clientHeight ?? innerHeight,
+        scroller?.scrollHeight ?? document.documentElement.scrollHeight,
+      ]);
+    const bounds = geometry();
+    observer.observe(scroller ?? document.documentElement);
+    observer.observe(target);
+    const mutations = new MutationObserver(() => {
+      if (!valid()) cancel();
+    });
+    mutations.observe(document.body, { childList: true, subtree: true });
     const cleanup = () => {
       done = true;
+      generation++;
       controls?.stop();
+      observer.disconnect();
+      mutations.disconnect();
       for (const name of ["wheel", "touchstart", "pointerdown", "resize", "popstate", "hashchange"]) {
-        window.removeEventListener(name, cancel);
+        window.removeEventListener(name, cancel, true);
       }
-      window.removeEventListener("keydown", keydown);
+      window.removeEventListener("keydown", keydown, true);
       if (flight.current === current) flight.current = null;
     };
     const cancel = () => {
@@ -154,6 +188,7 @@ export function Toc({
     };
     const finish = () => {
       if (done) return;
+      if (!valid() || geometry() !== bounds) return cancel();
       write(destination);
       cleanup();
       focusHeading(target);
@@ -164,19 +199,35 @@ export function Toc({
     };
     const retime = (transition: Transition) => {
       if (done) return;
+      if (!valid() || geometry() !== bounds) return cancel();
+      const epoch = ++generation;
       controls?.stop();
+      // Completion may already be queued. A clock edit at the endpoint is not a new journey.
+      if (Math.abs(read() - destination) < 1) {
+        Promise.resolve().then(() => {
+          if (epoch === generation) finish();
+        });
+        return;
+      }
       const next = new GroupAnimationWithThen([
-        animateSingleValue(read(), destination, { ...transition, onUpdate: write }),
+        animateSingleValue(read(), destination, {
+          ...transition,
+          onUpdate: (value) => {
+            if (epoch === generation) write(value);
+          },
+        }),
       ]);
-      next.finished.then(finish);
+      next.finished.then(() => {
+        if (epoch === generation) finish();
+      });
       controls = next;
     };
     const current: ScrollFlight = { cancel, finish, retime };
     flight.current = current;
     for (const name of ["wheel", "touchstart", "pointerdown", "resize", "popstate", "hashchange"]) {
-      window.addEventListener(name, cancel, { passive: true });
+      window.addEventListener(name, cancel, { passive: true, capture: true });
     }
-    window.addEventListener("keydown", keydown);
+    window.addEventListener("keydown", keydown, true);
     retime(navigation);
   };
 
@@ -230,10 +281,20 @@ export function Toc({
     };
     const unlistenTop = top.on("change", write);
     const unlistenBottom = bottom.on("change", write);
-    if (!placed.current || cm.reduced || transition.duration === 0) {
+    const settle = () => {
       top.jump(placement.top);
       bottom.jump(placement.top + placement.height);
       write();
+    };
+    settleIndicator.current = settle;
+    if (
+      !placed.current ||
+      cm.reduced ||
+      transition.duration === 0 ||
+      environment.unavailable ||
+      (top.get() === placement.top && bottom.get() === placement.top + placement.height)
+    ) {
+      settle();
     } else {
       // Explicit velocities survive cancellation/retargeting on the same values.
       animateSingleValue(top, placement.top, { ...transition, velocity: top.getVelocity() });
@@ -242,12 +303,13 @@ export function Toc({
     }
     placed.current = true;
     return () => {
+      if (settleIndicator.current === settle) settleIndicator.current = () => {};
       top.stop();
       bottom.stop();
       unlistenTop();
       unlistenBottom();
     };
-  }, [placement, ready, cm.reduced, cm.mode, clock, top, bottom]);
+  }, [placement, ready, cm.reduced, cm.mode, clock, top, bottom, environment.unavailable]);
 
   useEffect(() => {
     if (activeId !== undefined || items.length === 0) return;
@@ -285,7 +347,8 @@ export function Toc({
 
   if (!items.length) return null;
 
-  return (
+  return withCadenceScope(
+    cm,
     // biome-ignore lint/a11y/useKeyWithClickEvents: Delegates native anchor clicks, including keyboard-generated Enter activation.
     <nav
       aria-label={label}
@@ -294,6 +357,7 @@ export function Toc({
       className={cn("min-w-0 text-sm", className)}
       onClick={navigate}
       {...props}
+      ref={scopeRef}
     >
       <p data-slot="toc-title" className="mb-3 font-medium text-foreground">
         {label}
@@ -334,6 +398,6 @@ export function Toc({
           ))}
         </ol>
       </div>
-    </nav>
+    </nav>,
   );
 }

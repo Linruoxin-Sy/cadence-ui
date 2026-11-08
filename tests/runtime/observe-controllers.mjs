@@ -3,17 +3,17 @@ export const observeControllers = {
   name: "w2-observe-chart-controller",
   enforce: "pre",
   transform(code, id) {
-    if (!id.replaceAll("\\", "/").endsWith("/registry/cadence/chart/index.tsx")) return;
-    const head = /(\(_timeout,\s*handle,\s*listener\)\s*=>\s*\{)/;
+    if (!/(?:registry|components)\/cadence\/chart\/index\.tsx$/.test(id.replaceAll("\\", "/"))) return;
+    const head = /(\(_timeout,\s*handle,\s*listener(?:,\s*phase)?\)\s*=>\s*\{)/;
     if (!head.test(code)) throw new Error("Missing public Chart controller");
     code = code.replace(
       head,
       `$1
-const observed = {handle, state:"running", ticks:[], updates:[], applied:[], readClock:()=>current.current};
+const observed = {handle, phase:typeof phase === "undefined" ? null : phase, origin:typeof phase === "undefined" ? 0 : (phase?.progress ?? 0), created:performance.now(), state:"running", ticks:[], updates:[], applied:[], readClock:()=>current.current};
 (window.w2controllers ??= []).push(observed);
 (window.w2controllerSets ??= new Set()).add(running.current);
 const installedListener = listener;
-listener = value => {observed.updates.push({value,time:performance.now()});return installedListener(value);};`,
+listener = value => {observed.updates.push({value,time:performance.now(),phaseProgress:observed.phase?.progress});return installedListener(value);};`,
     );
     code = code.replace("handle.complete();", 'observed.state="finished"; handle.complete();');
     code = code.replace(/(return \(\) => \{\s*)done = true;/, '$1observed.state="cancelled"; done = true;');

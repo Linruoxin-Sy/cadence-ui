@@ -10,18 +10,34 @@ import {
   useCarousel,
 } from "@/registry/cadence/carousel";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
+import { visibleEngineViewport } from "../engine-viewport";
 import { expectMotionContract } from "../motion-contract";
 
 const engine = vi.hoisted(() => {
   const handlers = new Map<string, Set<(api: unknown) => void>>();
-  const body = { useDuration: vi.fn<(value: number) => unknown>() };
-  const internals = { scrollBody: body, options: { duration: 22 }, animation: { update: vi.fn(), render: vi.fn() } };
+  let currentDuration = 22;
+  const body = {
+    useDuration: vi.fn<(value: number) => unknown>((value) => {
+      currentDuration = value;
+    }),
+    duration: () => currentDuration,
+    settled: () => true,
+  };
+  const internals = {
+    scrollBody: body,
+    dragHandler: { pointerDown: () => false },
+    options: { duration: 22 },
+    scrollTo: { index: vi.fn(), distance: vi.fn() },
+    animation: { update: vi.fn(), render: vi.fn(), start: vi.fn(), stop: vi.fn() },
+  };
   const api = {
     scrollPrev: vi.fn(),
     scrollNext: vi.fn(),
     canScrollPrev: vi.fn(() => false),
     canScrollNext: vi.fn(() => true),
     internalEngine: () => internals,
+    rootNode: () => document.body,
+    reInit: vi.fn(),
     on: vi.fn((name: string, cb: (api: unknown) => void) => {
       const set = handlers.get(name) ?? new Set();
       set.add(cb);
@@ -33,7 +49,18 @@ const engine = vi.hoisted(() => {
       return api;
     }),
   };
-  return { api, internals, body, handlers, hook: vi.fn(), viewport: vi.fn() };
+  return {
+    api,
+    internals,
+    body,
+    handlers,
+    hook: vi.fn(),
+    viewport: vi.fn(),
+    resetDuration: () => {
+      currentDuration = 22;
+      internals.options.duration = 22;
+    },
+  };
 });
 vi.mock("embla-carousel-react", () => ({
   default: (...args: unknown[]) => {
@@ -60,8 +87,10 @@ function Context() {
 }
 
 beforeEach(() => {
+  visibleEngineViewport();
   vi.clearAllMocks();
   engine.handlers.clear();
+  engine.resetDuration();
   engine.api.canScrollPrev.mockReturnValue(false);
   engine.api.canScrollNext.mockReturnValue(true);
 });
@@ -185,9 +214,10 @@ describe("Carousel", () => {
       act(() => {
         for (const cb of engine.handlers.get("pointerUp") ?? []) cb(engine.api);
       });
-      expect(original).toHaveBeenLastCalledWith(mode === "full" ? 22 : 0);
+      expect(engine.internals.options.duration).toBe(44);
+      expect(original).toHaveBeenLastCalledWith(mode === "full" ? 44 : 0);
       expectMotionContract(mode, {
-        behavior: () => expect(original).toHaveBeenLastCalledWith(mode === "full" ? 22 : 0),
+        behavior: () => expect(original).toHaveBeenLastCalledWith(mode === "full" ? 44 : 0),
       });
       expect(view.container.querySelector('[data-slot="carousel"]')).toHaveAttribute("data-motion", mode);
       expect(view.container.querySelector('[data-slot="carousel-content"]')?.firstElementChild).toHaveAttribute(
@@ -208,6 +238,8 @@ describe("Carousel", () => {
       </CadenceProvider>,
     );
     const first = engine.hook.mock.lastCall ?? [];
+    first[1][0].init(engine.api);
+    engine.internals.animation.start();
     view.rerender(
       <CadenceProvider mode="none">
         <Example />
@@ -217,5 +249,6 @@ describe("Carousel", () => {
     expect(second[0]).toEqual(first[0]);
     expect(second[1][0]).toBe(first[1][0]);
     expect(engine.internals.animation.render).toHaveBeenCalledWith(1);
+    first[1][0].destroy();
   });
 });

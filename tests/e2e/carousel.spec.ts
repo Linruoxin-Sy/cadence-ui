@@ -1,4 +1,4 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { effectiveMode, MODES } from "./helpers";
@@ -157,6 +157,16 @@ for (const os of ["no-preference", "reduce"] as const)
 test("carousel live downgrade, system cancellation, custom controls and state identity", async ({ page }, info) => {
   await page.goto("/components/carousel?motion=full&speed=0.25");
   await page.waitForLoadState("networkidle");
+  // The API button can scroll into a part still hidden by the page entrance.
+  // Start the engine assertions after its real visibility owner has finished.
+  await expect
+    .poll(() =>
+      page
+        .locator("[data-document-entrance]")
+        .first()
+        .evaluate((node) => getComputedStyle(node).clipPath),
+    )
+    .toBe("none");
   const card = page.locator(selector("api")),
     root = card.getByRole("region"),
     track = trackOf(root),
@@ -263,7 +273,7 @@ test("carousel fixed drag policies and geometric alignment", async ({ page }) =>
 for (const theme of ["light", "dark"] as const)
   for (const width of [1280, 390])
     for (const name of ["top", ...names])
-      test(`carousel visual axe ${name}/${theme}/${width}`, async ({ page }) => {
+      test(`carousel visual axe ${name}/${theme}/${width}`, async ({ page }, info) => {
         await page.setViewportSize({ width, height: 1100 });
         await page.addInitScript((value) => localStorage.setItem("cadence-theme", value), theme);
         await page.goto("/components/carousel?motion=none");
@@ -276,8 +286,7 @@ for (const theme of ["light", "dark"] as const)
             .violations,
         ).toEqual([]);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        await mkdir(".cache/carousel-proof", { recursive: true });
-        await card.screenshot({ path: `.cache/carousel-proof/${name}-${theme}-${width}.png` });
+        await card.screenshot({ path: info.outputPath(`${name}-${theme}-${width}.png`) });
       });
 for (const anchor of ["usage", "changing-slides", "without-motion"])
   test(`carousel cold full deep link ${anchor}`, async ({ page }) => {
