@@ -57,6 +57,11 @@ otherwise permitted short opacity or colour feedback.
 
 ## Interruption and lifecycle
 
+Shared and local selected-decoration registrations belong to this group instance, not the public
+item value or preset name. Equal values in another group never join its plate or local-dot exchange.
+Changing single/multiple mode retires only this group's incompatible decoration; it cannot clear a
+different group's press, colour or selected state.
+
 - Committed value arrays and roving focus update immediately; a controlled request is not an accepted selection. Selection, label and item-set changes share the latest committed layout snapshot; an old selection cannot complete over a new item. No selected values means no selected plate, rather than inventing a first selection. First placement or restoration after no valid selected item is immediate; an absent origin is never a rectangle at zero.
 - Reversal continues from the current indicator geometry. Switching `multiple` cancels the incompatible shared/local presentation before placing the new state.
 - Removing an item unregisters its measurement and press state. Parent exit owns removal; the group does not retain interactive exiting items.
@@ -86,6 +91,10 @@ or reset the user's offset. Selected decoration must not enlarge scroll extent o
 For unchanged selected values, the strip transaction projects each selected decoration through the same current item reflow/size coordinates; the shared plate does not independently start layout.selection on a changed rectangle. One plate writer consumes that projection, without per-frame layout reads. Only a committed selection change uses the selection clock. If selection and reflow occur together, that writer combines the selection path and strip projection once, avoiding duplicate source/destination displacement. Multiple-mode decorations remain attached to their own item projections. If a custom render or adapter cannot preserve this coupling, settle the affected strip/item/plate geometry together immediately. Matching final boxes or starting independent smooth/snappy springs together is not adequate coordination.
 
 ## Acceptance scenarios
+
+- Pending: mount two groups with equal item values, switch one between single/multiple while both
+  animate, and remove/recreate one root. Retired cleanup cannot unregister the surviving group's
+  plate or a newer instance's item; neither group acquires another's selection or press origin.
 
 - Pending: change selection and labels in a scrollable RTL/vertical group while native focus scrolls
   an item into view. Scroll a shared ancestor, then invalidate the local mapping. The decoration stays

@@ -46,6 +46,12 @@ A tooltip reveals a short hint promptly, preserving the provider's existing dela
 
 ## Interruption and lifecycle
 
+Each Tooltip presence owner keeps its native lifecycle even when another tooltip uses the same
+description and provider delay. Its exit cannot wait solely for `transitionend`: identical resolved
+opacity, a safe-owner fallback or cancellation before the first frame may leave no owned transition.
+Use the primitive's current completion path without forcing removal under a retained native policy;
+unrelated child events and an earlier open revision cannot complete the current tooltip.
+
 When an existing shared/caller composition reuses Content for a different trigger or hint entity,
 retire the old text/reel transaction and establish the new exact display baseline in every mode.
 Use the already known trigger/entity identity; matching text, a reused Content node or two numeric
@@ -74,6 +80,11 @@ Dispatch a direct Content string to the text owner and a supported direct numeri
 - A destination-layout size animation must not newly crop required text, an active descendant or a focused control. Use existing legal scroll/overflow to keep them immediately reachable; otherwise settle that axis before paint. Do not add temporary truncation or hide required content to make the shell animate.
 
 ## Acceptance scenarios
+
+- Pending: close before the first transition frame, use a caller override that makes the owned
+  opacity endpoints equal, and cancel during an exit. Check native visibility/completion with no
+  end event, then deliver an unrelated child event and an old exit completion. Configured intent
+  delay and retained mount policy remain unchanged, and no second tooltip's lifecycle is affected.
 
 - Pending: reuse an open Content node for two known trigger identities with equal, partially shared
   and numeric hints. The second hint starts at its exact baseline; old completions cannot restore the

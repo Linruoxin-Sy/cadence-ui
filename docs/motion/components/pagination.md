@@ -54,6 +54,11 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 
 ## Interruption and lifecycle
 
+Two pagination controls for the same dataset remain separate visual scopes even when their hrefs
+and active page match. A top-of-page marker cannot fly to the bottom-of-page control or borrow its
+retained link rectangle. They may consume the same caller state, but each content owner resolves its
+own bounded layout and marker lifetime; unmounting one does not remove the other's registrations.
+
 Latest isActive and href values commit immediately, including rapid navigation; no animation waits for a request. A missing or multiply active set uses each link's local state rather than inventing a unique selection. Exiting links lose obsolete interaction immediately and require retained parent lifecycle. Live reduced cancels indicator/layout work; none or zero clock cancels all visual work. Returning to full does not replay the current page selection.
 
 The shared active decoration owns active fill/border through `active.colour` exclusively while enabled; the link's local active fill is suppressed for that same cause, while focus and foreground retain their own property owners. If the target leaves the mounted range, becomes ambiguous or changes destination identity, cancel the shared flight and obsolete marker colour work before enabling local state. Navigation, modified clicks and URL changes remain native. Root removal releases measurement and active-indicator registrations.
@@ -85,6 +90,10 @@ One final layout snapshot coordinates range reflow, text-driven dimensions and i
 First active-marker placement and restoration after an absent/ambiguous active target are immediate. Reordering or resizing links without a semantic active-page change does not start a selection journey: the single marker writer follows the content transaction's current item/size projection so it stays attached throughout reflow. It must not jump to a final rectangle while that active link is still visually elsewhere. During a simultaneous actual selection and range change, move only when both endpoints are valid in one coordinate scope and the same writer can combine selection with range projection exactly once. Otherwise settle the affected content/marker geometry together or use the local active-colour fallback, rather than run independently timed springs. No per-frame measurement of projected links is introduced.
 
 ## Acceptance scenarios
+
+Also pending: render top and bottom pagination with identical destinations, navigate both through
+shared caller state, then remove one mid-flight. Each marker stays in its own content space and old
+cleanup cannot affect the surviving links, focus or marker; modified-click semantics remain native.
 
 Also pending: change the visible range in a scrollable caller layout during focus-reveal scrolling
 and an active-marker flight. Verify current href/aria-current, one coordinate conversion, unchanged

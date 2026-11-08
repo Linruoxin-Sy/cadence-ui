@@ -338,6 +338,23 @@ old cleanup must not restore obsolete styles. A nested mode controls that child'
 an ancestor envelope. The [scope rule](../animation-system.md#6-three-layer-strategy-for-reducing-motion)
 applies to inherited entrances and coordinated parent/child layout throughout the catalogue.
 
+### 3.2 Instance isolation and terminal paths
+
+All catalogue actions inherit the system's
+[runtime identity and terminal-presentation contract](../animation-system.md#runtime-identity-and-terminal-presentation).
+A binding is reusable design vocabulary, not a global live animation id. Review at least two sibling
+instances and a nested independent instance using equal values/labels under one provider, including
+portalled parts. Reversing, closing, replacing or reducing one owner cannot retarget or finish another.
+Known parent/child coordination and aggregate work limits remain shared for their actual transaction;
+isolation does not permit one moving-set allowance per child.
+
+For every presence/indicator/geometry action, include a terminal path with no actual interpolating
+property and a cancellation before its first frame. A positive preset clock alone does not ensure an
+end event. Current native visibility, focus, mount policy and dimensions must resolve without an
+animation-only wait. Deliver a retired completion and a child's unrelated transition event afterwards:
+neither may release the current owner or change semantics. This extends each component's acceptance
+scenarios; it does not require changing its chosen preset or adding a public completion callback.
+
 ## 4. Parameter and choreography review
 
 The system's timing table is a default vocabulary. A Tooltip can select a faster popup preset than a

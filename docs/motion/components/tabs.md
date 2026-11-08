@@ -59,6 +59,11 @@ Apply the [shared owner precedence](../presets.md#31-effective-modes-and-clock-o
 
 ## Interruption and lifecycle
 
+The marker and panel transaction belong to this Tabs instance. Sibling or nested Tabs may repeat
+the same values; they do not share layout identity, panel measurements or exit authority. A portal
+does not transfer an inner Tabs marker into the outer list's scope. Replacing one root invalidates
+only its registrations, while a retained root/ref handoff preserves its current eligible flight.
+
 - Rapid selection retargets the same marker from its current geometry and uses the newest active panel. First placement and selection restored after an absent/removed active trigger place the marker immediately, never from an origin rectangle. Do not queue intermediate tabs or restart marker entry. Reorder/rename preserves trigger value identity rather than using index or label keys.
 - Preserve the caller's mount/persistence policy, form values, focus management, activation mode and custom render. Animation must not remount a panel, force persistence or keep an outgoing interactive panel accessible.
 - If the existing lifecycle provides no safe outgoing visual, the new panel enters alone. Closing an enclosing popup cancels subordinate panel motion rather than delaying the popup's exit.
@@ -104,6 +109,11 @@ without deleting caller transforms. Any temporary list/panel pixel dimensions re
 native layout policy when the size owner completes or yields.
 
 ## Acceptance scenarios
+
+- Pending: use sibling and nested Tabs with equal values under one provider. Change both, replace
+  one root and deliver its old panel/marker completions. Each marker stays in its own list; native
+  panel/focus policy and the other instance's in-flight work survive. Repeat with a none-mode inner
+  scope without treating it as cancellation of an independent outer owner.
 
 - Pending: select in an overflowing horizontal/RTL or vertical list while focus scrolls a trigger
   into view, then scroll a common ancestor and change a sticky/transform context. Check one local

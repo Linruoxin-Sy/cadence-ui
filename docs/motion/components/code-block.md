@@ -75,6 +75,11 @@ CopyButton and ExpandButton retain the existing Button surface/foreground owner,
 
 ## Interruption and lifecycle
 
+Tab marker, source-diff and copy-feedback identities are scoped to this CodeBlock instance. Two
+blocks may use the same tab values and source string without sharing a marker, highlighter result
+authority or clipboard-feedback completion. A shared resource cache may reuse immutable data, never
+another block's active visual handle or accepted-action identity.
+
 - Rapid fold reverses from current viewport size. Rapid tab selection moves the same marker to the latest active panel without remounting unrelated panels or replaying the whole code block. Persisted panels retain their own source/scroll state; do not diff two different files merely because the active tab changed. First marker placement or a restored selection without a valid previous tab is immediate.
 - Diff the direct source string, not highlighted span keys/classes or line indices. A one-character change cannot fade its entire retained line. A newline insertion/deletion may split or join lines while most glyphs survive: retain those glyphs across the old/new line boundary, and use whole-line entry/exit only for units with no retained identity in the revision. If bounded diff cannot establish safe identity, commit the affected source immediately rather than treating unmatched lines as entirely new.
 - Syntax grammar loading, language changes, theme/token recolouring and asynchronous highlighter results are presentation revisions, not source edits. Tag their result with the current source/language revision, discard stale results and preserve source identities across token boundaries where mapping is safe. Unsupported token/shaping mappings use immediate final paint with no whole-source crossfade.
@@ -105,6 +110,10 @@ Measure natural `code-block-content`/code layout separately from the clipped vie
 For a large source, inspect only the bounded affected visible lines/runs needed for the current revision. Automatic line presence/layout counts participating line presentations, any measured/projected retained lines, distinct outgoing visuals and a participating collection shell under the [collection bound](../presets.md#52-shared-work-limits), before member layout reads or retained-copy allocation. A whole-block envelope counts once, not once per syntax token or glyph. The shared diff-work and aggregate changed-glyph/reel limits apply once to the whole block revision, not once per line or token. Avoid re-tokenizing solely for animation, per-glyph layout reads, hidden full-document clones and work on every persisted inactive panel. Newline/duplicate-line ambiguity or a working set that cannot fit uses immediate affected source/layout, without truncating the file or queuing later batches. Nested parent geometry adopts the committed destination rather than chasing every height frame.
 
 ## Acceptance scenarios
+
+- Pending: render two blocks with identical tab values/source, switch and copy independently, then
+  replace one block before its results complete. Old marker/highlighter/clipboard-feedback deliveries
+  cannot mutate the surviving block or a newly mounted instance with the same labels.
 
 - Pending: edit a long line or remove lines while horizontally/vertically scrolled near the end;
   compare the scroll extent with the exact current source during and after replacement. Independently

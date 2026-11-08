@@ -1375,6 +1375,42 @@ came from an older request. Reject retired animation/measurement deliveries, not
 An internally owned resource such as an image or highlighter result still checks its actual source
 and owner lifetime. These are internal cause rules, not a new public transaction prop or request queue.
 
+### Runtime identity and terminal presentation
+
+Design binding names identify reusable contracts, not live controller keys. A runtime owner is scoped
+to its actual component instance, part and current host lifetime; a retained semantic item adds its
+existing identity within that scope. Two Tabs, Selects or Toasters may use identical values and the
+same presets without sharing measurements, origins, exit completions or cancellation. A shared motion
+provider supplies policy, not shared selection identity. Portals preserve their logical owner's scope;
+neither mounting under the same document body nor using the same `data-slot` merges their owners.
+Nested independent collections likewise retain separate selection scopes. Known compound geometry
+and aggregate work limits still coordinate at their real enclosing transaction; instance isolation
+must not create a fresh budget for each child of that transaction.
+
+Keep a scope stable across ordinary renders and ref handoff. On actual host/owner replacement, retire
+its registration before accepting new writes; a delayed cleanup may remove only its own registration,
+never a newer registration with the same semantic value. A `layoutId`, map key or origin cache derived
+only from a binding name, item value or DOM selector is insufficient. Use existing internal instance
+ownership without introducing public id props or nondeterministic SSR markup. Intentional cross-owner
+handoff requires the explicit source/destination contract, not accidental identity matching.
+
+Completion is an outcome of owned visual work, not a guarantee that a browser end event will arrive.
+An unchanged resolved property, unavailable safe owner, unsupported execution path or immediate
+fallback can produce no animation even under full mode and a positive clock. Release the affected
+library work and apply its current semantic presentation through the native lifecycle adapter; do
+not leave a hidden layer, busy flag, temporary size lock or retained exit waiting for a missing event.
+Cancellation/replacement is distinct from successful completion. Retired completion events, bubbled
+child transition events and rejected cancellation promises cannot finish a newer action or emit an
+application change/success callback. Accept completion only for the current owned handle/property
+and revision; cleanup is idempotent and disjoint writers survive.
+
+Native keep-mounted/prevent-unmount and exit-completion rules remain authoritative. This terminal
+path neither forces removal nor synthesizes an upstream callback that its policy intentionally
+defers. Never guess completion from `visualDuration`, add a timeout watchdog or change native intent
+timers. Adapter failure must release any acquired library-owned temporary presentation and retain
+exact native content; it does not hide application errors or claim an unavailable effect succeeded.
+These are target execution and browser-acceptance requirements, not new runtime capabilities.
+
 ## 5. Composition-layer API
 
 ### 5.1 Runtime compatibility surface

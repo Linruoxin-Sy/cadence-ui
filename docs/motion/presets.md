@@ -20,6 +20,13 @@ A binding does not create a recipe. A recipe does not determine an entire compon
 Two components may share a preset while using different parts, directions, ordering or triggers.
 Component contracts own those choices; this file owns their reusable parameter values.
 
+Sharing a preset or binding name shares parameter selection only, never a live controller, measured
+origin, selected-item scope or completion latch. The system's
+[instance and terminal-path rules](../animation-system.md#runtime-identity-and-terminal-presentation)
+apply after parameter resolution. Even a positive resolved duration may have no changing property:
+that action uses the current native terminal path without waiting for an end event. This is neither
+an implicit None mode nor permission to stop unrelated properties that still have eligible work.
+
 The Target forms column is the canonical vocabulary for the internal reference checker. A suffix
 distinguishes the designed property/engine form, not a newly installable resolver option. In particular,
 `state.color/surface` covers scoped background/border/shadow paint, `state.color/foreground` covers

@@ -52,6 +52,12 @@ The image replacement binding owns the paired Image/Fallback presentation; it is
 
 ## Interruption and lifecycle
 
+An image/fallback crossfade owns only the actual changing paint in this Avatar. If either visual is
+unavailable, endpoints are already equal or the owned transition is cancelled before starting, its
+coordinator takes the current available-image/fallback presentation without waiting for two end
+events. It must not keep a ready image hidden behind a completion latch or restart the image load.
+Equal source URLs in other avatars do not share that latch or image-layer lifetime.
+
 An image request completing for an old identity cannot replace the current avatar. Cached/initially ready images do not flash a fallback. Failure keeps a valid fallback visible. Reordering retains entity identity; remove/reinsert reverses only a surviving retained visual. Live reduced finishes size/reels/group movement; none or zero clock also resolves crossfades/colours. Cleanup removes observation and obsolete image transition callbacks.
 
 Preserve Base UI's image/fallback availability and caller-supplied timing rather than forcing a fallback on every request. An image source revision invalidates older load/decode/error completions even when the Avatar node is reused. Retain only a decorative outgoing image under the existing availability owner; its alt/name cannot duplicate the current image. If that owner cannot safely retain a ready layer, swap immediately. Parent close cancels image/text work and later decode completion cannot restart it.
@@ -74,6 +80,10 @@ For automatic group presence/reflow and known-group image appearance, use the [c
 The known AvatarGroup coordinator uses its registered member/source identities and active handles, not a DOM image scanner. If that live image set cannot fit or cannot be determined safely, swap the affected current available image/fallback immediately and release obsolete outgoing decoration. Never queue decode results, delay a request, change Base UI availability or hide a current identity to wait for capacity. Outside a known group, the local one-pair limit and component/page budgets remain mandatory; no unbounded retained-image queue is introduced. Text/reel work retains its independent limits.
 
 ## Acceptance scenarios
+
+Also pending: use two avatars with the same image URL, one with no available fallback paint; cancel
+or replace one before its crossfade starts and deliver old image/transition completions. Each shows
+its current native availability without a missing-event wait, shared latch or synthetic reload.
 
 Also pending: crossfade a loaded image with an id-linked or stateful custom fallback/render part.
 Only the current original keeps its semantic relationships and callbacks; retention cannot add a

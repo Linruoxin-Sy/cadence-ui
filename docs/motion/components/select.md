@@ -64,6 +64,12 @@ Colour eligibility is per actual trigger/value, popup, item, label or scroll-con
 
 ## Interruption and lifecycle
 
+Origin capture and selected-value presentation are scoped to this Select instance and its accepted
+selection revision. Another Select with equal option values/text, even in a portal under the same
+body, cannot provide a source or consume that capture. Replacing the source owner retires an
+unaccepted capture; accepted frozen paint follows its existing destination-lifetime rule rather
+than being looked up again by value or selector.
+
 Preserve Base UI's actual focus/list-navigation target when the popup opens. If that target would be hidden or displaced by the popup entrance, settle its envelope before presenting focus; default opening may therefore omit the scale/fade. A caller's supported existing focus policy is preserved, not changed to force entry. Returning focus to the trigger also makes any independent trigger-entry envelope immediately readable.
 
 - Base UI owns selection, open state, focus, typeahead and popup alignment. Actual committed value, accessible label and form state update immediately; a controlled request is not an accepted selection. The handoff is decorative and never a duplicate selectable/accessible label.
@@ -107,6 +113,10 @@ destination mapping changes. Never require a closed popup to stay mounted just t
 When `alignItemWithTrigger` gives Base UI active positioner/popup-height control, use that owner's immediate measured target unless a verified single-owner adapter can consume the revision. Do not animate an independent popup shell height while Base UI expands/repositions it for item alignment or scroll-arrow operation. Only a free, safely separated content axis uses `content.resize`. Native scroll-arrow interaction and its required frame/timer work remain available under reduced/none and zero recipe clock; it is not an autonomous decoration.
 
 ## Acceptance scenarios
+
+- Pending: open two independently owned Selects with equal values and labels in separate portals.
+  Accept a selection in one, replace the other and deliver its old cleanup. No cross-control origin,
+  duplicate flight or cancellation is allowed; a missing valid source uses the existing local path.
 
 - Pending: accept a visible-source selection, then scroll the popup list, a trigger ancestor or the
   document independently while its captured flight runs. Invalidate only a changed source/destination

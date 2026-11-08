@@ -57,6 +57,13 @@ A notification joins the stack, can update in place, and leaves under the manage
 
 ## Interruption and lifecycle
 
+Toast identity is qualified by its actual manager and presentation owner. Equal toast ids in
+independent providers/managers cannot share stack measurements, loading-icon handles or dismissal
+completion. If the native API supports more than one viewport for a manager, retain that API's
+delivery rules: each actual visual has its own host lifetime, without manufacturing duplicate toasts
+or adding another lifetime timer. An immediate/no-op exit uses the native completion path, never an
+animation-duration timer or a requirement for a non-existent end event.
+
 Adding a toast does not request focus. If native focus or pointer activation actually reaches an entering toast/action, settle that toast's decorative opacity/scale envelope before presenting the interaction; do not cancel unrelated stack entries merely because the viewport receives focus. A swipe similarly takes over after decorative entry has yielded, while retaining the native offset/capture.
 
 - Base UI manager retains toast IDs, timers, pause/resume, limits, focus, swipe and dismissal. Animation never resets duration or extends a minimum dwell time; same-ID updates preserve the manager's own semantics.
@@ -97,6 +104,11 @@ introducing another scrollbar or stale snap/anchor target.
 - A smaller intermediate toast shell must not crop the newly committed message or action/close control. Preserve existing legal overflow or settle its height immediately; never introduce a truncation/scroll policy just to keep a height tween. Focused actions are immediately visible.
 
 ## Acceptance scenarios
+
+- Pending: use independent toast managers with equal ids, update both and dismiss/remove one during
+  stack motion. Retired icon/exit callbacks cannot dismiss or reposition the other manager's toast.
+  Exercise a no-op exit and cancellation before first paint without extending lifetime or changing
+  the native viewport delivery/persistence policy.
 
 - Pending: configure a visible stack above the shared bound, then batch add/update/dismiss while
   earlier exits and a swipe are active. Verify bounded preflight before decorative measurements,

@@ -32,16 +32,21 @@ Selection reads as a coordinated exchange between two local dots. A dot never fl
 
 ## Choreography and modes
 
-| Trigger / owner                         | Full                                                                                                                   | Reduced                                                      | None                                  | Binding → preset → recipe/form                                               |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------- | ---------------------------------------------------------------------------- |
-| Group insertion / group                 | One opacity entrance, with all option targets ready together.                                                          | Short opacity.                                               | Final group immediately.              | `radio-group.root.enter` → `presence.inline` → `data.transition/opacity`     |
-| Selection / group selection coordinator | Shared selection transaction fades/scales the old and new local indicators using `scale.in`; no travelling row plate.  | Crossfade local dots.                                        | Exactly the selected dot immediately. | `radio-group.indicator.select` → `state.indicator` → `state.morph/indicator` |
-| Option state / item and dot             | Scoped border/background/glyph colour feedback. Colour eligibility and immediate-owner priority follow the rule below. | Short colour feedback. Colour obeys the same owner priority. | Target colours immediately.           | `radio-group.item.colour` → `state.color` → `state.color/surface-foreground` |
+| Trigger / owner                         | Full                                                                                                                   | Reduced                                                      | None                                         | Binding → preset → recipe/form                                               |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------------------------- | ---------------------------------------------------------------------------- |
+| Group insertion / group                 | One opacity entrance, with all option targets ready together.                                                          | Short opacity.                                               | Final group immediately.                     | `radio-group.root.enter` → `presence.inline` → `data.transition/opacity`     |
+| Selection / group selection coordinator | Exchange only actual old/new dots using `scale.in`; an accepted empty or unmatched value has no incoming dot.          | Fade only actual changed dots; no scale.                     | Actual selected dot, or no dot, immediately. | `radio-group.indicator.select` → `state.indicator` → `state.morph/indicator` |
+| Option state / item and dot             | Scoped border/background/glyph colour feedback. Colour eligibility and immediate-owner priority follow the rule below. | Short colour feedback. Colour obeys the same owner priority. | Target colours immediately.                  | `radio-group.item.colour` → `state.color` → `state.color/surface-foreground` |
 
 Each Item owns its own `item.colour` transaction, including its dot. Actual DOM focus/focus-within or that item's invalid state settles all its declared paint immediately and cancels the colour clock in every mode. Other items may still use verified readable colour interpolation; group selection is not itself DOM focus. Dot opacity/scale retains its separate owner.
 
 ## Interruption and lifecycle
 
+- Selection ownership is local to this RadioGroup, not the option value or the shared provider.
+  Equal values in another group cannot supply an outgoing dot or receive this group's cancellation.
+  Any accepted empty/unmatched value removes the old decoration without choosing a fallback option;
+  if its selected item is absent, no offscreen origin or synthetic dot is created. Restore an item's
+  current native checked presentation on remount rather than continuing its retired exchange.
 - Native reset/restoration establishes the actually accepted selected item immediately in full,
   reduced and none and retires the previous exchange; an absent accepted value produces no dot.
   A cancelled reset or rejected controlled request changes no presentation target. Equal accepted
@@ -61,6 +66,10 @@ Each Item owns its own `item.colour` transaction, including its dot. Actual DOM 
 
 ## Acceptance scenarios
 
+- Pending: render two groups with identical option values, change and remove one during an exchange,
+  then deliver its retired completion. The other group's actual native selection and legal motion
+  remain independent. Clear the controlled selection or use an unmatched value without a form reset;
+  all modes show no incoming dot, and remounting starts from actual current checked state.
 - Pending: reset mid-exchange to an existing option and to the primitive's accepted empty state;
   compare a cancelled reset and repeated equal controlled value in all modes. No old dot completion
   may restore a previous option, add a callback or select a default that the primitive did not accept.
