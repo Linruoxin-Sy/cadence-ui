@@ -269,6 +269,14 @@ Changing a shared preset requires reviewing its consumers; changing one componen
 change other components. Keep direction, identity and measured targets contextual; do not encode an
 application's business state in a preset.
 
+Read a mode cell as the outcome after the shared state/environment constraints, not a guarantee that
+its preset always runs. In particular, a row grouping hover, focus, invalid and theme changes must
+distinguish the immediate focus/invalid owner from eligible colour transitions. Apply the
+[colour-owner precedence](presets.md#31-effective-modes-and-clock-ownership) to the actual part;
+sharing one preset across parts does not make them one owner. Acceptance must include gaining focus
+or becoming invalid during an existing colour flight, as well as an unrelated owner that may keep
+animating. A complete reference table cannot prove either behavior.
+
 Local contracts may coordinate outgoing visuals, incoming visuals and geometry without delaying the
 semantic commit. Distinguish visual sequencing from delaying an actual action. In particular, replacement
 labels do not wait for a success animation, filter results do not wait for old rows to fade, and a

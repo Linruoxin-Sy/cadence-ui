@@ -16,7 +16,13 @@ The drawer remains attached to Base UI's swipe and snap model. Authored entry, r
     "overlay": ["drawer#DrawerOverlay"],
     "title": ["drawer#DrawerTitle"],
     "description": ["drawer#DrawerDescription"],
-    "surface": ["drawer#DrawerContent", "drawer#DrawerOverlay", "drawer#DrawerTitle", "drawer#DrawerDescription"],
+    "surface": [
+      "drawer#DrawerContent",
+      "drawer#DrawerOverlay",
+      "drawer#DrawerSwipeHandle",
+      "drawer#DrawerTitle",
+      "drawer#DrawerDescription"
+    ],
     "quantity": ["drawer#DrawerTitle", "drawer#DrawerDescription"],
     "body": ["drawer#DrawerContent"]
   }
@@ -45,8 +51,10 @@ The drawer remains attached to Base UI's swipe and snap model. Authored entry, r
 | Intentional content size revision / native geometry owner      | One measured destination coordinates content-owned dimensions and active snap offset on a clamped panel clock; during direct swipe, recompute immediately instead of interpolating. | Final measured geometry immediately.                                 | Final measured geometry immediately.         | `drawer.popup.resize` → `geometry.panel` → `geometry.resize/measured` (native single-owner adapter)                                                                                                                                       |
 | Explicit snap configuration change / native snap owner         | Resolve the latest valid active snap and destination through the native snap transaction, consuming current content bounds without another size spring.                             | Final snap geometry immediately.                                     | Final snap geometry immediately.             | `drawer.popup.configure` → `engine.native` → `native/base-ui-drawer` (Base UI Drawer swipe/snap owner (no new recipe))                                                                                                                    |
 | Primitive title/description / text owner                       | Stable-grapheme replacement, `stagger: none`; no presence replay.                                                                                                                   | Changed-run opacity only.                                            | Final text immediately.                      | `drawer.title.change` → `text.replace` → `text.change/changed-runs`; `drawer.description.change` → `text.replace` → `text.change/changed-runs`                                                                                            |
-| Supplied tokens / surface/text parts                           | Scoped colour transition independent of swipe opacity.                                                                                                                              | Short colour feedback.                                               | Target colours immediately.                  | `drawer.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                                                |
+| Supplied tokens / surface/text parts                           | Scoped colour transition independent of swipe opacity. Colour eligibility and immediate-owner priority follow the rule below.                                                       | Short colour feedback. Colour obeys the same owner priority.         | Target colours immediately.                  | `drawer.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                                                                                                                |
 | Direct numeric Title/Description revision / owned display slot | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                                                                                   | Final number immediately.                                            | Final number immediately.                    | `drawer.quantity.change` → `number.compact` → `number.roll/reels`                                                                                                                                                                         |
+
+`surface.colour` addresses separate popup, overlay, handle and title/description regions. Actual DOM focus/focus-within or a region's own invalid state cancels its colour clock and settles all its declared paint immediately; independent regions retain their clocks. Other colour interpolation requires a verified readable palette. Native swipe/placement remains under its existing owner.
 
 ## Interruption and lifecycle
 

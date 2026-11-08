@@ -31,11 +31,13 @@ The box acknowledges selection through its fill and its local check or mixed-sta
 
 ## Choreography and modes
 
-| Trigger / owner                      | Full                                                                              | Reduced                | None                        | Binding → preset → recipe/form                                            |
-| ------------------------------------ | --------------------------------------------------------------------------------- | ---------------------- | --------------------------- | ------------------------------------------------------------------------- |
-| Independent insertion / root         | Opacity entrance; no movement of hit area.                                        | Short opacity.         | Visible target immediately. | `checkbox.root.enter` → `presence.inline` → `data.transition/opacity`     |
-| Checked or mixed changes / indicator | Local opacity and `scale.in` to rest; check-to-minus replaces the glyph in place. | Opacity only.          | Final glyph immediately.    | `checkbox.indicator.change` → `state.indicator` → `state.morph/indicator` |
-| State changes / root and indicator   | Scoped background, border and glyph colour transition.                            | Short colour feedback. | Final colours immediately.  | `checkbox.root.colour` → `state.color` → `state.color/surface-foreground` |
+| Trigger / owner                      | Full                                                                                                                          | Reduced                                                      | None                        | Binding → preset → recipe/form                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------- | ------------------------------------------------------------------------- |
+| Independent insertion / root         | Opacity entrance; no movement of hit area.                                                                                    | Short opacity.                                               | Visible target immediately. | `checkbox.root.enter` → `presence.inline` → `data.transition/opacity`     |
+| Checked or mixed changes / indicator | Local opacity and `scale.in` to rest; check-to-minus replaces the glyph in place.                                             | Opacity only.                                                | Final glyph immediately.    | `checkbox.indicator.change` → `state.indicator` → `state.morph/indicator` |
+| State changes / root and indicator   | Scoped background, border and glyph colour transition. Colour eligibility and immediate-owner priority follow the rule below. | Short colour feedback. Colour obeys the same owner priority. | Final colours immediately.  | `checkbox.root.colour` → `state.color` → `state.color/surface-foreground` |
+
+`root.colour` coordinates the control and glyph palette. Actual DOM focus/focus-within or the control's invalid state cancels that colour clock and applies all declared paint immediately in every mode. Other states use the preset only for verified readable interpolation, otherwise they are immediate. Indicator opacity/scale remains a separate state action.
 
 ## Interruption and lifecycle
 

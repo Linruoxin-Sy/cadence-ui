@@ -43,7 +43,7 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 
 Rotation does not encode completion and never chooses a success icon. Caller removal stops rotation before a retained fade; reinsertion uses the latest loading state with no artificial wait. Hidden/offscreen rotation is paused. On live reduced/none, cancel the current rotation writer and expose a stable glyph; none also cancels fades/colours/geometry. A zero recipe clock settles one-shot work only and does not replace the separate continuous theme clock policy. Unmount releases all animation references, and the status name remains meaningful in every mode.
 
-The SVG's rotation writer never owns entry/exit opacity or slot positioning. A hidden/full-mode pause may resume its current phase, but reduced/none exposes the static rest orientation immediately. Returning to full can resume currently active indeterminate activity without replaying an entrance; stale presence completion cannot restart a removed spinner. Parent closure cancels local presence and removes obsolete status semantics from any retained decorative visual.
+The SVG's rotation writer never owns entry/exit opacity or slot positioning. Hidden/full-mode activity resumes only if it is still current and visible, using a fresh theme clock; reduced/none exposes the static rest orientation immediately. Returning to full may restart that continuous activity without replaying presence or historical updates; stale presence completion cannot restart a removed spinner. Parent closure cancels local presence and removes obsolete status semantics from any retained decorative visual.
 
 ## Geometry and performance
 
@@ -55,4 +55,4 @@ An explicit owned icon-size revision uses one final square width/height destinat
 
 Target acceptance; not executed: standalone and Button-composed loading; caller label changes; hide/show and removal during rotation; explicit icon-size change; live full to reduced/none and zero clock; static glyph still conveys loading with its accessible name.
 
-Also pending: parent exit while rotation is paused, return to full after a same-target downgrade, and an icon-size update during rotation; one transform writer, one status name and the separate recipe/theme clocks remain correct.
+Also pending: parent exit while rotation is paused, return to full after a same-target downgrade, and an icon-size update during rotation; one transform writer, one status name and the separate recipe/theme clocks remain correct. Restored visibility/full mode starts a fresh loop clock only for current activity and never replays an entrance or missed update.
