@@ -68,7 +68,7 @@ Dispatch a direct Title/Description string to the text owner and a supported dir
 
 - One natural-content observer and one shell writer own both measured axes. Centering/placement and panel decoration must use separated properties/layers so transforms do not compete.
 - Lay text at the final destination width once, measure its natural height, then animate the shell around that layout. Do not continuously rewrap text through intermediate widths; passive font/viewport changes are immediate.
-- Clamp to the viewport; overflow scrolls inside the content region. Do not clip focus rings, close controls or portalled descendants.
+- Preserve Content's existing width/viewport constraints and any caller-provided overflow region; the default Content does not create a scrolling viewport. If readable geometry cannot fit the available bounds without adding a scroll policy or extra clipping, use immediate native layout. Do not clip focus rings, close controls or portalled descendants.
 - At most one panel, one overlay and the bounded changed text set animate per dialog. Avoid per-child entrances and resize feedback from the animated shell.
 
 - Observe a natural-content region distinct from the sizing host and clamp each rendered dimension to valid non-negative intrinsic/closed/available bounds. Nested content and the panel choose one owner for the same size cause; the panel never observes a child's interpolated box as a fresh target.
@@ -86,3 +86,4 @@ A focused native editor also takes priority when geometry would move its caret/c
 - Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
 - Pending: Exercise the existing initial-focus default and a supported caller focus override during entry; default autofocus may settle only the panel while backdrop opacity continues, and neither path delays focus.
 - Pending: Press the built-in Content/Footer close Buttons and a caller-rendered DialogClose. Verify the real Button safe-layer owner or the actual caller owner executes once; switch to reduced/none or zero clock while held, then close. Preserve the correct held/released target, native activation/return focus and immediate native close without a stale press writer or added exit hold.
+- Pending: grow long content beyond available height with default Content and with an explicitly composed scroll region. Preserve each existing layout/overflow policy; an infeasible readable size interval uses immediate native layout rather than adding a scrollbar, clipping text or changing the caller's scroll owner for animation.

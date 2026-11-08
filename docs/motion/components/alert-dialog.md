@@ -72,7 +72,7 @@ Dispatch a direct Title/Description string to the text owner and a supported dir
 
 - One content measurement and shell writer; `size` variants keep their existing constraints. Reading-plane geometry uses clamped, non-bouncing transitions.
 - Reflow text at the final destination width before measuring the target height, then animate only the shell. Passive font/viewport changes settle immediately; no intermediate-width rewrapping.
-- Content overflow remains readable/scrollable, with actions and focus outlines reachable. Media dimensions belong to the media/layout owner, not an independent panel spring.
+- Preserve Content's existing overflow policy and any explicitly composed scroll region; default Content does not create one. If readable content/actions cannot fit the available bounds under that policy, use immediate native layout rather than introducing scrolling or extra clipping for animation. Media dimensions belong to the media/layout owner, not an independent panel spring.
 - One panel, one backdrop and bounded title/description transactions per alert. No looping urgency effect or per-action entrance.
 
 - Observe a natural-content region distinct from the sizing host and clamp each rendered dimension to valid non-negative intrinsic/closed/available bounds. Nested content and the panel choose one owner for the same size cause; the panel never observes a child's interpolated box as a fresh target.
@@ -90,3 +90,4 @@ A focused native editor also takes priority when geometry would move its caret/c
 - Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
 - Pending: Open with native initial focus on an action while content is fading; settle the content gate without delaying the action or cancelling the independent backdrop.
 - Pending: Press default Button-backed Action/Cancel and supported caller render replacements, including a render without a safe feedback layer. Switch to reduced/none or zero clock mid-press, then cancel/close. Only the actual owner runs, held/released targets follow Button modes, and neither activation nor closure is delayed; Action still does not close unless its existing caller behavior does so.
+- Pending: expand a long explanation/action group beyond available height, with and without a caller-owned scroll region. An infeasible readable size interval takes the native layout fallback without adding a scroll container, truncating the explanation or changing the caller's overflow/focus policy.
