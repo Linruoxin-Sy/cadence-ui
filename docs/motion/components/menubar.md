@@ -118,7 +118,7 @@ Inherited popup entry also inherits Dropdown Menu's actual-focus gate: a list/it
 - Switching menus invalidates old position/exit completions. The new trigger receives semantic focus/open feedback immediately; the old panel cannot steal focus when its fade finishes.
 - Close cancels text/geometry work in that branch. Reopening reverses only that boundary, with current labels and selection; removal unregisters the trigger and descendants.
 - Live reduced cancels travel/layout/scale; none/zero clock clears authored clocks and completes current exits through the native Base UI protocol. Inherited Dropdown Menu adapters perform cancellation once, not again in a Menubar wrapper. Native traversal, actions, focus and scrolling remain available in every mode.
-- Async labels/availability received while closed update the next view without replaying hidden work. Actual controlled open/selection state remains authoritative; reopening invalidates obsolete branch completion callbacks.
+- Async labels/availability in a closed popup establish its current baseline without replaying hidden work. The still-visible bar and top-level triggers retain independent label, colour and eligible closed-bar geometry revisions; closing a branch or completing its exit does not cancel those owners. Hiding/removing their enclosing bar cancels its work. Actual controlled open/selection state remains authoritative; reopening invalidates obsolete branch completion callbacks.
 
 ## Geometry and performance
 
@@ -135,3 +135,4 @@ Inherited popup entry also inherits Dropdown Menu's actual-focus gate: a list/it
 - Pending: nested checkbox/radio menus, all modes, live downgrade, zero clock and root removal cancel branch resources once.
 - Pending: change a trigger's width while its popup is open, then update async content after close; anchor placement stays attached, no bar FLIP competes with the positioner and required labels remain readable.
 - Pending: Open a menu while traversing triggers and then hover a submenu; inherited focus gating and both root/submenu resize anchors resolve through the same dependency once.
+- Pending: with all menus closed, asynchronously rename a visible trigger and a hidden menu item, then deliver an old branch-exit completion. Only the visible trigger/bar follows its eligible text and geometry bindings; the hidden item establishes its baseline. Removing the bar cancels its work, and reopening does not replay hidden updates.
