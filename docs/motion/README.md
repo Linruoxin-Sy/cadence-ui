@@ -277,6 +277,17 @@ branches and typography before selecting helpers for actual display slots. Built
 preserve the existing display format, with exact immediate output when safe decomposition fails;
 see [numeric formatting decisions](presets.md#51-numeric-identity-and-formatting-decisions).
 
+Ordinary caller layout, colour and typography customisation does not by itself make an animation
+owner unavailable. The same rule applies when an existing `className`, `style` or `render` callback
+supplies that customisation. Resolve the actual part and its evaluated properties; a nonempty class
+name or a function-valued prop is not evidence of a conflicting animation. Keep eligible default
+presence and other disjoint effects. Yield only the conflicting property or indivisible CSS family
+when safe composition is unavailable, without disabling the entire component or changing caller
+callbacks, refs or invocation semantics. None and zero cancel library work; they do not license an
+inline `transition: none` or blanket cancellation that destroys an independent caller/native writer.
+The [preset binding rules](presets.md#4-selection-overrides-and-effective-clocks) define the exact
+clock/property comparison boundary; unresolved ownership is a local fallback, not a global opt-out.
+
 Direction, writing mode, zoom and font/viewport changes are environment revisions, not navigation.
 Invalidate old rectangles/approach direction and establish current valid placement before another
 content action; preserve any live native input. A logical-axis or shaping layout the adapter cannot

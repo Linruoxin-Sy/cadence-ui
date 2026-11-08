@@ -295,6 +295,15 @@ entry interaction with an independent backdrop, three distinct modes, live cance
 completion and unknown caller overrides. This integration remains pending until source, declarations,
 public docs and executed evidence agree.
 
+Prove ordinary layout/colour classes and supported class/style/render callbacks retain default
+presence plus disjoint colour feedback. Compare them with actual caller transition/animation families,
+including a caller curve or delay that differs while duration and property names match. Verify local
+fractional token overrides through browser-normalized CSS values and the actual binding's entry/exit
+form, rather than an unrelated recipe with a coincidentally equal duration. Exercise initial none,
+same-target zero, live mode changes and close/reopen without cancelling caller/native handles or
+changing callback/ref semantics. Removing an override establishes the current baseline without an
+entrance replay. These acceptance cases do not grant arbitrary stylesheet-origin inference.
+
 Gate: meaningful algorithm, lifecycle and browser fixtures cover repeated characters, Unicode,
 multiline shaping fallback, numeric formatting, rapid retargeting, hidden/zero-size measurement,
 SSR/hydration, nested modes, live downgrades and clean unmount. Do not require per-frame React state

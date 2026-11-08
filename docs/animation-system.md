@@ -941,8 +941,11 @@ border geometry are not animated. Shadows require matching computed geometry/lis
 or changing topology settles to the cascade target. The host does not scan pseudo-elements; a named
 pseudo region still requires its own authored rule and future adoption proof.
 
-The delivered staged hooks require an otherwise unclaimed CSS transition/animation family. A caller
-class or inline family makes the hook yield, preserving that writer through mode/clock changes. Removing the
+The staged colour hooks require an otherwise unclaimed CSS transition/animation family; the target
+registered popup integration also permits explicitly coordinated, disjoint Cadence presence.
+A caller-authored transition/animation family from a class or inline style makes the conflicting
+hook yield, preserving that writer through mode/clock changes. Ordinary layout/paint classes and
+class/style callbacks do not by themselves establish a conflicting family. Removing the
 override re-establishes the current policy. Only the hook's own declarations/handles are removed;
 disjoint user/native WAAPI or Motion properties survive. Unknown caller class changes are checked
 in a committed style transaction, never by frame polling. No wrapper is inserted.
@@ -954,8 +957,8 @@ Framework pulse assumes resting opacity one: caller dimming from inline style or
 a static fallback, with class/environment changes sampled only at their committed boundary.
 Legacy Spinner/Skeleton callers retain their documented baseline until individually migrated.
 
-The target coordinator must distinguish that conservative caller boundary from Cadence's own known
-presence owner. When library presence and `state.color` share a real node, combine their declared
+The target popup coordinator distinguishes that conservative caller boundary from Cadence's own known
+presence owner. When registered library presence and explicitly adopted `state.color` share a real node, it combines their declared
 disjoint property sets in one transition-family composition, retaining each property's mode, clock
 and cancellation rules. The library's default presence family must not silently disable its colour
 capability. Focus/invalid settles the colour owner's whole palette; entry interaction settles only
@@ -963,6 +966,10 @@ the conflicting entry envelope, leaving an independent backdrop or other propert
 Unknown caller families keep their authority; if safe composition is unavailable, omit the conflicting
 library effect without inserting an incompatible wrapper or cancelling caller animations. This is a
 pending integration/verification requirement, not a claim that the staged hooks deliver it today.
+Ordinary caller customisation must retain eligible default presence and colour; only an actual
+ownership conflict permits the local fallback. Resolve and compare the real form's complete clock
+under the [preset binding rules](motion/presets.md#4-selection-overrides-and-effective-clocks), without
+replacing caller families with blanket inline cancellation or inferring ownership from a class name.
 
 ### 3.6 Changed text
 

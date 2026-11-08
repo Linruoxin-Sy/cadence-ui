@@ -346,6 +346,23 @@ interruption, CSS/JS equivalence and cost together. Update this catalogue and th
 bindings first; then implement all affected runtime/declaration/docs checks in the rollout. Do not
 create 59 copies of an easing curve or use a new preset name to avoid a recipe's safety contract.
 
+Resolve timing from the actual binding's selected form and phase. Sharing a duration token does not
+make two recipes interchangeable: an opacity exit can use `ease.in` while an entry using the same
+duration uses `ease.out`. Do not borrow an unrelated recipe's transition merely because its current
+numeric duration matches. A CSS adapter and its cancellation/ownership guard must use the same
+effective property set, duration, easing and delay, including local token overrides and mode/clock
+resolution. Compare browser-equivalent CSS values, not raw authored spelling or unrounded floating
+point values; timing-list repetition and functions containing commas retain native CSS semantics.
+
+A genuine caller transition/animation family keeps its existing override authority. Ordinary
+layout/paint classes and callbacks do not establish such a family. Known library owners with disjoint
+properties compose their transition family once; an ownership check must not mistake that composition
+for a caller override. The same duration with a different curve or delay is not the library's clock.
+Indistinguishable computed values do not prove author provenance, so do not promise arbitrary CSS
+origin detection. Use the explicit owner boundary and observable native behaviour; inspection must
+not strip live styles/classes, restart a native animation, scan every stylesheet or add frame polling.
+These are target adapter and verification requirements, not new presets or public settings.
+
 ## 5. Geometry, text and numerical limits
 
 Preset selection never changes natural content ownership. Observe natural content and size one
