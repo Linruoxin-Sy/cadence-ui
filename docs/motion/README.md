@@ -232,6 +232,14 @@ not create entrances, duplicate observers or consume a reveal. Cleanup is idempo
 the styles/listeners/engine hooks owned by that controller; never cancel every animation on a node or
 erase caller/native transforms. An old completion can release only its own handles, not the new writer.
 
+Async fallback/recovery uses the [committed-change contract](../animation-system.md#coordinating-one-committed-change):
+readiness is not a synthetic origin or a reason to replay hydration. A surviving region may own the
+actual content replacement, while newly available child displays start from their exact current value.
+Measured targets also inherit the [constraint validity rules](../animation-system.md#34-measured-size-and-position);
+scrollbar or responsive-constraint changes invalidate the affected destination without creating another
+content revision. Component acceptance must exercise these conditions where it hosts asynchronous or
+wrapping content, rather than certifying only a fixed-size synchronous fixture.
+
 Invalidate the owner lifetime before disconnecting observers or invoking disposal that can call back
 into the component. Queued observer deliveries, animation frames, microtasks, image completions and
 native-engine callbacks must check both their registration lifetime and the applicable committed

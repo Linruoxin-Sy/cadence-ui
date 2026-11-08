@@ -49,9 +49,20 @@ One current opacity phase owns the root: entrance, active pulse, exit or static.
 
 Reserve the intended dimensions before hydration. The parent owns differences between placeholder and real content; Skeleton does not inspect or measure an absent destination. Avoid a separate observer for every decorative line when the region owns its size. Keep the pulse opacity-only with a single writer; multiple placeholders may share a clock without a compulsory travelling shimmer.
 
+Suspense or caller readiness owns whether the placeholder exists. Completion of its exit/pulse must
+never resolve a loading state, delay real content, or retain an interactive fallback subtree. If no
+region survives the replacement, removal is immediate. A surviving region may coordinate safe
+placeholder paint and current content once; initial child text/numbers do not diff against skeleton
+shapes or placeholder copy. A later retry is a new real loading state, not a resumed obsolete pulse.
+
 For an explicit placeholder size revision, resolve final width/height under caller constraints and let one box writer interpolate; there is no text reflow to animate. Do not clip the subsequently revealed content to the outgoing placeholder shape. Region-level visibility observation can pause all child pulses; large placeholder sets use one coherent region pulse or static shapes instead of an unbounded set of independent observers/controllers. This changes only decoration, never loading state or reservation.
 
 ## Acceptance scenarios
+
+- Pending: resolve, reject and retry a loading region during entrance/pulse/exit, including a
+  replacement that unmounts its owner and streamed hydration. Current readiness is authoritative;
+  no missing completion holds content back, no stale pulse restarts, and new quantities never roll
+  from a fabricated placeholder value.
 
 Target acceptance; not executed: initial reserved layout; parent content handoff; aborted handoff; explicit shape changes; offscreen/hidden pause; nested placeholder region; full/reduced/none and zero clock during pulse with no stale animation.
 

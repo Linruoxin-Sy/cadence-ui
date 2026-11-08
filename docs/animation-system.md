@@ -956,6 +956,15 @@ for that axis instead of a second settling animation. A valid measured empty con
 an unavailable measurement from hidden/detached content is unknown, not a zero-size target. Existing
 minimums, padding and borders still determine the actual host box.
 
+A measured destination is valid only for its committed content and current layout constraints.
+Scrollbar occupancy, container-query breakpoint changes, writing mode and caller min/max/overflow
+changes can alter the available content width and therefore its wrapped height without a new content
+revision. Invalidate the affected destination and settle to current native layout; do not keep chasing
+the old spring endpoint. Preserve the caller's scrollbar/gutter and responsive policy. If the animated
+host itself would repeatedly cross such a breakpoint or toggle a scrollbar and invalidate its own
+destination, use immediate native geometry for that transaction rather than an iterative measurement
+loop, an invented fixed width or a new overflow policy. Unrelated paint may continue.
+
 Transform ownership includes the effective composition of CSS `translate`, `rotate`, `scale`, the
 `transform` list, origin and SVG transform attributes. Different property spellings do not by
 themselves establish independent coordinate owners. Preserve required placement and caller transforms
@@ -1374,6 +1383,21 @@ ordering remains caller-owned: motion must display a value the caller actually c
 came from an older request. Reject retired animation/measurement deliveries, not valid caller data.
 An internally owned resource such as an image or highlighter result still checks its actual source
 and owner lifetime. These are internal cause rules, not a new public transaction prop or request queue.
+
+Async readiness does not supply a missing animation origin. A Suspense fallback, error boundary or
+conditionally replaced host has its own actual lifetime; never measure speculative content or keep
+the old interactive subtree alive solely until its replacement is ready. If React preserves visible
+content during an update, it keeps its existing owner until an actual accepted replacement. If a host
+is hidden or replaced, retire its affected presentation work; recovery establishes current native
+geometry before considering a later independent revision. Reusing the same semantic key does not
+make an old detached host's measurements valid for a new host.
+
+A surviving region may coordinate a committed fallback-to-content replacement using its existing
+presence/geometry contract and one real measurable destination. The newly available child's initial
+text/number display is an exact baseline, not a diff from placeholder copy or a count from zero. Parent
+presence consumes that same child entrance once. First streamed hydration follows the ordinary readable
+SSR rule, not a deferred hidden reveal. Application readiness, retry, error and focus decisions never
+wait for an animation or acquire new callbacks from these presentation rules.
 
 ### Runtime identity and terminal presentation
 

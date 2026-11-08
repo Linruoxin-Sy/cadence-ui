@@ -71,6 +71,13 @@ only its registrations, while a retained root/ref handoff preserves its current 
 
 ## Geometry and performance
 
+An activated panel that first commits a loading fallback is measured as that real fallback only.
+When its content becomes ready, the same surviving panel/viewport may assess a new content-size
+revision; it never borrows hidden content or the previous tab's measurement. A replaced panel host
+starts at current native geometry. Suspense recovery alone does not replay selection, panel travel
+or a marker origin; no number rolls from a loading label. Scrollbar/container constraints that change
+the destination follow the shared immediate invalidation rule, including during panel height motion.
+
 A scrolling TabsList keeps the marker in the same local content coordinate space as its triggers.
 Do not subtract viewport rectangles and then apply the list's scroll offset again. Native focus-reveal
 scrolling and page scrolling do not constitute a new active-value revision. A valid shared local path
@@ -109,6 +116,12 @@ without deleting caller transforms. Any temporary list/panel pixel dimensions re
 native layout policy when the size owner completes or yields.
 
 ## Acceptance scenarios
+
+- Pending: activate an asynchronously resolving panel, switch away before resolution, then return;
+  compare a surviving fallback host, a replaced host and preserved visible content. Only committed
+  visible content participates, current labels/values start exactly, and no retired measurement can
+  resize the active panel or replay selection. Cross a scrollbar/container breakpoint while content
+  wraps and verify immediate native fallback without a repeated measurement/spring cycle.
 
 - Pending: use sibling and nested Tabs with equal values under one provider. Change both, replace
   one root and deliver its old panel/marker completions. Each marker stays in its own list; native

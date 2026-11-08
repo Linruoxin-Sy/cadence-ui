@@ -78,11 +78,22 @@ Pointer opening can keep focus on a trigger outside the popup and retain the des
 
 ## Geometry and performance
 
+The destination is the currently committed active content, including a real loading/error fallback;
+do not render or measure a speculative ready panel. A later resolution under the same active host is
+a content revision, not another item switch. Resolution after that item closes cannot reopen or size
+the current menu. If scrollbar occupancy or a responsive constraint invalidates the measured width
+and wrapped height, settle the affected shell to native geometry under the shared constraint rule.
+
 Resolve target dimensions from the actual viewport and constrain them to available width/height. Select one shell for each axis; do not animate both popup and viewport toward the same size independently. Anchor collision/viewport changes use Base UI's immediate positioning, not a second position tween. Clip the content transition inside the surface without clipping focus rings, pointer corridors or nested portals. Measure only the active/destination content and retain at most the immediately outgoing visual; no whole-menu layout scan per pointer event.
 
 The natural destination content lays out at its final constrained width before measuring height. A separate shared surface host animates width/height around that content; text does not continuously wrap as the surface changes. Content-switch travel belongs to a visual layer inside that host, never the Positioner or the same transform used for popup entry. When the primitive supplies destination dimensions, consume those measurements rather than observing the interpolated popup box. Supplied custom content that cannot preserve this separation takes immediate native geometry. Destination content exceeding available height uses the existing valid overflow policy; do not add scroll behaviour solely for animation. If an intermediate shell would crop required content/focus beyond that policy, settle the affected axis. A focused native editor also cancels decorative geometry that would shift its caret/content box or scroll. No hidden copy of the whole menu is measured.
 
 ## Acceptance scenarios
+
+- Pending: switch among asynchronously resolving items and replace one with an error fallback while
+  the viewport resizes. Resolve an inactive item last and cross a wrapping/scrollbar breakpoint in the
+  active one. Only current active content supplies a valid destination; there is no repeated switch
+  entrance, hidden measurement, stale size or measurement loop.
 
 - Pending: move rapidly between differently sized items, reverse direction, leave and reopen during resize; only the latest panel remains interactive.
 - Pending: test keyboard focus, nested links, RTL, custom render and viewport collision near each edge.

@@ -199,6 +199,14 @@ one-shot path and retargets from the currently displayed offset/opacity without 
 content; it does not require velocity continuity. A collision or passive layout correction settles
 placement immediately instead of inventing a navigation direction.
 
+For `handoff.value`, distinguish eligibility fallback from cancellation after flight starts. Before
+starting, a missing/unsafe source chooses the component's ordinary changed-run replacement; a revision
+already in reduced mode may use that local opacity path. Once a flight is running, loss of its mapping,
+owner, visibility or full-mode eligibility retires it and exposes the already-current destination
+immediately. Do not restart a destination fade for the same consumed revision. A genuinely new accepted
+content revision is assessed normally. This narrows the fallback wording below; it adds no preset or
+alternate duration and never fades retained characters.
+
 For `data.progress`, a shared bounded monotonic transaction phase coordinates compatible fill/reel
 travel; that phase is animation progress, never an interpolated business percentage. Both participants
 resolve their destinations from the same committed revision. If the visible fill is at 60 while the
