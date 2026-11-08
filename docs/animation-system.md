@@ -1386,7 +1386,9 @@ Implementation rules:
     glyphs have a budget. Reduce moving groups or show final values when limits are exceeded. Cyclic
     delay does not bound concurrency. Reuse observers where appropriate and do not measure every glyph
     on every frame. The 400 ms stagger ceiling applies after timeScale; scale/clamp group delay or
-    reduce the moving set to remain within it.
+    reduce the moving set to remain within it. The [shared renderer limits](motion/presets.md#52-shared-work-limits)
+    include still-active visual work from earlier revisions in the same known scope; frequent commits
+    cannot reset the allowance or accumulate obsolete outgoing layers.
 
 ---
 

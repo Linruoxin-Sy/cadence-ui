@@ -272,6 +272,11 @@ direction reversal and hidden-owner cancellation without queuing old states. Geo
 includes destination-width readability, focused editor stability, hidden measurement recovery and
 parent/child constraint cycles; native input must win over any preset or live mode change.
 
+Exercise overlapping revisions that each fit the per-revision budget but would exceed the live
+moving-set limit together. Count retained active work, release obsolete decorative copies and prove
+immediate latest-content fallback without waiting for capacity. Also prove that this cleanup leaves
+caller-persisted panels, unchanged text identity and independent list-item lifecycles intact.
+
 Gate: meaningful algorithm, lifecycle and browser fixtures cover repeated characters, Unicode,
 multiline shaping fallback, numeric formatting, rapid retargeting, hidden/zero-size measurement,
 SSR/hydration, nested modes, live downgrades and clean unmount. Do not require per-frame React state

@@ -481,6 +481,17 @@ Overflow settles the remaining affected slots immediately, in stable document or
 their semantics. Coalescing cannot keep an old target indefinitely: a superseded changed visual is
 replaced, and a hidden/detached owner cancels rather than accumulating work for later playback.
 
+The moving-set limits also bound live work across overlapping revisions in the same known owner scope.
+Count still-moving incoming/outgoing units from earlier revisions together with the proposed new
+moving set; a fresh revision does not reset that allowance. Retargeting an existing unit counts that
+unit once, while distinct departing/incoming text units count separately as above. Release obsolete
+decorative layers when their authority ends, not only when an old completion would have fired. If
+the combined set cannot fit, settle superseded work and apply the affected latest content immediately;
+do not defer a new revision until capacity becomes free. This bounds visual work without removing
+caller-persisted panels, truncating message history or conflating independent list item identities.
+Unchanged retained text and intentionally mounted inactive semantic content are not retiring visual
+copies; they keep their existing identity and lifecycle.
+
 Use visibility already known from the primitive, virtualizer or shared visibility controller. Do not
 poll every component's rectangle or add a per-glyph observer to discover offscreen work. An active
 native selection/copy range, browser find result or focused editing region takes precedence over
