@@ -74,6 +74,8 @@ A focused native editor also takes priority when geometry would move its caret/c
 
 ## Acceptance scenarios
 
+- Pending: change only an external callback ref while Content remains the same host and is entering, then genuinely replace the render host. The first transfers ref registration without stopping the valid animation; the second establishes a current baseline and rejects retired writes. Repeat with native retained mounting, actual unmount and close/reopen, checking native completion instead of assuming that every visual exit disconnects its node.
+
 - Pending: resize content near each viewport edge while scrolling/moving the anchor; placement remains valid without diagonal fly-through.
 - Pending: type into a composed input, close mid-update and reopen; focus/value stay native and only one panel is present.
 - Pending: verify controlled/default open, all modes, live downgrade, zero clock and anchor removal cleanup.

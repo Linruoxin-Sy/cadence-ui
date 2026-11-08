@@ -304,6 +304,14 @@ same-target zero, live mode changes and close/reopen without cancelling caller/n
 changing callback/ref semantics. Removing an override establishes the current baseline without an
 entrance replay. These acceptance cases do not grant arbitrary stylesheet-origin inference.
 
+Separate external ref registration from visual-owner identity in these fixtures. A new inline ref
+on the same host/entity/target must hand off registration without settling or restarting an eligible
+animation; actual node/entity replacement must revoke retired write authority. Prove both the
+continuity case and late-cleanup/replacement case, including ordinary callback/render rerenders.
+For retained native popups, distinguish visual completion, a connected closed host and actual unmount
+under the primitive's existing policy. Preserve caller handles on the same surviving host, allow
+native removal to end them, and never use an infinite caller loop as an added Cadence exit hold.
+
 Gate: meaningful algorithm, lifecycle and browser fixtures cover repeated characters, Unicode,
 multiline shaping fallback, numeric formatting, rapid retargeting, hidden/zero-size measurement,
 SSR/hydration, nested modes, live downgrades and clean unmount. Do not require per-frame React state

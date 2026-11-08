@@ -238,6 +238,14 @@ native-engine callbacks must check both their registration lifetime and the appl
 revision before writing or cancelling anything. Disconnecting a resource alone is not evidence that
 an already queued callback cannot run. A shared ref pointing at a new node does not transfer the old
 callback's authority; reusing the same node for another semantic entity does not preserve it either.
+Distinguish that visual lifetime from a caller's ref registration. A new callback/object ref on the
+same actual node, with the same semantic identity and target, only hands off the external registration:
+release the old ref according to its supported cleanup contract and attach the new ref exactly once.
+It does not restart presence, settle a legal flight, reset velocity or consume a new content revision.
+An ordinary inline ref can change on every render. Old registration cleanup must not detach the new
+registration or cancel the continuing visual owner. Actual node replacement or an explicit semantic
+identity change does revoke the old visual authority and establishes the new owner's current baseline.
+Do not infer that identity change from ref, event-handler or render-function identity alone.
 Recheck authority after a caller/native callback that can synchronously close, replace or unmount the
 owner. This guards decorative work, not permission to suppress the primitive's required semantic
 callbacks. Acceptance must include a retired delivery after replacement and after close/reopen,
@@ -276,6 +284,15 @@ in [changed text](../animation-system.md#36-changed-text): preserve existing con
 branches and typography before selecting helpers for actual display slots. Built-in numeric helpers
 preserve the existing display format, with exact immediate output when safe decomposition fails;
 see [numeric formatting decisions](presets.md#51-numeric-identity-and-formatting-decisions).
+
+Retained native presence is distinct from a decorative copy. A primitive's supported keep-mounted or
+prevent-unmount policy may leave its original closed subtree connected after its visual exit; preserve
+that policy's visibility, focus and completion semantics. Do not force removal, synthesize a completion
+at an assumed deadline or require a callback that the native policy defers until actual unmount.
+When comparing caller-owned animation handles, require continuity only while the same actual host
+survives. Native removal legitimately ends that host's animations; reopening on a new node establishes
+new handles. An infinite caller animation is not an extra Cadence exit hold, and must not be cancelled
+merely to manufacture completion. The existing primitive decides which native work its lifecycle awaits.
 
 Ordinary caller layout, colour and typography customisation does not by itself make an animation
 owner unavailable. The same rule applies when an existing `className`, `style` or `render` callback
@@ -320,6 +337,12 @@ cancel recipe work, while a positive-to-positive clock change follows the
 revision. Add an interruption scenario wherever a local cancellation rule could otherwise erase
 these distinctions. First appearance of a display slot establishes its exact content baseline;
 numeric replacement applies only to later applicable value revisions, not an invented count from zero.
+
+Check external ref handoff separately from node/entity replacement: the former preserves an eligible
+in-flight animation, while the latter rejects retired writes. Check inherited bindings against the
+dependency's actual part, preset and property subset, not just against the global list of valid names.
+A deliberate composition override must state the original assignment, replacement, cause and same
+owner; the structural reference checker alone cannot distinguish that override from accidental drift.
 
 Local contracts may coordinate outgoing visuals, incoming visuals and geometry without delaying the
 semantic commit. Distinguish visual sequencing from delaying an actual action. In particular, replacement

@@ -845,6 +845,12 @@ overrides respected. Settle only entry envelopes that would conceal or displace 
 an independent backdrop or other non-conflicting part may continue. Do not delay autofocus to show
 the full entrance, and do not promise that every popup opening completes every entry effect.
 
+Presence identity follows the actual host and committed semantic entity, not the identity of a caller
+ref or render callback. Rebinding an external ref on the same host must preserve an otherwise valid
+animation; replacing that host or entity revokes the old writer. Native keep-mounted/prevent-unmount
+semantics also remain authoritative after visual exit. The detailed registration, retention and
+caller-animation boundaries are in [the common lifecycle contract](motion/README.md#31-cancellation-environments-and-renderer-ownership).
+
 ### 3.4 Measured size and position
 
 geometry.resize is available wherever appropriate, regardless of legacy tier. Observe natural

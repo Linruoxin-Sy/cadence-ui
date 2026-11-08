@@ -52,6 +52,12 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 - Descendant geometry updates do not make the ancestor follow every spring frame. Hand off the affected axis or let the ancestor adopt the child's destination immediately.
 - Exit retention never creates accessible or focusable duplicate content. Base UI handles focus and hidden-until-found/beforematch semantics before decorative cleanup; a browser-initiated reopen invalidates the close completion. Unmount cancels observers/writers. Live reduced settles shell geometry and reels before paint; permitted opacity on still-drawable content/changed runs and eligible trigger colour follow their reduced contracts. A closed fully clipped body completes its invisible decorative exit immediately. None or zero recipe clock settles all one-shot work to the effective mode's current visibility/paint; re-enabling animation does not replay an already open body.
 
+Body closure retires text/reel and content-driven resize work; the current close-size/opacity
+transaction remains with the content shell/paint owners. A still-visible Trigger keeps its independently
+committed label, quantity and colour effects; only hiding/removing their actual enclosing boundary
+cancels those too. A body completion cannot erase a later trigger revision or reopen content in
+response to an async body update.
+
 ## Geometry and performance
 
 Measure the content-inner natural height and the shell's actual border/padding contribution where box sizing requires it. Avoid feedback from a clipped intermediate measurement. Clamp to closed and available size with no overshoot. Reflow surrounding content through the one shell; clip the body only. Passive font, viewport or unknown-origin changes resolve immediately. Stop observing removed/irrelevant parts and batch nested updates; no per-descendant measurement or render-time layout reads.
@@ -61,6 +67,8 @@ The natural inner content lays out at destination inline-size before measurement
 Reduced closing commits the closed block-size immediately. A fully clipped/hidden body has no visible exit opacity to retain, so complete that body's decorative exit immediately through the primitive; do not hold empty space just to run a fade. A short opacity entry is permitted after the open geometry is final. On focus/beforematch opening, settle any envelope that would hide the target immediately. This does not replace native persistence, focus or hidden-until-found handling.
 
 ## Acceptance scenarios
+
+- Pending: change the Trigger label/quantity while closing Content, then deliver a late body update and reopen. The visible Trigger keeps its own current revision; closed body work stays cancelled, native reopening uses current content, and no old completion touches either newer owner.
 
 - Pending: reverse rapidly with content growth, then close before the latest content arrives; verify state, height and focus agree.
 - Pending: nest disclosures and place one inside a resizing parent; inspect that no two writers chase the same axis.

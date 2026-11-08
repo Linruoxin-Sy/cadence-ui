@@ -48,6 +48,11 @@ Pointer cancellation, lost capture, blur and disabled changes release the press 
 
 A retained exit is decorative and cannot activate or expose an obsolete name. A caller key or native target revision cancels any obsolete label/press transaction even if the visible label matches; Button does not infer business identity from callback internals. Parent close cancels local text/size work; its completion cannot restart press or restore a removed label.
 
+A newly created inline ref or click/render callback on the same retained button is not a new action
+identity. Preserve its accepted held/released state and current eligible motion while handing off
+external ref registration. Actual host/key replacement revokes old writes; it must not be simulated
+by clearing every animation whenever a caller function changes.
+
 ## Geometry and performance
 
 Measure intrinsic inline size after commitment, clamp it to available space, and never stretch the label with root scale-based layout correction. Preserve the existing single-line label policy; changes resolve final truncation before interpolating the host width, rather than rewrapping during travel. Fixed-width buttons skip width measurement. Keep keyboard focus and pointer hit testing available throughout. A composed Spinner owns its rotation; Button does not rotate or replay unchanged label characters.
@@ -57,6 +62,11 @@ One natural-content measurement supplies both width and any explicit height dest
 A custom `render` must preserve the native ref/event target, direct-child icon selectors and existing layout. Press decoration requires a safe internal visual layer separate from hit/focus/anchor geometry; if none exists, use the declared colour feedback and omit press scale rather than inserting incompatible wrappers. The same rule applies to icon-only buttons and composed triggers. At full-mode zero timeScale, an accepted held press reaches `scale.press` immediately and release reaches rest immediately; a none/reduced branch remains unscaled. Presence completion restores current disabled/caller opacity, not a hard-coded fully opaque button.
 
 ## Acceptance scenarios
+
+Also pending: rerender during entry, press and a label revision with a fresh inline ref and callback
+but the same node/semantic target. Ref cleanup/attachment stays balanced and motion continues without
+a restart or forced terminal frame. Then actually replace the host/key and deliver old cleanup and
+completion callbacks; they cannot detach, cancel or overwrite the new owner.
 
 Target acceptance; not executed: pointer and keyboard press cancellation; repeated Save/Saving/Saved label changes; a quantity crossing a digit boundary; icon-only and constrained-width buttons; rich children; parent insertion without double entrance; live full/reduced/none and zero-clock changes during press and resize.
 

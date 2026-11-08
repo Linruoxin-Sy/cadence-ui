@@ -78,6 +78,9 @@ A focused native editor also takes priority when geometry would move its caret/c
 
 ## Acceptance scenarios
 
+- Pending: keep the same Content host while changing only its callback ref during entry/exit; external registration transfers without interrupting eligible presence. Separately replace the actual render host and reject writes from its retired owner. Exercise native retained mounting and prevent-unmount control: visual completion, hidden connected content and actual unmount retain their distinct native callback/focus semantics.
+- Pending: preserve a caller-owned continuous CSS animation across mode/clock changes and a close/reopen that retains the same host. Actual native unmount may end that handle; reopening a new host gets a new handle. The caller loop neither becomes a Cadence exit hold nor gets blanket-cancelled to force completion.
+
 - Pending: open from keyboard, change body height and close mid-resize; focus, Escape, modal variants and return focus retain Base UI behavior.
 - Pending: rapidly reopen during exit, including changed title and lazy body content, with no duplicated panel/name or stale geometry.
 - Pending: SSR-visible open state, small viewport/zoom, parent child entrance suppression, all modes, live downgrade and zero clock.

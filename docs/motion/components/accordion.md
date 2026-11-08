@@ -58,6 +58,12 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 - Closing immediately updates expanded/focus/accessibility semantics through Base UI. Do not apply inert/hidden to a subtree before the primitive has handled an affected focused control; outgoing visual copies have no focus targets. Respect persistence, custom `render`, hidden-until-found and beforematch reopening rather than retaining semantic nodes solely for animation.
 - Unmount disconnects measurement and cancels the writer. Live reduced/none changes and a zero clock settle size before paint, cancel delays and preserve the correct final indicator/content state; re-enabling motion does not replay it.
 
+Closing one content panel cancels that body's subordinate text/reel and content-update measurement
+work, while its shell retains the current close-size/opacity transaction. The still-visible trigger's
+independent label, quantity or colour transaction is unaffected. The chevron follows the latest
+expanded state even during closure. Actual item/root removal revokes all of that removed boundary's
+owners; a stale body-exit completion cannot cancel a trigger update or another open item's work.
+
 ## Geometry and performance
 
 Measure the natural inner block-size outside render, accounting for the actual content box. Clamp to the valid closed and available bounds with no bounce; do not animate padding. Clip only the disclosure body, not the trigger ring or descendant portals. Size animation produces real reflow for nearby items. Passive viewport/font changes resolve immediately. Observe open or transitioning panels only and batch measurements when several items change; do not measure arbitrary descendants or multiply nested observers.
@@ -67,6 +73,8 @@ Lay inner text out at its destination inline-size before measuring; the separate
 Reduced closing commits the closed block-size immediately. A fully clipped/hidden body has no visible exit opacity to retain, so complete that body's decorative exit immediately through the primitive; do not hold empty space just to run a fade. A short opacity entry is permitted after the open geometry is final. On focus/beforematch opening, settle any envelope that would hide the target immediately. This does not replace native persistence, focus or hidden-until-found handling.
 
 ## Acceptance scenarios
+
+- Pending: close one body while its trigger label/quantity and a sibling open panel update. Only the closing body's subordinate work is cancelled; the visible trigger and sibling follow their own modes and owners. Remove the whole item afterwards and reject all of its retired deliveries.
 
 - Pending: reverse opening and closing repeatedly, then update controlled values for several items; each ends at the latest size with correct expanded state.
 - Pending: change text and nested content while open; verify unchanged characters remain still and only one owner writes each height.
