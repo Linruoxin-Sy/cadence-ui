@@ -586,14 +586,15 @@ This and the following engine/part notes describe the delivered migration baseli
 engine and native semantics while the rollout plan schedules additional capabilities; they do not
 exempt these components from v2 coverage.
 
-Sidebar uses `layout.move` for the desktop offcanvas panel's own-width transform. The reserved
-gap and icon-mode widths update immediately; they are functional layout, with no width, left/right,
-margin, padding or height interpolation. Reduced/none use the static off-edge position, with zero
-transform duration. The same panel and its children survive desktop toggles and rapid reversals.
-Mobile delegates enter/exit to Sheet; button, tooltip and skeleton children retain their own recipes.
-No new geometry engine or measured resize recipe is introduced.
-
-Sidebar's scalar owner jumps at zero clock (resetting velocity), stops its MotionValue as well as its returned handle on cleanup, and guards detached `onUpdate` writes.
+Sidebar's desktop offcanvas adapter uses `geometry.resize` with `geometry.compact` for actual
+reserved width. Its `layout.move/size-linked` panel transform projects that same clamped physical
+size scalar; it has no independent position spring. Native CSS supplies both resting endpoints,
+including physical side and floating/inset padding. Temporary width/transform replace effects are
+released together. Reduced/none/zero clock and affected focused editors/native capture settle the
+whole transaction; passive constraints and unsupported coordinates establish an immediate baseline.
+Initial/missing/restored geometry never invents an origin. No content clone or frame-time layout
+read is used. Icon widths and labels still update immediately; their coupled destination-width
+label adapter remains pending. Mobile retains Sheet; inherited controls keep their own recipes.
 
 ### 3.0.1 Bubble surface entry
 
@@ -636,16 +637,18 @@ The installed internal content executor uses one bounded finite scalar phase for
 permitted directional translation across actual committed participants. Tabs panel activation and
 Calendar month slots adopt these forms; neither retains arbitrary outgoing trees. Calendar shares
 that phase across its visible month slots. Native dimensions remain immediate in these integrations:
-this does not claim a shared size-host projection or Sidebar support. Tabs retains one list marker
+this does not claim a shared content size-host projection. Sidebar has a separate limited desktop
+offcanvas adapter. Tabs retains one list marker
 with a separate single transform writer; filled or unsafe paths use immediate native selected paint.
 The catalogue remains legacy until its other applicable capabilities and acceptance migrate.
 
 The preset catalogue names the directional forms explicitly: `content.switch` for bounded panel
 content travel and `content.month` for the calendar grid. The generic `data.update` preset does not
-silently add such travel. Sidebar's target `layout.sidebar` binding uses a size-linked `layout.move`
+silently add such travel. Sidebar's `layout.sidebar` binding uses a size-linked `layout.move`
 projection: its transform and the reserved-gap `geometry.resize` share one space-progress coordinator,
 with transform derived from that value. Equal durations on two independent springs are not proof of
-matching geometry. These are target adapter/forms, not additional runtime recipe ids.
+matching geometry. The installed size-linked form currently covers desktop offcanvas only; icon
+label/width coordination remains target work. These forms add no runtime recipe ids.
 
 ### 3.1.1 `data.transition` for Embla collections
 

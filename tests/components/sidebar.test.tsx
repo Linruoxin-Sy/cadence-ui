@@ -118,20 +118,17 @@ describe("Sidebar", () => {
     const panel = container.querySelector('[data-slot="sidebar-container"]') as HTMLElement;
     expectMotionContract(mode, {
       behavior: () => {
-        if (mode !== "full") {
-          expect(panel.style.transform).toBe("none");
-          expect(imperativeSamples).toHaveLength(0);
-        } else {
-          expect(imperativeSamples).toHaveLength(1);
-          expect(imperativeSamples[0]?.[1]).toBe(-100);
-          expect(imperativeSamples[0]?.[2]).toMatchObject({ type: "spring" });
-        }
+        // jsdom has no measurable layout. Both owners use native destinations;
+        // actual coupled interpolation is exercised in the browser runner.
+        expect(panel.style.transform).toBe("");
+        expect(imperativeSamples).toHaveLength(0);
+        expect(container.querySelector('[data-slot="sidebar-gap"]')).toHaveAttribute("data-motion", mode);
       },
     });
     expect(panel).toHaveAttribute("data-motion", mode);
     rerender(<Example mode="none" />);
     expect(panel).toHaveAttribute("data-motion", "none");
-    expect(panel.style.transform).toBe("none");
+    expect(panel.style.transform).toBe("");
     expect(container.querySelector("input")).toBe(input);
   });
   it("forwards native events/styles/render refs and ref cleanup", () => {

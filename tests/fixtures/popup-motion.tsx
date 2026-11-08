@@ -263,7 +263,10 @@ function SidebarFixtureControls() {
 }
 function SidebarMotionFixture() {
   return (
-    <SidebarProvider className="relative isolate h-96 min-h-96 overflow-hidden [transform:translateZ(0)]">
+    <SidebarProvider
+      style={{ width: "calc(100vw - 4rem)" }}
+      className="relative isolate h-96 min-h-96 overflow-hidden [transform:translateZ(0)]"
+    >
       <Sidebar className="md:absolute md:h-full">
         <SidebarHeader>
           <SidebarInput aria-label="Sidebar fixture draft" />

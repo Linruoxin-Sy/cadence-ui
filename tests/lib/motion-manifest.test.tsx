@@ -19,6 +19,19 @@ describe("installed content and selection forms", () => {
   });
 });
 
+describe("installed size-linked geometry forms", () => {
+  const sidebar = readFileSync("registry/cadence/lib/sidebar-geometry.ts", "utf8");
+  it.each([
+    ["layout.move", "size-linked"],
+    ["geometry.resize", "measured"],
+  ])("requires actual %s/%s adoption", (recipe, form) => {
+    expect(implementedForm(sidebar, recipe, form)).toBe(form);
+    expect(implementedForm(sidebar.replaceAll("projection.prepare(", "missing("), recipe, form)).toBeNull();
+    expect(implementedForm(sidebar.replaceAll("projection.commit(", "missing("), recipe, form)).toBeNull();
+    expect(implementedForm(`cm.transition("${recipe}")`, recipe, form)).toBeNull();
+  });
+});
+
 describe("disclosure motion manifest", () => {
   it("requires an explicit CSS geometry form", () => {
     expect(implementedForm(source, "geometry.resize", "css-transition")).toBe("css-transition");

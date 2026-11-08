@@ -154,7 +154,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -184,7 +184,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -211,7 +211,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -240,7 +240,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -267,7 +267,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -296,7 +296,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -323,7 +323,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -350,7 +350,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -377,7 +377,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -406,7 +406,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -443,7 +443,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -472,7 +472,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -502,7 +502,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -534,7 +534,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -565,7 +565,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -597,7 +597,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -629,7 +629,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -659,7 +659,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -689,7 +689,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -726,7 +726,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -769,7 +769,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -804,7 +804,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -838,7 +838,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -871,7 +871,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -905,7 +905,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -940,7 +940,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -986,7 +986,7 @@
         }
       ]
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1021,7 +1021,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1054,7 +1054,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1096,7 +1096,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1131,7 +1131,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1166,7 +1166,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -1201,7 +1201,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -1238,7 +1238,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -1273,7 +1273,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -1311,7 +1311,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -1349,7 +1349,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -1386,7 +1386,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -1423,7 +1423,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -1460,7 +1460,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -1501,7 +1501,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -1558,7 +1558,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -1593,7 +1593,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -1631,7 +1631,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -1668,7 +1668,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -1712,7 +1712,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -1739,7 +1739,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -1774,7 +1774,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -1803,7 +1803,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -1837,7 +1837,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -1878,7 +1878,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -1919,7 +1919,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -1949,7 +1949,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -1982,6 +1982,7 @@
       "@cadence/cadence-utils",
       "@cadence/cadence-motion",
       "@cadence/cadence-provider",
+      "@cadence/cadence-geometry",
       "@cadence/use-mobile",
       "@cadence/button",
       "@cadence/input",
@@ -1994,7 +1995,14 @@
     "tier": "T3",
     "batch": "B7",
     "motion": [
-      "layout.move"
+      {
+        "recipe": "layout.move",
+        "form": "size-linked"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      }
     ],
     "intensity": "medium",
     "complexity": "L",
@@ -2003,7 +2011,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -2045,7 +2053,7 @@
       "path": "apps/v4/examples/base/data-table-demo.tsx",
       "guide": "apps/v4/content/docs/components/base/data-table.mdx"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -2086,7 +2094,7 @@
       "path": "apps/v4/examples/base/date-picker-demo.tsx",
       "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -2127,7 +2135,7 @@
       "version": "2026-10",
       "guide": "apps/v4/content/docs/components/base/attachment.mdx"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -2162,7 +2170,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -2197,7 +2205,7 @@
       "version": "0.5.0",
       "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
     },
-    "sourceSha": "bcdb3ada",
+    "sourceSha": "1be0ebda",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   }

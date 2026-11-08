@@ -2,13 +2,13 @@
 title: Sidebar
 description: Workspace navigation for dashboards and application shells.
 category: navigation
-motion: [layout.move]
+motion: [layout.move, geometry.resize]
 intensity: medium
 complexity: L
 tier: T3
 since: 0.5.0
 deps: ["@base-ui/react", "motion", "class-variance-authority", "lucide-react"]
-registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/use-mobile", "@cadence/button", "@cadence/input", "@cadence/separator", "@cadence/sheet", "@cadence/skeleton", "@cadence/tooltip"]
+registryDeps: ["@cadence/cadence-utils", "@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-geometry", "@cadence/use-mobile", "@cadence/button", "@cadence/input", "@cadence/separator", "@cadence/sheet", "@cadence/skeleton", "@cadence/tooltip"]
 ---
 
 ## Installation
@@ -1864,13 +1864,17 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Desktop offcanvas toggle | transform, own-width translation | `layout.move` | Yes, current position and velocity retarget. |
+| Desktop offcanvas position | transform projected from actual occupied width | `layout.move` | Yes, one shared size scalar. |
+| Desktop offcanvas gap | measured, clamped width | `geometry.resize` | Yes, current size and velocity retarget. |
 
-Full springs between the edge and off-edge position; no mounting reveal. Reduced and none update
-position immediately, with no animated transform. Gap, icon widths, label margins and visibility
-update immediately in every mode. No layout or height tween is authored. Caller `style.transform`
-owns that property and suppresses desktop motion. System reduced motion overrides full; live mode
-downgrades stop the running spring without replacing the panel.
+Full drives the actual gap and panel position from one clamped size spring. Initial state is native;
+there is no mounting reveal. Reduced, none and zero clock reach both destinations immediately. Icon
+widths, labels and visibility still update immediately. Native CSS supplies the resting widths and
+positions; temporary effects are released on completion or cancellation. Caller `style.transform`
+owns panel placement and suppresses this coupled animation. Unsupported or unavailable geometry
+uses immediate native layout. Focused editing in the Sidebar/Inset, native pointer capture, passive
+width/viewport changes and live mode downgrades settle both dependent properties. The same desktop
+panel and input nodes survive toggles.
 
 Mobile delegates `popup.anchored` / `exit.fade` to Sheet. Button press, tooltip popup and Skeleton pulse
 are owned by those dependencies, not extra Sidebar recipes. Their effective mode follows the provider.
@@ -1900,12 +1904,12 @@ Default mobile closing unmounts content. Store drafts outside Sidebar if they mu
 
 ## Performance
 
-Only the desktop offcanvas transform animates. There is no measurement loop, persistent will-change,
-timer, width interpolation or validation dependency. Child input values survive desktop state and
-motion-mode updates. Render only the navigation items the application needs.
+Desktop offcanvas uses one measured size scalar for its gap and panel projection. Reads occur at
+committed changes and invalidation, never on animation frames; no interactive content is cloned.
+Icon layout remains immediate. There is no persistent will-change or animation timer. Child input
+values survive desktop state and motion-mode updates. Render only the navigation items the application needs.
 
 ## Notes for AI
 
 Keep the provider, navigation landmark and main content together. Use `render`, never `asChild`.
-Do not assume the cookie is read or desktop `open` controls the mobile sheet. Do not animate icon
-widths or disclosure height without a separately reviewed measured geometry contract.
+Do not assume the cookie is read or desktop `open` controls the mobile sheet. Icon width/label choreography remains pending; preserve its immediate path.

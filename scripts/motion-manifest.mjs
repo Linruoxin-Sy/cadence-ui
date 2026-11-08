@@ -27,6 +27,8 @@ export const MOTION_FORMS = [
   "selection",
   "directional-content",
   "month-grid",
+  "size-linked",
+  "measured",
 ];
 
 /**
@@ -84,6 +86,15 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  if ((recipe === "layout.move" && form === "size-linked") || (recipe === "geometry.resize" && form === "measured"))
+    return source.includes("./size-linked-geometry") &&
+      source.includes("createSizeLinkedGeometry(") &&
+      source.includes("projection.prepare(") &&
+      source.includes("projection.commit(") &&
+      source.includes("geometry.resize/measured") &&
+      source.includes("layout.move/size-linked")
+      ? form
+      : null;
   if (recipe === "layout.shared" && form === "selection")
     return source.includes("./selection-projection") &&
       source.includes("createSelectionProjection(") &&

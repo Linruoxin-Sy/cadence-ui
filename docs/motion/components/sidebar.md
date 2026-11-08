@@ -1,6 +1,6 @@
 # Sidebar motion contract
 
-Status: target design; implementation and verification pending.
+Status: target design; limited desktop offcanvas size-linked projection is implemented. Icon geometry/label choreography and the remaining capabilities/acceptance are pending; migration remains legacy.
 
 Sidebar preserves spatial orientation while changing how much navigation is exposed. Offcanvas mode moves the existing desktop container; icon mode changes the occupied width and reveals labels only when space is usable. Mobile delegates to its existing Sheet composition. Route changes do not replay the sidebar.
 

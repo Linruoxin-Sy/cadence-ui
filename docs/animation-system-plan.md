@@ -243,8 +243,10 @@ existing performance task is a final delivery dependency, not a development prer
 - Internal content.switch/content.month and persistent selection projection have scoped integrations
   in Tabs and Calendar. One finite content phase derives opacity/travel across actual month slots;
   one list-local marker owns its transform, with immediate unsafe/filled placement. These integrations
-  keep native sizes and do not establish size-linked layout.sidebar, captured-origin handoff,
-  coordinated trigger reflow, text/number/colour adoption or full component-v2 conformance. Those
+  keep native sizes. A separate desktop offcanvas adapter projects layout.sidebar from one actual
+  gap-size scalar; icon width/label coordination remains pending. Neither integration establishes
+  captured-origin handoff, coordinated trigger reflow, text/number/colour adoption or full
+  component-v2 conformance. Those
   dependencies and the global budget gates remain pending.
 - Existing engine adapters preserve native geometry, direct gestures and ref/event ownership while
   cancelling their autonomous work. Embla retains actual effective option precedence; Recharts retains

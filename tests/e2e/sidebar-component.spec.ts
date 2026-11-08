@@ -5,6 +5,7 @@ import { effectiveMode, MODES } from "./helpers";
 import { openComponentSource } from "./installation-helpers";
 import { openPopupMotionFixture } from "./popup-motion-fixture";
 
+const proofRoot = process.env.CADENCE_SIDEBAR_PROOF ?? ".cache/sidebar-proof";
 const runtimeErrors = new WeakMap<Page, string[]>();
 test.beforeEach(({ page }) => {
   const errors: string[] = [];
@@ -208,16 +209,52 @@ for (const os of [false, true])
       // bound only their floating-point error (observed span 0.000122px), not real resizing.
       const widths = [...closing, ...opening].map((frame) => frame.width);
       expect(Math.max(...widths) - Math.min(...widths)).toBeLessThan(0.001);
-      if (effective === "full") {
-        expect(new Set(closing.map((f) => f.transform)).size).toBeGreaterThan(2);
-        expect(new Set(opening.map((f) => f.transform)).size).toBeGreaterThan(2);
-      } else expect([...closing, ...opening].every((f) => f.transform === "none" && f.animations === 0)).toBe(true);
+      // Both transactions affect the focused SidebarInput. Closing settles before
+      // inert blur; acquiring editor focus during opening cancels the whole group.
+      expect([...closing, ...opening].every((f) => f.transform === "none" && f.animations === 0)).toBe(true);
       await expect.poll(() => p.evaluate((el) => getComputedStyle(el).transform)).toBe("none");
       await expect(input).toBeFocused();
       expect(await input.evaluate((n, h) => n === h, node)).toBe(true);
       expect(await p.evaluate((n, h) => n === h, pn)).toBe(true);
       // Real pointer starts an offcanvas spring, then a non-pointer mode event cancels it.
       await t.click();
+      const stationaryTrigger = await snapshot(root);
+      await info.attach("coupled geometry native constraints", {
+        body: JSON.stringify(
+          await p.evaluate((panel) => {
+            const gap = panel.parentElement?.querySelector('[data-slot="sidebar-gap"]') as HTMLElement;
+            const inspect = (node: Element) => {
+              const css = getComputedStyle(node);
+              return {
+                slot: node.getAttribute("data-slot"),
+                tag: node.tagName,
+                className: node.className,
+                width: css.width,
+                height: css.height,
+                left: css.left,
+                right: css.right,
+                position: css.position,
+                box: css.boxSizing,
+                transform: css.transform,
+                translate: css.translate,
+                rotate: css.rotate,
+                scale: css.scale,
+                perspective: css.perspective,
+                path: css.offsetPath,
+                visible: node.checkVisibility(),
+                rects: node.getClientRects().length,
+              };
+            };
+            const ancestors = [];
+            for (let node = panel.parentElement; node; node = node.parentElement) ancestors.push(inspect(node));
+            return { panel: inspect(panel), gap: inspect(gap), ancestors, active: document.activeElement?.outerHTML };
+          }),
+        ),
+        contentType: "application/json",
+      });
+      if (effective === "full")
+        expect(new Set(stationaryTrigger.map((frame) => frame.transform)).size).toBeGreaterThan(2);
+      else expect(stationaryTrigger.every((frame) => frame.transform === "none")).toBe(true);
       await page.getByLabel("Fixture motion", { exact: true }).selectOption("none");
       await expect(p).toHaveCSS("transform", "none");
       expect((await snapshot(root)).every((f) => f.transform === "none" && f.animations === 0)).toBe(true);
@@ -357,14 +394,14 @@ for (const theme of ["light", "dark"] as const)
           (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
         ).toEqual([]);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        await mkdir(".cache/sidebar-proof", { recursive: true });
+        await mkdir(proofRoot, { recursive: true });
         for (const name of ["top", ...names].slice(part * 7, (part + 1) * 7)) {
           const c = name === "top" ? page.locator('[data-preview="sidebar"]') : card(page, name);
           const r = await c.boundingBox();
           if (!r) throw new Error("missing card");
           await page.evaluate(() => scrollTo(0, 0));
           await page.screenshot({
-            path: `.cache/sidebar-proof/${name}-${theme}-${width}.png`,
+            path: `${proofRoot}/${name}-${theme}-${width}.png`,
             fullPage: true,
             clip: { x: r.x, y: r.y + (await page.evaluate(() => scrollY)), width: r.width, height: r.height },
           });
@@ -376,7 +413,7 @@ for (const theme of ["light", "dark"] as const)
           expect(
             (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
           ).toEqual([]);
-          await d.screenshot({ path: `.cache/sidebar-proof/mobile-open-${theme}-${width}.png` });
+          await d.screenshot({ path: `${proofRoot}/mobile-open-${theme}-${width}.png` });
           await page.keyboard.press("Escape");
         }
       });
@@ -443,7 +480,7 @@ for (const theme of ["light", "dark"] as const)
     expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual(
       [],
     );
-    await tooltip.screenshot({ path: `.cache/sidebar-proof/icon-tooltip-${theme}-1280.png` });
+    await tooltip.screenshot({ path: `${proofRoot}/icon-tooltip-${theme}-1280.png` });
     await page.keyboard.press("Escape");
     const actions = card(page, "groups-and-actions");
     await actions.getByRole("button", { name: "Add project", exact: true }).press("Enter");
@@ -455,5 +492,5 @@ for (const theme of ["light", "dark"] as const)
     await page.evaluate(() => scrollTo(0, 0));
     const r = await actions.boundingBox();
     if (!r) throw new Error("missing project actions");
-    await page.screenshot({ path: `.cache/sidebar-proof/project-actions-${theme}-1280.png`, fullPage: true, clip: r });
+    await page.screenshot({ path: `${proofRoot}/project-actions-${theme}-1280.png`, fullPage: true, clip: r });
   });

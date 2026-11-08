@@ -4,13 +4,14 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
-import { animate, useMotionValue } from "motion/react";
 import * as React from "react";
 import { Button } from "../button";
 import { Input } from "../input";
 import { cn } from "../lib/cn";
 import { useIsMobile } from "../lib/hooks/use-mobile";
+import { useMotionHostRef } from "../lib/motion-ref";
 import { useCadenceMotion } from "../lib/provider";
+import { useSidebarGeometry } from "../lib/sidebar-geometry";
 import { Separator } from "../separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../sheet";
 import { Skeleton } from "../skeleton";
@@ -153,48 +154,15 @@ function Sidebar({
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
   const cm = useCadenceMotion();
   const offcanvas = state === "collapsed" && collapsible === "offcanvas";
-  const node = React.useRef<HTMLDivElement | null>(null);
-  const progress = useMotionValue(offcanvas ? (side === "left" ? -100 : 100) : 0);
-  const mergedRef = React.useCallback(
-    (element: HTMLDivElement | null) => {
-      node.current = element;
-      const cleanup = typeof ref === "function" ? ref(element) : undefined;
-      if (ref && typeof ref !== "function") ref.current = element;
-      return () => {
-        node.current = null;
-        if (typeof cleanup === "function") cleanup();
-        else if (typeof ref === "function") ref(null);
-        else if (ref) ref.current = null;
-      };
-    },
-    [ref],
+  const panel = useMotionHostRef(ref);
+  const gap = useMotionHostRef<HTMLDivElement>();
+  useSidebarGeometry(
+    gap.node,
+    panel.node,
+    state,
+    `${side}/${variant}/${collapsible}/${isMobile}`,
+    !isMobile && collapsible === "offcanvas" && style?.transform === undefined,
   );
-  const target = !cm.reduced && offcanvas ? (side === "left" ? -100 : 100) : 0;
-  const transition = cm.transition("layout.move");
-  // biome-ignore lint/correctness/useExhaustiveDependencies: recipe depends only on effective mode and timeScale
-  React.useLayoutEffect(() => {
-    const element = node.current;
-    if (!element || isMobile || collapsible === "none" || style?.transform !== undefined) return;
-    let active = true;
-    const write = (value: number) => {
-      if (!active) return;
-      element.style.transform = value === 0 ? "none" : `translateX(${value}%)`;
-    };
-    if (cm.reduced || transition.duration === 0) {
-      const resting = cm.reduced ? 0 : target;
-      progress.jump(resting);
-      write(resting);
-      return;
-    }
-    write(progress.get());
-    const controls = animate(progress, target, { ...transition, onUpdate: write });
-    return () => {
-      active = false;
-      controls.stop();
-      progress.stop();
-    };
-    // The recipe is determined exclusively by effective mode and timeScale.
-  }, [target, cm.mode, cm.timeScale, cm.reduced, isMobile, collapsible, style?.transform]);
 
   if (collapsible === "none") {
     return (
@@ -251,7 +219,9 @@ function Sidebar({
     >
       {/* This is what handles the sidebar gap on desktop */}
       <div
+        ref={gap.ref}
         data-slot="sidebar-gap"
+        data-motion={cm.mode}
         className={cn(
           "cn-sidebar-gap relative w-(--sidebar-width) bg-transparent",
           "group-data-[collapsible=offcanvas]:w-0",
@@ -262,16 +232,16 @@ function Sidebar({
         )}
       />
       <div
-        ref={mergedRef}
+        ref={panel.ref}
         dir={dir}
-        style={{ transform: cm.reduced || progress.get() === 0 ? "none" : `translateX(${progress.get()}%)`, ...style }}
+        style={style}
         data-slot="sidebar-container"
         data-motion={cm.mode}
         inert={offcanvas || undefined}
         data-side={side}
         className={cn(
           "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) data-[side=left]:left-0 data-[side=right]:right-0 md:flex",
-          cm.reduced &&
+          style?.transform === undefined &&
             "data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"

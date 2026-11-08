@@ -100,7 +100,7 @@ const parts = {
     "indicator arrow rotate-45 | static orientation | no autonomous motion",
   ],
   sidebar: [
-    "sidebar-container desktop own-width translation | Motion imperative scalar/onUpdate DOM writer | layout.move",
+    "sidebar-gap/sidebar-container desktop coupled width and size-linked translation | one physical size scalar with native replace effects | geometry.resize + layout.move",
   ],
   attachment: ["attachment-title processing/uploading pulse | CSS animation | data.transition"],
   bubble: [

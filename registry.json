@@ -131,6 +131,16 @@
           "path": "registry/cadence/lib/measured-geometry.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/measured-geometry.ts"
+        },
+        {
+          "path": "registry/cadence/lib/size-linked-geometry.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/size-linked-geometry.ts"
+        },
+        {
+          "path": "registry/cadence/lib/sidebar-geometry.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/sidebar-geometry.ts"
         }
       ]
     },
@@ -2029,6 +2039,7 @@
         "@cadence/cadence-utils",
         "@cadence/cadence-motion",
         "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
         "@cadence/use-mobile",
         "@cadence/button",
         "@cadence/input",
@@ -2048,7 +2059,10 @@
         "since": "0.5.0",
         "tier": "T3",
         "batch": "B7",
-        "motion": ["layout.move"],
+        "motion": [
+          { "recipe": "layout.move", "form": "size-linked" },
+          { "recipe": "geometry.resize", "form": "measured" }
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
