@@ -337,6 +337,14 @@ sharing one preset across parts does not make them one owner. Acceptance must in
 or becoming invalid during an existing colour flight, as well as an unrelated owner that may keep
 animating. A complete reference table cannot prove either behavior.
 
+For text over an independently painted or moving selection surface, review the actual intermediate
+combination, including immediate focused foreground against a still-moving plate or background.
+The [rendered-colour rule](../animation-system.md#35-colour-feedback) may require immediate placement
+without cancelling unrelated feedback. Check display applicability as well as child type: inherited
+editable contexts stay native, and filter/scrub-derived readouts stay immediate even when accepted
+later. Their rules live in [changed text](../animation-system.md#36-changed-text) and
+[changed numbers](../animation-system.md#37-changed-numbers); component tables refine those gates.
+
 Review live mode changes against the action's mode cells as well as its initial render. Reduction
 cancels spatial/layout/reel work and loops, then resolves any still-applicable short opacity/colour
 feedback through the reduced policy. It is not a blanket None branch. A same-target zero clock must

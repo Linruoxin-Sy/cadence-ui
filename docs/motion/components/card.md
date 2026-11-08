@@ -47,6 +47,13 @@ The `text`/`value` regions address only the named plain display parts. `foregrou
 
 ## Interruption and lifecycle
 
+A known plain Content/Title/Description slot inside an actual editable context follows the
+[native text boundary](../../animation-system.md#36-changed-text), even when editing is inherited
+from an ancestor rather than supplied on Card. It receives no split text, reel or outgoing copy in
+any mode. Preserve the existing editor tree/selection/undo ownership; entering editing retires only
+conflicting decoration, and returning to display establishes current content without replay. Card
+geometry still yields when it would move the editor's caret, content box or scroll position.
+
 Rapid content changes retarget the current card dimensions, not queued old heights. Reopened/reinserted content keeps stable identity when its parent retains lifecycle. Closing/removing the Card is owned by a surviving parent; visual retention cannot keep removed actions focusable. Live reduced cancels geometry and reels; none or zero clock also finishes surface/text fades and colours. The fit observer and animation must not both write height independently.
 
 ## Geometry and performance
@@ -64,6 +71,11 @@ body's unavailable measurement does not collapse the card. Ancestor presence and
 remain separate owners: a child in none does not cancel the card's envelope or counter-scale itself.
 
 ## Acceptance scenarios
+
+Also pending: render plain and numeric CardContent inside inherited editable and plaintext-only
+contexts, change editability during a display transition, then return to display. Native content,
+selection, undo and caller control remain intact in all modes, with no split editor or replayed edit;
+a separate noneditable display uses its own safe boundary rather than disabling the whole Card.
 
 Target acceptance; not executed: content expansion with header/footer; fit=content width changes; fixed-height and responsive cards; rich forms in content; numeric/plain title updates; nested card/parent entrance; rapid changes, live modes and zero clock with no competing observer writer.
 

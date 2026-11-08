@@ -58,6 +58,13 @@ The `text` region addresses BubbleContent replacement only; `reaction` owns Bubb
 
 ## Interruption and lifecycle
 
+Plain/numeric BubbleContent in an actual editable context is native editing, including inherited
+editability. Apply the [shared editing boundary](../../animation-system.md#36-changed-text) before
+fragment/reel integration: no splitting, decorative duplicate history or animation-owned editing
+tree in any mode. Entering editing retires conflicting fragment/geometry work without overwriting
+native selection or undo state; leaving editing establishes the current display baseline. Separate
+noneditable reactions keep their own eligible owners, subject to a safe selection/DOM boundary.
+
 The newest committed content wins. If append revisions overlap an already active height transition, classify that run as dense streaming: commit height immediately, coalesce new fragment visuals and drop excess visual work rather than queueing it. This exception does not cover a later isolated edit, attachment replacement or settled message update; those reassess owned geometry normally. Parent removal controls retained exits and cancels obsolete completions. Live reduced cancels geometry/reels; none or zero clock cancels all one-shot effects. Bubble adds no autonomous loop or scrolling behaviour.
 
 The append integration keeps only the latest pending fragment range; retained history never re-enters. A dense run ends when current presentation has settled with no newer append pending, or a non-append revision changes the cause; the next independent revision is assessed afresh without a timer or delayed data commit. Coalescing never exceeds the shared aggregate changed-text/reel budget across the message and its reactions: excess affected visuals update immediately rather than waiting to animate later.
@@ -73,6 +80,11 @@ Choose BubbleContent or its message host as the size writer for a revision, neve
 Long appends use the known append/revision boundary without rescanning the full history; without such a boundary, the shared bounded diff falls back to immediate affected content. There is one message-size measurement and one independent reaction-overlay measurement, no observer per token/reaction. Media readiness follows its composed owner's identity and passive-layout policy. If parent scroll anchoring or viewport constraints make a position transition unsafe, message/reaction placement is immediate; no hidden scroll correction or full-message opacity fallback is allowed.
 
 ## Acceptance scenarios
+
+Also pending: switch a plain message between display, inherited editable and plaintext-only contexts
+during append/replacement, then leave editing. Native content/selection/undo survives with no replay
+of edits, no duplicate copyable history and no reel for editable digits; independent noneditable
+reactions retain their applicable feedback in every mode.
 
 Target acceptance; not executed: new message without duplicate text entrance; plain edits retaining prefixes; dense append with newlines; isolated edit after streaming; attachment/media change; reaction count and placement changes; rich selectable content; align/variant changes; all modes and zero clock mid-update.
 

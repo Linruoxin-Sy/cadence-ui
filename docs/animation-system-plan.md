@@ -281,6 +281,19 @@ direction reversal and hidden-owner cancellation without queuing old states. Geo
 includes destination-width readability, focused editor stability, hidden measurement recovery and
 parent/child constraint cycles; native input must win over any preset or live mode change.
 
+Text/readout acceptance includes inherited editable hosts and live changes into/out of editing, not
+only Input/Textarea. Preserve the actual editing tree, selection, undo and exact output in all modes;
+returning to display establishes a baseline without replay. Query/filter-derived counts remain
+immediate through delayed accepted updates, while independently identified quantities retain their
+ordinary eligibility. Verify DataTable alongside Command/Combobox and direct chart/slider readouts.
+
+Palette acceptance covers different owner clocks and immediate focus/invalid paint, not only matching
+full-mode colour tweens. For Tabs, ToggleGroup and Pagination, inspect intermediate selected-plate
+travel behind labels. If the rendered combinations cannot stay readable, prove immediate placement
+and safe paint without duplicated/faded unchanged labels, a second owner or delayed selection.
+CodeBlock tab-label/reorder geometry with unchanged selection must rebase its marker immediately;
+it does not acquire a selection clock merely because the marker rectangle changed.
+
 Exercise overlapping revisions that each fit the per-revision budget but would exceed the live
 moving-set limit together. Count retained active work, release obsolete decorative copies and prove
 immediate latest-content fallback without waiting for capacity. Also prove that this cleanup leaves

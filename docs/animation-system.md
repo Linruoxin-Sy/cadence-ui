@@ -936,6 +936,22 @@ do not prove contrast. A forced-colours environment always uses native semantic 
 animate an inherited colour again on each glyph, or overwrite caller colour values with sampled inline
 styles left behind after cancellation.
 
+Readability belongs to the rendered combination, including an inherited/transparent background or a
+separate selected plate behind the text. Verify the actual permitted timing combinations: one owner
+can become immediate on focus while another retains its clock, and nested scopes can resolve different
+modes. A palette verified only with simultaneous full-mode endpoints does not cover those cases.
+Known related owners coordinate a safe immediate paint result when necessary, without changing their
+provider modes or taking over caller paint. Unknown combinations use the existing local immediate
+fallback; do not add a descendant colour scanner or per-frame contrast measurements.
+This prevents unreadable intermediate paint introduced by the library; it does not recolour or certify
+the caller's final palette. Preserve that exact final cascade and its existing override authority.
+
+A selected plate moving behind labels also changes their visible background before it reaches its
+destination. The selection binding must preserve readability against both track and moving plate
+throughout that path. If its palette/layering cannot do so, place the plate immediately and retain only
+independently safe colour feedback. Do not duplicate labels, fade an unchanged label, or delay the
+selected semantic state to disguise an unsafe intermediate frame.
+
 A scoped shadow colour transition keeps its geometry and shadow-list topology fixed. Focus ring
 width/offset, border width, shadow blur/spread, gradients/background images and filters are not
 implicitly granted by `state.color`; unsupported changes settle immediately unless another reviewed
@@ -1035,6 +1051,15 @@ Labels/helper text are separate display slots. Final semantic text updates immed
 and decorative layers cannot duplicate accessible names or copied text; do not default every update
 to aria-live. Selection, copy and accessible-name behaviour need browser proof.
 
+The editing exclusion follows the actual editable context, including inherited `contentEditable`
+and `plaintext-only`, not only a component named Input or a local prop. A generic Cell, CardContent,
+BubbleContent or other display host inside that context remains exact native editable content in
+full, reduced and none. Resolve this eligibility before introducing split/reel nodes or decorative
+copies; never replace the editing tree merely to disable its animation. An explicit noneditable
+island still needs a safe selection/DOM boundary before using its ordinary display contract. Entering
+editing retires conflicting presentation without changing the native value, caret, selection or undo
+ownership. Leaving editing establishes the current display baseline and does not replay edits.
+
 Dispatch a known display slot deterministically: a string uses text replacement; a directly supplied
 supported numeric value uses reels unless the component explicitly classifies that slot as identity
 (for example a page number, shortcut, option name or source code). Do not guess from wording or parse
@@ -1105,6 +1130,14 @@ do not count through intermediate values or make extra turns. Apply the shared m
 to a known coordinated update as well as an individual display, so splitting a data revision into
 many cells cannot create unbounded work. A data/readout composition such as Progress shares a single
 presentation transaction rather than assuming matching token names synchronize independent engines.
+
+Readouts derived from direct query/filtering or pointer/keyboard scrubbing reach their current value
+immediately in all modes, including a delayed accepted result of that operation. A quiet interval or
+blur does not turn such a result into an independent quantity revision. The known composition supplies
+the cause; uncertain correspondence takes the immediate readout fallback without parsing strings or
+adding request state. Independently identified data/amount updates and discrete selection counts keep
+their component's ordinary eligibility. This does not disable every readout merely because an input
+elsewhere is focused, and motion never reorders or rejects data accepted by the caller.
 
 ### 3.8 Viewport reveal and rhythm
 

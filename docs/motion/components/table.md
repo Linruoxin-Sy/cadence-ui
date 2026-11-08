@@ -51,6 +51,14 @@ A direct numeric Head title remains column-title identity and uses the existing 
 
 ## Interruption and lifecycle
 
+- The [native editing boundary](../../animation-system.md#36-changed-text) applies to the actual
+  Cell/Head/Caption context, including editability inherited from a row/table/ancestor. Direct string
+  or numeric children there remain native editable content in full, reduced and none; their type
+  never grants permission to split an editor. Entering editing retires conflicting decoration while
+  preserving the actual editing tree, selection and undo ownership. Leaving editing establishes
+  exact current display content without replay; an explicit noneditable island requires its own
+  safe selection/DOM boundary before normal display replacement can resume.
+
 - Rapid cell updates retain stable row/cell identity and retarget only changed content. New values are immediately authoritative for selection, accessibility and copy; outgoing glyphs are decorative and excluded from selection as well as accessibility. A virtualizer recycling a DOM cell must clear the previous logical row's transient glyph/reel state before presenting a different record.
 - A composition removing/filtering a row controls semantic removal and any safe visual retention. Table never delays removal or retains interactive row controls to finish a fade.
 - Caller rich children, editable content, native selections and custom table markup are not rewritten. If text diff or numeric formatting cannot be handled safely within budget, show the affected content immediately.
@@ -61,6 +69,11 @@ A direct numeric Head title remains column-title identity and uses the existing 
 Preserve valid table markup, header associations, sticky/native layout and horizontal overflow. Do not insert div wrappers between table sections, rows and cells, change those elements to block layout, or transform an entire table merely to animate one row. Within Cell/Head/Caption display slots, text/reel presentation must preserve native intrinsic sizing: only the current semantic value contributes size, with outgoing visuals excluded from table/caption sizing and selection. Native layout adopts final column widths and wraps cells once at those widths. No per-cell ResizeObserver, all-row measurement or inferred sorting. Large/virtualized compositions provide visible-row bounds and stable identities; recycled DOM is not evidence of a newly inserted logical row. Apply shared glyph/reel limits across the current update's visible cells, rather than letting each cell independently create an unbounded moving set.
 
 ## Acceptance scenarios
+
+- Pending: inherit editing from a table/ancestor, use a plaintext-only cell and an explicit noneditable
+  island, and toggle editability during a cell replacement/reel. In all modes the actual editor stays
+  native, selection/undo and copied data remain correct, and returning to display creates no queued
+  edit animation or stale record state. Do not solve eligibility by replacing the editor subtree.
 
 - Pending: change plain text and true numeric cells while hovering/selecting a row; unchanged glyphs remain still and the final copied value is exact.
 - Pending: render rich controls, editors, colspan/rowspan, sticky headers and overflowing tables; valid native semantics and input behaviour survive.

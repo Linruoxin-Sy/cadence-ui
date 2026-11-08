@@ -40,7 +40,7 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 
 | Trigger and owner                                                | Full                                                                                                                                                                  | Reduced                                                   | None                               | Binding → preset → recipe                                                                                                             |
 | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Active value changes; indicator                                  | Move the same local marker to the selected trigger, including its extent, on the list's actual axis.                                                                  | Marker at destination immediately.                        | Marker at destination immediately. | `tabs.indicator.select` → `layout.selection` → `layout.shared/selection`                                                              |
+| Active value changes; indicator                                  | Move the same local marker on the list's actual axis when its path is readable; otherwise place it immediately. Its extent follows the selected trigger.              | Marker at destination immediately.                        | Marker at destination immediately. | `tabs.indicator.select` → `layout.selection` → `layout.shared/selection`                                                              |
 | Active panel changes; panel paint                                | Opacity and `distance.xs` travel following actual activation direction/orientation; unknown/reordered destinations use opacity only. No replay for unrelated renders. | Short opacity, no travel.                                 | Final active panel immediately.    | `tabs.panel.change` → `content.switch` → `data.transition/directional-content`                                                        |
 | Active content's known intrinsic size changes                    | One clamped shell follows the destination block-size, coordinated with panel paint.                                                                                   | Destination size immediately.                             | Destination size immediately.      | `tabs.panel.resize` → `geometry.compact` → `geometry.resize/measured`                                                                 |
 | Known trigger label/quantity revision; list geometry coordinator | Consume final natural trigger layout once, resize the owned strip axis and reflow retained triggers; the marker uses the same committed snapshot.                     | Final geometry immediately.                               | Final geometry immediately.        | `tabs.list.resize` → `geometry.compact` → `geometry.resize/measured`; `tabs.items.reflow` → `layout.compact` → `layout.move/position` |
@@ -66,6 +66,14 @@ Apply the [shared owner precedence](../presets.md#31-effective-modes-and-clock-o
 
 ## Geometry and performance
 
+For a filled selected marker behind trigger text, `indicator.select` also follows the
+[rendered-colour constraint](../../animation-system.md#35-colour-feedback). Verify label readability
+over both track and moving fill, including immediately settled focused foreground and independently
+timed marker colour. If that combination is unsafe or unknown, place the marker and affected known
+paint immediately; unchanged labels do not fade or get duplicated to mask travel. An underline-only
+marker with no label-background overlap retains its normal geometry eligibility. The fallback does
+not cancel unrelated panel/text effects or change selection, focus or provider modes.
+
 Measure active trigger bounds in list-local coordinates so ancestor transforms are not counted twice. Observe the list/active panel as needed, not every descendant. Passive/unknown list reflow settles marker geometry directly; a known trigger-content transaction follows the coordinated projection rule below. If a native layout or outer geometry owner already controls the active shell, do not add a second height animation. Constrain/clamp content height, avoid focus-ring clipping and preserve scroll positions within persisted panels.
 
 When a panel owns size continuity, measure its natural content at destination inline-size and animate a separate bounded shell's block-size. The content does not rewrap every frame; surrounding layout follows that shell. This internal separation must preserve the actual Panel `render`, ref and caller mount policy. If activation replaces one independently sized Panel host with another, the new host starts at its final size; do not animate from zero or borrow an unrelated panel's stale measurement. Cross-panel height continuity requires a surviving explicitly composed viewport with one owner. A hidden/persisted panel is measured only after it becomes measurable; its unknown zero size is not a closing target. Panel travel and any nested layout transform use separate visual layers.
@@ -81,6 +89,11 @@ without deleting caller transforms. Any temporary list/panel pixel dimensions re
 native layout policy when the size owner completes or yields.
 
 ## Acceptance scenarios
+
+- Pending: move the filled marker under labels while theme/selected colours change and focus settles
+  one trigger's foreground immediately; compare the underline variant and nested clocks. Intermediate
+  text stays readable, or the affected placement/paint is immediate, with one marker/foreground owner
+  and no replay of unchanged labels. Reduced/none keep final marker geometry and their own paint rules.
 
 - Pending: combine a translated/scaled caller List with trigger reflow, then change that transform
   and the parent width while the marker moves. No stale coordinate conversion or temporary pixel lock

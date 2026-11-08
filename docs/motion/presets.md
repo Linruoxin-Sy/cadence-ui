@@ -226,6 +226,13 @@ disabling every item in the collection. The safe unverified-palette fallback is 
 These conditions narrow the existing preset; they require neither another timing token nor a second
 focus/invalid writer. Leaving a restricted state never replays updates suppressed while it was active.
 
+The [rendered-colour contract](../animation-system.md#35-colour-feedback) also covers different
+owner clocks and a moving selected surface behind text. `state.color` does not certify that palette,
+and `layout.selection` is conditional on a readable path. When the combination is unsafe or unknown,
+use immediate placement/paint for the affected known owners; never shorten a duration as a substitute
+for readability, add a second foreground writer or override a nested provider. Under reduced/none,
+marker geometry is already immediate; any remaining colour feedback must still pass that combination.
+
 | Preset family                            | Reduced                                                                                                              | None                                                                                            | Full-mode interruption                                                                                                 |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Presence and directional content         | Allowed opacity uses a short tween; all travel/scale is removed                                                      | Semantic visibility/geometry immediately, with native lifecycle completion                      | Retarget current paint; reopening invalidates old exit completion                                                      |
@@ -480,6 +487,13 @@ evidence before being claimed; otherwise their valid formatted display remains i
 symbols, accounting parentheses, grouping, decimal markers and bidi isolation are preserved. Never
 reverse digit order to implement RTL; the formatter determines logical order and layout, while reel
 travel is vertical. The numeric output remains current and singular for accessibility and copying.
+
+Both number presets use the [readout cause gate](../animation-system.md#37-changed-numbers) before
+starting a reel: query/filter-derived counts and direct scrubbing are immediate in all modes, including
+their delayed accepted echoes. A known independent revision may still roll under the component's
+binding. Editable contexts use the [native text boundary](../animation-system.md#36-changed-text) and
+never acquire reels merely because the supplied child has a numeric type. These are applicability
+rules, not additional presets, duration values or runtime availability claims.
 
 ### 5.2 Shared work limits
 
