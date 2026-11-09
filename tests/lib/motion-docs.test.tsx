@@ -117,19 +117,15 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
     ["missing section", button.replace("## Motion contract", "## Other"), "expected one ## Motion contract section"],
     ["duplicate section", `${button}\n## Motion contract\n`, "found 2"],
     ["missing table", button.replaceAll("| Phase", "Phase"), "expected one Motion contract recipe table"],
-    [
-      "frontmatter drift",
-      button.replace("motion: [feedback.press]", "motion: [reveal]"),
-      "frontmatter motion: missing recipe",
-    ],
+    ["frontmatter drift", button.replace(/^motion:.*$/m, "motion: [reveal]"), "frontmatter motion: missing recipe"],
     [
       "duplicate frontmatter",
-      button.replace("motion: [feedback.press]", "motion: [feedback.press, feedback.press]"),
+      button.replace(/^motion:.*$/m, "motion: [feedback.press, feedback.press]"),
       "frontmatter motion: duplicate recipe",
     ],
     [
       "wrong frontmatter form",
-      button.replace("motion: [feedback.press]", "motion: [{ recipe: feedback.press, form: continuous }]"),
+      button.replace(/^motion:.*$/m, "motion: [{ recipe: feedback.press, form: continuous }]"),
       "frontmatter motion forms differ",
     ],
     [
@@ -144,7 +140,7 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
     ],
     [
       "invalid frontmatter",
-      button.replace("motion: [feedback.press]", "motion: feedback.press"),
+      button.replace(/^motion:.*$/m, "motion: feedback.press"),
       "frontmatter motion must be an array",
     ],
     ["missing ownership", button.replace(/^motionCoverage: .*\r?\n/m, ""), "docs motionCoverage differs"],

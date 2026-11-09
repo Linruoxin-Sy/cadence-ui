@@ -1,6 +1,7 @@
 "use client";
 
 import { animateSingleValue, motionValue, type Transition } from "motion/react";
+import { createContext } from "react";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import type { MotionHostRef } from "./motion-ref";
 import {
@@ -11,6 +12,12 @@ import {
 } from "./motion-transaction";
 
 type Axis = "width" | "height";
+/** Internal compound adapter boundary. The parent commits after children have
+ * committed natural content; participating descendants share that transaction. */
+export const GeometryScope = createContext<{
+  controller: ReturnType<typeof createMeasuredGeometry>;
+  transaction: ReturnType<typeof createMotionTransaction>;
+} | null>(null);
 export type GeometryTarget = {
   size: number;
   min?: number;

@@ -82,6 +82,7 @@ async function partScanner(root, registry) {
   };
   const items = new Map(registry.items.map((item) => [item.name, item]));
   const scans = new Map();
+  const exportSets = new Map();
   return async (id, exported, targetForm, installedForm) => {
     const key = JSON.stringify([id, exported, targetForm, installedForm]);
     if (scans.has(key)) return scans.get(key);
@@ -102,7 +103,8 @@ async function partScanner(root, registry) {
       const key = JSON.stringify([file, selected]);
       if (visiting.has(key)) return;
       const source = await read(file);
-      if (selected.some((name) => !valueExports(source).has(name))) return;
+      if (!exportSets.has(file)) exportSets.set(file, valueExports(source));
+      if (selected.some((name) => !exportSets.get(file).has(name))) return;
       const owner = file.match(/^registry\/cadence\/([^/]+)\/index\.tsx$/)?.[1];
       const route = owner ? [...anchors, ...selected.map((name) => `${owner}#${name}`)] : anchors;
       const scanned = motionSource(source, selected);

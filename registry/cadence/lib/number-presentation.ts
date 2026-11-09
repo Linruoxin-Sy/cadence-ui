@@ -115,6 +115,10 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       stop();
   };
   const chain: HTMLElement[] = [];
+  const transition = (event: TransitionEvent) => {
+    // A sibling's hover/focus transition does not move or repaint this glyph.
+    if (chain.includes(event.target as HTMLElement)) stop();
+  };
   const observer = new MutationObserver((changes) => {
     stop();
     restrict();
@@ -129,7 +133,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       attributes: true,
       attributeFilter: ["class", "style", "hidden", "inert", "aria-hidden", "dir", "contenteditable"],
     });
-    node.addEventListener("transitionrun", stop, true);
+    node.addEventListener("transitionrun", transition, true);
   }
   observer.observe(host, {
     attributes: true,
@@ -412,14 +416,6 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
               b = after.boxes.get(lane.identity),
               box = b ?? a;
             if (!box || (a && b && (a.top !== b.top || a.height !== b.height))) throw new Error("Numeric line changed");
-            // Resting native/canvas correspondence is staged at integer origins.
-            // Fractional origins stay native; moving offsets remain subpixel.
-            if (
-              [a, b].some((item) => item && (!Number.isInteger(item.left) || !Number.isInteger(item.top))) ||
-              !Number.isInteger(before.baseline) ||
-              !Number.isInteger(after.baseline)
-            )
-              throw new Error("Unproven fractional glyph origin");
             const left = Math.min(a?.left ?? box.left, b?.left ?? box.left),
               right = Math.max(
                 (a?.left ?? box.left) + (a?.width ?? box.width),
@@ -456,7 +452,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
               const digit = incoming ? lane.incoming?.digit : lane.outgoing?.digit;
               if (digit === undefined) continue;
               const layout = incoming ? after : before;
-              const canvas = outgoingTextPaint(host, { text: digit, identity: lane.identity }, layout);
+              const canvas = outgoingTextPaint(host, { text: digit, identity: lane.identity }, layout, true);
               if (!canvas) throw new Error("Numeric paint unavailable");
               pixels += canvas.width * canvas.height;
               if (pixels > textProofLimits.pixels) throw new Error("Numeric pixel capacity");
@@ -531,7 +527,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       view?.visualViewport?.removeEventListener("resize", stop);
       view?.visualViewport?.removeEventListener("scroll", stop);
       doc.fonts?.removeEventListener("loadingdone", stop);
-      for (const node of chain) node.removeEventListener("transitionrun", stop, true);
+      for (const node of chain) node.removeEventListener("transitionrun", transition, true);
     },
   };
 }

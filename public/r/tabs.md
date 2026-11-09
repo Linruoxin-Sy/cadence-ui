@@ -54,6 +54,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | tabs | `@components/cadence/tabs/index.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |

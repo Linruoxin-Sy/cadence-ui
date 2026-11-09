@@ -338,9 +338,10 @@ existing departing cell from its last painted subpixel offsets with opposing vel
 Same-output commits retain a legal flight; positive clock changes rebase that flight. A third digit,
 incompatible direction or unavailable correspondence settles the exact latest target immediately.
 Rendering shares the text controller's bounded font/Range proof and trusted mask registry. Current
-reel correspondence is limited to unit device scale and integer resting glyph origins; fractional
-resting origins, RTL layout, unsupported typography/clipping and native editing remain exact native
-output. Moving offsets themselves remain subpixel. No font metrics or tabular styling are imposed.
+reel correspondence is limited to unit device scale. Numeric cells align their canvas textures to
+device pixels and raster the actual fractional glyph origin inside that texture; moving offsets
+remain subpixel. RTL layout, unsupported typography/clipping and native editing remain exact native
+output. No font metrics or tabular styling are imposed.
 Known numeric compositions preflight the 12-column union, including active identities; text and
 numeric owners share transaction cancellation and their independent work ceilings. A composition
 whose separate geometry/fill engine cannot share the reel phase uses the designed immediate readout

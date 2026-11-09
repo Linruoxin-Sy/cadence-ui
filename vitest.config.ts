@@ -5,6 +5,7 @@ import { componentExecutionPlugin } from "./tests/component-execution-plugin.mjs
 import jointMotionItems from "./tests/fixtures/joint-motion/items.json";
 
 const cliSuites = [
+  "tests/lib/motion-targets.test.tsx",
   "tests/lib/motion-contract.test.tsx",
   "tests/lib/motion-docs.test.tsx",
   "tests/lib/doc-template.test.tsx",

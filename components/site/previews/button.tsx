@@ -1,6 +1,7 @@
 "use client";
 
 import { MoreHorizontalIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
 import { type ComponentProps, useState } from "react";
 import { Button, buttonVariants } from "@/registry/cadence/button";
 import { PreviewRow, PreviewStack } from "./shell";
@@ -79,7 +80,48 @@ function Disabled() {
   );
 }
 
-const examples = { variants: Variants, sizes: Sizes, links: Links, composition: Composition, disabled: Disabled };
+function ChangingContent() {
+  const [label, setLabel] = useState("Save changes");
+  const [quantity, setQuantity] = useState(19);
+  return (
+    <PreviewStack>
+      <PreviewRow>
+        <Button style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>{label}</Button>
+        <Button variant="outline" style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>
+          {quantity}
+        </Button>
+      </PreviewRow>
+      <PreviewRow>
+        <Button variant="ghost" onClick={() => setLabel(label === "Save changes" ? "Saved" : "Save changes")}>
+          Change label
+        </Button>
+        <Button variant="ghost" onClick={() => setQuantity((value) => value + 1)}>
+          Increase quantity
+        </Button>
+      </PreviewRow>
+    </PreviewStack>
+  );
+}
+function Presence() {
+  const [visible, setVisible] = useState(false);
+  return (
+    <PreviewRow>
+      <Button variant="outline" onClick={() => setVisible((value) => !value)}>
+        Toggle action
+      </Button>
+      <AnimatePresence>{visible && <Button key="action">Optional action</Button>}</AnimatePresence>
+    </PreviewRow>
+  );
+}
+const examples = {
+  variants: Variants,
+  sizes: Sizes,
+  links: Links,
+  composition: Composition,
+  disabled: Disabled,
+  "changing-content": ChangingContent,
+  presence: Presence,
+};
 
 export function ButtonPreview({ example }: { example?: string }) {
   if (example !== undefined) {

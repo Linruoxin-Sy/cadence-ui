@@ -55,6 +55,7 @@ npm install clsx tailwind-merge motion
 | cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
 | cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
@@ -323,8 +324,8 @@ migrate other components. A compatible reversal retains current subpixel offsets
 velocity; an unsafe third digit settles the latest value. Zero timeScale, live downgrade, hidden state,
 selection/find/copy, native editing and unmount retire the active writer; restoration never replays.
 
-Reel correspondence currently requires unit device scale, supported ASCII/LTR native typography and
-integer resting glyph origins. Fractional resting origins, RTL, non-Latin digits, other DPR/zoom
+Reel correspondence currently requires unit device scale and supported ASCII/LTR native typography.
+Fractional glyph positions retain their native origin inside pixel-aligned canvases. RTL, non-Latin digits, other DPR/zoom
 (including DPR2), advanced font features or unproved clipping/layout use exact native immediate output.
 Actual moving offsets are subpixel. BigInts remain exact; arbitrary large BigInt rolling is not certified.
 NaN, Infinity and unsupported raw exponent spellings remain exact and immediate.

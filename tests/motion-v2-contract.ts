@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { expect, onTestFinished, vi } from "vitest";
 import { checkMotionTargets } from "../scripts/motion-targets.mjs";
@@ -54,11 +54,37 @@ declare module "vitest" {
 /** No successful hand-authored target record is accepted by this helper. Resolve
  * the authoritative contract and installed source anew, then observe a real action. */
 async function planFor(root: string) {
+  const cached = plans.get(root);
+  if (cached?.inputs.every(([file, sha]) => digest(readFileSync(file)) === sha)) return cached.plan;
   const registry = JSON.parse(readFileSync(path.join(root, "registry.json"), "utf8"));
   const result = await checkMotionTargets(root, registry);
   expect(result.problems, "v2 source/contract plan").toEqual([]);
   if (!result.v2) throw new Error("missing v2 plan");
+  const files = new Set([
+    "registry.json",
+    ...registry.items.flatMap((item: { files?: { path: string }[] }) => (item.files ?? []).map((file) => file.path)),
+    "docs/motion/README.md",
+    "docs/motion/presets.md",
+    ...readdirSync(path.join(root, "docs/motion/components"))
+      .filter((file) => file.endsWith(".md"))
+      .map((file) => `docs/motion/components/${file}`),
+    ...result.v2.actions.flatMap((action) => Object.keys(action.sources)),
+  ]);
+  plans.set(root, {
+    plan: result.v2,
+    inputs: [...files].map((file) => {
+      const absolute = path.resolve(root, file);
+      return [absolute, digest(readFileSync(absolute))];
+    }),
+  });
   return result.v2;
+}
+const plans = new Map<
+  string,
+  { plan: NonNullable<Awaited<ReturnType<typeof checkMotionTargets>>["v2"]>; inputs: [string, string][] }
+>();
+export async function prepareV2MotionPlan(root = process.cwd()) {
+  await planFor(root);
 }
 function loadedSources(root: string, sources: Record<string, string>) {
   const result: Record<string, string> = {};
@@ -129,7 +155,7 @@ function matches(
     record.host.exports.includes(action.anchor) &&
     record.host.slot === action.slot &&
     record.host.site === action.site &&
-    record.form === action.targetForm &&
+    (record.form === action.targetForm || record.supportedForms?.includes(action.targetForm)) &&
     record.host.module ===
       path
         .resolve(root, action.hostFile ?? `registry/cadence/${action.hostOwner ?? action.owner}/index.tsx`)
@@ -208,6 +234,9 @@ export async function expectV2MotionAction(
     expect(candidates, "same export/host/controller lifetime after action").toHaveLength(1);
     const record = candidates[0];
     if (!record) throw new Error("retired action owner");
+    expect(record.form, "the current action must execute its own phase, never borrow the opposite presence phase").toBe(
+      action.targetForm,
+    );
     expect(record.mode).toBe(mode);
     const exactSource = (module: string, sha: string, label: string) => {
       const entry = Object.entries(action.sources).find(
@@ -317,7 +346,11 @@ export async function expectV2MotionAction(
           record.propertyWrites?.[property] ?? 0,
           `actual ${property} writer must execute on this controller/host`,
         ).toBeGreaterThan(old.propertyWrites?.[property] ?? 0);
-      if (!["text.change/changed-runs", "reveal/viewport"].includes(action.targetForm))
+      if (
+        !["text.change/changed-runs", "reveal/viewport", "data.transition/opacity", "exit.fade/opacity"].includes(
+          action.targetForm,
+        )
+      )
         expect(
           record.scalars ?? 0,
           "actual scalar interpolation must start, beyond a native registration pose",

@@ -5,7 +5,7 @@ category: layout
 motion: [data.transition]
 intensity: medium
 motionProfile: {"scope":"collection","travel":"extended","coordination":"independent","reason":"The existing Embla owner slides the collection while native drag and final slide position remain authoritative."}
-motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"carousel","reason":"Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"carousel","reason":"Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."},{"relationship":"inherited","owner":"button","reason":"The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."}]}}
 complexity: M
 tier: T4
 since: 0.4.0

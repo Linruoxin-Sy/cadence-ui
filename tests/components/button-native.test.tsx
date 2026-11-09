@@ -3,6 +3,28 @@ import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
 import { expect, it, vi } from "vitest";
 import { Button } from "@/registry/cadence/button";
+import { CadenceProvider } from "@/registry/cadence/lib/provider";
+
+it("cancels obsolete activation on a retained native target revision, then accepts new intent", async () => {
+  const click = vi.fn();
+  const user = userEvent.setup();
+  const draw = (target: string) => (
+    <CadenceProvider timeScale={0}>
+      <Button type="submit" formAction={target} onClick={click}>
+        Action
+      </Button>
+    </CadenceProvider>
+  );
+  const view = render(draw("first"));
+  const node = screen.getByRole("button");
+  await user.pointer({ target: node, keys: "[MouseLeft>]" });
+  view.rerender(draw("second"));
+  await user.pointer({ keys: "[/MouseLeft]" });
+  expect(click).not.toHaveBeenCalled();
+  await user.click(node);
+  expect(click).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole("button")).toBe(node);
+});
 
 it.each(["onPointerDown", "onPointerUp", "onPointerCancel", "onKeyDown", "onKeyUp"] as const)(
   "press lifecycle forwards %s exactly once with native cancellation and currentTarget",

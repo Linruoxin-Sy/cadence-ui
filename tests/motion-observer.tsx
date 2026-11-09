@@ -80,6 +80,7 @@ export const presentationSamples = new Map<
   object,
   {
     form: string;
+    supportedForms?: string[];
     node: HTMLElement;
     origin?: Execution;
     scopeOrigin?: Execution;
@@ -109,6 +110,9 @@ vi.mock("../registry/cadence/lib/measured-geometry", async (original) => {
     createMeasuredGeometry(...args: Parameters<typeof actual.createMeasuredGeometry>) {
       const origin = currentExecution();
       const scope = actual.createMeasuredGeometry(...args);
+      // The compiler already observes the same executing factory and receipt.
+      // Do not register a second test ledger for that one physical owner.
+      if (controllerSources.has(scope)) return scope;
       const hosts = new Map<object, Parameters<typeof scope.register>[0]>();
       const register = scope.register.bind(scope),
         commit = scope.commit.bind(scope),

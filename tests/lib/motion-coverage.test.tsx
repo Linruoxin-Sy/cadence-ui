@@ -12,6 +12,14 @@ import negatives from "../fixtures/motion-coverage/negative.json";
 const registry = JSON.parse(readFileSync("registry.json", "utf8"));
 const button = registry.items.find((item: { name: string }) => item.name === "button");
 const key = "feedback.press/one-shot";
+// These schema/ownership negatives isolate one installed form. Button's current
+// full component graph is checked separately by the real registry/runtime gates.
+const pressFixture = () => {
+  const item = structuredClone(button);
+  item.meta.motion = ["feedback.press"];
+  item.meta.motionCoverage.effects = { [key]: item.meta.motionCoverage.effects[key] };
+  return item;
+};
 const evidence = (owner: string) => ({
   references: {
     button: [
@@ -22,14 +30,14 @@ const evidence = (owner: string) => ({
 
 describe("minimal installed coverage", () => {
   it.each(negatives)("fails closed for $name", ({ field, value, error }) => {
-    const item = structuredClone(button);
+    const item = pressFixture();
     if (["schema", "effects"].includes(field)) item.meta.motionCoverage[field] = value;
     else item.meta.motionCoverage.effects[key][0][field] = value;
     expect(motionCoverageProblems(item).join("\n")).toContain(error);
   });
   it("requires exact installed forms and rejects target capabilities as installed defaults", () => {
     expect(checkMotionCoverage(registry)).toEqual([]);
-    const item = structuredClone(button);
+    const item = pressFixture();
     item.meta.motionCoverage.effects = {};
     expect(motionCoverageProblems(item)).toContain(`${key}: missing installed ownership`);
     item.meta.motionCoverage.effects["text.change/changed-runs"] = button.meta.motionCoverage.effects[key];
@@ -38,7 +46,7 @@ describe("minimal installed coverage", () => {
     expect(motionCoverageProblems(item)).toContain("unknown motionCoverage field");
   });
   it("requires every distinct reached owner and rejects empty, duplicate or conflicting ownership lists", () => {
-    const item = structuredClone(button);
+    const item = pressFixture();
     item.registryDependencies = ["@cadence/other"];
     const implementations = evidence("button");
     implementations.references.button.push({
@@ -59,11 +67,12 @@ describe("minimal installed coverage", () => {
     expect(motionCoverageProblems(item).join("\n")).toContain("nonempty integration ownership list required");
   });
   it("distinguishes the local adapter from an inherited selected import and the shared lib executor", () => {
-    expect(checkMotionCoverage({ items: [button] }, evidence("button"))).toEqual([]);
-    expect(checkMotionCoverage({ items: [button] }, evidence("other")).join("\n")).toContain(
+    const item = pressFixture();
+    expect(checkMotionCoverage({ items: [item] }, evidence("button"))).toEqual([]);
+    expect(checkMotionCoverage({ items: [item] }, evidence("other")).join("\n")).toContain(
       "not the reached installed integration",
     );
-    expect(checkMotionCoverage({ items: [button] }, { references: {} }).join("\n")).toContain(
+    expect(checkMotionCoverage({ items: [item] }, { references: {} }).join("\n")).toContain(
       "not the reached installed integration",
     );
     expect(
@@ -72,7 +81,7 @@ describe("minimal installed coverage", () => {
         via: ["registry/cadence/tabs/index.tsx#Adapter"],
       }),
     ).toBe("tabs");
-    const inherited = structuredClone(button);
+    const inherited = pressFixture();
     inherited.registryDependencies = ["@cadence/other"];
     Object.assign(inherited.meta.motionCoverage.effects[key][0], { relationship: "inherited", owner: "other" });
     expect(checkMotionCoverage({ items: [inherited] }, evidence("other"))).toEqual([]);

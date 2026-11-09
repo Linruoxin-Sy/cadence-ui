@@ -1,6 +1,6 @@
 # Button motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated. Numerical performance governance remains deferred under ADR-023.
 
 Button gives immediate press feedback while keeping its label and hit target stable through content changes. It adds no loading, success or request state. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings below are internal design names, not public APIs or recipe IDs.
 
@@ -10,25 +10,33 @@ Button gives immediate press feedback while keeping its label and hit target sta
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
+  "regions": {
+    "root": ["button"],
+    "feedback": ["button-feedback"],
+    "label": ["button-text", "button-number"],
+    "rich": ["button"]
+  },
+  "axes": { "root": ["width", "height"] },
   "parts": {
     "root": ["button#Button"],
     "feedback": ["button#Button"],
-    "label": ["button#Button"]
+    "label": ["button#Button"],
+    "rich": ["button#Button"]
   }
 }
 ```
 
 ## Capability ownership
 
-| Capability      | Coverage and owner                                                                                                                                                                         | References                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
-| Appearance      | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause.                                                                          | default: `button.root.enter`, `button.root.exit`    |
-| Size            | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent.                        | default: `button.root.resize`                       |
-| Surface colour  | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state.                                                                           | default: `button.root.colour`                       |
-| Text colour     | default: button foreground; inherited by text and currentColor icons unless explicitly overridden.                                                                                         | default: `button.root.colour`                       |
-| Changed text    | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot.                                                                     | default: `button.label.replace`; composed: `@label` |
-| Changed numbers | default: a supported direct numeric child is the quantity signal and uses compact reels without changing its existing output; identifier strings remain text and rich content is composed. | default: `button.label.roll`; composed: `@label`    |
+| Capability      | Coverage and owner                                                                                                                                                                         | References                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| Appearance      | default: button root for independent dynamic insertion; inherited when a parent consumes the same entrance cause.                                                                          | default: `button.root.enter`, `button.root.exit`   |
+| Size            | default: button root owns intrinsic label/icon-driven width and explicit size-variant dimensions; externally constrained axes and passive reflow follow the parent.                        | default: `button.root.resize`                      |
+| Surface colour  | default: button background, border and scoped shadow respond to variant, hover, press, focus and disabled state.                                                                           | default: `button.root.colour`                      |
+| Text colour     | default: button foreground; inherited by text and currentColor icons unless explicitly overridden.                                                                                         | default: `button.root.colour`                      |
+| Changed text    | default: direct plain-text label retains unchanged graphemes; composed for rich children without a known display slot.                                                                     | default: `button.label.replace`; composed: `@rich` |
+| Changed numbers | default: a supported direct numeric child is the quantity signal and uses compact reels without changing its existing output; identifier strings remain text and rich content is composed. | default: `button.label.roll`; composed: `@rich`    |
 
 ## Choreography and modes
 
@@ -59,7 +67,10 @@ Measure intrinsic inline size after commitment, clamp it to available space, and
 
 One natural-content measurement supplies both width and any explicit height destination. If an intermediate shell would additionally hide the final visible label, icon or focus affordance, commit that axis immediately rather than introduce temporary truncation. Parent layout consumes this final destination once, never the changing shell bounds. Bound work to one owned label transaction and one direct quantity group; unsafe shaping or shared work-limit overflow applies affected content immediately. A numeric string is not parsed; mixed quantity/affix JSX uses explicit composition.
 
-A custom `render` must preserve the native ref/event target, direct-child icon selectors and existing layout. Press decoration requires a safe internal visual layer separate from hit/focus/anchor geometry; if none exists, use the declared colour feedback and omit press scale rather than inserting incompatible wrappers. The same rule applies to icon-only buttons and composed triggers. At full-mode zero timeScale, an accepted held press reaches `scale.press` immediately and release reaches rest immediately; a none/reduced branch remains unscaled. Presence completion restores current disabled/caller opacity, not a hard-coded fully opaque button.
+A custom `render` must preserve the native ref/event target, direct-child icon selectors and existing layout. Press decoration requires a safe internal visual layer separate from hit/focus/anchor geometry; if none exists, use the declared colour feedback and omit press scale rather than inserting incompatible wrappers. The same rule applies to icon-only buttons and composed triggers. At full-mode zero timeScale, an accepted held press reaches `scale.press` immediately and release reaches rest immediately; a none/reduced branch remains unscaled. Entrance completion restores current disabled/caller opacity, not a hard-coded fully opaque button.
+
+A completed exit stays transparent while a surviving parent waits for other retained descendants;
+zero-clock removal keeps the same semantic target. A new caller opacity owner revokes that envelope.
 
 Evaluate press-layer ownership across `scale`, `translate` and the `transform` list together. Native
 anchor placement or a caller transform does not become unowned merely because press uses another
@@ -69,17 +80,17 @@ layout classes that establish no transform conflict.
 
 ## Acceptance scenarios
 
-Also pending: press a caller-rendered anchored button using CSS individual transforms and interrupt
+Press a caller-rendered anchored button using CSS individual transforms and interrupt
 with a mode change or node replacement. Hit/focus/anchor geometry and caller transform targets remain
 intact, with no doubled scale, stale restored transform or new containing block around caller content.
 
-Also pending: rerender during entry, press and a label revision with a fresh inline ref and callback
+Rerender during entry, press and a label revision with a fresh inline ref and callback
 but the same node/semantic target. Ref cleanup/attachment stays balanced and motion continues without
 a restart or forced terminal frame. Then actually replace the host/key and deliver old cleanup and
 completion callbacks; they cannot detach, cancel or overwrite the new owner.
 
-Target acceptance; not executed: pointer and keyboard press cancellation; repeated Save/Saving/Saved label changes; a quantity crossing a digit boundary; icon-only and constrained-width buttons; rich children; parent insertion without double entrance; live full/reduced/none and zero-clock changes during press and resize.
+Exercise pointer and keyboard press cancellation; repeated Save/Saving/Saved label changes; a quantity crossing a digit boundary; icon-only and constrained-width buttons; rich children; parent insertion without double entrance; live full/reduced/none and zero-clock changes during press and resize.
 
-Also pending: replace an action while its DOM node is retained, change size during press, and grow a localized label inside a narrow clipped parent; no stale activation/name or transient unreadable label is permitted.
+Replace an action while its DOM node is retained, change size during press, and grow a localized label inside a narrow clipped parent; no stale activation/name or transient unreadable label is permitted.
 
-Also pending: use a custom anchor render with direct SVG children, set timeScale to zero while holding a press, and disable during entry; refs/selectors, native activation, correct static scale and disabled opacity survive. Focus or mark the root invalid during a colour transition: all its declared paint settles immediately, not only the focus ring.
+Use a custom anchor render with direct SVG children, set timeScale to zero while holding a press, and disable during entry; refs/selectors, native activation, correct static scale and disabled opacity survive. Focus or mark the root invalid during a colour transition: all its declared paint settles immediately, not only the focus ring.

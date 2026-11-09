@@ -6,7 +6,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import ts from "typescript";
 import { installationPlan } from "./installation.mjs";
-import { cssPolicyBindings, parameterWriterBindings } from "./motion-manifest.mjs";
+import { cssPolicyBindings, parameterWriterBindings, stringPresentationBindings } from "./motion-manifest.mjs";
 import { motionSource, valueExports } from "./motion-source.mjs";
 
 export const digest = (source) => createHash("sha256").update(source).digest("hex");
@@ -78,6 +78,21 @@ export function unboundMotionSyntax(source) {
   const problems = new Set();
   const writers = new Set(),
     frames = new Set();
+  const geometryPolicies = new Set();
+  const collectPolicies = (node) => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      ts.isCallExpression(node.initializer) &&
+      ts.isPropertyAccessExpression(node.initializer.expression) &&
+      node.initializer.expression.name.text === "parameters" &&
+      node.initializer.arguments[0]?.getText(tree).includes('"geometry.resize/measured"')
+    )
+      geometryPolicies.add(node.name.text);
+    ts.forEachChild(node, collectPolicies);
+  };
+  collectPolicies(tree);
   for (const statement of tree.statements)
     if (
       ts.isImportDeclaration(statement) &&
@@ -110,7 +125,19 @@ export function unboundMotionSyntax(source) {
       /^(?:["']?)(?:animation\w*|transition\w*)(?:["']?)$/.test(node.name.getText(tree))
     ) {
       const value = node.initializer.getText(tree);
-      if (!/^(?:["'](?:none|0s?|0ms)["']|0)$/.test(value)) problems.add(`authored style ${node.name.getText(tree)}`);
+      const object = node.parent,
+        call = object.parent;
+      const geometryPolicy =
+        node.name.getText(tree) === "transition" &&
+        ts.isPropertyAccessExpression(node.initializer) &&
+        geometryPolicies.has(node.initializer.expression.getText(tree)) &&
+        ts.isCallExpression(call) &&
+        call.arguments[1] === object &&
+        ts.isPropertyAccessExpression(call.expression) &&
+        call.expression.name.text === "commit" &&
+        source.includes("createMeasuredGeometry(");
+      if (!geometryPolicy && !/^(?:["'](?:none|0s?|0ms)["']|0)$/.test(value))
+        problems.add(`authored style ${node.name.getText(tree)}`);
     }
     if (
       ts.isCallExpression(node) &&
@@ -164,7 +191,13 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
   const problems = [],
     actions = [],
     boundaries = [];
-  const read = (file) => readFile(path.join(root, file), "utf8");
+  // One analysis snapshot; runtime receipts still rebind the actual loaded bytes.
+  const files = new Map();
+  const read = (file) => {
+    if (!files.has(file)) files.set(file, readFile(path.join(root, file), "utf8"));
+    return files.get(file);
+  };
+  const physicalRegions = new Map();
   const closeSources = async (file, selected, installed, sources, seen = new Set()) => {
     const key = JSON.stringify([file, selected]);
     if (seen.has(key)) return;
@@ -203,13 +236,22 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
       for (const selection of selections)
         for (const selected of selection.selected) {
           const bytes = await read(selection.file);
-          for (const host of motionHostRegions(bytes, selected))
+          const key = JSON.stringify([selection.file, selected]);
+          if (!physicalRegions.has(key)) physicalRegions.set(key, motionHostRegions(bytes, selected));
+          for (const host of physicalRegions.get(key))
             if (!candidates.some((candidate) => candidate.file === selection.file && candidate.offset === host.offset))
               candidates.push({ ...host, file: selection.file, source: bytes, selected });
         }
       let hosts = candidates;
       const region = contract.regions?.[contract.bindings.get(binding.binding).part];
       if (region) hosts = hosts.filter((host) => region.includes(host.slot));
+      if (["text.change/changed-runs", "number.roll/reels"].includes(binding.targetForm))
+        hosts = hosts.filter((host) =>
+          stringPresentationBindings(motionSource(host.source, [host.selected]).source).some(
+            (adapter) =>
+              adapter.form === binding.targetForm && adapter.slot === host.slot && adapter.offset === host.offset,
+          ),
+        );
       if (!hosts.length || (!region && hosts.length !== 1)) {
         report(`${binding.binding}: explicit unambiguous physical regions required`);
         continue;

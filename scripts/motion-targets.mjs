@@ -302,20 +302,34 @@ export async function checkMotionTargets(root, registry) {
   if (JSON.stringify(links.map((link) => link.slice("components/".length)).sort()) !== JSON.stringify(expected))
     problems.push("motion index must link each current registry UI/block contract exactly once");
   const surfaces = new Map();
-  for (const item of items) {
-    const source = (
-      await Promise.all(item.files.filter((file) => /\.[cm]?[jt]sx?$/.test(file.path)).map((file) => read(file.path)))
-    ).join("\n");
-    surfaces.set(item.name, valueExports(source));
+  const sourceInputs = await Promise.all(
+    items.map(async (item) => [
+      item.name,
+      (
+        await Promise.all(item.files.filter((file) => /\.[cm]?[jt]sx?$/.test(file.path)).map((file) => read(file.path)))
+      ).join("\n"),
+    ]),
+  );
+  for (const [name, source] of sourceInputs) {
+    surfaces.set(name, valueExports(source));
   }
+  const contractInputs = new Map(
+    await Promise.all(
+      items.map(async (item) => {
+        try {
+          return [item.name, { source: await read(`docs/motion/components/${item.name}.md`) }];
+        } catch (error) {
+          return [item.name, { error }];
+        }
+      }),
+    ),
+  );
   const contracts = new Map();
   for (const item of items) {
     try {
-      const contract = parseMotionTarget(
-        await read(`docs/motion/components/${item.name}.md`),
-        item.name,
-        presetResult.presets,
-      );
+      const input = contractInputs.get(item.name);
+      if (input.error) throw input.error;
+      const contract = parseMotionTarget(input.source, item.name, presetResult.presets);
       contracts.set(item.name, contract);
       problems.push(...contract.referenceProblems.map((problem) => `${item.name}: ${problem}`));
       if (contract.migration === "v2") {

@@ -36,7 +36,7 @@ export function createPresentationScope(node?: RefObject<HTMLElement | SVGElemen
 type PresentationScope = ReturnType<typeof createPresentationScope>;
 const Context = createContext<PresentationScope | null>(null);
 const documents = new WeakMap<Document, PresentationScope>();
-function documentPresentation(doc: Document) {
+export function documentPresentation(doc: Document) {
   let scope = documents.get(doc);
   if (!scope) {
     scope = createPresentationScope();

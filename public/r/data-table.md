@@ -38,6 +38,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/checkbox](https://cadence.dev/r/checkbox.json) — direct registry dependency.
 - [@cadence/dropdown-menu](https://cadence.dev/r/dropdown-menu.json) — direct registry dependency.
@@ -63,6 +67,19 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | checkbox | `@components/cadence/checkbox/index.tsx` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
 | dropdown-menu | `@components/cadence/dropdown-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/dropdown-menu.json) |
@@ -75,6 +92,14 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
 

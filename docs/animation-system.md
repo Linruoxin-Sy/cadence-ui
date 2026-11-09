@@ -887,6 +887,14 @@ out of the accessible name/tab order without prematurely releasing a modal's lif
 reverses the existing surface without resetting focus/state. Entrance delays never carry into exit.
 Minimum loading duration and delayed application commits are outside the animation system.
 
+The internal inline-presence executor implements `presence.inline` and `presence.exit` as one
+opacity channel on the original host. It captures finite clocks and reverses from current paint.
+Entrance releases to current disabled/caller opacity; a completed exit keeps a zero-opacity envelope
+while the parent waits for independently retained descendants, including at zero clock. Caller paint
+can revoke that envelope without restoring stale styles. Its adapter supplies actual parent retention and
+immediate inert/accessible-tree state. A conflicting caller opacity writer retains its authority.
+This is staged shared support; individual components still need explicit adoption and evidence.
+
 An ordinary opacity entrance is also subordinate to interaction. If autofocus, keyboard focus,
 pointer activation or browser find reaches entering content, settle any ancestor entrance envelope
 that would leave that target invisible or displaced before presenting the interaction. Do not hide,
@@ -942,6 +950,11 @@ the existing DOM/layout contract, use immediate native geometry. No measurement 
 editor, arbitrary panel or media subtree is authorized. A host without an eligible measurable box,
 including a skipped-layout region, supplies no synthetic zero target and no reason to force hidden
 content into layout; establish a baseline when it legitimately becomes measurable.
+
+Known compound adapters can supply the internal `GeometryScope` with one measured coordinator and
+transaction. Descendants register their real natural regions and defer flushing to the parent after
+committed child content. The coordinator resolves natural destinations before starting the sole outer
+axis writer. Scope registration alone is not component adoption; unknown external layout stays native.
 
 | Cause                                                | Default target behaviour                                          |
 | ---------------------------------------------------- | ----------------------------------------------------------------- |
@@ -1621,7 +1634,8 @@ the numeric API below. Omitted formatting props retain String(original); supplyi
 selects native Intl. This standalone boundary denotes an independently committed quantity; query/filter,
 delayed direct-input, reset and restoration readouts remain native JSX. Affixes and format-only revisions
 are immediate native text, with no additional text animation owner. Current reel proof requires supported
-ASCII/LTR typography, unit device scale and integer resting glyph origins; other mappings stay exact native.
+ASCII/LTR typography and unit device scale. Numeric canvas textures align to device pixels while
+the glyph's real fractional origin is retained inside the raster; other mappings stay exact native.
 The Reveal rows describe the standalone viewport API. Each primitive has
 an independently declared registry item, relative shared imports, namespaced dependencies and its own
 contract tests. They do not require every ordinary consumer to wrap each component manually.

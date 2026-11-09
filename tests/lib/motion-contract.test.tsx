@@ -24,7 +24,7 @@ describe("expectMotionContract", () => {
       </CadenceProvider>,
     );
     expect(motionSamples.size).toBeGreaterThan(0);
-    const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
+    const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button-feedback");
     if (!button) throw new Error("real Button Motion host missing");
     const node = document.querySelector("button");
     if (!node) throw new Error("button missing");
@@ -47,7 +47,7 @@ describe("expectMotionContract", () => {
     );
     const { container, rerender } = render(draw(false));
     const node = container.querySelector("button");
-    const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
+    const button = [...motionSamples.values()].find((p) => p["data-slot"] === "button-feedback");
     if (!button) throw new Error("real Button Motion host missing");
     const controls = button.animate as object;
     if (!node) throw new Error("button missing");
@@ -64,7 +64,7 @@ describe("expectMotionContract", () => {
       </CadenceProvider>
     );
     rerender(off(false));
-    const inactive = [...motionSamples.values()].find((p) => p["data-slot"] === "button");
+    const inactive = [...motionSamples.values()].find((p) => p["data-slot"] === "button-feedback");
     if (!inactive) throw new Error("real Button Motion host missing");
     if (!node) throw new Error("button missing");
     fireEvent.keyDown(node, { key: "Enter" });
@@ -274,8 +274,19 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
       expect(result.status, output).toBe(1);
-      for (const id of ["button", "toggle", "checkbox", "switch"])
+      for (const id of ["toggle", "checkbox", "switch"])
         expect(output).toContain(`${id}: execute expectMotionContract`);
+      for (const action of [
+        "button.root.enter",
+        "button.root.exit",
+        "button.feedback.press",
+        "button.root.colour",
+        "button.label.replace",
+        "button.label.roll",
+        "button.root.resize",
+      ])
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toMatch(new RegExp(`button: v2 execute ${action} on [^\\n]+ in ${mode}`));
       expect(output).not.toContain("spinner: execute expectMotionContract");
       expect(output).not.toContain("badge: execute expectMotionContract");
       for (const id of ["spinner", "label"])

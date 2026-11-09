@@ -193,7 +193,7 @@ export function proveTextLayout(host: HTMLElement, snapshot: TextSnapshot): Text
 }
 
 /** Paint contains pixels only: no outgoing accessible/selectable/findable string. */
-export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: TextLayout) {
+export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: TextLayout, alignPixels = false) {
   const box = layout.boxes.get(unit.identity);
   if (!box || box.width <= 0) return null;
   const canvas = host.ownerDocument.createElement("canvas");
@@ -212,8 +212,13 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
         metrics.actualBoundingBoxDescent - (box.height - layout.baseline),
       ),
     ) + 1;
-  const width = Math.ceil((box.width + padding * 2) * ratio),
-    height = Math.ceil((box.height + padding * 2) * ratio);
+  // A numeric cell can start at a fractional layout coordinate. Keep its canvas
+  // texture on the device-pixel grid and raster the actual glyph offset inside
+  // it; translating an integer-origin raster would resample its resting glyph.
+  const left = alignPixels ? Math.floor((box.left - padding) * ratio) / ratio : box.left - padding;
+  const top = alignPixels ? Math.floor((box.top - padding) * ratio) / ratio : box.top - padding;
+  const width = Math.ceil((box.left + box.width + padding - left) * ratio),
+    height = Math.ceil((box.top + box.height + padding - top) * ratio);
   if (width * height > textProofLimits.pixels || Math.max(width, height) > textProofLimits.axis) return null;
   canvas.width = width;
   canvas.height = height;
@@ -221,11 +226,11 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
   context.font = layout.font;
   context.fontKerning = layout.kerning;
   context.fillStyle = layout.color;
-  context.fillText(unit.text, padding, padding + layout.baseline);
+  context.fillText(unit.text, box.left - left, box.top - top + layout.baseline);
   Object.assign(canvas.style, {
     position: "absolute",
-    left: `${box.left - padding}px`,
-    top: `${box.top - padding}px`,
+    left: `${left}px`,
+    top: `${top}px`,
     width: `${width / ratio}px`,
     height: `${height / ratio}px`,
     pointerEvents: "none",

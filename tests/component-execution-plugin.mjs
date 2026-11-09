@@ -167,6 +167,7 @@ export function componentExecutionPlugin(additionalItems = []) {
                 "createContentTransition",
                 "createSizeLinkedGeometry",
                 "createMeasuredGeometry",
+                "createInlinePresence",
                 ...(normalized.endsWith("/lib/css-motion.ts") ? ["acquireFamily"] : []),
               ].includes(node.name?.text)
             ) {

@@ -113,6 +113,19 @@ export function cssImplementationExports(source, recipe) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  const key = JSON.stringify([source, recipe, form]);
+  if (implementedForms.has(key)) return implementedForms.get(key);
+  const result = detectImplementedForm(source, recipe, form);
+  if (implementedForms.size >= 512) implementedForms.delete(implementedForms.keys().next().value);
+  implementedForms.set(key, result);
+  return result;
+}
+// Pure, byte-keyed structural facts only; never a runtime/action evidence cache.
+const implementedForms = new Map();
+function detectImplementedForm(source, recipe, form) {
+  if (recipe === "text.change" && !source.includes("use-text-presentation")) return null;
+  if (recipe === "number.roll" && !source.includes("use-number-presentation")) return null;
+  if (recipe === "state.color" && !source.includes("css-motion")) return null;
   const scanned = motionSource(source);
   source = scanned.source;
   const imports = (name, module) =>
@@ -235,7 +248,24 @@ export function calledRecipes(source) {
 /** Parameter-backed shared controls retain their exact property form. The
  * binding must reach a rendered shared controller's real transition prop. */
 export function parameterWriterForms(source) {
-  return [...new Set(parameterWriterBindings(source).map((binding) => binding.form))];
+  return [
+    ...new Set([...parameterWriterBindings(source).map((binding) => binding.form), ...inlinePresenceForms(source)]),
+  ];
+}
+
+/** The native factory has no raw caller clock or arbitrary property endpoint.
+ * Runtime receipts still have to prove the executing installed factory bytes. */
+function inlinePresenceForms(source) {
+  if (!source.includes("function createInlinePresence(")) return [];
+  const selected = motionSource(source);
+  if (
+    !selected.source.includes("function createInlinePresence(") ||
+    !selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")) ||
+    !selected.source.includes("node.animate(") ||
+    !selected.source.includes('owner.begin(revision, ["opacity"]')
+  )
+    return [];
+  return ["data.transition/opacity", "exit.fade/opacity"].filter((form) => selected.source.includes(`"${form}"`));
 }
 
 export function parameterWriterBindings(source) {
@@ -360,7 +390,10 @@ function textImplementation(source) {
 }
 
 function stringAdapterImplementation(source, kind) {
-  if (!source.includes(`use-${kind}-presentation`)) return false;
+  return stringAdapterBindings(source, kind).length > 0;
+}
+function stringAdapterBindings(source, kind) {
+  if (!source.includes(`use-${kind}-presentation`)) return [];
   compiler ??= require("typescript");
   const ts = compiler;
   const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
@@ -383,7 +416,7 @@ function stringAdapterImplementation(source, kind) {
         )
           adapters.add(item.name.text);
   }
-  let found = false;
+  const found = [];
   const visit = (node) => {
     if (ts.isFunctionDeclaration(node) && node.body) {
       const calls = new Map();
@@ -443,8 +476,17 @@ function stringAdapterImplementation(source, kind) {
                 );
               })(),
           )
-        )
-          found = true;
+        ) {
+          const slot = child.openingElement.attributes.properties.find(
+            (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "data-slot",
+          );
+          if (slot?.initializer && ts.isStringLiteral(slot.initializer))
+            found.push({
+              form: kind === "text" ? "text.change/changed-runs" : "number.roll/reels",
+              slot: slot.initializer.text,
+              offset: child.getStart(tree),
+            });
+        }
         ts.forEachChild(child, mounted);
       };
       mounted(node.body);
@@ -453,6 +495,12 @@ function stringAdapterImplementation(source, kind) {
   };
   visit(tree);
   return found;
+}
+
+/** Exact rendered host of the connected string/number adapter. A broad export
+ * may render both, but one form cannot borrow the other physical label. */
+export function stringPresentationBindings(source) {
+  return [...stringAdapterBindings(source, "text"), ...stringAdapterBindings(source, "number")];
 }
 
 export function cssPolicyCapabilities(source) {

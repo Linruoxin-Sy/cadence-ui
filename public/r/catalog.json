@@ -202,13 +202,34 @@
     "registryDependencies": [
       "@cadence/cadence-motion",
       "@cadence/cadence-utils",
-      "@cadence/cadence-provider"
+      "@cadence/cadence-provider",
+      "@cadence/cadence-geometry",
+      "@cadence/cadence-text",
+      "@cadence/cadence-number"
     ],
     "since": "0.2.0",
     "tier": "T1",
     "batch": "B1",
     "motion": [
-      "feedback.press"
+      "feedback.press",
+      "data.transition",
+      "exit.fade",
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
+      }
     ],
     "intensity": "subtle",
     "complexity": "S",
@@ -221,7 +242,7 @@
       "scope": "local",
       "travel": "compact",
       "coordination": "independent",
-      "reason": "Press feedback stays on the pressed control; it adds no surface entrance or label replacement."
+      "reason": "The native target stays stable while owned label, quantity, paint, dimensions and independent presence respond to their causes."
     },
     "motionCoverage": {
       "schema": 1,
@@ -230,12 +251,54 @@
           {
             "relationship": "default",
             "owner": "button",
-            "reason": "Button integrates press feedback at its own parts, using the reached installed executor."
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+          }
+        ],
+        "data.transition/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "button",
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+          }
+        ],
+        "exit.fade/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "button",
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "button",
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "button",
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "button",
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "button",
+            "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
           }
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -275,7 +338,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -312,7 +375,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -351,7 +414,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -388,7 +451,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -427,7 +490,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -464,7 +527,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -501,7 +564,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -538,7 +601,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -577,7 +640,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -632,7 +695,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -671,7 +734,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -711,7 +774,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -753,7 +816,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -794,7 +857,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -836,7 +899,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -878,7 +941,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -918,7 +981,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -958,7 +1021,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -1013,7 +1076,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -1081,7 +1144,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -1134,7 +1197,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -1186,7 +1249,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -1237,7 +1300,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -1289,7 +1352,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -1342,7 +1405,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -1420,7 +1483,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1473,7 +1536,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1524,7 +1587,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1591,7 +1654,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1657,7 +1720,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1723,7 +1786,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -1789,7 +1852,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -1857,7 +1920,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -1923,7 +1986,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -2004,7 +2067,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -2080,7 +2143,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -2155,7 +2218,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -2230,7 +2293,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -2305,7 +2368,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -2360,6 +2423,11 @@
             "relationship": "default",
             "owner": "code-block",
             "reason": "Code block integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
           }
         ],
         "layout.shared/one-shot": [
@@ -2385,7 +2453,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -2467,7 +2535,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -2533,7 +2601,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -2589,7 +2657,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -2644,7 +2712,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -2713,7 +2781,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -2750,7 +2818,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -2799,11 +2867,16 @@
             "relationship": "default",
             "owner": "carousel",
             "reason": "Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
           }
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -2842,7 +2915,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -2894,7 +2967,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -2953,7 +3026,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -3032,7 +3105,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -3072,7 +3145,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -3159,6 +3232,11 @@
             "relationship": "default",
             "owner": "sidebar",
             "reason": "Sidebar integrates owned size transitions at its own parts, using the reached installed executor."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The selected live composition reaches button's installed geometry.resize/measured owner; this is inherited execution, not a second local writer."
           }
         ],
         "data.transition/one-shot": [
@@ -3166,11 +3244,16 @@
             "relationship": "default",
             "owner": "sidebar",
             "reason": "Sidebar integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
           }
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -3262,7 +3345,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -3344,11 +3427,16 @@
             "relationship": "inherited",
             "owner": "calendar",
             "reason": "Date Picker mounts calendar for the existing content/data/status phase; that installed component remains the integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
           }
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -3414,7 +3502,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -3467,7 +3555,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -3527,7 +3615,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -3579,7 +3667,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -3631,7 +3719,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -3685,7 +3773,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -3737,7 +3825,7 @@
         ]
       }
     },
-    "sourceSha": "53a81cad",
+    "sourceSha": "fa555c10",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

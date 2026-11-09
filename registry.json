@@ -200,6 +200,11 @@
           "path": "registry/cadence/lib/motion-ref.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/motion-ref.ts"
+        },
+        {
+          "path": "registry/cadence/lib/inline-presence.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-presence.ts"
         }
       ]
     },
@@ -432,7 +437,14 @@
       "description": "Commands such as save, submit, and delete.",
       "categories": ["form", "feedback"],
       "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/button/index.tsx",
@@ -444,7 +456,27 @@
         "since": "0.2.0",
         "tier": "T1",
         "batch": "B1",
-        "motion": ["feedback.press"],
+        "motion": [
+          "feedback.press",
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -456,7 +488,7 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Press feedback stays on the pressed control; it adds no surface entrance or label replacement."
+          "reason": "The native target stays stable while owned label, quantity, paint, dimensions and independent presence respond to their causes."
         },
         "motionCoverage": {
           "schema": 1,
@@ -465,7 +497,49 @@
               {
                 "relationship": "default",
                 "owner": "button",
-                "reason": "Button integrates press feedback at its own parts, using the reached installed executor."
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
               }
             ]
           }
@@ -2521,6 +2595,11 @@
                 "relationship": "default",
                 "owner": "code-block",
                 "reason": "Code block integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
               }
             ],
             "layout.shared/one-shot": [
@@ -2963,6 +3042,11 @@
                 "relationship": "default",
                 "owner": "carousel",
                 "reason": "Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
               }
             ]
           }
@@ -3312,6 +3396,11 @@
                 "relationship": "default",
                 "owner": "sidebar",
                 "reason": "Sidebar integrates owned size transitions at its own parts, using the reached installed executor."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "The selected live composition reaches button's installed geometry.resize/measured owner; this is inherited execution, not a second local writer."
               }
             ],
             "data.transition/one-shot": [
@@ -3319,6 +3408,11 @@
                 "relationship": "default",
                 "owner": "sidebar",
                 "reason": "Sidebar integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
               }
             ]
           }
@@ -3500,6 +3594,11 @@
                 "relationship": "inherited",
                 "owner": "calendar",
                 "reason": "Date Picker mounts calendar for the existing content/data/status phase; that installed component remains the integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
               }
             ]
           }

@@ -162,13 +162,18 @@ export function createTextPresentation(
     }
   });
   const chain: HTMLElement[] = [];
+  const transition = (event: TransitionEvent) => {
+    // Capture sees sibling/descendant feedback too. Only this host's actual
+    // ancestor chain can invalidate its raster correspondence.
+    if (chain.includes(event.target as HTMLElement)) stop();
+  };
   for (let node: HTMLElement | null = host; node; node = node.parentElement) {
     chain.push(node);
     mutations.observe(node, {
       attributes: true,
       attributeFilter: ["class", "style", "hidden", "inert", "dir", "contenteditable"],
     });
-    node.addEventListener("transitionrun", stop, true);
+    node.addEventListener("transitionrun", transition, true);
   }
   paintSignature = signature();
   mutations.observe(host, {
@@ -585,7 +590,7 @@ export function createTextPresentation(
       view?.visualViewport?.removeEventListener("resize", stop);
       view?.visualViewport?.removeEventListener("scroll", stop);
       doc.fonts?.removeEventListener("loadingdone", stop);
-      for (const node of chain) node.removeEventListener("transitionrun", stop, true);
+      for (const node of chain) node.removeEventListener("transitionrun", transition, true);
     },
   };
 }

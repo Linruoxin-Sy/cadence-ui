@@ -157,7 +157,12 @@ describe("current registry inventory and real part references", () => {
         .map((item: { name: string }) => item.name)
         .sort(),
     );
-    expect([...result.contracts.values()].every((contract) => contract.migration === "legacy")).toBe(true);
+    expect([...result.contracts].filter(([, contract]) => contract.migration === "v2").map(([id]) => id)).toEqual([
+      "button",
+    ]);
+    expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(
+      true,
+    );
   });
   it("rejects real source/dependency/index drift and accepts an extended actual inventory", async () => {
     await mkdir(path.join(root, ".cache"), { recursive: true });

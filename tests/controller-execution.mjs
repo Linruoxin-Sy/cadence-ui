@@ -154,6 +154,37 @@ export function observeCopiedController(controller, kind, args, source) {
   const origin = currentExecution();
   controllerOrigins.set(controller, origin);
   controllerSources.set(controller, source);
+  if (kind === "createInlinePresence") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    controller.commit = (...input) => {
+      const offset = parameterCalls.length;
+      const result = withController(controller, () => commit(...input));
+      const form = input[0].present ? "data.transition/opacity" : "exit.fade/opacity";
+      {
+        const policy = parameterCalls.slice(offset).find((call) => call.form === form);
+        presentationSamples.set(controller, {
+          controller,
+          node: args[0],
+          origin,
+          form,
+          supportedForms: ["data.transition/opacity", "exit.fade/opacity"],
+          mode: input[0].cm.mode,
+          properties: ["opacity"],
+          preset: policy?.preset,
+          zeroClock: parameterClockIsZero(policy?.result),
+          target: input[0].present,
+          commits: (presentationSamples.get(controller)?.commits ?? 0) + 1,
+        });
+      }
+      return result;
+    };
+    controller.dispose = () => {
+      presentationSamples.delete(controller);
+      dispose();
+    };
+    return controller;
+  }
   if (kind === "createMeasuredGeometry") {
     const hosts = new Map(),
       register = controller.register.bind(controller),

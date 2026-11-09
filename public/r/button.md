@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/button`
 - Type: registry:ui
 - Since: 0.2.0
-- Motion recipes: feedback.press
+- Motion recipes: feedback.press, data.transition, exit.fade, state.color, geometry.resize, text.change, number.roll
 
 ## Installation
 
@@ -32,6 +32,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -52,6 +56,19 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -59,6 +76,14 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
 
@@ -374,6 +399,63 @@ export function Disabled() {
 }
 ```
 
+## Changing content
+
+Direct strings replace only changed text. A direct numeric child is an independent quantity and
+uses compact place-value reels; numeric-looking strings remain text. Rich children keep their
+existing structure: compose AnimatedText or AnimatedNumber explicitly for a known display slot.
+No loading or request state is added.
+
+The specimens below use plain monospace typography so the changed text and reels are visible.
+Advanced font features, unsafe shaping, active press transforms and native selection use exact
+immediate text. The controls revise a separate specimen without changing its native target.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+
+export function ChangingContent() {
+  const [label, setLabel] = useState("Save changes");
+  const [quantity, setQuantity] = useState(19);
+  return <div className="flex flex-col items-center gap-3">
+    <div className="flex flex-wrap gap-3">
+      <Button style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>{label}</Button>
+      <Button variant="outline" style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>{quantity}</Button>
+    </div>
+    <div className="flex flex-wrap gap-3">
+      <Button variant="ghost" onClick={() => setLabel(label === "Save changes" ? "Saved" : "Save changes")}>Change label</Button>
+      <Button variant="ghost" onClick={() => setQuantity(value => value + 1)}>Increase quantity</Button>
+    </div>
+  </div>;
+}
+```
+
+## Dynamic presence
+
+Initial server markup and hydration stay visible. Later independent insertion fades in.
+A surviving Motion AnimatePresence boundary can retain removal; an exiting button is inert and
+absent from the accessible tree. Without that parent boundary, removal is immediate.
+
+<ComponentExample name="presence" />
+
+```tsx
+"use client";
+import { AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+
+export function Presence() {
+  const [visible, setVisible] = useState(false);
+  return <div className="flex flex-wrap items-center gap-3">
+    <Button variant="outline" onClick={() => setVisible(value => !value)}>Toggle action</Button>
+    <AnimatePresence>{visible && <Button key="action">Optional action</Button>}</AnimatePresence>
+  </div>;
+}
+```
+
 ## When to use
 
 - The primary action of a form, dialog, or toolbar.
@@ -404,21 +486,41 @@ Base UI state callbacks for `className` are evaluated before merging caller clas
 The default press button preserves native React `onAnimationStart`, `onDrag`,
 `onDragStart` and `onDragEnd` events, including capture and cancellation. Callback
 and object refs follow the same button; replacing a callback runs its React 19
-cleanup before assigning the next ref. A caller `render` replaces the default
-renderer and owns spreading its supplied props.
+cleanup before assigning the next ref. A caller `render` owns spreading its supplied native props. It retains its original event/ref target
+and direct SVG layout; its geometry and press transform remain caller-owned.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Press feedback stays on the pressed control; it adds no surface entrance or label replacement.
-
-Recipe: `feedback.press/one-shot`, driven by the press gesture.
+Authored intensity is **subtle**: The native target stays stable while owned label, quantity, paint, dimensions and independent presence respond to their causes.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| press | `scale 1 → 0.97` while active | `feedback.press/one-shot` / `spring.press` | yes (pointer up) |
-| release | `scale 0.97 → 1` | `feedback.press/one-shot` / `spring.press` | yes |
-| reduced | no scale; colour and shadow only | – | – |
-| none | no scale; colour and shadow only | – | – |
+| Later independent insertion | root opacity; initial markup stays visible | `data.transition/one-shot` / presence.inline | yes |
+| Parent-retained removal | root opacity; obsolete action is inert | `exit.fade/one-shot` / presence.exit | yes, reverses on re-entry |
+| Native press and release | safe plain-label visual scale; root hit/focus/anchor stays stable | `feedback.press/one-shot` / `spring.press` | yes |
+| State feedback | background, foreground, individual border colours and scoped shadow | `state.color/css-transition` | yes; focus/invalid paint is immediate |
+| Label/icon or size revision | owned measured width/height, clamped to readable bounds | `geometry.resize/measured` / geometry.compact | yes |
+| Direct string revision | changed-run opacity, no stagger | `text.change/changed-runs` / text.replace | yes |
+| Direct quantity revision | changed place-value reels; exact raw React number output | `number.roll/reels` / number.compact | yes |
+
+Full mode plays applicable effects. Reduced keeps short opacity/colour feedback and applies scale,
+size and quantities immediately. None disables every library transition and delay. A zero full-mode
+clock keeps an accepted held press at its token pose immediately; release returns it immediately.
+Live restrictions cancel existing writers; restoring full does not replay missed revisions.
+
+| Capability | Delivered relationship and boundary |
+| --- | --- |
+| Appearance | Default independent entry; inherited when a known parent owns the same entrance. Exit needs a surviving parent presence boundary. |
+| Size | Default intrinsic dimensions and explicit size changes. Fixed/externally constrained axes, passive reflow, custom render geometry and unsafe measurements use immediate native layout. Growth that would crop the current label is immediate. |
+| Surface and text colour | One root owner; text and currentColor icons inherit. Focus-within and invalid state settle all owned paint immediately. Caller transition families retain their own authority. |
+| Changed text | Default direct string, with retained native text identity. Rich JSX remains caller composition. |
+| Changed numbers | Default direct numeric quantity, preserving its exact display. Strings are never parsed. Rich quantity/affix JSX uses explicit composition. |
+
+Only an ordinary plain label provides the independent internal press visual. Icon-only, rich children
+and custom render targets use colour feedback without inserting a wrapper around caller content or
+scaling their hit/anchor geometry. Pointer cancellation, lost capture, blur, disable and native target
+replacement release press. Fresh inline refs, click handlers or render callbacks on a retained host
+do not create a new action identity. Native target/key replacement retires obsolete content work.
 
 ## Accessibility
 
@@ -434,8 +536,9 @@ Recipe: `feedback.press/one-shot`, driven by the press gesture.
 Buttons size to their label and selected size; the caller owns wrapping or stacking
 an action row on small screens. Icon-only buttons need an accessible name. Base UI
 activation and Motion press feedback require hydration; native button/link semantics
-remain browser-owned in server markup. Press feedback uses transform through
-feedback.press, with no layout interpolation. The T1 check budgets this item's own
+remain browser-owned in server markup. Press feedback transforms only its safe internal label visual. Owned size changes use measured geometry;
+passive reflow, focus and unsafe constraints settle immediately. Text/reel work is bounded by the shared
+limits and introduces one current selectable native value, with decorative paint outside layout. The T1 check budgets this item's own
 shipped source at 6 KiB gzip, excluding installed dependencies and application code.
 
 ## Notes for AI

@@ -402,7 +402,17 @@ try {
         host().style.position = "relative";
         host().style.left = ".5px";
         window.publicNumberUpdate({ value: 13 });
-        check("fractional origin native fallback", host().textContent === "13" && !layer());
+        check(
+          "fractional origin keeps exact current value and active bounded reels",
+          host().textContent === "13" && (dpr === 1 ? !!layer() : !layer()),
+        );
+        if (dpr === 1)
+          check(
+            "fractional resting raster has pixel-aligned canvas origins",
+            [...layer().querySelectorAll("canvas")].every((node) =>
+              Number.isInteger(node.getBoundingClientRect().left),
+            ),
+          );
         baseline(12);
         host().dir = "rtl";
         window.publicNumberUpdate({ value: 13 });

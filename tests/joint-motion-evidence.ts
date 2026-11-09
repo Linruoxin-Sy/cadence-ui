@@ -44,6 +44,7 @@ export type JointMotionRecord = {
   state?: string;
   writes?: number;
   controlExecuted?: boolean;
+  supportedForms?: string[];
   zeroClock?: boolean;
   propertyWrites?: Record<string, number>;
   scalars?: number;
@@ -339,6 +340,7 @@ export function expectJointMotionEvidence(
           "local",
         ),
         evidence: "executed-commit",
+        supportedForms: sample.supportedForms,
         preset: sample.preset,
         target: executed?.target ?? sample.target,
         commits: executed?.calls ?? sample.commits,
