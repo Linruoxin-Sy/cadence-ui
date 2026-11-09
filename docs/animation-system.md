@@ -1848,7 +1848,8 @@ continuous animation gating, and observed Motion targets/transitions. Only succe
 contribute runtime metadata; skipped suites do not count.
 The reporter also requires execution of the actual registry export and matching mounted parts;
 another component or a wrapper with copied attributes cannot supply its modes. Test-only compiler instrumentation records original component execution without replacing its type,
-adding DOM or changing props/ref; Base UI static child inspection retains its native identities. The shared text, numeric,
+adding DOM or altering caller ref/event semantics; authored host refs can be composed to observe the actual node,
+while Base UI static child inspection retains its native identities. The shared text, numeric,
 viewport, selection, directional/month content and size-linked geometry forms require real controller
 commits on the mounted hosts in each mode. A RevealGroup must register targets into its own scope;
 standalone Reveal cannot certify it. CSS forms require the reached CSS-bearing export and mounted

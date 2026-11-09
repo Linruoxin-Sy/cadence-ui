@@ -3,6 +3,11 @@ import { readFileSync } from "node:fs";
 import { expect, onTestFinished } from "vitest";
 import { targetMetadata } from "../scripts/motion-migration.mjs";
 import {
+  expectJointMotionEvidence,
+  type JointMotionRecord,
+  type JointMotionRequirement,
+} from "./joint-motion-evidence";
+import {
   controlSamples,
   cssPolicySamples,
   imperativeSamples,
@@ -27,6 +32,7 @@ declare module "vitest" {
     cadenceComponents?: Record<string, string[]>;
     cadenceExports?: Record<string, string[]>;
     cadenceCssParts?: Record<string, string[]>;
+    cadenceJoint?: JointMotionRecord[];
   }
 }
 
@@ -63,6 +69,8 @@ export function expectMotionContract(
     policy?: ("color" | "loop")[];
     /** Exact installed forms, backed by executed controller commits on these hosts. */
     forms?: NonNullable<ReturnType<typeof presentationSamples.get>>["form"][];
+    /** Test-only joint policy provenance; does not certify component-v2. */
+    joint?: JointMotionRequirement[];
   } = {},
 ) {
   for (const part of options.parts ?? []) expect(part).toBeInTheDocument();
@@ -211,7 +219,9 @@ export function expectMotionContract(
       ),
     )
     .map((node) => node.dataset.slot as string);
+  const joint = options.joint ? expectJointMotionEvidence(mode, options.root ?? document, options.joint) : [];
   onTestFinished(({ task }) => {
+    if (options.joint) task.meta.cadenceJoint = [...(task.meta.cadenceJoint ?? []), ...joint];
     const modes = (task.meta.cadenceModes ?? []) as string[];
     task.meta.cadenceModes = [...new Set([...modes, mode])];
     for (const component of components) {

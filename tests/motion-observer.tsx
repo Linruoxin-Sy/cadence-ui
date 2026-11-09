@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { vi } from "vitest";
+import { currentExecution, type Execution } from "./component-execution";
 
 export type Sample = Record<string, unknown>;
 export const imperativeSamples: unknown[][] = [];
@@ -11,6 +12,7 @@ export const cssPolicySamples = new Map<
   object,
   {
     kind: "color" | "loop";
+    origin?: Execution;
     ref: { current: HTMLElement | SVGElement | null };
     properties: readonly string[];
     mode: string;
@@ -32,6 +34,8 @@ export const presentationSamples = new Map<
       | "layout.move/size-linked"
       | "geometry.resize/measured";
     node: HTMLElement;
+    origin?: Execution;
+    scopeOrigin?: Execution;
     mode: string;
     group?: boolean;
     immediate?: boolean;
@@ -197,6 +201,7 @@ vi.mock("../registry/cadence/lib/viewport-reveal", async (original) => {
     ...actual,
     createViewportReveal(...args: Parameters<typeof actual.createViewportReveal>) {
       const scope = actual.createViewportReveal(...args);
+      const scopeOrigin = currentExecution();
       const targets = new Set<object>();
       const dispose = scope.dispose.bind(scope);
       scope.dispose = () => {
@@ -206,6 +211,7 @@ vi.mock("../registry/cadence/lib/viewport-reveal", async (original) => {
       };
       const register = scope.register.bind(scope);
       scope.register = (...input) => {
+        const origin = currentExecution();
         const target = register(...input);
         targets.add(target);
         const commit = target.commit.bind(target),
@@ -214,6 +220,8 @@ vi.mock("../registry/cadence/lib/viewport-reveal", async (original) => {
           presentationSamples.set(target, {
             form: "reveal/viewport",
             node: input[0],
+            origin,
+            scopeOrigin,
             mode,
             group: args[0] !== undefined,
           });
@@ -268,6 +276,7 @@ vi.mock("../registry/cadence/lib/css-motion", async (original) => {
   return {
     ...actual,
     useStateColor(...args: Parameters<typeof actual.useStateColor>) {
+      const origin = currentExecution();
       const result = actual.useStateColor(...args);
       const immediate =
         args[3]?.immediate ||
@@ -275,14 +284,17 @@ vi.mock("../registry/cadence/lib/css-motion", async (original) => {
         (args[3]?.readability !== "verified" && args[2].some((p) => p === "color" || p === "background-color"));
       return useObservePolicy(result, {
         kind: "color",
+        origin,
         properties: args[2],
         mode: args[1].mode,
         seconds: immediate ? 0 : args[1].transition("state.color").duration,
       });
     },
     useContinuousMotion(...args: Parameters<typeof actual.useContinuousMotion>) {
+      const origin = currentExecution();
       return useObservePolicy(actual.useContinuousMotion(...args), {
         kind: "loop",
+        origin,
         properties: [args[2]],
         mode: args[1].mode,
       });

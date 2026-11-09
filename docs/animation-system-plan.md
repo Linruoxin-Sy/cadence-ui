@@ -233,8 +233,13 @@ existing performance task is a final delivery dependency, not a development prer
   preset/form responsibilities and connected colour property subsets must agree. It rejects
   unsupported target mappings, legacy-only loops and installed owners without action references.
   Native/composed/N/A boundaries remain unverified obligations. This source subgate does not join
-  executed controllers, actual host regions, properties and modes; strict joint runtime evidence,
-  caller-registration compositions and valid end-to-end v2 acceptance remain pending.
+  executed controllers, actual host regions, properties and modes. Test-only instance/ref provenance
+  now joins connected colour/loop policies on the same actual host; RevealGroup scope creation and
+  Reveal target registration retain their distinct real owners. Registration records remain separate
+  from executed-property evidence. The non-published fixtures prove successful reporter transport
+  and reject unrelated export/host/property/mode and dead/skipped calls. Complete target-action and
+  six-capability boundary matching, remaining controller/property forms, strict owner-local policy
+  and conditional end-to-end v2 enforcement remain pending; this layer cannot open the marker.
   Audit exact host/region coverage as well as export existence: title/count/checkbox/sub-trigger text,
   separator/arrow/backdrop paint, native editor foreground and inherited accessories cannot disappear
   behind a broad root anchor. A composition either uses its dependency's preset/form unchanged or

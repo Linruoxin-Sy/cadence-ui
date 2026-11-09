@@ -2,15 +2,17 @@ import path from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import { componentExecutionPlugin } from "./tests/component-execution-plugin.mjs";
+import jointMotionItems from "./tests/fixtures/joint-motion/items.json";
 
 const cliSuites = [
   "tests/lib/motion-contract.test.tsx",
   "tests/lib/motion-docs.test.tsx",
   "tests/lib/doc-template.test.tsx",
+  "tests/lib/joint-motion-reporter.test.tsx",
 ];
 
 export default defineConfig({
-  plugins: [componentExecutionPlugin(), react()],
+  plugins: [componentExecutionPlugin(jointMotionItems), react()],
   resolve: {
     alias: { "@": path.resolve(process.cwd()) },
   },

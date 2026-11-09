@@ -156,9 +156,21 @@ neither matching recipe names nor clocks supply an implicit target-to-installed 
 This is selected-export source evidence only. `@part` native/composed/N/A references are returned as
 unverified applicability obligations, not runtime facts. The subgate cannot associate a controller
 with a particular mounted region inside a broad export anchor, certify caller-registration scopes
-such as RevealGroup, or prove single-property ownership and three-mode behavior. The helper/observer/
-reporter still need strict joint host/property/mode evidence and real executed positive/negative
-fixtures before per-item v2 enablement. Keep browser, first-paint, live-cancellation, installation and
+such as RevealGroup, or prove single-property ownership and three-mode behavior.
+
+Test-only execution instrumentation retains original component/JSX types and links authored host refs
+to committed export instances. Shared-hook effect callbacks retain that invocation's provenance.
+`expectMotionContract` can request joint colour/loop policy records with the same actual host,
+connected controller, property set and effective mode. Reveal records additionally link the real
+scope owner to its registered target instance. Those records are explicitly **registered-target**
+evidence, not executed-property or browser conformance evidence. A running loop and a native/static
+policy endpoint remain distinguishable. The non-published joint fixtures exercise identity, ref
+cleanup, aliases, host replacement and rejection of unrelated/independent-tag evidence; a reporter
+fixture checks successful execution transport, including dead and skipped calls.
+
+This evidence layer does not implement target-action matching, applicability/native/N/A review,
+all controller/property forms, or the conditional component-v2 reporter gate. These remain required
+before per-item v2 enablement. Keep browser, first-paint, live-cancellation, installation and
 performance acceptance separate; a static positive cannot open the migration marker.
 
 Migration is explicit and fail-closed. `legacy` keeps all installed manifest, MDX, intensity, source
