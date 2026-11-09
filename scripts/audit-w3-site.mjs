@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { chromium } from "@playwright/test";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
 import { measureInitialScripts, summarizeLayoutShifts } from "./site-js-budget.mjs";
 
 const dist = process.env.CADENCE_DIST_DIR ?? ".next-motion-runtime";
@@ -13,6 +14,7 @@ const manifest = JSON.parse(readFileSync(path.join(dist, "build-manifest.json"),
 const routes = Object.keys(JSON.parse(readFileSync(path.join(dist, "prerender-manifest.json"), "utf8")).routes);
 const applicable = routes.filter((route) => route === "/" || /^\/(components|docs)(\/|$)/.test(route));
 const report = {
+  performancePolicy: PERFORMANCE_POLICY,
   source: process.env.CADENCE_RUNTIME_SOURCE ?? "unspecified",
   buildId: readFileSync(path.join(dist, "BUILD_ID"), "utf8").trim(),
   protocol:
@@ -74,6 +76,10 @@ await Promise.all(
           cls,
           clsPassed: cls < 0.02,
           jsPassed: scripts.gzipBytes <= scripts.limit,
+          budgetAssessments: [
+            reportBudget(assessBudget(`${route} JS gzip bytes`, scripts.gzipBytes, scripts.limit)),
+            reportBudget(assessBudget(`${route} cold CLS`, cls, 0.02, "below")),
+          ],
         });
         writeFileSync(output, `${JSON.stringify(report, null, 2)}\n`);
         console.log(`${viewport.width} ${route}: JS ${scripts.gzipBytes}, CLS ${cls}`);
@@ -83,4 +89,7 @@ await Promise.all(
     }
   }),
 );
-process.exitCode = report.reports.every((entry) => entry.jsPassed && entry.clsPassed) ? 0 : 1;
+// Structural/browser/provenance assertions remain blocking; numerical comparisons do not.
+console.log(
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+);

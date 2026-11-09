@@ -4,7 +4,7 @@
  *   - every file listed in registry.json exists and has the canonical target
  *   - every item has a fresh payload with embedded content and docs
  *   - UI and block items declare `meta.tier`, `meta.batch`, `meta.upstream`, `meta.motion`, `meta.intensity`
- *   - the tier decides the gzip budget (T0 4 KB … T4 14 KB), unless `meta.budget` overrides it
+ *   - tier gzip comparisons (including meta.budget references) are advisory under ADR-023
  *   - no component imports a validation library or an alias, and every animated file has a reduced branch
  *   - intra-registry dependencies are namespaced (`@cadence/<id>`) and exist
  *   - the three copies of the CSS motion tokens agree (globals.css, cadence-theme, animation-system.md §2.3)
@@ -34,6 +34,7 @@ import {
 import { checkMotionTargets } from "./motion-targets.mjs";
 import { authoredCssTokens, loadMotionSource } from "./motion-token-source.mjs";
 import { compareTokenSources, parseCss, parseDocTokens, parseRegistryTheme } from "./motion-tokens.mjs";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
 const root = process.cwd();
@@ -218,9 +219,7 @@ for (const item of registry.items) {
   if (isComponent(item)) {
     const tier = item.meta?.tier ?? "T0";
     const budgetKb = item.meta?.budget ? item.meta.budget / 1024 : (TIER_BUDGET[tier] ?? 8);
-    if (bytes > budgetKb * 1024) {
-      problems.push(`${item.name}: ${(bytes / 1024).toFixed(1)} KB gzip exceeds the ${budgetKb} KB budget for ${tier}`);
-    }
+    reportBudget(assessBudget(`${item.name} source gzip bytes (${tier})`, bytes, budgetKb * 1024));
   }
 
   if (isComponent(item)) {
@@ -372,7 +371,7 @@ if (problems.length) {
 
 const componentCount = registry.items.filter(isComponent).length;
 console.log(
-  `Registry OK: ${registry.items.length} items (${componentCount} components), ${docFiles.size} docs, ${previewFiles.size} previews, targets and payloads in sync, tier budgets met, P11 clean.`,
+  `Registry OK: ${registry.items.length} items (${componentCount} components), ${docFiles.size} docs, ${previewFiles.size} previews, targets and payloads in sync, tier budgets ${PERFORMANCE_POLICY.enforcement} (performance ${PERFORMANCE_POLICY.performanceAcceptance}), P11 clean.`,
 );
 console.log(
   `Motion targets: ${targets.contracts.size} reference graphs checked; legacy enforcement, no v2 runtime certification.`,

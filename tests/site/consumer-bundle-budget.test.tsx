@@ -1,6 +1,7 @@
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { analyzeConsumerBundles, COMPONENT_ADDITION_LIMIT } from "../../scripts/consumer-bundle-budget.mjs";
+import { assessBudget } from "../../scripts/performance-policy.mjs";
 
 type Edge = { path: string; kind: string; external?: boolean };
 function required<T>(value: T | undefined): T {
@@ -68,7 +69,16 @@ describe("compiled consumer addition accounting", () => {
     expect(required(component.files.find((file) => file.file === "async-only.js")).initialImportPath).toBeNull();
     const over = fixture();
     required(over.files["async-only.js"]).gzip += 1;
-    expect(analyzeConsumerBundles(over).components[0]).toMatchObject({ gzip: 8001, passed: false });
+    const exceeded = required(analyzeConsumerBundles(over).components[0]);
+    expect(exceeded).toMatchObject({ gzip: 8001, passed: false });
+    expect(assessBudget("consumer addition", exceeded.gzip, COMPONENT_ADDITION_LIMIT)).toMatchObject({
+      actual: 8001,
+      reference: 8000,
+      comparisonPassed: false,
+      status: "advisory-exceeded",
+      blocking: false,
+      performanceAcceptance: "deferred",
+    });
   });
 
   it("sums separately compressed outputs and does not divide gzip by source or package proportions", () => {

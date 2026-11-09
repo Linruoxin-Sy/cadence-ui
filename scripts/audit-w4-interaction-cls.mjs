@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdirSync as ensureAuditDirectory, readFileSync, writeFileSync } from "node:fs";
 import { chromium } from "@playwright/test";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
 import { summarizeLayoutShifts } from "./site-js-budget.mjs";
 
 ensureAuditDirectory(".cache/audits", { recursive: true });
@@ -11,7 +12,8 @@ const base = process.argv[2] ?? "http://127.0.0.1:3183";
 const dist = process.env.CADENCE_DIST_DIR ?? ".next-motion-runtime";
 const manifest = JSON.parse(readFileSync(`${dist}/build-manifest.json`, "utf8"));
 const report = {
-  source: "f60e7fe",
+  performancePolicy: PERFORMANCE_POLICY,
+  source: process.env.CADENCE_RUNTIME_SOURCE ?? "unspecified",
   buildId: readFileSync(`${dist}/BUILD_ID`, "utf8").trim(),
   scope:
     "Accordion/Tabs/Select; full mode, OS no-preference; desktop/mobile emulation; fresh context; navigation, scroll, specified interactions, 15s final dwell; not all routes/modes/lifetime/real-device certification",
@@ -135,6 +137,7 @@ try {
           ...sample,
           cls,
           passed: cls < 0.02,
+          budgetAssessment: reportBudget(assessBudget(`${id} ${width} interaction CLS`, cls, 0.02, "below")),
         });
         writeFileSync(".cache/audits/w4-interaction-cls.json", `${JSON.stringify(report, null, 2)}\n`);
         console.log(`${id} ${width}: CLS ${cls}`);
@@ -146,4 +149,7 @@ try {
 } finally {
   await browser.close();
 }
-process.exitCode = report.records.every((record) => record.passed) ? 0 : 1;
+// Browser/interaction assertions remain blocking; numeric CLS governance is deferred.
+console.log(
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+);

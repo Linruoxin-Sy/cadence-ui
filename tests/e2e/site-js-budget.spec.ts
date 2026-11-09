@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { expect, test } from "@playwright/test";
+import { assessBudget, reportBudget } from "../../scripts/performance-policy.mjs";
 import { measureInitialScripts, summarizeLayoutShifts } from "../../scripts/site-js-budget.mjs";
 
 type ShiftRect = Pick<DOMRectReadOnly, "x" | "y" | "width" | "height">;
@@ -24,7 +25,7 @@ for (const width of [1280, 390]) {
     test.use({ viewport: { width, height: width === 390 ? 844 : 720 }, isMobile: width === 390 });
 
     for (const id of ["button", "data-table"]) {
-      test(`${id} initial JavaScript is within 120 KB gzip`, async ({ page, baseURL }, testInfo) => {
+      test(`${id} initial JavaScript and cold CLS advisory report`, async ({ page, baseURL }, testInfo) => {
         const consoleErrors: string[] = [];
         const httpErrors: { url: string; status: number }[] = [];
         page.on("console", (message) => {
@@ -102,6 +103,10 @@ for (const width of [1280, 390]) {
           exampleCount,
           shifts,
           coldCLS,
+          budgetAssessments: [
+            reportBudget(assessBudget(`${id} cold CLS`, coldCLS, 0.02, "below")),
+            reportBudget(assessBudget(`${id} initial JS gzip bytes`, report.gzipBytes, report.limit)),
+          ],
           consoleErrors,
           httpErrors,
           scrollY,
@@ -118,8 +123,7 @@ for (const width of [1280, 390]) {
         expect.soft(httpErrors).toEqual([]);
         expect.soft(exampleCount).toBe(examples[id].length);
         expect.soft(scrollY).toBe(0);
-        expect.soft(coldCLS).toBeLessThan(0.02);
-        expect(report.gzipBytes, JSON.stringify(report.files, null, 2)).toBeLessThanOrEqual(report.limit);
+        // Numerical comparisons are attached above; behavior/provenance assertions still gate.
       });
     }
   });

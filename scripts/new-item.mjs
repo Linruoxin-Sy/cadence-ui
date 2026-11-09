@@ -243,7 +243,8 @@ TODO: caller owns values, validation, errors and submission; render supplied inv
 ## Responsiveness and performance
 
 TODO: describe actual parent sizing, overflow, breakpoint and SSR behavior, installed runtime
-and source budget. Tier selects the source ceiling and documentation profile; describe only implemented motion.
+and source cost. Tier selects a historical advisory source reference and documentation profile
+under ADR-023; describe only implemented motion. Performance governance follows functional migration.
 
 ## Notes for AI
 

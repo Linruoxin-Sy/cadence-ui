@@ -4,6 +4,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 import { chromium } from "@playwright/test";
+import { assessBudget, PERFORMANCE_POLICY, reportBudget } from "./performance-policy.mjs";
 import { measureInitialScripts } from "./site-js-budget.mjs";
 
 // Run from the repository root after an isolated production build/start.
@@ -31,7 +32,14 @@ for (const id of ids) {
     assert.ok(report.files.length > 0);
     assert.ok(report.files.every((entry) => entry.status === 200));
     assert.deepEqual(report.errors, []);
-    reports.push({ id, ...report, roots, browser: browser.version(), budgetPassed: report.gzipBytes <= report.limit });
+    reports.push({
+      id,
+      ...report,
+      roots,
+      browser: browser.version(),
+      budgetPassed: report.gzipBytes <= report.limit,
+      budgetAssessment: reportBudget(assessBudget(`${id} initial JS gzip bytes`, report.gzipBytes, report.limit)),
+    });
     console.log(`${id}: ${report.gzipBytes}/${report.limit} gzip bytes, ${report.files.length} scripts`);
   } finally {
     await browser.close();
@@ -42,6 +50,7 @@ writeFileSync(
   output,
   `${JSON.stringify(
     {
+      performancePolicy: PERFORMANCE_POLICY,
       source: process.env.CADENCE_RUNTIME_SOURCE ?? "unspecified",
       buildId: readFileSync(path.join(dist, "BUILD_ID"), "utf8").trim(),
       protocol:
@@ -52,4 +61,7 @@ writeFileSync(
     2,
   )}\n`,
 );
-process.exitCode = reports.every((report) => report.budgetPassed) ? 0 : 1;
+// Measurement/provenance assertions still throw; numeric exceedances remain advisory.
+console.log(
+  `Performance ${PERFORMANCE_POLICY.performanceAcceptance}: ${PERFORMANCE_POLICY.enforcement} comparisons (ADR-023).`,
+);

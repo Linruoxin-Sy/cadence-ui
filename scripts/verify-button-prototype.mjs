@@ -3,6 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect } from "@playwright/test";
+import { assessBudget, reportBudget } from "./performance-policy.mjs";
 import { summarizeLayoutShifts } from "./site-js-budget.mjs";
 
 export async function auditButtonPrototype(browser, origin, baseline, dir, { componentIds, exampleIds }) {
@@ -281,7 +282,7 @@ export async function auditButtonPrototype(browser, origin, baseline, dir, { com
   for (const width of [1440, 390])
     for (const target of [origin, baseline])
       await check(
-        `bounded full-mode interaction CLS ${width} ${target === origin ? "candidate" : "baseline"}`,
+        `bounded full-mode interaction behavior and advisory CLS ${width} ${target === origin ? "candidate" : "baseline"}`,
         async () => {
           const isolated = await browser.newContext({
             viewport: { width, height: 900 },
@@ -332,11 +333,9 @@ export async function auditButtonPrototype(browser, origin, baseline, dir, { com
             await p.waitForTimeout(15000);
             const detail = await p.evaluate(() => ({ shifts: window.__shifts, firstFrames: window.__firstFrames }));
             detail.cls = summarizeLayoutShifts(detail.shifts);
-            if (detail.cls >= 0.02) {
-              const error = new Error(`CLS ${detail.cls} exceeds 0.02`);
-              error.detail = detail;
-              throw error;
-            }
+            detail.budgetAssessment = reportBudget(
+              assessBudget("prototype interaction CLS", detail.cls, 0.02, "below"),
+            );
             assert.equal(detail.firstFrames.length, 3);
             return detail;
           } finally {
