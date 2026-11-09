@@ -176,13 +176,15 @@ function NativeIntent() {
 function NativeSelection() {
   return (
     <section data-select-owner="">
-      <Select defaultValue="a">
-        <SelectTrigger aria-label="Policy selection">
+      <Select defaultValue="c" modal={false}>
+        <SelectTrigger aria-label="Policy selection" className="font-mono" style={{ width: 200 }}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent alignItemWithTrigger={false}>
+        <SelectContent alignItemWithTrigger={false} className="font-mono">
           <SelectItem value="a">Short</SelectItem>
           <SelectItem value="b">Long selected label</SelectItem>
+          <SelectItem value="c">AAA</SelectItem>
+          <SelectItem value="d">BBB</SelectItem>
         </SelectContent>
       </Select>
     </section>

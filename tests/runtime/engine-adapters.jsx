@@ -155,6 +155,14 @@ window.engineSample = () => {
       animating: typeof d.value === "number" ? d.controls.state === "running" : d.value.isAnimating(),
       value: typeof d.value === "number" ? d.controls.time : d.value.get(),
     })),
+    contentDrivers: (window.engineContentDrivers ?? []).map((d) => ({
+      id: identity(d.controls),
+      state: d.controls.state,
+      duration: d.options.duration,
+      target: d.target,
+      value: d.value.get(),
+      animating: d.value.isAnimating(),
+    })),
     rootRefs:
       window.engineRootRefs &&
       Object.fromEntries(

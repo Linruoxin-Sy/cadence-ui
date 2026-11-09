@@ -875,7 +875,9 @@ try {
     });
     await patch({ clock: 8 });
     await page.getByRole("combobox", { name: "Policy selection" }).click();
-    await page.getByRole("option", { name: "Long selected label", exact: true }).click();
+    // The current Select handoff supports complete disjoint ASCII units. The
+    // historical Short -> Long pair has retained characters and is native.
+    await page.getByRole("option", { name: "BBB", exact: true }).click();
     await page.locator('[data-slot="select-handoff"]').waitFor({ state: "attached" });
     await page.evaluate(() => (window.retainedSelectTrigger = document.querySelector('[data-slot="select-trigger"]')));
     await patch({ target: 500 });
@@ -906,7 +908,7 @@ try {
       natural: n.firstElementChild.getBoundingClientRect().width,
       sameTrigger: document.querySelector('[data-slot="select-trigger"]') === window.retainedSelectTrigger,
     }));
-    assert.equal(selected.text, "Long selected label");
+    assert.equal(selected.text, "BBB");
     assert.equal(selected.opacity, "1");
     assert(selected.sameTrigger);
     assert(selected.width >= selected.natural - 1);
@@ -920,6 +922,15 @@ try {
       label: "actual hidden settlement cannot replay after subsequent positive clocks",
       completions: hiddenPhysicsBefore,
     });
+    await patch({ clock: 0 });
+    await page.getByRole("combobox", { name: "Policy selection" }).click();
+    await page.getByRole("option", { name: "Short", exact: true }).click();
+    await patch({ clock: 4 });
+    await page.getByRole("combobox", { name: "Policy selection" }).click();
+    await page.getByRole("option", { name: "Long selected label", exact: true }).click();
+    assert.equal(await page.locator('[data-slot="select-handoff"]').count(), 0);
+    assert.equal(await page.locator('[data-slot="select-value"]').textContent(), "Long selected label");
+    report.cases.push({ label: "retained-character Select label keeps the current exact native fallback" });
     report.cases.push({
       label: "native visibility events",
       pid: ownedProcess.pid,

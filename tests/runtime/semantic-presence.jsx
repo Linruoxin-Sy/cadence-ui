@@ -160,6 +160,7 @@ export const initialState = {
   selectValue: "next",
   selectBehavior: "accept",
   selectEntity: 0,
+  selectDisjoint: false,
 };
 
 export function Fixture({ initial = initialState }) {
@@ -323,6 +324,7 @@ export function Fixture({ initial = initialState }) {
       </Tooltip>
       <Select
         defaultValue="next"
+        modal={state.selectDisjoint ? false : undefined}
         {...(state.selectControlled ? { value: state.selectValue } : {})}
         onValueChange={(value, details) => {
           log("select-request", value, details.reason);
@@ -337,13 +339,14 @@ export function Fixture({ initial = initialState }) {
         <SelectTrigger
           key={state.selectEntity}
           aria-label="Flight framework"
-          className={state.copyable ? "select-text" : undefined}
+          className={state.copyable ? "font-mono select-text" : "font-mono"}
+          style={state.selectDisjoint ? { width: 200 } : undefined}
         >
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="next">Next.js</SelectItem>
-          <SelectItem value="remix">Remix</SelectItem>
+        <SelectContent className="font-mono" alignItemWithTrigger={state.selectDisjoint ? false : undefined}>
+          <SelectItem value="next">{state.selectDisjoint ? "AAA" : "Next.js"}</SelectItem>
+          <SelectItem value="remix">{state.selectDisjoint ? "BBB" : "Remix"}</SelectItem>
         </SelectContent>
       </Select>
       {state.chart && (

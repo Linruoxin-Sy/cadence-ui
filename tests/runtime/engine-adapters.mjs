@@ -46,6 +46,24 @@ const bundle = await build({
     {
       name: "observe-installed-engine-owners",
       setup(builder) {
+        builder.onLoad({ filter: /content-transition\.ts$/ }, async (args) => {
+          const original = await readFile(args.path, "utf8");
+          const anchor = "import { animateSingleValue, motionValue }";
+          assert.equal(original.split(anchor).length, 2, "one actual shared content driver import");
+          const code = `${original.replace(anchor, "import { animateSingleValue as installedAnimateSingleValue, motionValue }")}
+function animateSingleValue(...args) {
+  const controls = installedAnimateSingleValue(...args);
+  (window.engineContentDrivers ??= []).push({value: args[0], target: args[1], options: args[2], controls});
+  return controls;
+}`;
+          observed.push({
+            file: args.path,
+            sourceSHA: digest(original),
+            observedSHA: digest(code),
+            kind: "actual-shared-content-driver",
+          });
+          return { contents: code, loader: "ts", resolveDir: path.dirname(args.path) };
+        });
         builder.onLoad({ filter: /embla-carousel[\\/]esm[\\/]embla-carousel\.esm\.js$/ }, async (args) => {
           const original = await readFile(args.path, "utf8"),
             code = observeEmbla(original, args.path);
@@ -450,7 +468,7 @@ try {
       }
       if (!process.env.CADENCE_ENGINE_FILTER || "calendar".includes(process.env.CADENCE_ENGINE_FILTER)) {
         await visit({ kind: "calendar" }, mode, os);
-        await check("real month table WAAPI tokens and captured handle cancellation", async () => {
+        await check("real month table shared phase, native paint and captured handle cancellation", async () => {
           const before = await sample(page);
           await patch(page, { revision: 2 });
           const active = await sample(page);
@@ -458,14 +476,29 @@ try {
           if (mode !== "none") {
             assert(active.grid.animations.length);
             const effect = active.grid.animations[0];
-            assert(Math.abs(effect.timing.duration - (full ? 1200 : 720)) < 0.01);
+            // The S08 month form has one scalar clock and zero-time native
+            // replace paint. Read its actual driver, not the paint's hold time.
+            assert.equal(effect.timing.duration, 0);
+            assert.equal(active.contentDrivers.length, 1);
+            assert(Math.abs(active.contentDrivers[0].duration * 1000 - (full ? 1200 : 720)) < 0.01);
+            assert.equal(active.contentDrivers[0].target, 1);
+            assert(active.contentDrivers[0].animating);
             if (!full) assert(effect.frames.every((f) => !f.transform || f.transform === "none"));
-          } else assert.equal(active.grid.animations.length, 0);
+            await frames(page, 2);
+            const intermediate = await sample(page);
+            assert(intermediate.contentDrivers[0].value > active.contentDrivers[0].value);
+            assert(intermediate.contentDrivers[0].value < 1);
+            assert(Number(intermediate.grid.opacity) > Number(active.grid.opacity));
+          } else {
+            assert.equal(active.grid.animations.length, 0);
+            assert.equal(active.contentDrivers.length, 0);
+          }
           await patch(page, { clock: 4 });
           const settled = await sample(page);
           assert.equal(settled.grid.animations.length, 0);
           assert.equal(settled.grid.opacity, "1");
           assert.equal(settled.grid.transform, "none");
+          assert(settled.contentDrivers.every((driver) => !driver.animating));
           await patch(page, { clock: 0, revision: 2 });
           assert.equal((await sample(page)).grid.animations.length, 0);
           await patch(page, { clock: 2 });
@@ -906,10 +939,20 @@ try {
         const reverse = await sample(page);
         assert.equal(reverse.grid.animations.length, 1);
         assert(Number(reverse.grid.transform.split(",")[4]) < 0);
-        await patch(page, { revision: 1 });
+        const continuity = await page.evaluate(() => {
+          const before = window.engineSample();
+          window.enginePatch({ revision: 1 });
+          return { before, after: window.engineSample() };
+        });
+        assert.equal(continuity.after.grid.animations.length, 1);
+        const offset = (grid) => Number(grid.transform.split(",")[4]);
+        assert(Math.abs(offset(continuity.after.grid) - offset(continuity.before.grid)) < 0.01);
+        assert(Math.abs(Number(continuity.after.grid.opacity) - Number(continuity.before.grid.opacity)) < 0.001);
+        assert.equal(continuity.after.contentDrivers.filter((driver) => driver.state === "running").length, 1);
+        await frames(page, 2);
         const forward = await sample(page);
         assert.equal(forward.grid.animations.length, 1);
-        assert(Number(forward.grid.transform.split(",")[4]) > 0);
+        assert(offset(forward.grid) >= offset(continuity.before.grid) && offset(forward.grid) <= 0);
         await patch(page, { appearanceClip: true });
         await frames(page, 3);
         assert.equal((await sample(page)).grid.animations.length, 0);
@@ -924,7 +967,7 @@ try {
         await patch(page, { overflowClip: false });
         await frames(page, 3);
         assert.equal((await sample(page)).grid.animations.length, 0);
-        return { forward, reverse };
+        return { forward, reverse, continuity };
       },
     );
   }

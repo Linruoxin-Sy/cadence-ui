@@ -550,6 +550,7 @@ try {
         for (const mode of ["full", "reduced", "none"]) {
           await visit({
             selectControlled: true,
+            selectDisjoint: true,
             selectBehavior: behavior,
             mode,
             clock: 8,
@@ -558,13 +559,13 @@ try {
           });
           const trigger = page.getByRole("combobox", { name: "Flight framework" });
           await trigger.click();
-          await page.getByRole("option", { name: "Remix", exact: true }).click();
+          await page.getByRole("option", { name: "BBB", exact: true }).click();
           await frame(page, 2);
           const count = await page.locator('[data-slot="select-handoff"]').count();
           assert.equal(count, behavior === "accept" && mode === "full" ? 1 : 0);
           assert.equal(
             await trigger.locator('[data-slot="select-value"]').textContent(),
-            ["hold", "cancel"].includes(behavior) ? "Next.js" : "Remix",
+            ["hold", "cancel"].includes(behavior) ? "AAA" : "BBB",
           );
           if (count) {
             await page.locator('[data-slot="select-handoff"]').evaluate((node) => {
@@ -584,7 +585,7 @@ try {
               0,
               "unrelated later same-value commit has no old origin",
             );
-            assert.equal(await trigger.locator('[data-slot="select-value"]').textContent(), "Remix");
+            assert.equal(await trigger.locator('[data-slot="select-value"]').textContent(), "BBB");
           }
           const requests = await page.evaluate(() =>
             window.semanticLog.filter((event) => event[0] === "select-request"),
@@ -925,16 +926,16 @@ try {
         selection.removeAllRanges();
         return text;
       });
-    await visit({ mode: "none", clock: 0 });
+    await visit({ mode: "none", clock: 0, selectDisjoint: true });
     await page.getByRole("combobox", { name: "Flight framework" }).click();
-    await page.getByRole("option", { name: "Remix", exact: true }).click();
+    await page.getByRole("option", { name: "BBB", exact: true }).click();
     await page.getByRole("listbox").waitFor({ state: "detached" });
     const defaultStatic = await copyPage();
-    assert.equal(defaultStatic.match(/Remix/g)?.length ?? 0, 0, "default native trigger is select-none");
-    await visit({ clock: 8 });
+    assert.equal(defaultStatic.match(/BBB/g)?.length ?? 0, 0, "default native trigger is select-none");
+    await visit({ clock: 8, selectDisjoint: true });
     const trigger = page.getByRole("combobox", { name: "Flight framework" });
     await trigger.click();
-    await page.getByRole("option", { name: "Remix", exact: true }).click();
+    await page.getByRole("option", { name: "BBB", exact: true }).click();
     const flight = page.locator('[data-slot="select-handoff"]');
     await flight.waitFor({ state: "attached" });
     const painted = await flight.evaluate((node) => ({
@@ -944,20 +945,20 @@ try {
       hidden: node.getAttribute("aria-hidden"),
       select: getComputedStyle(node).userSelect,
     }));
-    assert.deepEqual(painted, { text: "", attr: "Remix", pseudo: '"Remix"', hidden: "true", select: "none" });
-    assert.equal(await trigger.locator('[data-slot="select-value"]').textContent(), "Remix");
+    assert.deepEqual(painted, { text: "", attr: "BBB", pseudo: '"BBB"', hidden: "true", select: "none" });
+    assert.equal(await trigger.locator('[data-slot="select-value"]').textContent(), "BBB");
     await page.getByRole("listbox").waitFor({ state: "detached" });
     const defaultAnimated = await copyPage();
     assert.equal(defaultAnimated, defaultStatic, "default animation adds no selectable duplicate");
     const accessible = await trigger.ariaSnapshot();
-    assert.equal(accessible.match(/Remix/g)?.length, 1);
-    await visit({ clock: 8, copyable: true });
+    assert.equal(accessible.match(/BBB/g)?.length, 1);
+    await visit({ clock: 8, copyable: true, selectDisjoint: true });
     await page.getByRole("combobox", { name: "Flight framework" }).click();
-    await page.getByRole("option", { name: "Remix", exact: true }).click();
+    await page.getByRole("option", { name: "BBB", exact: true }).click();
     await page.locator('[data-slot="select-handoff"]').waitFor({ state: "attached" });
     await page.getByRole("listbox").waitFor({ state: "detached" });
     const copied = await copyPage();
-    assert.equal(copied.match(/Remix/g)?.length, 1, JSON.stringify(copied));
+    assert.equal(copied.match(/BBB/g)?.length, 1, JSON.stringify(copied));
     return {
       painted,
       defaultStatic,
@@ -966,6 +967,17 @@ try {
       accessible,
       callerOverride: 'SelectTrigger className="select-text"',
     };
+  });
+  await check("retained-character Select labels preserve exact native fallback", async () => {
+    for (const mode of ["full", "reduced", "none"]) {
+      await visit({ mode, clock: 8, chart: false, showDoc: false });
+      const trigger = page.getByRole("combobox", { name: "Flight framework" });
+      await trigger.click();
+      await page.getByRole("option", { name: "Remix", exact: true }).click();
+      assert.equal(await page.locator('[data-slot="select-handoff"]').count(), 0);
+      assert.equal(await trigger.locator('[data-slot="select-value"]').textContent(), "Remix");
+      assert.equal((await trigger.ariaSnapshot()).match(/Remix/g)?.length, 1);
+    }
   });
   const chartGeometry = () =>
     page

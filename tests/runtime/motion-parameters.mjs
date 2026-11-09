@@ -57,7 +57,12 @@ async function sample(id) {
       id,
       info,
       css: {
-        duration: parseFloat(css.transitionDuration),
+        // A stopped property family has no running transition, even when an
+        // authored effective token retains its positive value in the cascade.
+        duration: css.transitionProperty === "none" ? 0 : parseFloat(css.transitionDuration),
+        rawDuration: css.transitionDuration,
+        property: css.transitionProperty,
+        handles: element.getAnimations().length,
         delay: parseFloat(css.transitionDelay),
         ease: css.transitionTimingFunction,
         fast: element.querySelector("[data-fast]")
@@ -93,6 +98,10 @@ async function check(label, id, expected, fast = false) {
   near(fast ? value.css.fast : value.css.duration, expected);
   near(value.css.fast, value.info.colour.transition.duration ?? 0);
   if (id === "portal" && fast) near(value.css.duration, expected);
+  if (expected === 0 && value.css.property === "none") {
+    assert.equal(value.css.handles, 0, "disabled family must cancel actual native handles");
+    assert.equal(value.css.delay, 0);
+  }
   return value;
 }
 try {
@@ -188,8 +197,8 @@ try {
     transitionBehavior: "allow-discrete",
     color: "red",
   };
-  const transitionStyle = () =>
-    page.locator('[data-scope="portal"]').evaluate((node) => {
+  const transitionStyle = (scope = "portal") =>
+    page.locator(`[data-scope="${scope}"]`).evaluate((node) => {
       const css = getComputedStyle(node);
       return {
         property: css.transitionProperty,
@@ -201,7 +210,7 @@ try {
         longhands: [...node.style].filter((name) => name.startsWith("transition-")),
       };
     });
-  await patch({ portalStyle: callerTransition });
+  await patch({ portalStyle: callerTransition, localStyle: callerTransition });
   const callerBefore = await transitionStyle();
   assert.equal(callerBefore.property, "opacity");
   assert.equal(callerBefore.duration, "0.23s");
@@ -213,7 +222,10 @@ try {
     ["zero", { outerMode: "full", innerScale: 0 }],
   ]) {
     await patch(override);
-    const stopped = await transitionStyle();
+    // The local probe explicitly owns its whole transition family. Real popups
+    // coordinate their own family and yield to an actual caller override (S06).
+    // Exercise both boundaries: cancellation must not erase caller authority.
+    const stopped = await transitionStyle("local");
     assert.equal(stopped.property, "none");
     assert.equal(stopped.duration, "0s");
     assert.equal(stopped.delay, "0s");
@@ -221,13 +233,15 @@ try {
     // CSSStyleDeclaration may expand a shorthand; every member must be its stopped value.
     assert.equal(stopped.easing, "ease");
     assert.equal(stopped.behavior, "normal");
-    report.cases.push({ label: `caller transition family settles under ${label}`, stopped });
+    const caller = await transitionStyle();
+    assert.deepEqual(caller, callerBefore);
+    report.cases.push({ label: `owned family settles and caller popup family survives ${label}`, stopped, caller });
   }
   await patch({ innerScale: undefined });
   const callerRestored = await transitionStyle();
   assert.deepEqual(callerRestored, callerBefore);
   report.cases.push({ label: "caller transition family restored after stop", callerBefore, callerRestored });
-  await patch({ portalStyle: {} });
+  await patch({ portalStyle: {}, localStyle: {} });
   for (const os of ["no-preference", "reduce"])
     for (const mode of ["full", "reduced", "none"]) {
       await page.emulateMedia({ reducedMotion: os });
