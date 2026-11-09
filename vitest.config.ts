@@ -1,21 +1,43 @@
 import path from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
+import { componentExecutionPlugin } from "./tests/component-execution-plugin.mjs";
+
+const cliSuites = [
+  "tests/lib/motion-contract.test.tsx",
+  "tests/lib/motion-docs.test.tsx",
+  "tests/lib/doc-template.test.tsx",
+];
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [componentExecutionPlugin(), react()],
   resolve: {
     alias: { "@": path.resolve(process.cwd()) },
   },
   test: {
-    // Registry CLI fixtures and the nested real Vitest run share CPU and disk
-    // with this pool. Bound contention; retain their original deadlines.
+    // Run subprocess-heavy gates serially after ordinary tests. Keep every
+    // existing deadline/assertion; do not make a busy pool hide gate failures.
     maxWorkers: 4,
     reporters: ["default", "./tests/motion-contract-reporter.mjs"],
     environment: "jsdom",
     globals: true,
     setupFiles: ["./tests/setup.ts"],
-    include: ["tests/**/*.test.tsx"],
     css: false,
+    projects: [
+      {
+        extends: true,
+        test: { name: "runtime", include: ["tests/**/*.test.tsx"], exclude: cliSuites, sequence: { groupOrder: 0 } },
+      },
+      {
+        extends: true,
+        test: {
+          name: "cli-gates",
+          include: cliSuites,
+          pool: "forks",
+          poolOptions: { forks: { singleFork: true } },
+          sequence: { groupOrder: 1 },
+        },
+      },
+    ],
   },
 });

@@ -5,7 +5,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
-import { motionRecipes } from "./motion-manifest.mjs";
+import { MOTION_FORMS, motionForms, motionRecipes } from "./motion-manifest.mjs";
 
 export function visibleLines(markdown) {
   let fence = null;
@@ -40,12 +40,13 @@ function tableRecipes(markdown, heading, catalogue, label, guide = false) {
       .split(/(?<!\\)\|/)
       .map((cell) => cell.trim());
   const recipes = [];
+  const forms = [];
   let tables = 0;
   for (let i = 0; i < section.length - 1; i++) {
     if (!section[i].trim().startsWith("|") || !/^\s*\|[\s:|-]+\|\s*$/.test(section[i + 1])) continue;
     const headers = cells(section[i]);
     const column = headers.findIndex((cell) =>
-      (guide ? ["Recipe"] : ["Token", "Recipe", "Recipe / cause", "Recipe / tokens"]).includes(cell),
+      (guide ? ["Recipe"] : ["Token", "Recipe", "Recipe / cause", "Recipe / tokens", "Recipe / form"]).includes(cell),
     );
     const staticTable = !guide && ["Mode|Authored motion", "Mode|Animated properties"].includes(headers.join("|"));
     if (column < 0 && !staticTable) continue;
@@ -58,9 +59,17 @@ function tableRecipes(markdown, heading, catalogue, label, guide = false) {
       if (row.length !== headers.length) problems.push(`${label}: malformed ${heading} table row: ${section[i]}`);
       const cell = row[column < 0 ? 1 : column] ?? "";
       const codes = [...cell.matchAll(/`([^`]+)`/g)].map((match) => match[1]);
-      const found = codes.filter(
-        (code) => !/^(duration|ease|spring|distance)\./.test(code) && /^[a-z][a-z.]*$/.test(code),
-      );
+      const found = codes
+        .map((code) => code.split("/")[0])
+        .filter((code) => !/^(duration|ease|spring|distance)\./.test(code) && /^[a-z][a-z.]*$/.test(code));
+      if (!guide)
+        for (const code of codes) {
+          const [recipe, form, extra] = code.split("/");
+          if (!found.includes(recipe)) continue;
+          if (!form || extra || !MOTION_FORMS.includes(form))
+            problems.push(`${label}: Motion contract requires exact recipe/form: ${code}`);
+          else forms.push(`${recipe}/${form}`);
+        }
       if (guide && found.length !== 1) problems.push(`${label}: catalogue row must name exactly one recipe: ${cell}`);
       for (const recipe of found) {
         if (!catalogue.includes(recipe)) problems.push(`${label}: unknown recipe "${recipe}" in ${heading} table`);
@@ -73,7 +82,7 @@ function tableRecipes(markdown, heading, catalogue, label, guide = false) {
   }
   if (tables !== 1) problems.push(`${label}: expected one ${heading} recipe table, found ${tables}`);
   if (guide) problems.push(...duplicates(recipes, label));
-  return { recipes: [...new Set(recipes)], problems };
+  return { recipes: [...new Set(recipes)], forms: [...new Set(forms)], problems };
 }
 
 function duplicates(values, label) {
@@ -107,11 +116,28 @@ export async function checkMotionDocs(root, registry, catalogue) {
     }
     const declared = motionRecipes(item.meta?.motion);
     problems.push(...compare(declared, declared, `${item.name}: meta.motion`, catalogue));
-    if (!Array.isArray(doc.data.motion) || !doc.data.motion.every((recipe) => typeof recipe === "string")) {
-      problems.push(`${label}: frontmatter motion must be an array of recipe names`);
-    } else problems.push(...compare(doc.data.motion, declared, `${label}: frontmatter motion`, catalogue));
+    if (
+      !Array.isArray(doc.data.motion) ||
+      !doc.data.motion.every(
+        (entry) =>
+          typeof entry === "string" ||
+          (entry &&
+            typeof entry.recipe === "string" &&
+            typeof entry.form === "string" &&
+            Object.keys(entry).every((key) => ["recipe", "form"].includes(key))),
+      )
+    ) {
+      problems.push(`${label}: frontmatter motion must be an array of recipe names or recipe/form objects`);
+    } else {
+      problems.push(...compare(motionRecipes(doc.data.motion), declared, `${label}: frontmatter motion`, catalogue));
+      const actual = motionForms(doc.data.motion).sort();
+      if (JSON.stringify(actual) !== JSON.stringify(motionForms(item.meta?.motion).sort()))
+        problems.push(`${label}: frontmatter motion forms differ from meta.motion`);
+    }
     const table = tableRecipes(doc.content, "Motion contract", catalogue, label);
     problems.push(...table.problems, ...compare(table.recipes, declared, `${label}: Motion contract table`, catalogue));
+    if (JSON.stringify((table.forms ?? []).sort()) !== JSON.stringify(motionForms(item.meta?.motion).sort()))
+      problems.push(`${label}: Motion contract forms differ from meta.motion`);
   }
   const label = "content/docs/motion.mdx";
   try {

@@ -525,7 +525,7 @@ Root and Item classes merge last.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |
+| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |
 | Initially open | Natural height, no entrance | — | — |
 | Reduced | Instant height, no transform | Zero duration | Yes |
 | None | Instant height, no transform or transition | Zero duration | Yes |

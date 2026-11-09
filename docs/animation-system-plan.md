@@ -234,13 +234,19 @@ existing performance task is a final delivery dependency, not a development prer
 
 - Reconcile recipe/mode/token support in `registry/cadence/lib/motion.ts`, the provider, CSS token
   exports and theme registry item. Introduce target recipe names only with their execution contract.
-- Pending runtime migration: update `scripts/motion-manifest.mjs`, `scripts/motion-docs.mjs`, `scripts/check-registry.mjs`,
-  `scripts/catalog-intensity.mjs`, scaffold/template checks and corresponding fixtures for the new
-  recipe forms and temporary tier/budget semantics. Preserve source/metadata/docs equality.
+- Installed recipe/form checks require exact registry/MDX agreement and live installed value-import
+  references to the selected implementation exports. Comments, unused/type-only/dead references and
+  unrelated dependencies cannot establish adoption. Keep the conservative recognisers distinct from
+  executed controller evidence and browser acceptance. Capability schema, authored-intensity policy
+  (`scripts/catalog-intensity.mjs`) and temporary tier/budget semantics remain pending; preserve
+  existing source ceilings and truthful migration markers when implementing them.
 - Shared colour/loop policy has executed-hook observer/helper/reporter support, including rejected
   disconnected refs, missing capability evidence and legacy loop drift. Finite shared owners cancel
   restrictions and capture positive clocks; physics owners retime. Individual component adoption
-  and text/number enforcement remain pending; the total v2 marker remains fail-closed.
+  remains pending. The reporter additionally requires actual registry exports/parts and shared
+  text/number/reveal/selection/content/size controller commits in three modes. These unit execution
+  checks do not replace shared-stage installed/browser/performance acceptance; the total v2 marker
+  remains fail-closed.
 - Internal content.switch/content.month and persistent selection projection have scoped integrations
   in Tabs and Calendar. One finite content phase derives opacity/travel across actual month slots;
   one list-local marker owns its transform, with immediate unsafe/filled placement. These integrations

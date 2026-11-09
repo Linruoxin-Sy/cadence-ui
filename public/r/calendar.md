@@ -982,8 +982,8 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Month changes | opacity and signed horizontal transform on the actual grid | `data.transition`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |
-| Reduced | opacity only | `data.transition` reduced | Mode changes settle running motion. |
+| Month changes | opacity and signed horizontal transform on the actual grid | `data.transition/month-grid`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |
+| Reduced | opacity only | `data.transition/month-grid` reduced | Mode changes settle running motion. |
 | None | Immediate grid update | zero duration | No animation is started. |
 | Selection / enter / exit | Static selection and range styles | none | No decoration on mount. |
 

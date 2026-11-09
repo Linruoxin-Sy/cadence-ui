@@ -544,13 +544,13 @@ Plain wrappers over Base UI's parts; each forwards `className` and native props.
 
 ## Motion contract
 
-Recipe: `data.transition`, in both of its documented forms.
+Recipe: `data.transition/one-shot`, in both of its documented forms.
 
 | Phase         | Properties                     | Token            | Interruptible |
 | ------------- | ------------------------------ | ---------------- | ------------- |
-| value change  | `scaleX old → new` (one-shot)  | `data.transition`| yes           |
-| indeterminate | `opacity` pulse (continuous)   | `data.transition`| yes           |
-| reduced       | value jumps; pulse kept, opacity only | `data.transition` | yes     |
+| value change  | `scaleX old → new` (one-shot)  | `data.transition/one-shot`| yes           |
+| indeterminate | `opacity` pulse (continuous)   | `data.transition/one-shot`| yes           |
+| reduced       | value jumps; pulse kept, opacity only | `data.transition/one-shot` | yes     |
 | none          | no transition, `animate-none`  | –                | –             |
 
 The fill is a `scaleX` transform on an element that keeps the full track width, so

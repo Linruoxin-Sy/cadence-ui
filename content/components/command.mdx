@@ -2,7 +2,7 @@
 title: Command
 description: Search and run actions from a keyboard-driven command palette.
 category: navigation
-motion: [popup.anchored, exit.fade]
+motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: medium
 complexity: M
 tier: T2
@@ -791,8 +791,8 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
-| close | dialog and backdrop fade out, panel scales back in full mode | `exit.fade` via Dialog | yes |
+| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored/css-transition` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
+| close | dialog and backdrop fade out, panel scales back in full mode | `exit.fade/css-transition` via Dialog | yes |
 | filter / highlight | instant replacement and background feedback, no row motion | none | n/a |
 | reduced | opacity only; scale classes absent | mode durations | yes |
 | none | dialog and backdrop durations resolve to zero | zero duration | n/a |

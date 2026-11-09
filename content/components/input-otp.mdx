@@ -402,15 +402,15 @@ export function StaticCode() {
 
 ## Motion contract
 
-Recipe: `state.morph`. A character lands in its slot with a short fade and settles
+Recipe: `state.morph/one-shot`. A character lands in its slot with a short fade and settles
 from 0.96 to full size. Deleting a character is instant — an exit animation would
 leave a ghost in a field the user is racing against.
 
 | Phase   | Properties                        | Token         | Interruptible |
 | ------- | --------------------------------- | ------------- | ------------- |
-| type    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph` | yes           |
+| type    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot` | yes           |
 | delete  | none (instant)                    | –             | –             |
-| reduced | `opacity` only                    | `state.morph` | yes           |
+| reduced | `opacity` only                    | `state.morph/one-shot` | yes           |
 | none    | no transition                     | –             | –             |
 
 The character span stays mounted when its value changes; updates replay the recipe on that same node. Mode changes cancel the running entry, and `none` renders filled slots immediately, including on the first render.

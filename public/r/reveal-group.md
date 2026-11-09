@@ -305,7 +305,7 @@ No per-instance duration, easing, distance or spring props. Use shared recipe/to
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |
-| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal` / `duration.base`, `ease.out`, `distance.md` | yes |
+| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal/viewport` / `duration.base`, `ease.out`, `distance.md` | yes |
 | Reduced / none / zero | Visible native endpoint, no observer, delay or hidden state | — | immediate |
 
 The group coordinates the installed Reveal dependency; it creates no second animated part.

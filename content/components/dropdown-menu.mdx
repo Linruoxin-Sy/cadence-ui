@@ -2,7 +2,7 @@
 title: Dropdown Menu
 description: Row actions, filters, and view settings behind one button.
 category: overlay
-motion: [popup.anchored, exit.fade, state.morph]
+motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"},"state.morph"]
 intensity: medium
 complexity: L
 tier: T2
@@ -737,10 +737,10 @@ the element the user presses.
 
 | Phase         | Properties                                        | Token             | Interruptible                |
 | ------------- | ------------------------------------------------- | ----------------- | ---------------------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger origin | `popup.anchored` · `duration.fast` | yes (reopen mid-exit) |
-| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade` · `duration.fast` | yes                |
-| check / radio | mark `opacity` + `scale`                          | `state.morph`     | yes                          |
-| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade` | yes                         |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger origin | `popup.anchored/css-transition` · `duration.fast` | yes (reopen mid-exit) |
+| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade/css-transition` · `duration.fast` | yes                |
+| check / radio | mark `opacity` + `scale`                          | `state.morph/one-shot`     | yes                          |
+| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade/css-transition` | yes                         |
 | none          | every `--motion-duration-*` resolves to `0ms`; the mark jumps | –      | –                            |
 
 Opening and closing are one CSS transition on `opacity` and `scale`, driven by Base UI's

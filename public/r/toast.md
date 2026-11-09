@@ -594,8 +594,8 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored`, duration.base, ease.out | yes, CSS transition |
-| close / limited | opacity to 0; exit scale on close in full | `exit.fade`, duration.base | yes |
+| open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored/css-transition`, duration.base, ease.out | yes, CSS transition |
+| close / limited | opacity to 0; exit scale on close in full | `exit.fade/css-transition`, duration.base | yes |
 | swipe | Base UI pointer tracking in every mode; swipe-variable transform in full | primitive-owned gesture | yes |
 | stack / content updates | bottom and natural height update instantly | no layout transition | n/a |
 | reduced | opacity transitions only; no animated scale or swipe transform | duration.base × 0.6 | yes |

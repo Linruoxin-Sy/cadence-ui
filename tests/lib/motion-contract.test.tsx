@@ -158,13 +158,13 @@ describe("expectMotionContract", () => {
   });
   it("fails the actual Vitest entry for unused, dead, skipped and incomplete adoption", async () => {
     const root = process.cwd();
-    const fixture = await mkdtemp(path.join(root, ".cache", "motion-contract-gate-"));
+    const fixture = await mkdtemp(
+      path.join(process.env.CADENCE_GATE_EVIDENCE ?? path.join(root, ".cache"), "motion-contract-gate-"),
+    );
     try {
       await mkdir(path.join(fixture, "tests/components"), { recursive: true });
-      const imports = `import {render} from '@testing-library/react';
-import {it, describe, expect} from 'vitest';
-import {Button} from '@/registry/cadence/button';
-import {Spinner} from '@/registry/cadence/spinner';
+      const imports = `import {render,cleanup} from '@testing-library/react';
+import {it, describe, expect, afterEach} from 'vitest';afterEach(()=>cleanup());
 import {CadenceProvider} from '@/registry/cadence/lib/provider';
 import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const colorImports = `import {useRef} from 'react';import {useStateColor} from '@/registry/cadence/lib/css-motion';import {useCadenceMotion} from '@/registry/cadence/lib/provider';function Color(){const ref=useRef(null);const cm=useCadenceMotion(ref);const color=useStateColor(ref,cm,['color']);return <span {...color} data-slot="local-color">State</span>}`;
@@ -184,9 +184,24 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         skeleton:
           loopImports +
           `it.each(['full','reduced','none'])('undeclared loop cannot bypass policy %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button><Loop/></CadenceProvider>);expectMotionContract(mode)});`,
+        "animated-text": `it.each(['full','reduced','none'])('wrapper cannot certify text %s',mode=>{render(<span data-slot="animated-text" data-motion={mode}>Same text</span>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Same text')})});`,
+        "animated-number": `import {AnimatedText} from '@/registry/cadence/animated-text';it.each(['full','reduced','none'])('text cannot certify reels %s',mode=>{render(<CadenceProvider mode={mode}><span data-slot="animated-number" data-motion={mode}/><AnimatedText value="123"/></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('123')})});`,
+        reveal: `it.each(['full','reduced','none'])('attributes cannot certify viewport %s',mode=>{render(<div data-slot="reveal" data-motion={mode}>Visible</div>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Visible')})});`,
+        "reveal-group": `import {Reveal} from '@/registry/cadence/reveal';it.each(['full','reduced','none'])('ungrouped reveal cannot certify a group %s',mode=>{render(<CadenceProvider mode={mode}><Reveal>Visible</Reveal></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Visible')})});`,
+        slider: `it.each(['full','reduced','none'])('another component cannot certify a slider %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
+        tabs: `import {Tabs,TabsList,TabsTrigger} from '@/registry/cadence/tabs';it.each(['full','reduced','none'])('selection cannot certify absent panel content %s',mode=>{render(<CadenceProvider mode={mode}><Tabs defaultValue="a"><TabsList><TabsTrigger value="a">A</TabsTrigger></TabsList></Tabs></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('A')})});`,
+        popover: `import {Popover,PopoverTrigger} from '@/registry/cadence/popover';it.each(['full','reduced','none'])('trigger and copied CSS cannot certify a popup %s',mode=>{render(<CadenceProvider mode={mode}><Popover><PopoverTrigger>Open</PopoverTrigger><span data-slot="popover-content" data-motion={mode} className="transition-opacity duration-0">Fake panel</span></Popover></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Fake panel')})});`,
       };
       for (const [id, source] of Object.entries(cases))
-        await writeFile(path.join(fixture, `tests/components/${id}.test.tsx`), imports + source);
+        await writeFile(
+          path.join(fixture, `tests/components/${id}.test.tsx`),
+          imports +
+            (id === "button" || source.includes("<Button")
+              ? "import {Button} from '@/registry/cadence/button';\n"
+              : "") +
+            (source.includes("<Spinner") ? "import {Spinner} from '@/registry/cadence/spinner';\n" : "") +
+            source,
+        );
       // Run the actual reporter against isolated markers, without mutating the repository.
       await mkdir(path.join(fixture, "docs/motion/components"), { recursive: true });
       await mkdir(path.join(fixture, "scripts"), { recursive: true });
@@ -194,6 +209,8 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         "registry.json",
         "scripts/motion-migration.mjs",
         "scripts/motion-manifest.mjs",
+        "scripts/motion-source.mjs",
+        "scripts/motion-implementation.mjs",
         "tests/motion-contract-reporter.mjs",
       ])
         await writeFile(path.join(fixture, file), await readFile(path.join(root, file), "utf8"));
@@ -220,7 +237,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const config = path.join(fixture, "vitest.config.mjs");
       await writeFile(
         config,
-        `import react from '@vitejs/plugin-react'; export default {root:${JSON.stringify(fixture)},plugins:[react()],resolve:{alias:{'@':${JSON.stringify(root)}}},test:{environment:'jsdom',globals:true,setupFiles:[${JSON.stringify(path.join(root, "tests/setup.ts"))}],reporters:['default',${JSON.stringify(path.join(fixture, "tests/motion-contract-reporter.mjs"))}],maxWorkers:1,minWorkers:1,include:['tests/**/*.test.tsx']}}`,
+        `import react from '@vitejs/plugin-react'; import {componentExecutionPlugin} from ${JSON.stringify(path.join(root, "tests/component-execution-plugin.mjs"))}; export default {root:${JSON.stringify(fixture)},plugins:[componentExecutionPlugin(),react()],resolve:{alias:{'@':${JSON.stringify(root)}}},test:{environment:'jsdom',globals:true,setupFiles:[${JSON.stringify(path.join(root, "tests/setup.ts"))}],reporters:['default',${JSON.stringify(path.join(fixture, "tests/motion-contract-reporter.mjs"))}],maxWorkers:2,minWorkers:1,include:['tests/**/*.test.tsx']}}`,
       );
       const result = spawnSync(
         process.execPath,
@@ -228,6 +245,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         { cwd: root, encoding: "utf8", timeout: 30000 },
       );
       const output = result.stdout + result.stderr;
+      if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
       expect(result.status, output).toBe(1);
       for (const id of ["button", "toggle", "checkbox", "switch"])
         expect(output).toContain(`${id}: execute expectMotionContract`);
@@ -238,8 +256,24 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       for (const id of ["card", "input"])
         expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
       expect(output).toContain("skeleton: execute loop policy in full, reduced, none");
+      for (const [id, form] of [
+        ["animated-text", "text.change/changed-runs"],
+        ["animated-number", "number.roll/reels"],
+        ["reveal", "reveal/viewport"],
+      ])
+        expect(output).toContain(`${id}: execute ${form} controller policy in full, reduced, none`);
+      for (const id of ["slider", "reveal-group"])
+        expect(output).toContain(`${id}: execute actual component parts in full, reduced, none`);
+      expect(output).not.toContain("reveal-group: execute reveal/viewport controller policy");
+      expect(output).toContain(
+        "tabs: execute data.transition/directional-content controller policy in full, reduced, none",
+      );
+      expect(output).not.toContain("tabs: execute layout.shared/selection controller policy");
+      expect(output).toContain("popover: execute popup.anchored/css-transition CSS owner in full, reduced, none");
+      for (const id of ["animated-text", "animated-number", "reveal", "reveal-group", "slider"])
+        expect(output).toContain(`${id}: mount the actual registry component in full, reduced, none`);
     } finally {
-      await rm(fixture, { recursive: true, force: true });
+      if (!process.env.CADENCE_GATE_EVIDENCE) await rm(fixture, { recursive: true, force: true });
     }
   }, 40000);
 });

@@ -979,10 +979,10 @@ plus either color or a complete light/dark theme map. Helpers require ChartConta
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition` | Recharts retargets from its series state |
+| Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition/one-shot` | Recharts retargets from its series state |
 | Tooltip / legend | Immediate placement; no wrapper reveal | — | Immediate |
-| Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition` | Running controller completes |
-| None | Zero animation duration; final data | `data.transition` | Running controller completes |
+| Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition/one-shot` | Running controller completes |
+| None | Zero animation duration; final data | `data.transition/one-shot` | Running controller completes |
 
 The initial chart presents final geometry without an entrance. The full update clock is
 duration.base / ease.out, scaled by provider timeScale. Reduced adds no fade

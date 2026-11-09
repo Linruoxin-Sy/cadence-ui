@@ -388,14 +388,14 @@ always set, and `role="status"` with the label is the announcement.
 
 ## Motion contract
 
-Recipe: `data.transition`, continuous form. The loop is CSS (`animate-spin`) rather
+Recipe: `data.transition/continuous`, continuous form. The loop is CSS (`animate-spin`) rather
 than Motion, for the same reason as `skeleton`: a spinner is by definition next to work
 the user is waiting on, and it must not add a frame callback to it. Only `transform`
 (rotation) changes, so the loop can never trigger layout.
 
 | Phase   | Properties          | Token                         | Interruptible |
 | ------- | ------------------- | ----------------------------- | ------------- |
-| spin    | `rotate 0 → 360deg` | `data.transition` / `animate-spin` (theme timing) | yes (CSS)     |
+| spin    | `rotate 0 → 360deg` | `data.transition/continuous` / `animate-spin` (theme timing) | yes (CSS)     |
 | reduced | same rotation       | `animate-spin`                | yes (CSS)     |
 | none    | none; icon static   | `animate-none`                | –             |
 

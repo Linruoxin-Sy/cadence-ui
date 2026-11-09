@@ -8,7 +8,7 @@ export interface DocFrontmatter {
   description: string;
   category?: string;
   tier?: "T0" | "T1" | "T2" | "T3" | "T4" | "T5";
-  motion?: string[];
+  motion?: (string | { recipe: string; form: string })[];
   intensity?: "subtle" | "medium" | "expressive";
   complexity?: "S" | "M" | "L";
   since?: string;

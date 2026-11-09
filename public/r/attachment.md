@@ -840,8 +840,8 @@ No File or request state is stored internally. There is no default upload action
 
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
-| Uploading/processing title | `data.transition` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
-| Default action pressed | `feedback.press` | Button token spring/press scale | No scale | Instant, no scale |
+| Uploading/processing title | `data.transition/continuous` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
+| Default action pressed | `feedback.press/one-shot` | Button token spring/press scale | No scale | Instant, no scale |
 
 Continuous timing comes from the project's `--animate-pulse` theme token. This
 replaces upstream's travelling shimmer with opacity to stay in the motion budget.

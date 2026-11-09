@@ -313,7 +313,7 @@ CadenceProvider owns mode and timeScale. There are no instance duration, easing 
 
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
-| `number.roll` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |
+| `number.roll/reels` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |
 
 Initial rendering, affixes, format-only revisions, native size and colours are immediate. Affixes remain
 under native text ownership without a second text animation writer. Installing this item does not

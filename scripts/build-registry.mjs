@@ -16,7 +16,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { checkDocTemplates } from "./doc-template.mjs";
 import { expandInstallation } from "./installation.mjs";
-import { motionRecipes } from "./motion-manifest.mjs";
+import { motionForms, motionRecipes } from "./motion-manifest.mjs";
 import { generateMotionTokens } from "./motion-token-source.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
 
@@ -88,8 +88,10 @@ for (const item of registry.items) {
       );
     }
   }
-  const docMotion = [...(doc.data.motion ?? [])].sort().join("|");
-  const metaMotion = motionRecipes(item.meta?.motion).sort().join("|");
+  const docMotion = motionForms(doc.data.motion ?? [])
+    .sort()
+    .join("|");
+  const metaMotion = motionForms(item.meta?.motion).sort().join("|");
   if (docMotion !== metaMotion) {
     problems.push(`${item.name}: doc motion [${docMotion}] != registry motion [${metaMotion}]`);
   }

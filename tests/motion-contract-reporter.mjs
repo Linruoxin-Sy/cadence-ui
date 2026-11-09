@@ -1,13 +1,29 @@
 import { readFileSync } from "node:fs";
-import { cssPolicyCapabilities, motionRecipes } from "../scripts/motion-manifest.mjs";
+import { checkMotionImplementations } from "../scripts/motion-implementation.mjs";
+import { cssPolicyCapabilities, motionForms, motionRecipes, normaliseMotion } from "../scripts/motion-manifest.mjs";
 import { migrationProblems, targetMetadata } from "../scripts/motion-migration.mjs";
 
 const registry = JSON.parse(readFileSync(new URL("../registry.json", import.meta.url), "utf8"));
 
 /** Check successful runtime evidence, including when a whole contract suite is skipped. */
 export default class MotionContractReporter {
-  onTestRunEnd(modules) {
+  async onTestRunEnd(modules) {
     const failures = [];
+    const ids = modules.map(
+      (module) => module.moduleId.replaceAll("\\", "/").match(/\/tests\/components\/([^/]+)\.test\.tsx$/)?.[1],
+    );
+    const cssItems = registry.items
+      .filter(
+        (item) =>
+          ids.includes(item.name) &&
+          normaliseMotion(item.meta?.motion).some(
+            (entry) => entry.form === "css-transition" && entry.recipe !== "state.color",
+          ),
+      )
+      .map((item) => item.name);
+    const { references } = cssItems.length
+      ? await checkMotionImplementations(process.cwd(), registry, cssItems)
+      : { references: {} };
     for (const module of modules) {
       if (module.moduleId.replaceAll("\\", "/").endsWith("/tests/lib/motion-policy.test.tsx")) {
         for (const capability of ["color", "loop"]) {
@@ -45,9 +61,78 @@ export default class MotionContractReporter {
         for (const capability of cssPolicyCapabilities(source)) capabilities.add(capability);
       }
       if (!item.meta?.motion?.length && !capabilities.size) continue;
+      const passed = [...module.children.allTests("passed")];
+      for (const entry of normaliseMotion(item.meta?.motion).filter(
+        (entry) => entry.form === "css-transition" && entry.recipe !== "state.color",
+      )) {
+        const reference = references[id]?.find(
+          (candidate) => candidate.recipe === entry.recipe && candidate.form === entry.form,
+        );
+        const owner = reference?.file.match(/registry\/cadence\/([^/]+)\/index\.tsx$/)?.[1];
+        const expected = (reference?.exports ?? []).map((part) => `${owner}#${part}`);
+        const modes = new Set(
+          passed.flatMap((test) => {
+            const meta = test.meta();
+            return ["full", "reduced", "none"].filter(
+              (mode) =>
+                expected.some((part) => meta.cadenceExports?.[part]?.includes(mode)) &&
+                Object.entries(meta.cadenceCssParts ?? {}).some(
+                  ([slot, modes]) =>
+                    (slot === id || slot.startsWith(`${id}-`) || slot === owner || slot.startsWith(`${owner}-`)) &&
+                    modes.includes(mode),
+                ),
+            );
+          }),
+        );
+        const missing = ["full", "reduced", "none"].filter((mode) => !modes.has(mode));
+        if (missing.length)
+          failures.push(
+            `${id}: execute ${entry.recipe}/${entry.form} CSS owner in ${missing.join(", ")} (a trigger or copied CSS is insufficient)`,
+          );
+      }
+      const executed = new Set(passed.flatMap((test) => test.meta().cadenceComponents?.[id] ?? []));
+      const missingExecution = ["full", "reduced", "none"].filter((mode) => !executed.has(mode));
+      if (missingExecution.length)
+        failures.push(
+          `${id}: mount the actual registry component in ${missingExecution.join(", ")} (attributes alone are not execution)`,
+        );
+      for (const form of motionForms(item.meta?.motion).filter((form) =>
+        [
+          "text.change/changed-runs",
+          "number.roll/reels",
+          "reveal/viewport",
+          "layout.shared/selection",
+          "data.transition/directional-content",
+          "data.transition/month-grid",
+          "layout.move/size-linked",
+          "geometry.resize/measured",
+        ].includes(form),
+      )) {
+        const modes = new Set(passed.flatMap((test) => test.meta().cadenceForms?.[form] ?? []));
+        const missing = ["full", "reduced", "none"].filter((mode) => !modes.has(mode));
+        if (missing.length) failures.push(`${id}: execute ${form} controller policy in ${missing.join(", ")}`);
+      }
+      const partModes = new Set(
+        passed.flatMap((test) =>
+          id === "reveal-group"
+            ? (test.meta().cadenceGroup ?? [])
+            : Object.entries(test.meta().cadenceParts ?? {}).flatMap(([slot, modes]) =>
+                slot === id || slot.startsWith(`${id}-`) ? modes : [],
+              ),
+        ),
+      );
+      const missingParts = ["full", "reduced", "none"].filter((mode) => !partModes.has(mode));
+      if (missingParts.length)
+        failures.push(
+          `${id}: execute actual component parts in ${missingParts.join(", ")} (wrapper or another component cannot certify it)`,
+        );
       for (const capability of capabilities) {
         const modes = new Set(
-          [...module.children.allTests("passed")].flatMap((test) => test.meta().cadencePolicy?.[capability] ?? []),
+          [...module.children.allTests("passed")].flatMap((test) =>
+            Object.entries(test.meta().cadencePolicyParts?.[capability] ?? {}).flatMap(([slot, modes]) =>
+              slot === id || slot.startsWith(`${id}-`) ? modes : [],
+            ),
+          ),
         );
         const missing = ["full", "reduced", "none"].filter((mode) => !modes.has(mode));
         if (missing.length)

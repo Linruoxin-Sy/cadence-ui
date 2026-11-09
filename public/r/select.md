@@ -662,10 +662,10 @@ export function Placement() {
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| pointer selection | value slot width | `geometry.resize` | yes (physics-defined, clamped) |
-| pointer selection | label `x`/`y` from the item to the trigger | `handoff` | yes |
-| pointer selection | check `scale` / `opacity` | `state.morph` | yes |
-| open / close | popup `opacity` / `scale` | `popup.anchored` | yes |
+| pointer selection | value slot width | `geometry.resize/one-shot` | yes (physics-defined, clamped) |
+| pointer selection | label `x`/`y` from the item to the trigger | `handoff/one-shot` | yes |
+| pointer selection | check `scale` / `opacity` | `state.morph/one-shot` | yes |
+| open / close | popup `opacity` / `scale` | `popup.anchored/css-transition` | yes |
 | reduced | width jumps, no flight, no scale; opacity stays | – | – |
 | none | every duration is zero | – | – |
 

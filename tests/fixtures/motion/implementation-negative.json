@@ -1,0 +1,43 @@
+[
+  {
+    "name": "comment",
+    "source": "// cm.transition('feedback.press')\nexport function Part(){return <span/>}"
+  },
+  {
+    "name": "quoted code",
+    "source": "export function Part(){return <span>{\"cm.transition('feedback.press')\"}</span>}"
+  },
+  {
+    "name": "unused resolver",
+    "source": "export function Part(){const unused=cm.transition('feedback.press');return <span/>}"
+  },
+  {
+    "name": "displayed resolver",
+    "source": "export function Part(){const diagnostic=cm.transition('feedback.press');return <span>{JSON.stringify(diagnostic)}</span>}",
+    "called": true
+  },
+  {
+    "name": "dead helper",
+    "source": "function Never(){return <motion.span transition={cm.transition('feedback.press')}/>};export function Part(){return <span/>}"
+  },
+  {
+    "name": "uncalled nested helper",
+    "source": "export function Part(){function Never(){return cm.transition('feedback.press')}return <span/>}"
+  },
+  {
+    "name": "false branch",
+    "source": "export function Part(){if(false){return <motion.span transition={cm.transition('feedback.press')}/>};return <span/>}"
+  },
+  {
+    "name": "after return",
+    "source": "export function Part(){return <span/>;cm.transition('feedback.press')}"
+  },
+  {
+    "name": "false logical expression",
+    "source": "export function Part(){return <motion.span transition={false && cm.transition('feedback.press')}/>}"
+  },
+  {
+    "name": "dead conditional expression",
+    "source": "export function Part(){return <motion.span transition={true ? undefined : cm.transition('feedback.press')}/>}"
+  }
+]

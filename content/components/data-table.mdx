@@ -2,7 +2,7 @@
 title: "Data Table"
 description: "An editable payments table with sorting, filtering, selection, visibility, and pagination."
 category: "collection"
-motion: ["feedback.press", "state.morph", "popup.anchored", "exit.fade"]
+motion: ["feedback.press","state.morph",{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: "medium"
 complexity: "L"
 tier: "T2"
@@ -465,10 +465,10 @@ T2 describes the composed controls; there is no separate table animation runtime
 
 | Recipe / cause | full | reduced | none |
 | --- | --- | --- | --- |
-| `feedback.press` / Button press | token spring scale | no scale | immediate |
-| `state.morph` / checkbox or menu check | opacity and scale | opacity only | zero duration |
-| `popup.anchored` / Columns or Actions opens | opacity and scale | opacity only | visible on first frame |
-| `exit.fade` / menu closes | opacity and scale exit | opacity only | immediate |
+| `feedback.press/one-shot` / Button press | token spring scale | no scale | immediate |
+| `state.morph/one-shot` / checkbox or menu check | opacity and scale | opacity only | zero duration |
+| `popup.anchored/css-transition` / Columns or Actions opens | opacity and scale | opacity only | visible on first frame |
+| `exit.fade/css-transition` / menu closes | opacity and scale exit | opacity only | immediate |
 
 Recipes and timing tokens belong to the installed controls. Dropdown Menu uses
 its local `duration.fast` clock, including timeScale and reducedDurationScale,

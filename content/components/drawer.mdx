@@ -2,7 +2,7 @@
 title: Drawer
 description: Quick tasks on touch screens, such as share or move.
 category: overlay
-motion: [popup.anchored, exit.fade]
+motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: medium
 complexity: L
 tier: T2
@@ -497,10 +497,10 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.slow` / `duration.fast` | yes |
+| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.slow` / `duration.fast` | yes |
 | drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | Base UI gesture (no authored recipe) | yes (it is the gesture) |
-| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade` · `duration.slow` / `duration.fast` | yes |
-| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade` | yes |
+| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade/css-transition` · `duration.slow` / `duration.fast` | yes |
+| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the sheet is in place on the first frame | – | – |
 
 The drag keeps tracking the finger under `reduced`: that movement is the user's own, not authored motion,

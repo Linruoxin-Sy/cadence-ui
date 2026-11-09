@@ -609,15 +609,15 @@ export function StaticRadio() {
 
 ## Motion contract
 
-Recipe: `state.morph`. The dot of the newly selected item fades in and settles
+Recipe: `state.morph/one-shot`. The dot of the newly selected item fades in and settles
 from 0.96 to full size; the previously selected dot reverses. Nothing else in the
 row moves, so the eye follows the choice.
 
 | Phase     | Properties                        | Token          | Interruptible |
 | --------- | --------------------------------- | -------------- | ------------- |
-| select    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph`  | yes           |
-| deselect  | the same pair, reversed           | `state.morph`  | yes           |
-| reduced   | `opacity` only                    | `state.morph`  | yes           |
+| select    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot`  | yes           |
+| deselect  | the same pair, reversed           | `state.morph/one-shot`  | yes           |
+| reduced   | `opacity` only                    | `state.morph/one-shot`  | yes           |
 | none      | no transition                     | –              | –             |
 
 ## Keyboard interactions

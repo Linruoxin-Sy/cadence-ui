@@ -163,7 +163,7 @@ normalized before expansion so committed JSON docs agree with text in a fresh ch
 
 ### 2.1 The Motion contract section (this project's signature content)
 
-Every component has one flat `## Motion contract` section and a Markdown table. Recipe names
+Every component has one flat `## Motion contract` section and a Markdown table. Exact `recipe/form` pairs
 are inline code in the table's `Token`, `Recipe`, or `Recipe / cause`, or `Recipe / tokens` column. Token cells may
 also explain timing with `duration.*`, `ease.*`, `spring.*`, and `distance.*`; these are tokens,
 not recipes. Multiple phases may repeat a recipe, but a cell must not repeat it. Prose, examples,
@@ -174,17 +174,23 @@ reused from installed dependencies; they do not invent transition calls in the w
 ```md
 ## Motion contract
 
-| Phase          | Properties               | Token                             | Interruptible |
-| -------------- | ------------------------ | --------------------------------- | ------------- |
-| press          | scale while pressed      | `feedback.press` / `spring.press` | yes           |
-| reduced / none | immediate state feedback | —                                 | —             |
+| Phase          | Properties               | Token                                      | Interruptible |
+| -------------- | ------------------------ | ------------------------------------------ | ------------- |
+| press          | scale while pressed      | `feedback.press/one-shot` / `spring.press` | yes           |
+| reduced / none | immediate state feedback | —                                          | —             |
 ```
 
-`registry:check` compares the table's recipe set with `meta.motion` and frontmatter `motion`,
+`registry:check` compares the table's exact recipe/form set with `meta.motion` and frontmatter `motion`,
 and checks the `## Recipes` table in `content/docs/motion.mdx` against the runtime catalogue.
 Missing sections/tables, unknown or extra recipes, missing recipes and duplicate declarations
 fail the check. Free prose and phase descriptions remain editorial content. This static gate
 complements the implementation checks and three-mode tests; it does not prove live animation.
+
+Frontmatter uses the same declarations as the registry: a string means `one-shot`; another form
+requires `{ recipe: "geometry.resize", form: "css-transition" }`. The table always spells out the
+form, including `one-shot`. Repeating phases may reuse the same pair. A resolver call cannot satisfy
+a different form, and a dependency must be reached through an actual value import/export path to
+supply implementation evidence. Internal target forms and preset names remain separate.
 
 For each v2 migration, review a capability matrix alongside this recipe contract. Its rows cover the
 applicable appearance/removal, geometry, surface/text colour, text/number changes and component-specific

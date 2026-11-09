@@ -2,7 +2,7 @@
 title: Collapsible
 description: Reveal optional detail with a standalone disclosure.
 category: layout
-motion: [geometry.resize]
+motion: [{"recipe":"geometry.resize","form":"css-transition"}]
 intensity: medium
 complexity: M
 tier: T3
@@ -388,7 +388,7 @@ on a content child. Caller styles are preserved; padding and borders are never a
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |
+| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |
 | Initially open | Natural height without entrance | — | — |
 | Reduced | Instant height, no transform | Zero duration | Yes |
 | None | Instant height, no transform or transition | Zero duration | Yes |

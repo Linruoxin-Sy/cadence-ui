@@ -769,9 +769,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
-| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
+| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the panel appears on the first frame | – | – |
 
 The panel grows out of its anchor rather than sliding towards it. A slide would need a distance token

@@ -77,12 +77,18 @@ import {
   imperativeControls,
   imperativeSamples,
   motionSamples,
+  mountedComponents,
+  mountedExports,
+  presentationSamples,
 } from "./motion-observer";
 
 beforeEach(() => {
   controlSamples.clear();
   cssPolicySamples.clear();
   motionSamples.clear();
+  mountedComponents.clear();
+  mountedExports.clear();
+  presentationSamples.clear();
   imperativeSamples.length = 0;
   imperativeControls.length = 0;
 });

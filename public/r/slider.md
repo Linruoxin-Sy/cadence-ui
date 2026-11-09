@@ -542,13 +542,13 @@ Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchange
 
 ## Motion contract
 
-Recipe: `feedback.press`. The dragged thumb compresses to 0.97 and springs back on
+Recipe: `feedback.press/one-shot`. The dragged thumb compresses to 0.97 and springs back on
 release — the same press language as `button` and `toggle`.
 
 | Phase   | Properties              | Token            | Interruptible |
 | ------- | ----------------------- | ---------------- | ------------- |
-| drag    | `scale 1 → 0.97`        | `feedback.press` | yes           |
-| release | `scale 0.97 → 1`        | `feedback.press` | yes           |
+| drag    | `scale 1 → 0.97`        | `feedback.press/one-shot` | yes           |
+| release | `scale 0.97 → 1`        | `feedback.press/one-shot` | yes           |
 | reduced | no scale; the ring grows on focus/hover | – | –             |
 | none    | no scale                | –                | –             |
 

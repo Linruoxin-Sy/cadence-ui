@@ -1,8 +1,17 @@
-// Staged colour/loop evidence does not certify pending text/number/component adoption.
+// Executed installed forms remain distinct from full component-v2 acceptance.
 import { readFileSync } from "node:fs";
 import { expect, onTestFinished } from "vitest";
 import { targetMetadata } from "../scripts/motion-migration.mjs";
-import { controlSamples, cssPolicySamples, imperativeSamples, motionSamples, type Sample } from "./motion-observer";
+import {
+  controlSamples,
+  cssPolicySamples,
+  imperativeSamples,
+  motionSamples,
+  mountedComponents,
+  mountedExports,
+  presentationSamples,
+  type Sample,
+} from "./motion-observer";
 
 const legacySpinner =
   targetMetadata(readFileSync("docs/motion/components/spinner.md", "utf8")).metadata?.migration === "legacy";
@@ -11,6 +20,13 @@ declare module "vitest" {
   interface TaskMeta {
     cadenceModes?: string[];
     cadencePolicy?: Record<string, string[]>;
+    cadencePolicyParts?: Record<string, Record<string, string[]>>;
+    cadenceParts?: Record<string, string[]>;
+    cadenceForms?: Record<string, string[]>;
+    cadenceGroup?: string[];
+    cadenceComponents?: Record<string, string[]>;
+    cadenceExports?: Record<string, string[]>;
+    cadenceCssParts?: Record<string, string[]>;
   }
 }
 
@@ -45,6 +61,8 @@ export function expectMotionContract(
     /** Required for engine/imperative writers that cannot be read from DOM/Motion props. */
     behavior?: () => void;
     policy?: ("color" | "loop")[];
+    /** Exact installed forms, backed by executed controller commits on these hosts. */
+    forms?: NonNullable<ReturnType<typeof presentationSamples.get>>["form"][];
   } = {},
 ) {
   for (const part of options.parts ?? []) expect(part).toBeInTheDocument();
@@ -126,11 +144,16 @@ export function expectMotionContract(
     options.behavior();
     expect(expect.getState().assertionCalls, "behavior must execute assertions").toBeGreaterThan(before);
   }
+  const policySlots = new Map<string, string[]>();
   for (const kind of options.policy ?? []) {
     const samples = [...cssPolicySamples.values()].filter(
       (sample) => sample.kind === kind && sample.ref.current && nodes.includes(sample.ref.current),
     );
     expect(samples.length, `execute an actual ${kind} owner before claiming policy evidence`).toBeGreaterThan(0);
+    policySlots.set(
+      kind,
+      samples.map((sample) => sample.ref.current?.dataset.slot as string),
+    );
     const ownership = new Map<HTMLElement | SVGElement, Set<string>>();
     for (const sample of samples) {
       const node = sample.ref.current as HTMLElement | SVGElement;
@@ -162,12 +185,65 @@ export function expectMotionContract(
       } else expect(node.style.animation).toMatch(/^(?:none|var\(--animate-(?:spin|pulse)\))$/);
     }
   }
+  const presentations = [...presentationSamples.values()].filter((sample) => nodes.includes(sample.node));
+  for (const sample of presentations) {
+    expect(sample.mode, `${sample.form} committed mode`).toBe(mode);
+    if (mode !== "full" && sample.immediate !== undefined)
+      expect(sample.immediate, `${sample.form} downgraded geometry is immediate`).toBe(true);
+  }
+  for (const form of options.forms ?? []) {
+    const owners = presentations.filter(
+      (sample) => sample.form === form && sample.mode === mode && sample.node.isConnected,
+    );
+    expect(owners.length, `execute an actual ${form} controller on the mounted part`).toBeGreaterThan(0);
+  }
+  const slots = nodes.map((node) => node.dataset.slot as string);
+  const forms = presentations
+    .filter((sample) => sample.mode === mode && sample.node.isConnected)
+    .map((sample) => sample.form);
+  const group = presentations.some((sample) => sample.group && sample.mode === mode && sample.node.isConnected);
+  const components = [...new Set(mountedComponents.values())];
+  const exports = [...new Set(mountedExports.values())];
+  const cssParts = nodes
+    .filter((node) =>
+      /transition-(?:opacity|none|\[[^\]]*(?:opacity|scale|height|width))|duration-0/.test(
+        node.getAttribute("class") ?? "",
+      ),
+    )
+    .map((node) => node.dataset.slot as string);
   onTestFinished(({ task }) => {
     const modes = (task.meta.cadenceModes ?? []) as string[];
     task.meta.cadenceModes = [...new Set([...modes, mode])];
+    for (const component of components) {
+      task.meta.cadenceComponents ??= {};
+      task.meta.cadenceComponents[component] = [...new Set([...(task.meta.cadenceComponents[component] ?? []), mode])];
+    }
+    for (const part of exports) {
+      task.meta.cadenceExports ??= {};
+      task.meta.cadenceExports[part] = [...new Set([...(task.meta.cadenceExports[part] ?? []), mode])];
+    }
+    for (const part of cssParts) {
+      task.meta.cadenceCssParts ??= {};
+      task.meta.cadenceCssParts[part] = [...new Set([...(task.meta.cadenceCssParts[part] ?? []), mode])];
+    }
+    for (const slot of slots) {
+      task.meta.cadenceParts ??= {};
+      task.meta.cadenceParts[slot] = [...new Set([...(task.meta.cadenceParts[slot] ?? []), mode])];
+    }
+    for (const form of forms) {
+      task.meta.cadenceForms ??= {};
+      task.meta.cadenceForms[form] = [...new Set([...(task.meta.cadenceForms[form] ?? []), mode])];
+    }
+    if (group) task.meta.cadenceGroup = [...new Set([...(task.meta.cadenceGroup ?? []), mode])];
     for (const kind of options.policy ?? []) {
       task.meta.cadencePolicy ??= {};
       task.meta.cadencePolicy[kind] = [...new Set([...(task.meta.cadencePolicy[kind] ?? []), mode])];
+      task.meta.cadencePolicyParts ??= {};
+      task.meta.cadencePolicyParts[kind] ??= {};
+      for (const slot of policySlots.get(kind) ?? []) {
+        const parts = task.meta.cadencePolicyParts[kind];
+        parts[slot] = [...new Set([...(parts[slot] ?? []), mode])];
+      }
     }
   });
 }

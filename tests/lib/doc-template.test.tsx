@@ -26,7 +26,9 @@ beforeAll(() => {
   });
   symlinkSync(path.join(root, "public/r/snapshots"), path.join(fixture, "public/r/snapshots"), "junction");
   for (const dir of ["registry", "docs", "app"]) {
-    symlinkSync(path.join(root, dir), path.join(fixture, dir), "junction");
+    // Invalid build fixtures still regenerate token outputs before rejecting the
+    // body. Own these writable trees; junctions would write into the real repo.
+    cpSync(path.join(root, dir), path.join(fixture, dir), { recursive: true });
   }
 });
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));
@@ -41,6 +43,7 @@ function entry(file: string, source: string, fresh = false) {
     const result = spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
       cwd: fixture,
       encoding: "utf8",
+      env: { ...process.env, CADENCE_IMPLEMENTATION_CACHE: path.join(fixture, ".cache/implementation") },
     });
     return { status: result.status, output: result.stdout + result.stderr };
   } finally {
@@ -210,7 +213,11 @@ describe("real new-item entry", () => {
         expect(route).toContain('import { FixturePreview } from "@/components/site/previews/fixture"');
         expect(route).toContain('<ComponentPage id="fixture" preview={FixturePreview} />');
         const run = () =>
-          spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], { cwd: temp, encoding: "utf8" });
+          spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
+            cwd: temp,
+            encoding: "utf8",
+            env: { ...process.env, CADENCE_IMPLEMENTATION_CACHE: path.join(temp, ".cache/implementation") },
+          });
         // Stubs intentionally fail implementation/payload checks; the actual entry must accept their body.
         const accepted = run();
         expect(accepted.stderr).not.toContain("content/components/fixture.mdx:");

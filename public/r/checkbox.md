@@ -568,14 +568,14 @@ All native attributes are forwarded, including `aria-invalid` and
 
 ## Motion contract
 
-Recipe: `state.morph`. The tick is the protagonist — it fades in and settles from
+Recipe: `state.morph/one-shot`. The tick is the protagonist — it fades in and settles from
 0.96 to full size when the box is checked, and reverses when it is cleared.
 
 | Phase   | Properties                    | Token          | Interruptible |
 | ------- | ----------------------------- | -------------- | ------------- |
-| check   | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph` | yes (re-click) |
-| clear   | the same pair, reversed       | `state.morph`  | yes           |
-| reduced | `opacity` only                | `state.morph`  | yes           |
+| check   | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot` | yes (re-click) |
+| clear   | the same pair, reversed       | `state.morph/one-shot`  | yes           |
+| reduced | `opacity` only                | `state.morph/one-shot`  | yes           |
 | none    | no transition                 | –              | –             |
 
 Only the indicator moves. The box itself keeps a `transition-shadow` for the focus

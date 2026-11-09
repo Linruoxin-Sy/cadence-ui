@@ -517,8 +517,8 @@ margin and the host's scroll padding; movement stays within the host's scroll bo
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Active section or label size changes | Indicator translateY / scaleY | `layout.shared` / `spring.morph` | Yes; the existing indicator follows the latest target. |
-| Section link activation | Native scroll offset | `scroll.navigate` / `duration.page` / `ease.inOut` | Yes; another link retargets from the current position. |
+| Active section or label size changes | Indicator translateY / scaleY | `layout.shared/one-shot` / `spring.morph` | Yes; the existing indicator follows the latest target. |
+| Section link activation | Native scroll offset | `scroll.navigate/one-shot` / `duration.page` / `ease.inOut` | Yes; another link retargets from the current position. |
 | Initial measurement / restored selection | Instant placement, no entrance | — | — |
 | reduced | Instant indicator placement and section navigation | — | Stops springs; completes an active navigation before paint. |
 | none | Instant placement and navigation, no animation clock | — | Stops springs; completes an active navigation before paint. |

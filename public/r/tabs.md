@@ -550,8 +550,8 @@ render/ref and state callbacks remain available. Semantic activation is immediat
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared`, physics-defined smooth selection spring | Yes; current geometry and velocity |
-| Panel activation | Incoming opacity and safe directional transform | `data.transition`, directional content preset, distance.xs | Latest accepted panel |
+| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared/selection`, physics-defined smooth selection spring | Yes; current geometry and velocity |
+| Panel activation | Incoming opacity and safe directional transform | `data.transition/directional-content`, directional content preset, distance.xs | Latest accepted panel |
 | Initial selection | Native selected paint, then measured marker placement | — | No entrance |
 | Reduced | Marker geometry immediate; panel opacity only | Reduced data clock | Running travel settles before paint |
 | None / zero clock | Current marker and panel paint immediately | Zero duration and delay | Running effects cancelled |

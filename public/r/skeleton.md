@@ -393,14 +393,14 @@ always set.
 
 ## Motion contract
 
-Recipe: `data.transition`, a continuous opacity loop. It is implemented in CSS
+Recipe: `data.transition/continuous`, a continuous opacity loop. It is implemented in CSS
 (`animate-pulse`) rather than in Motion, because a page can render dozens of
 placeholders and each Motion loop costs a frame callback; the pulse only touches
 `opacity`, so it can never trigger layout.
 
 | Phase   | Properties                | Token                          | Interruptible |
 | ------- | ------------------------- | ------------------------------ | ------------- |
-| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition` / `animate-pulse` (theme timing) | yes (CSS)     |
+| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition/continuous` / `animate-pulse` (theme timing) | yes (CSS)     |
 | reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
 | none    | no animation; full opacity | `animate-none`                 | –             |
 

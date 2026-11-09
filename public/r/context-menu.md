@@ -818,10 +818,10 @@ slots.
 
 | Phase         | Properties                                        | Token             | Interruptible |
 | ------------- | ------------------------------------------------- | ----------------- | ------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored` · `duration.fast` | yes |
-| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade` · `duration.fast` | yes |
-| check / radio | mark `opacity` + `scale`                          | `state.morph`     | yes           |
-| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade` | yes           |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored/css-transition` · `duration.fast` | yes |
+| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade/css-transition` · `duration.fast` | yes |
+| check / radio | mark `opacity` + `scale`                          | `state.morph/one-shot`     | yes           |
+| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade/css-transition` | yes           |
 | none          | every `--motion-duration-*` resolves to `0ms`; the mark jumps | –      | –             |
 
 The panel grows out of the point that was pressed. That is the whole reason the recipe is

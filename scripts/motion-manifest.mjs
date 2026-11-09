@@ -9,12 +9,12 @@
  *   "motion": ["feedback.press"]
  *   "motion": [{ "recipe": "data.transition", "form": "continuous" }]
  *
- * The docs keep the bare names (`motion: [feedback.press]`) because they are read by
- * humans; `normaliseMotion()` folds both shapes down to `{ recipe, form }` so the two
- * sides can be compared.
+ * MDX uses the same shapes. A bare name means one-shot in both places; other
+ * forms are explicit. Target preset names never enter this declaration.
  */
 
 import { createRequire } from "node:module";
+import { motionSource, transitionCalls, transitionUsedByWriter } from "./motion-source.mjs";
 
 const require = createRequire(import.meta.url);
 let compiler;
@@ -79,9 +79,33 @@ export function normaliseMotion(entries = []) {
   );
 }
 
-/** Recipe names only — the shape the docs frontmatter uses. */
+/** Recipe names only, for catalogue labels and the guide's recipe union. */
 export function motionRecipes(entries = []) {
   return normaliseMotion(entries).map((entry) => entry.recipe);
+}
+
+export function motionForms(entries = []) {
+  return normaliseMotion(entries).map(({ recipe, form }) => `${recipe}/${form}`);
+}
+
+/** Actual CSS-bearing component exports, retained after the import-path scan. */
+export function cssImplementationExports(source, recipe) {
+  compiler ??= require("typescript");
+  const ts = compiler;
+  const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  return tree.statements
+    .filter(
+      (node) =>
+        ts.isFunctionDeclaration(node) &&
+        node.body &&
+        node.name &&
+        /^[A-Z]/.test(node.name.text) &&
+        /data-(?:\[(?:starting|ending)-style\]|(?:starting|ending)-style)/.test(node.getText(tree)) &&
+        node.getText(tree).includes("data-motion") &&
+        /transition-/.test(node.getText(tree)) &&
+        (recipe !== "geometry.resize" || /transition-\[[^\]]*(?:height|width)/.test(node.getText(tree))),
+    )
+    .map((node) => node.name.text);
 }
 
 /**
@@ -89,6 +113,10 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  const scanned = motionSource(source);
+  source = scanned.source;
+  const imports = (name, module) =>
+    scanned.imports.some((entry) => entry.name === name && entry.path.endsWith(`/${module}`));
   if (recipe === "reveal" && form === "viewport")
     return source.includes("function createViewportReveal(") &&
       source.includes("observeReveal(node, options, deliver") &&
@@ -100,7 +128,7 @@ export function implementedForm(source, recipe, form = "one-shot") {
     return form === "reels" && stringAdapterImplementation(source, "number") ? "reels" : null;
   if (recipe === "text.change") return form === "changed-runs" && textImplementation(source) ? "changed-runs" : null;
   // Structural adoption only; actual completion/cancellation is browser evidence.
-  if (recipe === "data.transition" && form === "one-shot" && source.includes("./sidebar-labels"))
+  if (recipe === "data.transition" && form === "one-shot" && imports("prepareSidebarLabels", "sidebar-labels"))
     return source.includes("prepareSidebarLabels(labels, transaction, revision)") &&
       source.includes("labelGate.start()") &&
       source.includes("labelGate?.complete()") &&
@@ -108,7 +136,7 @@ export function implementedForm(source, recipe, form = "one-shot") {
       ? "one-shot"
       : null;
   if ((recipe === "layout.move" && form === "size-linked") || (recipe === "geometry.resize" && form === "measured"))
-    return source.includes("./size-linked-geometry") &&
+    return imports("createSizeLinkedGeometry", "size-linked-geometry") &&
       source.includes("createSizeLinkedGeometry(") &&
       source.includes("projection.prepare(") &&
       source.includes("projection.commit(") &&
@@ -117,20 +145,20 @@ export function implementedForm(source, recipe, form = "one-shot") {
       ? form
       : null;
   if (recipe === "layout.shared" && form === "selection")
-    return source.includes("./selection-projection") &&
+    return imports("createSelectionProjection", "selection-projection") &&
       source.includes("createSelectionProjection(") &&
       source.includes("projection.commit(") &&
       source.includes("layout.shared/selection")
       ? form
       : null;
   if (recipe === "data.transition" && form === "directional-content")
-    return source.includes("./content-transition") &&
+    return imports("createContentTransition", "content-transition") &&
       source.includes("paint.commit(") &&
       source.includes("TabsPanelSurface")
       ? form
       : null;
   if (recipe === "data.transition" && form === "month-grid")
-    return source.includes("../lib/content-transition") &&
+    return imports("createContentTransition", "content-transition") &&
       source.includes("createContentTransition(") &&
       source.includes("paint.commit(") &&
       source.includes("calendar-month-grid")
@@ -138,16 +166,16 @@ export function implementedForm(source, recipe, form = "one-shot") {
       : null;
   if (recipe === "state.color")
     return form === "css-transition" && cssPolicyImplementation(source, "useStateColor") ? "css-transition" : null;
-  const called = source.includes(`transition("${recipe}")`) || source.includes(`transition('${recipe}')`);
+  const called = transitionCalls(source).includes(recipe);
 
   if (form === "continuous") {
     if (recipe === "data.transition" && cssPolicyImplementation(source, "useContinuousMotion")) return "continuous";
     const loop = /\banimate-(?!none\b)[a-z][a-z-]*\b/.test(source);
     const gated = /\banimate-none\b/.test(source);
-    return loop && gated ? "continuous" : null;
+    return recipe === "data.transition" && loop && gated ? "continuous" : null;
   }
 
-  if (called) return "one-shot";
+  if (called && form === "one-shot" && transitionUsedByWriter(source, recipe)) return "one-shot";
 
   if (recipe === "geometry.resize" && form === "css-transition") {
     // Navigation Menu delegates measurement/retargeting to Base UI's shared popup engine.
@@ -175,10 +203,10 @@ export function implementedForm(source, recipe, form = "one-shot") {
     return states && measured && transition && modes ? "css-transition" : null;
   }
 
-  if (CSS_POPUP_RECIPES.has(recipe)) {
-    const hasPopupState = /data-(?:starting|ending)-style/.test(source);
+  if (form === "css-transition" && CSS_POPUP_RECIPES.has(recipe)) {
+    const hasPopupState = /data-(?:\[(?:starting|ending)-style\]|(?:starting|ending)-style)/.test(source);
     const hasTransition = /\b(?:transition-|duration-\()/.test(source);
-    if (hasPopupState && hasTransition) return "css-transition";
+    if (hasPopupState && hasTransition && source.includes("data-motion={cm.mode}")) return "css-transition";
   }
 
   return null;
@@ -186,14 +214,13 @@ export function implementedForm(source, recipe, form = "one-shot") {
 
 /** Every `cm.transition("<recipe>")` call in a source file. */
 export function calledRecipes(source) {
-  return [...source.matchAll(/transition\(\s*["']([a-z][a-z.]*)["']/g)]
-    .map((match) => match[1])
-    .concat(
-      cssPolicyImplementation(source, "useStateColor") ? ["state.color"] : [],
-      cssPolicyImplementation(source, "useContinuousMotion") ? ["data.transition"] : [],
-      textImplementation(source) ? ["text.change"] : [],
-      stringAdapterImplementation(source, "number") ? ["number.roll"] : [],
-    );
+  source = motionSource(source).source;
+  return transitionCalls(source).concat(
+    cssPolicyImplementation(source, "useStateColor") ? ["state.color"] : [],
+    cssPolicyImplementation(source, "useContinuousMotion") ? ["data.transition"] : [],
+    textImplementation(source) ? ["text.change"] : [],
+    stringAdapterImplementation(source, "number") ? ["number.roll"] : [],
+  );
 }
 
 /** A connected string adapter, not comments, an unused import or an unmounted call. */
@@ -228,8 +255,24 @@ function stringAdapterImplementation(source, kind) {
   let found = false;
   const visit = (node) => {
     if (ts.isFunctionDeclaration(node) && node.body) {
-      const calls = new Set();
+      const calls = new Map();
+      const hosts = new Map();
       const collect = (child) => {
+        if (
+          ts.isVariableDeclaration(child) &&
+          ts.isObjectBindingPattern(child.name) &&
+          child.initializer &&
+          ts.isCallExpression(child.initializer) &&
+          /useMotionHostRef/.test(child.initializer.expression.getText(tree))
+        ) {
+          const names = new Map(
+            child.name.elements.map((binding) => [
+              (binding.propertyName ?? binding.name).getText(tree),
+              binding.name.getText(tree),
+            ]),
+          );
+          if (names.has("node") && names.has("ref")) hosts.set(names.get("node"), names.get("ref"));
+        }
         if (
           ts.isVariableDeclaration(child) &&
           ts.isIdentifier(child.name) &&
@@ -239,22 +282,35 @@ function stringAdapterImplementation(source, kind) {
           adapters.has(child.initializer.expression.text) &&
           child.initializer.arguments.length >= 4
         )
-          calls.add(child.name.text);
+          calls.set(child.name.text, {
+            host: child.initializer.arguments[0].getText(tree),
+            mode: child.initializer.arguments[2].getText(tree),
+          });
         ts.forEachChild(child, collect);
       };
       collect(node.body);
       const mounted = (child) => {
         if (
           ts.isJsxElement(child) &&
-          child.openingElement.attributes.properties.some(
-            (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "ref",
-          ) &&
           child.children.some(
             (item) =>
               ts.isJsxExpression(item) &&
               item.expression &&
               ts.isIdentifier(item.expression) &&
-              calls.has(item.expression.text),
+              calls.has(item.expression.text) &&
+              (() => {
+                const call = calls.get(item.expression.text);
+                const attrs = child.openingElement.attributes.properties;
+                const attr = (name) =>
+                  attrs
+                    .find((entry) => ts.isJsxAttribute(entry) && entry.name.getText(tree) === name)
+                    ?.initializer?.getText(tree);
+                return (
+                  attr("ref") === `{${hosts.get(call.host) ?? call.host}}` &&
+                  attr("data-motion") === `{${call.mode}.mode}` &&
+                  Boolean(attr("data-slot"))
+                );
+              })(),
           )
         )
           found = true;
@@ -269,6 +325,7 @@ function stringAdapterImplementation(source, kind) {
 }
 
 export function cssPolicyCapabilities(source) {
+  source = motionSource(source).source;
   return [
     ...(cssPolicyImplementation(source, "useStateColor") ? ["color"] : []),
     ...(cssPolicyImplementation(source, "useContinuousMotion") ? ["loop"] : []),
@@ -287,6 +344,7 @@ function cssPolicyImplementation(source, helper) {
       !ts.isImportDeclaration(statement) ||
       !ts.isStringLiteral(statement.moduleSpecifier) ||
       !/(?:^|\/)css-motion$/.test(statement.moduleSpecifier.text) ||
+      statement.importClause?.isTypeOnly ||
       !statement.moduleSpecifier.text.startsWith(".")
     )
       continue;
@@ -339,7 +397,10 @@ function cssPolicyImplementation(source, helper) {
         ts.isIdentifier(external.expression)
           ? external.expression.text
           : null;
-      if (valid) owners.set(node.name.text, { kind, parent });
+      let scope = node.parent;
+      while (scope && !ts.isFunctionDeclaration(scope) && !ts.isArrowFunction(scope) && !ts.isFunctionExpression(scope))
+        scope = scope.parent;
+      if (valid) owners.set(node.name.text, { kind, parent, scope });
     }
     ts.forEachChild(node, walk);
   };
@@ -348,6 +409,9 @@ function cssPolicyImplementation(source, helper) {
   const jsx = (node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))
       for (const owner of owners.keys()) {
+        let ancestor = node.parent;
+        while (ancestor && ancestor !== owners.get(owner).scope) ancestor = ancestor.parent;
+        if (!ancestor) continue;
         const attrs = node.attributes.properties;
         const spread = attrs.findIndex(
           (attr) => ts.isJsxSpreadAttribute(attr) && ts.isIdentifier(attr.expression) && attr.expression.text === owner,

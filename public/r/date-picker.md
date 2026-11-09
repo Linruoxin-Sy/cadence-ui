@@ -784,10 +784,10 @@ selection-keyed remount, new recipe or runtime is added.
 
 | Recipe / cause | full | reduced | none |
 | --- | --- | --- | --- |
-| `feedback.press` / trigger press | token spring scale | no scale | immediate |
-| `popup.anchored` / open | opacity and token scale | opacity only | visible first frame |
-| `exit.fade` / close | opacity and scale | opacity only | immediate |
-| `data.transition` / calendar month | token horizontal translation and opacity | opacity only | immediate |
+| `feedback.press/one-shot` / trigger press | token spring scale | no scale | immediate |
+| `popup.anchored/css-transition` / open | opacity and token scale | opacity only | visible first frame |
+| `exit.fade/css-transition` / close | opacity and scale | opacity only | immediate |
+| `data.transition/one-shot` / calendar month | token horizontal translation and opacity | opacity only | immediate |
 
 Popover resolves its own `duration.fast` clock with timeScale and reducedDurationScale
 inside the portal. Nested full can recover under outer none; OS reduce still wins.

@@ -87,7 +87,6 @@ describe("Data Table composition", () => {
         </CadenceProvider>,
       );
       const table = screen.getByRole("table");
-      expectMotionContract(mode, { parts: [container.querySelector('[data-slot="data-table"]')] });
       await userEvent.click(screen.getByRole("button", { name: "Columns" }));
       const menu = await screen.findByRole("menu");
       expect(menu).toHaveAttribute("data-motion", mode);
@@ -96,6 +95,7 @@ describe("Data Table composition", () => {
         expect(menu.className).toContain("duration-0");
         expect(menu.className).not.toContain("opacity-0");
       }
+      expectMotionContract(mode, { parts: [container.querySelector('[data-slot="data-table"]'), menu] });
       await userEvent.keyboard("{Escape}");
       await waitFor(() => expect(screen.queryByRole("menu")).not.toBeInTheDocument());
       expect(screen.getByRole("table")).toBe(table);

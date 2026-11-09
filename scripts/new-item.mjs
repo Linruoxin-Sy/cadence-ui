@@ -112,7 +112,7 @@ const apiRow = `| \`className\` | \`string\` | – | Merged last. |`;
 const motionSection = motion.length
   ? `| Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-${motion.map((recipe) => `| TODO | TODO | \`${recipe}\` | TODO |`).join("\n")}`
+${motion.map((recipe) => `| TODO | TODO | \`${recipe}/one-shot\` | TODO |`).join("\n")}`
   : `No motion. The component is structural: it keeps the focus ring and colour transitions only.
 
 | Mode | Authored motion |

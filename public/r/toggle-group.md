@@ -634,10 +634,10 @@ boxes; corner changes that join neighboring fills are immediate state styling.
 
 | Phase   | Properties       | Token            | Interruptible |
 | ------- | ---------------- | ---------------- | ------------- |
-| press   | `scale 1 → 0.97` | `feedback.press` | yes           |
-| release | `scale 0.97 → 1` | `feedback.press` | yes           |
-| single selection | fill transform between items | `layout.shared` | yes |
-| multiple selection | fill opacity and `scale 0.96 → 1` | `state.morph` | yes |
+| press   | `scale 1 → 0.97` | `feedback.press/one-shot` | yes           |
+| release | `scale 0.97 → 1` | `feedback.press/one-shot` | yes           |
+| single selection | fill transform between items | `layout.shared/one-shot` | yes |
+| multiple selection | fill opacity and `scale 0.96 → 1` | `state.morph/one-shot` | yes |
 | reduced | shared fill jumps; local fills fade; no press scale | – | – |
 | none | immediate selection, opacity and press state; zero duration | – | – |
 

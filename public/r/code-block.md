@@ -954,12 +954,12 @@ restyle without a wrapper.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize` | yes (a second click retargets the spring) |
-| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition` | yes |
-| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph` | yes |
-| fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph` | yes |
-| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared` | yes (a third tab pressed mid-travel retargets it) |
-| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize` resolves to `{ duration: 0 }` | – |
+| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/one-shot` | yes (a second click retargets the spring) |
+| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition/one-shot` | yes |
+| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph/one-shot` | yes |
+| fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph/one-shot` | yes |
+| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared/one-shot` | yes (a third tab pressed mid-travel retargets it) |
+| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize/one-shot` resolves to `{ duration: 0 }` | – |
 | none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
 
 Three notes on the choices:

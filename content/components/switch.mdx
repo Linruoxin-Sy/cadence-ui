@@ -310,14 +310,14 @@ export function StaticSwitch() {
 
 ## Motion contract
 
-Recipe: `state.morph`. The thumb travels from one end of the track to the other
+Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
 while the track recolours. The travel distance is measured from the rendered track
 and thumb — no hard-coded pixel value — so a custom size still lands flush.
 
 | Phase   | Properties                         | Token          | Interruptible |
 | ------- | ---------------------------------- | -------------- | ------------- |
-| on      | `translateX 0 → track − thumb`     | `state.morph`  | yes           |
-| off     | the same distance, reversed        | `state.morph`  | yes           |
+| on      | `translateX 0 → track − thumb`     | `state.morph/one-shot`  | yes           |
+| off     | the same distance, reversed        | `state.morph/one-shot`  | yes           |
 | reduced | no travel animation; the thumb jumps to the new end | – | –     |
 | none    | no transition                      | –              | –             |
 

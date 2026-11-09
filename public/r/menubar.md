@@ -810,10 +810,10 @@ export function MenuMotionScopes() {
 
 | Phase         | Properties                                     | Token             | Interruptible |
 | ------------- | ---------------------------------------------- | ----------------- | ------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger | `popup.anchored` · `duration.fast` | yes |
-| close         | panel `opacity → 0`, `scale → 0.96`            | `exit.fade` · `duration.fast` | yes |
-| check / radio | mark `opacity` + `scale`                       | `state.morph`     | yes           |
-| reduced       | panel fades, no scale; the mark cross-fades    | `exit.fade`       | yes           |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger | `popup.anchored/css-transition` · `duration.fast` | yes |
+| close         | panel `opacity → 0`, `scale → 0.96`            | `exit.fade/css-transition` · `duration.fast` | yes |
+| check / radio | mark `opacity` + `scale`                       | `state.morph/one-shot`     | yes           |
+| reduced       | panel fades, no scale; the mark cross-fades    | `exit.fade/css-transition`       | yes           |
 | none          | every duration resolves to `0ms`               | –                 | –             |
 
 The bar itself does not animate. Switching from one open menu to the next replaces one panel

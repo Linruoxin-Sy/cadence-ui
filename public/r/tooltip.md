@@ -577,9 +577,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
-| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
+| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the label appears on the first frame | – | – |
 
 A tooltip is small enough that `duration.fast` is already at the edge of readable: nothing here waits

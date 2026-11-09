@@ -2091,9 +2091,9 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Desktop offcanvas position | transform projected from actual occupied width | `layout.move` | Yes, one shared size scalar. |
-| Desktop offcanvas gap and icon gap/container | measured, clamped widths | `geometry.resize` | Yes, one scalar maps both icon endpoints. |
-| Safe icon label reveal | opacity after actual size completion | `data.transition` | Yes, cancelled on reversal, input or invalidation. |
+| Desktop offcanvas position | transform projected from actual occupied width | `layout.move/size-linked` | Yes, one shared size scalar. |
+| Desktop offcanvas gap and icon gap/container | measured, clamped widths | `geometry.resize/measured` | Yes, one scalar maps both icon endpoints. |
+| Safe icon label reveal | opacity after actual size completion | `data.transition/one-shot` | Yes, cancelled on reversal, input or invalidation. |
 
 Full drives the actual gap and panel position from one clamped size spring. Initial state is native;
 there is no mounting reveal. Reduced, none and zero clock reach the current destinations immediately.

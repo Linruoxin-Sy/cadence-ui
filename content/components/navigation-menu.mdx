@@ -2,7 +2,7 @@
 title: Navigation Menu
 description: Site navigation with shared popup content and interruptible sizing.
 category: navigation
-motion: [popup.anchored, exit.fade, geometry.resize]
+motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"},{"recipe":"geometry.resize","form":"css-transition"}]
 intensity: medium
 complexity: L
 tier: T3
@@ -550,9 +550,9 @@ viewport have additive `data-slot` hooks. Positioner props still follow upstream
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | --- | --- | --- | --- |
-| Open | Popup opacity and anchor scale; content opacity | `popup.anchored`, fast clock, scale.in | Native CSS reversal |
-| Close / outgoing content | Opacity to zero; popup returns to anchor scale | `exit.fade`, fast clock | Base UI retains exit nodes until completion |
-| Switch / update | Shared popup width/height, clamped to available space | `geometry.resize`, slow clock / ease.out | Base UI measures current size before retargeting |
+| Open | Popup opacity and anchor scale; content opacity | `popup.anchored/css-transition`, fast clock, scale.in | Native CSS reversal |
+| Close / outgoing content | Opacity to zero; popup returns to anchor scale | `exit.fade/css-transition`, fast clock | Base UI retains exit nodes until completion |
+| Switch / update | Shared popup width/height, clamped to available space | `geometry.resize/css-transition`, slow clock / ease.out | Base UI measures current size before retargeting |
 | Reduced | Opacity only; no scale or geometry transition | Fast clock at 0.6×; geometry instant | Live downgrade keeps nodes and focus |
 | None | All durations zero, geometry instant | Zeroed CSS tokens | Running transitions finish immediately |
 

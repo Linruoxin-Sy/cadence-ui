@@ -1833,6 +1833,15 @@ the animated fixture is implemented.
 The shared unit helper checks mounted `data-motion` parts, CSS state classes and local clocks,
 continuous animation gating, and observed Motion targets/transitions. Only successful test cases
 contribute runtime metadata; skipped suites do not count.
+The reporter also requires execution of the actual registry export and matching mounted parts;
+another component or a wrapper with copied attributes cannot supply its modes. Test-only compiler instrumentation records original component execution without replacing its type,
+adding DOM or changing props/ref; Base UI static child inspection retains its native identities. The shared text, numeric,
+viewport, selection, directional/month content and size-linked geometry forms require real controller
+commits on the mounted hosts in each mode. A RevealGroup must register targets into its own scope;
+standalone Reveal cannot certify it. CSS forms require the reached CSS-bearing export and mounted
+CSS parts; rendering a trigger beside copied transition classes does not certify a popup.
+Colour/loop evidence belongs to the actual connected owner on
+the item's parts, including an allowed ownership connection, rather than unrelated caller CSS.
 `registry:check` requires the named animated test file to exist. Test-only pass-through
 observers preserve real Motion rendering and control methods. Neutral scale/translation is legal;
 Switch/Progress retain positional transforms with an instant clock under reduced/none. Static
@@ -1847,7 +1856,14 @@ Composition suites include the installed controls, rather than inventing a motio
 Use a homogeneous provider fixture; retain dedicated nested-override tests for mixed mode trees.
 
 This is executable unit evidence, not a browser animation sampler or a source property extractor.
-The docs recipe set is checked separately by `registry:check`. Existing interaction assertions stay.
+The exact source/registry/MDX recipe/form set is checked separately by `registry:check`.
+Its source references follow live installed value imports to the selected exports, excluding comments,
+type-only references, unused declarations and statically dead branches. This is conservative static
+recognition, not general program verification. Runtime commit evidence includes valid immediate/native
+fallbacks and does not establish changing browser keyframes or full v2 conformance. Existing interaction assertions stay.
+Writable CLI fixtures may reuse static implementation results only after rebinding every source,
+declaration, selected root, recogniser and compiler byte by SHA. Runtime mode/policy evidence is
+always executed; the static cache cannot supply it or skip fresh MDX/budget/parity checks.
 Computed Tailwind styles, same-target live cancellation, first paint, system preference, nested
 providers, final measured positions and per-frame running geometry still need browser evidence.
 Adopting the helper does not close the cross-library running-mode audit.

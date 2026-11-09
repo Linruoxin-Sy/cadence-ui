@@ -2,7 +2,7 @@
 title: Animated Text
 description: Replaces changed display text while retaining one current native string.
 category: motion
-motion: [text.change]
+motion: [{"recipe":"text.change","form":"changed-runs"}]
 intensity: medium
 complexity: S
 tier: T1
@@ -84,7 +84,7 @@ the optional CadenceProvider. There are no instance duration, easing, origin or 
 
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
-| `text.change` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |
+| `text.change/changed-runs` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |
 
 Appearance, size and colours remain native. Built-in component display bindings use no stagger when
 they opt in; installing this item does not change other components. Rapid revisions cancel previous paint.

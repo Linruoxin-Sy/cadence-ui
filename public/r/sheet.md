@@ -663,9 +663,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.base` / `duration.fast` | yes |
-| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade` · panel `duration.base` / backdrop `duration.fast` | yes |
-| reduced | opacity only, no translate; at `timeScale={1}`, default duration tokens run at 0.6×: panel 132ms / backdrop 96ms | `exit.fade` | yes |
+| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.base` / `duration.fast` | yes |
+| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade/css-transition` · panel `duration.base` / backdrop `duration.fast` | yes |
+| reduced | opacity only, no translate; at `timeScale={1}`, default duration tokens run at 0.6×: panel 132ms / backdrop 96ms | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the panel is in place on the first frame | – | – |
 
 The slide is `translate-*-full`, the panel's own width or height, not a fixed distance: a side panel

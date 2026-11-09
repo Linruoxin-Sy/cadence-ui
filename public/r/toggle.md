@@ -524,13 +524,13 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
-Recipe: `feedback.press`. The button compresses to 0.97 while the pointer is down
+Recipe: `feedback.press/one-shot`. The button compresses to 0.97 while the pointer is down
 and springs back on release.
 
 | Phase   | Properties       | Token            | Interruptible |
 | ------- | ---------------- | ---------------- | ------------- |
-| press   | `scale 1 → 0.97` | `feedback.press` | yes           |
-| release | `scale 0.97 → 1` | `feedback.press` | yes           |
+| press   | `scale 1 → 0.97` | `feedback.press/one-shot` | yes           |
+| release | `scale 0.97 → 1` | `feedback.press/one-shot` | yes           |
 | reduced | no scale; the pressed background is the only change | – | – |
 | none    | no scale         | –                | –             |
 

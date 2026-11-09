@@ -1377,9 +1377,9 @@ an undo affordance should not also hand out half of one.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored` | yes: a CSS transition, so reopening reverses it |
-| close | popup `opacity` 1→0, `scale` 1→`--motion-scale-in` | `exit.fade` | yes |
-| select | tick `scale` `0.96`→1, `opacity` 0→1 | `state.morph` | yes: a spring, retargeted from the current value |
+| open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored/css-transition` | yes: a CSS transition, so reopening reverses it |
+| close | popup `opacity` 1→0, `scale` 1→`--motion-scale-in` | `exit.fade/css-transition` | yes |
+| select | tick `scale` `0.96`→1, `opacity` 0→1 | `state.morph/one-shot` | yes: a spring, retargeted from the current value |
 | filter | none — rows are replaced, not moved | – | – |
 | reduced | popup and tick fade without scaling; tick stays at full size | – | – |
 | none | every duration is zero | – | – |

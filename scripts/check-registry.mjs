@@ -22,11 +22,10 @@ import { checkComponentRoutes } from "./component-routes.mjs";
 import { checkDocTemplates } from "./doc-template.mjs";
 import { expandInstallation } from "./installation.mjs";
 import { checkMotionDocs } from "./motion-docs.mjs";
+import { checkMotionImplementations } from "./motion-implementation.mjs";
 import {
-  calledRecipes,
   cataloguedRecipes,
   documentedRecipes,
-  implementedForm,
   MOTION_FORMS,
   normaliseMotion,
   recipeCatalogue,
@@ -46,6 +45,7 @@ problems.push(...targets.problems);
 
 const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
 problems.push(...(await checkMotionDocs(root, registry, RECIPES)));
+problems.push(...(await checkMotionImplementations(root, registry)).problems);
 const docsDir = path.join(root, "content", "components");
 const fullDocs = await readFile(path.join(root, "public", "llms-full.txt"), "utf8");
 
@@ -176,7 +176,6 @@ for (const item of registry.items) {
   }
 
   let bytes = 0;
-  const sources = [];
   for (const file of item.files ?? []) {
     const filePath = path.join(root, file.path);
     if (!(await exists(filePath))) {
@@ -187,7 +186,6 @@ for (const item of registry.items) {
       problems.push(`${item.name}: ${file.path} targets ${file.target}, expected ${expectedTarget(file.path)}`);
     }
     const source = await readFile(filePath, "utf8");
-    sources.push(source);
     const embedded = payload.files?.find((entry) => entry.path === file.path)?.content;
     if (embedded !== source) problems.push(`${item.name}: payload is stale for ${file.path}`);
     if (source.includes('from "@/') || source.includes("from '@/")) {
@@ -207,19 +205,6 @@ for (const item of registry.items) {
     if (isComponent(item)) bytes += gzipSync(source).length;
   }
 
-  // Sources of the registry items this one installs, for the implementation half of the
-  // motion contract only (see below). One level is enough: a dependency that needs two
-  // levels can declare its own dependency's recipes the same way.
-  const dependencySources = [];
-  for (const dependency of item.registryDependencies ?? []) {
-    if (!dependency.startsWith(NAMESPACE)) continue;
-    const target = registry.items.find((entry) => entry.name === dependency.slice(NAMESPACE.length));
-    for (const file of target?.files ?? []) {
-      const filePath = path.join(root, file.path);
-      if (await exists(filePath)) dependencySources.push(await readFile(filePath, "utf8"));
-    }
-  }
-
   if (isComponent(item)) {
     const tier = item.meta?.tier ?? "T0";
     const budgetKb = item.meta?.budget ? item.meta.budget / 1024 : (TIER_BUDGET[tier] ?? 8);
@@ -229,36 +214,6 @@ for (const item of registry.items) {
   }
 
   if (isComponent(item)) {
-    // Declared = implemented. A recipe with no implementation is a documentation
-    // claim, not a component behaviour; a `transition()` call with no declaration
-    // is an undeclared animation.
-    //
-    // The implementation may live in an item this one installs: `menubar` composes
-    // `dropdown-menu`, so the panel transition and the check mark are that item's code.
-    // The declaration is still the menubar's own, and an undeclared call is still only
-    // searched for in its own files — otherwise every item would inherit its dependency's
-    // declarations and the check would pass on nothing.
-    const declared = normaliseMotion(item.meta?.motion);
-    const called = [...new Set(sources.flatMap(calledRecipes))];
-
-    for (const { recipe, form } of declared) {
-      const implemented = (recipe === "state.color" ? sources : [...sources, ...dependencySources])
-        .map((source) => implementedForm(source, recipe, form))
-        .find(Boolean);
-      if (!implemented) {
-        problems.push(
-          `${item.name}: declares "${recipe}" (${form}) but nothing implements it — ` +
-            "add the transition, or mark the form as continuous",
-        );
-      }
-    }
-
-    for (const recipe of called) {
-      if (!declared.some((entry) => entry.recipe === recipe)) {
-        problems.push(`${item.name}: calls transition("${recipe}") without declaring it in meta.motion`);
-      }
-    }
-
     // Declared = documented. The frontmatter is what readers and agents see.
     const frontmatter = isComponent(item) ? await docFrontmatter(item.name) : null;
     if (frontmatter) {

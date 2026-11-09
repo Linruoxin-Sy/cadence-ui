@@ -511,12 +511,12 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
-Recipe: `feedback.press`, driven by the press gesture.
+Recipe: `feedback.press/one-shot`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| press | `scale 1 → 0.97` while active | `feedback.press` / `spring.press` | yes (pointer up) |
-| release | `scale 0.97 → 1` | `feedback.press` / `spring.press` | yes |
+| press | `scale 1 → 0.97` while active | `feedback.press/one-shot` / `spring.press` | yes (pointer up) |
+| release | `scale 0.97 → 1` | `feedback.press/one-shot` / `spring.press` | yes |
 | reduced | no scale; colour and shadow only | – | – |
 | none | no scale; colour and shadow only | – | – |
 
@@ -3092,14 +3092,14 @@ always set.
 
 ## Motion contract
 
-Recipe: `data.transition`, a continuous opacity loop. It is implemented in CSS
+Recipe: `data.transition/continuous`, a continuous opacity loop. It is implemented in CSS
 (`animate-pulse`) rather than in Motion, because a page can render dozens of
 placeholders and each Motion loop costs a frame callback; the pulse only touches
 `opacity`, so it can never trigger layout.
 
 | Phase   | Properties                | Token                          | Interruptible |
 | ------- | ------------------------- | ------------------------------ | ------------- |
-| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition` / `animate-pulse` (theme timing) | yes (CSS)     |
+| pulse   | `opacity 1 → 0.5 → 1`     | `data.transition/continuous` / `animate-pulse` (theme timing) | yes (CSS)     |
 | reduced | same pulse, opacity only  | `animate-pulse`                | yes (CSS)     |
 | none    | no animation; full opacity | `animate-none`                 | –             |
 
@@ -6601,14 +6601,14 @@ always set, and `role="status"` with the label is the announcement.
 
 ## Motion contract
 
-Recipe: `data.transition`, continuous form. The loop is CSS (`animate-spin`) rather
+Recipe: `data.transition/continuous`, continuous form. The loop is CSS (`animate-spin`) rather
 than Motion, for the same reason as `skeleton`: a spinner is by definition next to work
 the user is waiting on, and it must not add a frame callback to it. Only `transform`
 (rotation) changes, so the loop can never trigger layout.
 
 | Phase   | Properties          | Token                         | Interruptible |
 | ------- | ------------------- | ----------------------------- | ------------- |
-| spin    | `rotate 0 → 360deg` | `data.transition` / `animate-spin` (theme timing) | yes (CSS)     |
+| spin    | `rotate 0 → 360deg` | `data.transition/continuous` / `animate-spin` (theme timing) | yes (CSS)     |
 | reduced | same rotation       | `animate-spin`                | yes (CSS)     |
 | none    | none; icon static   | `animate-none`                | –             |
 
@@ -7382,9 +7382,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade` | yes |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored/css-transition` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 
 The panel stays mounted while its exit transition runs; Base UI delays unmount until the
@@ -7991,14 +7991,14 @@ All native attributes are forwarded, including `aria-invalid` and
 
 ## Motion contract
 
-Recipe: `state.morph`. The tick is the protagonist — it fades in and settles from
+Recipe: `state.morph/one-shot`. The tick is the protagonist — it fades in and settles from
 0.96 to full size when the box is checked, and reverses when it is cleared.
 
 | Phase   | Properties                    | Token          | Interruptible |
 | ------- | ----------------------------- | -------------- | ------------- |
-| check   | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph` | yes (re-click) |
-| clear   | the same pair, reversed       | `state.morph`  | yes           |
-| reduced | `opacity` only                | `state.morph`  | yes           |
+| check   | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot` | yes (re-click) |
+| clear   | the same pair, reversed       | `state.morph/one-shot`  | yes           |
+| reduced | `opacity` only                | `state.morph/one-shot`  | yes           |
 | none    | no transition                 | –              | –             |
 
 Only the indicator moves. The box itself keeps a `transition-shadow` for the focus
@@ -8658,15 +8658,15 @@ export function StaticRadio() {
 
 ## Motion contract
 
-Recipe: `state.morph`. The dot of the newly selected item fades in and settles
+Recipe: `state.morph/one-shot`. The dot of the newly selected item fades in and settles
 from 0.96 to full size; the previously selected dot reverses. Nothing else in the
 row moves, so the eye follows the choice.
 
 | Phase     | Properties                        | Token          | Interruptible |
 | --------- | --------------------------------- | -------------- | ------------- |
-| select    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph`  | yes           |
-| deselect  | the same pair, reversed           | `state.morph`  | yes           |
-| reduced   | `opacity` only                    | `state.morph`  | yes           |
+| select    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot`  | yes           |
+| deselect  | the same pair, reversed           | `state.morph/one-shot`  | yes           |
+| reduced   | `opacity` only                    | `state.morph/one-shot`  | yes           |
 | none      | no transition                     | –              | –             |
 
 ## Keyboard interactions
@@ -9218,14 +9218,14 @@ export function StaticSwitch() {
 
 ## Motion contract
 
-Recipe: `state.morph`. The thumb travels from one end of the track to the other
+Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
 while the track recolours. The travel distance is measured from the rendered track
 and thumb — no hard-coded pixel value — so a custom size still lands flush.
 
 | Phase   | Properties                         | Token          | Interruptible |
 | ------- | ---------------------------------- | -------------- | ------------- |
-| on      | `translateX 0 → track − thumb`     | `state.morph`  | yes           |
-| off     | the same distance, reversed        | `state.morph`  | yes           |
+| on      | `translateX 0 → track − thumb`     | `state.morph/one-shot`  | yes           |
+| off     | the same distance, reversed        | `state.morph/one-shot`  | yes           |
 | reduced | no travel animation; the thumb jumps to the new end | – | –     |
 | none    | no transition                      | –              | –             |
 
@@ -9819,13 +9819,13 @@ Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchange
 
 ## Motion contract
 
-Recipe: `feedback.press`. The dragged thumb compresses to 0.97 and springs back on
+Recipe: `feedback.press/one-shot`. The dragged thumb compresses to 0.97 and springs back on
 release — the same press language as `button` and `toggle`.
 
 | Phase   | Properties              | Token            | Interruptible |
 | ------- | ----------------------- | ---------------- | ------------- |
-| drag    | `scale 1 → 0.97`        | `feedback.press` | yes           |
-| release | `scale 0.97 → 1`        | `feedback.press` | yes           |
+| drag    | `scale 1 → 0.97`        | `feedback.press/one-shot` | yes           |
+| release | `scale 0.97 → 1`        | `feedback.press/one-shot` | yes           |
 | reduced | no scale; the ring grows on focus/hover | – | –             |
 | none    | no scale                | –                | –             |
 
@@ -10399,13 +10399,13 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
-Recipe: `feedback.press`. The button compresses to 0.97 while the pointer is down
+Recipe: `feedback.press/one-shot`. The button compresses to 0.97 while the pointer is down
 and springs back on release.
 
 | Phase   | Properties       | Token            | Interruptible |
 | ------- | ---------------- | ---------------- | ------------- |
-| press   | `scale 1 → 0.97` | `feedback.press` | yes           |
-| release | `scale 0.97 → 1` | `feedback.press` | yes           |
+| press   | `scale 1 → 0.97` | `feedback.press/one-shot` | yes           |
+| release | `scale 0.97 → 1` | `feedback.press/one-shot` | yes           |
 | reduced | no scale; the pressed background is the only change | – | – |
 | none    | no scale         | –                | –             |
 
@@ -11087,10 +11087,10 @@ boxes; corner changes that join neighboring fills are immediate state styling.
 
 | Phase   | Properties       | Token            | Interruptible |
 | ------- | ---------------- | ---------------- | ------------- |
-| press   | `scale 1 → 0.97` | `feedback.press` | yes           |
-| release | `scale 0.97 → 1` | `feedback.press` | yes           |
-| single selection | fill transform between items | `layout.shared` | yes |
-| multiple selection | fill opacity and `scale 0.96 → 1` | `state.morph` | yes |
+| press   | `scale 1 → 0.97` | `feedback.press/one-shot` | yes           |
+| release | `scale 0.97 → 1` | `feedback.press/one-shot` | yes           |
+| single selection | fill transform between items | `layout.shared/one-shot` | yes |
+| multiple selection | fill opacity and `scale 0.96 → 1` | `state.morph/one-shot` | yes |
 | reduced | shared fill jumps; local fills fade; no press scale | – | – |
 | none | immediate selection, opacity and press state; zero duration | – | – |
 
@@ -11746,15 +11746,15 @@ export function StaticCode() {
 
 ## Motion contract
 
-Recipe: `state.morph`. A character lands in its slot with a short fade and settles
+Recipe: `state.morph/one-shot`. A character lands in its slot with a short fade and settles
 from 0.96 to full size. Deleting a character is instant — an exit animation would
 leave a ghost in a field the user is racing against.
 
 | Phase   | Properties                        | Token         | Interruptible |
 | ------- | --------------------------------- | ------------- | ------------- |
-| type    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph` | yes           |
+| type    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot` | yes           |
 | delete  | none (instant)                    | –             | –             |
-| reduced | `opacity` only                    | `state.morph` | yes           |
+| reduced | `opacity` only                    | `state.morph/one-shot` | yes           |
 | none    | no transition                     | –             | –             |
 
 The character span stays mounted when its value changes; updates replay the recipe on that same node. Mode changes cancel the running entry, and `none` renders filled slots immediately, including on the first render.
@@ -12352,13 +12352,13 @@ Plain wrappers over Base UI's parts; each forwards `className` and native props.
 
 ## Motion contract
 
-Recipe: `data.transition`, in both of its documented forms.
+Recipe: `data.transition/one-shot`, in both of its documented forms.
 
 | Phase         | Properties                     | Token            | Interruptible |
 | ------------- | ------------------------------ | ---------------- | ------------- |
-| value change  | `scaleX old → new` (one-shot)  | `data.transition`| yes           |
-| indeterminate | `opacity` pulse (continuous)   | `data.transition`| yes           |
-| reduced       | value jumps; pulse kept, opacity only | `data.transition` | yes     |
+| value change  | `scaleX old → new` (one-shot)  | `data.transition/one-shot`| yes           |
+| indeterminate | `opacity` pulse (continuous)   | `data.transition/one-shot`| yes           |
+| reduced       | value jumps; pulse kept, opacity only | `data.transition/one-shot` | yes     |
 | none          | no transition, `animate-none`  | –                | –             |
 
 The fill is a `scaleX` transform on an element that keeps the full track width, so
@@ -13143,9 +13143,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade` | yes |
+| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored/css-transition` · `duration.fast` / `duration.base` | yes |
+| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
 
 The entrance is the dialog's, because this is the same popup: a fade under a 0.96-scale settle. The
@@ -13972,9 +13972,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
-| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
+| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes (reopen mid-exit) |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the panel appears on the first frame | – | – |
 
 The panel grows out of its anchor rather than sliding towards it. A slide would need a distance token
@@ -14607,9 +14607,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
-| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| enter | label `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
+| exit | label `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the label appears on the first frame | – | – |
 
 A tooltip is small enough that `duration.fast` is already at the edge of readable: nothing here waits
@@ -15179,9 +15179,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored` · `duration.fast` | yes |
-| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade` · `duration.fast` | yes |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade` | yes |
+| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
+| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes |
+| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the panel appears on the first frame | – | – |
 
 Same anchored motion as `popover` and `tooltip`: the scale starts at `--transform-origin`, which Base UI
@@ -15894,9 +15894,9 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.base` / `duration.fast` | yes |
-| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade` · panel `duration.base` / backdrop `duration.fast` | yes |
-| reduced | opacity only, no translate; at `timeScale={1}`, default duration tokens run at 0.6×: panel 132ms / backdrop 96ms | `exit.fade` | yes |
+| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.base` / `duration.fast` | yes |
+| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade/css-transition` · panel `duration.base` / backdrop `duration.fast` | yes |
+| reduced | opacity only, no translate; at `timeScale={1}`, default duration tokens run at 0.6×: panel 132ms / backdrop 96ms | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the panel is in place on the first frame | – | – |
 
 The slide is `translate-*-full`, the panel's own width or height, not a fixed distance: a side panel
@@ -16635,10 +16635,10 @@ Each portal surface resolves its own mode and token clock. A nested full scope r
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored` · `duration.slow` / `duration.fast` | yes |
+| enter | sheet `opacity 0 → 1` + `transform` from `--closed-transform`; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.slow` / `duration.fast` | yes |
 | drag | `transform` follows `--drawer-swipe-movement-*`; backdrop opacity is `1 - --drawer-swipe-progress` | Base UI gesture (no authored recipe) | yes (it is the gesture) |
-| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade` · `duration.slow` / `duration.fast` | yes |
-| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade` | yes |
+| exit | sheet back to `--closed-transform` + `opacity → 0`; backdrop `opacity → 0` | `exit.fade/css-transition` · `duration.slow` / `duration.fast` | yes |
+| reduced | fade only: the closed-state slide is dropped, so the sheet appears and disappears in place | `exit.fade/css-transition` | yes |
 | none | every `--motion-duration-*` resolves to `0ms`, so the sheet is in place on the first frame | – | – |
 
 The drag keeps tracking the finger under `reduced`: that movement is the user's own, not authored motion,
@@ -17344,10 +17344,10 @@ export function Placement() {
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| pointer selection | value slot width | `geometry.resize` | yes (physics-defined, clamped) |
-| pointer selection | label `x`/`y` from the item to the trigger | `handoff` | yes |
-| pointer selection | check `scale` / `opacity` | `state.morph` | yes |
-| open / close | popup `opacity` / `scale` | `popup.anchored` | yes |
+| pointer selection | value slot width | `geometry.resize/one-shot` | yes (physics-defined, clamped) |
+| pointer selection | label `x`/`y` from the item to the trigger | `handoff/one-shot` | yes |
+| pointer selection | check `scale` / `opacity` | `state.morph/one-shot` | yes |
+| open / close | popup `opacity` / `scale` | `popup.anchored/css-transition` | yes |
 | reduced | width jumps, no flight, no scale; opacity stays | – | – |
 | none | every duration is zero | – | – |
 
@@ -18795,9 +18795,9 @@ an undo affordance should not also hand out half of one.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored` | yes: a CSS transition, so reopening reverses it |
-| close | popup `opacity` 1→0, `scale` 1→`--motion-scale-in` | `exit.fade` | yes |
-| select | tick `scale` `0.96`→1, `opacity` 0→1 | `state.morph` | yes: a spring, retargeted from the current value |
+| open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored/css-transition` | yes: a CSS transition, so reopening reverses it |
+| close | popup `opacity` 1→0, `scale` 1→`--motion-scale-in` | `exit.fade/css-transition` | yes |
+| select | tick `scale` `0.96`→1, `opacity` 0→1 | `state.morph/one-shot` | yes: a spring, retargeted from the current value |
 | filter | none — rows are replaced, not moved | – | – |
 | reduced | popup and tick fade without scaling; tick stays at full size | – | – |
 | none | every duration is zero | – | – |
@@ -19799,10 +19799,10 @@ the element the user presses.
 
 | Phase         | Properties                                        | Token             | Interruptible                |
 | ------------- | ------------------------------------------------- | ----------------- | ---------------------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger origin | `popup.anchored` · `duration.fast` | yes (reopen mid-exit) |
-| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade` · `duration.fast` | yes                |
-| check / radio | mark `opacity` + `scale`                          | `state.morph`     | yes                          |
-| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade` | yes                         |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger origin | `popup.anchored/css-transition` · `duration.fast` | yes (reopen mid-exit) |
+| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade/css-transition` · `duration.fast` | yes                |
+| check / radio | mark `opacity` + `scale`                          | `state.morph/one-shot`     | yes                          |
+| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade/css-transition` | yes                         |
 | none          | every `--motion-duration-*` resolves to `0ms`; the mark jumps | –      | –                            |
 
 Opening and closing are one CSS transition on `opacity` and `scale`, driven by Base UI's
@@ -20700,10 +20700,10 @@ slots.
 
 | Phase         | Properties                                        | Token             | Interruptible |
 | ------------- | ------------------------------------------------- | ----------------- | ------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored` · `duration.fast` | yes |
-| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade` · `duration.fast` | yes |
-| check / radio | mark `opacity` + `scale`                          | `state.morph`     | yes           |
-| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade` | yes           |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored/css-transition` · `duration.fast` | yes |
+| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade/css-transition` · `duration.fast` | yes |
+| check / radio | mark `opacity` + `scale`                          | `state.morph/one-shot`     | yes           |
+| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade/css-transition` | yes           |
 | none          | every `--motion-duration-*` resolves to `0ms`; the mark jumps | –      | –             |
 
 The panel grows out of the point that was pressed. That is the whole reason the recipe is
@@ -21574,10 +21574,10 @@ export function MenuMotionScopes() {
 
 | Phase         | Properties                                     | Token             | Interruptible |
 | ------------- | ---------------------------------------------- | ----------------- | ------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger | `popup.anchored` · `duration.fast` | yes |
-| close         | panel `opacity → 0`, `scale → 0.96`            | `exit.fade` · `duration.fast` | yes |
-| check / radio | mark `opacity` + `scale`                       | `state.morph`     | yes           |
-| reduced       | panel fades, no scale; the mark cross-fades    | `exit.fade`       | yes           |
+| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger | `popup.anchored/css-transition` · `duration.fast` | yes |
+| close         | panel `opacity → 0`, `scale → 0.96`            | `exit.fade/css-transition` · `duration.fast` | yes |
+| check / radio | mark `opacity` + `scale`                       | `state.morph/one-shot`     | yes           |
+| reduced       | panel fades, no scale; the mark cross-fades    | `exit.fade/css-transition`       | yes           |
 | none          | every duration resolves to `0ms`               | –                 | –             |
 
 The bar itself does not animate. Switching from one open menu to the next replaces one panel
@@ -22588,12 +22588,12 @@ restyle without a wrapper.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize` | yes (a second click retargets the spring) |
-| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition` | yes |
-| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph` | yes |
-| fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph` | yes |
-| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared` | yes (a third tab pressed mid-travel retargets it) |
-| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize` resolves to `{ duration: 0 }` | – |
+| fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/one-shot` | yes (a second click retargets the spring) |
+| floating actions | `opacity 0 → 1` on hover and focus-within | `data.transition/one-shot` | yes |
+| copy | glyph cross-fade + `scale` 0.96 → 1 | `state.morph/one-shot` | yes |
+| fold toggle | chevron `rotate 0 → 180`, label swaps | `state.morph/one-shot` | yes |
+| tab indicator | one pill shared between tabs, `layoutId` | `layout.shared/one-shot` | yes (a third tab pressed mid-travel retargets it) |
+| reduced | opacity stays; the chevron and height jump, the copy glyph swaps without scaling, and the tab pill appears in place instead of travelling | `geometry.resize/one-shot` resolves to `{ duration: 0 }` | – |
 | none | every transition resolves to zero duration; the block is in its end state on the first frame | – | – |
 
 Three notes on the choices:
@@ -23697,8 +23697,8 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
-| close | dialog and backdrop fade out, panel scales back in full mode | `exit.fade` via Dialog | yes |
+| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored/css-transition` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
+| close | dialog and backdrop fade out, panel scales back in full mode | `exit.fade/css-transition` via Dialog | yes |
 | filter / highlight | instant replacement and background feedback, no row motion | none | n/a |
 | reduced | opacity only; scale classes absent | mode durations | yes |
 | none | dialog and backdrop durations resolve to zero | zero duration | n/a |
@@ -24340,8 +24340,8 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored`, duration.base, ease.out | yes, CSS transition |
-| close / limited | opacity to 0; exit scale on close in full | `exit.fade`, duration.base | yes |
+| open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored/css-transition`, duration.base, ease.out | yes, CSS transition |
+| close / limited | opacity to 0; exit scale on close in full | `exit.fade/css-transition`, duration.base | yes |
 | swipe | Base UI pointer tracking in every mode; swipe-variable transform in full | primitive-owned gesture | yes |
 | stack / content updates | bottom and natural height update instantly | no layout transition | n/a |
 | reduced | opacity transitions only; no animated scale or swipe transform | duration.base × 0.6 | yes |
@@ -24910,7 +24910,7 @@ Root and Item classes merge last.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |
+| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |
 | Initially open | Natural height, no entrance | — | — |
 | Reduced | Instant height, no transform | Zero duration | Yes |
 | None | Instant height, no transform or transition | Zero duration | Yes |
@@ -25529,7 +25529,7 @@ on a content child. Caller styles are preserved; padding and borders are never a
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |
+| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |
 | Initially open | Natural height without entrance | — | — |
 | Reduced | Instant height, no transform | Zero duration | Yes |
 | None | Instant height, no transform or transition | Zero duration | Yes |
@@ -26116,8 +26116,8 @@ render/ref and state callbacks remain available. Semantic activation is immediat
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared`, physics-defined smooth selection spring | Yes; current geometry and velocity |
-| Panel activation | Incoming opacity and safe directional transform | `data.transition`, directional content preset, distance.xs | Latest accepted panel |
+| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared/selection`, physics-defined smooth selection spring | Yes; current geometry and velocity |
+| Panel activation | Incoming opacity and safe directional transform | `data.transition/directional-content`, directional content preset, distance.xs | Latest accepted panel |
 | Initial selection | Native selected paint, then measured marker placement | — | No entrance |
 | Reduced | Marker geometry immediate; panel opacity only | Reduced data clock | Running travel settles before paint |
 | None / zero clock | Current marker and panel paint immediately | Zero duration and delay | Running effects cancelled |
@@ -27564,7 +27564,7 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 | Phase | Recipe | Behaviour |
 | --- | --- | --- |
 | Enter / exit | — | No authored entrance or removal animation. |
-| Interaction | `data.transition` | `data.transition`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
+| Interaction | `data.transition/one-shot` | `data.transition/one-shot`, engine form: Embla alone translates the track. Default duration.base maps to 22 attraction units via carouselClock; timeScale scales it. Explicit full-mode opts.duration remains native. |
 | Interruption | — | Next/previous/drag retarget Embla's existing location and velocity. Release uses the effective base clock, including breakpoint options, instead of a hard-coded release duration. |
 | Reduced | — | Track and loop relocation transforms retain the correct state position. Direct dragging remains available. All autonomous engine interpolation is zero; no CSS/Motion transform animation is added. |
 | None | — | Same immediate state positioning, with every engine duration zero even for explicit API/plugin duration requests. |
@@ -29017,10 +29017,10 @@ plus either color or a complete light/dark theme map. Helpers require ChartConta
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition` | Recharts retargets from its series state |
+| Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition/one-shot` | Recharts retargets from its series state |
 | Tooltip / legend | Immediate placement; no wrapper reveal | — | Immediate |
-| Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition` | Running controller completes |
-| None | Zero animation duration; final data | `data.transition` | Running controller completes |
+| Reduced | Geometry jumps to final data; no transform/scale tween | `data.transition/one-shot` | Running controller completes |
+| None | Zero animation duration; final data | `data.transition/one-shot` | Running controller completes |
 
 The initial chart presents final geometry without an entrance. The full update clock is
 duration.base / ease.out, scaled by provider timeScale. Reduced adds no fade
@@ -30049,8 +30049,8 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Month changes | opacity and signed horizontal transform on the actual grid | `data.transition`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |
-| Reduced | opacity only | `data.transition` reduced | Mode changes settle running motion. |
+| Month changes | opacity and signed horizontal transform on the actual grid | `data.transition/month-grid`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |
+| Reduced | opacity only | `data.transition/month-grid` reduced | Mode changes settle running motion. |
 | None | Immediate grid update | zero duration | No animation is started. |
 | Selection / enter / exit | Static selection and range styles | none | No decoration on mount. |
 
@@ -30855,9 +30855,9 @@ viewport have additive `data-slot` hooks. Positioner props still follow upstream
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | --- | --- | --- | --- |
-| Open | Popup opacity and anchor scale; content opacity | `popup.anchored`, fast clock, scale.in | Native CSS reversal |
-| Close / outgoing content | Opacity to zero; popup returns to anchor scale | `exit.fade`, fast clock | Base UI retains exit nodes until completion |
-| Switch / update | Shared popup width/height, clamped to available space | `geometry.resize`, slow clock / ease.out | Base UI measures current size before retargeting |
+| Open | Popup opacity and anchor scale; content opacity | `popup.anchored/css-transition`, fast clock, scale.in | Native CSS reversal |
+| Close / outgoing content | Opacity to zero; popup returns to anchor scale | `exit.fade/css-transition`, fast clock | Base UI retains exit nodes until completion |
+| Switch / update | Shared popup width/height, clamped to available space | `geometry.resize/css-transition`, slow clock / ease.out | Base UI measures current size before retargeting |
 | Reduced | Opacity only; no scale or geometry transition | Fast clock at 0.6×; geometry instant | Live downgrade keeps nodes and focus |
 | None | All durations zero, geometry instant | Zeroed CSS tokens | Running transitions finish immediately |
 
@@ -33465,9 +33465,9 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Desktop offcanvas position | transform projected from actual occupied width | `layout.move` | Yes, one shared size scalar. |
-| Desktop offcanvas gap and icon gap/container | measured, clamped widths | `geometry.resize` | Yes, one scalar maps both icon endpoints. |
-| Safe icon label reveal | opacity after actual size completion | `data.transition` | Yes, cancelled on reversal, input or invalidation. |
+| Desktop offcanvas position | transform projected from actual occupied width | `layout.move/size-linked` | Yes, one shared size scalar. |
+| Desktop offcanvas gap and icon gap/container | measured, clamped widths | `geometry.resize/measured` | Yes, one scalar maps both icon endpoints. |
+| Safe icon label reveal | opacity after actual size completion | `data.transition/one-shot` | Yes, cancelled on reversal, input or invalidation. |
 
 Full drives the actual gap and panel position from one clamped size spring. Initial state is native;
 there is no mounting reveal. Reduced, none and zero clock reach the current destinations immediately.
@@ -34196,10 +34196,10 @@ T2 describes the composed controls; there is no separate table animation runtime
 
 | Recipe / cause | full | reduced | none |
 | --- | --- | --- | --- |
-| `feedback.press` / Button press | token spring scale | no scale | immediate |
-| `state.morph` / checkbox or menu check | opacity and scale | opacity only | zero duration |
-| `popup.anchored` / Columns or Actions opens | opacity and scale | opacity only | visible on first frame |
-| `exit.fade` / menu closes | opacity and scale exit | opacity only | immediate |
+| `feedback.press/one-shot` / Button press | token spring scale | no scale | immediate |
+| `state.morph/one-shot` / checkbox or menu check | opacity and scale | opacity only | zero duration |
+| `popup.anchored/css-transition` / Columns or Actions opens | opacity and scale | opacity only | visible on first frame |
+| `exit.fade/css-transition` / menu closes | opacity and scale exit | opacity only | immediate |
 
 Recipes and timing tokens belong to the installed controls. Dropdown Menu uses
 its local `duration.fast` clock, including timeScale and reducedDurationScale,
@@ -35028,10 +35028,10 @@ selection-keyed remount, new recipe or runtime is added.
 
 | Recipe / cause | full | reduced | none |
 | --- | --- | --- | --- |
-| `feedback.press` / trigger press | token spring scale | no scale | immediate |
-| `popup.anchored` / open | opacity and token scale | opacity only | visible first frame |
-| `exit.fade` / close | opacity and scale | opacity only | immediate |
-| `data.transition` / calendar month | token horizontal translation and opacity | opacity only | immediate |
+| `feedback.press/one-shot` / trigger press | token spring scale | no scale | immediate |
+| `popup.anchored/css-transition` / open | opacity and token scale | opacity only | visible first frame |
+| `exit.fade/css-transition` / close | opacity and scale | opacity only | immediate |
+| `data.transition/one-shot` / calendar month | token horizontal translation and opacity | opacity only | immediate |
 
 Popover resolves its own `duration.fast` clock with timeScale and reducedDurationScale
 inside the portal. Nested full can recover under outer none; OS reduce still wins.
@@ -35909,8 +35909,8 @@ No File or request state is stored internally. There is no default upload action
 
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
-| Uploading/processing title | `data.transition` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
-| Default action pressed | `feedback.press` | Button token spring/press scale | No scale | Instant, no scale |
+| Uploading/processing title | `data.transition/continuous` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
+| Default action pressed | `feedback.press/one-shot` | Button token spring/press scale | No scale | Instant, no scale |
 
 Continuous timing comes from the project's `--animate-pulse` theme token. This
 replaces upstream's travelling shimmer with opacity to stay in the motion budget.
@@ -36511,7 +36511,7 @@ and data-align. No additional message-state or validation API is introduced.
 
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
-| Later client insertion | `data.transition` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Current resting opacity immediately |
+| Later client insertion | `data.transition/one-shot` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Current resting opacity immediately |
 
 Server HTML, hydration and the first client presentation retain natural paint. A later
 client insertion may use one native opacity animation. A known entering parent consumes
@@ -37071,8 +37071,8 @@ margin and the host's scroll padding; movement stays within the host's scroll bo
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Active section or label size changes | Indicator translateY / scaleY | `layout.shared` / `spring.morph` | Yes; the existing indicator follows the latest target. |
-| Section link activation | Native scroll offset | `scroll.navigate` / `duration.page` / `ease.inOut` | Yes; another link retargets from the current position. |
+| Active section or label size changes | Indicator translateY / scaleY | `layout.shared/one-shot` / `spring.morph` | Yes; the existing indicator follows the latest target. |
+| Section link activation | Native scroll offset | `scroll.navigate/one-shot` / `duration.page` / `ease.inOut` | Yes; another link retargets from the current position. |
 | Initial measurement / restored selection | Instant placement, no entrance | — | — |
 | reduced | Instant indicator placement and section navigation | — | Stops springs; completes an active navigation before paint. |
 | none | Instant placement and navigation, no animation clock | — | Stops springs; completes an active navigation before paint. |
@@ -37422,7 +37422,7 @@ the optional CadenceProvider. There are no instance duration, easing, origin or 
 
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
-| `text.change` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |
+| `text.change/changed-runs` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |
 
 Appearance, size and colours remain native. Built-in component display bindings use no stagger when
 they opt in; installing this item does not change other components. Rapid revisions cancel previous paint.
@@ -37769,7 +37769,7 @@ CadenceProvider owns mode and timeScale. There are no instance duration, easing 
 
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
-| `number.roll` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |
+| `number.roll/reels` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |
 
 Initial rendering, affixes, format-only revisions, native size and colours are immediate. Affixes remain
 under native text ownership without a second text animation writer. Installing this item does not
@@ -38103,7 +38103,7 @@ No per-instance duration, easing, distance or spring props. Use shared recipe/to
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |
-| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal` / `duration.base`, `ease.out`, `distance.md` | yes |
+| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal/viewport` / `duration.base`, `ease.out`, `distance.md` | yes |
 | Reduced / none / zero | Visible native endpoint, no observer, delay or hidden state | — | immediate |
 
 The viewport form is implemented by the installed shared controller, not a mount-time Motion initial state.
@@ -38437,7 +38437,7 @@ No per-instance duration, easing, distance or spring props. Use shared recipe/to
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |
-| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal` / `duration.base`, `ease.out`, `distance.md` | yes |
+| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal/viewport` / `duration.base`, `ease.out`, `distance.md` | yes |
 | Reduced / none / zero | Visible native endpoint, no observer, delay or hidden state | — | immediate |
 
 The group coordinates the installed Reveal dependency; it creates no second animated part.

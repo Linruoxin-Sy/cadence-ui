@@ -1,7 +1,8 @@
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { promisify } from "node:util";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { checkMotionDocs } from "../../scripts/motion-docs.mjs";
 import { recipeCatalogue } from "../../scripts/motion-manifest.mjs";
@@ -33,15 +34,21 @@ beforeAll(() => {
 });
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));
 
-function entry(file: string, source: string, fresh = false) {
+async function entry(file: string, source: string, fresh = false) {
   writeFileSync(path.join(fixture, file), source);
   if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), source);
   try {
-    const result = spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
-      cwd: fixture,
-      encoding: "utf8",
-    });
-    return { status: result.status, output: result.stdout + result.stderr };
+    try {
+      const result = await promisify(execFile)(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
+        cwd: fixture,
+        encoding: "utf8",
+        env: { ...process.env, CADENCE_IMPLEMENTATION_CACHE: path.join(fixture, ".cache/implementation") },
+      });
+      return { status: 0, output: result.stdout + result.stderr };
+    } catch (error) {
+      const result = error as { code: number; stdout: string; stderr: string };
+      return { status: result.code, output: result.stdout + result.stderr };
+    }
   } finally {
     writeFileSync(path.join(fixture, file), readFileSync(path.join(root, file), "utf8"));
     if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), readFileSync(path.join(root, file), "utf8"));
@@ -50,12 +57,12 @@ function entry(file: string, source: string, fresh = false) {
 
 // biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; full-catalogue AST/registry subprocesses need startup headroom under full-suite I/O contention.
 describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
-  it("requires an animated component's actual test file", () => {
+  it("requires an animated component's actual test file", async () => {
     const file = path.join(fixture, "tests/components/button.test.tsx");
     const source = readFileSync(file, "utf8");
     unlinkSync(file);
     try {
-      const result = entry(buttonPath, button);
+      const result = await entry(buttonPath, button);
       expect(result.status).toBe(1);
       expect(result.output).toContain("button: missing animated contract suite tests/components/button.test.tsx");
     } finally {
@@ -68,13 +75,14 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
       registry.items.filter((item: { type: string }) => ["registry:ui", "registry:block"].includes(item.type)),
     ).toHaveLength(63);
     expect(await checkMotionDocs(root, registry, catalogue)).toEqual([]);
-    expect(entry(buttonPath, button).status).toBe(0);
+    const result = await entry(buttonPath, button);
+    expect(result.status, result.output).toBe(0);
   });
 
   it.each([
     [
       "missing recipe",
-      button.replaceAll("`feedback.press` / `spring.press`", "`spring.press`"),
+      button.replaceAll("`feedback.press/one-shot` / `spring.press`", "`spring.press`"),
       'missing recipe "feedback.press"',
     ],
     ["extra recipe", button.replace("`spring.press`", "`reveal` / `spring.press`"), 'extra recipe "reveal"'],
@@ -98,12 +106,27 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
       "frontmatter motion: duplicate recipe",
     ],
     [
+      "wrong frontmatter form",
+      button.replace("motion: [feedback.press]", "motion: [{ recipe: feedback.press, form: continuous }]"),
+      "frontmatter motion forms differ",
+    ],
+    [
+      "wrong table form",
+      button.replaceAll("feedback.press/one-shot", "feedback.press/continuous"),
+      "Motion contract forms differ",
+    ],
+    [
+      "missing explicit table form",
+      button.replaceAll("feedback.press/one-shot", "feedback.press"),
+      "requires exact recipe/form",
+    ],
+    [
       "invalid frontmatter",
       button.replace("motion: [feedback.press]", "motion: feedback.press"),
       "frontmatter motion must be an array",
     ],
-  ])("rejects %s through the actual check script", (_, source, diagnostic) => {
-    const result = entry(buttonPath, source);
+  ])("rejects %s through the actual check script", async (_, source, diagnostic) => {
+    const result = await entry(buttonPath, source);
     expect(result.status).toBe(1);
     expect(result.output).toContain(`${buttonPath}:`);
     expect(result.output).toContain(diagnostic);
@@ -114,16 +137,16 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
     ["unknown", guide.replace("| `reveal`", "| `theme.reveal`"), 'unknown recipe "theme.reveal"'],
     ["duplicate", guide.replace("| `enter.pop`", "| `reveal`"), 'duplicate recipe "reveal"'],
     ["missing table", guide.replace("| Recipe |", "| Other |"), "expected one Recipes recipe table"],
-  ])("rejects guide catalogue %s through the check script", (_, source, diagnostic) => {
-    const result = entry(guidePath, source);
+  ])("rejects guide catalogue %s through the check script", async (_, source, diagnostic) => {
+    const result = await entry(guidePath, source);
     expect(result.status).toBe(1);
     expect(result.output).toContain(diagnostic);
   });
 
-  it("does not mistake prose, API tables, comments or fenced examples for declarations", () => {
+  it("does not mistake prose, API tables, comments or fenced examples for declarations", async () => {
     const extra =
       "\nProse can discuss `theme.reveal`.\n<!-- ## Motion contract -->\n\n```md\n## Motion contract\n| Token |\n| --- |\n| `theme.reveal` |\n```\n\n~~~md\n## Motion contract\n~~~\n";
-    const result = entry(
+    const result = await entry(
       buttonPath,
       button.replace(
         "## Motion contract",

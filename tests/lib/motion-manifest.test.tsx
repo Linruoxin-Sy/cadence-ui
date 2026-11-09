@@ -1,6 +1,11 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { calledRecipes, cssPolicyCapabilities, implementedForm } from "../../scripts/motion-manifest.mjs";
+import {
+  calledRecipes,
+  cssImplementationExports,
+  cssPolicyCapabilities,
+  implementedForm,
+} from "../../scripts/motion-manifest.mjs";
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
@@ -76,6 +81,10 @@ describe("installed size-linked geometry forms", () => {
 });
 
 describe("disclosure motion manifest", () => {
+  it("keeps the CSS content owner separate from its mounted natural-measurement body", () => {
+    expect(cssImplementationExports(source, "geometry.resize")).toContain("AccordionContent");
+    expect(cssImplementationExports(source, "geometry.resize")).not.toContain("AccordionBody");
+  });
   it("requires an explicit CSS geometry form", () => {
     expect(implementedForm(source, "geometry.resize", "css-transition")).toBe("css-transition");
     expect(implementedForm(source, "geometry.resize")).toBeNull();

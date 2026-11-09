@@ -1365,7 +1365,16 @@
         "since": "0.3.0",
         "tier": "T2",
         "batch": "B4",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -1394,7 +1403,16 @@
         "since": "0.3.0",
         "tier": "T2",
         "batch": "B4",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "S",
         "upstream": {
@@ -1423,7 +1441,16 @@
         "since": "0.3.0",
         "tier": "T2",
         "batch": "B4",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -1457,7 +1484,16 @@
         "since": "0.3.0",
         "tier": "T2",
         "batch": "B4",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -1486,7 +1522,16 @@
         "since": "0.3.0",
         "tier": "T2",
         "batch": "B4",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -1520,7 +1565,15 @@
         "since": "0.4.0",
         "tier": "T3",
         "batch": "B5",
-        "motion": ["popup.anchored", "geometry.resize", "handoff", "state.morph"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          "geometry.resize",
+          "handoff",
+          "state.morph"
+        ],
         "intensity": "expressive",
         "complexity": "L",
         "upstream": {
@@ -1554,7 +1607,17 @@
         "since": "0.4.0",
         "tier": "T2",
         "batch": "B5",
-        "motion": ["popup.anchored", "exit.fade", "state.morph"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          },
+          "state.morph"
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -1583,7 +1646,17 @@
         "since": "0.4.0",
         "tier": "T2",
         "batch": "B5",
-        "motion": ["popup.anchored", "exit.fade", "state.morph"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          },
+          "state.morph"
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -1612,7 +1685,17 @@
         "since": "0.4.0",
         "tier": "T2",
         "batch": "B5",
-        "motion": ["popup.anchored", "exit.fade", "state.morph"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          },
+          "state.morph"
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -1646,7 +1729,17 @@
         "since": "0.4.0",
         "tier": "T2",
         "batch": "B5",
-        "motion": ["popup.anchored", "exit.fade", "state.morph"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          },
+          "state.morph"
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -1775,7 +1868,16 @@
         "since": "0.3.0",
         "tier": "T2",
         "batch": "B5",
-        "motion": ["popup.anchored", "exit.fade"],
+        "motion": [
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -2083,8 +2185,14 @@
         "tier": "T3",
         "batch": "B7",
         "motion": [
-          "popup.anchored",
-          "exit.fade",
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          },
           {
             "recipe": "geometry.resize",
             "form": "css-transition"
@@ -2221,7 +2329,18 @@
         "since": "0.5.0",
         "tier": "T2",
         "batch": "B8",
-        "motion": ["feedback.press", "state.morph", "popup.anchored", "exit.fade"],
+        "motion": [
+          "feedback.press",
+          "state.morph",
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "medium",
         "complexity": "L",
         "upstream": {
@@ -2259,7 +2378,18 @@
         "since": "0.5.0",
         "tier": "T2",
         "batch": "B8",
-        "motion": ["feedback.press", "popup.anchored", "exit.fade", "data.transition"],
+        "motion": [
+          "feedback.press",
+          {
+            "recipe": "popup.anchored",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "css-transition"
+          },
+          "data.transition"
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
