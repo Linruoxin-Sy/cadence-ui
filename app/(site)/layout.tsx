@@ -16,7 +16,15 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <div className="mx-auto flex w-full max-w-site flex-col gap-8 px-4 md:flex-row md:px-6">
-      <Sidebar groups={groups} guides={guides} />
+      <Sidebar
+        // Navigation needs names/links only; registry ownership/profile data stays on the server.
+        groups={groups.map(({ id, title, components }) => ({
+          id,
+          title,
+          components: components.map(({ slug, title }) => ({ slug, title })),
+        }))}
+        guides={guides.map(({ slug, title }) => ({ slug, title }))}
+      />
       <div className="min-w-0 flex-1">{children}</div>
     </div>
   );

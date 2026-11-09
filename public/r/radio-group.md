@@ -609,6 +609,8 @@ export function StaticRadio() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: The selected dot changes inside its radio control without moving the option collection.
+
 Recipe: `state.morph/one-shot`. The dot of the newly selected item fades in and settles
 from 0.96 to full size; the previously selected dot reverses. Nothing else in the
 row moves, so the eye follows the choice.

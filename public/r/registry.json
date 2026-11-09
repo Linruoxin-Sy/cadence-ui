@@ -144,7 +144,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Press feedback stays on the pressed control; it adds no surface entrance or label replacement."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "feedback.press/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "button",
+                "reason": "Button integrates press feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -167,7 +185,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Badge declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -190,7 +218,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -213,7 +251,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -236,7 +284,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Label declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -259,7 +317,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Input declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -282,7 +350,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Textarea declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -305,7 +383,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -328,7 +416,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Aspect Ratio declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -351,7 +449,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Avatar declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -380,7 +488,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "The existing loading pulse changes local opacity without moving content."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/continuous": [
+              {
+                "relationship": "default",
+                "owner": "skeleton",
+                "reason": "Skeleton integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -403,7 +529,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -427,7 +563,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Empty declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -451,7 +597,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -474,7 +630,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -498,7 +664,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Button Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -521,7 +697,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -544,7 +730,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -567,7 +763,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Pagination declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -595,7 +801,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "The status glyph rotates in place; the legacy reduced rotation remains pending migration."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/continuous": [
+              {
+                "relationship": "default",
+                "owner": "spinner",
+                "reason": "Spinner integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -627,7 +851,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Dialog opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "dialog",
+                "reason": "Dialog integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "dialog",
+                "reason": "Dialog integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -652,7 +901,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "The checked indicator appears within the control and keeps its native selection state."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "checkbox",
+                "reason": "Checkbox integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -677,7 +944,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "The selected dot changes inside its radio control without moving the option collection."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "radio-group",
+                "reason": "Radio Group integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -702,7 +987,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "The thumb travels only within its switch track."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "switch",
+                "reason": "Switch integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -727,7 +1030,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Thumb feedback stays on the direct manipulation control; native value input is immediate."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "feedback.press/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "slider",
+                "reason": "Slider integrates press feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -752,7 +1073,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Press feedback scales the active control in place."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "feedback.press/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates press feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -787,7 +1126,39 @@
             }
           ]
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "collection",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "A shared selected highlight moves among stable controls, alongside local press and glyph feedback."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "feedback.press/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates press feedback at its own parts, using the reached installed executor."
+              }
+            ],
+            "layout.shared/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates selected-indicator continuity at its own parts, using the reached installed executor."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -812,7 +1183,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "The active caret blinks in its native character slot; OTP characters are not animated counters."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "input-otp",
+                "reason": "Input OTP integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -837,7 +1226,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "A local progress fill follows the semantic value inside its fixed track."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "progress",
+                "reason": "Progress integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -869,7 +1276,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Alert Dialog opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "alert-dialog",
+                "reason": "Alert Dialog integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "alert-dialog",
+                "reason": "Alert Dialog integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -901,7 +1333,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Popover opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "popover",
+                "reason": "Popover integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "popover",
+                "reason": "Popover integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -933,7 +1390,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Tooltip opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "tooltip",
+                "reason": "Tooltip integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "tooltip",
+                "reason": "Tooltip integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -965,7 +1447,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Hover Card opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "hover-card",
+                "reason": "Hover Card integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "hover-card",
+                "reason": "Hover Card integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -997,7 +1504,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Sheet opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "sheet",
+                "reason": "Sheet integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "sheet",
+                "reason": "Sheet integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1029,7 +1561,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Drawer opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "drawer",
+                "reason": "Drawer integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "drawer",
+                "reason": "Drawer integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1060,7 +1617,46 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "identity",
+          "reason": "The selected label transfers between the popup and trigger while trigger geometry follows the owned label."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "geometry.resize/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates owned size transitions at its own parts, using the reached installed executor."
+              }
+            ],
+            "handoff/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates selected-label ownership transfer at its own parts, using the reached installed executor."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1093,7 +1689,39 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Combobox opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "combobox",
+                "reason": "Combobox integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "combobox",
+                "reason": "Combobox integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "combobox",
+                "reason": "Combobox integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1126,7 +1754,39 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "dropdown-menu",
+                "reason": "Dropdown Menu integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "dropdown-menu",
+                "reason": "Dropdown Menu integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "dropdown-menu",
+                "reason": "Dropdown Menu integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1159,7 +1819,39 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Context Menu opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "context-menu",
+                "reason": "Context Menu integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "context-menu",
+                "reason": "Context Menu integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "context-menu",
+                "reason": "Context Menu integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1192,7 +1884,39 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Menubar opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Menubar mounts dropdown-menu for popup opening; that installed component remains the integration owner."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Menubar mounts dropdown-menu for popup closing; that installed component remains the integration owner."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Menubar mounts dropdown-menu for local state/glyph feedback; that installed component remains the integration owner."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1220,7 +1944,46 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Code switching, active tab highlight and measured block geometry coordinate within one code surface."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "code-block",
+                "reason": "Code block integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ],
+            "layout.shared/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "code-block",
+                "reason": "Code block integrates selected-indicator continuity at its own parts, using the reached installed executor."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "code-block",
+                "reason": "Code block integrates local state/glyph feedback at its own parts, using the reached installed executor."
+              }
+            ],
+            "geometry.resize/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "code-block",
+                "reason": "Code block integrates owned size transitions at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1262,7 +2025,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Command opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "dialog",
+                "reason": "Command mounts dialog for popup opening; that installed component remains the integration owner."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "dialog",
+                "reason": "Command mounts dialog for popup closing; that installed component remains the integration owner."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1294,7 +2082,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Toast opens and closes its existing popup surface; content and native focus retain their current owners."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toast",
+                "reason": "Toast integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toast",
+                "reason": "Toast integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1322,7 +2135,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "extended",
+          "coordination": "independent",
+          "reason": "The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "geometry.resize/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "Accordion integrates owned size transitions at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1350,7 +2181,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "extended",
+          "coordination": "independent",
+          "reason": "The disclosure content changes height for open and close with one existing CSS size writer."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "geometry.resize/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "collapsible",
+                "reason": "Collapsible integrates owned size transitions at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1382,7 +2231,32 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Selection projection and directional content phases coordinate the selected tab and its panel."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "layout.shared/selection": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates selected-indicator continuity at its own parts, using the reached installed executor."
+              }
+            ],
+            "data.transition/directional-content": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1405,7 +2279,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1430,7 +2314,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "collection",
+          "travel": "extended",
+          "coordination": "independent",
+          "reason": "The existing Embla owner slides the collection while native drag and final slide position remain authoritative."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "carousel",
+                "reason": "Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1453,7 +2355,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Scroll Area declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1478,7 +2390,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "collection",
+          "travel": "extended",
+          "coordination": "independent",
+          "reason": "Recharts interpolates the plotted geometry; Cadence does not add a second data-geometry writer."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "chart",
+                "reason": "Chart integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1499,14 +2429,32 @@
             "form": "month-grid"
           }
         ],
-        "intensity": "subtle",
+        "intensity": "medium",
         "complexity": "L",
         "upstream": {
           "registry": "shadcn",
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "collection",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Month navigation shifts the bounded month grid; day selection retains its existing local feedback."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/month-grid": [
+              {
+                "relationship": "default",
+                "owner": "calendar",
+                "reason": "Calendar integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1542,7 +2490,39 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Popup presence and the shared viewport size transition coordinate within the navigation surface."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "Navigation Menu integrates popup opening at its own parts, using the reached installed executor."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "Navigation Menu integrates popup closing at its own parts, using the reached installed executor."
+              }
+            ],
+            "geometry.resize/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "navigation-menu",
+                "reason": "Navigation Menu integrates owned size transitions at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1565,7 +2545,17 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "static",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Resizable declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {}
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1609,7 +2599,39 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "extended",
+          "coordination": "group",
+          "reason": "The reserved gap and panel position share a size-linked owner while destination-width labels stay readable."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "layout.move/size-linked": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "Sidebar integrates size-linked panel position at its own parts, using the reached installed executor."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "Sidebar integrates owned size transitions at its own parts, using the reached installed executor."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "sidebar",
+                "reason": "Sidebar integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1645,7 +2667,51 @@
           "path": "apps/v4/examples/base/data-table-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "feedback.press/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Data Table mounts button for press feedback; that installed component remains the integration owner."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "checkbox",
+                "reason": "Data Table mounts checkbox for local state/glyph feedback; that installed component remains the integration owner."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Data Table mounts dropdown-menu for this installed state.morph form; distinct component parts retain their own writers."
+              }
+            ],
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Data Table mounts dropdown-menu for popup opening; that installed component remains the integration owner."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "dropdown-menu",
+                "reason": "Data Table mounts dropdown-menu for popup closing; that installed component remains the integration owner."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1681,7 +2747,46 @@
           "path": "apps/v4/examples/base/date-picker-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Installed Popover owns the surface and Calendar owns month changes; the formatted trigger label still updates immediately."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "feedback.press/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Date Picker mounts button for press feedback; that installed component remains the integration owner."
+              }
+            ],
+            "popup.anchored/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "popover",
+                "reason": "Date Picker mounts popover for popup opening; that installed component remains the integration owner."
+              }
+            ],
+            "exit.fade/css-transition": [
+              {
+                "relationship": "inherited",
+                "owner": "popover",
+                "reason": "Date Picker mounts popover for popup closing; that installed component remains the integration owner."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "calendar",
+                "reason": "Date Picker mounts calendar for the existing content/data/status phase; that installed component remains the integration owner."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1711,7 +2816,32 @@
           "version": "2026-10",
           "guide": "apps/v4/content/docs/components/base/attachment.mdx"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "Progress feedback stays within the attachment; it introduces no upload state or surface choreography."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/continuous": [
+              {
+                "relationship": "default",
+                "owner": "attachment",
+                "reason": "Attachment integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ],
+            "feedback.press/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Attachment mounts button for press feedback; that installed component remains the integration owner."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1736,7 +2866,25 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "none",
+          "coordination": "independent",
+          "reason": "The pending indicator pulses locally; message content remains caller-owned."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "bubble",
+                "reason": "Bubble integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1763,7 +2911,32 @@
           "version": "0.5.0",
           "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "extended",
+          "coordination": "independent",
+          "reason": "Native section navigation scrolls the page while a local indicator follows the active heading."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "layout.shared/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toc",
+                "reason": "Table of Contents integrates selected-indicator continuity at its own parts, using the reached installed executor."
+              }
+            ],
+            "scroll.navigate/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toc",
+                "reason": "Table of Contents integrates native heading navigation at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1783,7 +2956,7 @@
             "form": "changed-runs"
           }
         ],
-        "intensity": "medium",
+        "intensity": "subtle",
         "complexity": "S",
         "since": "0.6.0",
         "upstream": {
@@ -1792,7 +2965,25 @@
           "version": "0.6.0",
           "reason": "Cadence standalone changed-text primitive; no upstream shadcn equivalent."
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Only changed safe display-text runs receive bounded replacement effects; unchanged native text survives."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "animated-text",
+                "reason": "Animated Text integrates changed display-text runs at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1812,7 +3003,7 @@
             "form": "reels"
           }
         ],
-        "intensity": "medium",
+        "intensity": "subtle",
         "complexity": "S",
         "since": "0.6.0",
         "upstream": {
@@ -1821,7 +3012,25 @@
           "version": "0.6.0",
           "reason": "Cadence original numeric display primitive; no shadcn counterpart."
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "Bounded digit-place reels update one numeric readout; unsupported typography and geometry use native text."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "animated-number",
+                "reason": "Animated Number integrates bounded digit-place reels at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1841,7 +3050,7 @@
             "form": "viewport"
           }
         ],
-        "intensity": "subtle",
+        "intensity": "medium",
         "complexity": "S",
         "since": "0.6.0",
         "upstream": {
@@ -1850,7 +3059,25 @@
           "version": "0.6.0",
           "reason": "Cadence original reveal viewport primitive; no shadcn counterpart."
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "independent",
+          "reason": "An explicitly composed offscreen host enters with opacity and compact travel; first-screen content remains native."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "reveal/viewport": [
+              {
+                "relationship": "default",
+                "owner": "reveal",
+                "reason": "Reveal integrates explicit viewport enhancement at its own parts, using the reached installed executor."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     },
     {
@@ -1870,7 +3097,7 @@
             "form": "viewport"
           }
         ],
-        "intensity": "subtle",
+        "intensity": "medium",
         "complexity": "S",
         "since": "0.6.0",
         "upstream": {
@@ -1879,7 +3106,25 @@
           "version": "0.6.0",
           "reason": "Cadence original reveal-group viewport primitive; no shadcn counterpart."
         },
-        "sourceSha": "bb39e3e3"
+        "motionProfile": {
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "An explicit scope coordinates registered Reveal hosts with optional bounded cycle stagger; it creates no animated wrapper."
+        },
+        "motionCoverage": {
+          "schema": 1,
+          "effects": {
+            "reveal/viewport": [
+              {
+                "relationship": "composed",
+                "owner": "reveal-group",
+                "reason": "RevealGroup coordinates explicitly registered caller-composed Reveal hosts; the group adds no animated DOM."
+              }
+            ]
+          }
+        },
+        "sourceSha": "f1d1229c"
       }
     }
   ]

@@ -180,6 +180,8 @@ The ratio is written as `--ratio`, and the box uses `aspect-(--ratio)`. Your own
 
 ## Motion contract
 
+Authored intensity is **subtle**: Aspect Ratio declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). The whole point of the box is that it does not change size; a
 transition here would reintroduce the layout shift it exists to prevent.
 

@@ -544,6 +544,8 @@ Plain wrappers over Base UI's parts; each forwards `className` and native props.
 
 ## Motion contract
 
+Authored intensity is **subtle**: A local progress fill follows the semantic value inside its fixed track.
+
 Recipe: `data.transition/one-shot`, in both of its documented forms.
 
 | Phase         | Properties                     | Token            | Interruptible |

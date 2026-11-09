@@ -881,6 +881,8 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 
 ## Motion contract
 
+Authored intensity is **medium**: The existing Embla owner slides the collection while native drag and final slide position remain authoritative.
+
 | Phase | Recipe | Behaviour |
 | --- | --- | --- |
 | Enter / exit | — | No authored entrance or removal animation. |

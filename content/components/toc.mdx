@@ -4,6 +4,8 @@ description: Section navigation for documentation, guides, and long articles.
 category: navigation
 motion: [layout.shared, scroll.navigate]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"Native section navigation scrolls the page while a local indicator follows the active heading."}
+motionCoverage: {"schema":1,"effects":{"layout.shared/one-shot":[{"relationship":"default","owner":"toc","reason":"Table of Contents integrates selected-indicator continuity at its own parts, using the reached installed executor."}],"scroll.navigate/one-shot":[{"relationship":"default","owner":"toc","reason":"Table of Contents integrates native heading navigation at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T3
 since: 0.5.0
@@ -315,6 +317,8 @@ export function ScrollTracking() {
 Slots are `toc`, `toc-title`, `toc-track`, `toc-rail`, `toc-indicator`, `toc-list`, `toc-item`, and `toc-link`.
 
 ## Motion contract
+
+Authored intensity is **medium**: Native section navigation scrolls the page while a local indicator follows the active heading.
 
 One persistent indicator follows the active entry. Its top and bottom edges use the shared physics
 spring, then render as translation and vertical scale on a one-pixel base. Wrapped labels determine

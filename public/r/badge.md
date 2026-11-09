@@ -166,6 +166,8 @@ props are forwarded.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Badge declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A badge labels content; it does not enter, leave, or move.
 
 | Phase   | Properties                          | Token | Interruptible |

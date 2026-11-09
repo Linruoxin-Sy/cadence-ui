@@ -285,6 +285,8 @@ the optional CadenceProvider. There are no instance duration, easing, origin or 
 
 ## Motion contract
 
+Authored intensity is **subtle**: Only changed safe display-text runs receive bounded replacement effects; unchanged native text survives.
+
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
 | `text.change/changed-runs` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |

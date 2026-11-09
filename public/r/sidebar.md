@@ -2089,6 +2089,8 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 
 ## Motion contract
 
+Authored intensity is **medium**: The reserved gap and panel position share a size-linked owner while destination-width labels stay readable.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Desktop offcanvas position | transform projected from actual occupied width | `layout.move/size-linked` | Yes, one shared size scalar. |

@@ -4,6 +4,8 @@ description: Commands such as save, submit, and delete.
 category: form
 motion: [feedback.press]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Press feedback stays on the pressed control; it adds no surface entrance or label replacement."}
+motionCoverage: {"schema":1,"effects":{"feedback.press/one-shot":[{"relationship":"default","owner":"button","reason":"Button integrates press feedback at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.2.0
@@ -216,6 +218,8 @@ cleanup before assigning the next ref. A caller `render` replaces the default
 renderer and owns spreading its supplied props.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Press feedback stays on the pressed control; it adds no surface entrance or label replacement.
 
 Recipe: `feedback.press/one-shot`, driven by the press gesture.
 

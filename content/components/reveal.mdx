@@ -3,7 +3,9 @@ title: Reveal
 description: An explicit viewport entrance on one native content host.
 category: motion
 motion: [{"recipe":"reveal","form":"viewport"}]
-intensity: subtle
+intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"An explicitly composed offscreen host enters with opacity and compact travel; first-screen content remains native."}
+motionCoverage: {"schema":1,"effects":{"reveal/viewport":[{"relationship":"default","owner":"reveal","reason":"Reveal integrates explicit viewport enhancement at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.6.0
@@ -91,6 +93,8 @@ not a disclosure, semantic open state, validation system or route transition.
 No per-instance duration, easing, distance or spring props. Use shared recipe/token policy.
 
 ## Motion contract
+
+Authored intensity is **medium**: An explicitly composed offscreen host enters with opacity and compact travel; first-screen content remains native.
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |

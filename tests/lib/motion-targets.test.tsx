@@ -37,6 +37,17 @@ describe("internal target reference schema", () => {
     const result = parse(fixture);
     expect(result.problems).toEqual([]);
     expect(result.migration).toBe("legacy");
+    expect(
+      result.capabilities.find((capability) => capability.name === "Changed numbers")?.references[0]?.owners,
+    ).toEqual(["fixture#Fixture"]);
+    expect(
+      parse(
+        fixture.replace(
+          "default: `fixture.root.enter`",
+          "default: `fixture.root.enter`; inherited: `fixture.root.enter`",
+        ),
+      ).problems.join("\n"),
+    ).toContain("conflicting relationship");
     expect(result.bindings.get("fixture.rule.colour")).toEqual({
       preset: "state.color",
       form: "state.color/surface",

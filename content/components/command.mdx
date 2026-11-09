@@ -4,6 +4,8 @@ description: Search and run actions from a keyboard-driven command palette.
 category: navigation
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Command opens and closes its existing popup surface; content and native focus retain their current owners."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts dialog for popup opening; that installed component remains the integration owner."}],"exit.fade/css-transition":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts dialog for popup closing; that installed component remains the integration owner."}]}}
 complexity: M
 tier: T2
 since: 0.3.0
@@ -788,6 +790,8 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 `data-selected` is not a committed choice.
 
 ## Motion contract
+
+Authored intensity is **medium**: Command opens and closes its existing popup surface; content and native focus retain their current owners.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

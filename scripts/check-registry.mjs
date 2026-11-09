@@ -21,6 +21,7 @@ import { checkCatalogIntensity } from "./catalog-intensity.mjs";
 import { checkComponentRoutes } from "./component-routes.mjs";
 import { checkDocTemplates } from "./doc-template.mjs";
 import { expandInstallation } from "./installation.mjs";
+import { checkMotionCoverage, motionMetadataProblems } from "./motion-coverage.mjs";
 import { checkMotionDocs } from "./motion-docs.mjs";
 import { checkMotionImplementations } from "./motion-implementation.mjs";
 import {
@@ -45,9 +46,12 @@ problems.push(...targets.problems);
 
 const RECIPES = recipeCatalogue(await readFile(path.join(root, "registry", "cadence", "lib", "motion.ts"), "utf8"));
 problems.push(...(await checkMotionDocs(root, registry, RECIPES)));
-problems.push(...(await checkMotionImplementations(root, registry)).problems);
+const implementations = await checkMotionImplementations(root, registry);
+problems.push(...implementations.problems, ...checkMotionCoverage(registry, implementations));
 const docsDir = path.join(root, "content", "components");
 const fullDocs = await readFile(path.join(root, "public", "llms-full.txt"), "utf8");
+const publishedCatalog = JSON.parse(await readFile(path.join(root, "public/r/catalog.json"), "utf8"));
+const publishedIndex = JSON.parse(await readFile(path.join(root, "public/r/registry.json"), "utf8"));
 
 /** Frontmatter is the human-facing copy of `meta`; the two must not drift. */
 async function docFrontmatter(name) {
@@ -96,6 +100,15 @@ for (const item of registry.items) {
   }
 
   if (isComponent(item)) {
+    for (const [surface, metadata] of [
+      [`public/r/${item.name}.json`, payload.meta],
+      ["public/r/catalog.json", publishedCatalog.find((entry) => entry.name === item.name)],
+      ["public/r/registry.json", publishedIndex.items.find((entry) => entry.name === item.name)?.meta],
+    ]) {
+      problems.push(...motionMetadataProblems(item, metadata, surface));
+      if (metadata?.intensity !== item.meta?.intensity)
+        problems.push(`${item.name}: ${surface} intensity differs from installed metadata (run registry:build)`);
+    }
     const raw = matter(await readFile(path.join(docsDir, `${item.name}.mdx`), "utf8"));
     // Expansion validates boundaries once; reuse its result for freshness while
     // retaining source-path errors and collecting the other registry failures.
@@ -125,9 +138,6 @@ for (const item of registry.items) {
     }
     if (isComponent(item)) {
       if (!Array.isArray(item.meta?.motion)) problems.push(`${item.name}: meta.motion must be an array`);
-      if (item.meta?.tier !== "T0" && !item.meta?.motion?.length) {
-        problems.push(`${item.name}: non-T0 components need at least one recipe in meta.motion`);
-      }
       if (!item.meta?.intensity) problems.push(`${item.name}: missing meta.intensity`);
 
       for (const { recipe, form } of normaliseMotion(item.meta?.motion)) {

@@ -808,6 +808,8 @@ export function MenuMotionScopes() {
 
 ## Motion contract
 
+Authored intensity is **medium**: Menubar opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase         | Properties                                     | Token             | Interruptible |
 | ------------- | ---------------------------------------------- | ----------------- | ------------- |
 | open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger | `popup.anchored/css-transition` · `duration.fast` | yes |

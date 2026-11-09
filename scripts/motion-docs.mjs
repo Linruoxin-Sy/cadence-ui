@@ -5,6 +5,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import { motionMetadataProblems } from "./motion-coverage.mjs";
 import { MOTION_FORMS, motionForms, motionRecipes } from "./motion-manifest.mjs";
 
 export function visibleLines(markdown) {
@@ -115,6 +116,10 @@ export async function checkMotionDocs(root, registry, catalogue) {
       continue;
     }
     const declared = motionRecipes(item.meta?.motion);
+    problems.push(...motionMetadataProblems(item, doc.data).map((problem) => `${label}: ${problem}`));
+    const profileDescription = `Authored intensity is **${item.meta?.intensity}**: ${item.meta?.motionProfile?.reason}`;
+    if (!visibleLines(doc.content).join(" ").replace(/\s+/g, " ").includes(profileDescription.replace(/\s+/g, " ")))
+      problems.push(`${label}: visible authored intensity/profile explanation differs from installed metadata`);
     problems.push(...compare(declared, declared, `${item.name}: meta.motion`, catalogue));
     if (
       !Array.isArray(doc.data.motion) ||

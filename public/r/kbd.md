@@ -161,6 +161,8 @@ KbdGroup keeps the pinned native div prop type while rendering a `kbd` element.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A key hint is a label; it must not pulse or slide while the user
 is reading it.
 

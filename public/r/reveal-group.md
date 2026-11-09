@@ -303,6 +303,8 @@ No per-instance duration, easing, distance or spring props. Use shared recipe/to
 
 ## Motion contract
 
+Authored intensity is **medium**: An explicit scope coordinates registered Reveal hosts with optional bounded cycle stagger; it creates no animated wrapper.
+
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |
 | Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal/viewport` / `duration.base`, `ease.out`, `distance.md` | yes |

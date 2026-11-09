@@ -502,6 +502,8 @@ export function StaticSwitch() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: The thumb travels only within its switch track.
+
 Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
 while the track recolours. The travel distance is measured from the rendered track
 and thumb — no hard-coded pixel value — so a custom size still lands flush.

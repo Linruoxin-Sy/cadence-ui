@@ -4,6 +4,8 @@ description: A swipeable collection with previous and next controls.
 category: layout
 motion: [data.transition]
 intensity: medium
+motionProfile: {"scope":"collection","travel":"extended","coordination":"independent","reason":"The existing Embla owner slides the collection while native drag and final slide position remain authoritative."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"carousel","reason":"Carousel integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T4
 since: 0.4.0
@@ -684,6 +686,8 @@ as startIndex, align, loop, dragFree, watchDrag, breakpoints and direction pass 
 For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 
 ## Motion contract
+
+Authored intensity is **medium**: The existing Embla owner slides the collection while native drag and final slide position remain authoritative.
 
 | Phase | Recipe | Behaviour |
 | --- | --- | --- |

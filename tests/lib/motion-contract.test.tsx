@@ -211,6 +211,8 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         "scripts/motion-manifest.mjs",
         "scripts/motion-source.mjs",
         "scripts/motion-implementation.mjs",
+        "scripts/motion-coverage.mjs",
+        "scripts/catalog-intensity.mjs",
         "tests/motion-contract-reporter.mjs",
       ])
         await writeFile(path.join(fixture, file), await readFile(path.join(root, file), "utf8"));
@@ -220,6 +222,13 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
           { recipe: "state.color", form: "css-transition" },
         ];
       const loopItem = stagedRegistry.items.find((item: { name: string }) => item.name === "skeleton");
+      const sliderItem = stagedRegistry.items.find((item: { name: string }) => item.name === "slider");
+      Object.assign(sliderItem.meta.motionCoverage.effects["feedback.press/one-shot"][0], {
+        relationship: "inherited",
+        owner: "button",
+      });
+      sliderItem.registryDependencies.push("@cadence/button");
+      delete sliderItem.meta.motionProfile;
       loopItem.meta.motion = [];
       loopItem.files = [{ path: "registry/cadence/skeleton/index.tsx" }];
       await mkdir(path.join(fixture, "registry/cadence/skeleton"), { recursive: true });
@@ -255,6 +264,11 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         expect(output).toContain(`${id}: v2 enforcement is not implemented; legacy evidence cannot certify v2`);
       for (const id of ["card", "input"])
         expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
+      expect(output).toContain("card: state.color/css-transition: missing installed ownership");
+      expect(output).toContain(
+        "slider: feedback.press/one-shot: owner button is not the reached installed integration",
+      );
+      expect(output).toContain("slider: explicit authored motionProfile required");
       expect(output).toContain("skeleton: execute loop policy in full, reduced, none");
       for (const [id, form] of [
         ["animated-text", "text.change/changed-runs"],

@@ -660,6 +660,8 @@ export function Placement() {
 
 ## Motion contract
 
+Authored intensity is **expressive**: The selected label transfers between the popup and trigger while trigger geometry follows the owned label.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | pointer selection | value slot width | `geometry.resize/one-shot` | yes (physics-defined, clamped) |

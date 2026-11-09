@@ -10,6 +10,16 @@ export interface DocFrontmatter {
   tier?: "T0" | "T1" | "T2" | "T3" | "T4" | "T5";
   motion?: (string | { recipe: string; form: string })[];
   intensity?: "subtle" | "medium" | "expressive";
+  motionProfile?: {
+    scope: "static" | "local" | "surface" | "collection";
+    travel: "none" | "compact" | "extended";
+    coordination: "independent" | "group" | "identity";
+    reason: string;
+  };
+  motionCoverage?: {
+    schema: 1;
+    effects: Record<string, { relationship: "default" | "inherited" | "composed"; owner: string; reason: string }[]>;
+  };
   complexity?: "S" | "M" | "L";
   since?: string;
   deps?: string[];

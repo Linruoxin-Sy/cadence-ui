@@ -628,6 +628,8 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
+Authored intensity is **medium**: A shared selected highlight moves among stable controls, alongside local press and glyph feedback.
+
 Single selection uses one shared decorative fill scoped to each group. Multiple
 selection keeps one local fill per item. Neither changes the buttons' layout
 boxes; corner changes that join neighboring fills are immediate state styling.

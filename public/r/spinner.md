@@ -388,6 +388,8 @@ always set, and `role="status"` with the label is the announcement.
 
 ## Motion contract
 
+Authored intensity is **subtle**: The status glyph rotates in place; the legacy reduced rotation remains pending migration.
+
 Recipe: `data.transition/continuous`, continuous form. The loop is CSS (`animate-spin`) rather
 than Motion, for the same reason as `skeleton`: a spinner is by definition next to work
 the user is waiting on, and it must not add a frame callback to it. Only `transform`

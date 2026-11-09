@@ -594,6 +594,8 @@ export function StaticCode() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: The active caret blinks in its native character slot; OTP characters are not animated counters.
+
 Recipe: `state.morph/one-shot`. A character lands in its slot with a short fade and settles
 from 0.96 to full size. Deleting a character is instant — an exit animation would
 leave a ghost in a field the user is racing against.

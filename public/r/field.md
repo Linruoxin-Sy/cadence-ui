@@ -353,6 +353,8 @@ export function ChoiceCard() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A field never animates — not on mount, not when the error appears.
 The error is the one thing the user must read immediately; fading or sliding it in
 delays the only information that matters, and it moves the control the user's cursor

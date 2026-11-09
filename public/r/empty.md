@@ -272,6 +272,8 @@ export function EmptyWithoutMedia() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: Empty declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). An empty state is a resting state: it is what the region looks like
 when nothing is happening. Fading it in would make it look like content arriving,
 which is the one thing it is not.

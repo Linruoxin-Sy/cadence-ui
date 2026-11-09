@@ -523,6 +523,8 @@ Root and Item classes merge last.
 
 ## Motion contract
 
+Authored intensity is **medium**: The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |

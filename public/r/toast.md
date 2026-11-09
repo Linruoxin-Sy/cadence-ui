@@ -592,6 +592,8 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 ## Motion contract
 
+Authored intensity is **medium**: Toast opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored/css-transition`, duration.base, ease.out | yes, CSS transition |

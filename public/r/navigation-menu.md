@@ -740,6 +740,8 @@ viewport have additive `data-slot` hooks. Positioner props still follow upstream
 
 ## Motion contract
 
+Authored intensity is **medium**: Popup presence and the shared viewport size transition coordinate within the navigation surface.
+
 | Phase | Properties | Recipe / tokens | Interruptible |
 | --- | --- | --- | --- |
 | Open | Popup opacity and anchor scale; content opacity | `popup.anchored/css-transition`, fast clock, scale.in | Native CSS reversal |

@@ -4,6 +4,8 @@ description: Text alignment, view density, and other mode sets.
 category: form
 motion: [feedback.press, layout.shared, state.morph]
 intensity: medium
+motionProfile: {"scope":"collection","travel":"compact","coordination":"group","reason":"A shared selected highlight moves among stable controls, alongside local press and glyph feedback."}
+motionCoverage: {"schema":1,"effects":{"feedback.press/one-shot":[{"relationship":"default","owner":"toggle-group","reason":"Toggle Group integrates press feedback at its own parts, using the reached installed executor."}],"layout.shared/one-shot":[{"relationship":"default","owner":"toggle-group","reason":"Toggle Group integrates selected-indicator continuity at its own parts, using the reached installed executor."}],"state.morph/one-shot":[{"relationship":"default","owner":"toggle-group","reason":"Toggle Group integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T3
 since: 0.3.0
@@ -431,6 +433,8 @@ cleanup before assigning the next ref. A caller `render` replaces the default
 renderer and owns spreading its supplied props.
 
 ## Motion contract
+
+Authored intensity is **medium**: A shared selected highlight moves among stable controls, alongside local press and glyph feedback.
 
 Single selection uses one shared decorative fill scoped to each group. Multiple
 selection keeps one local fill per item. Neither changes the buttons' layout

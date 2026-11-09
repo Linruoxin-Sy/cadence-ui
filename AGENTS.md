@@ -54,7 +54,7 @@ These follow from the documents above; the documents are authoritative if they d
 - **Match upstream.** Exports, `data-slot` values, props, and their defaults are copied from shadcn; additions are allowed, renames, removals, and silent default changes are not (`meta.upstream` records the pinned style). A difference the visual style forces is recorded in `meta.parity.props` with a reason — `parity:check` fails on an unrecorded difference and on a record that no longer applies.
 - **Upstream tooling is the CLI's `build`, never the skill's `add`.** Cadence authors a registry; it is not a shadcn consumer. There is no `components.json`, and the source tree is a hand-written mirror on purpose. Read upstream from `upstream/manifest.json` or `npx shadcn@latest docs <id>`; never run `shadcn init` / `add` / `apply` here. See [shadcn tooling boundary](#shadcn-tooling-boundary).
 - **Intra-registry dependencies are namespaced.** Use `@cadence/<id>` in `registryDependencies`; a bare name resolves against the default shadcn registry and installs the wrong file.
-- **Docs are data.** `content/components/<id>.mdx` frontmatter must match `registry.json` (title, description, deps, registryDeps, motion, intensity, complexity, since, tier); the build fails when docs or metadata are missing.
+- **Docs are data.** `content/components/<id>.mdx` frontmatter must match `registry.json` (title, description, deps, registryDeps, motion, motionCoverage, motionProfile, intensity, complexity, since, tier); the build fails when docs or metadata are missing. Installed coverage records every reached integration owner per exact recipe/form; the internal six-capability target and legacy marker remain separate. Authored profiles describe extent/travel/coordination, never runtime parameters or animation permission.
 - **Docs have a fixed section order, not a fixed section count.** `## Installation` then `## Usage` open every body; everything after them is a flat `##` — one section per example, no `## Examples` wrapper (only `## API` may group props under `### \`Part\``). Order and membership come from §2 of [docs/documentation-site-and-distribution.md](docs/documentation-site-and-distribution.md); how many examples you write is yours. `scripts/new-item.mjs` scaffolds this order.
 - **Docs code blocks are the `code-block` item.** `components/site/mdx.tsx` maps `pre` to `components/site/code-fence.tsx`, which highlights at build time; never hand-roll a `<pre>` in site chrome, and add a new fenced language to `code-highlight/highlight.tsx` (`tests/site/fence.test.tsx` fails otherwise).
 
@@ -132,7 +132,8 @@ the check compares payloads against source and fails on stale artifacts.
    and choreography before implementation. Placeholder contracts deliberately fail `registry:check`.
 3. Keep the item in `registry.json` with `files[].target` of `@components/cadence/<id>/index.tsx`, plus
    the current compatibility fields `meta.tier`, `meta.batch`, `meta.motion`, `meta.intensity`,
-   `meta.complexity`, and `meta.upstream`. Declare implemented recipes only; assess v2 capabilities by
+   `meta.complexity`, and `meta.upstream`, plus matching `meta.motionCoverage` and `meta.motionProfile`.
+   Declare implemented recipes only; assess v2 capabilities by
    applicability and ownership, not tier.
 4. Write `content/components/<id>.mdx` with matching frontmatter: tier-specific membership and order from documentation-site-and-distribution §2,
    including responsiveness/performance at every tier and input data ownership; no fixed heading count.

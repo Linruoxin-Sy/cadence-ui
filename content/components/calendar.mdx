@@ -3,7 +3,9 @@ title: Calendar
 description: Select dates, multiple days, and ranges with accessible month navigation.
 category: collection
 motion: [{"recipe":"data.transition","form":"month-grid"}]
-intensity: subtle
+intensity: medium
+motionProfile: {"scope":"collection","travel":"compact","coordination":"independent","reason":"Month navigation shifts the bounded month grid; day selection retains its existing local feedback."}
+motionCoverage: {"schema":1,"effects":{"data.transition/month-grid":[{"relationship":"default","owner":"calendar","reason":"Calendar integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
 complexity: L
 tier: T4
 since: 0.5.0
@@ -779,6 +781,8 @@ Custom components replace default parts completely and must maintain the same ac
 and motion contract. A custom Month or MonthGrid also takes ownership of month motion.
 
 ## Motion contract
+
+Authored intensity is **medium**: Month navigation shifts the bounded month grid; day selection retains its existing local feedback.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

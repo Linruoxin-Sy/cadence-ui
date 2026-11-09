@@ -977,6 +977,8 @@ plus either color or a complete light/dark theme map. Helpers require ChartConta
 
 ## Motion contract
 
+Authored intensity is **medium**: Recharts interpolates the plotted geometry; Cadence does not add a second data-geometry writer.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Later series insertion / data update | SVG data geometry (T4 engine form) | `data.transition/one-shot` | Recharts retargets from its series state |

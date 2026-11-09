@@ -5,10 +5,10 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import ts from "typescript";
 import { unified } from "unified";
+import { MOTION_RELATIONSHIPS } from "./motion-coverage.mjs";
 import { migrationProblems, targetMetadata } from "./motion-migration.mjs";
 
 export const CAPABILITIES = ["Appearance", "Size", "Surface colour", "Text colour", "Changed text", "Changed numbers"];
-const RELATIONSHIPS = ["default", "inherited", "composed", "not-applicable"];
 const SECTIONS = [
   "Capability ownership",
   "Choreography and modes",
@@ -162,9 +162,10 @@ export function parseMotionTarget(markdown, id, presets) {
     seen.add(name);
     if (!meaningful(reason) || reason.length < 20) problems.push(`${name}: ownership/applicability reason required`);
     const references = [];
+    const relationships = new Map();
     for (const clause of refs.split(";")) {
       const match = clause.trim().match(/^(default|inherited|composed|not-applicable): (.+)$/);
-      if (!match || !RELATIONSHIPS.includes(match[1])) {
+      if (!match || !MOTION_RELATIONSHIPS.includes(match[1])) {
         problems.push(`${name}: explicit coverage and references required`);
         continue;
       }
@@ -172,6 +173,10 @@ export function parseMotionTarget(markdown, id, presets) {
       const targets = list.split(", ");
       if (new Set(targets).size !== targets.length) problems.push(`${name}: duplicate capability reference`);
       for (const target of targets) {
+        const previous = relationships.get(target);
+        if (previous === coverage || (previous && !target.startsWith("@")))
+          problems.push(`${name}: duplicate/conflicting relationship for ${target}`);
+        relationships.set(target, coverage);
         const binding = bindings.get(target);
         if (target.startsWith("@")) {
           if (coverage === "default" || !Object.hasOwn(safeParts, target.slice(1)))
@@ -209,7 +214,15 @@ export function parseMotionTarget(markdown, id, presets) {
         if (coverage === "not-applicable" && !target.startsWith("@"))
           problems.push(`${name}: not-applicable must name a part, not an effect`);
       }
-      references.push({ coverage, targets });
+      const owners = [
+        ...new Set(
+          targets.flatMap((target) => {
+            const part = target.startsWith("@") ? target.slice(1) : bindings.get(target)?.part;
+            return safeParts[part] ?? [];
+          }),
+        ),
+      ];
+      references.push({ coverage, targets, owners });
     }
     capabilities.push({ name, reason, references });
   }

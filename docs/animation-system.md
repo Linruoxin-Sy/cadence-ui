@@ -61,8 +61,10 @@ Every component/part records the applicable trigger, owner, default response and
 Coverage is **default** (owned here), **inherited** (coordinated by a parent), **composed** (explicit
 caller composition), or **not applicable** with a reason. An inherited capability is not proof of
 a local recipe implementation. The [internal reference schema](motion/README.md#21-internal-reference-schema)
-checks target capability/action/part closure. It does not add public registry capability metadata or
-prove installed behaviour; the existing recipe declarations remain the shipped contract.
+checks target capability/action/part closure. Installed `meta.motionCoverage` separately records
+ownership of exactly the declared recipe/forms; it never copies target abilities into a payload.
+Neither a target row nor installed ownership metadata proves runtime conformance. The recipe
+declarations, reached implementation and executed evidence remain required together.
 
 | Capability              | Existing or target recipes                                | Required outcome                                                             |
 | ----------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -139,19 +141,30 @@ not adjustable at runtime.
 Catalogue intensity is the strongest authored behaviour available in the component (including
 its documented composition), independent of the selected runtime mode, complexity and tier:
 
-- `subtle`: static UI, local press/glyph feedback, opacity-only entry/progress/loading, or a
-  small control indicator. Static T0 belongs here; this label does not promise animation.
+- `subtle`: native/structural UI or local feedback within one control/readout, including compact
+  changed text, numeric reels, press/glyph feedback and local progress/loading. This label does
+  not promise animation or make a text/geometry recipe less capable.
 - `medium`: a surface enters/exits, a panel/indicator moves or resizes, a collection slides,
   or chart geometry interpolates. Carousel and Chart's `data.transition` moves geometry;
-  Calendar, Bubble, Skeleton, Spinner and Attachment's data feedback stays local.
+  Calendar's delivered month-grid phase moves a collection. Bubble, Skeleton, Spinner and
+  Attachment's status feedback stays local. Explicit Reveal moves a surface; RevealGroup can
+  coordinate those surfaces with bounded group rhythm.
 - `expressive`: coordinated identity/ownership transfers across surfaces (`handoff`, currently
   Select). This is not a claim that every spring or every T3 component is expressive.
 
-The classification above is the **current compatibility policy**, enforced by
-`scripts/catalog-intensity.mjs` against recipe forms and explicit data-geometry owners. The v2 target
-classifies the authored spatial extent, travel and coordination, not the mere presence of text or
-geometry recipes. Migrate the classifier, metadata and catalogue explanations together; until then
-keep registry/frontmatter equality and do not relabel components to imply an unimplemented effect.
+`meta.motionProfile` records the strongest **implemented** authored extent, independently of mode:
+`scope` is `static`, `local`, `surface` or `collection`; `travel` is `none`, `compact` (within the
+control/readout or token entry envelope) or `extended` (panel/collection/page displacement);
+`coordination` is `independent`, `group` or `identity`. A substantive `reason` describes the actual
+behaviour, including an optional documented composition. These are descriptive categories, not
+new numeric parameters, a runtime map or an animation allowance. No token or executor reads them.
+
+`scripts/catalog-intensity.mjs` fails on missing/unknown/conflicting profiles. Identity transfer is
+expressive; surface/collection extent, extended travel or group coordination is medium; native UI
+and independent compact local feedback is subtle. Static means no declared Cadence recipe and may
+retain native or legacy CSS state feedback. Text/size recipe names alone never determine a label.
+Profile, intensity and public frontmatter must agree. The reason needs source/manual review;
+structural consistency alone cannot establish perceptual truth or v2 adoption.
 
 The reduced tween multiplier is exported as `reducedDurationScale` from `lib/motion.ts`.
 CSS popup adapters and `transitionFor()` read that same token rather than repeating the multiplier.

@@ -40,12 +40,14 @@ back/forward restores controls/results, unrelated query/hash/history state survi
 remain mounted and cannot receive focus; history that hides a focused result restores search focus.
 Dependencies remain a future catalogue dimension; no optional GSAP entries currently ship.
 
-The v2 target replaces recipe-name/prefix inference of intensity with an explicit review of actual
-authored behaviour. It also introduces capability coverage that distinguishes default, inherited,
-composed and not-applicable behaviour. Neither change has migrated the current catalogue or its
-metadata/checker schema yet. Do not expose hypothetical filters, automatic capabilities or runtime
-intensity controls. Tier remains a compatibility field for source budgets and documentation profiles,
-not a user-facing animation allowance; budget limits remain unchanged.
+Authored profiles now describe implemented extent, travel and coordination instead of inferring
+intensity from recipe names. Frontmatter, registry payloads, catalog and index must agree on
+`motionProfile`, `motionCoverage` and intensity. [Installed coverage](motion/README.md#22-minimal-installed-coverage-schema)
+names the reached integration owners of exact declared forms; the internal six-capability target
+retains its separate default/inherited/composed/not-applicable assessments and reasons. Neither is
+full v2 acceptance. Do not expose hypothetical filters, automatic capabilities or runtime intensity
+controls. Navigation serializes only names/links, not these metadata objects or document bodies.
+Tier remains a compatibility field for source budgets and documentation profiles; budgets are unchanged.
 
 ---
 

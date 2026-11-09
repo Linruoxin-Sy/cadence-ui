@@ -255,6 +255,8 @@ button, an input, a select trigger — participates without a prop.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Button Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). The group does not animate. Adjacent buttons share a border, and the
 only depth cue is `focus-visible:relative` plus `z-10`, which lifts the focused
 control above its neighbours so its ring is not clipped.

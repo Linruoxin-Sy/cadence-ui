@@ -243,6 +243,8 @@ export function RouterTrail() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). Nothing in a trail animates. A navigation landmark that fades or
 slides in is harder to find, and a trail that reflows on navigation makes the one
 stable thing on the page move.

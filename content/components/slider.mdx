@@ -4,6 +4,8 @@ description: Volume, brightness, zoom, and price ranges.
 category: form
 motion: [feedback.press]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Thumb feedback stays on the direct manipulation control; native value input is immediate."}
+motionCoverage: {"schema":1,"effects":{"feedback.press/one-shot":[{"relationship":"default","owner":"slider","reason":"Slider integrates press feedback at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T1
 since: 0.3.0
@@ -349,6 +351,8 @@ Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchange
 | `name`, `form` | `string` | – | Native form identity and owner. |
 
 ## Motion contract
+
+Authored intensity is **subtle**: Thumb feedback stays on the direct manipulation control; native value input is immediate.
 
 Recipe: `feedback.press/one-shot`. The dragged thumb compresses to 0.97 and springs back on
 release — the same press language as `button` and `toggle`.

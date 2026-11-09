@@ -3,7 +3,9 @@ title: Reveal Group
 description: Coordinates registered viewport entrances with bounded optional rhythm.
 category: motion
 motion: [{"recipe":"reveal","form":"viewport"}]
-intensity: subtle
+intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"An explicit scope coordinates registered Reveal hosts with optional bounded cycle stagger; it creates no animated wrapper."}
+motionCoverage: {"schema":1,"effects":{"reveal/viewport":[{"relationship":"composed","owner":"reveal-group","reason":"RevealGroup coordinates explicitly registered caller-composed Reveal hosts; the group adds no animated DOM."}]}}
 complexity: S
 tier: T1
 since: 0.6.0
@@ -99,6 +101,8 @@ not a disclosure, semantic open state, validation system or route transition.
 No per-instance duration, easing, distance or spring props. Use shared recipe/token policy.
 
 ## Motion contract
+
+Authored intensity is **medium**: An explicit scope coordinates registered Reveal hosts with optional bounded cycle stagger; it creates no animated wrapper.
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |

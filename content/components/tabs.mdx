@@ -4,6 +4,8 @@ description: Switch between peer views with a shared selection indicator.
 category: navigation
 motion: [{"recipe":"layout.shared","form":"selection"},{"recipe":"data.transition","form":"directional-content"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"Selection projection and directional content phases coordinate the selected tab and its panel."}
+motionCoverage: {"schema":1,"effects":{"layout.shared/selection":[{"relationship":"default","owner":"tabs","reason":"Tabs integrates selected-indicator continuity at its own parts, using the reached installed executor."}],"data.transition/directional-content":[{"relationship":"default","owner":"tabs","reason":"Tabs integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T3
 since: 0.4.0
@@ -346,6 +348,8 @@ merge last. The added `tabs-indicator` slot is decorative and aria-hidden.
 render/ref and state callbacks remain available. Semantic activation is immediate; eligible incoming paint uses the content phase without changing native size or mount policy.
 
 ## Motion contract
+
+Authored intensity is **medium**: Selection projection and directional content phases coordinate the selected tab and its panel.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

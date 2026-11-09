@@ -542,6 +542,8 @@ Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchange
 
 ## Motion contract
 
+Authored intensity is **subtle**: Thumb feedback stays on the direct manipulation control; native value input is immediate.
+
 Recipe: `feedback.press/one-shot`. The dragged thumb compresses to 0.97 and springs back on
 release — the same press language as `button` and `toggle`.
 

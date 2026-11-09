@@ -4,6 +4,8 @@ description: Destructive or irreversible actions that need confirmation.
 category: overlay
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Alert Dialog opens and closes its existing popup surface; content and native focus retain their current owners."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"alert-dialog","reason":"Alert Dialog integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"alert-dialog","reason":"Alert Dialog integrates popup closing at its own parts, using the reached installed executor."}]}}
 complexity: L
 tier: T2
 since: 0.3.0
@@ -547,6 +549,8 @@ Button: clicking it invokes the caller’s handler and leaves the popup open. Us
 `open` / `onOpenChange` to close when the caller decides the action is complete.
 
 ## Motion contract
+
+Authored intensity is **medium**: Alert Dialog opens and closes its existing popup surface; content and native focus retain their current owners.
 
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 

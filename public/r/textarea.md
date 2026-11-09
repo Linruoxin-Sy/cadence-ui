@@ -251,6 +251,8 @@ All native `textarea` props are forwarded, including `rows`, `maxLength`,
 
 ## Motion contract
 
+Authored intensity is **subtle**: Textarea declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). Growth is the browser sizing the box, not an animation: on a
 `field-sizing-content` textarea the height changes with the text as you type, and
 a transition on it would lag behind the caret.

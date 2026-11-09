@@ -952,6 +952,8 @@ restyle without a wrapper.
 
 ## Motion contract
 
+Authored intensity is **medium**: Code switching, active tab highlight and measured block geometry coordinate within one code surface.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | fold / unfold | viewport `height`, measured and clamped to the content | `geometry.resize/one-shot` | yes (a second click retargets the spring) |

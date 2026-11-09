@@ -4,6 +4,8 @@ description: Settings that take effect immediately, such as alerts or visibility
 category: form
 motion: [state.morph]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"The thumb travels only within its switch track."}
+motionCoverage: {"schema":1,"effects":{"state.morph/one-shot":[{"relationship":"default","owner":"switch","reason":"Switch integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.3.0
@@ -309,6 +311,8 @@ export function StaticSwitch() {
 | `className`       | `string` / state callback                    | –           | Merged last.                                   |
 
 ## Motion contract
+
+Authored intensity is **subtle**: The thumb travels only within its switch track.
 
 Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
 while the track recolours. The travel distance is measured from the rendered track

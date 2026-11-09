@@ -4,6 +4,8 @@ description: Transient notifications with accessible actions and dismissal.
 category: feedback
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Toast opens and closes its existing popup surface; content and native focus retain their current owners."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"toast","reason":"Toast integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"toast","reason":"Toast integrates popup closing at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T2
 since: 0.3.0
@@ -395,6 +397,8 @@ All parts forward upstream props and refs. Classes merge user values last. Butto
 match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 ## Motion contract
+
+Authored intensity is **medium**: Toast opens and closes its existing popup surface; content and native focus retain their current owners.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

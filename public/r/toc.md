@@ -508,6 +508,8 @@ Slots are `toc`, `toc-title`, `toc-track`, `toc-rail`, `toc-indicator`, `toc-lis
 
 ## Motion contract
 
+Authored intensity is **medium**: Native section navigation scrolls the page while a local indicator follows the active heading.
+
 One persistent indicator follows the active entry. Its top and bottom edges use the shared physics
 spring, then render as translation and vertical scale on a one-pixel base. Wrapped labels determine
 the destination's length. Edges stay inside the rail, and interrupted movement preserves velocity.

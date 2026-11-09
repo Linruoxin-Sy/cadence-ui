@@ -4,6 +4,8 @@ description: Keyboard shortcuts in tooltips, menus, and command lists.
 category: utility
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.2.0
@@ -138,6 +140,8 @@ export function SaveHint() {
 KbdGroup keeps the pinned native div prop type while rendering a `kbd` element.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A key hint is a label; it must not pulse or slide while the user
 is reading it.

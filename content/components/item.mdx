@@ -4,6 +4,8 @@ description: Rows in lists of files, members, and invoices.
 category: data
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: M
 tier: T0
 since: 0.2.0
@@ -317,6 +319,8 @@ write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 `ItemSeparator` accepts Base state callbacks for `className` and `style`; caller classes are merged last. `Item` render props use native string classes and style objects.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A row does not lift on hover or slide on mount. The only transition
 is `transition-colors` on the row and on a link inside it — state feedback that

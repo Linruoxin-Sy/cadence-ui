@@ -980,6 +980,8 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 
 ## Motion contract
 
+Authored intensity is **medium**: Month navigation shifts the bounded month grid; day selection retains its existing local feedback.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Month changes | opacity and signed horizontal transform on the actual grid | `data.transition/month-grid`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |

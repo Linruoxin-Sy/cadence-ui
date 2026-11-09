@@ -4,6 +4,8 @@ description: Independent yes/no choices and multi-select lists.
 category: form
 motion: [state.morph]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"The checked indicator appears within the control and keeps its native selection state."}
+motionCoverage: {"schema":1,"effects":{"state.morph/one-shot":[{"relationship":"default","owner":"checkbox","reason":"Checkbox integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.3.0
@@ -375,6 +377,8 @@ All native attributes are forwarded, including `aria-invalid` and
 `aria-describedby`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: The checked indicator appears within the control and keeps its native selection state.
 
 Recipe: `state.morph/one-shot`. The tick is the protagonist — it fades in and settles from
 0.96 to full size when the box is checked, and reverses when it is cleared.

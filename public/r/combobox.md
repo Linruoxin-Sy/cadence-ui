@@ -1375,6 +1375,8 @@ an undo affordance should not also hand out half of one.
 
 ## Motion contract
 
+Authored intensity is **medium**: Combobox opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored/css-transition` | yes: a CSS transition, so reopening reverses it |

@@ -144,12 +144,48 @@ measurements are safe or an animation passes runtime/performance acceptance. Rev
 conditional relationship manually; a matching recipe alone does not establish semantic applicability.
 
 Migration is explicit and fail-closed. `legacy` keeps all installed manifest, MDX, intensity, source
-budget and successful runtime-helper gates. Missing/unknown markers fail; `v2` currently fails because
-the stricter runtime observer, public docs and intensity enforcement have not landed. The marker is
+budget and successful runtime-helper gates. Missing/unknown markers fail; `v2` still fails because
+complete per-component six-capability/browser acceptance and the shared-stage gate remain pending.
+Installed ownership and authored-profile enforcement do not open that gate. The marker is
 internal to this design file, is never copied into registry payloads, and cannot waive existing checks.
 Later shared support must enable stricter evidence before any item changes to `v2`; per-item source,
 metadata, user docs and tests must then migrate together. Inventory comes from the registry, so adding
 standalone primitives requires contracts without changing a hard-coded count.
+
+### 2.2 Minimal installed coverage schema
+
+Every UI/block item additionally declares `meta.motionCoverage: { schema: 1, effects: { ... } }`.
+The effects keys are **exactly** the normalized installed `meta.motion` recipe/forms, including
+`/one-shot` for existing bare recipe strings. Each value is a nonempty list of integration records
+with `relationship`, `owner` (the registry component id integrating the executor) and a substantive
+`reason`. Distinct parts may reach distinct owners for one recipe (Data Table's Checkbox and menu
+glyphs, for example); all are listed once, with no conflicting/duplicate owner. No per-part matrix is copied.
+Empty effects explicitly means no declared installed recipe; it never means the six targets are
+inapplicable or complete. Existing recipe strings/forms, origin, dependencies, tier and source
+ceilings retain their meanings. Public frontmatter, item payload, catalog and registry index mirror
+both coverage and authored profile/intensity; stale published metadata fails registry checking.
+
+`default` identifies the local component adapter, including an adapter calling a shared lib
+executor. `inherited` identifies a different actual installed component reached through the live
+selected-export import path, with an explicit registry dependency. `composed` identifies an
+explicit caller boundary and its reached integration owner (for example RevealGroup coordinates
+caller-registered hosts). A helper import, dependency list, target binding or caller's similar CSS
+cannot supply ownership. The static checker and mandatory reporter validate every reached owner;
+successful three-mode runtime evidence (including foreign owner execution) is still required separately. A composed record cannot
+skip controller, part, CSS-owner or policy evidence.
+
+All four relationships, including `not-applicable`, remain in the internal six-capability schema.
+The parser resolves every target reference to its real part anchors and requires an applicability
+reason. Not-applicable names a part and its absent/native event, never an installed effect. A
+declared recipe cannot be labelled not-applicable. Missing, unknown, duplicate or conflicting
+relationships fail closed. Target `default` is an integration obligation after migration, not a
+fallback for absent installed metadata. No capability is inferred from tier, intensity, a shared
+helper's availability or the presence of a target recipe name.
+
+Part causes/properties, modes, interruption and native boundaries stay in the individual contract,
+public Motion contract and executable fixtures. Installed coverage records ownership of delivered
+recipes, not completion of the target six. Shared/schema success cannot promote a legacy marker;
+future v2 enablement must add full adoption and browser acceptance before opening the marker gate.
 
 ## 3. Common execution obligations
 

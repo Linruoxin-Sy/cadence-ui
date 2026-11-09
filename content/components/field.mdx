@@ -4,6 +4,8 @@ description: Form controls that need a label, help text, and error.
 category: form
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: M
 tier: T0
 since: 0.2.0
@@ -322,6 +324,8 @@ export function ChoiceCard() {
 `field-separator-content`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A field never animates — not on mount, not when the error appears.
 The error is the one thing the user must read immediately; fading or sliding it in

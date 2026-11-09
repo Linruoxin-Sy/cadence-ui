@@ -291,6 +291,8 @@ No per-instance duration, easing, distance or spring props. Use shared recipe/to
 
 ## Motion contract
 
+Authored intensity is **medium**: An explicitly composed offscreen host enters with opacity and compact travel; first-screen content remains native.
+
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |
 | Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal/viewport` / `duration.base`, `ease.out`, `distance.md` | yes |

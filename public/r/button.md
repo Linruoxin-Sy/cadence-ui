@@ -409,6 +409,8 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Press feedback stays on the pressed control; it adds no surface entrance or label replacement.
+
 Recipe: `feedback.press/one-shot`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |

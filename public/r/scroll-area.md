@@ -388,6 +388,8 @@ ref API is invented; query its slot from the root for application-owned imperati
 
 ## Motion contract
 
+Authored intensity is **subtle**: Scroll Area declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 T0: empty recipe set, no provider, hook, timing token or authored animation.
 Enter, exit and resize are immediate. Full, reduced and none share static markup.
 The primitive positions and sizes its thumb from actual native scroll geometry;

@@ -578,6 +578,8 @@ on a content child. Caller styles are preserved; padding and borders are never a
 
 ## Motion contract
 
+Authored intensity is **medium**: The disclosure content changes height for open and close with one existing CSS size writer.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |

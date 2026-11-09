@@ -816,6 +816,8 @@ slots.
 
 ## Motion contract
 
+Authored intensity is **medium**: Context Menu opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase         | Properties                                        | Token             | Interruptible |
 | ------------- | ------------------------------------------------- | ----------------- | ------------- |
 | open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored/css-transition` · `duration.fast` | yes |

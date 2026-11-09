@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+import { checkCatalogIntensity } from "../scripts/catalog-intensity.mjs";
+import { checkMotionCoverage } from "../scripts/motion-coverage.mjs";
 import { checkMotionImplementations } from "../scripts/motion-implementation.mjs";
 import { cssPolicyCapabilities, motionForms, motionRecipes, normaliseMotion } from "../scripts/motion-manifest.mjs";
 import { migrationProblems, targetMetadata } from "../scripts/motion-migration.mjs";
@@ -12,18 +14,19 @@ export default class MotionContractReporter {
     const ids = modules.map(
       (module) => module.moduleId.replaceAll("\\", "/").match(/\/tests\/components\/([^/]+)\.test\.tsx$/)?.[1],
     );
-    const cssItems = registry.items
-      .filter(
-        (item) =>
-          ids.includes(item.name) &&
-          normaliseMotion(item.meta?.motion).some(
-            (entry) => entry.form === "css-transition" && entry.recipe !== "state.color",
-          ),
-      )
+    const testedItems = registry.items
+      .filter((item) => ids.includes(item.name) && item.meta?.motion?.length)
       .map((item) => item.name);
-    const { references } = cssItems.length
-      ? await checkMotionImplementations(process.cwd(), registry, cssItems)
-      : { references: {} };
+    const implementations = testedItems.length
+      ? await checkMotionImplementations(process.cwd(), registry, testedItems)
+      : { references: {}, problems: [] };
+    const { references } = implementations;
+    const selected = { items: registry.items.filter((item) => ids.includes(item.name)) };
+    failures.push(
+      ...implementations.problems,
+      ...checkMotionCoverage(selected, implementations),
+      ...checkCatalogIntensity(selected),
+    );
     for (const module of modules) {
       if (module.moduleId.replaceAll("\\", "/").endsWith("/tests/lib/motion-policy.test.tsx")) {
         for (const capability of ["color", "loop"]) {
@@ -62,6 +65,16 @@ export default class MotionContractReporter {
       }
       if (!item.meta?.motion?.length && !capabilities.size) continue;
       const passed = [...module.children.allTests("passed")];
+      for (const effects of Object.values(item.meta?.motionCoverage?.effects ?? {})) {
+        if (!Array.isArray(effects)) continue;
+        for (const { owner } of effects) {
+          if (owner === id) continue;
+          const modes = new Set(passed.flatMap((test) => test.meta().cadenceComponents?.[owner] ?? []));
+          const missing = ["full", "reduced", "none"].filter((mode) => !modes.has(mode));
+          if (missing.length)
+            failures.push(`${id}: execute inherited integration owner ${owner} in ${missing.join(", ")}`);
+        }
+      }
       for (const entry of normaliseMotion(item.meta?.motion).filter(
         (entry) => entry.form === "css-transition" && entry.recipe !== "state.color",
       )) {

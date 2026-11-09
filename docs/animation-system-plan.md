@@ -98,14 +98,18 @@ implemented subset during migration and must identify actual recipes, not intern
 Update the component's target contract when a design decision changes; do not maintain a second target
 table inside this rollout plan or change a public claim to conceal missing implementation.
 
-Phase 1 must define the minimal capability schema and its relationship to that contract: default
-(integrated by the component), inherited, composed, or not applicable with a reason. An inherited capability does
-not prove a local recipe implementation. Existing metadata must remain readable during the schema
-transition; new defaults must not silently turn an unimplemented declaration into a passing check.
+The [minimal coverage schema](motion/README.md#22-minimal-installed-coverage-schema) separates the
+internal six target relationships from installed recipe ownership. Default, inherited, composed
+and not-applicable target references resolve to real part anchors with reasons. Installed coverage
+has exactly the declared recipe/forms and reached integration owners, never target-derived defaults
+or false inapplicable effects. Existing recipe, origin/dependency and source-budget fields remain
+readable. Strict per-item v2 enablement and complete shared-stage acceptance remain gated.
 
-Revisit `meta.intensity` and `scripts/catalog-intensity.mjs` together. Adding text or geometry to every
-applicable component would otherwise turn the current recipe-name heuristic into a nearly uniform
-label. Intensity remains descriptive and must not restrict capability or weaken runtime modes.
+`meta.motionProfile`, intensity, public explanations and `scripts/catalog-intensity.mjs` now use
+implemented perceptual extent, travel and coordination together. Text/geometry presence alone is
+not a medium label. Future adoptions must review their strongest actual behaviour and preserve the
+descriptive-only boundary; profiles cannot restrict capabilities or weaken modes. This tooling is
+not evidence of a component's complete target adoption or of the remaining shared-stage gates.
 
 ## 3. Shared implementation work
 
@@ -141,9 +145,10 @@ utilities and the current contract helper do not yet prove that broader guarante
 | `Reveal`         | A single surface entering the viewport, with once/repeat behaviour                             | Readable first screen, hydration and no-JS fallback; visibility policy is separate from presence                                         |
 | `RevealGroup`    | Group-owned reveal order and bounded stagger                                                   | Prevent nested duplicate entrances; stable item ids and a total delay/concurrency cap                                                    |
 
-AnimatedText is installed as `@cadence/animated-text`; its string/locale/granularity surface, relative
-dependency tree and conservative native fallback are described in its public MDX. The other names
-remain planned capabilities, with additive props and install dependencies still due in Phase 2.
+AnimatedText, AnimatedNumber, Reveal and RevealGroup have standalone registry entries; their delivered
+API subsets, relative dependency trees and conservative native fallbacks are described in public MDX.
+Complete four-install/shared-stage acceptance remains a separate gate; their existence does not
+establish original-catalogue adoption or full six-capability conformance.
 Existing components will integrate the same internal helpers for their owned strings/numbers; consumers need not
 wrap every built-in label to obtain the baseline. Complex user-authored content uses explicit
 composition so that links, refs, keys, selection and accessibility remain intact.
@@ -237,9 +242,11 @@ existing performance task is a final delivery dependency, not a development prer
 - Installed recipe/form checks require exact registry/MDX agreement and live installed value-import
   references to the selected implementation exports. Comments, unused/type-only/dead references and
   unrelated dependencies cannot establish adoption. Keep the conservative recognisers distinct from
-  executed controller evidence and browser acceptance. Capability schema, authored-intensity policy
-  (`scripts/catalog-intensity.mjs`) and temporary tier/budget semantics remain pending; preserve
-  existing source ceilings and truthful migration markers when implementing them.
+  executed controller evidence and browser acceptance. Installed coverage lists every reached
+  integration owner per exact form; the six-capability target keeps its separate applicability and
+  part graph. Authored profiles/intensity use actual extent, travel and coordination. Tier remains
+  a compatibility/source-budget label, never an animation prerequisite; existing ceilings and
+  written exceptions remain unchanged. Complete shared-stage and per-item migration gates remain pending.
 - Shared colour/loop policy has executed-hook observer/helper/reporter support, including rejected
   disconnected refs, missing capability evidence and legacy loop drift. Finite shared owners cancel
   restrictions and capture positive clocks; physics owners retime. Individual component adoption
@@ -301,7 +308,7 @@ or typography override is used. Unknown scripts/features, highlights, layout or 
 Existing captured-origin support composes only a complete single-unit destination; partial strings
 remain changed-only local replacements. The original 59 component owners do not yet import these
 text modules. AnimatedText exposes this controller as a standalone string renderer with its own registry
-item and changed-runs declaration. Original catalogue slot adoption, the other public renderers and
+item and changed-runs declaration. Original catalogue slot adoption, complete shared-stage acceptance and
 the overall v2 schema/evidence marker remain separate migration work. Unsupported correspondence
 remains native immediate, including the rejected DPR2 raster mapping.
 

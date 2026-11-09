@@ -3,7 +3,9 @@ title: Animated Number
 description: Independent quantities, amounts, and read-only numeric summaries.
 category: motion
 motion: [{"recipe":"number.roll","form":"reels"}]
-intensity: medium
+intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Bounded digit-place reels update one numeric readout; unsupported typography and geometry use native text."}
+motionCoverage: {"schema":1,"effects":{"number.roll/reels":[{"relationship":"default","owner":"animated-number","reason":"Animated Number integrates bounded digit-place reels at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.6.0
@@ -101,6 +103,8 @@ The span exposes `data-slot="animated-number"` and its effective `data-motion`. 
 CadenceProvider owns mode and timeScale. There are no instance duration, easing or identity props.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Bounded digit-place reels update one numeric readout; unsupported typography and geometry use native text.
 
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |

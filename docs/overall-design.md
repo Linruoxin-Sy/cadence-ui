@@ -102,10 +102,12 @@ The target capability matrix records whether each applicable behaviour is provid
 inherited from an owning part, available through documented composition, or not applicable with a
 reason. These are distinct delivery relationships, not interchangeable claims of automatic support.
 The internal reference schema in `docs/motion/README.md` checks target edges and explicit migration
-state; these are not registry fields or runtime evidence. Remaining schema/checker integration is rollout work. Target
-intensity is reviewed from actual authored behaviour and its scope; it must not be inferred solely
-from a recipe name or prefix. The current intensity policy and catalogue remain the delivered
-baseline until their migration is implemented and verified.
+state; these are not registry fields or runtime evidence. Its minimal installed counterpart,
+`meta.motionCoverage`, lists every reached integration owner per declared recipe/form, with a
+relationship and reason. It does not copy the six planned capabilities into installed claims.
+`meta.motionProfile` describes actual extent, travel and coordination for authored intensity;
+recipe names alone do not classify it. Public metadata/frontmatter and visible explanations agree.
+Complete per-item v2 enforcement and the remaining shared-stage gates stay in the rollout plan.
 
 `meta.parity.props` records justified upstream prop/default deviations; stale or missing records
 fail parity. Public export/slot/default changes cannot be hidden in documentation cleanup.

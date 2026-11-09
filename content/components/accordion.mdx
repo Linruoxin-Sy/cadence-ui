@@ -4,6 +4,8 @@ description: Reveal related sections while keeping their headings easy to scan.
 category: layout
 motion: [{"recipe":"geometry.resize","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes."}
+motionCoverage: {"schema":1,"effects":{"geometry.resize/css-transition":[{"relationship":"default","owner":"accordion","reason":"Accordion integrates owned size transitions at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T3
 since: 0.4.0
@@ -330,6 +332,8 @@ and `ref`. `className` styles the inner content, matching upstream; `style` appl
 Root and Item classes merge last.
 
 ## Motion contract
+
+Authored intensity is **medium**: The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

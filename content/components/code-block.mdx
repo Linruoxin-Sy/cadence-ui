@@ -4,6 +4,8 @@ description: Install commands, source snippets, and tool output.
 category: ai
 motion: [data.transition, layout.shared, state.morph, geometry.resize]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"Code switching, active tab highlight and measured block geometry coordinate within one code surface."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates the existing content/data/status phase at its own parts, using the reached installed executor."}],"layout.shared/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates selected-indicator continuity at its own parts, using the reached installed executor."}],"state.morph/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates local state/glyph feedback at its own parts, using the reached installed executor."}],"geometry.resize/one-shot":[{"relationship":"default","owner":"code-block","reason":"Code block integrates owned size transitions at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T5
 since: 0.5.0
@@ -743,6 +745,8 @@ Every part carries a `data-slot` (`code-block`, `code-block-header`, `code-block
 restyle without a wrapper.
 
 ## Motion contract
+
+Authored intensity is **medium**: Code switching, active tab highlight and measured block geometry coordinate within one code surface.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

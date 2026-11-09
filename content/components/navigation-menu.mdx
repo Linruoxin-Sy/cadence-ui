@@ -4,6 +4,8 @@ description: Site navigation with shared popup content and interruptible sizing.
 category: navigation
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"},{"recipe":"geometry.resize","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"Popup presence and the shared viewport size transition coordinate within the navigation surface."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"navigation-menu","reason":"Navigation Menu integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"navigation-menu","reason":"Navigation Menu integrates popup closing at its own parts, using the reached installed executor."}],"geometry.resize/css-transition":[{"relationship":"default","owner":"navigation-menu","reason":"Navigation Menu integrates owned size transitions at its own parts, using the reached installed executor."}]}}
 complexity: L
 tier: T3
 since: 0.5.0
@@ -547,6 +549,8 @@ Positioner contains the popup and viewport. Root already appends it; do not add 
 viewport have additive `data-slot` hooks. Positioner props still follow upstream composition.
 
 ## Motion contract
+
+Authored intensity is **medium**: Popup presence and the shared viewport size transition coordinate within the navigation surface.
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | --- | --- | --- | --- |

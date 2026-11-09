@@ -4,6 +4,8 @@ description: Invoices, transaction histories, and small collections of structure
 category: collection
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.4.0
@@ -450,6 +452,8 @@ not that wrapper. Size the surrounding layout to constrain the scrolling region.
 Rows retain hover, `data-state="selected"` and descendant `aria-expanded` feedback.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 T0: no motion recipe, hook, provider, or animation runtime. All modes render the
 same static table. Row colour feedback is the upstream CSS colour transition;

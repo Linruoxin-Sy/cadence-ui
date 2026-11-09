@@ -4,6 +4,8 @@ description: Displays file media, metadata, caller-owned upload state, and actio
 category: ai
 motion: [{"recipe":"data.transition","form":"continuous"},"feedback.press"]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"Progress feedback stays within the attachment; it introduces no upload state or surface choreography."}
+motionCoverage: {"schema":1,"effects":{"data.transition/continuous":[{"relationship":"default","owner":"attachment","reason":"Attachment integrates the existing content/data/status phase at its own parts, using the reached installed executor."}],"feedback.press/one-shot":[{"relationship":"inherited","owner":"button","reason":"Attachment mounts button for press feedback; that installed component remains the integration owner."}]}}
 complexity: M
 tier: T5
 since: 0.5.0
@@ -641,6 +643,8 @@ Native refs, styles and events pass through; classes merge last. Root also expos
 No File or request state is stored internally. There is no default upload action.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Progress feedback stays within the attachment; it introduces no upload state or surface choreography.
 
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |

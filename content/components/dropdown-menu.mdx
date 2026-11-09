@@ -4,6 +4,8 @@ description: Row actions, filters, and view settings behind one button.
 category: overlay
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"},"state.morph"]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"dropdown-menu","reason":"Dropdown Menu integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"dropdown-menu","reason":"Dropdown Menu integrates popup closing at its own parts, using the reached installed executor."}],"state.morph/one-shot":[{"relationship":"default","owner":"dropdown-menu","reason":"Dropdown Menu integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: L
 tier: T2
 since: 0.4.0
@@ -734,6 +736,8 @@ the element the user presses.
 `DropdownMenuShortcut`, `DropdownMenuPortal`.
 
 ## Motion contract
+
+Authored intensity is **medium**: Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners.
 
 | Phase         | Properties                                        | Token             | Interruptible                |
 | ------------- | ------------------------------------------------- | ----------------- | ---------------------------- |

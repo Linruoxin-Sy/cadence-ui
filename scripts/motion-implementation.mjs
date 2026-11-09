@@ -97,12 +97,12 @@ export async function checkMotionImplementations(
     for (const { recipe, form } of declared) {
       // Policy/text/number adoption is local. Its executor's availability alone
       // never implements a component; a composition can reach an actual adapter.
-      const match = [...reachable.values()].find((entry) => implementedForm(entry.source, recipe, form) === form);
-      if (!match)
+      const matches = [...reachable.values()].filter((entry) => implementedForm(entry.source, recipe, form) === form);
+      if (!matches.length)
         problems.push(
           `${item.name}: declares "${recipe}" (${form}) but nothing implements it on a live installed import path`,
         );
-      else
+      for (const match of matches)
         references[item.name].push({
           recipe,
           form,

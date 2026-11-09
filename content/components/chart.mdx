@@ -4,6 +4,8 @@ description: Responsive data charts with themed tooltips and legends.
 category: collection
 motion: [data.transition]
 intensity: medium
+motionProfile: {"scope":"collection","travel":"extended","coordination":"independent","reason":"Recharts interpolates the plotted geometry; Cadence does not add a second data-geometry writer."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"chart","reason":"Chart integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T4
 since: 0.4.0
@@ -784,6 +786,8 @@ and config and emits nothing without configured colours. ChartConfig is a record
 plus either color or a complete light/dark theme map. Helpers require ChartContainer context.
 
 ## Motion contract
+
+Authored intensity is **medium**: Recharts interpolates the plotted geometry; Cadence does not add a second data-geometry writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

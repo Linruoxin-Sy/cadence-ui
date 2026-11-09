@@ -779,6 +779,8 @@ components. A custom render must retain a focusable button and the supplied prop
 
 ## Motion contract
 
+Authored intensity is **medium**: Installed Popover owns the surface and Calendar owns month changes; the formatted trigger label still updates immediately.
+
 T2 describes existing control motion. No date label animation, layout tween,
 selection-keyed remount, new recipe or runtime is added.
 

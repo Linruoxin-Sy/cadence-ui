@@ -4,6 +4,8 @@ description: Displays conversational content with variants, grouping, reactions,
 category: ai
 motion: [data.transition]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"The pending indicator pulses locally; message content remains caller-owned."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"bubble","reason":"Bubble integrates the existing content/data/status phase at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T5
 since: 0.5.0
@@ -357,6 +359,8 @@ Bubble exposes data-variant, data-align and data-motion; reactions expose data-s
 and data-align. No additional message-state or validation API is introduced.
 
 ## Motion contract
+
+Authored intensity is **subtle**: The pending indicator pulses locally; message content remains caller-owned.
 
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |

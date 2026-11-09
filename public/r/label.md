@@ -179,6 +179,8 @@ All native `label` props are forwarded.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Label declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A label is text; the only thing it reacts to is the disabled state,
 which is an opacity change on a token, not an animation.
 

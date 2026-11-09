@@ -4,6 +4,8 @@ description: Lists, tables, and panels with nothing to show yet.
 category: layout
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Empty declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.2.0
@@ -249,6 +251,8 @@ export function EmptyWithoutMedia() {
 `empty-description`, `empty-icon`, `empty-content`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Empty declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). An empty state is a resting state: it is what the region looks like
 when nothing is happening. Fading it in would make it look like content arriving,

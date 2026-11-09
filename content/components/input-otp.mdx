@@ -4,6 +4,8 @@ description: Login codes, email verification, and device pairing.
 category: form
 motion: [state.morph]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"The active caret blinks in its native character slot; OTP characters are not animated counters."}
+motionCoverage: {"schema":1,"effects":{"state.morph/one-shot":[{"relationship":"default","owner":"input-otp","reason":"Input OTP integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T1
 since: 0.3.0
@@ -401,6 +403,8 @@ export function StaticCode() {
 `input-otp-group` and `input-otp-separator`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: The active caret blinks in its native character slot; OTP characters are not animated counters.
 
 Recipe: `state.morph/one-shot`. A character lands in its slot with a short fade and settles
 from 0.96 to full size. Deleting a character is instant — an exit animation would

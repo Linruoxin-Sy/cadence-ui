@@ -4,6 +4,8 @@ description: Errors, warnings, and page-level status messages.
 category: feedback
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.2.0
@@ -174,6 +176,8 @@ Every part sets `data-slot` (`alert`, `alert-title`, `alert-description`,
 Destructive descriptions use the full destructive text token for readable contrast in both themes. An action has its own grid column so it cannot cover the title or description.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). An alert that slides or fades in draws attention to the animation
 instead of the message, and a message that is already on screen when the page loads

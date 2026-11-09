@@ -237,6 +237,8 @@ Base UI state callbacks for `className` are evaluated before merging caller clas
 
 ## Motion contract
 
+Authored intensity is **subtle**: Input declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). An input that grows, slides, or fades while the user types is a
 bug: it moves the caret under the user's eyes.
 

@@ -4,6 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { checkCatalogIntensity } from "../../scripts/catalog-intensity.mjs";
+import { checkMotionCoverage } from "../../scripts/motion-coverage.mjs";
 import { checkMotionDocs } from "../../scripts/motion-docs.mjs";
 import { recipeCatalogue } from "../../scripts/motion-manifest.mjs";
 import { freshDocs } from "../fixtures/fresh-docs";
@@ -78,6 +80,26 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
     const result = await entry(buttonPath, button);
     expect(result.status, result.output).toBe(0);
   });
+  it.each(["button.json", "catalog.json", "registry.json"])(
+    "rejects stale published profile/ownership in %s",
+    async (name) => {
+      const file = `public/r/${name}`;
+      const published = JSON.parse(readFileSync(path.join(fixture, file), "utf8"));
+      const metadata =
+        name === "catalog.json"
+          ? published.find((item: { name: string }) => item.name === "button")
+          : name === "registry.json"
+            ? published.items.find((item: { name: string }) => item.name === "button").meta
+            : published.meta;
+      metadata.motionCoverage.effects = {};
+      metadata.motionProfile.scope = "surface";
+      metadata.intensity = "medium";
+      const result = await entry(file, JSON.stringify(published));
+      expect(result.status, result.output).toBe(1);
+      for (const field of ["motionCoverage", "motionProfile", "intensity"])
+        expect(result.output).toContain(`button: ${file} ${field} differs from installed metadata`);
+    },
+  );
 
   it.each([
     [
@@ -125,6 +147,13 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
       button.replace("motion: [feedback.press]", "motion: feedback.press"),
       "frontmatter motion must be an array",
     ],
+    ["missing ownership", button.replace(/^motionCoverage: .*\r?\n/m, ""), "docs motionCoverage differs"],
+    ["missing profile", button.replace(/^motionProfile: .*\r?\n/m, ""), "docs motionProfile differs"],
+    [
+      "false intensity explanation",
+      button.replace("Authored intensity is **subtle**", "Authored intensity is **medium**"),
+      "visible authored intensity/profile explanation differs",
+    ],
   ])("rejects %s through the actual check script", async (_, source, diagnostic) => {
     const result = await entry(buttonPath, source);
     expect(result.status).toBe(1);
@@ -167,55 +196,63 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
 });
 
 describe("new-item motion docs scaffold", () => {
-  it.each([{ motion: [] }, { motion: ["reveal", "exit.fade"] }])(
-    "emits the complete declared set %j",
-    async ({ motion }) => {
-      const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-scaffold-"));
-      try {
-        cpSync("docs", path.join(temp, "docs"), { recursive: true });
-        cpSync("content", path.join(temp, "content"), { recursive: true });
-        cpSync("components", path.join(temp, "components"), { recursive: true });
-        writeFileSync(path.join(temp, "registry.json"), '{"items":[]}');
-        const result = spawnSync(
-          process.execPath,
-          [
-            path.join(root, "scripts/new-item.mjs"),
-            "--name",
-            "fixture",
-            "--description",
-            "Fixture.",
-            "--batch",
-            "B1",
-            "--tier",
-            motion.length ? "T2" : "T0",
-            "--motion",
-            motion.join(","),
-          ],
-          { cwd: temp, encoding: "utf8" },
-        );
-        expect(result.status, result.stderr).toBe(0);
-        const target = readFileSync(path.join(temp, "docs/motion/components/fixture.md"), "utf8");
-        expect(target).toContain('"migration": "legacy"');
-        expect(target).toContain("TODO: assess applicability, actual owner and reason.");
-        expect(readFileSync(path.join(temp, "docs/motion/README.md"), "utf8")).toContain(
-          "[Fixture](components/fixture.md)",
-        );
-        const testSource = readFileSync(path.join(temp, "tests/components/fixture.test.tsx"), "utf8");
-        if (motion.length) {
-          expect(testSource).toContain('import { expectMotionContract } from "../motion-contract"');
-          expect(testSource).toContain('it.each(["full", "reduced", "none"] as const)');
-          expect(testSource).toContain("expectMotionContract(mode)");
-        } else {
-          expect(testSource).not.toContain("expectMotionContract");
-          expect(testSource).not.toContain("CadenceProvider");
-        }
-
-        expect(
-          await checkMotionDocs(temp, JSON.parse(readFileSync(path.join(temp, "registry.json"), "utf8")), catalogue),
-        ).toEqual([]);
-      } finally {
-        rmSync(temp, { recursive: true, force: true });
+  it.each([
+    { motion: [], tier: "T0" },
+    { motion: ["reveal", "exit.fade"], tier: "T2" },
+    { motion: [], tier: "T3" },
+  ])("emits the complete declared set %j", async ({ motion, tier }) => {
+    const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-scaffold-"));
+    try {
+      cpSync("docs", path.join(temp, "docs"), { recursive: true });
+      cpSync("content", path.join(temp, "content"), { recursive: true });
+      cpSync("components", path.join(temp, "components"), { recursive: true });
+      writeFileSync(path.join(temp, "registry.json"), '{"items":[]}');
+      const result = spawnSync(
+        process.execPath,
+        [
+          path.join(root, "scripts/new-item.mjs"),
+          "--name",
+          "fixture",
+          "--description",
+          "Fixture.",
+          "--batch",
+          "B1",
+          "--tier",
+          tier,
+          "--motion",
+          motion.join(","),
+        ],
+        { cwd: temp, encoding: "utf8" },
+      );
+      expect(result.status, result.stderr).toBe(0);
+      const target = readFileSync(path.join(temp, "docs/motion/components/fixture.md"), "utf8");
+      const scaffold = JSON.parse(readFileSync(path.join(temp, "registry.json"), "utf8"));
+      expect(checkCatalogIntensity(scaffold).join("\n")).toContain("authored behaviour reason");
+      if (motion.length)
+        expect(checkMotionCoverage(scaffold).join("\n")).toContain("substantive ownership/boundary reason");
+      expect(scaffold.items[0].meta.intensity).toBe("subtle");
+      expect(target).toContain('"migration": "legacy"');
+      expect(target).toContain("TODO: assess applicability, actual owner and reason.");
+      expect(readFileSync(path.join(temp, "docs/motion/README.md"), "utf8")).toContain(
+        "[Fixture](components/fixture.md)",
+      );
+      const testSource = readFileSync(path.join(temp, "tests/components/fixture.test.tsx"), "utf8");
+      if (motion.length) {
+        expect(testSource).toContain('import { expectMotionContract } from "../motion-contract"');
+        expect(testSource).toContain('it.each(["full", "reduced", "none"] as const)');
+        expect(testSource).toContain("expectMotionContract(mode)");
+      } else {
+        expect(testSource).not.toContain("expectMotionContract");
+        expect(testSource).not.toContain("CadenceProvider");
+        expect(scaffold.items[0].registryDependencies).toEqual(["@cadence/cadence-utils"]);
+        expect(scaffold.items[0].dependencies).toEqual([]);
       }
-    },
-  );
+
+      expect(
+        await checkMotionDocs(temp, JSON.parse(readFileSync(path.join(temp, "registry.json"), "utf8")), catalogue),
+      ).toEqual([]);
+    } finally {
+      rmSync(temp, { recursive: true, force: true });
+    }
+  });
 });

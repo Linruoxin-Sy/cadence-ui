@@ -4,6 +4,8 @@ description: Grouping related content, such as a summary or a record.
 category: layout
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.2.0
@@ -232,6 +234,8 @@ from — style the parts from the shell as before, and the flow box only if you
 need the measured layer itself.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A card does not fade, lift, or scale in. If a group of cards should
 appear in sequence, that is a page-level `list.stagger` decision made by the parent,

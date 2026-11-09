@@ -15,3 +15,7 @@ Generated samples, logs, traces and audit output belong in ignored .cache/audits
 motion-target/ contains a small authored target reference graph and drift mutations. Tests exercise
 Markdown parsing, part/capability/preset closure, property-scope mistakes and fail-closed migration.
 These fixtures neither install planned recipes nor certify runtime v2 behaviour.
+
+motion-coverage/ contains negative installed-ownership declarations. They reject unknown/missing
+schema, relationships and owners, false inapplicable effects and placeholder reasons. The tests
+keep target assessments separate from exact delivered forms and actual live integration evidence.

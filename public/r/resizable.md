@@ -437,6 +437,8 @@ stable panel ids to numeric percentages. Slots: `resizable-panel-group`, `resiza
 
 ## Motion contract
 
+Authored intensity is **subtle**: Resizable declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 T0: declared, implemented and documented recipe sets are empty. Direct manipulation is functional
 layout, not an authored animation. The default panel preview, keyboard, collapse/expand and imperative updates apply
 immediately in full, reduced and none. Separator preview defers pointer commitment until release without interpolation. No spring, timer, geometry tween, opacity reveal, provider,

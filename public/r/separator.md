@@ -161,6 +161,8 @@ Base UI state callbacks for `className` are evaluated before merging caller clas
 
 ## Motion contract
 
+Authored intensity is **subtle**: Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A boundary that animates draws the eye to the wrong thing; if the
 layout changes, the surrounding `accordion` or `collapsible` owns that animation.
 

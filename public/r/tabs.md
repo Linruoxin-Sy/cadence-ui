@@ -548,6 +548,8 @@ render/ref and state callbacks remain available. Semantic activation is immediat
 
 ## Motion contract
 
+Authored intensity is **medium**: Selection projection and directional content phases coordinate the selected tab and its panel.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared/selection`, physics-defined smooth selection spring | Yes; current geometry and velocity |

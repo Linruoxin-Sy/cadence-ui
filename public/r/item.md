@@ -344,6 +344,8 @@ write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 
 ## Motion contract
 
+Authored intensity is **subtle**: Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A row does not lift on hover or slide on mount. The only transition
 is `transition-colors` on the row and on a link inside it — state feedback that
 costs nothing and never moves the text the user is reading.

@@ -4,6 +4,8 @@ description: Filters, share links, and other controls tied to a trigger.
 category: overlay
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Popover opens and closes its existing popup surface; content and native focus retain their current owners."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"popover","reason":"Popover integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"popover","reason":"Popover integrates popup closing at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T2
 since: 0.3.0
@@ -572,6 +574,8 @@ export function PopoverMotionScopes() {
 trigger and upstream's Base UI surface has no anchor part.
 
 ## Motion contract
+
+Authored intensity is **medium**: Popover opens and closes its existing popup surface; content and native focus retain their current owners.
 
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 

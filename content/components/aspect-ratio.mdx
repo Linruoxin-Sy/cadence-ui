@@ -4,6 +4,8 @@ description: Images, videos, and embeds that must keep their shape.
 category: layout
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Aspect Ratio declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.2.0
@@ -157,6 +159,8 @@ The ratio is written as `--ratio`, and the box uses `aspect-(--ratio)`. Your own
 `style` is preserved: the custom property is merged after it.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Aspect Ratio declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). The whole point of the box is that it does not change size; a
 transition here would reintroduce the layout shift it exists to prevent.

@@ -553,6 +553,8 @@ button without becoming one.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Pagination declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A page change is a navigation: the content that changes is the list,
 not the control. Animating the pagination would animate the one thing that stays the
 same.

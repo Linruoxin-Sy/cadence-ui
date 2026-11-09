@@ -524,6 +524,8 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Press feedback scales the active control in place.
+
 Recipe: `feedback.press/one-shot`. The button compresses to 0.97 while the pointer is down
 and springs back on release.
 

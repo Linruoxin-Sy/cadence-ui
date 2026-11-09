@@ -838,6 +838,8 @@ No File or request state is stored internally. There is no default upload action
 
 ## Motion contract
 
+Authored intensity is **subtle**: Progress feedback stays within the attachment; it introduces no upload state or surface choreography.
+
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
 | Uploading/processing title | `data.transition/continuous` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |

@@ -4,6 +4,8 @@ description: Choosing one option from a small, fixed set.
 category: form
 motion: [state.morph]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"The selected dot changes inside its radio control without moving the option collection."}
+motionCoverage: {"schema":1,"effects":{"state.morph/one-shot":[{"relationship":"default","owner":"radio-group","reason":"Radio Group integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.3.0
@@ -416,6 +418,8 @@ export function StaticRadio() {
 | `className` | `string` / state callback  | –       | Merged last.                             |
 
 ## Motion contract
+
+Authored intensity is **subtle**: The selected dot changes inside its radio control without moving the option collection.
 
 Recipe: `state.morph/one-shot`. The dot of the newly selected item fades in and settles
 from 0.96 to full size; the previously selected dot reverses. Nothing else in the

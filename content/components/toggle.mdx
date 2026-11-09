@@ -4,6 +4,8 @@ description: Bold, italic, preview, and other on/off modes.
 category: form
 motion: [feedback.press]
 intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Press feedback scales the active control in place."}
+motionCoverage: {"schema":1,"effects":{"feedback.press/one-shot":[{"relationship":"default","owner":"toggle","reason":"Toggle integrates press feedback at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.3.0
@@ -331,6 +333,8 @@ cleanup before assigning the next ref. A caller `render` replaces the default
 renderer and owns spreading its supplied props.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Press feedback scales the active control in place.
 
 Recipe: `feedback.press/one-shot`. The button compresses to 0.97 while the pointer is down
 and springs back on release.

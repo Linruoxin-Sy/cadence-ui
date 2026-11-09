@@ -4,6 +4,8 @@ description: Choosing one value from a short list of options.
 category: form
 motion: [{"recipe":"popup.anchored","form":"css-transition"},"geometry.resize","handoff","state.morph"]
 intensity: expressive
+motionProfile: {"scope":"surface","travel":"compact","coordination":"identity","reason":"The selected label transfers between the popup and trigger while trigger geometry follows the owned label."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"select","reason":"Select integrates popup opening at its own parts, using the reached installed executor."}],"geometry.resize/one-shot":[{"relationship":"default","owner":"select","reason":"Select integrates owned size transitions at its own parts, using the reached installed executor."}],"handoff/one-shot":[{"relationship":"default","owner":"select","reason":"Select integrates selected-label ownership transfer at its own parts, using the reached installed executor."}],"state.morph/one-shot":[{"relationship":"default","owner":"select","reason":"Select integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
 complexity: L
 tier: T3
 since: 0.4.0
@@ -463,6 +465,8 @@ export function Placement() {
 | `SelectScrollUpButton` / `SelectScrollDownButton` | scroll-arrow props | Appear only when the list overflows. |
 
 ## Motion contract
+
+Authored intensity is **expressive**: The selected label transfers between the popup and trigger while trigger geometry follows the owned label.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

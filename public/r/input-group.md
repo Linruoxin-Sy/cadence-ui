@@ -502,6 +502,8 @@ shows the ring.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). The frame never animates. `transition-[color,box-shadow]` covers the
 focus ring and the invalid border — state feedback that takes no space and does not
 run on mount.

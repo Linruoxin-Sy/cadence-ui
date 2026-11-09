@@ -61,10 +61,12 @@ A pull request is ready when the component has:
    on every part, and the same exports and props as shadcn.
 2. **Registry metadata**: `meta.tier`, `meta.batch` (the parity batch from
    [the plan](docs/parity-plan.md#7-batches)), `meta.motion`, `meta.intensity`, `meta.complexity`, and
-   `meta.upstream`. These remain required compatibility fields until the schema migration lands;
-   declare only implemented recipes. Intra-registry dependencies are namespaced (`@cadence/button`).
+   `meta.upstream`. These compatibility fields remain required. Add exact installed ownership in
+   `meta.motionCoverage` and review authored extent/travel/coordination in `meta.motionProfile`;
+   neither promotes a legacy target or replaces runtime evidence. Declare only implemented recipes.
+   Intra-registry dependencies are namespaced (`@cadence/button`).
 3. **Docs** in `content/components/<id>.mdx` with frontmatter that matches `registry.json`
-   (title, description, deps, registryDeps, motion, intensity, complexity, since, tier). Follow the [tier-specific template](docs/documentation-site-and-distribution.md#2-component-page-templates-tier-specific-membership):
+   (title, description, deps, registryDeps, motion, motionCoverage, motionProfile, intensity, complexity, since, tier). Follow the [tier-specific template](docs/documentation-site-and-distribution.md#2-component-page-templates-tier-specific-membership):
    required membership/order, responsiveness/performance at every tier, a motion contract table,
    and input data ownership. Follow the [preview authoring contract](docs/documentation-site-and-distribution.md#22-preview-capabilities):
    keep the top card focused on the component itself, with no demo configuration controls; show a compact

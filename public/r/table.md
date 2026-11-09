@@ -473,6 +473,8 @@ Rows retain hover, `data-state="selected"` and descendant `aria-expanded` feedba
 
 ## Motion contract
 
+Authored intensity is **subtle**: Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 T0: no motion recipe, hook, provider, or animation runtime. All modes render the
 same static table. Row colour feedback is the upstream CSS colour transition;
 rows do not enter, reorder, resize, or animate selection.

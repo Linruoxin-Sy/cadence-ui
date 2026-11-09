@@ -255,6 +255,8 @@ need the measured layer itself.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A card does not fade, lift, or scale in. If a group of cards should
 appear in sequence, that is a page-level `list.stagger` decision made by the parent,
 not a property of the card.

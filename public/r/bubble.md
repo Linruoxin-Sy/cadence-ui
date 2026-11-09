@@ -550,6 +550,8 @@ and data-align. No additional message-state or validation API is introduced.
 
 ## Motion contract
 
+Authored intensity is **subtle**: The pending indicator pulses locally; message content remains caller-owned.
+
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
 | Later client insertion | `data.transition/one-shot` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Current resting opacity immediately |

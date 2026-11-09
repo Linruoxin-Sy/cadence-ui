@@ -2,11 +2,31 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { checkMotionCoverage, implementationOwner } from "../../scripts/motion-coverage.mjs";
 import { checkMotionImplementations } from "../../scripts/motion-implementation.mjs";
 import { calledRecipes, implementedForm } from "../../scripts/motion-manifest.mjs";
 import negatives from "../fixtures/motion/implementation-negative.json";
 
 describe("exact live installed implementations", () => {
+  it("retains all independent installed owners for the same form without treating an imported executor as a new owner", async () => {
+    const registry = JSON.parse(await readFile("registry.json", "utf8"));
+    const result = await checkMotionImplementations(process.cwd(), registry, ["data-table"]);
+    expect(result.problems).toEqual([]);
+    const owners = [
+      ...new Set(
+        result.references["data-table"]
+          .filter((ref: { recipe: string }) => ref.recipe === "state.morph")
+          .map(implementationOwner),
+      ),
+    ].sort();
+    expect(owners).toEqual(["checkbox", "dropdown-menu"]);
+    const selected = { items: registry.items.filter((item: { name: string }) => item.name === "data-table") };
+    expect(checkMotionCoverage(selected, result)).toEqual([]);
+    selected.items[0].meta.motionCoverage.effects["state.morph/one-shot"].pop();
+    expect(checkMotionCoverage(selected, result).join("\n")).toContain(
+      "reached integration dropdown-menu missing ownership",
+    );
+  });
   it.each(negatives)("rejects $name without mistaking syntax for playback", ({ source, called }) => {
     expect(calledRecipes(source).includes("feedback.press")).toBe(Boolean(called));
     expect(implementedForm(source, "feedback.press")).toBeNull();

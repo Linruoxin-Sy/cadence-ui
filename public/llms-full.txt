@@ -511,6 +511,8 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Press feedback stays on the pressed control; it adds no surface entrance or label replacement.
+
 Recipe: `feedback.press/one-shot`, driven by the press gesture.
 
 | Phase | Properties | Token | Interruptible |
@@ -706,6 +708,8 @@ props are forwarded.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Badge declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A badge labels content; it does not enter, leave, or move.
 
 | Phase   | Properties                          | Token | Interruptible |
@@ -899,6 +903,8 @@ KbdGroup keeps the pinned native div prop type while rendering a `kbd` element.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A key hint is a label; it must not pulse or slide while the user
 is reading it.
 
@@ -1089,6 +1095,8 @@ Base UI state callbacks for `className` are evaluated before merging caller clas
 `style` accepts an object or a state callback and is forwarded to the primitive.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A boundary that animates draws the eye to the wrong thing; if the
 layout changes, the surrounding `accordion` or `collapsible` owns that animation.
@@ -1298,6 +1306,8 @@ export function DisabledFields() {
 All native `label` props are forwarded.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Label declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A label is text; the only thing it reacts to is the disabled state,
 which is an opacity change on a token, not an animation.
@@ -1565,6 +1575,8 @@ Base UI state callbacks for `className` are evaluated before merging caller clas
 `style` accepts an object or a state callback and is forwarded to the primitive.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Input declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). An input that grows, slides, or fades while the user types is a
 bug: it moves the caret under the user's eyes.
@@ -1867,6 +1879,8 @@ All native `textarea` props are forwarded, including `rows`, `maxLength`,
 `required`, `readOnly`, `disabled`, and `aria-*`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Textarea declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). Growth is the browser sizing the box, not an animation: on a
 `field-sizing-content` textarea the height changes with the text as you type, and
@@ -2171,6 +2185,8 @@ need the measured layer itself.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A card does not fade, lift, or scale in. If a group of cards should
 appear in sequence, that is a page-level `list.stagger` decision made by the parent,
 not a property of the card.
@@ -2394,6 +2410,8 @@ The ratio is written as `--ratio`, and the box uses `aspect-(--ratio)`. Your own
 `style` is preserved: the custom property is merged after it.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Aspect Ratio declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). The whole point of the box is that it does not change size; a
 transition here would reintroduce the layout shift it exists to prevent.
@@ -2664,6 +2682,8 @@ Root, Image and Fallback accept Base UI state callbacks for `className` and `sty
 Caller classes merge last; Badge and group parts use native string classes and object styles.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Avatar declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). The image-to-fallback swap is instant by design: Base UI knows when
 the image errored, and a cross-fade would show a half-drawn face in the meantime.
@@ -3092,6 +3112,8 @@ always set.
 
 ## Motion contract
 
+Authored intensity is **subtle**: The existing loading pulse changes local opacity without moving content.
+
 Recipe: `data.transition/continuous`, a continuous opacity loop. It is implemented in CSS
 (`animate-pulse`) rather than in Motion, because a page can render dozens of
 placeholders and each Motion loop costs a frame callback; the pulse only touches
@@ -3338,6 +3360,8 @@ Every part sets `data-slot` (`alert`, `alert-title`, `alert-description`,
 Destructive descriptions use the full destructive text token for readable contrast in both themes. An action has its own grid column so it cannot cover the title or description.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). An alert that slides or fades in draws attention to the animation
 instead of the message, and a message that is already on screen when the page loads
@@ -3649,6 +3673,8 @@ export function EmptyWithoutMedia() {
 `empty-description`, `empty-icon`, `empty-content`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Empty declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). An empty state is a resting state: it is what the region looks like
 when nothing is happening. Fading it in would make it look like content arriving,
@@ -4033,6 +4059,8 @@ write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 `ItemSeparator` accepts Base state callbacks for `className` and `style`; caller classes are merged last. `Item` render props use native string classes and style objects.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). A row does not lift on hover or slide on mount. The only transition
 is `transition-colors` on the row and on a link inside it — state feedback that
@@ -4430,6 +4458,8 @@ export function ChoiceCard() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A field never animates — not on mount, not when the error appears.
 The error is the one thing the user must read immediately; fading or sliding it in
 delays the only information that matters, and it moves the control the user's cursor
@@ -4740,6 +4770,8 @@ button, an input, a select trigger — participates without a prop.
 `ButtonGroupSeparator` accepts Base state callbacks for `className` and `style`, merged after defaults. `ButtonGroupText` uses native string classes and style objects.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Button Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). The group does not animate. Adjacent buttons share a border, and the
 only depth cue is `focus-visible:relative` plus `z-10`, which lifts the focused
@@ -5283,6 +5315,8 @@ shows the ring.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). The frame never animates. `transition-[color,box-shadow]` covers the
 focus ring and the invalid border — state feedback that takes no space and does not
 run on mount.
@@ -5576,6 +5610,8 @@ export function RouterTrail() {
 | `BreadcrumbEllipsis`   | native span props     | Hidden from assistive tech; contains `sr-only` "More".        |
 
 ## Motion contract
+
+Authored intensity is **subtle**: Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). Nothing in a trail animates. A navigation landmark that fades or
 slides in is harder to find, and a trail that reflows on navigation makes the one
@@ -6172,6 +6208,8 @@ button without becoming one.
 
 ## Motion contract
 
+Authored intensity is **subtle**: Pagination declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). A page change is a navigation: the content that changes is the list,
 not the control. Animating the pagination would animate the one thing that stays the
 same.
@@ -6600,6 +6638,8 @@ All native `svg` props are forwarded. `data-slot="spinner"` and `data-motion` ar
 always set, and `role="status"` with the label is the announcement.
 
 ## Motion contract
+
+Authored intensity is **subtle**: The status glyph rotates in place; the legacy reduced rotation remains pending migration.
 
 Recipe: `data.transition/continuous`, continuous form. The loop is CSS (`animate-spin`) rather
 than Motion, for the same reason as `skeleton`: a spinner is by definition next to work
@@ -7378,6 +7418,8 @@ export function DialogMotionScopes() {
 
 ## Motion contract
 
+Authored intensity is **medium**: Dialog opens and closes its existing popup surface; content and native focus retain their current owners.
+
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
@@ -7990,6 +8032,8 @@ All native attributes are forwarded, including `aria-invalid` and
 `aria-describedby`.
 
 ## Motion contract
+
+Authored intensity is **subtle**: The checked indicator appears within the control and keeps its native selection state.
 
 Recipe: `state.morph/one-shot`. The tick is the protagonist — it fades in and settles from
 0.96 to full size when the box is checked, and reverses when it is cleared.
@@ -8658,6 +8702,8 @@ export function StaticRadio() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: The selected dot changes inside its radio control without moving the option collection.
+
 Recipe: `state.morph/one-shot`. The dot of the newly selected item fades in and settles
 from 0.96 to full size; the previously selected dot reverses. Nothing else in the
 row moves, so the eye follows the choice.
@@ -9217,6 +9263,8 @@ export function StaticSwitch() {
 | `className`       | `string` / state callback                    | –           | Merged last.                                   |
 
 ## Motion contract
+
+Authored intensity is **subtle**: The thumb travels only within its switch track.
 
 Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
 while the track recolours. The travel distance is measured from the rendered track
@@ -9819,6 +9867,8 @@ Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchange
 
 ## Motion contract
 
+Authored intensity is **subtle**: Thumb feedback stays on the direct manipulation control; native value input is immediate.
+
 Recipe: `feedback.press/one-shot`. The dragged thumb compresses to 0.97 and springs back on
 release — the same press language as `button` and `toggle`.
 
@@ -10398,6 +10448,8 @@ cleanup before assigning the next ref. A caller `render` replaces the default
 renderer and owns spreading its supplied props.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Press feedback scales the active control in place.
 
 Recipe: `feedback.press/one-shot`. The button compresses to 0.97 while the pointer is down
 and springs back on release.
@@ -11081,6 +11133,8 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
+Authored intensity is **medium**: A shared selected highlight moves among stable controls, alongside local press and glyph feedback.
+
 Single selection uses one shared decorative fill scoped to each group. Multiple
 selection keeps one local fill per item. Neither changes the buttons' layout
 boxes; corner changes that join neighboring fills are immediate state styling.
@@ -11746,6 +11800,8 @@ export function StaticCode() {
 
 ## Motion contract
 
+Authored intensity is **subtle**: The active caret blinks in its native character slot; OTP characters are not animated counters.
+
 Recipe: `state.morph/one-shot`. A character lands in its slot with a short fade and settles
 from 0.96 to full size. Deleting a character is instant — an exit animation would
 leave a ghost in a field the user is racing against.
@@ -12351,6 +12407,8 @@ Plain wrappers over Base UI's parts; each forwards `className` and native props.
 `ProgressIndicator` carries the motion.
 
 ## Motion contract
+
+Authored intensity is **subtle**: A local progress fill follows the semantic value inside its fixed track.
 
 Recipe: `data.transition/one-shot`, in both of its documented forms.
 
@@ -13138,6 +13196,8 @@ Button: clicking it invokes the caller’s handler and leaves the popup open. Us
 `open` / `onOpenChange` to close when the caller decides the action is complete.
 
 ## Motion contract
+
+Authored intensity is **medium**: Alert Dialog opens and closes its existing popup surface; content and native focus retain their current owners.
 
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
@@ -13968,6 +14028,8 @@ trigger and upstream's Base UI surface has no anchor part.
 
 ## Motion contract
 
+Authored intensity is **medium**: Popover opens and closes its existing popup surface; content and native focus retain their current owners.
+
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
@@ -14603,6 +14665,8 @@ export function TooltipMotionScopes() {
 
 ## Motion contract
 
+Authored intensity is **medium**: Tooltip opens and closes its existing popup surface; content and native focus retain their current owners.
+
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
@@ -15174,6 +15238,8 @@ is no `HoverCardArrow`: upstream's Base UI surface has none, and the card is a s
 pointer.
 
 ## Motion contract
+
+Authored intensity is **medium**: Hover Card opens and closes its existing popup surface; content and native focus retain their current owners.
 
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
@@ -15889,6 +15955,8 @@ export function SheetMotionScopes() {
 | `SheetDescription` | `className` | Supporting text. |
 
 ## Motion contract
+
+Authored intensity is **medium**: Sheet opens and closes its existing popup surface; content and native focus retain their current owners.
 
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
@@ -16631,6 +16699,8 @@ export function DrawerMotionScopes() {
 
 ## Motion contract
 
+Authored intensity is **medium**: Drawer opens and closes its existing popup surface; content and native focus retain their current owners.
+
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |
@@ -17341,6 +17411,8 @@ export function Placement() {
 | `SelectScrollUpButton` / `SelectScrollDownButton` | scroll-arrow props | Appear only when the list overflows. |
 
 ## Motion contract
+
+Authored intensity is **expressive**: The selected label transfers between the popup and trigger while trigger geometry follows the owned label.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -18793,6 +18865,8 @@ an undo affordance should not also hand out half of one.
 
 ## Motion contract
 
+Authored intensity is **medium**: Combobox opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored/css-transition` | yes: a CSS transition, so reopening reverses it |
@@ -19797,6 +19871,8 @@ the element the user presses.
 
 ## Motion contract
 
+Authored intensity is **medium**: Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase         | Properties                                        | Token             | Interruptible                |
 | ------------- | ------------------------------------------------- | ----------------- | ---------------------------- |
 | open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger origin | `popup.anchored/css-transition` · `duration.fast` | yes (reopen mid-exit) |
@@ -20698,6 +20774,8 @@ slots.
 
 ## Motion contract
 
+Authored intensity is **medium**: Context Menu opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase         | Properties                                        | Token             | Interruptible |
 | ------------- | ------------------------------------------------- | ----------------- | ------------- |
 | open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the pointer | `popup.anchored/css-transition` · `duration.fast` | yes |
@@ -21571,6 +21649,8 @@ export function MenuMotionScopes() {
 | `MenubarGroup` / `MenubarLabel` / `MenubarSeparator` / `MenubarShortcut` / `MenubarPortal` | Structure.                                            |
 
 ## Motion contract
+
+Authored intensity is **medium**: Menubar opens and closes its existing popup surface; content and native focus retain their current owners.
 
 | Phase         | Properties                                     | Token             | Interruptible |
 | ------------- | ---------------------------------------------- | ----------------- | ------------- |
@@ -22585,6 +22665,8 @@ Every part carries a `data-slot` (`code-block`, `code-block-header`, `code-block
 restyle without a wrapper.
 
 ## Motion contract
+
+Authored intensity is **medium**: Code switching, active tab highlight and measured block geometry coordinate within one code surface.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -23695,6 +23777,8 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 
 ## Motion contract
 
+Authored intensity is **medium**: Command opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored/css-transition` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
@@ -24338,6 +24422,8 @@ match pinned upstream. Each rendered part retains its `toast-*` data slot.
 
 ## Motion contract
 
+Authored intensity is **medium**: Toast opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | opacity 0 to 1, scale from `--motion-scale-in` in full | `popup.anchored/css-transition`, duration.base, ease.out | yes, CSS transition |
@@ -24907,6 +24993,8 @@ and `ref`. `className` styles the inner content, matching upstream; `style` appl
 Root and Item classes merge last.
 
 ## Motion contract
+
+Authored intensity is **medium**: The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -25527,6 +25615,8 @@ on a content child. Caller styles are preserved; padding and borders are never a
 
 ## Motion contract
 
+Authored intensity is **medium**: The disclosure content changes height for open and close with one existing CSS size writer.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |
@@ -26114,6 +26204,8 @@ render/ref and state callbacks remain available. Semantic activation is immediat
 
 ## Motion contract
 
+Authored intensity is **medium**: Selection projection and directional content phases coordinate the selected tab and its panel.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared/selection`, physics-defined smooth selection spring | Yes; current geometry and velocity |
@@ -26639,6 +26731,8 @@ not that wrapper. Size the surrounding layout to constrain the scrolling region.
 Rows retain hover, `data-state="selected"` and descendant `aria-expanded` feedback.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Table declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 T0: no motion recipe, hook, provider, or animation runtime. All modes render the
 same static table. Row colour feedback is the upstream CSS colour transition;
@@ -27561,6 +27655,8 @@ For RTL set both native `dir="rtl"` and `opts.direction="rtl"`.
 
 ## Motion contract
 
+Authored intensity is **medium**: The existing Embla owner slides the collection while native drag and final slide position remain authoritative.
+
 | Phase | Recipe | Behaviour |
 | --- | --- | --- |
 | Enter / exit | — | No authored entrance or removal animation. |
@@ -27993,6 +28089,8 @@ belongs on a child. Root ref does not address the viewport. No viewport prop or
 ref API is invented; query its slot from the root for application-owned imperative scrolling.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Scroll Area declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 T0: empty recipe set, no provider, hook, timing token or authored animation.
 Enter, exit and resize are immediate. Full, reduced and none share static markup.
@@ -29014,6 +29112,8 @@ and config and emits nothing without configured colours. ChartConfig is a record
 plus either color or a complete light/dark theme map. Helpers require ChartContainer context.
 
 ## Motion contract
+
+Authored intensity is **medium**: Recharts interpolates the plotted geometry; Cadence does not add a second data-geometry writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
@@ -30047,6 +30147,8 @@ and motion contract. A custom Month or MonthGrid also takes ownership of month m
 
 ## Motion contract
 
+Authored intensity is **medium**: Month navigation shifts the bounded month grid; day selection retains its existing local feedback.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Month changes | opacity and signed horizontal transform on the actual grid | `data.transition/month-grid`, distance.sm | Yes; latest month replaces the target, without remounting the month tree. |
@@ -30853,6 +30955,8 @@ viewport have additive `data-slot` hooks. Positioner props still follow upstream
 
 ## Motion contract
 
+Authored intensity is **medium**: Popup presence and the shared viewport size transition coordinate within the navigation surface.
+
 | Phase | Properties | Recipe / tokens | Interruptible |
 | --- | --- | --- | --- |
 | Open | Popup opacity and anchor scale; content opacity | `popup.anchored/css-transition`, fast clock, scale.in | Native CSS reversal |
@@ -31334,6 +31438,8 @@ stable panel ids to numeric percentages. Slots: `resizable-panel-group`, `resiza
 `resizable-handle`. Use `elementRef` for DOM access rather than a generic React ref.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Resizable declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 T0: declared, implemented and documented recipe sets are empty. Direct manipulation is functional
 layout, not an authored animation. The default panel preview, keyboard, collapse/expand and imperative updates apply
@@ -33463,6 +33569,8 @@ and useRender event merging remain available. `useSidebar` requires a provider.
 
 ## Motion contract
 
+Authored intensity is **medium**: The reserved gap and panel position share a size-linked owner while destination-width labels stay readable.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | Desktop offcanvas position | transform projected from actual occupied width | `layout.move/size-linked` | Yes, one shared size scalar. |
@@ -34188,6 +34296,8 @@ additional generic public table API. Customize this file rather than passing
 arbitrary columns to `DataTableDemo`.
 
 ## Motion contract
+
+Authored intensity is **medium**: Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates.
 
 No row entrance, reorder, resize or layout motion. Sorting, filtering, pagination
 and visibility update native markup immediately without keying the table or input
@@ -35022,6 +35132,8 @@ calendar overrides remain caller-owned, including month, locale, focus and
 components. A custom render must retain a focusable button and the supplied props.
 
 ## Motion contract
+
+Authored intensity is **medium**: Installed Popover owns the surface and Calendar owns month changes; the formatted trigger label still updates immediately.
 
 T2 describes existing control motion. No date label animation, layout tween,
 selection-keyed remount, new recipe or runtime is added.
@@ -35907,6 +36019,8 @@ No File or request state is stored internally. There is no default upload action
 
 ## Motion contract
 
+Authored intensity is **subtle**: Progress feedback stays within the attachment; it introduces no upload state or surface choreography.
+
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
 | Uploading/processing title | `data.transition/continuous` | Opacity pulse via theme `animate-pulse` | Same opacity loop, no transform | `animate-none`, opacity 1 |
@@ -36509,6 +36623,8 @@ and data-align. No additional message-state or validation API is introduced.
 
 ## Motion contract
 
+Authored intensity is **subtle**: The pending indicator pulses locally; message content remains caller-owned.
+
 | Cause | Recipe | Full | Reduced | None |
 | --- | --- | --- | --- | --- |
 | Later client insertion | `data.transition/one-shot` | Opacity 0→1, duration.base / ease.out | Opacity only, duration ×0.6 | Current resting opacity immediately |
@@ -37062,6 +37178,8 @@ Slots are `toc`, `toc-title`, `toc-track`, `toc-rail`, `toc-indicator`, `toc-lis
 
 ## Motion contract
 
+Authored intensity is **medium**: Native section navigation scrolls the page while a local indicator follows the active heading.
+
 One persistent indicator follows the active entry. Its top and bottom edges use the shared physics
 spring, then render as translation and vertical scale on a one-pixel base. Wrapped labels determine
 the destination's length. Edges stay inside the rail, and interrupted movement preserves velocity.
@@ -37420,6 +37538,8 @@ the optional CadenceProvider. There are no instance duration, easing, origin or 
 
 ## Motion contract
 
+Authored intensity is **subtle**: Only changed safe display-text runs receive bounded replacement effects; unchanged native text survives.
+
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
 | `text.change/changed-runs` | Changed-only opacity with default 12ms character rhythm; word mode uses the 35ms word token. Final delays cap at 120ms after timeScale; at most 20 changed graphemes animate. | Short changed-only opacity without stagger or travel. | Final native text immediately, without transition or delay. |
@@ -37767,6 +37887,8 @@ CadenceProvider owns mode and timeScale. There are no instance duration, easing 
 
 ## Motion contract
 
+Authored intensity is **subtle**: Bounded digit-place reels update one numeric readout; unsupported typography and geometry use native text.
+
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
 | `number.roll/reels` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |
@@ -38101,6 +38223,8 @@ No per-instance duration, easing, distance or spring props. Use shared recipe/to
 
 ## Motion contract
 
+Authored intensity is **medium**: An explicitly composed offscreen host enters with opacity and compact travel; first-screen content remains native.
+
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |
 | Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal/viewport` / `duration.base`, `ease.out`, `distance.md` | yes |
@@ -38434,6 +38558,8 @@ not a disclosure, semantic open state, validation system or route transition.
 No per-instance duration, easing, distance or spring props. Use shared recipe/token policy.
 
 ## Motion contract
+
+Authored intensity is **medium**: An explicit scope coordinates registered Reveal hosts with optional bounded cycle stagger; it creates no animated wrapper.
 
 | Phase | Properties | Recipe / tokens | Interruptible |
 | ----- | ---------- | --------------- | ------------- |

@@ -393,6 +393,8 @@ always set.
 
 ## Motion contract
 
+Authored intensity is **subtle**: The existing loading pulse changes local opacity without moving content.
+
 Recipe: `data.transition/continuous`, a continuous opacity loop. It is implemented in CSS
 (`animate-pulse`) rather than in Motion, because a page can render dozens of
 placeholders and each Motion loop costs a frame callback; the pulse only touches

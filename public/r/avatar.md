@@ -239,6 +239,8 @@ Caller classes merge last; Badge and group parts use native string classes and o
 
 ## Motion contract
 
+Authored intensity is **subtle**: Avatar declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). The image-to-fallback swap is instant by design: Base UI knows when
 the image errored, and a cross-fade would show a half-drawn face in the meantime.
 

@@ -41,9 +41,35 @@ const motion = (flag("motion", "") || "")
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
-const intensity = flag("intensity", tier === "T0" ? "subtle" : "medium");
+// No tier or recipe-name heuristic decides authored perceptual extent.
+const intensity = flag("intensity", "subtle");
+const motionProfile = {
+  scope: motion.length ? "local" : "static",
+  travel: "none",
+  coordination: "independent",
+  reason: "TODO: review actual authored extent, travel and coordination before assigning intensity.",
+};
+const motionCoverage = {
+  schema: 1,
+  effects: Object.fromEntries(
+    motion.map((recipe) => [
+      `${recipe}/one-shot`,
+      [
+        {
+          relationship: "default",
+          owner: id,
+          reason: "TODO: identify the real integration owner and caller boundary for this exact installed form.",
+        },
+      ],
+    ]),
+  ),
+};
 const complexity = flag("complexity", ["T0", "T1"].includes(tier) ? "S" : "M");
 const since = flag("since", "0.2.0");
+const dependencies = motion.length ? ["@base-ui/react", "motion"] : [];
+const registryDependencies = motion.length
+  ? ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+  : ["@cadence/cadence-utils"];
 
 const TIERS = new Set(["T0", "T1", "T2", "T3", "T4", "T5"]);
 
@@ -57,7 +83,6 @@ if (!title) fail("--title is required");
 if (!description) fail("--description is required (it must match registry.json exactly)");
 if (!TIERS.has(tier)) fail(`--tier must be one of ${[...TIERS].join(", ")}`);
 if (!/^B[1-9]$/.test(batch ?? "")) fail("--batch is required (B1–B9, see docs/parity-plan.md §7)");
-if (motion.length === 0 && tier !== "T0") fail("non-T0 components need --motion <recipe>[,<recipe>]");
 
 const pascal = id
   .split("-")
@@ -127,11 +152,13 @@ description: ${description}
 category: ${category}
 motion: ${motionLine}
 intensity: ${intensity}
+motionProfile: ${JSON.stringify(motionProfile)}
+motionCoverage: ${JSON.stringify(motionCoverage)}
 complexity: ${complexity}
 tier: ${tier}
 since: ${since}
-deps: ["@base-ui/react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+deps: ${JSON.stringify(dependencies)}
+registryDeps: ${JSON.stringify(registryDependencies)}
 ---
 
 ## Installation
@@ -185,6 +212,8 @@ export function CompositionExample() {
 ${apiRow}
 
 ## Motion contract
+
+Authored intensity is **${intensity}**: ${motionProfile.reason}
 
 ${motionSection}
 
@@ -293,8 +322,8 @@ registry.items.push({
   title,
   description,
   categories: [category],
-  dependencies: ["@base-ui/react", "motion"],
-  registryDependencies: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+  dependencies,
+  registryDependencies,
   files: [
     {
       path: `registry/cadence/${id}/index.tsx`,
@@ -308,6 +337,8 @@ registry.items.push({
     batch,
     motion,
     intensity,
+    motionProfile,
+    motionCoverage,
     complexity,
     upstream: { registry: "shadcn", style: "base-ui", version: "2026-10" },
   },

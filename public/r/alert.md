@@ -197,6 +197,8 @@ Destructive descriptions use the full destructive text token for readable contra
 
 ## Motion contract
 
+Authored intensity is **subtle**: Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+
 No motion (T0). An alert that slides or fades in draws attention to the animation
 instead of the message, and a message that is already on screen when the page loads
 did not change — animating it is decoration (P9).

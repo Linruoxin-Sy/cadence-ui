@@ -3,7 +3,9 @@ title: Animated Text
 description: Replaces changed display text while retaining one current native string.
 category: motion
 motion: [{"recipe":"text.change","form":"changed-runs"}]
-intensity: medium
+intensity: subtle
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Only changed safe display-text runs receive bounded replacement effects; unchanged native text survives."}
+motionCoverage: {"schema":1,"effects":{"text.change/changed-runs":[{"relationship":"default","owner":"animated-text","reason":"Animated Text integrates changed display-text runs at its own parts, using the reached installed executor."}]}}
 complexity: S
 tier: T1
 since: 0.6.0
@@ -81,6 +83,8 @@ The span has `data-slot="animated-text"` and its effective `data-motion`. Mode a
 the optional CadenceProvider. There are no instance duration, easing, origin or identity props.
 
 ## Motion contract
+
+Authored intensity is **subtle**: Only changed safe display-text runs receive bounded replacement effects; unchanged native text survives.
 
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |

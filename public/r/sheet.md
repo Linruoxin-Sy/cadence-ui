@@ -659,6 +659,8 @@ export function SheetMotionScopes() {
 
 ## Motion contract
 
+Authored intensity is **medium**: Sheet opens and closes its existing popup surface; content and native focus retain their current owners.
+
 Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
 
 | Phase | Properties | Token | Interruptible |

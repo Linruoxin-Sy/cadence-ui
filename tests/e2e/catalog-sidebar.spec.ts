@@ -8,6 +8,33 @@ const items = registry.items.filter((entry: { type: string }) =>
   ["registry:ui", "registry:block"].includes(entry.type),
 );
 
+test("authored profiles expose the delivered intensity and ownership without changing modes", async ({ page }) => {
+  await page.goto("/components?keep=profiles#catalog");
+  const main = page.locator("main");
+  await expect(main.getByText("Intensity describes authored scope:", { exact: false })).toBeVisible();
+  const results = main.locator("[data-catalog-results]");
+  for (const [id, intensity] of [
+    ["animated-text", "subtle"],
+    ["animated-number", "subtle"],
+    ["calendar", "medium"],
+    ["reveal", "medium"],
+    ["reveal-group", "medium"],
+  ] as const) {
+    await main.getByRole("combobox", { name: "Intensity", exact: true }).selectOption(intensity);
+    await expect(results.locator(`a[href="/components/${id}"]`)).toBeVisible();
+    const item = items.find((item: { name: string }) => item.name === id);
+    const response = await page.request.get(`/r/${id}.json`);
+    expect(response.ok()).toBe(true);
+    const payload = await response.json();
+    expect(payload.meta.motionCoverage).toEqual(item.meta.motionCoverage);
+    expect(payload.meta.motionProfile).toEqual(item.meta.motionProfile);
+    expect(payload.meta.intensity).toBe(intensity);
+    expect(payload.meta.motionCoverage).not.toHaveProperty("migration");
+  }
+  expect(new URL(page.url()).searchParams.get("keep")).toBe("profiles");
+  expect(new URL(page.url()).hash).toBe("#catalog");
+});
+
 test("catalogue composes real metadata, search, empty, clear and history without losing URLs", async ({ page }) => {
   await page.goto("/components?keep=yes#catalog");
   await page.waitForLoadState("networkidle");

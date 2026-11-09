@@ -1,0 +1,33 @@
+[
+  { "name": "missing schema", "field": "schema", "value": null, "error": "schema: 1" },
+  { "name": "unknown schema", "field": "schema", "value": 2, "error": "schema: 1" },
+  { "name": "missing effects", "field": "effects", "value": null, "error": "effects map" },
+  {
+    "name": "unknown relationship",
+    "field": "relationship",
+    "value": "available",
+    "error": "requires default, inherited or composed"
+  },
+  {
+    "name": "false inapplicable effect",
+    "field": "relationship",
+    "value": "not-applicable",
+    "error": "not-applicable cannot declare motion"
+  },
+  {
+    "name": "inherited local effect",
+    "field": "relationship",
+    "value": "inherited",
+    "error": "inherited requires another"
+  },
+  { "name": "missing owner", "field": "owner", "value": null, "error": "integration owner id" },
+  { "name": "uninstalled owner", "field": "owner", "value": "other", "error": "explicit component dependency" },
+  {
+    "name": "placeholder reason",
+    "field": "reason",
+    "value": "TODO: the owner will be implemented later",
+    "error": "substantive ownership"
+  },
+  { "name": "empty reason", "field": "reason", "value": "", "error": "substantive ownership" },
+  { "name": "unknown effect field", "field": "allowLegacy", "value": true, "error": "unknown ownership field" }
+]

@@ -3,7 +3,9 @@ title: "Data Table"
 description: "An editable payments table with sorting, filtering, selection, visibility, and pagination."
 category: "collection"
 motion: ["feedback.press","state.morph",{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
-intensity: "medium"
+intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates."}
+motionCoverage: {"schema":1,"effects":{"feedback.press/one-shot":[{"relationship":"inherited","owner":"button","reason":"Data Table mounts button for press feedback; that installed component remains the integration owner."}],"state.morph/one-shot":[{"relationship":"inherited","owner":"checkbox","reason":"Data Table mounts checkbox for local state/glyph feedback; that installed component remains the integration owner."},{"relationship":"inherited","owner":"dropdown-menu","reason":"Data Table mounts dropdown-menu for this installed state.morph form; distinct component parts retain their own writers."}],"popup.anchored/css-transition":[{"relationship":"inherited","owner":"dropdown-menu","reason":"Data Table mounts dropdown-menu for popup opening; that installed component remains the integration owner."}],"exit.fade/css-transition":[{"relationship":"inherited","owner":"dropdown-menu","reason":"Data Table mounts dropdown-menu for popup closing; that installed component remains the integration owner."}]}}
 complexity: "L"
 tier: "T2"
 since: "0.5.0"
@@ -457,6 +459,8 @@ additional generic public table API. Customize this file rather than passing
 arbitrary columns to `DataTableDemo`.
 
 ## Motion contract
+
+Authored intensity is **medium**: Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates.
 
 No row entrance, reorder, resize or layout motion. Sorting, filtering, pagination
 and visibility update native markup immediately without keying the table or input

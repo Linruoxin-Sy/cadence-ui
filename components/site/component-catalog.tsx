@@ -136,6 +136,11 @@ export function ComponentCatalog({ components }: { components: Entry[] }) {
           </div>
         </fieldset>
       </form>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Intensity describes authored scope: subtle is local feedback or native UI; medium moves a surface or collection;
+        expressive transfers identity across surfaces. Local text and digit changes can be subtle. Mode, capabilities
+        and installation size are separate.
+      </p>
       <noscript>
         <p className="mt-3 text-sm">Enable JavaScript to filter. All components are listed below.</p>
       </noscript>

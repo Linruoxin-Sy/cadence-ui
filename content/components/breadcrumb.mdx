@@ -4,6 +4,8 @@ description: Hierarchy navigation, from the root to the current page.
 category: navigation
 motion: []
 intensity: subtle
+motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
+motionCoverage: {"schema":1,"effects":{}}
 complexity: S
 tier: T0
 since: 0.2.0
@@ -220,6 +222,8 @@ export function RouterTrail() {
 | `BreadcrumbEllipsis`   | native span props     | Hidden from assistive tech; contains `sr-only` "More".        |
 
 ## Motion contract
+
+Authored intensity is **subtle**: Breadcrumb declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
 No motion (T0). Nothing in a trail animates. A navigation landmark that fades or
 slides in is harder to find, and a trail that reflows on navigation makes the one

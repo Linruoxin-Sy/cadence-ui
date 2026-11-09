@@ -568,6 +568,8 @@ All native attributes are forwarded, including `aria-invalid` and
 
 ## Motion contract
 
+Authored intensity is **subtle**: The checked indicator appears within the control and keeps its native selection state.
+
 Recipe: `state.morph/one-shot`. The tick is the protagonist — it fades in and settles from
 0.96 to full size when the box is checked, and reverses when it is cleared.
 

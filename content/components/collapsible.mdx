@@ -4,6 +4,8 @@ description: Reveal optional detail with a standalone disclosure.
 category: layout
 motion: [{"recipe":"geometry.resize","form":"css-transition"}]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"The disclosure content changes height for open and close with one existing CSS size writer."}
+motionCoverage: {"schema":1,"effects":{"geometry.resize/css-transition":[{"relationship":"default","owner":"collapsible","reason":"Collapsible integrates owned size transitions at its own parts, using the reached installed executor."}]}}
 complexity: M
 tier: T3
 since: 0.4.0
@@ -385,6 +387,8 @@ hides or unmounts the panel. To reach a visually zero-height endpoint before hid
 on a content child. Caller styles are preserved; padding and borders are never animated.
 
 ## Motion contract
+
+Authored intensity is **medium**: The disclosure content changes height for open and close with one existing CSS size writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |

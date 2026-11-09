@@ -4,6 +4,8 @@ description: Application menus along the top of a window.
 category: overlay
 motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"},"state.morph"]
 intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Menubar opens and closes its existing popup surface; content and native focus retain their current owners."}
+motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"inherited","owner":"dropdown-menu","reason":"Menubar mounts dropdown-menu for popup opening; that installed component remains the integration owner."}],"exit.fade/css-transition":[{"relationship":"inherited","owner":"dropdown-menu","reason":"Menubar mounts dropdown-menu for popup closing; that installed component remains the integration owner."}],"state.morph/one-shot":[{"relationship":"inherited","owner":"dropdown-menu","reason":"Menubar mounts dropdown-menu for local state/glyph feedback; that installed component remains the integration owner."}]}}
 complexity: L
 tier: T2
 since: 0.4.0
@@ -611,6 +613,8 @@ export function MenuMotionScopes() {
 | `MenubarGroup` / `MenubarLabel` / `MenubarSeparator` / `MenubarShortcut` / `MenubarPortal` | Structure.                                            |
 
 ## Motion contract
+
+Authored intensity is **medium**: Menubar opens and closes its existing popup surface; content and native focus retain their current owners.
 
 | Phase         | Properties                                     | Token             | Interruptible |
 | ------------- | ---------------------------------------------- | ----------------- | ------------- |

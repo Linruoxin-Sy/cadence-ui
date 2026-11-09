@@ -311,6 +311,8 @@ CadenceProvider owns mode and timeScale. There are no instance duration, easing 
 
 ## Motion contract
 
+Authored intensity is **subtle**: Bounded digit-place reels update one numeric readout; unsupported typography and geometry use native text.
+
 | Recipe | full | reduced | none |
 | --- | --- | --- | --- |
 | `number.roll/reels` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |

@@ -14,8 +14,10 @@ import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/
 import os from "node:os";
 import path from "node:path";
 import matter from "gray-matter";
+import { checkCatalogIntensity } from "./catalog-intensity.mjs";
 import { checkDocTemplates } from "./doc-template.mjs";
 import { expandInstallation } from "./installation.mjs";
+import { checkMotionCoverage, motionMetadataProblems } from "./motion-coverage.mjs";
 import { motionForms, motionRecipes } from "./motion-manifest.mjs";
 import { generateMotionTokens } from "./motion-token-source.mjs";
 import { verifySnapshots } from "./registry-snapshots.mjs";
@@ -55,7 +57,11 @@ async function readDocs() {
 }
 
 const docs = await readDocs();
-const problems = await checkDocTemplates(root, registry);
+const problems = [
+  ...checkCatalogIntensity(registry),
+  ...checkMotionCoverage(registry),
+  ...(await checkDocTemplates(root, registry)),
+];
 const same = (a = [], b = []) => [...a].sort().join("|") === [...b].sort().join("|");
 
 for (const item of registry.items) {
@@ -65,6 +71,7 @@ for (const item of registry.items) {
     problems.push(`${item.name}: missing content/components/${item.name}.mdx`);
     continue;
   }
+  problems.push(...motionMetadataProblems(item, doc.data));
   if (doc.data.title !== item.title)
     problems.push(`${item.name}: doc title "${doc.data.title}" != registry title "${item.title}"`);
   if (doc.data.description !== item.description)

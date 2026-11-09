@@ -670,6 +670,8 @@ arbitrary columns to `DataTableDemo`.
 
 ## Motion contract
 
+Authored intensity is **medium**: Installed menu surfaces open and close; sorting, filtering and rows remain immediate native updates.
+
 No row entrance, reorder, resize or layout motion. Sorting, filtering, pagination
 and visibility update native markup immediately without keying the table or input
 by state. Surviving rows use stable IDs; off-page rows unmount normally.

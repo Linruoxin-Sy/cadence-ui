@@ -1001,6 +1001,8 @@ the Base UI dialog uses `render`. The check glyph follows upstream's `data-check
 
 ## Motion contract
 
+Authored intensity is **medium**: Command opens and closes its existing popup surface; content and native focus retain their current owners.
+
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
 | open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored/css-transition` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
