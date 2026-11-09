@@ -1,0 +1,150 @@
+---
+title: Animated Number
+description: Independent quantities, amounts, and read-only numeric summaries.
+category: motion
+motion: [number.roll]
+intensity: medium
+complexity: S
+tier: T1
+since: 0.6.0
+deps: []
+registryDeps: ["@cadence/cadence-number", "@cadence/cadence-utils"]
+---
+
+## Installation
+
+**Command**
+
+```install
+npx shadcn@latest add @cadence/animated-number
+```
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/animated-number.json)
+
+Keep the complete dependency-first sibling tree and theme setup from the expanded manual instructions.
+The provider is imported by the renderer; wrapping the application is optional.
+
+## Usage
+
+```tsx
+import { AnimatedNumber } from "@/components/cadence/animated-number";
+
+export function Quantity({ quantity }: { quantity: number }) {
+  return <AnimatedNumber value={quantity} />;
+}
+```
+
+The caller owns an independently committed quantity. With no formatting props, output is exactly
+`String(value)`: no added grouping, rounding, exponent expansion or negative-zero sign. SSR and
+hydration start at the actual value. Updates immediately commit one native Text node; safely mapped
+changed digit paint rolls without creating intermediate business values. Add `"use client"` to callers
+that own state, events or refs. Serializable props can cross this component's client boundary.
+
+## Currency and locale
+
+```tsx
+import { AnimatedNumber } from "@/components/cadence/animated-number";
+
+export function Amount({ amount }: { amount: number }) {
+  return <AnimatedNumber value={amount} locales="en-US" format={{ style: "currency", currency: "USD" }} />;
+}
+```
+
+Supplying `locales` or `format` explicitly uses native `Intl.NumberFormat`, including its defaults and
+errors. Original numbers and BigInts are never reconstructed from a numeric-looking string. Precision,
+locale, currency, compact scale or formatter changes settle immediately. Equal formatted output never
+replays. Separators and signs remain ordinary current native text; they are not extra reel columns.
+
+## Direction
+
+```tsx
+import { AnimatedNumber } from "@/components/cadence/animated-number";
+
+export function Level({ level }: { level: number }) {
+  return <AnimatedNumber value={level} direction="shortest" />;
+}
+```
+
+Trend follows the whole original value, including negative values. Up/down choose the visual travel;
+shortest chooses each digit's shorter decimal-cycle direction with an up tie-break. All modes show
+only departing and target cells, with at most one cell of travel and no extra turns.
+
+## When to use
+
+Use for an independently updated quantity, amount or discrete selection count that the application
+explicitly owns. Compose plain wording with AnimatedText and rich or interactive siblings with native JSX.
+Use the caller's existing React key at an entity boundary; a new entity begins at its current value.
+
+## When not to use
+
+Keep query/filter-derived counts, live scrubbing, delayed direct-input echoes, reset and restoration
+readouts native and immediate, for example `<span>{count}</span>`. This standalone API classifies value
+updates as independent quantities; it cannot infer the cause of an application request. It adds no
+public cause, identity or request state API. Keep input, textarea and contenteditable editing native.
+Identifiers, phone numbers, dates, versions and numeric strings are not quantities to infer.
+
+## API
+
+### `AnimatedNumber`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number \| bigint` | required | Original current quantity; strings are unsupported. |
+| `locales` | `Intl.LocalesArgument` | omitted | Explicit Intl locale policy; activates Intl formatting. |
+| `format` | `Intl.NumberFormatOptions` | omitted | Explicit native Intl options; activates Intl formatting. |
+| `direction` | `"trend" \| "up" \| "down" \| "shortest"` | `"trend"` | Bounded visual direction; never changes semantic value. |
+| Native span props | `ComponentProps<"span">` | — | Includes ref, className, style, events and ARIA; excludes children and dangerouslySetInnerHTML. |
+
+The span exposes `data-slot="animated-number"` and its effective `data-motion`. The optional
+CadenceProvider owns mode and timeScale. There are no instance duration, easing or identity props.
+
+## Motion contract
+
+| Recipe | full | reduced | none |
+| --- | --- | --- | --- |
+| `number.roll` | Changed decimal-place two-cell reels using the smooth, bounce-zero physics preset; exact native fallback when correspondence or continuity is unsafe. | Exact final native value immediately; no roll, duration or delay. | Exact final native value immediately; no duration or delay. |
+
+Initial rendering, affixes, format-only revisions, native size and colours are immediate. Affixes remain
+under native text ownership without a second text animation writer. Installing this item does not
+migrate other components. A compatible reversal retains current subpixel offsets and discards opposing
+velocity; an unsafe third digit settles the latest value. Zero timeScale, live downgrade, hidden state,
+selection/find/copy, native editing and unmount retire the active writer; restoration never replays.
+
+Reel correspondence currently requires unit device scale, supported ASCII/LTR native typography and
+integer resting glyph origins. Fractional resting origins, RTL, non-Latin digits, other DPR/zoom
+(including DPR2), advanced font features or unproved clipping/layout use exact native immediate output.
+Actual moving offsets are subpixel. BigInts remain exact; arbitrary large BigInt rolling is not certified.
+NaN, Infinity and unsupported raw exponent spellings remain exact and immediate.
+
+## Keyboard and accessibility
+
+The span adds no role, tab stop, keyboard commands or automatic announcements. Native refs, events,
+focus and control activation remain with the caller. One current native string supplies accessibility,
+selection, find and clipboard; inert, aria-hidden canvas cells contain no text nodes. Selection/copy/find
+cancel decoration. Editing retains the existing tree, caret, composition and undo owner; this helper is
+a display primitive, not an editable number field. Announcements belong to a caller-owned status region.
+
+## Responsiveness and performance
+
+Native typography, wrapping and whitespace are preserved; no tabular-nums or containing block is added.
+The surrounding composition owns any size animation. Resize, scroll, font or uncertain layout changes
+cancel paint. A shared internal composition with an external size/fill engine shares the semantic revision
+and uses immediate readout when a common reel phase cannot be proven; matching tokens alone do not synchronize engines.
+There is no per-frame React formatting, layout read, second width controller or historical target queue.
+Each display and known transaction permits at most 12 moving columns, including still-active identities.
+Mixed text/numeric work retains separate transaction ceilings. Decomposition caps at 2048 UTF-16 units;
+exact oversized output is never truncated. Raster proof/paint caps at 262144 pixels and a 4096-pixel axis.
+Compiled dependency and complete-page budgets remain under active work; this primitive does not certify
+overall Motion v2 or real-device performance acceptance.
+
+## Notes for AI
+
+Pass the original numeric value. Preserve existing formatting and entity keys. Do not parse strings,
+invent intermediate values, animate direct editing, add validation, duplicate text for semantics or add
+a second geometry writer. Preserve the complete relative shared dependency tree.
+
+## Related components
+
+[Animated Text](/components/animated-text), [Progress](/components/progress), [Motion guide](/docs/motion).

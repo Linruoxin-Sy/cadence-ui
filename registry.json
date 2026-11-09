@@ -63,6 +63,31 @@
       ]
     },
     {
+      "name": "cadence-number",
+      "type": "registry:lib",
+      "title": "Numeric reel controller",
+      "description": "Exact native numeric formatting and bounded decorative two-cell reels.",
+      "categories": ["foundation"],
+      "registryDependencies": ["@cadence/cadence-text"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/number-plan.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/number-plan.ts"
+        },
+        {
+          "path": "registry/cadence/lib/number-presentation.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/number-presentation.ts"
+        },
+        {
+          "path": "registry/cadence/lib/use-number-presentation.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/use-number-presentation.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-utils",
       "type": "registry:lib",
       "title": "Utilities",
@@ -2345,6 +2370,40 @@
           "style": "native",
           "version": "0.6.0",
           "reason": "Cadence standalone changed-text primitive; no upstream shadcn equivalent."
+        }
+      }
+    },
+    {
+      "name": "animated-number",
+      "type": "registry:ui",
+      "title": "Animated Number",
+      "description": "Independent quantities, amounts, and read-only numeric summaries.",
+      "categories": ["motion"],
+      "registryDependencies": ["@cadence/cadence-number", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/animated-number/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/animated-number/index.tsx"
+        }
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
+        "intensity": "medium",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence original numeric display primitive; no shadcn counterpart."
         }
       }
     }

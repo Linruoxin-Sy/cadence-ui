@@ -55,7 +55,8 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   const registration = transaction.register(host);
   let alive = true,
     baseline = true,
-    editing = nativeTextContext(host);
+    editing = nativeTextContext(host),
+    nativeOwned = false;
   let current: NumberPresentationCommit | null = null;
   let snapshot: NumberSnapshot | null = null;
   let lease: MotionLease | null = null;
@@ -99,6 +100,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
     const next = nativeTextContext(host);
     if (editing !== next) {
       editing = next;
+      nativeOwned = false;
       baseline = true;
       snapshot = null;
       stop();
@@ -149,8 +151,12 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   const key = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") stop();
   };
-  for (const name of ["beforeinput", "copy", "beforematch", "compositionstart"])
-    host.addEventListener(name, stop, true);
+  const nativeInput = () => {
+    nativeOwned = true;
+    stop();
+  };
+  for (const name of ["beforeinput", "compositionstart"]) host.addEventListener(name, nativeInput, true);
+  for (const name of ["copy", "beforematch"]) host.addEventListener(name, stop, true);
   doc.addEventListener("selectionchange", selection);
   doc.addEventListener("keydown", key, true);
   doc.addEventListener("scroll", stop, true);
@@ -278,7 +284,11 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
         parameters.kind === "reel" &&
         parameters.transition.duration !== 0;
       current = options;
-      if (!plain() || host.matches("input,textarea,select,option")) {
+      // Once native input owns this editor (or its buffer differs from the last
+      // accepted prop), mode/clock/prop commits cannot restore display text.
+      // Clean controlled display updates retain their existing native semantics.
+      if (editing && host.textContent !== (previous?.snapshot.text ?? options.snapshot.text)) nativeOwned = true;
+      if ((editing && nativeOwned) || !plain() || host.matches("input,textarea,select,option")) {
         stop();
         snapshot = null;
         baseline = true;
@@ -512,8 +522,8 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       observer.disconnect();
       resize.disconnect();
       unsubscribe();
-      for (const name of ["beforeinput", "copy", "beforematch", "compositionstart"])
-        host.removeEventListener(name, stop, true);
+      for (const name of ["beforeinput", "compositionstart"]) host.removeEventListener(name, nativeInput, true);
+      for (const name of ["copy", "beforematch"]) host.removeEventListener(name, stop, true);
       doc.removeEventListener("selectionchange", selection);
       doc.removeEventListener("keydown", key, true);
       doc.removeEventListener("scroll", stop, true);

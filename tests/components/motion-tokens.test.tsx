@@ -7,6 +7,14 @@ import { duration, physicalSpring, type Recipe, spring, transitionFor } from "@/
  * place a regression is cheapest to catch: every component trusts these values.
  */
 describe("transitionFor", () => {
+  it("resolves numeric reels with reviewed smooth physics and no reduced or delayed travel", () => {
+    expect(transitionFor("number.roll", "full", { delay: 3 })).toEqual({
+      ...physicalSpring(spring.smooth.visualDuration, spring.smooth.bounce),
+      delay: 0,
+    });
+    expect(transitionFor("number.roll", "reduced", { delay: 3 })).toEqual({ duration: 0, delay: 0 });
+    expect(transitionFor("number.roll", "none", { delay: 3 })).toEqual({ duration: 0 });
+  });
   it("uses the page clock for section navigation and removes travel under reduced", () => {
     expect(transitionFor("scroll.navigate", "full", { timeScale: 4 })).toMatchObject({ duration: duration.page * 4 });
     expect(transitionFor("scroll.navigate", "reduced", { delay: 1 })).toEqual({ duration: 0, delay: 0 });
@@ -49,7 +57,7 @@ describe("transitionFor", () => {
 });
 
 /**
- * Four recipes are allowed to be interrupted mid-flight, so they are handed to
+ * Continuity recipes can be interrupted mid-flight, so they are handed to
  * Motion as physics rather than as `visualDuration`: a time-defined spring
  * throws the inherited velocity away on retarget. The numbers below are pinned
  * because they mirror motion-dom 13.5.1's conversion; a Motion upgrade that

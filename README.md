@@ -55,6 +55,7 @@ limits on which capabilities a component may acquire.
 
 | Component                             | Tier | Motion                                                               |
 | ------------------------------------- | ---- | -------------------------------------------------------------------- |
+| `animated-number` — quantities        | T1   | `number.roll`                                                        |
 | `animated-text` — changed text        | T1   | `text.change`                                                        |
 | `button` — action trigger             | T1   | `feedback.press`                                                     |
 | `badge` — status label                | T0   | none                                                                 |

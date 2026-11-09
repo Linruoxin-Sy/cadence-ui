@@ -317,10 +317,15 @@ output. Moving offsets themselves remain subpixel. No font metrics or tabular st
 Known numeric compositions preflight the 12-column union, including active identities; text and
 numeric owners share transaction cancellation and their independent work ceilings. A composition
 whose separate geometry/fill engine cannot share the reel phase uses the designed immediate readout
-fallback with that same semantic revision. This is staged internal support, not public revised
-`number.roll` adoption: the existing resolver/declarations remain unchanged. AnimatedNumber's API,
-registry/distribution, public guide/examples, installed cost and remaining original S12 acceptance
-still require the subsequent public primitive work. Original catalogue migration stays separate.
+fallback with that same semantic revision. AnimatedNumber exposes this renderer through a standalone
+original registry item, namespaced shared dependencies and an explicit reels declaration. The revised
+number.roll resolver follows smooth physics and the immediate reduced/none policy; runtime evidence
+remains necessary beyond a resolver name. Public raw/Intl formatting, four directions, native text
+semantics and conservative mapping fallbacks are documented together. Affixes and format-only changes
+remain under immediate native text ownership, without a second fade or geometry writer. The standalone
+boundary classifies independent quantities; query/filter/direct-input/reset/restoration readouts use
+native JSX, while internal known compositions retain explicit accepted causes. Original catalogue
+adoption, final global performance and the overall v2 marker stay separate migration gates.
 
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).

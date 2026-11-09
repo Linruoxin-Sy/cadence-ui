@@ -71,7 +71,7 @@ prove installed behaviour; the existing recipe declarations remain the shipped c
 | Position and identity   | layout.move, layout.shared, handoff                       | Stable items move or transfer without remounting their semantic owners       |
 | Surface and text colour | state.color (target addition)                             | Explicit colour properties share token clocks and honour none                |
 | Changed text            | text.change                                               | Unchanged text identity survives; only changed text gets replacement effects |
-| Changed numbers         | number.roll (resolver exists; reel renderer pending)      | Stable place-value columns roll in the semantic direction                    |
+| Changed numbers         | number.roll                                               | Stable place-value columns roll in the semantic direction                    |
 | Control feedback        | feedback.press, state.morph                               | Native input responds immediately with appropriate visual feedback           |
 | Data and ongoing status | data.transition                                           | Existing engine targets and accessible status survive every mode             |
 
@@ -82,8 +82,9 @@ to roll. Richness means complete relevant coverage, not identical effects on eve
 ### 1.3 Delivery boundary
 
 AnimatedText is installable with the conservative changed-only native text form described in §3.6.
-AnimatedNumber, RevealGroup and Reveal remain planned.
-`text.reveal`, `text.split` and `number.roll` being present in the resolver does not mean a component
+AnimatedNumber is installable with the conservative bounded reel form described in §3.7.
+RevealGroup and Reveal remain planned.
+`text.reveal`, `text.split` and `number.roll` being present in the resolver does not mean another component
 implements them. Shared v2 primitives are the planned scope; their final registry items must follow
 the Cadence-original origin and dependency rules. Do not infer the reference library's other 121
 components are added to Cadence's scope.
@@ -501,33 +502,33 @@ separated in §3.1.0 and must enter the runtime union, metadata and user docs at
 implementation. Behaviour sections below define the target; named baseline differences remain
 explicit until their rollout phase completes.
 
-| Recipe            | Purpose                                                                                 | Key parameters                  | Implementation                                                                                                        | reduced behaviour                                                           |
-| ----------------- | --------------------------------------------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`             | V2 grouped observer and CSS states (§3.8); shared renderer pending                                                    | Bypass decorative controller; visible                                       |
-| `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`               | scale + opacity, `transformOrigin` follows the anchor                                                                 | Fade only                                                                   |
-| `exit.fade`       | Element disappearing                                                                    | `duration`                      | opacity to 0                                                                                                          | Same (opacity kept)                                                         |
-| `exit.shrink`     | Closing a popover                                                                       | `scale`                         | scale to 0.96 + opacity                                                                                               | Fade only                                                                   |
-| `popup.anchored`  | Base UI popups                                                                          | `side`, `align`                 | `data-starting-style`/`data-ending-style` or Motion `render`                                                          | No scale, pure cross-fade                                                   |
-| `layout.move`     | List/grid reordering                                                                    | `spring`                        | `layout` prop + `LayoutGroup` + physics-defined spring                                                                | Layout disabled, instant jump                                               |
-| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId` / measured targets   | `layoutId` or a persistent measured indicator (§3.1.4) + physics-defined `spring.morph`                               | Disabled, immediate switch                                                  |
-| `list.stagger`    | Items appearing one by one                                                              | `stagger`, `delayChildren`      | variants + `staggerChildren`                                                                                          | All fade in together (no stagger)                                           |
-| `gesture.drag`    | Drag / swipe to dismiss                                                                 | `axis`, `threshold`, `velocity` | `drag` + `useMotionValue` + `animate` spring-back                                                                     | Direct operation retained; no inertial travel; button alternative           |
-| `scroll.progress` | Reading progress, parallax                                                              | `offset`                        | `useScroll` + `useSpring`                                                                                             | Static value (no smoothing)                                                 |
-| `scroll.navigate` | Navigate to a document section after an explicit link activation                        | measured destination            | Motion number tween writes native scroll offsets; `duration.page` + `ease.inOut` (§3.1.5)                             | Immediate destination                                                       |
-| `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`              | GSAP ScrollTrigger (optional dependency)                                                                              | End state shown directly                                                    |
-| `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                 | variants + child spans                                                                                                | Whole block fades in                                                        |
-| `text.change`     | Changed-only native display text                                                        | `locale`, `granularity`         | Bounded native Text raster/Range proof; opacity only                                                                  | Changed-only opacity, no stagger; none immediate                            |
-| `text.split`      | Character by character (GSAP)                                                           | `type`                          | GSAP SplitText (optional)                                                                                             | Shown as a whole                                                            |
-| `number.roll`     | Numeric changes                                                                         | `precision`, `spring`           | Resolver exists; place-value reel renderer and formatter integration pending (§3.7)                                   | New value shown directly                                                    |
-| `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                  | CSS continuous form or explicit Motion/engine clock                                                                   | V2 loops static (§3.2); engine geometry instant; permitted one-shot opacity |
-| `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                 | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state                            | Indicator at full size, thumb jumps                                         |
-| `state.color`     | Explicit surface/foreground colour feedback                                             | scoped properties, fast tween   | CSS owner with active cancellation; no delayed focus geometry                                                         | Short colour tween; none cancels duration and delay                         |
-| `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                   | `animate()` on a motion value, or the Base UI disclosure CSS form below; measure content and clamp to the closed size | Instant size change, opacity kept                                           |
-| `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                        | inverse transform from `measureOrigin()` + physics spring                                                             | Cross-fade at the destination                                               |
-| `feedback.press`  | Press feedback                                                                          | `scale`                         | Native press ownership + committed controls                                                                           | Colour change only                                                          |
+| Recipe            | Purpose                                                                                 | Key parameters                   | Implementation                                                                                                        | reduced behaviour                                                           |
+| ----------------- | --------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`              | V2 grouped observer and CSS states (§3.8); shared renderer pending                                                    | Bypass decorative controller; visible                                       |
+| `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`                | scale + opacity, `transformOrigin` follows the anchor                                                                 | Fade only                                                                   |
+| `exit.fade`       | Element disappearing                                                                    | `duration`                       | opacity to 0                                                                                                          | Same (opacity kept)                                                         |
+| `exit.shrink`     | Closing a popover                                                                       | `scale`                          | scale to 0.96 + opacity                                                                                               | Fade only                                                                   |
+| `popup.anchored`  | Base UI popups                                                                          | `side`, `align`                  | `data-starting-style`/`data-ending-style` or Motion `render`                                                          | No scale, pure cross-fade                                                   |
+| `layout.move`     | List/grid reordering                                                                    | `spring`                         | `layout` prop + `LayoutGroup` + physics-defined spring                                                                | Layout disabled, instant jump                                               |
+| `layout.shared`   | Shared elements (tab indicator, card expansion)                                         | `layoutId` / measured targets    | `layoutId` or a persistent measured indicator (§3.1.4) + physics-defined `spring.morph`                               | Disabled, immediate switch                                                  |
+| `list.stagger`    | Items appearing one by one                                                              | `stagger`, `delayChildren`       | variants + `staggerChildren`                                                                                          | All fade in together (no stagger)                                           |
+| `gesture.drag`    | Drag / swipe to dismiss                                                                 | `axis`, `threshold`, `velocity`  | `drag` + `useMotionValue` + `animate` spring-back                                                                     | Direct operation retained; no inertial travel; button alternative           |
+| `scroll.progress` | Reading progress, parallax                                                              | `offset`                         | `useScroll` + `useSpring`                                                                                             | Static value (no smoothing)                                                 |
+| `scroll.navigate` | Navigate to a document section after an explicit link activation                        | measured destination             | Motion number tween writes native scroll offsets; `duration.page` + `ease.inOut` (§3.1.5)                             | Immediate destination                                                       |
+| `scroll.story`    | Scroll-narrative timeline                                                               | `trigger`, `scrub`               | GSAP ScrollTrigger (optional dependency)                                                                              | End state shown directly                                                    |
+| `text.reveal`     | Headline reveals word by word / line by line                                            | `by`, `stagger`                  | variants + child spans                                                                                                | Whole block fades in                                                        |
+| `text.change`     | Changed-only native display text                                                        | `locale`, `granularity`          | Bounded native Text raster/Range proof; opacity only                                                                  | Changed-only opacity, no stagger; none immediate                            |
+| `text.split`      | Character by character (GSAP)                                                           | `type`                           | GSAP SplitText (optional)                                                                                             | Shown as a whole                                                            |
+| `number.roll`     | Explicit independently committed numeric changes                                        | `locales`, `format`, `direction` | Bounded native-Text/canvas two-cell reels, smooth reviewed physics and exact fallback (§3.7)                          | Exact current value immediately, without duration or delay                  |
+| `data.transition` | Data surfaces changing state in place                                                   | `mode`, `loop`                   | CSS continuous form or explicit Motion/engine clock                                                                   | V2 loops static (§3.2); engine geometry instant; permitted one-shot opacity |
+| `state.morph`     | A control's own state changing in place (check tick, radio dot, switch thumb, OTP slot) | `axis`, `scale`                  | `animate()` or `layout` + ResizeObserver, or Motion driven by the primitive's render state                            | Indicator at full size, thumb jumps                                         |
+| `state.color`     | Explicit surface/foreground colour feedback                                             | scoped properties, fast tween    | CSS owner with active cancellation; no delayed focus geometry                                                         | Short colour tween; none cancels duration and delay                         |
+| `geometry.resize` | A control's measured width/height following its content (select trigger, disclosure)    | `axis`, `min`                    | `animate()` on a motion value, or the Base UI disclosure CSS form below; measure content and clamp to the closed size | Instant size change, opacity kept                                           |
+| `handoff`         | A value flying from a source that unmounts to a destination that mounts elsewhere       | `origin`                         | inverse transform from `measureOrigin()` + physics spring                                                             | Cross-fade at the destination                                               |
+| `feedback.press`  | Press feedback                                                                          | `scale`                          | Native press ownership + committed controls                                                                           | Colour change only                                                          |
 
-Four recipes currently opt into `continuity: "velocity"`: `layout.move`, `layout.shared`, `geometry.resize`, and
-`handoff`. All four exist to be retargeted while they are still moving (a list reorders twice, a tab
+Five recipes currently opt into `continuity: "velocity"`: `layout.move`, `layout.shared`, `geometry.resize`,
+`number.roll` and `handoff`. They exist to be retargeted while they are still moving (a list reorders twice, a tab
 indicator is clicked mid-flight, a second option is selected before the first label lands), and all
 travel far enough that losing the velocity is visible. Every other spring stays time-defined on
 purpose: `press` is a sub-pixel scale and a popup scales by 4%, where Motion's own guard against
@@ -537,8 +538,10 @@ table, not switched on in a component.
 `geometry.resize` resolves to zero duration under `reduced`: a short width tween is still layout
 motion, and the size is information, so it jumps. `scroll.navigate` also jumps. V2 immediate paths
 must remove delay as well as duration. `handoff` may retain a short opacity tween at the destination
-while dropping the transform. V2 numeric reels need their own reviewed continuity policy; the
-existing number.roll resolver's snappy spring alone does not implement that contract.
+while dropping the transform. Numeric reels use smooth physics with current painted offsets, discard
+opposing velocity on reversal, clamp travel to one cell and settle unreadable interruptions immediately.
+Reduced/none and zero recipe clock have no reel duration or delay. The resolver alone does not
+implement the numeric planner, native text ownership or renderer eligibility checks.
 
 Theme switching is deliberately absent. A view transition is a document-level operation: it resolves
 to no Motion `Transition`, so it cannot be a recipe and no component declares it. The site's theme
@@ -1249,7 +1252,7 @@ Built-in numeric integration preserves the exact output of the existing display 
 precision, grouping and sign. Raw React numeric children do not acquire Intl defaults, rounding,
 negative-zero signs or expanded exponent notation just to support reels. Existing formatting APIs
 remain authoritative. If the original representation cannot be safely decomposed, show that exact
-representation immediately. The planned standalone AnimatedNumber's explicit formatting belongs to
+representation immediately. The standalone AnimatedNumber's explicit formatting belongs to
 its API; this integration rule does not alter public defaults. See the
 [numeric formatting policy](motion/presets.md#51-numeric-identity-and-formatting-decisions).
 
@@ -1562,7 +1565,14 @@ AnimatedText is available as `@cadence/animated-text`, exporting `AnimatedText` 
 `cadence/animated-text`. It takes native span props and a string value; it does not accept arbitrary
 children, an origin or an identity prop. Auto/grapheme uses the character clock; word groups only
 changed paint using Intl word segments and the word clock. All retain the same native text and
-conservative proof/fallback policy. The remaining rows are design interfaces. Each primitive has
+conservative proof/fallback policy. AnimatedNumber is available as `@cadence/animated-number`,
+exporting `AnimatedNumber` and its props from `cadence/animated-number`. Native span props accompany
+the numeric API below. Omitted formatting props retain String(original); supplying locales or format
+selects native Intl. This standalone boundary denotes an independently committed quantity; query/filter,
+delayed direct-input, reset and restoration readouts remain native JSX. Affixes and format-only revisions
+are immediate native text, with no additional text animation owner. Current reel proof requires supported
+ASCII/LTR typography, unit device scale and integer resting glyph origins; other mappings stay exact native.
+The Reveal rows remain design interfaces. Each primitive has
 an independently declared registry item, relative shared imports, namespaced dependencies and its own
 contract tests. They do not require every ordinary consumer to wrap each component manually.
 

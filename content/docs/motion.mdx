@@ -70,7 +70,7 @@ writing durations inline.
 | `text.reveal` | per-word reveals | 0.32s |
 | `text.change` | [Animated Text](/components/animated-text) | Changed-only opacity; immediate exact native text when proof is unavailable |
 | `text.split` | per-character reveals (optional GSAP) | 0.32s |
-| `number.roll` | numeric values | snappy spring |
+| `number.roll` | [Animated Number](/components/animated-number) | Bounded two-cell reels, smooth physics; reduced/none immediately settle |
 | `data.transition` | skeletons, loading surfaces | opacity loop (CSS), 0.22s when one-shot |
 | `state.morph` | checkbox, radio, switch, input-otp | morph spring |
 | `state.color` | Scoped background, foreground, border and SVG colour feedback | Explicit CSS properties; reduced shortens timing; none cancels active duration/delay |
@@ -83,7 +83,9 @@ writing durations inline.
 The provider library includes shared CSS execution support for `state.color` and theme-clock
 spin/pulse status. Components adopt it individually; each component's Motion contract remains the
 source of its delivered behavior. [Animated Text](/components/animated-text) is installable for plain
-strings. AnimatedNumber, Reveal and RevealGroup remain planned.
+strings. [Animated Number](/components/animated-number) is installable for independently committed
+quantities, with raw defaults or explicit Intl formatting. Reveal and RevealGroup remain planned.
+Both display primitives retain exact native fallback when typography or layout correspondence is unproven.
 
 A colour owner names its background, foreground, individual borders or SVG fill/stroke. Focus and
 invalid indicators update immediately. Foreground/background animation requires a reviewed palette

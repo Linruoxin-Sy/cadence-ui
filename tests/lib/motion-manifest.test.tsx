@@ -4,6 +4,23 @@ import { calledRecipes, cssPolicyCapabilities, implementedForm } from "../../scr
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+describe("installed numeric form", () => {
+  const number = readFileSync("registry/cadence/animated-number/index.tsx", "utf8");
+  it("requires a mounted relative numeric adapter, not a recipe name or dead call", () => {
+    expect(implementedForm(number, "number.roll", "reels")).toBe("reels");
+    expect(calledRecipes(number)).toContain("number.roll");
+    for (const candidate of [
+      number.replace("{text}", "{value}"),
+      number.replace("useNumberPresentation(node,", "missing(node,"),
+      number.replace('"../lib/use-number-presentation"', '"@/host/use-number-presentation"'),
+      `// ${number.replaceAll("\n", "\n// ")}`,
+      'cm.transition("number.roll")',
+    ])
+      expect(implementedForm(candidate, "number.roll", "reels")).toBeNull();
+    expect(implementedForm(number, "number.roll", "one-shot")).toBeNull();
+  });
+});
+
 describe("installed changed-text form", () => {
   const text = readFileSync("registry/cadence/animated-text/index.tsx", "utf8");
   it("recognizes the mounted adapter and rejects absent/dead declarations", () => {

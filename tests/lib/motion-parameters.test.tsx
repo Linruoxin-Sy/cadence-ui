@@ -164,7 +164,7 @@ it("validates authored overrides and never treats native unit options as millise
   expect(() => resolvePreset(parameters.stateColor, "full", { delay: -1 })).toThrow(RangeError);
 });
 
-it("keeps all 20 installed recipe outputs equal to the frozen pre-preset runtime", async () => {
+it("keeps 19 unchanged recipes frozen and explicitly verifies the revised numeric resolver", async () => {
   const parent = path.resolve(process.env.CADENCE_MOTION_TOKEN_TEST_DIR ?? ".cache/tests/motion-tokens");
   await mkdir(parent, { recursive: true });
   const temp = await mkdtemp(path.join(parent, "legacy-"));
@@ -181,9 +181,27 @@ it("keeps all 20 installed recipe outputs equal to the frozen pre-preset runtime
     for (const mode of ["full", "reduced", "none"] as const)
       for (const timeScale of [0, 1, 4])
         for (const options of [{ timeScale }, { timeScale, delay: 0.3 }, { timeScale, delay: 0.3, duration: 0.5 }])
-          expect(parameters.transitionFor(id, mode, options), `${id}/${mode}/${JSON.stringify(options)}`).toEqual(
-            legacy.transitionFor(id, mode, options),
-          );
+          if (id === "number.roll") {
+            const expected =
+              mode === "none"
+                ? { duration: 0 }
+                : mode === "reduced" || timeScale === 0
+                  ? { duration: 0, delay: 0 }
+                  : {
+                      ...parameters.physicalSpring(
+                        parameters.spring.smooth.visualDuration * timeScale,
+                        parameters.spring.smooth.bounce,
+                      ),
+                      delay: 0,
+                    };
+            expect(parameters.transitionFor(id, mode, options), `${id}/${mode}/${JSON.stringify(options)}`).toEqual(
+              expected,
+            );
+          } else {
+            expect(parameters.transitionFor(id, mode, options), `${id}/${mode}/${JSON.stringify(options)}`).toEqual(
+              legacy.transitionFor(id, mode, options),
+            );
+          }
 });
 
 it("handles effective overrides and unrepresentable engine clocks without Infinity or default physics", () => {

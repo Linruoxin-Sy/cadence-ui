@@ -485,8 +485,10 @@ new target cannot preserve a readable bounded presentation during interruption, 
 formatted value immediately rather than adding more turns or a backlog. A
 formatter/locale-only revision settles the numeric lane and changes only necessary affixes/formatting,
 without a growth/decline story. NaN/Infinity and unsupported digit systems display their exact formatter
-output immediately. Nonfinite values are never fed to physics. These are target renderer requirements,
-not a claim that the existing `number.roll` resolver supplies them.
+output immediately. Nonfinite values are never fed to physics. AnimatedNumber implements this form through the shared numeric planner/renderer;
+the recipe resolver alone is never evidence of component adoption. The standalone binding
+`animated-number.number.roll` selects `number.roll` with `number.roll/reels`. Affixes and formatter-only
+changes use immediate native text ownership; no affix replacement animation is claimed.
 
 ### 5.1 Numeric identity and formatting decisions
 
@@ -495,7 +497,7 @@ reconstructs a quantity from rendered DOM or a string. Built-in integration pres
 exact output. In particular, a raw React numeric child keeps `1000`, `1.234567`, `0` for negative zero,
 and `1e+21` where that is the existing output; default Intl grouping, rounding, sign display or exponent
 expansion must not silently replace it. Existing format APIs keep their own formatting. An output
-that cannot be safely decomposed remains exact and immediate. The planned standalone AnimatedNumber's
+that cannot be safely decomposed remains exact and immediate. The standalone AnimatedNumber's
 explicit formatter remains governed by its API, not a change to existing component defaults.
 
 Existing conditional, placeholder and falsy-content branches run before renderer selection, as in

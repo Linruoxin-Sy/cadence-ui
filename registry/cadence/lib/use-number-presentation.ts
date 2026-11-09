@@ -9,7 +9,7 @@ import type { CadenceMotion } from "./provider";
 
 const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-/** Internal pilot adapter. Return the actual SSR value once, retain one native
+/** Numeric display adapter. Return the actual SSR value once, retain one native
  * Text node and commit formatting only when accepted inputs change. */
 export function useNumberPresentation(
   host: MotionHostRef<HTMLElement>,

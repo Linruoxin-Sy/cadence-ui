@@ -30,6 +30,7 @@ export const MOTION_FORMS = [
   "size-linked",
   "measured",
   "changed-runs",
+  "reels",
 ];
 
 /**
@@ -87,6 +88,8 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  if (recipe === "number.roll")
+    return form === "reels" && stringAdapterImplementation(source, "number") ? "reels" : null;
   if (recipe === "text.change") return form === "changed-runs" && textImplementation(source) ? "changed-runs" : null;
   // Structural adoption only; actual completion/cancellation is browser evidence.
   if (recipe === "data.transition" && form === "one-shot" && source.includes("./sidebar-labels"))
@@ -181,12 +184,17 @@ export function calledRecipes(source) {
       cssPolicyImplementation(source, "useStateColor") ? ["state.color"] : [],
       cssPolicyImplementation(source, "useContinuousMotion") ? ["data.transition"] : [],
       textImplementation(source) ? ["text.change"] : [],
+      stringAdapterImplementation(source, "number") ? ["number.roll"] : [],
     );
 }
 
 /** A connected string adapter, not comments, an unused import or an unmounted call. */
 function textImplementation(source) {
-  if (!source.includes("use-text-presentation")) return false;
+  return stringAdapterImplementation(source, "text");
+}
+
+function stringAdapterImplementation(source, kind) {
+  if (!source.includes(`use-${kind}-presentation`)) return false;
   compiler ??= require("typescript");
   const ts = compiler;
   const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
@@ -195,14 +203,18 @@ function textImplementation(source) {
     if (
       !ts.isImportDeclaration(statement) ||
       !ts.isStringLiteral(statement.moduleSpecifier) ||
-      !/^\.\.?\/.*use-text-presentation$/.test(statement.moduleSpecifier.text) ||
+      !new RegExp(`^\\.\\.?/.*use-${kind}-presentation$`).test(statement.moduleSpecifier.text) ||
       statement.importClause?.isTypeOnly
     )
       continue;
     const bindings = statement.importClause?.namedBindings;
     if (bindings && ts.isNamedImports(bindings))
       for (const item of bindings.elements)
-        if (!item.isTypeOnly && (item.propertyName?.text ?? item.name.text) === "useTextPresentation")
+        if (
+          !item.isTypeOnly &&
+          (item.propertyName?.text ?? item.name.text) ===
+            (kind === "text" ? "useTextPresentation" : "useNumberPresentation")
+        )
           adapters.add(item.name.text);
   }
   let found = false;
