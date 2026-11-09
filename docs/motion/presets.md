@@ -9,6 +9,13 @@ internal static bindings, not additional public APIs, registry items or `Recipe`
 
 ## 1. Tokens, recipes, presets and bindings
 
+Internal viewport reveal binds `reveal` to `duration.base`/`ease.out`, `distance.md` vertical
+translation and opacity. Cyclic group rhythm uses `stagger.reveal` (55 ms), stable mounted slots
+modulo three, default none. The shared `revealPolicy` in motion.ts owns amount/insets/hysteresis;
+the executor enforces 20 active hosts and 400 ms aggregate outstanding delay after clock scaling.
+Repeat reset, explicit/focus/hash reveal, bypass and cleanup have zero delay and restore native
+paint. This binding does not publish public Reveal/RevealGroup or migrate site reveal.
+
 | Term              | Responsibility                                                                    | Example                                    |
 | ----------------- | --------------------------------------------------------------------------------- | ------------------------------------------ |
 | Token             | A reusable authored value; defined once in the shared motion source               | `duration.fast`, `distance.xs`             |

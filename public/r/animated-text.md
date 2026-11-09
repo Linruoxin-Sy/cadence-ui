@@ -132,6 +132,7 @@ Merge the CSS from [cadence-theme](https://cadence.dev/r/cadence-theme.json) int
     --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
     --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
     --motion-source-version: 1;
+    --motion-stagger-reveal: 0.055s;
   }
   [data-cadence-scope] {
     --motion-source-duration-instant: var(--cadence-inherited-motion-source-duration-instant, inherit);
@@ -168,6 +169,7 @@ Merge the CSS from [cadence-theme](https://cadence.dev/r/cadence-theme.json) int
     --motion-spring-size-compact-bounce: var(--cadence-inherited-motion-spring-size-compact-bounce, inherit);
     --motion-spring-size-panel-duration: var(--cadence-inherited-motion-spring-size-panel-duration, inherit);
     --motion-spring-size-panel-bounce: var(--cadence-inherited-motion-spring-size-panel-bounce, inherit);
+    --motion-stagger-reveal: var(--cadence-inherited-motion-stagger-reveal, inherit);
   }
   [data-motion='full'] {
     --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));

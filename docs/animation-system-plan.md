@@ -327,6 +327,17 @@ boundary classifies independent quantities; query/filter/direct-input/reset/rest
 native JSX, while internal known compositions retain explicit accepted causes. Original catalogue
 adoption, final global performance and the overall v2 marker stay separate migration gates.
 
+Internal viewport reveal now has an explicit-registration controller and physical React adapter.
+Matching root/options/area thresholds share native observation, with height-derived pixel insets,
+root/target resize handling, reachable huge-target thresholds and separate repeat leave policy.
+Visible-first native/SSR/hydration content is consumed; only successfully observed offscreen hosts
+arm. Focus/hash, print, hidden documents, restrictive mode/clock edits and failed setup restore the
+native endpoint and cancel existing transition handles. Stable mounted slots use optional bounded
+cyclic delays; the group includes active earlier entrances in its concurrency/delay allowance.
+This internal pilot does not replace the site's legacy Reveal, install public Reveal/RevealGroup,
+authorize nested public composition or migrate catalogue components. Those public APIs, registry
+items, per-component contracts and composition acceptance remain pending, as do global budgets.
+
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).
 Prove rejected requests, equal-target rerenders during a legal flight, batched versus committed

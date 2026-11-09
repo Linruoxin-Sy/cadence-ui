@@ -194,6 +194,7 @@
     --motion-stagger-char: 0.012s;
     --motion-stagger-word: 0.035s;
     --motion-stagger-item: 0.05s;
+    --motion-stagger-reveal: 0.055s;
     --motion-spring-press-duration: 0.24s;
     --motion-spring-press-bounce: 0.12;
     --motion-spring-snappy-duration: 0.26s;
@@ -248,6 +249,7 @@
     --motion-stagger-char: var(--cadence-inherited-motion-stagger-char, inherit);
     --motion-stagger-word: var(--cadence-inherited-motion-stagger-word, inherit);
     --motion-stagger-item: var(--cadence-inherited-motion-stagger-item, inherit);
+    --motion-stagger-reveal: var(--cadence-inherited-motion-stagger-reveal, inherit);
     --ease-cadence-out: var(--cadence-inherited-ease-cadence-out, inherit);
     --ease-cadence-in-out: var(--cadence-inherited-ease-cadence-in-out, inherit);
     --ease-cadence-in: var(--cadence-inherited-ease-cadence-in, inherit);

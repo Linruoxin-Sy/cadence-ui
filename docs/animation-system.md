@@ -252,6 +252,7 @@ and engine adapters still require their own adoption evidence.
     --motion-stagger-char: 0.012s;
     --motion-stagger-word: 0.035s;
     --motion-stagger-item: 0.05s;
+    --motion-stagger-reveal: 0.055s;
     --motion-spring-press-duration: 0.24s;
     --motion-spring-press-bounce: 0.12;
     --motion-spring-snappy-duration: 0.26s;
@@ -306,6 +307,7 @@ and engine adapters still require their own adoption evidence.
     --motion-stagger-char: var(--cadence-inherited-motion-stagger-char, inherit);
     --motion-stagger-word: var(--cadence-inherited-motion-stagger-word, inherit);
     --motion-stagger-item: var(--cadence-inherited-motion-stagger-item, inherit);
+    --motion-stagger-reveal: var(--cadence-inherited-motion-stagger-reveal, inherit);
     --ease-cadence-out: var(--cadence-inherited-ease-cadence-out, inherit);
     --ease-cadence-in-out: var(--cadence-inherited-ease-cadence-in-out, inherit);
     --ease-cadence-in: var(--cadence-inherited-ease-cadence-in, inherit);
@@ -504,7 +506,7 @@ explicit until their rollout phase completes.
 
 | Recipe            | Purpose                                                                                 | Key parameters                   | Implementation                                                                                                        | reduced behaviour                                                           |
 | ----------------- | --------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`              | V2 grouped observer and CSS states (§3.8); shared renderer pending                                                    | Bypass decorative controller; visible                                       |
+| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`              | Internal registered observer/CSS controller (§3.8); public composition and catalogue adoption pending                 | Bypass decorative controller; visible                                       |
 | `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`                | scale + opacity, `transformOrigin` follows the anchor                                                                 | Fade only                                                                   |
 | `exit.fade`       | Element disappearing                                                                    | `duration`                       | opacity to 0                                                                                                          | Same (opacity kept)                                                         |
 | `exit.shrink`     | Closing a popover                                                                       | `scale`                          | scale to 0.96 + opacity                                                                                               | Fade only                                                                   |
@@ -1313,6 +1315,28 @@ frame. @starting-style can provide initial styles where applicable; it does not 
 state. Neither single nor double requestAnimationFrame proves paint. Unsupported/failed enhancement
 leaves the final visible state; avoid per-target forced layout and timeout rescue animations. The
 initial-style adapter needs actual browser first-frame proof.
+
+The internal viewport adapter uses registered native hosts, token-backed opacity/translation CSS
+states and one document style/layout barrier per observer delivery before any entrance writes.
+It never forces layout once per target or polls frames. Native transition handles own completion;
+retiring a target cancels those handles and releases only its own declarations. Repeat resets to
+pending immediately, with zero exit delay. Reachable area thresholds scale `amount` by the maximum
+root/target area ratio; separate half-amount leave thresholds provide hysteresis. A shared root
+resize observer recomputes pixel margins and target thresholds. Matching options/thresholds share
+one IntersectionObserver, including across independent groups. Unregistration drains queued records
+for the retired physical target, preserves live sibling deliveries and rejects batches whose
+registration retired before dispatch;
+it does not infer lifecycle identity from frame timestamps. Group activity includes delayed and
+still-running transitions; excess targets become visible immediately. Entrance delays scale once
+and are proportionally clamped to the remaining aggregate delay budget. Positive clock edits keep
+the captured finite entrance; restrictive edits consume and cancel it. A once entrance leaving the
+root also settles immediately. Caller-owned opacity, transform, transitions, animations and editable
+hosts use the native visible fallback.
+Pending and entering hosts reserve opacity/transform in the existing transaction writer registry;
+an existing owner prevents enhancement. This reservation does not authorize two writers or compose
+press/layout on the same property. Public composition must keep those owners disjoint.
+This is internal controller support; public Reveal/RevealGroup composition and registry delivery
+remain separate work.
 
 Pending targets cannot accept invisible pointer activation. Focus-in, hash navigation and explicit
 reveal show the target before interaction without delay; repeat cannot hide a focused subtree.

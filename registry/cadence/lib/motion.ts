@@ -47,7 +47,10 @@ export const reducedDurationScale = 0.6;
 /** Generated theme/scope protocol, separate from recipe and registry versions. */
 export const motionCssVersion = 1;
 
-export const stagger = { char: 0.012, word: 0.035, item: 0.05 } as const;
+export const stagger = { char: 0.012, word: 0.035, item: 0.05, reveal: 0.055 } as const;
+
+/** Shared viewport trigger policy. Insets are fractions of root HEIGHT, never CSS percentages. */
+export const revealPolicy = { amount: 0.08, insetTop: 0.03, insetBottom: 0.08, leaveRatio: 0.5, cycle: 3 } as const;
 
 /** Parameter budgets only; the owning controllers enforce visible work and rendered bounds. */
 export const motionLimits = {
