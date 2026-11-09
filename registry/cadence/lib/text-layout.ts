@@ -2,6 +2,18 @@ import { textProofLimits } from "./motion";
 import type { TextSnapshot, TextUnit } from "./text-diff";
 
 type Box = Pick<DOMRect, "left" | "top" | "width" | "height">;
+const highlights = new WeakMap<Document, Set<Highlight>>();
+/** Trusted pixel-only text/reel masks share a document registry. Unknown caller
+ * highlights still force native paint; one family's mask is not foreign work. */
+export function ownedTextHighlights(doc: Document) {
+  let known = highlights.get(doc);
+  if (!known) {
+    known = new Set<Highlight>();
+    highlights.set(doc, known);
+  }
+  return known;
+}
+
 export type TextLayout = {
   boxes: Map<object, Box>;
   font: string;

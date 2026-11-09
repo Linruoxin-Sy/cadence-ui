@@ -13,11 +13,16 @@ import { type MotionEnvironment, subscribeMotionEnvironment } from "./motion-env
 import { createMotionTransaction, type MotionLease, type MotionRevision } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
 import { boundTextRevision, changedTextGroups, createTextSnapshot, diffText, shapeTextDiff } from "./text-diff";
-import { nativeTextContext, outgoingTextPaint, proveTextLayout, selectedTextContext } from "./text-layout";
+import {
+  nativeTextContext,
+  outgoingTextPaint,
+  ownedTextHighlights,
+  proveTextLayout,
+  selectedTextContext,
+} from "./text-layout";
 
 const binding = bindMotionParameters(textReplace, "text.change/changed-runs");
 type Capture = Parameters<ReturnType<typeof createCapturedHandoff>["commit"]>[0]["capture"];
-const ownedHighlights = new WeakMap<Document, Set<Highlight>>();
 let nextMask = 0;
 export interface TextPresentationCommit {
   value: string;
@@ -48,8 +53,7 @@ export function createTextPresentation(
   const doc = host.ownerDocument,
     view = doc.defaultView;
   const highlights = view?.CSS?.highlights;
-  const known = ownedHighlights.get(doc) ?? new Set<Highlight>();
-  ownedHighlights.set(doc, known);
+  const known = ownedTextHighlights(doc);
   let snapshot = createTextSnapshot(host.textContent ?? "");
   let current: TextPresentationCommit | null = null;
   let requested = snapshot.value;

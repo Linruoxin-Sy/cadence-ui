@@ -305,9 +305,22 @@ two-cell/one-cell-height candidate lanes against the 12-column display/known-tra
 Original number/BigInt values supply trend without conversion; format/scale revisions, unsupported
 digits/parts, nonfinite values and ineligible accepted readout causes stay exact and immediate.
 The conservative existing text-input ceiling also bounds decomposition without truncating output.
-This is not an installable numeric helper or a reel renderer: native editing/layout eligibility,
-live offsets/velocity, shared geometry/semantic transactions, modes and the public AnimatedNumber
-API/distribution still require the subsequent renderer implementation and browser evidence.
+An internal native-Text renderer and React adapter now consume these candidates. Pixel-only two-cell
+lanes keep semantic selection/copy output singular, use reviewed preset physics, and reverse to an
+existing departing cell from its last painted subpixel offsets with opposing velocity discarded.
+Same-output commits retain a legal flight; positive clock changes rebase that flight. A third digit,
+incompatible direction or unavailable correspondence settles the exact latest target immediately.
+Rendering shares the text controller's bounded font/Range proof and trusted mask registry. Current
+reel correspondence is limited to unit device scale and integer resting glyph origins; fractional
+resting origins, RTL layout, unsupported typography/clipping and native editing remain exact native
+output. Moving offsets themselves remain subpixel. No font metrics or tabular styling are imposed.
+Known numeric compositions preflight the 12-column union, including active identities; text and
+numeric owners share transaction cancellation and their independent work ceilings. A composition
+whose separate geometry/fill engine cannot share the reel phase uses the designed immediate readout
+fallback with that same semantic revision. This is staged internal support, not public revised
+`number.roll` adoption: the existing resolver/declarations remain unchanged. AnimatedNumber's API,
+registry/distribution, public guide/examples, installed cost and remaining original S12 acceptance
+still require the subsequent public primitive work. Original catalogue migration stays separate.
 
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).
