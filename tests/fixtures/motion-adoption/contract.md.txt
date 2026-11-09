@@ -1,0 +1,44 @@
+# Fixture static adoption specimen
+
+## Contract references
+
+```json motion-contract
+{
+  "schema": 1,
+  "target": "motion-v2",
+  "migration": "v2",
+  "parts": { "paint": ["fixture#Fixture"] }
+}
+```
+
+## Capability ownership
+
+| Capability | Coverage and owner | References |
+| --- | --- | --- |
+| Appearance | Native visible paint only, without an entrance owner. | not-applicable: `@paint` |
+| Size | The native container owns its intrinsic layout and reflow. | inherited: `@paint` |
+| Surface colour | Own the fixture's bounded background palette feedback. | default: `fixture.paint.colour` |
+| Text colour | Own the fixture's inherited foreground palette feedback. | default: `fixture.paint.colour` |
+| Changed text | The fixture has no mutable string or replacement owner. | not-applicable: `@paint` |
+| Changed numbers | The fixture has no numeric quantity or rolling owner. | not-applicable: `@paint` |
+
+## Choreography and modes
+
+| Trigger / owner | Full | Reduced | None | Binding → preset → recipe/form |
+| --- | --- | --- | --- | --- |
+| Palette revision / paint | Scoped background and foreground feedback. | Short colour feedback without travel. | Immediate native target with zero duration and delay. | `fixture.paint.colour` → `state.color` → `state.color/surface-foreground` |
+
+## Interruption and lifecycle
+
+Live downgrade settles only the connected palette writer. Detach releases the current owner and
+never lets stale cleanup write into a replacement. Native focus and invalid paint are immediate.
+
+## Geometry and performance
+
+Native layout has no measured size or transform owner. Only a bounded scoped palette is adopted;
+this specimen supplies static adoption input, not browser or whole-component acceptance.
+
+## Acceptance scenarios
+
+Pair this static specimen with the real policy tests. An accepted source reference is not executed
+mode evidence, semantic applicability review, first paint, live cancellation or performance proof.

@@ -143,6 +143,24 @@ placeholders. This proves reference closure, not that prose is true, properties 
 measurements are safe or an animation passes runtime/performance acceptance. Review every part and
 conditional relationship manually; a matching recipe alone does not establish semantic applicability.
 
+`scripts/motion-adoption.mjs` adds a static subgate for proposed `v2` contracts. It resolves each
+supported action from its selected value-export anchor through the actual installation closure,
+retains import aliases and the nearest integration owner, and checks exact installed declarations
+and ownership. Inherited effects retain the migrated dependency's exact preset/form and responsibility.
+Connected colour inputs distinguish surface, foreground and a combined palette; separate hooks do
+not establish a combined owner. Continuous forms require shared loop policy adoption, rather than
+the legacy `animate-*` exception. Every installed owner needs a verified action, including ancillary
+effects outside the six summary rows. Unsupported property-qualified/native forms fail closed;
+neither matching recipe names nor clocks supply an implicit target-to-installed mapping.
+
+This is selected-export source evidence only. `@part` native/composed/N/A references are returned as
+unverified applicability obligations, not runtime facts. The subgate cannot associate a controller
+with a particular mounted region inside a broad export anchor, certify caller-registration scopes
+such as RevealGroup, or prove single-property ownership and three-mode behavior. The helper/observer/
+reporter still need strict joint host/property/mode evidence and real executed positive/negative
+fixtures before per-item v2 enablement. Keep browser, first-paint, live-cancellation, installation and
+performance acceptance separate; a static positive cannot open the migration marker.
+
 Migration is explicit and fail-closed. `legacy` keeps all installed manifest, MDX, intensity, source
 budget and successful runtime-helper gates. Missing/unknown markers fail; `v2` still fails because
 complete per-component six-capability/browser acceptance and the shared-stage gate remain pending.

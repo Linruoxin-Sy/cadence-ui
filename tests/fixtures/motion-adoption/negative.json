@@ -1,0 +1,65 @@
+[
+  {
+    "name": "wrong exported part",
+    "file": "contract",
+    "from": "fixture#Fixture",
+    "to": "fixture#Plain",
+    "error": "not adopted by actual fixture#Plain"
+  },
+  {
+    "name": "unmounted policy result",
+    "file": "source",
+    "from": "{...paint}",
+    "to": "",
+    "error": "not adopted by actual fixture#Fixture"
+  },
+  {
+    "name": "unused policy import",
+    "file": "source",
+    "from": "const paint = useStateColor(undefined, cm, [\"background-color\", \"color\"]);",
+    "to": "const paint = {};",
+    "error": "not adopted by actual fixture#Fixture"
+  },
+  {
+    "name": "type-only policy",
+    "file": "source",
+    "from": "import { useStateColor }",
+    "to": "import type { useStateColor }",
+    "error": "not adopted by actual fixture#Fixture"
+  },
+  {
+    "name": "foreground cannot certify surface",
+    "file": "source",
+    "from": "[\"background-color\", \"color\"]",
+    "to": "[\"color\"]",
+    "error": "not adopted by actual fixture#Fixture"
+  },
+  {
+    "name": "surface cannot certify foreground",
+    "file": "source",
+    "from": "[\"background-color\", \"color\"]",
+    "to": "[\"background-color\"]",
+    "error": "not adopted by actual fixture#Fixture"
+  },
+  {
+    "name": "foreign ownership cannot be local",
+    "file": "contract",
+    "from": "fixture#Fixture",
+    "to": "animated-text#AnimatedText",
+    "error": "foreign-only ownership is inherited/composed"
+  },
+  {
+    "name": "composition cannot replace a built-in default",
+    "file": "contract",
+    "from": "default: `fixture.paint.colour`",
+    "to": "composed: `fixture.paint.colour`",
+    "error": "conflicting capability integration relationships"
+  },
+  {
+    "name": "N/A cannot hide an installed effect",
+    "file": "contract",
+    "from": "default: `fixture.paint.colour`",
+    "to": "not-applicable: `@paint`",
+    "error": "requires capability action references for Surface colour"
+  }
+]

@@ -228,6 +228,13 @@ existing performance task is a final delivery dependency, not a development prer
   exact preset/recipe form, and full/reduced/none plus interruption to observable properties. Include
   directional `content.switch`/`content.month` and size-linked `layout.sidebar` as explicit target forms;
   equal timing tokens alone do not prove coordinated progress or geometry.
+  A static selected-export adoption subgate is available for proposed v2 actions: supported exact
+  forms resolve through installed value-import paths to the nearest integration owner; inherited
+  preset/form responsibilities and connected colour property subsets must agree. It rejects
+  unsupported target mappings, legacy-only loops and installed owners without action references.
+  Native/composed/N/A boundaries remain unverified obligations. This source subgate does not join
+  executed controllers, actual host regions, properties and modes; strict joint runtime evidence,
+  caller-registration compositions and valid end-to-end v2 acceptance remain pending.
   Audit exact host/region coverage as well as export existence: title/count/checkbox/sub-trigger text,
   separator/arrow/backdrop paint, native editor foreground and inherited accessories cannot disappear
   behind a broad root anchor. A composition either uses its dependency's preset/form unchanged or

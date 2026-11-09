@@ -22,6 +22,10 @@ property; tiers do not grant or prohibit animation. The current runtime, registr
 and test helpers retain compatibility while migration continues. Shared `state.color` and CSS loop
 executors have support; each component must still adopt the real owner, declare its implemented forms
 and prove the corresponding policies in all three modes. The overall v2 marker remains gated.
+The static selected-export adoption subgate checks proposed v2 action paths and installed owners;
+its positive references do not certify host/property/mode execution or applicability boundaries.
+Per-item v2 enablement still requires the pending strict joint runtime gate, alongside the existing
+browser, installation and performance requirements.
 Planned `text.change`, numeric rolling changes and public primitives are not installable APIs merely
 because they appear in the design. Keep source, declarations and user-facing documentation in sync
 for each migrated component, and leave outstanding implementation work explicit in the plan.

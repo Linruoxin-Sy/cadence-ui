@@ -1,0 +1,12 @@
+import { useStateColor } from "../lib/css-motion";
+import { useCadenceMotion } from "../lib/provider";
+
+export function Fixture() {
+  const cm = useCadenceMotion();
+  const paint = useStateColor(undefined, cm, ["background-color", "color"]);
+  return <span {...paint} data-slot="fixture" data-motion={cm.mode}>State</span>;
+}
+
+export function Plain() {
+  return <span data-slot="fixture-plain">Native</span>;
+}

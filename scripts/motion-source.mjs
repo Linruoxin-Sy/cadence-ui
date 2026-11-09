@@ -3,6 +3,30 @@ import ts from "typescript";
 const cache = new Map();
 const models = new Map();
 
+/** Public value-export names, excluding trivia and type-only declarations. */
+export function valueExports(source) {
+  const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const result = new Set();
+  const typeOnly = new Set(
+    tree.statements
+      .filter((node) => ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node))
+      .map((node) => node.name.text),
+  );
+  for (const node of tree.statements) {
+    if (ts.isExportDeclaration(node) && !node.isTypeOnly && node.exportClause && ts.isNamedExports(node.exportClause)) {
+      for (const element of node.exportClause.elements)
+        if (!element.isTypeOnly && !typeOnly.has((element.propertyName ?? element.name).text))
+          result.add(element.name.text);
+    } else if (node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) {
+      if ((ts.isFunctionDeclaration(node) || ts.isClassDeclaration(node)) && node.name) result.add(node.name.text);
+      if (ts.isVariableStatement(node))
+        for (const declaration of node.declarationList.declarations)
+          if (ts.isIdentifier(declaration.name)) result.add(declaration.name.text);
+    }
+  }
+  return result;
+}
+
 // A conservative static boundary, not a runtime conformance certificate. Keep
 // source positions so form recognisers can inspect actual syntax, not comments.
 export function motionSource(source, exports) {

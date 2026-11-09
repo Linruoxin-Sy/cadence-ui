@@ -3,10 +3,13 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
-import ts from "typescript";
 import { unified } from "unified";
+import { checkMotionPartAdoption } from "./motion-adoption.mjs";
 import { MOTION_RELATIONSHIPS } from "./motion-coverage.mjs";
 import { migrationProblems, targetMetadata } from "./motion-migration.mjs";
+import { valueExports } from "./motion-source.mjs";
+
+export { valueExports } from "./motion-source.mjs";
 
 export const CAPABILITIES = ["Appearance", "Size", "Surface colour", "Text colour", "Changed text", "Changed numbers"];
 const SECTIONS = [
@@ -96,7 +99,7 @@ export function parseMotionTarget(markdown, id, presets) {
     problems.push("motion schema: 1 and target: motion-v2 required");
   if (meta && Object.keys(meta).some((key) => !["schema", "target", "migration", "parts"].includes(key)))
     problems.push("unknown motion schema field");
-  problems.push(...migrationProblems(meta?.migration));
+  const migration = migrationProblems(meta?.migration);
   const parts = meta?.parts;
   if (!parts || typeof parts !== "object" || Array.isArray(parts) || !Object.keys(parts).length)
     problems.push("nonempty parts reference map required");
@@ -232,31 +235,15 @@ export function parseMotionTarget(markdown, id, presets) {
     for (const ref of capability.references)
       for (const target of ref.targets) if (target.startsWith("@")) usedParts.add(target.slice(1));
   for (const part of Object.keys(safeParts)) if (!usedParts.has(part)) problems.push(`${part}: unused part reference`);
-  return { problems, migration: meta?.migration, parts: safeParts, bindings, actions, capabilities };
-}
-
-/** Parse value exports, excluding comments, strings and type-only exports. */
-export function valueExports(source) {
-  const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-  const result = new Set();
-  const typeOnly = new Set(
-    tree.statements
-      .filter((node) => ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node))
-      .map((node) => node.name.text),
-  );
-  for (const node of tree.statements) {
-    if (ts.isExportDeclaration(node) && !node.isTypeOnly && node.exportClause && ts.isNamedExports(node.exportClause)) {
-      for (const element of node.exportClause.elements)
-        if (!element.isTypeOnly && !typeOnly.has((element.propertyName ?? element.name).text))
-          result.add(element.name.text);
-    } else if (node.modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) {
-      if ((ts.isFunctionDeclaration(node) || ts.isClassDeclaration(node)) && node.name) result.add(node.name.text);
-      if (ts.isVariableStatement(node))
-        for (const declaration of node.declarationList.declarations)
-          if (ts.isIdentifier(declaration.name)) result.add(declaration.name.text);
-    }
-  }
-  return result;
+  return {
+    problems: [...problems, ...migration],
+    referenceProblems: problems,
+    migration: meta?.migration,
+    parts: safeParts,
+    bindings,
+    actions,
+    capabilities,
+  };
 }
 
 export async function checkMotionTargets(root, registry) {
@@ -316,5 +303,7 @@ export async function checkMotionTargets(root, registry) {
       problems.push(`${item.name}: cannot read target contract: ${error.message}`);
     }
   }
-  return { problems, contracts, presets: presetResult.presets };
+  const adoption = await checkMotionPartAdoption(root, registry, contracts);
+  problems.push(...adoption.problems);
+  return { problems, contracts, presets: presetResult.presets, adoption };
 }

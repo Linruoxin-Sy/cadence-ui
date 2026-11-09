@@ -334,7 +334,13 @@ export function cssPolicyCapabilities(source) {
 
 /** Structural local adoption only; successful runtime evidence remains mandatory. */
 function cssPolicyImplementation(source, helper) {
-  if (!source.includes("css-motion")) return false;
+  return cssPolicyBindings(source).some((binding) => binding.kind === helper);
+}
+
+/** Connected literal policy inputs, not a union of unrelated hooks/properties. */
+export function cssPolicyBindings(source) {
+  if (!source.includes("css-motion")) return [];
+  source = motionSource(source).source;
   compiler ??= require("typescript");
   const ts = compiler;
   const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
@@ -400,12 +406,18 @@ function cssPolicyImplementation(source, helper) {
       let scope = node.parent;
       while (scope && !ts.isFunctionDeclaration(scope) && !ts.isArrowFunction(scope) && !ts.isFunctionExpression(scope))
         scope = scope.parent;
-      if (valid) owners.set(node.name.text, { kind, parent, scope });
+      if (valid)
+        owners.set(node.name.text, {
+          kind,
+          parent,
+          scope,
+          properties: kind === "useStateColor" ? selected.elements.map((value) => value.text) : [],
+        });
     }
     ts.forEachChild(node, walk);
   };
   walk(tree);
-  let used = false;
+  const used = [];
   const jsx = (node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))
       for (const owner of owners.keys()) {
@@ -432,7 +444,12 @@ function cssPolicyImplementation(source, helper) {
         while (current && owners.has(current) && !visited.has(current)) {
           visited.add(current);
           const entry = owners.get(current);
-          if (entry.kind === helper) used = true;
+          const slot = attrs.find((attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "data-slot");
+          used.push({
+            kind: entry.kind,
+            properties: entry.properties,
+            slot: slot?.initializer && ts.isStringLiteral(slot.initializer) ? slot.initializer.text : null,
+          });
           current = entry.parent;
         }
       }
