@@ -552,8 +552,15 @@
       "title": "Badge",
       "description": "Statuses, counts, and categories.",
       "categories": ["feedback"],
-      "dependencies": ["@base-ui/react", "class-variance-authority"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/badge/index.tsx",
@@ -565,7 +572,26 @@
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -574,14 +600,57 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
+          "scope": "local",
+          "travel": "compact",
           "coordination": "independent",
-          "reason": "Badge declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "Local status replacement, compact quantity reels, readable inline-size continuity and independent opacity presence preserve the native label or link."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "badge",
+                "reason": "Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "badge",
+                "reason": "Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "badge",
+                "reason": "Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "badge",
+                "reason": "Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "badge",
+                "reason": "Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "badge",
+                "reason": "Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."
+              }
+            ]
+          }
         }
       }
     },

@@ -2,15 +2,15 @@
 title: Badge
 description: Statuses, counts, and categories.
 category: feedback
-motion: []
+motion: ["data.transition","exit.fade",{"recipe":"state.color","form":"css-transition"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Badge declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Local status replacement, compact quantity reels, readable inline-size continuity and independent opacity presence preserve the native label or link."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"badge","reason":"Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."}],"exit.fade/one-shot":[{"relationship":"default","owner":"badge","reason":"Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."}],"state.color/css-transition":[{"relationship":"default","owner":"badge","reason":"Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."}],"geometry.resize/measured":[{"relationship":"default","owner":"badge","reason":"Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."}],"text.change/changed-runs":[{"relationship":"default","owner":"badge","reason":"Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."}],"number.roll/reels":[{"relationship":"default","owner":"badge","reason":"Badge integrates this executor on its retained root or direct display content; native sizing, rich children and inherited presentation retain their own owners."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: ["@base-ui/react", "class-variance-authority"]
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["@base-ui/react","class-variance-authority","motion"]
+registryDeps: ["@cadence/cadence-motion","@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text","@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -25,8 +25,8 @@ npx shadcn@latest add @cadence/badge
 
 [Manual installation files](https://cadence.dev/r/badge.json)
 
-Badge needs only the files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required.
+Badge installs its shared motion helpers and provider dependency. The default policy works without
+an explicit provider; use `CadenceProvider` to select a mode or clock for a subtree.
 
 The With an icon example also uses `lucide-react`. Install it only when using those
 icons; Badge itself does not require an icon package:
@@ -117,6 +117,81 @@ export function BadgeLinks() {
 }
 ```
 
+## Changing content
+
+Direct string children replace only changed text, with no character stagger. Direct numeric children
+use compact reels; numeric-looking strings such as `"00123"` and `"v1.2.3"` remain labels. Supported
+font/layout correspondence is checked against the real native text. Pixel layers follow its native
+position through a verified CSS anchor; unavailable or caller-owned anchors use native paint. Unsupported shaping, clipping,
+editing, or device scaling keeps the exact latest text immediately. This example uses a known
+monospace font to make the supported effect easy to inspect; Badge imposes no typography.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Badge } from "@/components/cadence/badge";
+import { Button } from "@/components/cadence/button";
+
+export function Status() {
+  const [ready, setReady] = useState(false);
+  const [quantity, setQuantity] = useState(19);
+  return (
+    <div className="flex flex-col items-start gap-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <Badge variant="secondary" style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>
+          {ready ? "Status ready" : "Status retry"}
+        </Badge>
+        <Badge style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>{quantity}</Badge>
+        <Badge variant="outline">v1.2.3</Badge>
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="outline" size="sm" onClick={() => setReady((value) => !value)}>Change status</Button>
+        <Button variant="outline" size="sm" onClick={() => setQuantity((value) => value + 1)}>Increase quantity</Button>
+      </div>
+    </div>
+  );
+}
+```
+
+The controls use the separately installed `@cadence/button` item. Consumers own status, quantity,
+request state, formatting and stable keys. Rich JSX stays intact: compose `AnimatedText` or
+`AnimatedNumber` explicitly for a known rich-content display slot. Keep application announcements
+on a suitable surrounding live region; decorative motion does not add an implicit live region.
+
+## Independent presence
+
+A newly inserted badge fades when its enclosing presentation has already appeared. An enclosing
+Cadence presentation consumes the same initial entrance; Badge does not replay it. Use a surviving
+`AnimatePresence` parent for retained removal. An exiting badge becomes inert and hidden from
+assistive technology immediately; reintroducing the same key reverses its opacity.
+
+<ComponentExample name="presence" />
+
+```tsx
+"use client";
+
+import { AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { Badge } from "@/components/cadence/badge";
+import { Button } from "@/components/cadence/button";
+
+export function OptionalStatus() {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-5">
+      <div className="flex min-h-8 items-center gap-3">
+        <span>Release status</span>
+        <AnimatePresence>{visible && <Badge key="status" variant="secondary">Available</Badge>}</AnimatePresence>
+      </div>
+      <Button variant="outline" size="sm" onClick={() => setVisible((value) => !value)}>Toggle status</Button>
+    </div>
+  );
+}
+```
+
 ## When to use
 
 - A short status: `Active`, `Beta`, `Deprecated`, `3 open`.
@@ -129,8 +204,7 @@ export function BadgeLinks() {
   press feedback, and no keyboard path).
 - More than about three words. A long label belongs in running text or in a `card`
   header, not in a pill.
-- A status that changes while the user watches; use `toast` or an inline message,
-  because a badge swap is easy to miss.
+- A detailed or urgent message; use `alert`, `toast`, or an inline message with an appropriate announcement.
 
 ## API
 
@@ -146,19 +220,32 @@ props are forwarded.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Badge declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: Local status replacement, compact quantity reels, readable inline-size continuity and independent opacity presence preserve the native label or link.
 
-No motion (T0). A badge labels content; it does not enter, leave, or move.
+| Phase | Properties | Recipe / tokens | Interruptible |
+| --- | --- | --- | --- |
+| Independent insertion | root opacity | `data.transition/one-shot` | yes |
+| Retained removal | root opacity; semantics removed immediately | `exit.fade/one-shot` | yes |
+| Content revision | measured inline width; constrained/unverified render axes remain native | `geometry.resize/measured` | yes |
+| Status text | changed-only opacity; unchanged text identity retained | `text.change/changed-runs` | yes |
+| Direct quantity | changed numeric places, compact reels | `number.roll/reels` | yes |
+| Eligible state paint | background, foreground, border and shadow | `state.color/css-transition` | yes |
 
-| Phase   | Properties                          | Token | Interruptible |
-| ------- | ----------------------------------- | ----- | ------------- |
-| –       | none                                | –     | –             |
-| reduced | none                                | –     | –             |
-| none    | none                                | –     | –             |
+Full plays applicable effects. Reduced retains short text/presence opacity and eligible colour
+feedback; width and numeric values commit immediately. None and a zero recipe clock reach every
+target immediately with no delay. A live policy downgrade cancels active writers. Rapid revisions
+coalesce to the newest semantic content; no old status or quantity waits in a queue.
 
-`transition-[color,box-shadow]` is state feedback on the design tokens (hover on a
-linked badge, the focus ring), not motion: it never moves the box and never runs
-on mount.
+Plain spans gain no hover affordance. Actual anchors keep their native hover and focus styles.
+Palette switches and caller paint whose contrast is unknown commit immediately, avoiding an unreadable
+intermediate foreground/background pair. Focus-within and invalid state settle all owned paint
+immediately. Caller colour/opacity/transition ownership is respected.
+
+Badge owns direct string/number display changes and intrinsic width. Fixed or externally constrained
+widths, passive row reflow and unverified custom-render geometry follow native layout. A native
+`render={<a />}` without custom paint/layout also retains intrinsic width continuity. Growth reaches the final
+width immediately when a smaller intermediate shell would hide the new label; safe shrinkage retains
+continuity. Rich children keep their original nodes, refs, keys, events and direct SVG selectors.
 
 ## Accessibility
 
@@ -173,13 +260,18 @@ on mount.
 Badges keep intrinsic width and do not wrap their text. Keep labels short; let the parent wrap a
 collection or provide an overflow strategy for long labels.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
-HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
-works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
-source; dependencies and application bundles are measured separately.
+The initial server, no-JavaScript and hydration presentation remains readable with the exact native
+text. Effects enhance later accepted changes; they do not replay the first screen. Base UI composition
+still requires hydration for application handlers. No additional item-specific CSS is required beyond
+the installed Cadence theme/provider setup.
+
+One inline-size owner coordinates the root; text and reels share bounded transactions with current
+semantic output. Unknown geometry or text correspondence takes the immediate native path. T0 is a
+compatibility label. Historical source and bundle budgets are advisory during functional migration;
+performance governance and device acceptance remain deferred under ADR-023.
 
 ## Notes for AI
 
 - Never attach `onClick` to a badge; switch to `button` with `size="sm"`.
-- Do not animate a badge in or out. If the status changes, swap the text and let
-  `aria-live` on the surrounding region announce it.
+- Keep stable keys and pass actual numbers only for quantities; do not parse identifiers or version strings.
+- Use `AnimatePresence` when removal must retain a fade, and a surrounding `aria-live` region when changes need announcements.

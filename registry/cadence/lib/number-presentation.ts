@@ -15,6 +15,7 @@ import {
 import type { CadenceMotion } from "./provider";
 import type { TextSnapshot } from "./text-diff";
 import {
+  followTextLayout,
   nativeTextContext,
   outgoingTextPaint,
   ownedTextHighlights,
@@ -63,6 +64,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   let generation = 0;
   let clock = "";
   let layer: HTMLElement | null = null;
+  let releaseLayoutAnchor: (() => void) | null = null;
   let mask: { name: string; highlight: Highlight; sheet: CSSStyleSheet } | null = null;
   let lanes: {
     identity: object;
@@ -91,6 +93,8 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       doc.adoptedStyleSheets = doc.adoptedStyleSheets.filter((sheet) => sheet !== mask?.sheet);
       mask = null;
     }
+    releaseLayoutAnchor?.();
+    releaseLayoutAnchor = null;
     layer?.remove();
     layer = null;
     lease?.finish();
@@ -496,6 +500,8 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
             layer.append(clip);
           }
           doc.body.append(layer);
+          releaseLayoutAnchor = followTextLayout(host, layer, stop);
+          if (!releaseLayoutAnchor) throw new Error("Native display anchor unavailable");
         }
         installMask();
         for (const record of lanes) {

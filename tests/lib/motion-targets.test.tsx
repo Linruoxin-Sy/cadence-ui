@@ -159,6 +159,7 @@ describe("current registry inventory and real part references", () => {
     );
     expect([...result.contracts].filter(([, contract]) => contract.migration === "v2").map(([id]) => id)).toEqual([
       "button",
+      "badge",
     ]);
     expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(
       true,

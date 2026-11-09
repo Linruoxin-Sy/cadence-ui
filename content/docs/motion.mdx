@@ -91,6 +91,12 @@ Both display primitives retain exact native fallback when typography or layout c
 A colour owner names its background, foreground, individual borders or SVG fill/stroke. Focus and
 invalid indicators update immediately. Foreground/background animation requires a reviewed palette
 with readable intermediate colours; the executor defaults to immediate paint without that proof.
+Changed-text and numeric pixel layers follow their single native text host using CSS anchor
+positioning, so concurrent intrinsic-size changes keep the pixels aligned with the label. Anchor
+support and actual coordinates are checked before hiding any native paint. An existing caller
+anchor, isolated/unsupported scope or failed correspondence keeps the exact native text immediately.
+Rounded overflow clips permit only fully interior candidate paint; edge-clipped text stays native.
+
 Shadow feedback retains fixed geometry. A conflicting caller CSS transition/animation family keeps
 its writer through mode/clock edits; removing the override restores shared ownership.
 

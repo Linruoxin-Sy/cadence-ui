@@ -1,17 +1,14 @@
 "use client";
 
 import { CheckIcon, ClockIcon, GitBranchIcon } from "lucide-react";
+import { AnimatePresence } from "motion/react";
+import { useState } from "react";
 import { Badge } from "@/registry/cadence/badge";
+import { Button } from "@/registry/cadence/button";
 import { PreviewRow } from "./shell";
 
 const variants = ["default", "secondary", "destructive", "outline", "ghost", "link"] as const;
 
-/**
- * Six variants, then the two things a badge does that a plain span cannot: carry an
- * icon, and *be* a link. `render` is what makes the second one real — the badge stays
- * a badge, the element under it becomes an anchor, and the `[a&]:hover` styles from
- * `badgeVariants` start applying.
- */
 function Variants() {
   return (
     <PreviewRow>
@@ -57,7 +54,58 @@ function AsLink() {
   );
 }
 
-const examples = { variants: Variants, icon: WithIcon, link: AsLink };
+function ChangingContent() {
+  const [ready, setReady] = useState(false);
+  const [quantity, setQuantity] = useState(19);
+  return (
+    <div className="flex flex-col items-start gap-5">
+      <PreviewRow>
+        <Badge variant="secondary" style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>
+          {ready ? "Status ready" : "Status retry"}
+        </Badge>
+        <Badge style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>{quantity}</Badge>
+        <Badge variant="outline">v1.2.3</Badge>
+      </PreviewRow>
+      <PreviewRow>
+        <Button variant="outline" size="sm" onClick={() => setReady((value) => !value)}>
+          Change status
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setQuantity((value) => value + 1)}>
+          Increase quantity
+        </Button>
+      </PreviewRow>
+    </div>
+  );
+}
+
+function Presence() {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="flex flex-col items-start gap-5">
+      <div className="flex min-h-8 items-center gap-3">
+        <span className="text-sm text-muted-foreground">Release status</span>
+        <AnimatePresence>
+          {visible && (
+            <Badge key="status" variant="secondary">
+              Available
+            </Badge>
+          )}
+        </AnimatePresence>
+      </div>
+      <Button variant="outline" size="sm" onClick={() => setVisible((value) => !value)}>
+        Toggle status
+      </Button>
+    </div>
+  );
+}
+
+const examples = {
+  variants: Variants,
+  icon: WithIcon,
+  link: AsLink,
+  "changing-content": ChangingContent,
+  presence: Presence,
+};
 
 export function BadgePreview({ example }: { example?: string }) {
   if (example !== undefined) {

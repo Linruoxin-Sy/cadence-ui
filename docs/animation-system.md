@@ -1406,6 +1406,20 @@ hundreds and resize the shell; an intervening 98 retargets from current reels ra
 
 ---
 
+Rounded overflow clips may enhance text/reels only when the entire candidate paint region is
+inside every ancestor's used padding-box clip, including normalized elliptical corner radii.
+Opacity paint includes native ink overhang; a numeric candidate proves the full clipped lane
+rectangle, not only its resting glyph. Unknown radius syntax, border/scrollbar geometry, partial
+clipping or an unsafe destination remains native immediate. This proves safe existing paint, not a
+second clip/layout owner or permission to expose pixels beyond the original rounded surface.
+
+Pixel-only display layers follow their original native text host through CSS anchor positioning,
+without a per-frame layout read or a second movement clock. A private, reversible anchor name is
+acquired only on an otherwise unclaimed host and its actual coordinate correspondence is checked.
+Unsupported anchor positioning, an existing caller anchor, isolated scope or failed correspondence
+uses immediate native text. Cleanup removes only the private anchor and owned stylesheet; the
+semantic tree, native formatting, caller ref and geometry owner remain intact.
+
 ## 4. Base UI integration
 
 ### Native event boundary for press controls

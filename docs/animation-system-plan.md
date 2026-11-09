@@ -495,7 +495,11 @@ root presence or content-driven outer-host geometry follows the separate target 
 
 ### Phase 3: Five pilots
 
-Depends on Phase 2. Migrate Button and Badge first to validate shared content/geometry. Use Card to
+Button and Badge have individual functional v2 adoption with installed/runtime evidence. Their
+shared content/geometry, conservative native fallbacks and property ownership are the pilot baseline;
+this does not complete the other pilots or performance governance.
+
+Depends on Phase 2. Use Card to
 prove nested ownership, then Tabs and Select to prove retained selection, popup lifecycle and
 multiple coordinated writers on distinct parts. For each pilot, update source, actual recipes,
 MDX frontmatter/Motion contract, preview and component/browser fixtures in the same change.

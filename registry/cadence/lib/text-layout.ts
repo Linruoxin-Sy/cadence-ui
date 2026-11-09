@@ -99,13 +99,6 @@ export function proveTextLayout(host: HTMLElement, snapshot: TextSnapshot): Text
       /layout|paint|strict|content/.test(style.contain) ||
       style.contentVisibility !== "visible" ||
       /transform|filter|perspective/.test(style.willChange) ||
-      (/(auto|scroll|hidden|clip)/.test(`${style.overflowX} ${style.overflowY}`) &&
-        [
-          style.borderTopLeftRadius,
-          style.borderTopRightRadius,
-          style.borderBottomLeftRadius,
-          style.borderBottomRightRadius,
-        ].some((radius) => Number.parseFloat(radius) !== 0)) ||
       !["normal", "1"].includes(style.zoom) ||
       node.getAnimations().length > 0
     )
@@ -192,6 +185,125 @@ export function proveTextLayout(host: HTMLElement, snapshot: TextSnapshot): Text
   };
 }
 
+let nextLayoutAnchor = 0;
+/** Native coordinate transport, not an animated position owner. Preserve the
+ * single native Text tree while fixed pixel layers follow an intrinsic shell. */
+export function followTextLayout(host: HTMLElement, layer: HTMLElement, revoke: () => void): (() => void) | null {
+  const doc = host.ownerDocument,
+    view = doc.defaultView;
+  const attribute = "data-cadence-layout-anchor";
+  if (
+    !view?.CSS.supports("anchor-name", "--cadence-display") ||
+    !view.CSS.supports("left", "anchor(--cadence-display left)") ||
+    host.getRootNode() !== doc ||
+    host.hasAttribute(attribute) ||
+    view.getComputedStyle(host).getPropertyValue("anchor-name") !== "none"
+  )
+    return null;
+  const id = String(++nextLayoutAnchor),
+    name = `--cadence-display-${id}`;
+  const sheet = new view.CSSStyleSheet();
+  const origin = host.getBoundingClientRect();
+  let alive = true;
+  const observer = new MutationObserver(() => {
+    if (alive && host.getAttribute(attribute) !== id) revoke();
+  });
+  const dispose = () => {
+    alive = false;
+    observer.disconnect();
+    if (host.getAttribute(attribute) === id) host.removeAttribute(attribute);
+    doc.adoptedStyleSheets = doc.adoptedStyleSheets.filter((value) => value !== sheet);
+  };
+  try {
+    sheet.replaceSync(`[${attribute}="${id}"] { anchor-name: ${name}; }`);
+    doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet];
+    host.setAttribute(attribute, id);
+    layer.style.left = `anchor(${name} left)`;
+    layer.style.top = `anchor(${name} top)`;
+    // Check the actual containing tree/scope, not CSS.supports alone.
+    const mapped = layer.getBoundingClientRect();
+    if (
+      view.getComputedStyle(host).getPropertyValue("anchor-name") !== name ||
+      mapped.left !== origin.left ||
+      mapped.top !== origin.top
+    ) {
+      dispose();
+      return null;
+    }
+    layer.style.left = `calc(anchor(${name} left) - ${origin.left}px)`;
+    layer.style.top = `calc(anchor(${name} top) - ${origin.top}px)`;
+    observer.observe(host, { attributes: true, attributeFilter: [attribute] });
+    return dispose;
+  } catch {
+    dispose();
+    return null;
+  }
+}
+
+/** Candidate pixels must fit the original overflow clip, including used rounded
+ * corners. CSS scales all corner radii by one factor before subtracting borders.
+ * No clipping tree or typography is cloned; unknown shapes stay native. */
+function insideTextClips(host: HTMLElement, box: Box) {
+  const view = host.ownerDocument.defaultView;
+  if (!view) return false;
+  for (let node: HTMLElement | null = host; node; node = node.parentElement) {
+    const css = view.getComputedStyle(node);
+    if (!/(auto|scroll|hidden|clip)/.test(`${css.overflowX} ${css.overflowY}`)) continue;
+    const outer = node.getBoundingClientRect();
+    const borders = [css.borderLeftWidth, css.borderTopWidth, css.borderRightWidth, css.borderBottomWidth].map(
+      Number.parseFloat,
+    ) as [number, number, number, number];
+    if (
+      borders.some((value) => !Number.isFinite(value)) ||
+      node.clientLeft !== Math.round(borders[0]) ||
+      node.clientTop !== Math.round(borders[1])
+    )
+      return false;
+    const left = outer.left + borders[0],
+      top = outer.top + borders[1];
+    const width = Math.min(node.clientWidth, outer.width - borders[0] - borders[2]);
+    const height = Math.min(node.clientHeight, outer.height - borders[1] - borders[3]);
+    if (box.left < left || box.top < top || box.left + box.width > left + width || box.top + box.height > top + height)
+      return false;
+    const length = (value: string, size: number) => {
+      if (!/^(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?(?:px|%)?$/.test(value)) return NaN;
+      return Number.parseFloat(value) * (value.endsWith("%") ? size / 100 : 1);
+    };
+    const radius = (value: string): [number, number] => {
+      const [x = "", y = x] = value.split(/\s+/);
+      return [length(x, outer.width), length(y, outer.height)];
+    };
+    const corners = [
+      radius(css.borderTopLeftRadius),
+      radius(css.borderTopRightRadius),
+      radius(css.borderBottomRightRadius),
+      radius(css.borderBottomLeftRadius),
+    ] as const;
+    if (corners.flat().some((value) => !Number.isFinite(value))) return false;
+    const factor = Math.min(
+      1,
+      outer.width / (corners[0][0] + corners[1][0]),
+      outer.width / (corners[3][0] + corners[2][0]),
+      outer.height / (corners[0][1] + corners[3][1]),
+      outer.height / (corners[1][1] + corners[2][1]),
+    );
+    if (!Number.isFinite(factor)) return false;
+    const radii = corners.map(([x, y], i): [number, number] => [
+      Math.max(0, x * factor - borders[i === 0 || i === 3 ? 0 : 2]),
+      Math.max(0, y * factor - borders[i < 2 ? 1 : 3]),
+    ]);
+    for (const x of [box.left - left, box.left + box.width - left])
+      for (const y of [box.top - top, box.top + box.height - top]) {
+        for (const [i, [rx, ry]] of radii.entries()) {
+          const dx = Math.max(0, rx - (i === 0 || i === 3 ? x : width - x));
+          const dy = Math.max(0, ry - (i < 2 ? y : height - y));
+          if (rx > 0 && ry > 0 && dx > 0 && dy > 0 && (dx / rx) ** 2 + (dy / ry) ** 2 > 1) return false;
+        }
+      }
+  }
+  return true;
+}
+
 /** Paint contains pixels only: no outgoing accessible/selectable/findable string. */
 export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: TextLayout, alignPixels = false) {
   const box = layout.boxes.get(unit.identity);
@@ -202,6 +314,14 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
   if (!context) return null;
   context.font = layout.font;
   const metrics = context.measureText(unit.text);
+  const inkLeft = Math.min(box.left, box.left - metrics.actualBoundingBoxLeft);
+  const inkRight = Math.max(box.left + box.width, box.left + metrics.actualBoundingBoxRight);
+  const inkTop = alignPixels ? box.top : Math.min(box.top, box.top + layout.baseline - metrics.actualBoundingBoxAscent);
+  const inkBottom = alignPixels
+    ? box.top + box.height
+    : Math.max(box.top + box.height, box.top + layout.baseline + metrics.actualBoundingBoxDescent);
+  if (!insideTextClips(host, { left: inkLeft, top: inkTop, width: inkRight - inkLeft, height: inkBottom - inkTop }))
+    return null;
   const padding =
     Math.ceil(
       Math.max(

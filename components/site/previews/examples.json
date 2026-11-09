@@ -1,6 +1,6 @@
 {
   "button": ["variants", "sizes", "links", "composition", "disabled", "changing-content", "presence"],
-  "badge": ["variants", "icon", "link"],
+  "badge": ["variants", "icon", "link", "changing-content", "presence"],
   "kbd": ["single", "combination", "tooltip"],
   "separator": ["horizontal", "vertical", "decorative"],
   "label": ["wrapping", "disabled"],

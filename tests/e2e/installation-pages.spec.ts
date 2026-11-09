@@ -4,6 +4,8 @@ import { expect, type Locator, test } from "@playwright/test";
 import { installationPlan } from "../../scripts/installation.mjs";
 import { openComponentSource } from "./installation-helpers";
 
+const proofDirectory = process.env.CADENCE_INSTALLATION_PROOF_DIR ?? ".cache/installation-proof";
+
 const registry = JSON.parse(await readFile("registry.json", "utf8"));
 const pages = await Promise.all(
   registry.items
@@ -15,7 +17,7 @@ const pages = await Promise.all(
 );
 
 test.beforeAll(() => {
-  expect(pages).toHaveLength(59);
+  expect(pages).toHaveLength(63);
 });
 
 async function sourceText(block: Locator) {
@@ -29,14 +31,15 @@ for (const { id, body } of pages) {
   const plan = installationPlan(registry.items, id);
   const files = (
     await Promise.all(
-      plan.items.map(async (item) => JSON.parse(await readFile(`public/r/${item.name}.json`, "utf8")).files),
+      plan.items.map(async (item) => JSON.parse(await readFile(`public/r/${item.name}.json`, "utf8")).files ?? []),
     )
   ).flat() as Array<{ target: string; content: string }>;
 
   for (const mode of ["full", "reduced", "none"])
     for (const width of [1280, 390])
       test(`${id} installation preserves commands, files and controls ${mode}/${width}`, async ({ page, context }) => {
-        test.setTimeout(90_000);
+        // A migrated item copies its finite recursive source tree, including shared helpers.
+        test.setTimeout(90_000 + plan.files.length * 5_000);
         await context.grantPermissions(["clipboard-read", "clipboard-write"]);
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`/components/${id}?motion=${mode}`);
@@ -128,9 +131,9 @@ for (const { id, body } of pages) {
         }
         if (id === "badge") {
           await expect(panel.getByText("npm install lucide-react", { exact: true })).toBeVisible();
-          await expect(panel).toContainText("no motion runtime, provider or additional item-specific CSS is required");
+          await expect(panel).toContainText("shared motion helpers and provider dependency");
           expect(plan.dependencies).not.toContain("lucide-react");
-          expect(plan.dependencies).not.toContain("motion");
+          expect(plan.dependencies).toContain("motion");
         }
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       });
@@ -138,7 +141,7 @@ for (const { id, body } of pages) {
   for (const theme of ["light", "dark"])
     test(`${id} installation themes and mobile ${theme}`, async ({ page }) => {
       test.setTimeout(90_000);
-      await mkdir(".cache/installation-proof", { recursive: true });
+      await mkdir(proofDirectory, { recursive: true });
       for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 900 });
         await page.goto(`/components/${id}?motion=none`);
@@ -149,13 +152,13 @@ for (const { id, body } of pages) {
           (await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations,
         ).toEqual([]);
         const installation = page.locator("[data-installation]");
-        await installation.screenshot({ path: `.cache/installation-proof/${id}-manual-${theme}-${width}.png` });
+        await installation.screenshot({ path: `${proofDirectory}/${id}-manual-${theme}-${width}.png` });
         await installation
           .getByRole("tablist", { name: "Installation method" })
           .evaluate((node) => window.scrollTo(0, node.getBoundingClientRect().top + scrollY - 140));
-        await page.screenshot({ path: `.cache/installation-proof/${id}-manual-${theme}-${width}-viewport.png` });
+        await page.screenshot({ path: `${proofDirectory}/${id}-manual-${theme}-${width}-viewport.png` });
         await installation.getByRole("tab", { name: "Command", exact: true }).click();
-        await installation.screenshot({ path: `.cache/installation-proof/${id}-command-${theme}-${width}.png` });
+        await installation.screenshot({ path: `${proofDirectory}/${id}-command-${theme}-${width}.png` });
       }
     });
 }

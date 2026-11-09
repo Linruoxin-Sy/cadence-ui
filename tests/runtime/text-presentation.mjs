@@ -10,13 +10,13 @@ import { gzipSync } from "node:zlib";
 import { chromium } from "@playwright/test";
 
 const output = path.resolve(process.env.TEXT_PRESENTATION_OUTPUT);
-await mkdir(output, { recursive: false });
+await mkdir(output, { recursive: true });
 const require = createRequire(import.meta.url);
 const vite = require.resolve("vite", { paths: [require.resolve("vitest/node")] });
 const { build } = await import(pathToFileURL(require.resolve("esbuild", { paths: [vite] })));
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const relocated = path.join(output, "relocated", "lib");
-await cp("registry/cadence/lib", relocated, { recursive: true, errorOnExist: true });
+await cp("registry/cadence/lib", relocated, { recursive: true, errorOnExist: false });
 const report = {
   inputs: {},
   profiles: [],
@@ -505,12 +505,7 @@ try {
           f.dispose();
         });
         await test("unknown containing blocks and shaped clipping never acquire paint", () => {
-          for (const style of [
-            "contain:paint",
-            "clip-path:circle(40%)",
-            "overflow:hidden;border-radius:20px",
-            "transform:scale(1.1)",
-          ]) {
+          for (const style of ["contain:paint", "clip-path:circle(40%)", "transform:scale(1.1)"]) {
             const f = make("Save", { containerStyle: style }),
               text = f.host.firstChild;
             f.commit("Saved");
@@ -521,6 +516,66 @@ try {
             );
             f.dispose();
           }
+        });
+        await test("rounded clips accept only a fully interior candidate paint region", () => {
+          for (const radius of ["9999px", "50%", "24px / 16px", "40% 10% 35% 15% / 35% 20% 40% 15%"]) {
+            const f = make("Save", {
+              containerStyle: `display:inline-flex;padding:18px;border:1px solid;overflow:hidden;border-radius:${radius}`,
+            });
+            const text = f.host.firstChild;
+            f.commit("Same");
+            check("interior opacity executes", all(f.host).length > 0, radius);
+            check("semantic identity retained", f.host.firstChild === text && f.host.textContent === "Same");
+            f.dispose();
+          }
+          for (const radius of ["9999px", "50%", "100% 0 0 0 / 100% 0 0 0"]) {
+            const f = make("S", {
+              containerStyle: `display:inline-flex;border:1px solid;overflow:hidden;border-radius:${radius}`,
+            });
+            f.commit("M");
+            check(
+              "corner-clipped candidate remains native",
+              all(f.host).length === 0 && f.host.textContent === "M",
+              radius,
+            );
+            f.dispose();
+          }
+        });
+        await test("native anchor transport follows layout without moving the semantic host", async () => {
+          const f = make("Save", { containerStyle: "display:flex;justify-content:center;width:250px" });
+          f.commit("Same");
+          const id = f.host.getAttribute("data-cadence-layout-anchor");
+          const layer = [...document.querySelectorAll("[data-cadence-text-layer]")].find(
+            (node) => node.dataset.cadenceTextOwner === f.host.id,
+          );
+          check("actual private anchor", Boolean(id && layer));
+          const origin = f.host.getBoundingClientRect().left;
+          const width = f.container.animate([{ width: "250px" }, { width: "150px" }], { duration: 500, fill: "both" });
+          await frame();
+          check(
+            "root coordinates follow native layout",
+            Math.abs(layer.getBoundingClientRect().left - (f.host.getBoundingClientRect().left - origin)) < 0.02,
+          );
+          f.host.setAttribute("data-cadence-layout-anchor", "caller");
+          await Promise.resolve();
+          await Promise.resolve();
+          check(
+            "caller claim revokes only owned paint",
+            all(f.host).length === 0 &&
+              f.host.textContent === "Same" &&
+              f.host.getAttribute("data-cadence-layout-anchor") === "caller",
+          );
+          width.cancel();
+          f.dispose();
+          const caller = make("Save", { style: "anchor-name:--caller" });
+          caller.commit("Same");
+          check(
+            "existing anchor remains caller owned",
+            all(caller.host).length === 0 &&
+              caller.host.style.anchorName === "--caller" &&
+              caller.host.textContent === "Same",
+          );
+          caller.dispose();
         });
         await test("foreign rich child tree is untouched", () => {
           const f = make("Save");

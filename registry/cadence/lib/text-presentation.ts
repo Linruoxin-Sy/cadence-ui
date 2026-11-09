@@ -14,6 +14,7 @@ import { createMotionTransaction, type MotionLease, type MotionRevision } from "
 import type { CadenceMotion } from "./provider";
 import { boundTextRevision, changedTextGroups, createTextSnapshot, diffText, shapeTextDiff } from "./text-diff";
 import {
+  followTextLayout,
   nativeTextContext,
   outgoingTextPaint,
   ownedTextHighlights,
@@ -67,6 +68,7 @@ export function createTextPresentation(
   let capturedCommit: Parameters<ReturnType<typeof createCapturedHandoff>["commit"]>[0] | null = null;
   let animations: Animation[] = [];
   let layer: HTMLElement | null = null;
+  let releaseLayoutAnchor: (() => void) | null = null;
   let mask: { name: string; highlight: Highlight; sheet: CSSStyleSheet } | null = null;
   let environment: MotionEnvironment = { hidden: false, immediate: false, reduced: false, themeOwned: false };
   const signature = () =>
@@ -127,6 +129,8 @@ export function createTextPresentation(
       doc.adoptedStyleSheets = doc.adoptedStyleSheets.filter((sheet) => sheet !== mask?.sheet);
       mask = null;
     }
+    releaseLayoutAnchor?.();
+    releaseLayoutAnchor = null;
     layer?.remove();
     layer = null;
     lease?.finish();
@@ -512,6 +516,8 @@ export function createTextPresentation(
           });
           for (const item of paints) layer.append(item.canvas);
           doc.body.append(layer);
+          releaseLayoutAnchor = followTextLayout(host, layer, stop);
+          if (!releaseLayoutAnchor) throw new Error("Native display anchor unavailable");
           for (const { canvas, incoming: entering, index } of paints) {
             const transition = entering ? clock.enter : clock.exit;
             const animation = canvas.animate(
