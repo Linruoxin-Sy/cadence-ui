@@ -83,9 +83,9 @@ to roll. Richness means complete relevant coverage, not identical effects on eve
 
 AnimatedText is installable with the conservative changed-only native text form described in §3.6.
 AnimatedNumber is installable with the conservative bounded reel form described in §3.7.
-RevealGroup and Reveal remain planned.
+RevealGroup and Reveal have explicit standalone registry entries; catalogue adoption remains pending.
 `text.reveal`, `text.split` and `number.roll` being present in the resolver does not mean another component
-implements them. Shared v2 primitives are the planned scope; their final registry items must follow
+implements them. Standalone primitive registry items follow
 the Cadence-original origin and dependency rules. Do not infer the reference library's other 121
 components are added to Cadence's scope.
 
@@ -506,7 +506,7 @@ explicit until their rollout phase completes.
 
 | Recipe            | Purpose                                                                                 | Key parameters                   | Implementation                                                                                                        | reduced behaviour                                                           |
 | ----------------- | --------------------------------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`              | Internal registered observer/CSS controller (§3.8); public composition and catalogue adoption pending                 | Bypass decorative controller; visible                                       |
+| `reveal`          | Viewport entrance with explicit replay policy                                           | `distance`, `delay`              | Registered observer/CSS controller and explicit Reveal composition (§3.8); catalogue adoption pending                 | Bypass decorative controller; visible                                       |
 | `enter.pop`       | Popovers and cards appearing                                                            | `origin`, `scale`                | scale + opacity, `transformOrigin` follows the anchor                                                                 | Fade only                                                                   |
 | `exit.fade`       | Element disappearing                                                                    | `duration`                       | opacity to 0                                                                                                          | Same (opacity kept)                                                         |
 | `exit.shrink`     | Closing a popover                                                                       | `scale`                          | scale to 0.96 + opacity                                                                                               | Fade only                                                                   |
@@ -1070,7 +1070,7 @@ The shared provider library supplies `useStateColor` and `useContinuousMotion` a
 support. Spread their returned bindings, including the managed callback ref, onto the real HTML/SVG
 owner. The callback connects delayed portals and replacement render nodes and preserves object,
 callback and React 19 cleanup refs. Discarding it is not adoption. This does not migrate catalogue
-components or deliver the four planned public primitives.
+components or substitute for the standalone primitives' dedicated delivery contracts.
 
 Disjoint colour and loop owners can share one node without a wrapper: create `loop` with the
 external ref, pass `loop.ref` as the colour hook's ref, and spread the final colour bindings onto
@@ -1335,8 +1335,12 @@ hosts use the native visible fallback.
 Pending and entering hosts reserve opacity/transform in the existing transaction writer registry;
 an existing owner prevents enhancement. This reservation does not authorize two writers or compose
 press/layout on the same property. Public composition must keep those owners disjoint.
-This is internal controller support; public Reveal/RevealGroup composition and registry delivery
-remain separate work.
+Public Reveal uses Base useRender on one native ref-capable host; RevealGroup creates no DOM. Nested
+Reveal consumes the same entrance under the containing envelope. Later child mounts remain eligible
+after that envelope settles; a repeated parent entrance consumes active descendant entry. Scope/root/options changes consume mounted
+entrances immediately; equivalent policies and keyed reorder retain stable slots. New mounts use the
+current policy. Dedicated registry entries install explicit shared dependencies; ordinary components
+and the legacy site reveal path gain no implicit viewport enhancement.
 
 Pending targets cannot accept invisible pointer activation. Focus-in, hash navigation and explicit
 reveal show the target before interaction without delay; repeat cannot hide a focused subtree.
@@ -1521,7 +1525,7 @@ These are target execution and browser-acceptance requirements, not new runtime 
 ### 5.1 Runtime compatibility surface
 
 This Recipe union is the current exported set, kept in sync with lib/motion.ts by registry:check.
-It includes shared `state.color` and `text.change` support. AnimatedText is installable; the other public renderers remain pending. The hook's existing
+It includes shared `state.color` and `text.change` support. AnimatedText, AnimatedNumber, Reveal and RevealGroup have dedicated registry entries. The hook's existing
 mode/timeScale inheritance and source-distributed API remain compatible during migration.
 
 ```ts
@@ -1596,7 +1600,7 @@ selects native Intl. This standalone boundary denotes an independently committed
 delayed direct-input, reset and restoration readouts remain native JSX. Affixes and format-only revisions
 are immediate native text, with no additional text animation owner. Current reel proof requires supported
 ASCII/LTR typography, unit device scale and integer resting glyph origins; other mappings stay exact native.
-The Reveal rows remain design interfaces. Each primitive has
+The Reveal rows describe the standalone viewport API. Each primitive has
 an independently declared registry item, relative shared imports, namespaced dependencies and its own
 contract tests. They do not require every ordinary consumer to wrap each component manually.
 
@@ -1612,7 +1616,7 @@ independent inline blocks. All primitives inherit mode/timeScale. Per-instance r
 spring knobs are not part of the default API. Overrides use shared recipe/token policy. Read-only
 numeric display is separate from an editable number field; the latter is not added by this design.
 
-Illustrative target composition (not runnable against the current registry):
+Composition using the standalone primitives (catalogue-internal adoption remains pending):
 
 ```tsx
 <CadenceProvider mode="full">
@@ -1950,7 +1954,7 @@ Site DocumentEntrance follows §3.3's readable SSR/no-JS/hydration baseline. Onl
 client insertion may enter; returning to full after an initial none or restoring an offscreen document
 must not re-hide or replay that consumed host. Print retains current semantic visibility. An SSR-hidden
 strategy with a noscript repair is not this target contract. Site adoption and browser evidence remain
-tracked by the rollout plan; they do not establish delivery of §3.8's separately planned Reveal API.
+tracked by the rollout plan; they are separate from §3.8's explicit standalone Reveal API.
 
 ## 12. Technical references
 

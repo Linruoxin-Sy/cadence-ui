@@ -12,8 +12,8 @@ and the [shared preset catalogue](motion/presets.md). Each component is designed
 global visual style guides its choices while the system execution contract stays mandatory. These
 files specify target behavior and acceptance scenarios, not completed implementation or test evidence.
 
-The original catalogue scope remains 59 components. AnimatedText is an additional shipped primitive;
-the other three public animation primitives below remain planned additions. No third-party
+The original catalogue scope remains 59 components. AnimatedText, AnimatedNumber, Reveal and
+RevealGroup are additional standalone primitives with documented delivered subsets. No third-party
 reference catalogue, new application behaviour or optional animation engine is adopted implicitly.
 
 ## 1. Outcome and boundaries
@@ -334,9 +334,10 @@ Visible-first native/SSR/hydration content is consumed; only successfully observ
 arm. Focus/hash, print, hidden documents, restrictive mode/clock edits and failed setup restore the
 native endpoint and cancel existing transition handles. Stable mounted slots use optional bounded
 cyclic delays; the group includes active earlier entrances in its concurrency/delay allowance.
-This internal pilot does not replace the site's legacy Reveal, install public Reveal/RevealGroup,
-authorize nested public composition or migrate catalogue components. Those public APIs, registry
-items, per-component contracts and composition acceptance remain pending, as do global budgets.
+The standalone Reveal/RevealGroup add explicit native render composition and dedicated installation.
+Nested Reveal consumes its entry; group/root/policy revisions consume mounted entrances without
+re-hiding; equivalent policy and keyed reorder preserve mounted slots. The site's legacy Reveal and original catalogue remain unmigrated;
+global budgets and the complete shared stage gate remain pending.
 
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).

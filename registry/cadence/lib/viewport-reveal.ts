@@ -1,4 +1,4 @@
-import { ease, motionLimits, revealPolicy } from "./motion";
+import { bindMotionParameters, ease, motionLimits, revealPolicy, viewportReveal } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import { createMotionTransaction, type MotionLease } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
@@ -24,10 +24,12 @@ type Target = {
   epoch: number;
   release?: () => void;
   registration: ReturnType<ReturnType<typeof createMotionTransaction>["register"]>;
+  listeners: Set<() => void>;
   lease?: MotionLease | null;
 };
 const owners = new WeakMap<HTMLElement, object>();
 const printSheets = new WeakMap<Document, { count: number; node: HTMLStyleElement }>();
+const revealBinding = bindMotionParameters(viewportReveal, "reveal/viewport");
 
 function printFallback(doc: Document) {
   let sheet = printSheets.get(doc);
@@ -130,6 +132,7 @@ function offscreen(node: HTMLElement, root?: HTMLElement | null) {
 
 /** Internal explicit-registration scope. It creates no semantic DOM, public primitive or timers. */
 export function createViewportReveal(options: ViewportRevealOptions = {}) {
+  options = { ...options };
   const targets = new Map<HTMLElement, Target>();
   const slots = new WeakMap<object, number>();
   const active = new Set<Target>();
@@ -170,6 +173,7 @@ export function createViewportReveal(options: ViewportRevealOptions = {}) {
       stopObservation(target);
     }
     restore(target);
+    for (const listener of target.listeners) listener();
   };
   const pending = (target: Target) => {
     cancel(target);
@@ -188,8 +192,10 @@ export function createViewportReveal(options: ViewportRevealOptions = {}) {
     write(target, "transition", "none");
     write(target, "--cadence-reveal-delay", "0s");
     write(target, "opacity", "0");
-    write(target, "transform", `translateY(${target.cm.distance.md}px)`);
+    const parameters = target.cm.parameters(revealBinding);
+    write(target, "transform", `translateY(${parameters.kind === "visual" ? parameters.distance : 0}px)`);
     write(target, "pointer-events", "none");
+    for (const listener of target.listeners) listener();
   };
   const allowed = (target: Target) =>
     !target.cm.reduced && !target.cm.disabled && Number(target.cm.transition("reveal").duration) > 0;
@@ -313,7 +319,15 @@ export function createViewportReveal(options: ViewportRevealOptions = {}) {
     });
   };
   return {
-    register(node: HTMLElement, identity: object, cm: CadenceMotion) {
+    /** A policy/root revision consumes mounted entrances, never re-hides readable content. */
+    configure(next: ViewportRevealOptions) {
+      const keys = ["root", "amount", "insetTop", "insetBottom", "replay", "stagger"] as const;
+      const defaults = { ...revealPolicy, root: null, replay: "once", stagger: "none" };
+      if (keys.every((key) => (options[key] ?? defaults[key]) === (next[key] ?? defaults[key]))) return;
+      options = { ...next };
+      for (const target of targets.values()) visible(target);
+    },
+    register(node: HTMLElement, identity: object, cm: CadenceMotion, consumed = false) {
       if (disposed || targets.has(node) || owners.has(node))
         throw new Error("Reveal host already owned or scope retired");
       let slot = slots.get(identity);
@@ -326,13 +340,14 @@ export function createViewportReveal(options: ViewportRevealOptions = {}) {
         slot,
         cm,
         alive: true,
-        consumed: false,
+        consumed,
         state: "visible",
         delay: 0,
         styles: new Map(),
         handles: [],
         epoch: 0,
         registration: transaction.register(node, identity),
+        listeners: new Set(),
       };
       targets.set(node, target);
       owners.set(node, target);
@@ -362,6 +377,16 @@ export function createViewportReveal(options: ViewportRevealOptions = {}) {
         visible(target);
       }
       const registration = {
+        subscribe(listener: () => void) {
+          target.listeners.add(listener);
+          listener();
+          return () => {
+            target.listeners.delete(listener);
+          };
+        },
+        get consumed() {
+          return target.consumed;
+        },
         get state() {
           return target.state;
         },
@@ -389,6 +414,7 @@ export function createViewportReveal(options: ViewportRevealOptions = {}) {
           if (!target.alive) return;
           target.alive = false;
           visible(target);
+          target.listeners.clear();
           target.registration.dispose();
           targets.delete(node);
           if (owners.get(node) === target) owners.delete(node);

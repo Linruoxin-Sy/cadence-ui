@@ -84,6 +84,8 @@ npx shadcn@latest add @cadence/button
 - [Table of Contents](https://cadence.dev/r/toc.md): Section navigation for documentation, guides, and long articles. (navigation)
 - [Animated Text](https://cadence.dev/r/animated-text.md): Replaces changed display text while retaining one current native string. (motion)
 - [Animated Number](https://cadence.dev/r/animated-number.md): Independent quantities, amounts, and read-only numeric summaries. (motion)
+- [Reveal](https://cadence.dev/r/reveal.md): An explicit viewport entrance on one native content host. (motion)
+- [Reveal Group](https://cadence.dev/r/reveal-group.md): Coordinates registered viewport entrances with bounded optional rhythm. (motion)
 
 ## Docs
 

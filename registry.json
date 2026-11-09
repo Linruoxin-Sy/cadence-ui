@@ -88,6 +88,36 @@
       ]
     },
     {
+      "name": "cadence-reveal",
+      "type": "registry:lib",
+      "title": "Viewport reveal controller",
+      "description": "Explicit native viewport registration, shared observers and bounded entrance rhythm.",
+      "categories": ["foundation"],
+      "registryDependencies": ["@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/viewport-reveal.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/viewport-reveal.ts"
+        },
+        {
+          "path": "registry/cadence/lib/reveal-observer.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/reveal-observer.ts"
+        },
+        {
+          "path": "registry/cadence/lib/use-viewport-reveal.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/use-viewport-reveal.ts"
+        },
+        {
+          "path": "registry/cadence/lib/reveal-context.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/reveal-context.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-utils",
       "type": "registry:lib",
       "title": "Utilities",
@@ -2406,6 +2436,75 @@
           "style": "native",
           "version": "0.6.0",
           "reason": "Cadence original numeric display primitive; no shadcn counterpart."
+        }
+      }
+    },
+    {
+      "name": "reveal",
+      "type": "registry:ui",
+      "title": "Reveal",
+      "description": "An explicit viewport entrance on one native content host.",
+      "categories": ["motion"],
+      "dependencies": ["@base-ui/react"],
+      "registryDependencies": ["@cadence/cadence-reveal", "@cadence/cadence-utils"],
+      "files": [
+        {
+          "path": "registry/cadence/reveal/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/reveal/index.tsx"
+        }
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "reveal",
+            "form": "viewport"
+          }
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence original reveal viewport primitive; no shadcn counterpart."
+        }
+      }
+    },
+    {
+      "name": "reveal-group",
+      "type": "registry:ui",
+      "title": "Reveal Group",
+      "description": "Coordinates registered viewport entrances with bounded optional rhythm.",
+      "categories": ["motion"],
+      "registryDependencies": ["@cadence/reveal", "@cadence/cadence-reveal"],
+      "files": [
+        {
+          "path": "registry/cadence/reveal-group/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/reveal-group/index.tsx"
+        }
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "reveal",
+            "form": "viewport"
+          }
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence original reveal-group viewport primitive; no shadcn counterpart."
         }
       }
     }

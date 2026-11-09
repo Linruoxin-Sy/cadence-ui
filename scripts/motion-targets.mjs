@@ -17,7 +17,7 @@ const SECTIONS = [
   "Acceptance scenarios",
 ];
 const CAPABILITY_RECIPES = {
-  Appearance: ["enter.pop", "exit.fade", "popup.anchored", "data.transition", "layout.move"],
+  Appearance: ["reveal", "enter.pop", "exit.fade", "popup.anchored", "data.transition", "layout.move"],
   Size: ["geometry.resize", "native"],
   "Surface colour": ["state.color"],
   "Text colour": ["state.color"],

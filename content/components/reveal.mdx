@@ -1,0 +1,128 @@
+---
+title: Reveal
+description: An explicit viewport entrance on one native content host.
+category: motion
+motion: [reveal]
+intensity: subtle
+complexity: S
+tier: T1
+since: 0.6.0
+deps: ["@base-ui/react"]
+registryDeps: ["@cadence/cadence-reveal","@cadence/cadence-utils"]
+---
+
+## Installation
+
+**Command**
+
+```install
+npx shadcn@latest add @cadence/reveal
+```
+
+Install @cadence/reveal-group when shared policy or cyclic rhythm is needed.
+
+**Manual**
+
+[Manual installation files](https://cadence.dev/r/reveal.json)
+
+Keep the dependency-first sibling tree and theme setup from the expanded instructions. A provider
+wrapper is optional; use CadenceProvider for explicit mode/timeScale. No ordinary component gains
+viewport reveal simply because these files are installed.
+
+## Usage
+
+```tsx
+import { Reveal } from "@/components/cadence/reveal";
+
+export function Chapter() {
+  return <Reveal render={<section />}><h2>A new chapter</h2><p>Native readable content.</p></Reveal>;
+}
+```
+
+Initial server content, first-screen hydration and no-JS content are visible. Only successfully
+registered offscreen targets may be enhanced. Reduced/none bypass the hidden state and observer.
+Default behavior is once with no stagger. Children remain one native semantic tree.
+
+## Native composition
+
+```tsx
+import { Reveal } from "@/components/cadence/reveal";
+import { Button } from "@/components/cadence/button";
+
+export function Action() {
+  return <Reveal><Button>Continue</Button></Reveal>;
+}
+```
+
+The outer host owns entrance opacity/transform; the inner button owns its existing press behavior.
+Keep measured geometry and layout on separate child hosts as well. A caller-owned transform,
+transition, animation or editable host uses visible native fallback. Nested Reveal consumes the same containing entrance, including across nested groups. Later child
+mounts after that envelope settles remain eligible; another parent entrance consumes active child entry.
+Base render callbacks must spread supplied props and forward the ref. Never render a Fragment as the host.
+
+## Changing the scope
+
+Group root or policy changes immediately consume mounted entrances and cancel their current work.
+Existing content is never re-hidden to apply a new policy. New keyed mounts use the new policy;
+ordinary rerenders and keyed reorder preserve their mounted rhythm slots. Passing an equivalent
+options object does not reset the group. Invalid/unavailable observation safely leaves content visible.
+Use a state callback ref to provide a committed custom root; changing ref.current alone does not render.
+
+## When to use
+
+Use an explicit entrance for narrative sections or a small related group. The caller owns content,
+keys, semantic state, focus and any application actions. Choose repeat only for an intentional narrative.
+
+## When not to use
+
+Do not hide essential first-screen information, animate native editors, wrap every catalogue component,
+or place press/layout/reveal transform writers on the same host. This is decorative viewport policy,
+not a disclosure, semantic open state, validation system or route transition.
+
+## API
+
+| Prop | Type | Default | Behavior |
+| ---- | ---- | ------- | -------- |
+| `render` | ReactElement / render function | div | One real ref-capable host; forward all supplied props and ref. |
+| `children` | ReactNode | — | Original native content, including interactive children. |
+| `ref` | native host ref | — | Same physical host; React 19 cleanup semantics. |
+| Native props | div attributes/events/style | — | Base useRender merges with render-element props. |
+
+No per-instance duration, easing, distance or spring props. Use shared recipe/token policy.
+
+## Motion contract
+
+| Phase | Properties | Recipe / tokens | Interruptible |
+| ----- | ---------- | --------------- | ------------- |
+| Explicit offscreen entrance | opacity, transform on registered Reveal host | `reveal` / `duration.base`, `ease.out`, `distance.md` | yes |
+| Reduced / none / zero | Visible native endpoint, no observer, delay or hidden state | — | immediate |
+
+The viewport form is implemented by the installed shared controller, not a mount-time Motion initial state.
+Full restores neither bypassed nor consumed entrances. A live restrictive edit, hidden document,
+focus/hash, print or failure cancels existing native CSS handles and restores visibility. Positive
+clock edits retain their finite captured entrance. Repeat leaves immediately, without exit stagger.
+Appearance is explicit; native layout/foreground are inherited. There are no surface colour,
+changed-text or numeric capabilities in this primitive. Child components retain their own contracts.
+
+## Accessibility
+
+The native tree remains available to assistive technology. Pending and entering targets reject
+invisible pointer/click activation. Native focus-in and hash navigation immediately reveal the target;
+repeat never hides a focused subtree. Tab, Enter, Space, editing, selection and form behavior belong
+to the rendered element and its children. No aria-hidden, inert clone or extra tab stop is introduced.
+Print and no-JS content stay visible. This does not make JavaScript-driven child widgets work without JS.
+
+## Responsiveness and performance
+
+Native layout and caller breakpoints determine size and overflow. ResizeObserver recomputes root-height
+pixel insets and reachable huge-target thresholds. Matching native observers are shared. Cyclic rhythm
+uses stable slots modulo three, with at most 20 active targets and 400ms aggregate outstanding delay;
+overflow is visible immediately. No target queue, animation timer or per-frame layout polling.
+The own-source tier ceiling and dedicated installed cost exclude different things; provider/dependency
+and complete page costs must be measured separately. Overall v2 and real-device performance remain gated.
+
+## Notes for AI
+
+Install the actual primitive and its namespaced dependencies. Preserve relative sibling imports,
+native props/ref/events and one writer per property. Keep content visible by default. Use a separate
+host for child press/geometry and document repeat explicitly. Do not infer catalogue migration.

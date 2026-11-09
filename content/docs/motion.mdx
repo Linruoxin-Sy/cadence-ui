@@ -84,7 +84,8 @@ The provider library includes shared CSS execution support for `state.color` and
 spin/pulse status. Components adopt it individually; each component's Motion contract remains the
 source of its delivered behavior. [Animated Text](/components/animated-text) is installable for plain
 strings. [Animated Number](/components/animated-number) is installable for independently committed
-quantities, with raw defaults or explicit Intl formatting. Reveal and RevealGroup remain planned.
+quantities, with raw defaults or explicit Intl formatting. [Reveal](/components/reveal) and
+[Reveal Group](/components/reveal-group) provide explicit viewport entrances as described below.
 Both display primitives retain exact native fallback when typography or layout correspondence is unproven.
 
 A colour owner names its background, foreground, individual borders or SVG fill/stroke. Focus and
@@ -114,23 +115,39 @@ reduced render never depends on a media query alone.
 The resolution order, the component contract, and the three-mode test matrix live in
 [Motion modes](/docs/motion-modes).
 
+## Viewport entrances
+
+Install [Reveal](/components/reveal) for one explicit native host, or
+[Reveal Group](/components/reveal-group) for shared root/replay/trigger policy and optional bounded rhythm.
+Both are independent registry items; the group installs Reveal as a namespaced dependency.
+
+```install
+npx shadcn@latest add @cadence/reveal-group
+```
+
+```tsx
+import { Reveal } from "@/components/cadence/reveal";
+import { RevealGroup } from "@/components/cadence/reveal-group";
+
+export function Chapters() {
+  return <RevealGroup stagger="cycle"><Reveal render={<section />}>Native content</Reveal></RevealGroup>;
+}
+```
+
+Server HTML and first-screen hydration remain visible. Only successfully registered offscreen content
+arms; reduced/none bypass hiding and observation. Default once/no-stagger and shared root-height
+insets avoid replaying consumed content. Root/policy changes consume mounted entrances immediately.
+Nested Reveal consumes only the same parent entrance; later independent child mounts remain eligible.
+Use separate hosts for child press/layout/geometry. Existing ordinary components and the site's earlier
+reveal path keep their own contracts; installing the primitive creates no implicit catalogue effect.
+
 ## Writing a component
 
 ```tsx
-"use client";
-import { motion } from "motion/react";
-import { useCadenceMotion } from "../lib/provider";
+import { Reveal } from "@/components/cadence/reveal";
 
 export function Example() {
-  const cm = useCadenceMotion();
-  return (
-    <motion.div
-      initial={cm.reduced ? { opacity: 0 } : { opacity: 0, y: cm.distance.md }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={cm.transition("reveal")}
-      data-motion={cm.mode}
-    />
-  );
+  return <Reveal render={<section />}>Visible native content</Reveal>;
 }
 ```
 
@@ -143,7 +160,7 @@ Five rules for new components:
    immediate fallback. Never use `transition: all`.
 3. Give every animation an explicit reduced branch: applicable short opacity/colour feedback,
    immediate spatial targets and static migrated loops. None cancels owned duration and delay.
-   Shared support does not certify an unmigrated component or install the planned public primitives.
+   Shared support does not certify an unmigrated component; standalone primitives have explicit installs.
 4. Use `data-slot` on each part so consumers can target it with CSS.
 5. Add a Motion contract table to the component's docs.
 

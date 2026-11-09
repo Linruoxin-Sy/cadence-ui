@@ -31,6 +31,7 @@ export const MOTION_FORMS = [
   "measured",
   "changed-runs",
   "reels",
+  "viewport",
 ];
 
 /**
@@ -88,6 +89,13 @@ export function motionRecipes(entries = []) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
+  if (recipe === "reveal" && form === "viewport")
+    return source.includes("function createViewportReveal(") &&
+      source.includes("observeReveal(node, options, deliver") &&
+      source.includes('transition("reveal")') &&
+      source.includes("target.handles = handles")
+      ? "viewport"
+      : null;
   if (recipe === "number.roll")
     return form === "reels" && stringAdapterImplementation(source, "number") ? "reels" : null;
   if (recipe === "text.change") return form === "changed-runs" && textImplementation(source) ? "changed-runs" : null;

@@ -42,6 +42,16 @@
       "meta": {}
     },
     {
+      "name": "cadence-reveal",
+      "type": "registry:lib",
+      "title": "Viewport reveal controller",
+      "description": "Explicit native viewport registration, shared observers and bounded entrance rhythm.",
+      "categories": [
+        "foundation"
+      ],
+      "meta": {}
+    },
+    {
       "name": "cadence-utils",
       "type": "registry:lib",
       "title": "Utilities",
@@ -134,7 +144,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -157,7 +167,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -180,7 +190,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -203,7 +213,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -226,7 +236,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -249,7 +259,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -272,7 +282,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -295,7 +305,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -318,7 +328,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -341,7 +351,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -370,7 +380,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -393,7 +403,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -417,7 +427,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -441,7 +451,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -464,7 +474,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -488,7 +498,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -511,7 +521,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -534,7 +544,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -557,7 +567,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -585,7 +595,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -617,7 +627,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -642,7 +652,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -667,7 +677,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -692,7 +702,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -717,7 +727,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -742,7 +752,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -777,7 +787,7 @@
             }
           ]
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -802,7 +812,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -827,7 +837,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -859,7 +869,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -885,7 +895,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -911,7 +921,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -937,7 +947,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -963,7 +973,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -989,7 +999,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1017,7 +1027,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1044,7 +1054,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1071,7 +1081,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1098,7 +1108,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1125,7 +1135,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1153,7 +1163,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1195,7 +1205,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1221,7 +1231,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1249,7 +1259,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1277,7 +1287,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1309,7 +1319,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1332,7 +1342,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1357,7 +1367,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1380,7 +1390,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1405,7 +1415,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1433,7 +1443,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1463,7 +1473,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1486,7 +1496,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1530,7 +1540,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1560,7 +1570,7 @@
           "path": "apps/v4/examples/base/data-table-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/data-table.mdx"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1590,7 +1600,7 @@
           "path": "apps/v4/examples/base/date-picker-demo.tsx",
           "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1620,7 +1630,7 @@
           "version": "2026-10",
           "guide": "apps/v4/content/docs/components/base/attachment.mdx"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1645,7 +1655,7 @@
           "style": "base-ui",
           "version": "2026-10"
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1672,7 +1682,7 @@
           "version": "0.5.0",
           "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1701,7 +1711,7 @@
           "version": "0.6.0",
           "reason": "Cadence standalone changed-text primitive; no upstream shadcn equivalent."
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
       }
     },
     {
@@ -1730,7 +1740,65 @@
           "version": "0.6.0",
           "reason": "Cadence original numeric display primitive; no shadcn counterpart."
         },
-        "sourceSha": "ac5baa3f"
+        "sourceSha": "4e5352a8"
+      }
+    },
+    {
+      "name": "reveal",
+      "type": "registry:ui",
+      "title": "Reveal",
+      "description": "An explicit viewport entrance on one native content host.",
+      "categories": [
+        "motion"
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "reveal",
+            "form": "viewport"
+          }
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence original reveal viewport primitive; no shadcn counterpart."
+        },
+        "sourceSha": "4e5352a8"
+      }
+    },
+    {
+      "name": "reveal-group",
+      "type": "registry:ui",
+      "title": "Reveal Group",
+      "description": "Coordinates registered viewport entrances with bounded optional rhythm.",
+      "categories": [
+        "motion"
+      ],
+      "meta": {
+        "tier": "T1",
+        "batch": "B2",
+        "motion": [
+          {
+            "recipe": "reveal",
+            "form": "viewport"
+          }
+        ],
+        "intensity": "subtle",
+        "complexity": "S",
+        "since": "0.6.0",
+        "upstream": {
+          "registry": "cadence",
+          "style": "native",
+          "version": "0.6.0",
+          "reason": "Cadence original reveal-group viewport primitive; no shadcn counterpart."
+        },
+        "sourceSha": "4e5352a8"
       }
     }
   ]

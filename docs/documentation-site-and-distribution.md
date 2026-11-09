@@ -210,8 +210,8 @@ describe actual full, reduced and none behaviour, including live cancellation an
 of colour feedback and continuous loops once implemented. A recipe listed in the internal target
 catalogue is not permission to declare an unimplemented transition in public metadata.
 
-In particular, `state.color`, `text.change`, `AnimatedText`, `AnimatedNumber` and `Reveal` are proposed v2
-work, not current installation commands, exports or runnable examples. Update the public motion
+Standalone `AnimatedText`, `AnimatedNumber`, `Reveal` and `RevealGroup` are installable with their
+documented delivered subsets. Shared `state.color` support does not imply catalogue adoption. Update the public motion
 guide and each affected component's API, capability claims and examples only with the corresponding
 source, registry dependencies, tests and rebuilt payloads. Unmigrated components retain truthful
 descriptions of their existing behaviour; the internal rollout owns the gaps.

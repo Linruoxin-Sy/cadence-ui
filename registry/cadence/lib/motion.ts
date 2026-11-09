@@ -309,6 +309,14 @@ export const presenceInline = {
   duration: "fast",
   ease: "out",
 } as const satisfies ParameterDefinition;
+export const viewportReveal = {
+  id: "viewport.reveal",
+  forms: ["reveal/viewport"],
+  kind: "visual",
+  duration: "base",
+  ease: "out",
+  distance: "md",
+} as const satisfies ParameterDefinition;
 export const presenceSurface = {
   id: "presence.surface",
   forms: ["enter.pop/surface", "enter.pop/opacity"],
@@ -517,6 +525,7 @@ export const engineNative = {
 } as const satisfies ParameterDefinition;
 
 export type MotionParameterPreset =
+  | typeof viewportReveal
   | typeof presenceInline
   | typeof presenceSurface
   | typeof presencePopup
@@ -801,7 +810,7 @@ export function resolveMotionParameters(
       const exit = preset.exit || form.endsWith("/opacity-exit");
       return {
         kind: "visual",
-        opacity: tween(preset.duration, preset.ease, false, exit),
+        opacity: form === "reveal/viewport" && !full ? zero() : tween(preset.duration, preset.ease, false, exit),
         spatial: opacityOnly ? zero() : tween(preset.duration, preset.ease, true, exit),
         distance:
           full && !opacityOnly && preset.distance

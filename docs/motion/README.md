@@ -149,7 +149,7 @@ the stricter runtime observer, public docs and intensity enforcement have not la
 internal to this design file, is never copied into registry payloads, and cannot waive existing checks.
 Later shared support must enable stricter evidence before any item changes to `v2`; per-item source,
 metadata, user docs and tests must then migrate together. Inventory comes from the registry, so adding
-the planned primitives will require contracts without changing a hard-coded count.
+standalone primitives requires contracts without changing a hard-coded count.
 
 ## 3. Common execution obligations
 
@@ -429,12 +429,12 @@ multi-select controls retain independent selected states rather than forcing a s
 ## 5. Catalogue
 
 The original 59 component contracts remain migration targets. The catalogue also includes the
-standalone AnimatedText contract; its delivered text form is documented separately from the global
-v2 marker. AnimatedNumber, Reveal and RevealGroup remain planned.
+standalone primitive contracts; their delivered forms are documented separately from the global
+v2 marker. AnimatedNumber, Reveal and RevealGroup have standalone contracts; original catalogue adoption remains pending.
 
 | Family                        | Individual contracts                                                                                                                                                                                                                                                                                     |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Public motion primitives      | [Animated Text](components/animated-text.md), [Animated Number](components/animated-number.md)                                                                                                                                                                                                           |
+| Public motion primitives      | [Animated Text](components/animated-text.md), [Animated Number](components/animated-number.md), [Reveal](components/reveal.md), [Reveal Group](components/reveal-group.md)                                                                                                                               |
 | Actions and groups            | [Button](components/button.md), [Button Group](components/button-group.md), [Toggle](components/toggle.md), [Toggle Group](components/toggle-group.md)                                                                                                                                                   |
 | Inline structure              | [Badge](components/badge.md), [Kbd](components/kbd.md), [Label](components/label.md), [Separator](components/separator.md)                                                                                                                                                                               |
 | Editing and fields            | [Input](components/input.md), [Textarea](components/textarea.md), [Input OTP](components/input-otp.md), [Input Group](components/input-group.md), [Field](components/field.md)                                                                                                                           |

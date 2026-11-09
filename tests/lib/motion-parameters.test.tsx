@@ -22,7 +22,7 @@ const resolvePreset = (preset: MotionParameterPreset, mode: CadenceMode, options
 it("matches all reviewed exact forms without extending installed recipes", async () => {
   const { presets, problems } = parseTargetPresets(await readFile("docs/motion/presets.md", "utf8"));
   expect(problems).toEqual([]);
-  expect(catalogue).toHaveLength(29);
+  expect(catalogue).toHaveLength(30);
   expect(new Map(catalogue.map(({ id, forms }) => [id, [...forms]]))).toEqual(presets);
   // @ts-expect-error A colour binding cannot claim a geometry form.
   expect(() => bind(parameters.stateColor, "geometry.resize/measured")).toThrow(/does not support/);
@@ -67,6 +67,11 @@ describe("mode targets and independent clocks", () => {
       enter: { duration: 0.384, delay: 0.8 },
       exit: { duration: 0.24, delay: 0 },
       stagger: "none",
+    });
+    expect(resolvePreset(parameters.viewportReveal, "reduced", { delay: 9 })).toMatchObject({
+      opacity: { duration: 0, delay: 0 },
+      spatial: { duration: 0, delay: 0 },
+      distance: 0,
     });
     for (const preset of [
       parameters.layoutReflow,
