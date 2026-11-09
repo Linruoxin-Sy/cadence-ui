@@ -168,19 +168,40 @@ policy endpoint remain distinguishable. The non-published joint fixtures exercis
 cleanup, aliases, host replacement and rejection of unrelated/independent-tag evidence; a reporter
 fixture checks successful execution transport, including dead and skipped calls.
 
-This evidence layer does not implement target-action matching, applicability/native/N/A review,
-all controller/property forms, or the conditional component-v2 reporter gate. These remain required
-before per-item v2 enablement. Keep browser, first-paint, live-cancellation, installation and
-performance acceptance separate; a static positive cannot open the migration marker.
+`scripts/motion-v2.mjs` builds the conditional action plan from those source references. Each action
+names an exact authored physical host, property set, preset/form and loaded installation source hash.
+For an ambiguous export, contract metadata may add `regions: { "part": ["literal-data-slot"] }`;
+measured geometry additionally requires `axes: { "part": ["width", "height"] }`. These are internal
+proof references, not component props. Every connected colour/loop region and parameter-backed
+Control host still needs its own action; selecting a smaller region cannot conceal another writer.
+Unbound raw engine props, native CSS clocks, pseudo-element loops and nested transition utilities
+fail closed. Legacy popup CSS cannot certify a named target preset merely by matching its duration.
 
-Migration is explicit and fail-closed. `legacy` keeps all installed manifest, MDX, intensity, source
-budget and successful runtime-helper gates. Missing/unknown markers fail; `v2` still fails because
-complete per-component six-capability/browser acceptance and the shared-stage gate remain pending.
-Installed ownership and authored-profile enforcement do not open that gate. The marker is
-internal to this design file, is never copied into registry payloads, and cannot waive existing checks.
-Later shared support must enable stricter evidence before any item changes to `v2`; per-item source,
-metadata, user docs and tests must then migrate together. Inventory comes from the registry, so adding
-standalone primitives requires contracts without changing a hard-coded count.
+Proposed `v2` tests use `expectV2MotionAction(item, binding, mode, exercise)` from
+`tests/motion-v2-contract.ts`. The helper observes a real semantic action on the same committed
+export instance, physical host and live controller. It checks actual parameter clocks, native/scalar
+writes and owner-local mode policy; a registration, no-op or unrelated dependency is insufficient.
+Inherited actions need the actual authored parent path; composed Reveal needs the actual registered
+scope. `expectV2NativeBoundaries` checks the mounted native/composed/N/A parts separately. Native-only
+items require neither a fabricated provider nor a motion helper solely for their tier.
+The mandatory reporter accepts only successful current-test evidence signed by the compiler/helper
+for this launch. Hand-filled metadata, stale source rows, dead calls and skipped tests cannot grant
+acceptance. This is evidence integrity within the test harness, not a sandbox against hostile test code.
+Executor source receipts come from the actual factory, CSS-family acquisition or shared control hook.
+Loading an unused installed copy cannot certify a different executing module. Finite control updates
+cannot borrow a prior flight; colour actions compare their semantic end palettes. CSS policy identity
+follows its actual ownership ref across native family refreshes, rather than treating each refreshed
+family record as a new component or accepting an unrelated hook.
+
+Migration is explicit and fail-closed. `legacy` retains its manifest, MDX, intensity, source-budget
+and successful runtime-helper gates. Missing/unknown markers fail. `v2` requires the complete static
+action plan and the stricter successful three-mode runtime records; unsupported executors remain
+rejected until their recogniser and actual execution proof are implemented together. The marker is
+internal, never copied into registry payloads, and cannot waive existing checks. Semantic applicability
+review, first paint, browser live cancellation, installation and performance acceptance remain separate
+mandatory obligations; unit records do not certify those facts. Product contracts remain legacy until
+their source, declarations, public docs and complete acceptance migrate together. Inventory comes from
+the registry, so standalone primitives require contracts without a hard-coded component count.
 
 ### 2.2 Minimal installed coverage schema
 

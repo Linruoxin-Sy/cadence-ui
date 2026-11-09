@@ -9,6 +9,8 @@ const cliSuites = [
   "tests/lib/motion-docs.test.tsx",
   "tests/lib/doc-template.test.tsx",
   "tests/lib/joint-motion-reporter.test.tsx",
+  "tests/lib/motion-v2-reporter.test.tsx",
+  "tests/lib/motion-v2-projection.test.tsx",
 ];
 
 export default defineConfig({

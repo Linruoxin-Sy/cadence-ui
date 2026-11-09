@@ -1,5 +1,6 @@
 // Executed installed forms remain distinct from full component-v2 acceptance.
 import { readFileSync } from "node:fs";
+import { getValueTransition } from "motion/react";
 import { expect, onTestFinished } from "vitest";
 import { targetMetadata } from "../scripts/motion-migration.mjs";
 import {
@@ -11,6 +12,7 @@ import {
   controlSamples,
   cssPolicySamples,
   imperativeSamples,
+  motionSampleOrigins,
   motionSamples,
   mountedComponents,
   mountedExports,
@@ -71,10 +73,13 @@ export function expectMotionContract(
     forms?: NonNullable<ReturnType<typeof presentationSamples.get>>["form"][];
     /** Test-only joint policy provenance; does not certify component-v2. */
     joint?: JointMotionRequirement[];
+    ownerLocal?: Element[];
   } = {},
 ) {
   for (const part of options.parts ?? []) expect(part).toBeInTheDocument();
-  const nodes = [...(options.root ?? document).querySelectorAll<HTMLElement | SVGElement>("[data-motion][data-slot]")];
+  const nodes = (options.ownerLocal as (HTMLElement | SVGElement)[] | undefined) ?? [
+    ...(options.root ?? document).querySelectorAll<HTMLElement | SVGElement>("[data-motion][data-slot]"),
+  ];
   expect(nodes.length, "render an animated part before asserting its contract").toBeGreaterThan(0);
   for (const node of nodes) {
     expect(node).toHaveAttribute("data-motion", mode);
@@ -112,11 +117,16 @@ export function expectMotionContract(
       ).toBe(true);
     }
   }
-  if (mode === "none" || (mode === "reduced" && options.instantImperative)) {
+  if (!options.ownerLocal && (mode === "none" || (mode === "reduced" && options.instantImperative))) {
     for (const call of imperativeSamples) zero((call[2] ?? {}) as Sample);
   }
   let observed = 0;
   for (const props of motionSamples.values()) {
+    if (options.ownerLocal) {
+      const origin = motionSampleOrigins.get(props);
+      if (!origin || !nodes.some((node) => origin.hosts.has(node) && node.dataset.slot === props["data-slot"]))
+        continue;
+    }
     expect(props["data-motion"], "every observed Motion part carries the effective mode").toBe(mode);
     observed++;
     const control = controlSamples.get(props.animate as object);
@@ -126,7 +136,19 @@ export function expectMotionContract(
     if (mode !== "full") {
       expect(moving(props.whileTap) || moving(props.whileHover), "downgraded gesture transform").toBe(false);
       expect(props.layout || props.layoutId, "downgraded layout interpolation").toBeFalsy();
-      if (positional) zero(transition ?? {});
+      if (options.ownerLocal) {
+        for (const candidate of [target, props.initial, props.exit])
+          if (candidate && typeof candidate === "object")
+            for (const key of Object.keys(candidate))
+              if (geometry.test(key)) {
+                const clock = getValueTransition(
+                  ((candidate as Sample).transition as Sample) ?? transition ?? {},
+                  key,
+                ) as Sample;
+                expect(clock?.duration, `instant owned ${key}`).toBe(0);
+                expect(clock?.delay ?? 0).toBe(0);
+              }
+      } else if (positional) zero(transition ?? {});
       else {
         expect(
           moving(target, props["aria-hidden"] === "true" && transition?.duration === 0),
@@ -136,8 +158,15 @@ export function expectMotionContract(
         expect(moving(props.exit), "downgraded exit geometry").toBe(false);
       }
     }
-    if (mode === "none" && (transition || (target && typeof target === "object" && Object.keys(target).length)))
-      zero(transition ?? {});
+    if (mode === "none" && (transition || (target && typeof target === "object" && Object.keys(target).length))) {
+      if (options.ownerLocal && target && typeof target === "object")
+        for (const key of Object.keys(target)) {
+          const clock = getValueTransition(transition ?? {}, key) as Sample;
+          expect(clock?.duration, `none owned ${key}`).toBe(0);
+          expect(clock?.delay ?? 0).toBe(0);
+        }
+      else zero(transition ?? {});
+    }
   }
   const css = nodes.some((n) => /animate-|duration-0|transition-(opacity|\[|none)/.test(n.getAttribute("class") ?? ""));
   expect(

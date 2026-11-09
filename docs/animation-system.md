@@ -235,6 +235,14 @@ positive action clock until completion; physics owners retime from current paint
 Their zero/mode downgrade cancels the current writer before paint. Other callers
 and engine adapters still require their own adoption evidence.
 
+Shared control targets resolve the effective clock of each property, including
+property-specific overrides. A zero geometry clock does not suppress a separate
+eligible opacity clock; all-zero targets settle immediately. None also forces
+immediate settlement independently of the supplied transition object. Physics
+retiming considers the participating property clocks rather than only a root clock.
+An unchanged resolved physics clock retains its current writer and captured delay on unrelated
+renders. A real clock change retimes the active action without replaying a property delay.
+
 ### 2.3 CSS-side exposure
 
 ```css
@@ -1886,6 +1894,19 @@ V2 extends the recognisers/helper to colour properties, shared helper implementa
 reduced static loops. A passing legacy helper is not sufficient evidence for a newly promised v2
 capability. Retain negative fixtures so a declared dependency, dead call or wrapper attribute cannot
 masquerade as exercised motion.
+
+The conditional per-item v2 gate uses `expectV2MotionAction` and `expectV2NativeBoundaries` from
+`tests/motion-v2-contract.ts` with the source plan in `scripts/motion-v2.mjs`. It binds an action to
+the same committed export, physical ref host, live controller, exact properties, resolved preset/form,
+effective mode and loaded source bytes. Full finite actions must execute their actual writers;
+reduced/none retain only permitted properties and cancel restricted work. Parameter-backed shared
+controls are checked against the real renderer values and effective per-property clocks. Native-only
+boundaries are observed without inventing an animation/provider requirement. Successful current-test
+records use a fresh launch signature; public test metadata or an old report is insufficient.
+Raw engine props and unbound authored CSS clocks (including nested and pseudo-element variants)
+cannot hide behind native/N/A declarations. Unsupported executors remain rejected, rather than being
+inferred from matching token names. This is a conservative test gate; semantic applicability and the
+browser/installation/performance requirements below remain mandatory before component migration.
 
 ### 9.4 a11y and visual regression
 

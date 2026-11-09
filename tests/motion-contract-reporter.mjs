@@ -1,15 +1,26 @@
 import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { checkCatalogIntensity } from "../scripts/catalog-intensity.mjs";
 import { checkMotionCoverage } from "../scripts/motion-coverage.mjs";
+import { verifiedMotionEvidence } from "../scripts/motion-evidence-authority.mjs";
 import { checkMotionImplementations } from "../scripts/motion-implementation.mjs";
 import { cssPolicyCapabilities, motionForms, motionRecipes, normaliseMotion } from "../scripts/motion-manifest.mjs";
 import { migrationProblems, targetMetadata } from "../scripts/motion-migration.mjs";
+import { checkMotionTargets } from "../scripts/motion-targets.mjs";
+import { motionV2ExecutionProblems } from "../scripts/motion-v2.mjs";
 
 const registry = JSON.parse(readFileSync(new URL("../registry.json", import.meta.url), "utf8"));
 
 /** Check successful runtime evidence, including when a whole contract suite is skipped. */
 export default class MotionContractReporter {
+  constructor(options = {}) {
+    this.root = options.root ?? process.cwd();
+    this.contractRoot = options.root ?? fileURLToPath(new URL("../", import.meta.url));
+    this.registry = options.root ? JSON.parse(readFileSync(path.join(this.root, "registry.json"), "utf8")) : registry;
+  }
   async onTestRunEnd(modules) {
+    const registry = this.registry;
     const failures = [];
     const ids = modules.map(
       (module) => module.moduleId.replaceAll("\\", "/").match(/\/tests\/components\/([^/]+)\.test\.tsx$/)?.[1],
@@ -18,7 +29,7 @@ export default class MotionContractReporter {
       .filter((item) => ids.includes(item.name) && item.meta?.motion?.length)
       .map((item) => item.name);
     const implementations = testedItems.length
-      ? await checkMotionImplementations(process.cwd(), registry, testedItems)
+      ? await checkMotionImplementations(this.root, registry, testedItems)
       : { references: {}, problems: [] };
     const { references } = implementations;
     const selected = { items: registry.items.filter((item) => ids.includes(item.name)) };
@@ -44,8 +55,54 @@ export default class MotionContractReporter {
       const item = registry.items.find((item) => item.name === id);
       if (item && ["registry:ui", "registry:block"].includes(item.type)) {
         const target = targetMetadata(
-          readFileSync(new URL(`../docs/motion/components/${id}.md`, import.meta.url), "utf8"),
+          readFileSync(path.join(this.contractRoot, `docs/motion/components/${id}.md`), "utf8"),
         );
+        if (target.metadata?.migration === "v2") {
+          const checked = await checkMotionTargets(this.contractRoot, registry);
+          failures.push(...target.problems.map((problem) => `${id}: ${problem}`), ...checked.problems);
+          if (!checked.v2) {
+            failures.push(`${id}: v2 complete source/contract plan required`);
+            continue;
+          }
+          const animated = checked.v2.actions.some((action) => action.item === id);
+          failures.push(
+            ...motionV2ExecutionProblems(
+              id,
+              checked.v2,
+              [...module.children.allTests("passed")].map((test) => {
+                const meta = test.meta();
+                const nativeBoundaries = animated
+                  ? []
+                  : checked.v2.boundaries
+                      .filter(
+                        (boundary) =>
+                          boundary.item === id &&
+                          verifiedMotionEvidence(meta.cadenceNativeSigned, test.id, "native").some(
+                            (execution) =>
+                              execution.live &&
+                              execution.module ===
+                                path.resolve(this.contractRoot, boundary.file).replaceAll("\\", "/") &&
+                              execution.digest === boundary.digest &&
+                              execution.exports.includes(boundary.anchor.split("#")[1]) &&
+                              boundary.slots.every((slot) => execution.slots.includes(slot)),
+                          ),
+                      )
+                      .map((boundary) => ({ ...boundary, live: true, native: true }));
+                return {
+                  passed: true,
+                  records: verifiedMotionEvidence(meta.cadenceV2Signed, test.id, "actions"),
+                  boundaries: [
+                    ...verifiedMotionEvidence(meta.cadenceV2Signed, test.id, "boundaries"),
+                    ...nativeBoundaries,
+                  ],
+                };
+              }),
+            ),
+          );
+          // The strict helper executes the actual mode policy. Independent legacy
+          // tag unions cannot grant or veto a source-bound v2 action.
+          continue;
+        }
         failures.push(
           ...[...target.problems, ...migrationProblems(target.metadata?.migration)].map(
             (problem) => `${id}: ${problem}`,

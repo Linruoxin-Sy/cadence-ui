@@ -208,6 +208,11 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       for (const file of [
         "registry.json",
         "scripts/motion-migration.mjs",
+        "scripts/motion-targets.mjs",
+        "scripts/motion-adoption.mjs",
+        "scripts/motion-v2.mjs",
+        "scripts/motion-evidence-authority.mjs",
+        "scripts/installation.mjs",
         "scripts/motion-manifest.mjs",
         "scripts/motion-source.mjs",
         "scripts/motion-implementation.mjs",
@@ -217,6 +222,19 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       ])
         await writeFile(path.join(fixture, file), await readFile(path.join(root, file), "utf8"));
       const stagedRegistry = JSON.parse(await readFile(path.join(fixture, "registry.json"), "utf8"));
+      for (const item of stagedRegistry.items) {
+        for (const file of item.files ?? []) {
+          await mkdir(path.dirname(path.join(fixture, file.path)), { recursive: true });
+          await writeFile(path.join(fixture, file.path), await readFile(path.join(root, file.path)));
+        }
+        if (["registry:ui", "registry:block"].includes(item.type))
+          await writeFile(
+            path.join(fixture, `docs/motion/components/${item.name}.md`),
+            await readFile(path.join(root, `docs/motion/components/${item.name}.md`)),
+          );
+      }
+      for (const file of ["docs/motion/presets.md", "docs/motion/README.md"])
+        await writeFile(path.join(fixture, file), await readFile(path.join(root, file)));
       for (const id of ["card", "input"])
         stagedRegistry.items.find((item: { name: string }) => item.name === id).meta.motion = [
           { recipe: "state.color", form: "css-transition" },
@@ -261,7 +279,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       expect(output).not.toContain("spinner: execute expectMotionContract");
       expect(output).not.toContain("badge: execute expectMotionContract");
       for (const id of ["spinner", "label"])
-        expect(output).toContain(`${id}: v2 enforcement is not implemented; legacy evidence cannot certify v2`);
+        expect(output).toContain(`${id}: v2 ${id}.root.enter: no source-bound action plan`);
       for (const id of ["card", "input"])
         expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
       expect(output).toContain("card: state.color/css-transition: missing installed ownership");

@@ -8,6 +8,7 @@ import { checkMotionPartAdoption } from "./motion-adoption.mjs";
 import { MOTION_RELATIONSHIPS } from "./motion-coverage.mjs";
 import { migrationProblems, targetMetadata } from "./motion-migration.mjs";
 import { valueExports } from "./motion-source.mjs";
+import { motionV2Plan } from "./motion-v2.mjs";
 
 export { valueExports } from "./motion-source.mjs";
 
@@ -97,13 +98,39 @@ export function parseMotionTarget(markdown, id, presets) {
   problems.push(...metadataProblems);
   if (meta?.schema !== 1 || meta.target !== "motion-v2")
     problems.push("motion schema: 1 and target: motion-v2 required");
-  if (meta && Object.keys(meta).some((key) => !["schema", "target", "migration", "parts"].includes(key)))
+  if (
+    meta &&
+    Object.keys(meta).some((key) => !["schema", "target", "migration", "parts", "regions", "axes"].includes(key))
+  )
     problems.push("unknown motion schema field");
   const migration = migrationProblems(meta?.migration);
   const parts = meta?.parts;
   if (!parts || typeof parts !== "object" || Array.isArray(parts) || !Object.keys(parts).length)
     problems.push("nonempty parts reference map required");
   const safeParts = parts && typeof parts === "object" && !Array.isArray(parts) ? parts : {};
+  for (const field of ["regions", "axes"]) {
+    const map = meta?.[field];
+    if (map === undefined) continue;
+    if (!map || typeof map !== "object" || Array.isArray(map)) {
+      problems.push(`${field}: expected part map`);
+      continue;
+    }
+    for (const [part, values] of Object.entries(map))
+      if (
+        !Object.hasOwn(safeParts, part) ||
+        !Array.isArray(values) ||
+        !values.length ||
+        new Set(values).size !== values.length ||
+        values.some(
+          (value) =>
+            typeof value !== "string" ||
+            !(field === "axes" ? ["width", "height"].includes(value) : /^[a-z][\w-]*$/.test(value)),
+        )
+      )
+        problems.push(
+          `${field}.${part}: exact unique ${field === "axes" ? "physical axes" : "literal host slots"} required`,
+        );
+  }
   for (const [part, refs] of Object.entries(safeParts)) {
     if (
       !/^[a-z][\w-]*$/.test(part) ||
@@ -243,6 +270,8 @@ export function parseMotionTarget(markdown, id, presets) {
     bindings,
     actions,
     capabilities,
+    regions: meta?.regions,
+    axes: meta?.axes,
   };
 }
 
@@ -288,7 +317,16 @@ export async function checkMotionTargets(root, registry) {
         presetResult.presets,
       );
       contracts.set(item.name, contract);
-      problems.push(...contract.problems.map((problem) => `${item.name}: ${problem}`));
+      problems.push(...contract.referenceProblems.map((problem) => `${item.name}: ${problem}`));
+      if (contract.migration === "v2") {
+        try {
+          await read(`tests/components/${item.name}.test.tsx`);
+        } catch {
+          problems.push(`${item.name}: v2 requires its named actual component test, including native-only items`);
+        }
+      }
+      if (!["legacy", "v2"].includes(contract.migration))
+        problems.push(...migrationProblems(contract.migration).map((problem) => `${item.name}: ${problem}`));
       for (const [part, refs] of Object.entries(contract.parts)) {
         if (!Array.isArray(refs)) continue;
         for (const ref of refs) {
@@ -305,5 +343,7 @@ export async function checkMotionTargets(root, registry) {
   }
   const adoption = await checkMotionPartAdoption(root, registry, contracts);
   problems.push(...adoption.problems);
-  return { problems, contracts, presets: presetResult.presets, adoption };
+  const v2 = await motionV2Plan(root, registry, contracts, adoption);
+  problems.push(...v2.problems);
+  return { problems, contracts, presets: presetResult.presets, adoption, v2 };
 }

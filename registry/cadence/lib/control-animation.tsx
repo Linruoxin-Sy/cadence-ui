@@ -1,6 +1,14 @@
 "use client";
 
-import { cancelFrame, frame, type HTMLMotionProps, motion, type Transition, useAnimationControls } from "motion/react";
+import {
+  cancelFrame,
+  frame,
+  getValueTransition,
+  type HTMLMotionProps,
+  motion,
+  type Transition,
+  useAnimationControls,
+} from "motion/react";
 import { type ComponentProps, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import type { CadenceMode } from "./motion";
@@ -31,7 +39,13 @@ export function useControlAnimation(
   onComplete?: (target: Target) => void,
 ) {
   const controls = useAnimationControls();
-  const current = useRef<{ target: string; mode?: CadenceMode; instant: boolean; active: boolean } | null>(null);
+  const current = useRef<{
+    target: string;
+    mode?: CadenceMode;
+    instant: boolean;
+    active: boolean;
+    clock?: string;
+  } | null>(null);
   const generation = useRef(0);
   const queued = useRef<(() => void) | null>(null);
   const latest = useRef(target);
@@ -87,12 +101,16 @@ export function useControlAnimation(
     }
     latest.current = target;
     const key = JSON.stringify(target);
+    const clock = JSON.stringify(transition);
+    const clocks = Object.keys(target).map((property) => getValueTransition(transition, property));
+    const physics = clocks.some((clock) => clock.stiffness !== undefined);
     const instant =
-      transition.duration === 0 ||
+      mode === "none" ||
+      clocks.every((clock) => clock.duration === 0 && (clock.delay ?? 0) === 0) ||
       presentation?.available() === false ||
       Boolean(environment.current?.hidden || environment.current?.immediate);
     const previous = current.current;
-    current.current = { target: key, mode, instant, active: previous?.active ?? false };
+    current.current = { target: key, mode, instant, active: previous?.active ?? false, clock };
     // Finite tweens and duration-defined springs capture their action clock.
     // Physics owners explicitly retime; restrictions always cancel, even when
     // the target is unchanged. Restoring full does not replay a settled action.
@@ -102,7 +120,7 @@ export function useControlAnimation(
       !instant &&
       !previous.instant &&
       previous.mode === mode &&
-      (!transition.stiffness || !previous.active)
+      (!physics || !previous.active || previous.clock === clock)
     )
       return;
     if (queued.current) cancelFrame(queued.current);
@@ -145,7 +163,19 @@ export function useControlAnimation(
       frame.update(settle);
     } else {
       current.current.active = true;
-      const timing = previous?.target === key && transition.stiffness ? { ...transition, delay: 0 } : transition;
+      const timing =
+        previous?.target === key && physics
+          ? {
+              ...transition,
+              delay: 0,
+              ...Object.fromEntries(
+                Object.keys(target).map((property) => [
+                  property,
+                  { ...getValueTransition(transition, property), delay: 0 },
+                ]),
+              ),
+            }
+          : transition;
       void controls.start(target, timing).then(() => {
         if (lease.current() && owner.current === record && generation.current === epoch && current.current) {
           current.current.active = false;

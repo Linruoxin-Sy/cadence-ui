@@ -30,8 +30,11 @@ export function targetMetadata(markdown) {
 }
 
 /** Internal target-state gate; it never changes the meaning of meta.motion. */
-export function migrationProblems(migration) {
+export function migrationProblems(migration, gate) {
   if (migration === "legacy") return [];
-  if (migration === "v2") return ["v2 enforcement is not implemented; legacy evidence cannot certify v2"];
+  if (migration === "v2")
+    return gate?.checked
+      ? gate.problems
+      : ["v2 requires source-bound action and runtime gates; legacy evidence cannot certify v2"];
   return ["migration must explicitly be legacy or v2 (no inferred default)"];
 }

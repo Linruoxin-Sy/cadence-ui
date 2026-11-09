@@ -1,0 +1,22 @@
+import {useLayoutEffect,useRef,useState} from "react";
+import {bindMotionParameters,layoutSelection} from "../lib/motion";
+import {useMotionHostRef} from "../lib/motion-ref";
+import {createMotionTransaction} from "../lib/motion-transaction";
+import {useCadenceMotion} from "../lib/provider";
+import {createSelectionProjection} from "../lib/selection-projection";
+
+export function Fixture({changed=false,stale=false}) {
+  const {node,ref}=useMotionHostRef();
+  const cm=useCadenceMotion(node);
+  const [transaction]=useState(createMotionTransaction);
+  const controller=useRef();
+  useLayoutEffect(()=>{controller.current=createSelectionProjection(node,transaction);return()=>controller.current.dispose()},[node,transaction]);
+  useLayoutEffect(()=>{
+    const projection=controller.current;
+    const p=cm.parameters(bindMotionParameters(layoutSelection,"layout.shared/selection"));
+    const revision=transaction.revision("state",changed);
+    if(stale)transaction.revision("state",!changed);
+    projection.commit(revision,{x:changed?80:0,y:0,width:40,height:20},p.transition,cm.reduced);
+  });
+  return <span ref={ref} data-slot="fixture" data-motion={cm.mode} aria-selected={changed}>Persistent indicator</span>;
+}

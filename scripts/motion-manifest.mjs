@@ -117,6 +117,8 @@ export function implementedForm(source, recipe, form = "one-shot") {
   source = scanned.source;
   const imports = (name, module) =>
     scanned.imports.some((entry) => entry.name === name && entry.path.endsWith(`/${module}`));
+  if (form === "one-shot" && parameterWriterForms(source).some((target) => target.startsWith(`${recipe}/`)))
+    return form;
   if (recipe === "reveal" && form === "viewport")
     return source.includes("function createViewportReveal(") &&
       source.includes("observeReveal(node, options, deliver") &&
@@ -136,12 +138,18 @@ export function implementedForm(source, recipe, form = "one-shot") {
       ? "one-shot"
       : null;
   if ((recipe === "layout.move" && form === "size-linked") || (recipe === "geometry.resize" && form === "measured"))
-    return imports("createSizeLinkedGeometry", "size-linked-geometry") &&
-      source.includes("createSizeLinkedGeometry(") &&
-      source.includes("projection.prepare(") &&
-      source.includes("projection.commit(") &&
-      source.includes("geometry.resize/measured") &&
-      source.includes("layout.move/size-linked")
+    return (recipe === "geometry.resize" &&
+      imports("createMeasuredGeometry", "measured-geometry") &&
+      source.includes("createMeasuredGeometry(") &&
+      source.includes(".register(") &&
+      source.includes(".commit(") &&
+      source.includes("geometry.resize/measured")) ||
+      (imports("createSizeLinkedGeometry", "size-linked-geometry") &&
+        source.includes("createSizeLinkedGeometry(") &&
+        source.includes("projection.prepare(") &&
+        source.includes("projection.commit(") &&
+        source.includes("geometry.resize/measured") &&
+        source.includes("layout.move/size-linked"))
       ? form
       : null;
   if (recipe === "layout.shared" && form === "selection")
@@ -216,11 +224,134 @@ export function implementedForm(source, recipe, form = "one-shot") {
 export function calledRecipes(source) {
   source = motionSource(source).source;
   return transitionCalls(source).concat(
+    parameterWriterForms(source).map((form) => form.split("/")[0]),
     cssPolicyImplementation(source, "useStateColor") ? ["state.color"] : [],
     cssPolicyImplementation(source, "useContinuousMotion") ? ["data.transition"] : [],
     textImplementation(source) ? ["text.change"] : [],
     stringAdapterImplementation(source, "number") ? ["number.roll"] : [],
   );
+}
+
+/** Parameter-backed shared controls retain their exact property form. The
+ * binding must reach a rendered shared controller's real transition prop. */
+export function parameterWriterForms(source) {
+  return [...new Set(parameterWriterBindings(source).map((binding) => binding.form))];
+}
+
+export function parameterWriterBindings(source) {
+  // Most installed sources use other executors. Avoid re-parsing the entire
+  // legacy installation graph for a recogniser whose required imports are absent.
+  if (!source.includes("bindMotionParameters") || !source.includes("control-animation")) return [];
+  const selected = motionSource(source);
+  const bind = selected.imports
+    .filter((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion"))
+    .map((entry) => entry.local);
+  const controls = selected.imports
+    .filter(
+      (entry) =>
+        ["ControlSpan", "ControlDiv", "NativeControlDiv"].includes(entry.name) &&
+        entry.path.endsWith("/control-animation"),
+    )
+    .map((entry) => entry.local);
+  if (!bind.length || !controls.length) return [];
+  compiler ??= require("typescript");
+  const ts = compiler;
+  const tree = ts.createSourceFile("component.tsx", selected.source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX),
+    bindings = [];
+  const visit = (node, inherited) => {
+    const policies = ts.isFunctionLike(node) || ts.isBlock(node) ? new Map(inherited) : inherited;
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      ts.isCallExpression(node.initializer) &&
+      ts.isPropertyAccessExpression(node.initializer.expression) &&
+      node.initializer.expression.name.text === "parameters"
+    ) {
+      const binding = node.initializer.arguments[0];
+      if (
+        binding &&
+        ts.isCallExpression(binding) &&
+        ts.isIdentifier(binding.expression) &&
+        bind.includes(binding.expression.text) &&
+        binding.arguments[1] &&
+        ts.isStringLiteral(binding.arguments[1])
+      )
+        policies.set(node.name.text, binding.arguments[1].text);
+    }
+    if (
+      (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) &&
+      controls.includes(node.tagName.getText(tree))
+    ) {
+      const transition = node.attributes.properties.find(
+        (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "transition",
+      );
+      const expression =
+        transition?.initializer && ts.isJsxExpression(transition.initializer)
+          ? transition.initializer.expression
+          : undefined;
+      const forms = [];
+      if (
+        expression &&
+        ts.isPropertyAccessExpression(expression) &&
+        ts.isIdentifier(expression.expression) &&
+        policies.has(expression.expression.text)
+      )
+        forms.push(policies.get(expression.expression.text));
+      if (expression && ts.isObjectLiteralExpression(expression)) {
+        const selected = new Set();
+        const collect = (child) => {
+          if (
+            ts.isPropertyAccessExpression(child) &&
+            ts.isIdentifier(child.expression) &&
+            policies.has(child.expression.text)
+          )
+            selected.add(policies.get(child.expression.text));
+          ts.forEachChild(child, collect);
+        };
+        collect(expression);
+        if (selected.size === 1) forms.push([...selected][0]);
+      }
+      const slot = node.attributes.properties.find(
+        (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "data-slot",
+      );
+      const target = node.attributes.properties.find(
+        (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "target",
+      );
+      const value =
+        target?.initializer && ts.isJsxExpression(target.initializer) ? target.initializer.expression : undefined;
+      const keys =
+        value &&
+        ts.isObjectLiteralExpression(value) &&
+        value.properties.every(
+          (property) =>
+            ts.isPropertyAssignment(property) && (ts.isIdentifier(property.name) || ts.isStringLiteral(property.name)),
+        )
+          ? value.properties.map((property) => property.name.text)
+          : null;
+      const properties =
+        keys &&
+        [
+          ...new Set(
+            keys.map((key) =>
+              /^(?:transform|[xyz]|translate[XYZ]|rotate[XYZ]?|scale[XY]?|skew[XY]?)$/.test(key)
+                ? "transform"
+                : key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
+            ),
+          ),
+        ].sort();
+      for (const form of forms)
+        bindings.push({
+          form,
+          properties,
+          slot: slot?.initializer && ts.isStringLiteral(slot.initializer) ? slot.initializer.text : null,
+          offset: node.getStart(tree),
+        });
+    }
+    ts.forEachChild(node, (child) => visit(child, policies));
+  };
+  visit(tree, new Map());
+  return bindings;
 }
 
 /** A connected string adapter, not comments, an unused import or an unmounted call. */
@@ -412,6 +543,7 @@ export function cssPolicyBindings(source) {
           parent,
           scope,
           properties: kind === "useStateColor" ? selected.elements.map((value) => value.text) : [],
+          loop: kind === "useContinuousMotion" ? selected.text : undefined,
         });
     }
     ts.forEachChild(node, walk);
@@ -448,6 +580,7 @@ export function cssPolicyBindings(source) {
           used.push({
             kind: entry.kind,
             properties: entry.properties,
+            loop: entry.loop,
             slot: slot?.initializer && ts.isStringLiteral(slot.initializer) ? slot.initializer.text : null,
           });
           current = entry.parent;

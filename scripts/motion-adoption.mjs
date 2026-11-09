@@ -2,7 +2,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { implementationOwner, motionCoverageProblems } from "./motion-coverage.mjs";
-import { cssPolicyBindings, implementedForm, motionForms } from "./motion-manifest.mjs";
+import { cssPolicyBindings, implementedForm, motionForms, parameterWriterForms } from "./motion-manifest.mjs";
 import { motionSource, valueExports } from "./motion-source.mjs";
 
 // These forms have the SAME installed and target meaning. Property-qualified
@@ -38,16 +38,24 @@ const TARGET_CAPABILITIES = new Map([
   ["state.color/surface-foreground", ["Surface colour", "Text colour"]],
 ]);
 
-export function installedTargetForm(form) {
+export function installedTargetForm(form, parameterized = false) {
   if (EXACT_FORMS.has(form)) return form;
   if (["state.color/surface", "state.color/foreground", "state.color/surface-foreground"].includes(form))
     return "state.color/css-transition";
+  if (
+    parameterized &&
+    /^(data\.transition\/(opacity|determinate)|enter\.pop\/(opacity|surface)|exit\.fade\/opacity|feedback\.press\/scale|state\.morph\/indicator|layout\.move\/position|popup\.anchored\/(presence|edge|edge-exit|ending|opacity-enter|opacity-exit)|scroll\.navigate\/scroll)$/.test(
+      form,
+    )
+  )
+    return `${form.split("/")[0]}/one-shot`;
   return null;
 }
 
 function targetImplementation(source, targetForm, installedForm) {
   const [recipe, form] = installedForm.split("/");
   if (implementedForm(source, recipe, form) !== form) return false;
+  if (form === "one-shot" && parameterWriterForms(source).includes(targetForm)) return true;
   // v2 loops require the real policy, never the legacy animate-* exception.
   if (targetForm === "data.transition/continuous")
     return cssPolicyBindings(source).some((binding) => binding.kind === "useContinuousMotion");
@@ -90,7 +98,7 @@ async function partScanner(root, registry) {
     };
     install(id);
     const references = [];
-    const visit = async (file, selected, via, anchors, visiting) => {
+    const visit = async (file, selected, via, anchors, visiting, selections = []) => {
       const key = JSON.stringify([file, selected]);
       if (visiting.has(key)) return;
       const source = await read(file);
@@ -98,9 +106,10 @@ async function partScanner(root, registry) {
       const owner = file.match(/^registry\/cadence\/([^/]+)\/index\.tsx$/)?.[1];
       const route = owner ? [...anchors, ...selected.map((name) => `${owner}#${name}`)] : anchors;
       const scanned = motionSource(source, selected);
+      const pathSelections = [...selections, { file, selected }];
       if (targetImplementation(scanned.source, targetForm, installedForm)) {
         const [recipe, form] = installedForm.split("/");
-        references.push({ recipe, form, file, via, anchors: route });
+        references.push({ recipe, form, file, via, anchors: route, selections: pathSelections });
       }
       for (const dependency of scanned.imports) {
         if (!dependency.path.startsWith(".")) continue;
@@ -113,6 +122,7 @@ async function partScanner(root, registry) {
             [...via, `${file}#${dependency.local}`],
             route,
             new Set([...visiting, key]),
+            pathSelections,
           );
       }
     };
@@ -131,6 +141,7 @@ export async function checkMotionPartAdoption(root, registry, contracts) {
   const problems = [];
   const bindings = [];
   const boundaries = [];
+  const nativeActions = [];
   const scanner = await partScanner(root, registry);
   const items = new Map(registry.items.map((item) => [item.name, item]));
   for (const [id, contract] of contracts) {
@@ -161,7 +172,46 @@ export async function checkMotionPartAdoption(root, registry, contracts) {
               reason: capability.reason,
             });
     for (const [name, binding] of contract.bindings) {
-      const installedForm = installedTargetForm(binding.form);
+      if (binding.form.startsWith("native/")) {
+        const engine = binding.form.slice("native/".length);
+        const modules = {
+          embla: "embla-carousel-react",
+          recharts: "recharts",
+          cmdk: "cmdk",
+          "input-otp": "input-otp",
+          "resizable-panels": "react-resizable-panels",
+        };
+        let valid = true;
+        for (const anchor of contract.parts[binding.part] ?? []) {
+          const [owner, exported] = anchor.split("#");
+          const file = `registry/cadence/${owner}/index.tsx`;
+          const selected = motionSource(await readFile(path.join(root, file), "utf8"), [exported]);
+          const module =
+            modules[engine] ?? (engine.startsWith("base-ui-") ? `@base-ui/react/${engine.slice(8)}` : undefined);
+          const nativeTag = { input: "input", textarea: "textarea", table: "table" }[engine];
+          const adopted = module
+            ? selected.imports.some((entry) => entry.path === module)
+            : nativeTag
+              ? new RegExp(`<${nativeTag}\\b`).test(selected.source)
+              : engine === "css-layout" && /<[a-z][\w-]*\b/.test(selected.source);
+          if (!adopted) {
+            report(`${name}: actual native ${engine} owner required on ${anchor}`);
+            valid = false;
+          } else
+            nativeActions.push({
+              item: id,
+              binding: name,
+              part: binding.part,
+              anchor,
+              file,
+              preset: binding.preset,
+              form: binding.form,
+            });
+        }
+        if (!valid) continue;
+        continue;
+      }
+      const installedForm = installedTargetForm(binding.form, true);
       if (!installedForm) {
         report(`${name}: no exact installed recogniser for target ${binding.form}`);
         continue;
@@ -201,7 +251,66 @@ export async function checkMotionPartAdoption(root, registry, contracts) {
       }
       const relationship = [...relationships][0];
       if (relationship === "composed") {
-        report(`${name}: composed action requires joint scope/host registration evidence (pending)`);
+        // Explicit viewport composition is a real context-provided scope. A
+        // nearby group, a dependency declaration or an arbitrary wrapper cannot
+        // supply this source edge; runtime still requires its registered host.
+        const scopeAnchor = contract.parts.scope?.find((anchor) => anchor.startsWith(`${id}#`));
+        const scopeSource = await readFile(path.join(root, `registry/cadence/${id}/index.tsx`), "utf8");
+        const scopePart = scopeAnchor?.split("#")[1];
+        const selected = scopePart ? motionSource(scopeSource, [scopePart]).source : "";
+        if (
+          binding.form !== "reveal/viewport" ||
+          !scopeAnchor ||
+          !selected.includes("createViewportReveal(options)") ||
+          !selected.includes("<RevealScopeContext value={scope}>")
+        ) {
+          report(`${name}: composed action requires a real scope provider and registered target path`);
+          continue;
+        }
+        const coverage = effects[installedForm];
+        if (!coverage?.some((effect) => effect.owner === id && effect.relationship === "composed")) {
+          report(`${name}: composed scope must retain its actual installed owner ${id}`);
+          continue;
+        }
+        for (const anchor of anchors) {
+          const [hostOwner, exported] = anchor.split("#");
+          const hostSource = await readFile(path.join(root, `registry/cadence/${hostOwner}/index.tsx`), "utf8");
+          const target = motionSource(hostSource, [exported]).source;
+          const adopted = contracts.get(hostOwner);
+          if (
+            !item.registryDependencies?.includes(`@cadence/${hostOwner}`) ||
+            adopted?.migration !== "v2" ||
+            !target.includes("useContext(RevealScopeContext)") ||
+            !target.includes("inherited ?? local") ||
+            ![...adopted.bindings.values()].some((own) => own.form === binding.form && own.preset === binding.preset)
+          ) {
+            report(
+              `${name}: composed target ${anchor} must consume the actual scope and retain its migrated form/preset`,
+            );
+            continue;
+          }
+          const references = [
+            ...(await scanner(id, scopePart, binding.form, installedForm)),
+            ...(await scanner(hostOwner, exported, binding.form, installedForm)),
+          ];
+          if (references.length < 2) {
+            report(`${name}: real scope and host implementation paths required`);
+            continue;
+          }
+          covered.add(`${installedForm}\0${id}`);
+          bindings.push({
+            item: id,
+            binding: name,
+            targetForm: binding.form,
+            installedForm,
+            relationship,
+            anchor,
+            owner: id,
+            hostOwner,
+            scopeAnchor,
+            references,
+          });
+        }
         continue;
       }
       const ownership = Array.isArray(effects[installedForm]) ? effects[installedForm] : [];
@@ -282,5 +391,5 @@ export async function checkMotionPartAdoption(root, registry, contracts) {
         if (!covered.has(`${form}\0${effect.owner}`))
           report(`${form}: installed owner ${effect.owner} has no verified target action`);
   }
-  return { problems, bindings, boundaries };
+  return { problems, bindings, boundaries, nativeActions };
 }

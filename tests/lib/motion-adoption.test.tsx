@@ -6,6 +6,7 @@ import { checkMotionPartAdoption, installedTargetForm } from "../../scripts/moti
 import { checkMotionCoverage } from "../../scripts/motion-coverage.mjs";
 import { checkMotionImplementations } from "../../scripts/motion-implementation.mjs";
 import { checkMotionTargets, parseMotionTarget, parseTargetPresets } from "../../scripts/motion-targets.mjs";
+import { motionV2Plan } from "../../scripts/motion-v2.mjs";
 import negatives from "../fixtures/motion-adoption/negative.json";
 
 const root = process.cwd();
@@ -59,6 +60,36 @@ function effect(item: Awaited<ReturnType<typeof fixture>>["item"], form: string)
 }
 
 describe("selected-part static adoption subgate (not full v2 acceptance)", () => {
+  it("rejects unowned native, pseudo-element and nested clocks while retaining the connected policy", async () => {
+    const { temp, registry, file } = await fixture();
+    const contracts = new Map([["fixture", parse(contractSource)]]);
+    for (const extra of [
+      'className="before:animate-spin"',
+      'className="[&>span]:transition-opacity [&>span]:duration-200"',
+      'style={{transitionDuration:"0.2s"}}',
+      "animate={{opacity:1}}",
+      "onClick={()=>requestAnimationFrame(()=>{})}",
+      "onClick={()=>new Animation()}",
+      'onClick={event=>{event.currentTarget.style.transitionDuration="0.2s"}}',
+      "onClick={()=>schedule.update(()=>{})}",
+      "onClick={()=>movement(0,1)}",
+    ]) {
+      const imported = extra.includes("schedule.update")
+        ? 'import {frame as schedule} from "motion/react";\n'
+        : extra.includes("movement(")
+          ? 'import {animate as movement} from "motion/react";\n'
+          : "";
+      await put(temp, file, imported + source.replace("<span ", `<span ${extra} `));
+      const adoption = await checkMotionPartAdoption(temp, registry, contracts);
+      const plan = await motionV2Plan(temp, registry, contracts, adoption);
+      expect(plan.problems.join("\n")).toContain("source-bound executor before v2 adoption");
+    }
+    await put(temp, file, `${source}\n// before:animate-spin and transition-duration are not executable.\n`);
+    expect(
+      (await motionV2Plan(temp, registry, contracts, await checkMotionPartAdoption(temp, registry, contracts)))
+        .problems,
+    ).toEqual([]);
+  });
   it("resolves real shipped text, number and viewport adapters without promoting their markers", async () => {
     const contracts = new Map();
     for (const id of ["animated-text", "animated-number", "reveal"]) {
@@ -104,10 +135,10 @@ describe("selected-part static adoption subgate (not full v2 acceptance)", () =>
     await put(temp, "docs/motion/components/fixture.md", contractSource.replace("fixture#Fixture", "fixture#Plain"));
     const checked = await checkMotionTargets(temp, installedRegistry);
     expect(checked.problems.join("\n")).toContain("not adopted by actual fixture#Plain");
-    expect(checked.problems.join("\n")).toContain("legacy evidence cannot certify v2");
+    expect(checked.problems.join("\n")).toContain("fixture.paint.colour: no source-bound action plan");
   });
 
-  it("keeps real caller-registered RevealGroup composition pending joint scope/host evidence", async () => {
+  it("resolves a real scope/target source edge while retaining runtime registration obligations", async () => {
     const contracts = new Map();
     for (const id of ["reveal", "reveal-group"])
       contracts.set(
@@ -121,11 +152,14 @@ describe("selected-part static adoption subgate (not full v2 acceptance)", () =>
         ),
       );
     const result = await checkMotionPartAdoption(root, original, contracts);
-    expect(result.problems).toContain(
-      "reveal-group: adoption: reveal-group.target.enter: composed action requires joint scope/host registration evidence (pending)",
-    );
-    expect(result.problems.every((problem) => problem.startsWith("reveal-group:"))).toBe(true);
-    expect(result.bindings.some((binding) => binding.item === "reveal-group")).toBe(false);
+    expect(result.problems).toEqual([]);
+    expect(result.bindings.find((binding) => binding.item === "reveal-group")).toMatchObject({
+      owner: "reveal-group",
+      hostOwner: "reveal",
+      scopeAnchor: "reveal-group#RevealGroup",
+      anchor: "reveal#Reveal",
+      relationship: "composed",
+    });
     expect(result.bindings.some((binding) => binding.item === "reveal")).toBe(true);
   });
 
@@ -183,7 +217,7 @@ describe("selected-part static adoption subgate (not full v2 acceptance)", () =>
     expect(parse(hidden).referenceProblems).toEqual([]);
     expect(
       (await checkMotionPartAdoption(temp, registry, new Map([["fixture", parse(hidden)]]))).problems.join("\n"),
-    ).toContain("composed action requires joint scope/host registration evidence (pending)");
+    ).toContain("composed action requires a real scope provider and registered target path");
     item.meta.motion.push({ recipe: "data.transition", form: "continuous" });
     item.meta.motionCoverage.effects["data.transition/continuous"] = [
       { relationship: "default", owner: "fixture", reason },

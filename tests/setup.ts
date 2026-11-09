@@ -72,6 +72,8 @@ window.scrollTo = vi.fn();
 // Observers retain real Motion behavior; clear only test-owned observations.
 import { beforeEach } from "vitest";
 import {
+  controllerPropertyWrites,
+  controllerWrites,
   controlSamples,
   cssPolicySamples,
   imperativeControls,
@@ -79,7 +81,11 @@ import {
   motionSamples,
   mountedComponents,
   mountedExports,
+  nativeEffects,
+  parameterCalls,
   presentationSamples,
+  scalarControllerWrites,
+  scalarValues,
 } from "./motion-observer";
 
 beforeEach(() => {
@@ -89,6 +95,12 @@ beforeEach(() => {
   mountedComponents.clear();
   mountedExports.clear();
   presentationSamples.clear();
+  parameterCalls.length = 0;
+  controllerWrites.clear();
+  scalarControllerWrites.clear();
+  controllerPropertyWrites.clear();
+  scalarValues.clear();
+  nativeEffects.clear();
   imperativeSamples.length = 0;
   imperativeControls.length = 0;
 });

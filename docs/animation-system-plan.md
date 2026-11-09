@@ -212,8 +212,8 @@ baseline cannot certify a failed budget. Stage completion is not performance acc
 
 ### Phase 1: Contract-to-tooling alignment
 
-Depends on the target design. Target reference tooling is available; runtime support and per-item
-v2 enforcement remain pending. Shared runtime work follows contract/tooling alignment; closing the
+Depends on the target design. Target reference tooling and conditional per-item enforcement are
+available; complete catalogue adoption remains pending. Shared runtime work follows contract/tooling alignment; closing the
 existing performance task is a final delivery dependency, not a development prerequisite.
 
 - `scripts/motion-targets.mjs` validates current UI/block inventory, actual value-export anchors,
@@ -232,14 +232,16 @@ existing performance task is a final delivery dependency, not a development prer
   forms resolve through installed value-import paths to the nearest integration owner; inherited
   preset/form responsibilities and connected colour property subsets must agree. It rejects
   unsupported target mappings, legacy-only loops and installed owners without action references.
-  Native/composed/N/A boundaries remain unverified obligations. This source subgate does not join
-  executed controllers, actual host regions, properties and modes. Test-only instance/ref provenance
+  Native/composed/N/A boundaries require actual mounted part evidence and semantic review. Test-only instance/ref provenance
   now joins connected colour/loop policies on the same actual host; RevealGroup scope creation and
   Reveal target registration retain their distinct real owners. Registration records remain separate
   from executed-property evidence. The non-published fixtures prove successful reporter transport
-  and reject unrelated export/host/property/mode and dead/skipped calls. Complete target-action and
-  six-capability boundary matching, remaining controller/property forms, strict owner-local policy
-  and conditional end-to-end v2 enforcement remain pending; this layer cannot open the marker.
+  and reject unrelated export/host/property/mode and dead/skipped calls. The conditional v2 gate now
+  joins source-bound target actions with actual controller/host lifetimes, exact properties/presets
+  and owner-local three-mode execution. Successful records are bound to the current test/launch;
+  hand-filled or replayed metadata cannot certify an action. Unsupported forms and unbound native,
+  pseudo-element or nested CSS writers fail closed. This gate does not replace semantic applicability,
+  independent browser behavior or performance acceptance, and does not migrate catalogue items.
   Audit exact host/region coverage as well as export existence: title/count/checkbox/sub-trigger text,
   separator/arrow/backdrop paint, native editor foreground and inherited accessories cannot disappear
   behind a broad root anchor. A composition either uses its dependency's preset/form unchanged or
@@ -286,9 +288,10 @@ existing performance task is a final delivery dependency, not a development prer
   interpolation. This shared support does not migrate their complete component contracts,
   annotation/content capabilities or the remaining popup/geometry work.
 - Target reference metadata explicitly records `migration: "legacy"`; absent/unknown state fails.
-  Registry checking and the runtime reporter reject `v2` until strict enforcement support exists.
-  Legacy items still prove their documented baseline. Next, enable shared target assertion support,
-  then migrate individual items with stricter helper/observer evidence, source and public docs together.
+  Registry checking and the mandatory reporter conditionally accept `v2` only with source-bound
+  actions and executed strict evidence; unsupported or incomplete mappings reject. Legacy items
+  still prove their documented baseline. Migrate individual items only with complete six-capability
+  review, stricter helper/observer and actual browser evidence, source and public docs together.
   Remove transitional exceptions only with those changes; a marker cannot promote legacy evidence.
 - Keep legacy runtime differences explicit while a component remains unmigrated. Do not update
   generated metadata or public claims to describe pending behaviour.

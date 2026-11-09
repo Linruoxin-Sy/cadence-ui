@@ -10,6 +10,7 @@ import { pathToFileURL } from "node:url";
 import { chromium } from "@playwright/test";
 import ts from "typescript";
 import { installationCss } from "../../scripts/installation.mjs";
+import { componentExecutionPlugin } from "../component-execution-plugin.mjs";
 
 assert(process.env.SHARED_PRIMITIVES_OUTPUT, "Use a fresh evidence directory");
 const out = path.resolve(process.env.SHARED_PRIMITIVES_OUTPUT);
@@ -23,6 +24,7 @@ const expectedReact = JSON.parse(
 ).version;
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const report = { inputs: {}, installations: {}, matrix: [], failures: [], errors: [] };
+report.instrumented = process.env.SHARED_PRIMITIVES_OBSERVER === "1";
 report.reactDependencyRoot = reactRoot ?? "workspace dependency graph";
 const styles = new Map();
 const union = path.join(out, "union/components/cadence");
@@ -132,6 +134,21 @@ const sourceRoot = path.resolve("registry/cadence");
 const plugin = {
   name: "installed-only-no-workspace-fallback",
   setup(builder) {
+    if (report.instrumented) {
+      const observer = componentExecutionPlugin();
+      builder.onResolve({ filter: /^(vitest|node:crypto|.*motion-observer)$/ }, () => ({
+        path: path.resolve("tests/fixtures/motion-v2/browser-observations.mjs"),
+      }));
+      builder.onLoad({ filter: /[\\/]components[\\/]cadence[\\/].*\.[jt]sx?$/ }, async (args) => {
+        const source = await readFile(args.path, "utf8");
+        const transformed = observer.transform(source, args.path);
+        return {
+          contents: transformed?.code ?? source,
+          loader: args.path.endsWith("x") ? "tsx" : "ts",
+          resolveDir: path.dirname(args.path),
+        };
+      });
+    }
     if (reactRoot)
       builder.onResolve({ filter: /^(react|react-dom)(\/.*)?$/ }, (args) => ({
         path: require.resolve(args.path, { paths: [reactRoot] }),
@@ -167,12 +184,27 @@ const compile = async (options) => {
 const fixture = "tests/runtime/shared-primitives.jsx";
 report.inputs[fixture] = hash(await readFile(fixture));
 report.inputs["tests/runtime/shared-primitives.mjs"] = hash(await readFile(new URL(import.meta.url)));
+if (report.instrumented)
+  for (const file of ["tests/component-execution-plugin.mjs", require.resolve("typescript")])
+    report.inputs[file] = hash(await readFile(file));
 const ssr = await compile({
   entryPoints: ["tests/runtime/shared-primitives-ssr.jsx"],
   platform: "node",
   format: "cjs",
   packages: reactRoot ? undefined : "external",
-  plugins: [plugin],
+  plugins: [
+    report.instrumented
+      ? {
+          ...plugin,
+          setup(builder) {
+            const was = report.instrumented;
+            report.instrumented = false;
+            plugin.setup(builder);
+            report.instrumented = was;
+          },
+        }
+      : plugin,
+  ],
 });
 await writeFile(path.join(out, "ssr.cjs"), ssr.outputFiles[0].contents);
 const render = require(path.join(out, "ssr.cjs")).render;

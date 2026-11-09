@@ -1,0 +1,12 @@
+import { useStateColor } from "../lib/css-motion";
+import { useCadenceMotion } from "../lib/provider";
+
+export function Fixture({ changed = false }: { changed?: boolean }) {
+  const cm = useCadenceMotion();
+  const paint = useStateColor(undefined, cm, ["background-color", "color"], { readability: "verified" });
+  return <span {...paint} data-slot="fixture" data-motion={cm.mode} style={{...paint.style, color: changed ? "#222" : "#111", backgroundColor: changed ? "#eee" : "#fff"}}>State</span>;
+}
+
+export function Unrelated() {
+  return <span data-slot="fixture">State</span>;
+}
