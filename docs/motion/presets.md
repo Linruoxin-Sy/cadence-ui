@@ -545,6 +545,15 @@ rules, not additional presets, duration values or runtime availability claims.
 
 ### 5.2 Shared work limits
 
+**Migration phase policy — ADR-023:** numerical workload values here and in component contracts
+are current implementation/advisory references, not fixed effect permissions. Implement intended
+effects first. Later effect tasks may adjust shared settings/presets and relevant tests with finite-work
+reasoning and behavior/visual evidence, without budget-only builds or device performance proof.
+This decision alone changes no runtime constant. Retain bounded work, latest-target coalescing,
+cancellation, native safety, exact semantic output and no infinite queues. After full-library functional
+migration, assess performance and justify v2 budgets separately; old numbers are not immutable final
+standards. This policy overrides conflicting historical numerical restrictions below.
+
 References to a "list budget", "visible-list budget" or "overload" in component prose mean the
 applicable limits below, not an additional unspecified item count or update-rate threshold. The
 50-visual bound applies to added collection presence/layout work, not to the number of semantic rows
@@ -560,15 +569,16 @@ timers or a rule that every interrupted tween is overload. Reassess a later inde
 normally, without replaying suppressed changes.
 
 All bindings inherit [the system budgets](../animation-system.md#7-performance-budgets-and-implementation-rules):
-existing per-item source ceilings, consumer/runtime/page limits, real-device frame rate and CLS.
+historical per-item source ceilings, consumer/runtime/page limits, real-device frame rate and CLS
+as advisory references during migration.
 The 20-element concurrency limit is for stagger scenarios, and the 400 ms limit is total stagger,
 not the maximum duration of every animation. Components may set stricter visible-work bounds. On
 overflow, reduce the moving set or show the latest final state; never delay semantic data or grow a
 backlog to fit an animation budget.
 
 The following are target shared renderer work limits, not proof of measured performance. They belong
-in the same future shared source and may be tightened per component; relaxing them requires review
-and measurement. A budget fallback never truncates content or delays its accessible value.
+in the same future shared source and may be adjusted for intended effects under the phase policy above.
+Finite-work reasoning and behavior/visual evidence remain required; performance measurement is deferred. A budget fallback never truncates content or delays its accessible value.
 
 | Target limit              | Bound                                                                                                                                                                         | Overflow behavior                                                                                                                              |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |

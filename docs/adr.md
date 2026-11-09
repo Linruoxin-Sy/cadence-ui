@@ -4,6 +4,9 @@ These are the current decisions and their enduring rationale, not a delivery log
 stable. A future reversal adds a new decision with an explicit supersession; implementation outcomes
 and open work belong in the plan and test suite, not appended experiment histories.
 
+ADR-023 is current authority for Motion v2 budget sequencing. Earlier ADR text remains historical;
+conflicting numerical budget/performance-stage requirements no longer gate migration.
+
 ## ADR-001 · Distribute registry-first
 
 Accepted. Consumers own copied MIT source. Distribute registry items and embedded docs; do not publish a runtime UI package or add runtime licensing.
@@ -209,3 +212,43 @@ source, metadata, public documentation and tests must agree on implemented capab
 delivery cannot pass with any failed or unmeasured requirement. ADR-009 and ADR-016 retain their
 framework and product-adoption constraints; this decision authorizes no framework replacement,
 budget relaxation, dependency exemption or publication of planned capabilities.
+
+## ADR-023 · Effects-first migration, performance governance afterwards
+
+Accepted by explicit user instruction: “放宽限制，先把效果做出来，新的动画系统完全迁移后再考虑这件事，把这个写进约定”.
+
+Prioritize complete intended new animation effects, shared functionality and every component's
+functional migration. During migration, tier source ceilings, component 8 KB, Motion 48 KB, page
+120 KB, FPS/CLS and other numerical performance budgets are advisory records. They cannot block a
+component, shared phase or overall functional migration completion, reduce required effects or
+require premature optimization. Retain old values, source-bound failures and missing measurements
+truthfully; advisory/deferred does not mean passed or performance-accepted.
+
+Numerical workload limits, including concurrency, text/digit/sample counts, stagger and drawing
+areas, are adjustable settings rather than fixed effect permissions. Effect tasks may revise shared
+source/presets and relevant tests with finite-work reasoning and behavior/visual evidence. Preserve
+bounded work, no infinite backlog, latest-target convergence and cancellation. This decision changes
+no runtime constants by itself and removes no invalid-input/native-safety fallback.
+
+After full-library functional migration, separately assess performance, justify suitable v2 budgets,
+optimize and accept performance. Old limits do not automatically return as immutable final standards.
+Functional migration completion and performance governance completion are separate statuses. Retain
+existing records; migration no longer requires a budget-only build, complete-page cost matrix or
+real-device performance acceptance per change. Use behavioral/browser/visual checks appropriate to
+the task; this policy task launches no new full-library cost/performance audit.
+
+API/native interaction/accessibility, full/reduced/none, cancellation/interruption, one property
+owner, genuine source/action evidence, declaration = implementation = documentation, compatibility
+and correctness checks remain mandatory. Actual functional evidence still gates v2 markers; this
+policy promotes no unfinished component or overall v2 claim. F02 native behavior issues remain open.
+S02/F03 retain IDs and historical evidence as post-functional-migration performance governance,
+not component/shared/functional completion prerequisites.
+
+Supersedes ADR-022's continuous optimization, mandatory stage measurements, source/CLS hard gates
+and final unchanged-budget coupling. Partially supersedes numerical budget/performance acceptance
+requirements in ADR-013, ADR-016, ADR-018, ADR-019, ADR-020 and ADR-021 and corresponding active design,
+preset, component-contract, contributor and queue wording. Those decisions' API, architecture/framework
+adoption, provenance, native behavior, bounded engineering and correctness requirements remain.
+Historical measurement protocols remain available whenever explicitly run. A future explicit
+performance decision establishes redesigned budgets and enforcement; migration completion cannot
+silently restore old thresholds or certify prior exceedances.

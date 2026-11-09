@@ -84,9 +84,9 @@ does not provide a digit-wheel primitive or prove any component's rolling implem
 
 Tier is no longer permission to animate. During the schema transition, retain existing `meta.tier`
 and matching frontmatter because current checks, source budgets and templates depend on them.
-Retain each item's current source budget; raising its tier to accommodate a larger implementation is
-not a valid migration. Introduce an independent budget representation only with equivalent limits
-and updated checks. The existing `meta.budget` exceptions keep their written reasons.
+Retain tier and historical budget values/reasons for traceability; do not relabel tiers to hide costs.
+Under ADR-023 these comparisons are advisory and do not constrain functional migration. Reassess
+the budget representation and appropriate limits in post-migration performance governance.
 
 Keep the declaration small: recipe names and implementation forms, existing origin/dependency
 metadata, and any justified additive fields. Put part-level causes, property ownership, mode outcomes
@@ -113,17 +113,17 @@ not evidence of a component's complete target adoption or of the remaining share
 
 ## 3. Shared implementation work
 
-| Workstream           | Deliverable                                                                                                                               | Acceptance evidence                                                                                                                           |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tokens and recipes   | One authored token source; CSS and Motion adapters; `state.color` and `text.change` definitions; updated `number.roll` execution contract | Recipe catalogue, CSS token exports, guide tables and resolver tests agree; no component-local motion literals                                |
-| Presets and bindings | Implement the reviewed purpose/compact/panel presets and each component's part bindings without a full-catalogue runtime map              | Parameter references resolve to the shared source; CSS/JS effective clocks agree; overrides cannot bypass modes, clamping or budgets          |
-| Semantic changes     | Explicit content/state revision and stable identity handling                                                                              | Re-renders and passive resizes do not restart effects; rapid updates follow the latest committed state                                        |
-| Geometry             | Shared measurement and retargeting helpers with one writer per axis                                                                       | Observe natural content and size a separate host; clamp valid geometry; avoid feedback loops; preserve text scale and baseline                |
-| Presence             | Entry/exit ownership integrated with Base UI and ordinary React content                                                                   | Closing can reverse; obsolete completion cannot remove reopened content; focus/portal/scroll ownership cleans up correctly                    |
-| Text                 | Grapheme-aware stable diff with bounded work and shaping fallback                                                                         | Unchanged content stays mounted; insert/delete/replace and repeated characters behave correctly; only the intended accessible text is exposed |
-| Numbers              | Locale-aware value decomposition and stable digit-place identity                                                                          | Correct direction, carry, sign, separators, precision and digit-count changes; retarget without replaying intermediate update queues          |
-| Modes and clocks     | Shared CSS/Motion/engine cancellation paths                                                                                               | Running full-to-reduced/none changes settle before paint; zero clock is immediate; nested scopes respect system preference                    |
-| Existing engines     | Adapters for actual installed writers such as Embla and Recharts                                                                          | No second transform/data-geometry writer; actual engine motion obeys the effective mode and lifecycle                                         |
+| Workstream           | Deliverable                                                                                                                               | Acceptance evidence                                                                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tokens and recipes   | One authored token source; CSS and Motion adapters; `state.color` and `text.change` definitions; updated `number.roll` execution contract | Recipe catalogue, CSS token exports, guide tables and resolver tests agree; no component-local motion literals                                       |
+| Presets and bindings | Implement the reviewed purpose/compact/panel presets and each component's part bindings without a full-catalogue runtime map              | Parameter references resolve to the shared source; CSS/JS effective clocks agree; overrides cannot bypass modes, clamping or finite-work protections |
+| Semantic changes     | Explicit content/state revision and stable identity handling                                                                              | Re-renders and passive resizes do not restart effects; rapid updates follow the latest committed state                                               |
+| Geometry             | Shared measurement and retargeting helpers with one writer per axis                                                                       | Observe natural content and size a separate host; clamp valid geometry; avoid feedback loops; preserve text scale and baseline                       |
+| Presence             | Entry/exit ownership integrated with Base UI and ordinary React content                                                                   | Closing can reverse; obsolete completion cannot remove reopened content; focus/portal/scroll ownership cleans up correctly                           |
+| Text                 | Grapheme-aware stable diff with bounded work and shaping fallback                                                                         | Unchanged content stays mounted; insert/delete/replace and repeated characters behave correctly; only the intended accessible text is exposed        |
+| Numbers              | Locale-aware value decomposition and stable digit-place identity                                                                          | Correct direction, carry, sign, separators, precision and digit-count changes; retarget without replaying intermediate update queues                 |
+| Modes and clocks     | Shared CSS/Motion/engine cancellation paths                                                                                               | Running full-to-reduced/none changes settle before paint; zero clock is immediate; nested scopes respect system preference                           |
+| Existing engines     | Adapters for actual installed writers such as Embla and Recharts                                                                          | No second transform/data-geometry writer; actual engine motion obeys the effective mode and lifecycle                                                |
 
 A CSS sampled spring curve can express a fixed transition but does not replace a physics controller
 that must inherit velocity from an interrupted gesture. CSS intrinsic-size interpolation also does
@@ -190,31 +190,30 @@ mode table, interruption rules, bindings or geometry/performance constraints of 
 
 The five pilots are `button`, `badge`, `card`, `tabs` and `select`. They span an interactive control,
 inline content, a nested surface, a shared selection/panel and cross-tree geometry/handoff. A pilot
-passing does not certify another family or enlarge its source budget.
+passing does not certify another family; historical source comparisons remain advisory.
 
 ## 5. Dependency-ordered phases
 
-Under [ADR-022](adr.md#adr-022--continuous-performance-work-with-final-hard-gates), the existing
-performance task in [parity-plan §8](parity-plan.md#8-next-work) stays pending while shared capabilities
-and component migration follow their technical dependencies. It must close before final performance
-acceptance and the final audit. Performance work continues during these phases, with source budgets,
-mandatory checks and affected real browser/engine and performance measurements retained.
+Under [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards),
+Phases 1–4 prioritize intended effects, shared capabilities, pilots and full-library functional
+migration. Numerical source/consumer/runtime/page, FPS/CLS and workload budgets are advisory;
+exceedances and missing performance measurements do not block functional gates. Do not reduce
+required effects, require repeated budget-only builds/cost matrices/device acceptance, or optimize
+prematurely. Preserve historical failures and source-bound measurements without relabelling passes.
+Finite work, no infinite queues, semantic convergence, genuine behavior/action evidence, API/native
+accessibility, compatibility, three modes, cancellation and single-property ownership remain required.
 
-Phases 1–4 accept their own behavior, compatibility, source-budget and regression evidence. Required
-measurements must be collected and their actual failures retained; an existing global JS-budget
-failure or missing real-device proof remains unresolved in the performance task and Phase 5. This
-distinction does not permit missing stage measurements, failed stage checks or weakened assertions.
-Compare affected costs with recorded baselines. Before propagating a pattern, fix behavior,
-compatibility, source-budget or layout-stability regressions and unexplained or unbounded cost growth.
-Quantified costs of authorized capabilities require a named remediation owner/task and plan in the
-unresolved performance task and Phase 5; zero byte growth per build is not required. Replacing a
-baseline cannot certify a failed budget. Stage completion is not performance acceptance or delivery.
+After all functional migration and distribution checks, separately assess performance, justify v2
+budgets, optimize and accept performance governance. S02/F03 retain IDs and historical evidence as
+post-migration work, not functional completion prerequisites. Old limits are redesign inputs, not
+automatically restored final standards. Stage completion does not certify performance or enable an
+unproven v2 marker.
 
 ### Phase 1: Contract-to-tooling alignment
 
 Depends on the target design. Target reference tooling and conditional per-item enforcement are
 available; complete catalogue adoption remains pending. Shared runtime work follows contract/tooling alignment; closing the
-existing performance task is a final delivery dependency, not a development prerequisite.
+existing performance task is post-migration governance, not a functional completion prerequisite.
 
 - `scripts/motion-targets.mjs` validates current UI/block inventory, actual value-export anchors,
   six capability references and exact target preset/recipe forms. `new-item` creates a deliberately
@@ -259,7 +258,7 @@ existing performance task is a final delivery dependency, not a development prer
   executed controller evidence and browser acceptance. Installed coverage lists every reached
   integration owner per exact form; the six-capability target keeps its separate applicability and
   part graph. Authored profiles/intensity use actual extent, travel and coordination. Tier remains
-  a compatibility/source-budget label, never an animation prerequisite; existing ceilings and
+  a compatibility/source-budget label, never an animation prerequisite; historical advisory ceilings and
   written exceptions remain unchanged. Complete shared-stage and per-item migration gates remain pending.
 - Shared colour/loop policy has executed-hook observer/helper/reporter support, including rejected
   disconnected refs, missing capability evidence and legacy loop drift. Finite shared owners cancel
@@ -297,7 +296,7 @@ existing performance task is a final delivery dependency, not a development prer
   generated metadata or public claims to describe pending behaviour.
 
 Gate: targeted resolver/parser/helper tests prove both valid integrations and rejected drift; existing
-parity and source budget rules still work. No check is removed merely because migration exposes a
+parity and advisory source comparisons still work. Correctness checks are not removed because migration exposes a
 failure. Measure real shared runtime/consumer reachability and complete pilot-route costs against
 unchanged limits before pilots begin; global performance failures remain open under the section 5
 acceptance distinction. The design and installed behaviour remain distinguishable.
@@ -502,11 +501,10 @@ MDX frontmatter/Motion contract, preview and component/browser fixtures in the s
 
 Gate: unchanged upstream usage works; all applicable baseline capabilities are visible in meaningful
 examples; unchanged text retains identity; no doubled geometry, stretched text, lost focus or stale
-exit callback occurs. Check all modes and both themes, and measure real consumer/page costs before
-using pilots as the pattern for catalogue rollout. Missing measurements or failed behavioral,
-compatibility, source-budget or layout-stability checks block this gate. Apply the section 5 cost
-policy to measured growth; unresolved global JS-budget and real-device requirements remain explicit
-in the performance task and Phase 5, not a pilot pass claim.
+exit callback occurs. Check all modes and both themes with actual browser/engine evidence appropriate
+to the changed paths before propagating patterns. Failed behavior, compatibility, native layout
+correctness or accessibility blocks this gate. Numeric cost/CLS/FPS comparisons and missing performance
+measurements are advisory/deferred; a pilot pass makes no performance acceptance claim.
 
 ### Phase 4: Catalogue rollout by ownership family
 
@@ -526,19 +524,20 @@ must agree. Exercise close/reopen, live modes, unchanged targets, input takeover
 writes as applicable. Preserve CodeBlock retained-text identity, Bubble's bounded streaming policy,
 immediate DataTable filter semantics and the caller's Tabs mount policy.
 
-### Phase 5: Distribution, full-route and performance acceptance
+### Phase 5: Functional distribution completion, then performance governance
 
 Depends on the changed components and their dependencies passing their gates. Rebuild registry
 payloads, guides and generated AI text from actual implementation. Verify copied consumer installs,
 dedicated dependencies, routes and source provenance; retain immutable snapshots unchanged.
-Final performance acceptance and the final audit also explicitly depend on closing the existing
-performance task; accepted development gates cannot substitute for that closure.
+Functional gate: required correctness commands and relevant real browser/engine, distribution and
+full-route behavior checks pass, with all capabilities demonstrated. Functional migration completion
+is distinct from performance governance, which remains pending.
 
-Gate: required commands and relevant real browser/engine paths pass; complete-route measurements
-meet the unchanged budgets below. Full catalogue adoption remains incomplete if a requirement is
-unmeasured or fails, even if unit tests and registry builds pass.
+Then S02/F03 assess the migrated system, justify suitable v2 budgets, optimize and accept performance.
+A later explicit budget decision establishes hard gates; old numbers do not automatically return as
+final standards. Report functional and performance status separately.
 
-## 6. Acceptance and unchanged budgets
+## 6. Functional acceptance and deferred performance governance
 
 The acceptance matrix includes full/reduced/none against both system preferences, live mode/clock
 changes, nested providers, content changes during exit, rapid reversal, pointer/keyboard paths,
@@ -547,19 +546,18 @@ properties and retained identity; a `data-motion` attribute alone is insufficien
 checks cover readable names, duplicate outgoing text, selection/copy, native editing, focus and
 errors. Test light and dark themes and realistic narrow/wide layouts.
 
-Keep the current source gzip ceiling of each item during migration. The separate production budgets
-remain initial Motion at most 48000 bytes gzip, component addition at most 8000 bytes gzip excluding
-the declared shared runtime, complete-page initial JS at most 120000 bytes gzip, CLS below 0.02,
-and at least 55 presented fps on a real midrange mobile device. Preserve the animation system's
-concurrency/stagger limits and measurement protocol. Neither colour transitions nor CSS execution
-make paint/layout work free.
+Historical references are per-item tier source gzip, initial Motion 48000 bytes, component addition
+8000 bytes excluding declared shared runtime, full-page initial JS 120000 bytes, CLS <0.02,
+real-midrange presented frame rate ≥55 fps, and recorded concurrency/stagger/renderer limits.
+They remain traceable advisory comparisons, never fixed effect permissions. Shared workload settings
+may change with finite-work reasoning and behavior/visual evidence; no blind constant increase is
+authorized. Invalid/unsupported-input and native-safety fallbacks, coalescing and cancellation remain.
 
-Performance remains unresolved as described in [parity-plan.md](parity-plan.md#8-next-work). Measure
-consumer dependencies and complete routes, including automatically requested scripts; separate cold
-layout and interaction windows. Historical measurements do not certify new shared helpers or new
-component code. Continue scoped remediation and affected remeasurement during development; all
-required performance evidence must pass at final delivery. No framework change, relaxed budget or
-dependency exemption is part of this plan.
+Performance is unresolved in [parity-plan.md](parity-plan.md#8-next-work). Existing failures and
+measurement protocols remain retained; old measurements cannot certify changed source. No repeated
+budget-specific builds, complete cost matrices or device performance audits are required per migration
+change. After full-library functional migration, assess costs, redesign/justify v2 budgets, optimize
+and perform separate performance acceptance. Framework/product-adoption restrictions remain intact.
 
 Cross-component geometry acceptance also checks the frame after temporary constraints are released:
 natural auto/percentage/flex/grid/ratio/field-sizing remains responsive, valid empty geometry is not
@@ -582,7 +580,8 @@ Toast's configurable visible limit must not bypass the shared active-collection 
 pending browser acceptance cases; structural Markdown validation does not prove them.
 
 For implementation changes, run `pnpm registry:build` before `pnpm check` when shipped source,
-metadata or content changes, then the affected browser/runtime and performance checks. Documentation
+metadata or content changes, then the affected behavioral browser/runtime checks. Performance-only
+remeasurement is deferred under ADR-023. Documentation
 design work alone does not regenerate payloads or claim runtime conformance. Keep regression inputs
 in `tests/fixtures/`, audit output in `.cache/`, and delivered provenance in Git and retained registry
 snapshots.

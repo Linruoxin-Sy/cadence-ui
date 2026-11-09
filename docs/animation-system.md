@@ -3,7 +3,7 @@
 Cadence Motion v2 gives every component the motion capabilities appropriate to its content and
 interactions. Components report changes; shared policy coordinates them; recipes and tokens define
 their presentation; CSS, Motion and existing engine adapters execute it. T0–T5 no longer grant or
-deny animation capabilities. Source budgets remain unchanged during migration.
+deny animation capabilities. Numerical budgets are advisory during migration under ADR-023 (§7).
 
 This is the accepted target design, replacing the tier-gated animation design. It is not a claim that
 v2 has shipped. The [implementation plan](animation-system-plan.md) owns rollout dependencies and
@@ -107,7 +107,8 @@ The shared documents do not replace that individual design with a family-level a
 Global visual guidance covers causality, rhythm, restraint, readability and spatial coherence.
 Components choose their own meaningful actions and may select different reviewed presets. Global
 requirements cover semantics and upstream compatibility, mode ceilings, SSR visibility, unchanged
-text identity, one property writer, cancellation and performance. A component cannot make those
+text identity, one property writer, cancellation and finite-work protections. Numerical performance
+requirements follow the advisory migration policy in §7. A component cannot make the correctness
 requirements optional in the name of visual customisation. Six applicable baseline capabilities
 remain default integration after migration, not six opt-in switches for every consumer.
 
@@ -1723,6 +1724,32 @@ idempotent cleanup and property-scoped cancellation follow the
 
 ## 7. Performance budgets and implementation rules
 
+### Current phase: effects first, performance governance afterwards
+
+[ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards) supersedes
+conflicting budget/performance-stage wording throughout these contracts, including numerical
+bounds in component files and presets. Complete intended v2 effects and full-library functional
+migration before separate performance assessment, budget redesign, optimization and acceptance.
+Tier source sizes, component/runtime/page costs, FPS/CLS and workload numbers below are historical
+advisory references, not functional migration gates or immutable final v2 standards. Do not reduce
+required effects or optimize prematurely to meet those numbers.
+
+Concurrency, text/digit/sample counts, stagger, drawing areas and similar workload settings may be
+revised for intended effects in shared source/presets and relevant tests, with finite-work reasoning
+and behavioral/visual evidence. Existing runtime caps retain current behavior until explicitly
+changed; this decision does not blindly increase constants. Preserve bounded work, latest targets,
+cancellation, safe input/geometry/provenance fallbacks, native editing and semantic convergence.
+
+Retain historical measured values, exceeded comparisons and missing evidence as unresolved inputs.
+No migration stage requires repeated budget-only builds, full-page cost matrices or real-device
+performance acceptance. When a collector is explicitly run, retain its protocol, raw results and
+source binding; label budget comparisons advisory/deferred, never turn an exceedance into a pass.
+Functional migration completion and performance governance completion are distinct. Genuine source,
+action, three-mode, native/API/accessibility, ownership, interruption, compatibility and correctness
+proof still gates functional claims; this decision does not enable an unproven v2 marker.
+
+### Historical numerical references (advisory during migration)
+
 | Metric                            | Budget                                             | How it is checked                                           |
 | --------------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
 | Motion runtime (initial)          | ≤ 48 KB gzip (measure the actual required runtime) | Build analysis                                              |
@@ -1733,12 +1760,12 @@ idempotent cleanup and property-scoped cancellation follow the
 | Simultaneously animating elements | ≤ 20 (stagger scenarios)                           | Code review                                                 |
 | Total stagger duration            | ≤ 400 ms                                           | Code review                                                 |
 
-Implementation rules:
+Implementation rules (engineering protections remain mandatory; numerical tuning follows the phase policy above):
 
 1. **Budget properties explicitly.** Spatial presentation uses transform/opacity; optional filter blur is limited to reviewed small text areas at ≤4 px and is off by default. Colour/border/fill/stroke and declared shadow feedback use state.color. Measured width/height uses geometry.resize, clamped and immediate under reduced/none at any legacy tier. Chart SVG geometry (§3.1.2) and explicit native scroll offsets (§3.1.5) retain their documented exceptions. No generic padding/font-size/radius/path animation is implied by a recipe name.
 2. **No layout-read loops**: read `getBoundingClientRect`/`offsetWidth` only in a committed client layout phase, an event measurement transaction or a `ResizeObserver` callback. Batch reads before writes; never read during render, in an abandoned render, or once per animation frame/glyph. A shared layout scheduler may batch a known transaction but must not turn it into polling.
 3. **`will-change` is removed once done**: add it only while animating, remove it afterwards (or let Motion manage it).
-4. **Bound automatic collection work before measurement**: use the participant limit and counting rules in [presets §5.2](motion/presets.md#52-shared-work-limits), including still-active earlier revisions and retained outgoing decoration. Reject an oversized set before per-member layout reads or copy allocation and use immediate native presentation. Manual, paginated or virtualized compositions require their own bounded adapter and performance evidence; changing the execution technique is not an unlimited exemption.
+4. **Bound automatic collection work before measurement**: use the participant limit and counting rules in [presets §5.2](motion/presets.md#52-shared-work-limits), including still-active earlier revisions and retained outgoing decoration. Reject an oversized set before per-member layout reads or copy allocation and use immediate native presentation. Manual, paginated or virtualized compositions require their own bounded adapter and behavioral evidence; changing the execution technique is not an unlimited exemption.
 5. **Reading surfaces do not bounce**: text, numeric readouts and size recipes author bounce zero. Existing press feedback remains separately tokenised. A physics spring inheriting velocity can still cross its target, so geometry clamps the rendered value (rule 9). More expressive gestures require a separately reviewed recipe and do not become everyday defaults.
 6. **Keep optional engines optional**: any future scroll.story/GSAP item must declare and load that dependency explicitly. No GSAP component is currently shipped; basic v2 capabilities do not require it.
 7. **Keep `AnimatePresence` subtrees small**: wrap only the elements that need an exit, never a whole page.
@@ -1906,7 +1933,8 @@ records use a fresh launch signature; public test metadata or an old report is i
 Raw engine props and unbound authored CSS clocks (including nested and pseudo-element variants)
 cannot hide behind native/N/A declarations. Unsupported executors remain rejected, rather than being
 inferred from matching token names. This is a conservative test gate; semantic applicability and the
-browser/installation/performance requirements below remain mandatory before component migration.
+browser/installation correctness requirements below remain mandatory before component migration;
+numerical performance acceptance is deferred under §7 / ADR-023.
 
 ### 9.4 a11y and visual regression
 
@@ -1962,7 +1990,7 @@ measured separately under §7, including complete routes and real-device frame p
 - [ ] Are properties explicitly allowed, including colour and any measured/engine exception? What layout/paint work occurs?
 - [ ] Does it use this document's tokens and recipes? Are there new magic numbers?
 - [ ] Is there a matching Playwright assertion or screenshot?
-- [ ] Does it pass real-device budgets? CPU throttling is diagnostic and does not replace device evidence.
+- [ ] Retain available performance results truthfully; real-device budget acceptance is post-migration governance. CPU throttling remains diagnostic.
 - [ ] Does the duration match the element's place in the hierarchy?
 - [ ] Can it be fully disabled with `data-motion="none"`?
 - [ ] Do live downgrade and same-target clock changes cancel running work, including CSS colour and delayed starts?

@@ -1,5 +1,13 @@
 # Contributing to Cadence
 
+Motion v2 follows [ADR-023](docs/adr.md#adr-023--effects-first-migration-performance-governance-afterwards):
+complete intended effects and full-library functional migration before separate performance assessment,
+budget redesign, optimization and acceptance. Numeric source/runtime/page/FPS/CLS/workload budgets are
+advisory during migration. Retain historical comparisons, bounded work and all behavior, API/native,
+accessibility, mode/cancellation/ownership and source/action proof. No repeated budget-only build,
+page-cost matrix or device performance acceptance is required per migration change.
+
+
 Thanks for helping. Cadence mirrors shadcn's component API and adds a motion contract. Motion has to
 explain cause and effect, every animation needs a reduced-motion branch, and the library never owns
 validation.
@@ -107,7 +115,7 @@ pnpm registry:build && pnpm check
 ```
 
 which runs typecheck, Biome (lint, formatting, and import order), the registry checks (targets, payload
-freshness, docs, export names, tier budgets, P11), and the unit tests. `registry:check` verifies recipe
+freshness, docs, export names, advisory tier budgets, P11), and the unit tests. `registry:check` verifies recipe
 declarations and requires animated test files; the test reporter
 requires three-mode helper adoption. Neither replaces the animation review or browser evidence for
 running cancellation, first paint, nested providers and measured geometry.
@@ -120,7 +128,7 @@ running cancellation, first paint, nested providers and measured geometry.
 - Motion presets from `registry/cadence/lib/motion.ts`. No ad-hoc durations.
 - Animate transform, opacity, or bounded filter; use measured, clamped `geometry.resize` for applicable
   content-driven width/height, instant under reduced/none. Scope colour feedback to explicit properties.
-  Assign one writer per property and preserve native editing, direct manipulation and performance budgets.
+  Assign one writer per property and preserve native editing, direct manipulation and finite-work protections.
 - Use Base UI `render`, `data-slot` on each part, and `cn()` with user classes last.
 - Sentence case in UI copy.
 

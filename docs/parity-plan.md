@@ -81,8 +81,8 @@ selection, gestures and other additional effects follow their own causes and con
 T0–T5 remain legacy schema values during migration because the current registry checks, templates
 and source budget mapping use them. They are not motion levels or recipe allowlists in the target
 design. Do not promote a component to a higher tier to enable text, colour or geometry, and do not
-raise a tier merely to obtain a larger budget. Each item's current source ceiling remains in force
-until an independent equivalent budget representation and its checks are implemented.
+raise a tier merely to obtain a larger budget. Each item's historical source ceiling remains traceable
+but advisory under ADR-023; reassess appropriate v2 budgets after functional migration.
 
 Disclosure height uses the measured, clamped `geometry.resize` recipe (including its documented
 Base UI CSS form); there is no separate `disclosure.height` recipe. `data.transition` is also
@@ -101,15 +101,17 @@ ownership, semantic cause and its mode/performance contract, not a T3 threshold.
 | T5        | 12 KB                                                         |
 | Exception | `meta.budget` with a written reason (sidebar, chart, command) |
 
-This is the current source-budget mapping retained for the schema transition, not an animation
-permission table. It remains separate from compiled component, runtime and complete-page budgets.
+This historical source-budget mapping is advisory during migration under ADR-023, not an animation
+permission table or immutable final v2 standard. It remains separate from compiled component, runtime
+and complete-page budgets.
 
 ### 6.5 Acceptance
 
 Preserve upstream/API/native semantics and the documented recipe contract. Required unit checks,
 applicable actual browser/engine paths, SSR/noJS, keyboard/focus/axe and dual-theme visual review must
 support the change. Source-tier checks do not prove the separate compiled/runtime/page budgets.
-Known failures and unmeasured requirements block overall acceptance.
+Behavioral/correctness failures and missing functional evidence block functional acceptance.
+Numerical performance failures and missing performance measurements remain deferred governance work.
 
 For preview-route or provider-boundary changes, exercise actual client navigation and browser history
 with a pending timer, an active portal and an exercised engine. The bounded regression in
@@ -179,36 +181,32 @@ shared recipes/controllers and checks, the Button/Badge/Card/Tabs/Select pilots,
 rollout, the planned public primitives, and full distribution/performance acceptance. Keep actual
 registry declarations and public documentation truthful until each capability is implemented.
 
-Follow [ADR-022](adr.md#adr-022--continuous-performance-work-with-final-hard-gates): shared work may
-follow contract/tooling alignment while the existing performance task remains pending. Continue
-performance work and affected measurements throughout migration; close that task before final
-performance acceptance and the final audit. Development-stage acceptance covers its own behavior,
-compatibility, source budgets and regressions, with required measurements collected and failures
-reported. It does not turn global performance failures or missing device evidence into a pass.
-Missing stage measurements or failed stage checks still block that stage. Measure real consumer and
-complete-page costs for shared work and all five pilots before propagating their patterns. Compare
-recorded baselines; fix behavior, compatibility, source-budget or layout-stability regressions and
-unexplained or unbounded cost growth. Quantified costs of authorized capabilities need a named
-remediation owner/task and plan in the unresolved performance work, not zero byte growth per build.
-Keep unchanged budget comparisons explicit; replacing a baseline cannot certify a failed budget.
+Follow [ADR-023](adr.md#adr-023--effects-first-migration-performance-governance-afterwards): complete
+intended effects and full-library functional migration first. Numeric source/compiled/runtime/page,
+FPS/CLS and workload budgets are advisory, not shared/pilot/catalogue/functional completion gates.
+Do not trim effects or require repeated budget-only builds, page cost matrices or device performance
+acceptance. Preserve correctness, native/API/accessibility, mode/cancellation/ownership and genuine
+source/action evidence. F02 native behavior defects stay open.
 
-The project is not yet performance-accepted. Historical measurements below are diagnostic baselines
-bound to their measured source; subsequent component/site changes require appropriate remeasurement,
-not relabelling old results as current HEAD. Preserve the animation system's performance budgets.
+S02/F03 follow full functional migration: assess the migrated system, justify suitable v2 budgets,
+optimize and accept performance separately. References below and prior failed/missing results remain
+source-bound inputs, not automatic final standards or passing evidence. Explicitly run collectors
+retain raw values and protocols. Workload settings may change with finite-work and behavior/visual
+evidence; keep no unbounded work/queues and exact semantic convergence.
 
-1. **Complete-page initial JS ≤120000 bytes.** Resolve the remaining full-route cost with specifically
+1. **Historical complete-page initial JS ≤120000 bytes (advisory).** Resolve the remaining full-route cost with specifically
    scoped, measured work before final performance acceptance. This is not a prerequisite for shared
    capability development. The complete Button research baseline at source
    4fe1a51 was 221511 bytes; it does not authorize adopting that runtime or rolling out other routes.
    Keep all site functions, SSR/noJS and required Motion features. Repeat full-route measurement and
    functional/visual/a11y validation before asking for a product migration decision.
-   Keep the permanent `tests/e2e/site-js-budget.spec.ts` gate on complete Button and Data Table routes
+   Keep the permanent `tests/e2e/site-js-budget.spec.ts` collector and advisory comparison on complete Button and Data Table routes
    at desktop and narrow widths. Preserve automatic requests, exact served root hashes, complete
    example counts, cold-layout entries and browser/resource errors when evaluating a candidate.
-2. **Initial Motion ≤48000 bytes.** Establish the actual required production runtime scope, including
+2. **Historical initial Motion ≤48000 bytes (advisory).** Establish the actual required production runtime scope, including
    site-exclusive APIs. A registry-only reference compilation or proportional mixed-chunk estimate
    cannot certify the page metric.
-3. **Compiled component addition ≤8000 bytes, shared runtime excluded.** Revalidate dedicated
+3. **Historical compiled component addition ≤8000 bytes, shared runtime excluded (advisory).** Revalidate dedicated
    dependency and async boundaries with a declared baseline; local-only code passing is insufficient.
    Dedicated dependencies remain counted unless the budget contract is explicitly revised.
    Use the consumer audit's emitted import paths and source composition to locate counted costs.
@@ -216,14 +214,14 @@ not relabelling old results as current HEAD. Preserve the animation system's per
    explains a mixed file's contents and cannot allocate its gzip to individual packages.
    A dependency-level fix must reach consumers through a supported package release. An authoring-only
    `node_modules` patch or compiler override is diagnostic and cannot certify copied registry source.
-4. **CLS <0.02.** Keep cold-load and interaction windows distinct. The complete-route regression in
+4. **Historical CLS <0.02 (advisory).** Keep cold-load and interaction windows distinct. The complete-route regression in
    `tests/e2e/document-interaction-layout.spec.ts` covers Button's composition/source/install/Toc path
    and Data Table filtering, pagination, selection, column visibility and record updates at two widths
    in all three modes. Extend coverage when a changed layout introduces another relevant window;
    retain raw entries and action times, including recent-input shifts. These bounded scenarios do
    not certify other routes, themes, clocks or lifetime behaviour, and historical negatives retain
    their original source binding.
-5. **Real midrange mobile ≥55 fps.** Obtain a debuggable device and environment metadata, collect real
+5. **Historical real midrange mobile ≥55 fps (advisory).** Obtain a debuggable device and environment metadata, collect real
    presented-frame traces through meaningful motion windows and retain reduced/none behaviour.
    Desktop emulation and rAF frequency cannot close this requirement.
 

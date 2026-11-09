@@ -17,6 +17,36 @@ animation allowance. [docs/animation-system.md](docs/animation-system.md) define
 registry metadata, MDX and test helpers remain the compatibility surface until migrated together; this design
 update does not make v2 complete or make planned recipes and public helpers installable.
 
+## Motion v2 migration priority (ADR-023)
+
+Complete the intended new animation effects and full-library functional migration first.
+During migration, tier source ceilings, 8 KB component addition, 48 KB Motion, 120 KB page JS,
+FPS/CLS and other numerical performance budgets are advisory references. They do not block
+component, shared-stage or overall **functional migration completion**. Do not reduce required
+effects or optimize prematurely to meet old limits. Preserve historical values, failed comparisons
+and missing measurements truthfully; advisory/deferred never means performance passed.
+
+Numerical workload limits (concurrency, stagger, text/digit counts, drawing area and similar caps)
+are adjustable settings, not fixed effect permissions. Subsequent effect tasks may revise shared
+source/presets and relevant tests with a finite-work rationale and behavioral/visual evidence;
+budget-specific builds or device performance proof are not prerequisites. This decision changes
+no runtime constant automatically. Keep bounded work, latest-target coalescing, cancellation and
+semantic convergence; no infinite backlog or removal of native-safety/invalid-input fallbacks.
+
+After full-library functional migration, separately assess performance, justify budgets suited to
+v2, optimize and perform performance acceptance. Historical limits are inputs, not immutable final
+standards or automatically restored hard gates. Distinguish functional migration completion from
+performance governance completion. Retain existing records; no repeated budget-only build, full-page
+cost matrix or real-device performance acceptance is required per migration change. Run behavioral,
+browser and visual verification as appropriate to the task.
+
+API/native interaction/accessibility, full/reduced/none, cancellation/interruption, one property
+owner, genuine source/action evidence, declaration = implementation = documentation, compatibility
+and correctness checks remain mandatory. Functional v2 markers still require actual functional
+evidence; this policy grants none. This section overrides conflicting budget/performance-stage
+wording in older contracts, component bounds, queue prompts and ADR-022; see
+[ADR-023](docs/adr.md#adr-023--effects-first-migration-performance-governance-afterwards).
+
 ## Read the design record first
 
 The `docs/` directory contains current concepts, contracts and future work for contributors, not site content. Start at [docs/README.md](docs/README.md). Completed work and handoffs belong in Git history; generated reports go to `.cache/`, and executable regression inputs go to `tests/fixtures/`.
@@ -46,7 +76,7 @@ These follow from the documents above; the documents are authoritative if they d
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
 - **Design each component individually.** Maintain its target contract in `docs/motion/components/<id>.md`: six-capability ownership, actions in all modes, interruption, bindings and geometry/performance bounds. Global style guides visual choices; shared execution rules remain mandatory. Parameter assignments belong in `docs/motion/presets.md` and the future shared runtime source, not duplicated component constants. These target files do not declare shipped capabilities.
 - **Keep explicit mode branches.** Every animated component must keep `useCadenceMotion().reduced` and `data-motion`. The v2 target stops continuous loops, including Spinner, under `reduced`, and disables every transition, delay and loop, including colour, under `none`. These are migration requirements, not claims about the unchanged runtime.
-- **Choose capabilities by applicability and ownership.** Use `transform`, `opacity`, or bounded `filter` for visual motion; measured width/height uses clamped `geometry.resize` wherever the component owns content-driven geometry. Disclosures follow the same rule. State colours use the shared `state.color` executor; component adoption remains explicit. Preserve native editing and direct manipulation, keep one writer per property, and retain the performance budgets. No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
+- **Choose capabilities by applicability and ownership.** Use `transform`, `opacity`, or bounded `filter` for visual motion; measured width/height uses clamped `geometry.resize` wherever the component owns content-driven geometry. Disclosures follow the same rule. State colours use the shared `state.color` executor; component adoption remains explicit. Preserve native editing and direct manipulation, keep one writer per property, and follow the migration priority above. No `transition: all`, no `setTimeout`-driven animation, no reading layout during render.
 - **Do not publish plans as capabilities.** Shared colour/loop support does not migrate a component: its actual implementation, declarations, docs and executed three-mode policy evidence must agree. `text.change`, revised numeric rolling and public motion helpers still require implementation, registry entries where applicable, docs and tests before install instructions or metadata. Keep existing schema fields and recipe declarations until their migration is implemented; the overall v2 marker remains gated.
 - **Audit the animation before calling a component done.** After writing or editing a component, run the [motion conformance check](#motion-conformance-check): the declared recipes, the implementation, and the docs must agree, and all three modes must be proven. `registry:check` validates declarations and structural evidence; it does not prove runtime conformance.
 - **Base UI `render`, not `asChild`.** Use `data-slot` on every part and merge classes with `cn()` (user classes last).
@@ -85,10 +115,10 @@ accurate while implementing the target; a passing legacy check alone does not es
    `useCadenceMotion().reduced`; the reduced path is a JSX/class branch, not a media query alone. Under `none`
    no animated property may keep a non-zero transition in the v2 contract. A live downgrade must cancel
    the existing writer as well as change its next target.
-5. **Properties stay in budget.** Visual motion uses `transform`, `opacity`, bounded `filter`, and measured
+5. **Properties keep explicit ownership.** Visual motion uses `transform`, `opacity`, bounded `filter`, and measured
    width/height through `geometry.resize` (clamped, instant under `reduced`/`none`). Applicable colour,
    border and shadow feedback must use scoped properties and the v2 mode contract when migrated. Capabilities
-   do not remove source/runtime/page budgets or permit two engines to own the same property.
+   do not permit two engines to own the same property. Numerical budgets follow ADR-023 and do not block functional migration.
 6. **Tests prove the modes.** Every animated `tests/components/<id>.test.tsx` must execute the shared
    `expectMotionContract(mode)` after rendering/exercising the actual parts in full, reduced and none.
    The mandatory Vitest reporter counts successful runtime calls, never imports, dead calls or skipped
@@ -114,7 +144,7 @@ pnpm lint             # biome check: lint + formatting + import order
 pnpm lint:fix         # biome check --write
 pnpm format           # biome format --write
 pnpm registry:build   # rebuild public/r from registry.json + content
-pnpm registry:check   # targets, payload freshness, docs coverage, exports, tier budgets, P11
+pnpm registry:check   # targets, payload freshness, docs coverage, exports, advisory tier budgets, P11
 pnpm test             # unit tests
 pnpm check            # typecheck + lint + registry:check + tests
 node scripts/new-item.mjs --name <id> --tier <T0..T5> --title "Title" --description "Sentence."

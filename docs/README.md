@@ -27,6 +27,12 @@ the execution contract remains mandatory. Target part-level designs live central
 `motion/components/<id>.md`, one file per current UI/block id, with common parameter assignments in
 `motion/presets.md`. Public MDX continues to describe delivered behavior, not these pending targets.
 
+ADR-023 supersedes conflicting performance-stage requirements (including ADR-022): intended v2
+effects and full-library functional migration come first; numeric cost/workload budgets are advisory
+and adjustable with bounded work and correctness retained. Separate post-migration performance
+assessment, budget redesign, optimization and acceptance; historical failures remain unresolved.
+See animation-system §7 and its rollout plan before interpreting older budget wording.
+
 Keep rules in their owning document and link to them. Update future work by replacing resolved items,
 not appending completion logs. Add no handoff, evidence or archive directory here. Test inputs belong
 in `tests/fixtures/`; generated audit reports, traces and screenshots belong in ignored `.cache/`.

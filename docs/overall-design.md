@@ -94,9 +94,11 @@ Categories are layout/form/navigation/overlay/feedback/data/ai/utility. Recipe, 
 complexity describe different things; intensity is authored behaviour, not a runtime multiplier.
 
 For the v2 target, tier remains a compatibility field for the current schema, source budget and
-documentation profile; it is not permission to use or deny an animation capability. Keep the existing
-budget limits. Any obsolete tier-to-recipe checks must migrate explicitly with the corresponding
-implementation, rather than be bypassed by relabelling components or weakening budgets.
+documentation profile; it is not permission to use or deny an animation capability. Keep historical
+budget values traceable as advisory comparisons under ADR-023 (animation-system §7). Complete v2
+effects and functional migration before separate performance assessment, budget redesign, optimization
+and acceptance; old values are not immutable final v2 standards. Any obsolete tier-to-recipe checks must migrate explicitly with the corresponding
+implementation, rather than be bypassed by relabelling components.
 
 The target capability matrix records whether each applicable behaviour is provided by default,
 inherited from an owning part, available through documented composition, or not applicable with a
@@ -125,7 +127,7 @@ Global animation style guides causality, rhythm and restraint; individual compon
 their choreography. Their bindings select shared presets, including reviewed component-specific
 timing refinements. [The preset catalogue](motion/presets.md) defines the single authored parameter
 source, CSS/Motion output and override order. A new preset does not bypass modes, geometry clamping,
-native semantics or budgets, and does not introduce a consumer-facing configuration object.
+native semantics or finite-work protections, and does not introduce a consumer-facing configuration object.
 
 ## 8. Component API and ownership
 
@@ -164,7 +166,7 @@ domAnimation replacement for layout/drag users. See the animation system for the
 ## 10. Build and validation
 
 - `pnpm registry:build`: shadcn build using the explicit registry, then docs/meta/sourceSha finalisation.
-- `pnpm registry:check`: targets, imports, metadata, recipes, docs, payload freshness, tier budgets,
+- `pnpm registry:check`: targets, imports, metadata, recipes, docs, payload freshness, advisory tier budgets,
   P11 and snapshot integrity.
 - `pnpm parity:check`: pinned upstream exports/slots/props/defaults and declared deviations.
 - `pnpm check`: typecheck, lint, registry, parity and unit tests in sequence.
@@ -185,8 +187,10 @@ is allowed. No components.json or second components/ui tree belongs here.
 A component requires source, matching metadata/MDX, a registered preview, meaningful API/keyboard/
 accessibility tests and motion conformance where applicable. Verify actual full/reduced/none behaviour,
 same-node cancellation and relevant browser paths, not only helper imports or data attributes.
-Required checks, current payloads, dual-theme visual review and declared performance budgets must
-agree. An unmeasured or failed requirement remains open even when unit tests pass. CONTRIBUTING.md
+Required correctness checks, current payloads and dual-theme visual review must
+agree. Missing or failed functional evidence remains open even when unit tests pass. Numeric
+performance comparisons/missing performance evidence are deferred under ADR-023; functional completion
+does not certify performance governance. CONTRIBUTING.md
 owns the PR checklist; [scope and future work](parity-plan.md) owns remaining tasks.
 
 ## 12. Security and scope

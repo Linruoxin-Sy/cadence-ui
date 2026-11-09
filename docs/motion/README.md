@@ -212,8 +212,9 @@ with `relationship`, `owner` (the registry component id integrating the executor
 `reason`. Distinct parts may reach distinct owners for one recipe (Data Table's Checkbox and menu
 glyphs, for example); all are listed once, with no conflicting/duplicate owner. No per-part matrix is copied.
 Empty effects explicitly means no declared installed recipe; it never means the six targets are
-inapplicable or complete. Existing recipe strings/forms, origin, dependencies, tier and source
-ceilings retain their meanings. Public frontmatter, item payload, catalog and registry index mirror
+inapplicable or complete. Existing recipe strings/forms, origin, dependencies and tier retain their
+compatibility meanings. Source ceilings remain traceable advisory comparisons during migration
+under ADR-023. Public frontmatter, item payload, catalog and registry index mirror
 both coverage and authored profile/intensity; stale published metadata fails registry checking.
 
 `default` identifies the local component adapter, including an adapter calling a shared lib
@@ -291,8 +292,11 @@ These obligations are inherited by every file; local action tables make their co
   Destination-width layout must not introduce extra cropping of a required label, caret or active
   control while the shell is smaller. Use valid existing overflow or settle that axis immediately.
   Explicit disclosure body reveal remains allowed; focus into clipped content forces it visible.
-- **Bounds:** preserve existing item source ceilings, compiled component/runtime/page limits, CLS and
-  real-device frame-rate requirements. Stagger scenarios allow at most 20 concurrent moving elements
+- **Bounds:** [ADR-023](../adr.md#adr-023--effects-first-migration-performance-governance-afterwards)
+  makes numeric source/compiled/runtime/page, CLS/FPS and workload limits advisory during migration.
+  Implement intended effects first, then assess and redesign budgets after full functional migration.
+  The following numbers are adjustable tuning references, not fixed effect permissions. Preserve
+  finite work, latest targets, cancellation, native safety and semantic convergence. Historical stagger tuning allows 20 concurrent moving elements
   and 400 ms total delay after timeScale; character stagger also has a final 120 ms delay ceiling after
   timeScale. Automatic collection presence/layout uses the
   [participant bound](presets.md#52-shared-work-limits), determined before per-member measurement or
