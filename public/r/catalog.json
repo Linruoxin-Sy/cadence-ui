@@ -187,7 +187,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -217,7 +217,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -244,7 +244,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -273,7 +273,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -300,7 +300,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -329,7 +329,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -356,7 +356,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -383,7 +383,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -410,7 +410,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -439,7 +439,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -476,7 +476,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -505,7 +505,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -535,7 +535,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -567,7 +567,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -598,7 +598,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -630,7 +630,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -662,7 +662,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -692,7 +692,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -722,7 +722,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -759,7 +759,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -802,7 +802,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -837,7 +837,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -871,7 +871,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -904,7 +904,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -938,7 +938,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -973,7 +973,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -1019,7 +1019,7 @@
         }
       ]
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1054,7 +1054,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1087,7 +1087,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1129,7 +1129,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1164,7 +1164,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1199,7 +1199,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -1234,7 +1234,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -1271,7 +1271,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -1306,7 +1306,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -1345,7 +1345,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -1383,7 +1383,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -1420,7 +1420,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -1457,7 +1457,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -1494,7 +1494,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -1535,7 +1535,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -1592,7 +1592,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -1627,7 +1627,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -1665,7 +1665,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -1702,7 +1702,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -1746,7 +1746,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -1773,7 +1773,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -1808,7 +1808,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -1837,7 +1837,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -1871,7 +1871,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -1912,7 +1912,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -1953,7 +1953,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -1983,7 +1983,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -2049,7 +2049,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -2091,7 +2091,7 @@
       "path": "apps/v4/examples/base/data-table-demo.tsx",
       "guide": "apps/v4/content/docs/components/base/data-table.mdx"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -2132,7 +2132,7 @@
       "path": "apps/v4/examples/base/date-picker-demo.tsx",
       "guide": "apps/v4/content/docs/components/base/date-picker.mdx"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -2173,7 +2173,7 @@
       "version": "2026-10",
       "guide": "apps/v4/content/docs/components/base/attachment.mdx"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -2208,7 +2208,7 @@
       "style": "base-ui",
       "version": "2026-10"
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -2243,7 +2243,7 @@
       "version": "0.5.0",
       "reason": "Original document section navigation; no shadcn counterpart in the pinned catalogue."
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -2277,7 +2277,7 @@
       "version": "0.6.0",
       "reason": "Cadence standalone changed-text primitive; no upstream shadcn equivalent."
     },
-    "sourceSha": "f9815ae3",
+    "sourceSha": "0bd57c37",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   }

@@ -299,6 +299,16 @@ item and changed-runs declaration. Original catalogue slot adoption, the other p
 the overall v2 schema/evidence marker remain separate migration work. Unsupported correspondence
 remains native immediate, including the rejected DPR2 raster mapping.
 
+Internal pure numeric planning in `registry/cadence/lib/number-plan.ts` preserves raw numeric
+output or an explicit native Intl formatter, retains decimal-place identities and preflights
+two-cell/one-cell-height candidate lanes against the 12-column display/known-transaction bound.
+Original number/BigInt values supply trend without conversion; format/scale revisions, unsupported
+digits/parts, nonfinite values and ineligible accepted readout causes stay exact and immediate.
+The conservative existing text-input ceiling also bounds decomposition without truncating output.
+This is not an installable numeric helper or a reel renderer: native editing/layout eligibility,
+live offsets/velocity, shared geometry/semantic transactions, modes and the public AnimatedNumber
+API/distribution still require the subsequent renderer implementation and browser evidence.
+
 Pending semantic-cause acceptance must distinguish requested values from accepted commits and actual
 presentation changes, following [the shared cause contract](animation-system.md#coordinating-one-committed-change).
 Prove rejected requests, equal-target rerenders during a legal flight, batched versus committed
