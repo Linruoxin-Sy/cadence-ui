@@ -259,7 +259,10 @@ export function createContentTransition(transaction = createMotionTransaction())
         // content revision or sample layout on a frame.
         const withoutClock = (style: string) =>
           style
-            .replace(/--(?:(?:motion-|ease-cadence-)[\w-]+|cadence-(?:time-scale|recipe-enabled))\s*:[^;]*;?/g, "")
+            .replace(
+              /--(?:(?:motion-|ease-cadence-)[\w-]+|cadence-(?:inherited-[\w-]+|time-scale|recipe-enabled))\s*:[^;]*;?/g,
+              "",
+            )
             .trim();
         const attributes = new MutationObserver((entries) => {
           if (!current()) return;

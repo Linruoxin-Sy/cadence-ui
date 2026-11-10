@@ -3049,7 +3049,10 @@
         "@cadence/cadence-utils",
         "@cadence/cadence-provider",
         "@cadence/cadence-content",
-        "@cadence/cadence-selection"
+        "@cadence/cadence-selection",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
       ],
       "files": [
         {
@@ -3061,6 +3064,16 @@
           "path": "registry/cadence/lib/tabs-motion.tsx",
           "type": "registry:lib",
           "target": "@components/cadence/lib/tabs-motion.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/tabs-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/tabs-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/tabs-colour.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/tabs-colour.ts"
         }
       ],
       "meta": {
@@ -3075,6 +3088,26 @@
           {
             "recipe": "data.transition",
             "form": "directional-content"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "layout.move",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -3097,14 +3130,49 @@
               {
                 "relationship": "default",
                 "owner": "tabs",
-                "reason": "Tabs integrates selected-indicator continuity at its own parts, using the reached installed executor."
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
               }
             ],
             "data.transition/directional-content": [
               {
                 "relationship": "default",
                 "owner": "tabs",
-                "reason": "Tabs integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "tabs",
+                "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
               }
             ]
           }

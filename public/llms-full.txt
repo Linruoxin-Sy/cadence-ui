@@ -26545,6 +26545,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — direct registry dependency.
 - [@cadence/cadence-selection](https://cadence.dev/r/cadence-selection.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -26568,8 +26572,22 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | tabs | `@components/cadence/tabs/index.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 | tabs | `@components/cadence/lib/tabs-motion.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
+| tabs | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
+| tabs | `@components/cadence/lib/tabs-colour.ts` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -26580,6 +26598,14 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
 
 [Source files: cadence-selection](https://cadence.dev/r/cadence-selection.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: tabs](https://cadence.dev/r/tabs.json)
 
@@ -26750,10 +26776,11 @@ Standalone components follow the system motion preference; use
 Each list retains one decorative selection indicator. Full mode moves a safe line indicator;
 filled markers place immediately to preserve label contrast. Reduced, none and a zero clock place
 markers immediately. A newly active panel can fade and, where existing root padding provides a safe
-paint corridor, travel by distance.xs. Panel size stays native. Preserve merged children and refs
+paint corridor, travel by distance.xs. Known content changes can resize the same panel and intrinsic
+list; plain strings replace changed runs and direct numbers roll changed places. Preserve merged children and refs
 when supplying a custom trigger render.
 
-Controlled and List sizing need a client caller for their state and event
+Controlled, List sizing, Changing content and Quantities need a client caller for their state and event
 handlers. Refs, event handlers and function-valued `render`, `className`
 or `style` props also require a client caller. Usage, Vertical, Line style,
 Custom elements and persistent panels, and Disabled use serializable props
@@ -26761,7 +26788,7 @@ and children and can be composed in a Server Component. Element-valued
 `render` is supported there; internal motion hooks do not
 require a client caller.
 
-Controlled and List sizing additionally use `@cadence/button`. Install it
+Controlled, List sizing, Changing content and Quantities additionally use `@cadence/button`. Install it
 separately, or copy every target and recursive dependency from its Manual
 panel. The caller owns controlled selection and durable panel data. Supply
 matching trigger/content values and a list label; `null` selects no panel.
@@ -26911,7 +26938,7 @@ export function LineStyle() {
 
 ## Custom elements and persistent panels
 
-`render` preserves the primitive semantics and refs on a custom element. Hidden panels unmount by default; `keepMounted` keeps the draft textarea and its value when History is selected. Render callbacks must spread merged props and retain children, including the indicator.
+`render` preserves the primitive semantics and refs on a custom element. Hidden panels unmount by default; `keepMounted` keeps the draft textarea and its value when History is selected. Render callbacks must spread merged props and retain children, including the indicator. A custom component render keeps primitive children so its own label, number and feedback owners continue to work; Tabs does not wrap that component's content again.
 
 <ComponentExample name="persistent" />
 
@@ -27014,6 +27041,71 @@ export function Disabled() {
 }
 ```
 
+## Changing content
+
+Change the earlier label while Activity stays selected. The intrinsic strip and retained triggers
+reflow together; the marker stays attached to Activity. Change panel content updates the same real
+panel, with no hidden measurement copy or cross-panel height borrowing. A focused/captured trigger,
+external width constraint, passive reflow or unsafe transform commits affected geometry immediately.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+
+export function ChangingContent() {
+  const [long, setLong] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="flex w-full max-w-lg flex-col items-start gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setLong((v) => !v)}>Change label</Button>
+        <Button variant="outline" size="sm" onClick={() => setExpanded((v) => !v)}>Change panel content</Button>
+      </div>
+      <Tabs defaultValue="activity" className="w-full p-2 font-mono [font-feature-settings:normal]">
+        <TabsList variant="line" aria-label="Changing project views">
+          <TabsTrigger value="overview">{long ? "Project overview" : "Overview"}</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="rounded-md border p-4 text-sm">Project overview</TabsContent>
+        <TabsContent value="activity" className="whitespace-pre-line rounded-md border p-4 text-sm">{expanded ? "Release ready\nReview complete\nReady for the next milestone" : "Release pending"}</TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+```
+
+## Quantities
+
+Direct numeric children are display quantities. Their native formatted text updates immediately while
+changed places roll in full mode. String identifiers such as `"0019"` remain text, and tab `value`
+never becomes a counter. Rich numeric badges keep their own owner.
+
+<ComponentExample name="quantities" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/cadence/tabs";
+
+export function Quantities() {
+  const [count, setCount] = useState(19);
+  return <div className="flex w-full max-w-md flex-col items-start gap-4">
+    <Button variant="outline" size="sm" onClick={() => setCount((n) => n === 19 ? 20 : 19)}>Update count</Button>
+    <Tabs defaultValue="count" className="font-mono [font-feature-settings:normal]">
+      <TabsList aria-label="Open requests"><TabsTrigger value="count">{count}</TabsTrigger></TabsList>
+      <TabsContent value="count" className="p-4 text-2xl tabular-nums">{count}</TabsContent>
+    </Tabs>
+  </div>;
+}
+```
+
 ## When to use
 
 - Peer views of the same project.
@@ -27056,7 +27148,7 @@ merge last. The added `tabs-indicator` slot is decorative and aria-hidden.
 ### `TabsContent`
 
 `value` links to the corresponding trigger. `keepMounted` defaults to false. All Base UI Panel props,
-render/ref and state callbacks remain available. Semantic activation is immediate; eligible incoming paint uses the content phase without changing native size or mount policy.
+render/ref and state callbacks remain available. Semantic activation is immediate. Eligible incoming paint uses the content phase; known content changes in the same host use its own measured height. Independently mounted panels start at their native size. Plain direct strings/numbers are display owners; rich children retain their own content ownership and mount policy.
 
 ## Motion contract
 
@@ -27064,24 +27156,42 @@ Authored intensity is **medium**: Selection projection and directional content p
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared/selection`, physics-defined smooth selection spring | Yes; current geometry and velocity |
-| Panel activation | Incoming opacity and safe directional transform | `data.transition/directional-content`, directional content preset, distance.xs | Latest accepted panel |
-| Initial selection | Native selected paint, then measured marker placement | — | No entrance |
-| Reduced | Marker geometry immediate; panel opacity only | Reduced data clock | Running travel settles before paint |
-| None / zero clock | Current marker and panel paint immediately | Zero duration and delay | Running effects cancelled |
+| Selection | One persistent line marker transform; filled/unsafe paths place immediately | `layout.shared/selection`, layout.selection | Current geometry and velocity |
+| Panel activation | Incoming opacity and travel only inside an existing safe corridor | `data.transition/directional-content`, content.switch, distance.xs | Latest accepted panel |
+| Same-panel / intrinsic list content revision | Clamped owned height / width; native content lays out at destination width | `geometry.resize/measured`, geometry.compact | Latest committed content |
+| Retained trigger reflow | Trigger position and attached marker use the same list-local projection | `layout.move/one-shot`, layout.compact, target layout.move/position | Latest target; no intermediate queue |
+| Track / marker / trigger state paint | Disjoint explicit background, foreground, border and scoped shadow properties | `state.color/css-transition`, state.color | Focus/invalid owner settles its entire paint |
+| Direct string revision | Changed-only opacity with one retained native Text node; no stagger | `text.change/changed-runs`, text.replace | Latest exact text |
+| Direct quantity revision | Changed place-value reels; no independent helper width spring | `number.roll/reels`, number.compact | Latest exact quantity |
+| Initial SSR / hydration | Current native selection and content | — | No entry replay |
+| Reduced | Immediate geometry/quantities; short eligible panel/text opacity and colour | Reduced recipe clocks | Running travel settles before paint |
+| None / zero clock | Current semantic presentation, no transition or delay | Zero recipe clocks | Running effects cancelled |
 
-Each list owns one span throughout selection, including null/restored values. Measurements occur
-in committed layout work, never during render or animation frames. Missing origins and restored
-hosts place immediately. Passive constraint/style changes yield to the trigger's native selected
-paint; they do not invent a selection revision. Common ancestor scrolling keeps valid local paths.
-Sibling and nested instances cannot exchange marker identity or completion authority.
+The strip's natural content is its one real trigger tree. Its size clock owns the shell; retained
+positions and the marker attachment use one shared reflow projection, without per-frame DOM reads.
+An actual selection during that projection settles the affected list/marker transaction immediately.
+A label revision alone never starts a second selection spring. Final native label boxes must fit
+throughout the position path: a growth that would overlap labels places those positions immediately,
+while safe empty-space shell resizing can continue. A clipped shell cannot hide the new label.
+Unknown custom List render and constrained
+axes keep immediate native geometry. Caller transforms, scroll offsets, refs and native focus remain authoritative.
 
-The panel's actual primitive tree remains mounted according to keepMounted. There is no outgoing
-copy, speculative measurement or cross-panel height interpolation. A safe existing paint corridor
-permits directional travel; otherwise incoming opacity remains. Focus/editing cancels a conflicting
-entrance immediately. Repeated targets retain their current phase. Live reduced removes travel and
-reconciles permitted opacity; none and zero recipe time retire the phase before paint. Full restoration
-does not replay consumed work. Colour/text/number capabilities remain pending their migrations.
+Panels preserve Base UI keepMounted/unmount policy and use their original content once. There is
+no outgoing copy, speculative inactive measurement or cross-panel height interpolation. Default
+panels separate their natural content from their owned shell; custom renders keep native geometry
+when this separation is unavailable. Passive size changes settle immediately. Panel activation
+consumes same-cause text entry; later independent direct content changes remain eligible.
+
+Track, nonfocusable marker and trigger paint have separate owners. Filled marker travel uses immediate
+placement to preserve label readability over track/fill across independent clocks. Known neutral
+palettes permit scoped colour; unknown custom palettes use the exact final cascade immediately.
+Focus/focus-within or an owner's invalid state cancels that region's whole colour clock. The marker's
+independent eligible colour may continue. Unchanged labels never fade to disguise marker travel.
+
+Native editing, selection/copy, unsupported rich text, font/paint correspondence and shared finite-work
+limits retain their native safety boundaries. An ancestor colour transition can cancel raster text/reels;
+this keeps current native text readable while eligible colour continues, without claiming concurrent
+raster support. Changing a primitive string to a number keeps the same native span/Text identity.
 
 ## Accessibility
 
@@ -27106,9 +27216,9 @@ long lists. Passive reflow uses current native selected paint until the next saf
 
 ## Performance
 
-T3 source budget: 12 KB gzip. Only the list's active target is measured; bounded style ancestry
+T3 source budget: 12 KB gzip. Only bounded registered triggers and the active natural panel are measured; bounded style ancestry
 checks avoid guessing transformed coordinates. Resize/mutation observations invalidate passive work.
-The marker uses one transform writer; panel opacity and translation share one finite scalar phase.
+The marker has one writer at a time: selection or the coordinated strip projection. Panel opacity and translation share one finite scalar phase. Numerical budgets remain advisory/deferred under ADR-023; this migration does not certify performance.
 The native selected background/underline remains readable in SSR without JavaScript. The aggregate
 50-visual transaction limit includes marker and content participants, with immediate fallback.
 

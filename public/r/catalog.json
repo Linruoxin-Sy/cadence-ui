@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -458,7 +458,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -497,7 +497,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -534,7 +534,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -573,7 +573,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -610,7 +610,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -717,7 +717,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -754,7 +754,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -793,7 +793,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -848,7 +848,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -887,7 +887,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -927,7 +927,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -969,7 +969,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1010,7 +1010,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1052,7 +1052,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1094,7 +1094,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -1134,7 +1134,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -1174,7 +1174,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -1229,7 +1229,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -1297,7 +1297,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -1350,7 +1350,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -1402,7 +1402,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -1453,7 +1453,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -1505,7 +1505,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -1558,7 +1558,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -1636,7 +1636,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1689,7 +1689,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1740,7 +1740,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1807,7 +1807,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1873,7 +1873,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1939,7 +1939,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -2005,7 +2005,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -2073,7 +2073,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -2139,7 +2139,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -2220,7 +2220,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -2296,7 +2296,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -2371,7 +2371,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -2446,7 +2446,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -2521,7 +2521,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -2606,7 +2606,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -2688,7 +2688,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -2754,7 +2754,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -2810,7 +2810,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -2865,7 +2865,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -2887,7 +2887,10 @@
       "@cadence/cadence-utils",
       "@cadence/cadence-provider",
       "@cadence/cadence-content",
-      "@cadence/cadence-selection"
+      "@cadence/cadence-selection",
+      "@cadence/cadence-geometry",
+      "@cadence/cadence-text",
+      "@cadence/cadence-number"
     ],
     "since": "0.4.0",
     "tier": "T3",
@@ -2900,6 +2903,26 @@
       {
         "recipe": "data.transition",
         "form": "directional-content"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "layout.move",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
       }
     ],
     "intensity": "medium",
@@ -2922,19 +2945,54 @@
           {
             "relationship": "default",
             "owner": "tabs",
-            "reason": "Tabs integrates selected-indicator continuity at its own parts, using the reached installed executor."
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
           }
         ],
         "data.transition/directional-content": [
           {
             "relationship": "default",
             "owner": "tabs",
-            "reason": "Tabs integrates the existing content/data/status phase at its own parts, using the reached installed executor."
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "tabs",
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+          }
+        ],
+        "layout.move/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "tabs",
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "tabs",
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "tabs",
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "tabs",
+            "reason": "Tabs integrates this exact form at its own persistent list, trigger, panel or display region."
           }
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -2971,7 +3029,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -3029,7 +3087,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -3068,7 +3126,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -3120,7 +3178,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -3179,7 +3237,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -3258,7 +3316,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -3298,7 +3356,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -3406,7 +3464,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -3498,7 +3556,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -3589,7 +3647,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -3655,7 +3713,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -3708,7 +3766,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -3768,7 +3826,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -3820,7 +3878,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -3872,7 +3930,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -3926,7 +3984,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -3978,7 +4036,7 @@
         ]
       }
     },
-    "sourceSha": "f2de760c",
+    "sourceSha": "5e41cd0d",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

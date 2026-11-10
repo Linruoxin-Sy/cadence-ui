@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { type Ref, useRef } from "react";
 import { describe, expect, it } from "vitest";
 import { useContinuousMotion, useStateColor } from "@/registry/cadence/lib/css-motion";
@@ -83,8 +83,48 @@ function ConflictingLoops() {
     </svg>
   );
 }
+function GuardedColour() {
+  const ref = useRef<HTMLSpanElement>(null),
+    cm = useCadenceMotion(ref);
+  const colour = useStateColor(ref, cm, ["color"], {
+    readability: "verified",
+    readabilityGate: (node) =>
+      Boolean(node.closest("section")?.classList.contains("readable")) &&
+      node.ownerDocument.activeElement?.id !== "takeover",
+    readabilityScope: (node) => node.closest("section"),
+  });
+  return (
+    <section className="readable">
+      <span {...colour} data-slot="guarded-colour">
+        Known region
+      </span>
+      <button type="button" id="takeover">
+        Take focus
+      </button>
+    </section>
+  );
+}
 
 describe("shared executed colour/loop policy", () => {
+  it("settles only the guarded region on actual scope/focus invalidation and restores without pinning paint", async () => {
+    const view = render(
+      <CadenceProvider>
+        <GuardedColour />
+      </CadenceProvider>,
+    );
+    const region = view.container.querySelector("section") as HTMLElement,
+      node = region.querySelector("span") as HTMLElement;
+    expect(Number.parseFloat(node.style.transitionDuration)).toBeGreaterThan(0);
+    region.classList.remove("readable");
+    await waitFor(() => expect(node.style.transitionDuration).toBe("0s"));
+    region.classList.add("readable");
+    await waitFor(() => expect(Number.parseFloat(node.style.transitionDuration)).toBeGreaterThan(0));
+    (region.querySelector("button") as HTMLElement).focus();
+    expect(node.style.transitionDuration).toBe("0s");
+    expect(node.style.color).toBe("");
+    view.unmount();
+    expect(node.style.transitionProperty).toBe("");
+  });
   it.each(["full", "reduced", "none"] as const)("executes actual owners in %s", (mode) => {
     const { rerender } = render(
       <CadenceProvider mode={mode}>

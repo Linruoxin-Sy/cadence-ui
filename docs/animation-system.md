@@ -1024,6 +1024,13 @@ for that axis instead of a second settling animation. A valid measured empty con
 an unavailable measurement from hidden/detached content is unknown, not a zero-size target. Existing
 minimums, padding and borders still determine the actual host box.
 
+A known intrinsic column-flex panel can project a temporary non-growing/non-shrinking auto basis
+alongside its height overlay: otherwise flex-basis can ignore the height presentation entirely.
+This is static layout stabilization by the same size owner, not a second animated property or a
+resting flex change. Only a measured intrinsic parent/child relationship enables it; external fixed
+allocation keeps native sizing. Release the overlay together with height on completion, input,
+constraint invalidation or mode cancellation, with the same natural destination before and after.
+
 A measured destination is valid only for its committed content and current layout constraints.
 Scrollbar occupancy, container-query breakpoint changes, writing mode and caller min/max/overflow
 changes can alter the available content width and therefore its wrapped height without a new content
@@ -1100,6 +1107,14 @@ participate only through their named host/region; no generic descendant colour s
 State and theme revisions affecting the same region feed one colour controller, not parallel
 hover/theme/selection transitions. Cancellation restores the current cascade rather than leaving
 sampled colours or temporary transition overrides pinned inline.
+
+An explicitly composed region may supply the colour executor with a committed readability gate and
+its known region scope. The executor evaluates it on committed state, named colour transition/focus
+events and bounded scope/ancestor invalidation, never on animation frames. A rejected gate cancels
+only that owner's declared colour family and exposes its current cascade. Tabs uses this for its
+known track/marker/trigger regions: neutral endpoint intervals must preserve text contrast across
+independent clocks; unknown colour syntax/palettes take the immediate path. This does not certify
+or recolour a caller's final palette, discover arbitrary descendant text, or add a second paint writer.
 
 The shared provider library supplies `useStateColor` and `useContinuousMotion` as staged execution
 support. Spread their returned bindings, including the managed callback ref, onto the real HTML/SVG

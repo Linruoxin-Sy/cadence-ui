@@ -3,12 +3,40 @@ import { describe, expect, it } from "vitest";
 import {
   calledRecipes,
   cssImplementationExports,
+  cssPolicyBindings,
   cssPolicyCapabilities,
   implementedForm,
   parameterWriterForms,
 } from "../../scripts/motion-manifest.mjs";
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
+
+describe("Tabs compound execution paths", () => {
+  const tabs = readFileSync("registry/cadence/lib/tabs-motion.tsx", "utf8");
+  it("requires connected item/list controllers and their exact bindings", () => {
+    expect(implementedForm(tabs, "layout.move", "one-shot")).toBe("one-shot");
+    expect(implementedForm(tabs, "geometry.resize", "measured")).toBe("measured");
+    for (const broken of [
+      tabs.replaceAll('from "./tabs-layout"', 'from "@/tabs-layout"'),
+      tabs.replaceAll("createTabsItem(node", "missing(node").replaceAll("createTabsLayout(node", "missing(node"),
+      tabs.replaceAll("layout.move/position", "unknown"),
+    ])
+      expect(implementedForm(broken, "layout.move", "one-shot")).toBeNull();
+  });
+  it("recognises the actual useRender paint host, rejecting discarded/overridden refs", () => {
+    const input = `import {useStateColor} from "../lib/css-motion";import {useRender} from "@base-ui/react/use-render";export function Paint(){const cm=useCadenceMotion();const Paint=useStateColor(ref,cm,["color"]);return useRender({props:{...Paint,"data-slot":"paint"}})}`;
+    expect(cssPolicyBindings(input)).toMatchObject([{ slot: "paint", properties: ["color"] }]);
+    const returned = cssPolicyBindings(input);
+    returned[0].properties.length = 0;
+    expect(cssPolicyBindings(input)).toMatchObject([{ slot: "paint", properties: ["color"] }]);
+    for (const broken of [
+      input.replace("...Paint,", ""),
+      input.replace('"data-slot":"paint"', 'ref:other,"data-slot":"paint"'),
+      input.replace("...Paint,", "...Paint,...other,"),
+    ])
+      expect(cssPolicyBindings(broken)).toEqual([]);
+  });
+});
 
 describe("retained surface presence form", () => {
   const surface = readFileSync("registry/cadence/lib/surface-presence.ts", "utf8");

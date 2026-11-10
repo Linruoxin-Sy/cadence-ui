@@ -113,11 +113,16 @@ export function cssImplementationExports(source, recipe) {
  * Returns `null` when the declaration has no implementation behind it.
  */
 export function implementedForm(source, recipe, form = "one-shot") {
-  const key = JSON.stringify([source, recipe, form]);
-  if (implementedForms.has(key)) return implementedForms.get(key);
+  const key = `${recipe}/${form}`;
+  let facts = implementedForms.get(source);
+  if (facts?.has(key)) return facts.get(key);
   const result = detectImplementedForm(source, recipe, form);
-  if (implementedForms.size >= 512) implementedForms.delete(implementedForms.keys().next().value);
-  implementedForms.set(key, result);
+  if (!facts) {
+    if (implementedForms.size >= 512) implementedForms.delete(implementedForms.keys().next().value);
+    facts = new Map();
+    implementedForms.set(source, facts);
+  }
+  facts.set(key, result);
   return result;
 }
 // Pure, byte-keyed structural facts only; never a runtime/action evidence cache.
@@ -129,8 +134,29 @@ function detectImplementedForm(source, recipe, form) {
   const scanned = motionSource(source);
   source = scanned.source;
   const imports = (name, module) =>
-    scanned.imports.some((entry) => entry.name === name && entry.path.endsWith(`/${module}`));
+    scanned.imports.some(
+      (entry) => entry.name === name && entry.path.startsWith(".") && entry.path.endsWith(`/${module}`),
+    );
   if (form === "one-shot" && parameterWriterForms(source).some((target) => target.startsWith(`${recipe}/`)))
+    return form;
+  if (
+    recipe === "layout.move" &&
+    form === "one-shot" &&
+    imports("createTabsItem", "tabs-layout") &&
+    source.includes("createTabsItem(") &&
+    source.includes(".item.commit(") &&
+    source.includes("layout.move/position")
+  )
+    return form;
+  if (
+    imports("createTabsLayout", "tabs-layout") &&
+    source.includes("createTabsLayout(") &&
+    source.includes("layout.prepare(") &&
+    source.includes("layout.commit(") &&
+    source.includes("geometry.resize/measured") &&
+    source.includes("layout.move/position") &&
+    ((recipe === "geometry.resize" && form === "measured") || (recipe === "layout.move" && form === "one-shot"))
+  )
     return form;
   if (recipe === "reveal" && form === "viewport")
     return source.includes("function createViewportReveal(") &&
@@ -523,14 +549,33 @@ function cssPolicyImplementation(source, helper) {
 }
 
 /** Connected literal policy inputs, not a union of unrelated hooks/properties. */
+const policyBindings = new Map();
 export function cssPolicyBindings(source) {
   if (!source.includes("css-motion")) return [];
   source = motionSource(source).source;
+  // The same selected export is audited by recipes, parts and target policies.
+  // Reuse only byte-identical structural facts, returning independent arrays;
+  // no action, mode receipt or runtime result is stored here.
+  const cached = policyBindings.get(source);
+  if (cached) return structuredClone(cached);
   compiler ??= require("typescript");
   const ts = compiler;
   const tree = ts.createSourceFile("component.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const imports = new Map();
+  const renderers = new Set();
   for (const statement of tree.statements) {
+    if (
+      ts.isImportDeclaration(statement) &&
+      ts.isStringLiteral(statement.moduleSpecifier) &&
+      statement.moduleSpecifier.text === "@base-ui/react/use-render" &&
+      !statement.importClause?.isTypeOnly
+    ) {
+      const bindings = statement.importClause?.namedBindings;
+      if (bindings && ts.isNamedImports(bindings))
+        for (const entry of bindings.elements)
+          if (!entry.isTypeOnly && (entry.propertyName?.text ?? entry.name.text) === "useRender")
+            renderers.add(entry.name.text);
+    }
     if (
       !ts.isImportDeclaration(statement) ||
       !ts.isStringLiteral(statement.moduleSpecifier) ||
@@ -605,6 +650,42 @@ export function cssPolicyBindings(source) {
   walk(tree);
   const used = [];
   const jsx = (node) => {
+    if (ts.isCallExpression(node) && renderers.has(node.expression.getText(tree))) {
+      const options = node.arguments[0];
+      const props =
+        options &&
+        ts.isObjectLiteralExpression(options) &&
+        options.properties.find((p) => ts.isPropertyAssignment(p) && p.name.getText(tree) === "props")?.initializer;
+      if (props && ts.isObjectLiteralExpression(props)) {
+        const slot = props.properties.find(
+          (p) => ts.isPropertyAssignment(p) && p.name.getText(tree) === '"data-slot"',
+        )?.initializer;
+        for (const [index, property] of props.properties.entries()) {
+          if (!ts.isSpreadAssignment(property) || !ts.isIdentifier(property.expression)) continue;
+          const name = property.expression.text,
+            entry = owners.get(name);
+          let ancestor = node.parent;
+          while (ancestor && ancestor !== entry?.scope) ancestor = ancestor.parent;
+          if (
+            !entry ||
+            !ancestor ||
+            !slot ||
+            !ts.isStringLiteral(slot) ||
+            props.properties
+              .slice(index + 1)
+              .some(
+                (p) =>
+                  ts.isSpreadAssignment(p) ||
+                  (ts.isPropertyAssignment(p) &&
+                    p.name.getText(tree) === "ref" &&
+                    p.initializer.getText(tree) !== `${name}.ref`),
+              )
+          )
+            continue;
+          used.push({ kind: entry.kind, properties: entry.properties, loop: entry.loop, slot: slot.text });
+        }
+      }
+    }
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node))
       for (const owner of owners.keys()) {
         let ancestor = node.parent;
@@ -643,5 +724,7 @@ export function cssPolicyBindings(source) {
     ts.forEachChild(node, jsx);
   };
   jsx(tree);
+  if (policyBindings.size >= 512) policyBindings.delete(policyBindings.keys().next().value);
+  policyBindings.set(source, structuredClone(used));
   return used;
 }

@@ -161,6 +161,7 @@ describe("current registry inventory and real part references", () => {
       "button",
       "badge",
       "card",
+      "tabs",
     ]);
     expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(
       true,

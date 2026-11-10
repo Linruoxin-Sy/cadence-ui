@@ -3,10 +3,21 @@
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
+import { isValidElement } from "react";
 import { cn } from "../lib/cn";
+import { useStateColor } from "../lib/css-motion";
 import { useMotionHostRef } from "../lib/motion-ref";
 import { useCadenceMotion } from "../lib/provider";
-import { TabsListSurface, TabsMotionRoot, TabsPanelSurface, TabsRootSurface, useTabsTrigger } from "../lib/tabs-motion";
+import { tabsColourReadable, tabsColourScope } from "../lib/tabs-colour";
+import {
+  safeTabsPaint,
+  TabsDisplayContent,
+  TabsListSurface,
+  TabsMotionRoot,
+  TabsPanelSurface,
+  TabsRootSurface,
+  useTabsTrigger,
+} from "../lib/tabs-motion";
 
 function Tabs({ className, orientation = "horizontal", render, ...props }: TabsPrimitive.Root.Props) {
   return (
@@ -44,12 +55,11 @@ function TabsList({
 }: TabsPrimitive.List.Props & VariantProps<typeof tabsListVariants>) {
   return (
     <TabsPrimitive.List
-      data-slot="tabs-list"
       data-variant={variant}
       render={(elementProps, state) => (
         <TabsListSurface
           elementProps={elementProps}
-          state={{ ...state }}
+          state={{ ...state, slot: "tabs-list" }}
           render={render}
           variant={variant ?? "default"}
         />
@@ -68,18 +78,44 @@ function TriggerSurface({
   state,
   render,
   value,
+  content,
 }: {
   value: unknown;
+  content: React.ReactNode;
   elementProps: React.ComponentPropsWithRef<"button">;
   state: TabsPrimitive.Tab.State;
   render: TabsPrimitive.Tab.Props["render"];
 }) {
   const { node, ref } = useMotionHostRef(elementProps.ref);
-  useTabsTrigger(node, value, state.active);
+  const cm = useCadenceMotion(node);
+  const TriggerPaint = useStateColor(
+    ref,
+    cm,
+    [
+      "background-color",
+      "color",
+      "border-top-color",
+      "border-right-color",
+      "border-bottom-color",
+      "border-left-color",
+      "box-shadow",
+    ],
+    {
+      readability: safeTabsPaint(elementProps) ? "verified" : "immediate",
+      readabilityGate: tabsColourReadable,
+      readabilityScope: tabsColourScope,
+    },
+  );
+  useTabsTrigger(
+    node,
+    value,
+    state.active,
+    typeof content === "string" || typeof content === "number" ? content : null,
+  );
   return useRender({
     defaultTagName: "button",
     render,
-    state: { ...state },
+    state: { ...state, slot: "tabs-trigger" },
     stateAttributesMapping: {
       active: () => null,
       disabled: () => null,
@@ -88,7 +124,17 @@ function TriggerSurface({
     },
     props: {
       ...elementProps,
-      ref,
+      ...TriggerPaint,
+      style: { ...TriggerPaint.style, ...elementProps.style },
+      "data-slot": "tabs-trigger",
+      // A custom component owns its own label/feedback tree (for example Button).
+      // Preserve primitive children there instead of disguising them as rich JSX.
+      children:
+        !render || (isValidElement(render) && typeof render.type === "string") ? (
+          <TabsDisplayContent value={elementProps.children} />
+        ) : (
+          elementProps.children
+        ),
     },
   });
 }
@@ -97,7 +143,6 @@ function TabsTrigger({ className, render, ...props }: TabsPrimitive.Tab.Props) {
   const cm = useCadenceMotion();
   return (
     <TabsPrimitive.Tab
-      data-slot="tabs-trigger"
       data-motion={cm.mode}
       className={(state) =>
         cn(
@@ -106,7 +151,13 @@ function TabsTrigger({ className, render, ...props }: TabsPrimitive.Tab.Props) {
         )
       }
       render={(elementProps, state) => (
-        <TriggerSurface elementProps={elementProps} state={state} render={render} value={props.value} />
+        <TriggerSurface
+          elementProps={elementProps}
+          state={state}
+          render={render}
+          value={props.value}
+          content={props.children}
+        />
       )}
       {...props}
     />
@@ -118,7 +169,12 @@ function TabsContent({ className, render, ...props }: TabsPrimitive.Panel.Props)
     <TabsPrimitive.Panel
       data-slot="tabs-content"
       render={(elementProps, state) => (
-        <TabsPanelSurface elementProps={elementProps} state={{ ...state }} render={render} value={props.value} />
+        <TabsPanelSurface
+          elementProps={elementProps}
+          state={{ ...state, slot: "tabs-content" }}
+          render={render}
+          value={props.value}
+        />
       )}
       className={(state) => cn("flex-1 outline-none", typeof className === "function" ? className(state) : className)}
       {...props}

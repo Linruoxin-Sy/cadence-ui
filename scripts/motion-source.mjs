@@ -35,11 +35,16 @@ export function motionSource(source, exports) {
   let model = models.get(source);
   if (!model) {
     const file = ts.createSourceFile("motion.tsx", source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
-    const host = ts.createCompilerHost({ noLib: true, noResolve: true });
+    const options = { noLib: true, noResolve: true, types: [] };
+    const host = ts.createCompilerHost(options);
     host.getSourceFile = (name) => (name === file.fileName ? file : undefined);
+    // Bind only this source's local symbols. Installed import closure is resolved
+    // explicitly by the registry audit, never through the host node_modules tree.
+    // noResolve alone still performs package/type lookup before discarding it.
+    host.resolveModuleNames = (names) => names.map(() => undefined);
     model = {
       file,
-      checker: ts.createProgram([file.fileName], { noLib: true, noResolve: true }, host).getTypeChecker(),
+      checker: ts.createProgram([file.fileName], options, host).getTypeChecker(),
     };
   }
   // The same module is visited through several selected exports. Reuse binding,

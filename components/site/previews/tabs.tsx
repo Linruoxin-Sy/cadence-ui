@@ -135,6 +135,54 @@ function Disabled() {
   return <ProjectTabs disabled />;
 }
 
+function ChangingContent() {
+  const [long, setLong] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="flex w-full max-w-lg flex-col items-start gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setLong((v) => !v)}>
+          Change label
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setExpanded((v) => !v)}>
+          Change panel content
+        </Button>
+      </div>
+      <Tabs defaultValue="activity" className="w-full p-2 font-mono [font-feature-settings:normal]">
+        <TabsList variant="line" aria-label="Changing project views">
+          <TabsTrigger value="overview">{long ? "Project overview" : "Overview"}</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="rounded-md border p-4 text-sm">
+          Project overview
+        </TabsContent>
+        <TabsContent value="activity" className="whitespace-pre-line rounded-md border p-4 text-sm">
+          {expanded ? "Release ready\nReview complete\nReady for the next milestone" : "Release pending"}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function Quantities() {
+  const [count, setCount] = useState(19);
+  return (
+    <div className="flex w-full max-w-md flex-col items-start gap-4">
+      <Button variant="outline" size="sm" onClick={() => setCount((n) => (n === 19 ? 20 : 19))}>
+        Update count
+      </Button>
+      <Tabs defaultValue="count" className="font-mono [font-feature-settings:normal]">
+        <TabsList aria-label="Open requests">
+          <TabsTrigger value="count">{count}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="count" className="p-4 text-2xl tabular-nums">
+          {count}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
 const examples = {
   controlled: Controlled,
   vertical: Vertical,
@@ -142,6 +190,8 @@ const examples = {
   persistent: Persistent,
   "list-sizing": ListSizing,
   disabled: Disabled,
+  "changing-content": ChangingContent,
+  quantities: Quantities,
 };
 
 export function TabsPreview({ example }: { example?: string }) {

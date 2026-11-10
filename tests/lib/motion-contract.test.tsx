@@ -308,9 +308,24 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       for (const id of ["slider", "reveal-group"])
         expect(output).toContain(`${id}: execute actual component parts in full, reduced, none`);
       expect(output).not.toContain("reveal-group: execute reveal/viewport controller policy");
-      expect(output).toContain(
-        "tabs: execute data.transition/directional-content controller policy in full, reduced, none",
-      );
+      for (const [action, part, slot] of [
+        ["tabs.indicator.select", "TabsList", "tabs-indicator"],
+        ["tabs.panel.change", "TabsContent", "tabs-content"],
+        ["tabs.panel.resize", "TabsContent", "tabs-content"],
+        ["tabs.list.resize", "TabsList", "tabs-list"],
+        ["tabs.items.reflow", "TabsTrigger", "tabs-trigger"],
+        ["tabs.trigger.colour", "TabsTrigger", "tabs-trigger"],
+        ["tabs.indicator.colour", "TabsList", "tabs-indicator"],
+        ["tabs.list.colour", "TabsList", "tabs-list"],
+        ["tabs.label.replace", "TabsTrigger", "tabs-text"],
+        ["tabs.label.replace", "TabsContent", "tabs-text"],
+        ["tabs.value.change", "TabsTrigger", "tabs-number"],
+        ["tabs.value.change", "TabsContent", "tabs-number"],
+      ])
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toContain(
+            `tabs: v2 execute ${action} on tabs#${part}/${slot} with exact source/property/preset policy in ${mode}`,
+          );
       expect(output).not.toContain("tabs: execute layout.shared/selection controller policy");
       expect(output).toContain("popover: execute popup.anchored/css-transition CSS owner in full, reduced, none");
       for (const id of ["animated-text", "animated-number", "reveal", "reveal-group", "slider"])

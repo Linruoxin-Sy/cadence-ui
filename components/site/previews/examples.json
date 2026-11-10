@@ -5,7 +5,16 @@
   "separator": ["horizontal", "vertical", "decorative"],
   "label": ["wrapping", "disabled"],
   "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid", "multiple", "placement"],
-  "tabs": ["controlled", "vertical", "line-style", "persistent", "list-sizing", "disabled"],
+  "tabs": [
+    "controlled",
+    "vertical",
+    "line-style",
+    "persistent",
+    "list-sizing",
+    "disabled",
+    "changing-content",
+    "quantities"
+  ],
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
   "toc": ["nested", "controlled", "scroll-tracking"],
   "input": ["invalid", "file", "controlled", "disabled-readonly"],

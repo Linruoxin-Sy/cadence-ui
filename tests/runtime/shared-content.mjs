@@ -467,7 +467,13 @@ try {
     await reset();
     await update({ value: "b", month: 11 });
     await page.evaluate(() => {
-      window.viewportHandles = [...document.getAnimations()];
+      window.viewportHandles = [
+        ...document.querySelectorAll(
+          '[data-slot="tabs-indicator"],[data-slot="tabs-content"],[data-slot="calendar-month-grid"]',
+        ),
+      ]
+        .flatMap((node) => node.getAnimations())
+        .filter((handle) => !("transitionProperty" in handle));
     });
     await page.setViewportSize({ width: 900, height: 1200 });
     await page.waitForTimeout(40);
@@ -541,7 +547,7 @@ try {
     );
     return { counts, s };
   });
-  await check("native press transform survives selection fallback", async () => {
+  await check("composed Button feedback survives selection fallback on its stable native target", async () => {
     await reset();
     await update({ press: true });
     const tab = page.getByRole("tab", { name: "Beta longer", exact: true });
@@ -550,9 +556,13 @@ try {
     await page.waitForTimeout(70);
     const pressed = await tab.evaluate((node) => ({
       transform: getComputedStyle(node).transform,
+      feedback: node.querySelector('[data-slot="button-feedback"]')
+        ? getComputedStyle(node.querySelector('[data-slot="button-feedback"]')).transform
+        : null,
       animations: node.getAnimations().length,
     }));
-    assert.notEqual(pressed.transform, "none");
+    assert.equal(pressed.transform, "none");
+    assert(pressed.feedback && pressed.feedback !== "none");
     await page.mouse.up();
     assert.equal(await tab.getAttribute("aria-selected"), "true");
     return { pressed, selected: await sample() };

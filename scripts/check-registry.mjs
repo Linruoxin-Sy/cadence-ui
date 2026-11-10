@@ -205,11 +205,15 @@ for (const item of registry.items) {
     if (VALIDATION_IMPORT.test(source)) {
       problems.push(`${item.name}: ${file.path} imports a validation library (P11)`);
     }
-    if (isComponent(item) && !source.includes("data-slot")) {
+    // Non-JSX library controllers receive mode/host policy from their adapter;
+    // connected recipe evidence and executed mode coverage validate that path.
+    // The DOM branch requirements apply to component and JSX adapter files.
+    const componentSource = isComponent(item) && (file.type !== "registry:lib" || /\.[jt]sx$/.test(file.path));
+    if (componentSource && !source.includes("data-slot")) {
       problems.push(`${item.name}: ${file.path} has no data-slot attribute`);
     }
 
-    const animated = isComponent(item) && ANIMATION_IMPORT.test(source);
+    const animated = componentSource && ANIMATION_IMPORT.test(source);
     if (animated && !/useCadenceMotion|useReducedMotion|data-motion/.test(source)) {
       problems.push(`${item.name}: ${file.path} animates without a reduced-motion branch`);
     }

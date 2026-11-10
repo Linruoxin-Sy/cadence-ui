@@ -2,10 +2,11 @@ import { DirectionProvider } from "@base-ui/react/direction-provider";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Tabs, TabsContent, TabsList, TabsTrigger, tabsListVariants } from "@/registry/cadence/tabs";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 function Example({
   orientation = "horizontal",
@@ -60,6 +61,147 @@ function Controlled({ change }: { change: (value: unknown) => void }) {
 }
 
 describe("Tabs", () => {
+  beforeAll(() => prepareV2MotionPlan());
+  it("preserves arbitrary tab value identity without serializing application objects", () => {
+    const first: { self?: unknown } = {};
+    first.self = first;
+    const second = Symbol("second"),
+      change = vi.fn();
+    render(
+      <Tabs defaultValue={first} onValueChange={change}>
+        <TabsList>
+          <TabsTrigger value={first}>Object</TabsTrigger>
+          <TabsTrigger value={second}>Symbol</TabsTrigger>
+        </TabsList>
+        <TabsContent value={first}>Object panel</TabsContent>
+        <TabsContent value={second}>Symbol panel</TabsContent>
+      </Tabs>,
+    );
+    expect(screen.getByRole("tab", { name: "Object" })).toHaveAttribute("aria-selected", "true");
+    fireEvent.click(screen.getByRole("tab", { name: "Symbol" }));
+    expect(change).toHaveBeenCalledWith(second, expect.any(Object));
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("Symbol panel");
+  });
+  it.each(["full", "reduced", "none"] as const)(
+    "executes every direct owner and preserves native boundaries in %s",
+    async (mode) => {
+      const draw = (value: string | number, paint = false, selected: string | null = "a") => (
+        <CadenceProvider mode={mode} timeScale={0}>
+          <style>{`[data-slot=tabs-indicator] {background-color: ${paint ? "rgb(220, 220, 220)" : "rgb(255, 255, 255)"}}`}</style>
+          <Tabs value={selected}>
+            <TabsList aria-label="Direct" style={{ backgroundColor: paint ? "#eee" : "#ddd" }}>
+              <TabsTrigger value="a" style={{ color: paint ? "#222" : "#111" }}>
+                {value}
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="a" keepMounted>
+              {value}
+            </TabsContent>
+          </Tabs>
+        </CadenceProvider>
+      );
+      const view = render(draw("Status pending"));
+      const texts = Array.from(view.container.querySelectorAll('[data-slot="tabs-text"]')).map(
+        (node) => node.firstChild,
+      );
+      await expectV2MotionAction("tabs", "tabs.label.replace", mode, () => view.rerender(draw("Status ready")));
+      expect(
+        Array.from(view.container.querySelectorAll('[data-slot="tabs-text"]')).map((node) => node.firstChild),
+      ).toEqual(texts);
+      await expectV2MotionAction("tabs", "tabs.panel.resize", mode, () => view.rerender(draw("Ready")));
+      await expectV2MotionAction("tabs", "tabs.list.resize", mode, () => view.rerender(draw("Ready for review")));
+      await expectV2MotionAction("tabs", "tabs.items.reflow", mode, () => view.rerender(draw("Ready now")));
+      await expectV2MotionAction("tabs", "tabs.trigger.colour", mode, () => view.rerender(draw("Ready now", true)));
+      await expectV2MotionAction("tabs", "tabs.list.colour", mode, () => view.rerender(draw("Ready now", false)));
+      await expectV2MotionAction("tabs", "tabs.indicator.colour", mode, () => view.rerender(draw("Ready now", true)));
+      view.rerender(draw(19));
+      const quantities = Array.from(view.container.querySelectorAll('[data-slot="tabs-number"]')).map(
+        (node) => node.firstChild,
+      );
+      await expectV2MotionAction("tabs", "tabs.value.change", mode, () => view.rerender(draw(20)));
+      expect(
+        Array.from(view.container.querySelectorAll('[data-slot="tabs-number"]')).map((node) => node.firstChild),
+      ).toEqual(quantities);
+      expect(
+        Array.from(view.container.querySelectorAll('[data-slot="tabs-number"]')).map((node) => node.textContent),
+      ).toEqual(["20", "20"]);
+      view.rerender(draw("Ready", false, null));
+      await expectV2MotionAction("tabs", "tabs.panel.change", mode, () => view.rerender(draw("Ready")));
+      expectMotionContract(mode, { policy: ["color"] });
+      view.rerender(
+        <CadenceProvider mode={mode}>
+          <Tabs defaultValue="a">
+            <TabsList>
+              <TabsTrigger value="a">
+                <strong>Rich label</strong>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="a">
+              <input name="memo" defaultValue="draft" />
+            </TabsContent>
+          </Tabs>
+        </CadenceProvider>,
+      );
+      await expectV2NativeBoundaries("tabs", { container: view.container });
+    },
+  );
+  it.each(["full", "reduced", "none"] as const)("executes retained selection in %s", async (mode) => {
+    // jsdom has no layout. Supply explicit native endpoints; browser fixtures
+    // independently verify real CSS coordinates, intermediate paint and cancellation.
+    const computed = window.getComputedStyle.bind(window);
+    const css = vi.spyOn(window, "getComputedStyle").mockImplementation(
+      (node) =>
+        new Proxy(computed(node), {
+          get(target, key) {
+            const value = Reflect.get(target, key);
+            if (
+              ["transform", "translate", "rotate", "scale", "perspective", "offsetPath"].includes(String(key)) &&
+              !value
+            )
+              return "none";
+            if (key === "position" && !value) return "relative";
+            if (/^border.*Width$/.test(String(key)) && !value) return "0px";
+            return typeof value === "function" ? value.bind(target) : value;
+          },
+        }),
+    );
+    const width = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(200);
+    const height = vi.spyOn(HTMLElement.prototype, "offsetHeight", "get").mockReturnValue(32);
+    const rect = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const x = this.textContent === "Charlie" ? 100 : 0;
+      return { x, y: 0, left: x, top: 0, right: x + 200, bottom: 32, width: 200, height: 32, toJSON() {} };
+    });
+    const rects = vi.spyOn(HTMLElement.prototype, "getClientRects").mockImplementation(function (this: HTMLElement) {
+      return [this.getBoundingClientRect()] as unknown as DOMRectList;
+    });
+    const draw = (value: string | null) => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Tabs value={value}>
+          <TabsList variant="line">
+            <TabsTrigger value="a">Alpha</TabsTrigger>
+            <TabsTrigger value="c">Charlie</TabsTrigger>
+          </TabsList>
+          <TabsContent value="a" keepMounted>
+            First
+          </TabsContent>
+          <TabsContent value="c" keepMounted>
+            Third
+          </TabsContent>
+        </Tabs>
+      </CadenceProvider>
+    );
+    const view = render(draw("a"));
+    const marker = view.container.querySelector('[data-slot="tabs-indicator"]');
+    await expectV2MotionAction("tabs", "tabs.indicator.select", mode, () => view.rerender(draw("c")));
+    view.rerender(draw(null));
+    view.rerender(draw("a"));
+    expect(view.container.querySelector('[data-slot="tabs-indicator"]')).toBe(marker);
+    expectMotionContract(mode);
+    view.unmount();
+    for (const spy of [css, width, height, rect, rects]) spy.mockRestore();
+  });
   it("preserves slots, variants and state callbacks with render/ref on every part", async () => {
     const refs = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
     const { container } = render(
@@ -206,13 +348,13 @@ describe("Tabs", () => {
       expect(indicator?.parentElement).toBe(container.querySelector('[data-slot="tabs-list"]'));
       expectMotionContract(mode, {
         behavior: () => {
-          if (mode !== "full") expect(indicator).not.toHaveAttribute("style");
+          if (mode !== "full") expect((indicator as HTMLElement).style.transform).toBe("");
           else expect(indicator).toHaveAttribute("data-motion", "full");
         },
       });
       expect(indicator).toHaveAttribute("data-motion", mode);
       expect(indicator).not.toHaveAttribute("style", expect.stringContaining("transform"));
-      if (mode !== "full") expect(indicator).not.toHaveAttribute("style");
+      if (mode !== "full") expect((indicator as HTMLElement).style.transform).toBe("");
     },
   );
 });

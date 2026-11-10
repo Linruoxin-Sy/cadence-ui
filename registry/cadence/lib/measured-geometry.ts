@@ -31,6 +31,8 @@ export type GeometryTarget = {
   independent?: boolean;
   /** Only an adapter already owning a maintained native dimension supplies this. */
   resting?: string;
+  /** Known intrinsic column-flex allocation; release with the height overlay. */
+  flexBlock?: boolean;
 };
 export type GeometryDestination = Partial<Record<Axis, GeometryTarget>>;
 export type GeometryPolicy = { reduced: boolean; transition: Transition; available?: boolean };
@@ -128,6 +130,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     const values = { width: motionValue(0), height: motionValue(0) };
     const effects: Partial<Record<Axis, Animation>> = {};
     let contentWidth: Animation | null = null;
+    let flexBlock: Animation | null = null;
     const stops = new Set<() => void>();
     let baseline: GeometryDestination | null = null;
     let lease: MotionLease | null = null;
@@ -162,6 +165,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     const release = () => {
       contentWidth?.cancel();
       contentWidth = null;
+      flexBlock?.cancel();
+      flexBlock = null;
       for (const stop of stops) stop();
       stops.clear();
       for (const axis of ["width", "height"] as const) {
@@ -295,6 +300,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
             !target.independent ||
             !Number.isFinite(start) ||
             start === size ||
+            (target.flexBlock && Math.min(max, Math.max(min, start as number)) === size) ||
             typeof node.animate !== "function"
           ) {
             values[axis].jump(size);
@@ -308,10 +314,12 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           }
           // A replace-effect overlays CSS without capturing/restoring caller
           // declarations. Cancelling exposes the latest auto/flex/grid policy.
-          const effect = node.animate(
-            { [axis]: `${Math.min(max, Math.max(min, start as number))}px` },
-            { duration: 0, fill: "both" },
-          );
+          if (axis === "height" && target.flexBlock) {
+            const naturalFlex = { flexBasis: "auto", flexGrow: "0", flexShrink: "0" };
+            flexBlock = node.animate([naturalFlex, naturalFlex], { duration: 0, fill: "both" });
+          }
+          const initial = { [axis]: `${Math.min(max, Math.max(min, start as number))}px` };
+          const effect = node.animate([initial, initial], { duration: 0, fill: "both" });
           effects[axis] = effect;
           const permit = lease;
           const write = (value: number) => {
@@ -336,6 +344,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
                 running = false;
                 contentWidth?.cancel();
                 contentWidth = null;
+                flexBlock?.cancel();
+                flexBlock = null;
                 permit.finish();
               }
             },

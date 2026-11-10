@@ -228,6 +228,73 @@ export function observeCopiedController(controller, kind, args, source) {
     };
     return controller;
   }
+  if (kind === "createTabsLayout") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller),
+      keys = new Set();
+    controller.commit = (...input) => {
+      const result = withController(controller, () => commit(...input));
+      for (const key of keys) presentationSamples.delete(key);
+      keys.clear();
+      const add = (node, form, properties, clock) => {
+        const key = {};
+        keys.add(key);
+        presentationSamples.set(key, {
+          controller,
+          origin,
+          node,
+          form,
+          properties,
+          mode: node.dataset.motion,
+          preset: parameterSamples.get(clock)?.preset,
+          clock,
+          immediate: input[4],
+          zeroClock: parameterClockIsZero(clock),
+          target: input[0].target,
+          revision: input[0],
+          commits: 1,
+        });
+      };
+      if (args[0].current) add(args[0].current, "geometry.resize/measured", ["width", "height"], input[2]);
+      // Trigger projections are observed at their own executing item facade.
+      return result;
+    };
+    controller.dispose = () => {
+      for (const key of keys) presentationSamples.delete(key);
+      keys.clear();
+      return dispose();
+    };
+    return controller;
+  }
+  if (kind === "createTabsItem") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    controller.commit = (...input) => {
+      const result = withController(controller, () => commit(...input));
+      if (args[0].current)
+        presentationSamples.set(controller, {
+          controller,
+          origin,
+          node: args[0].current,
+          form: "layout.move/position",
+          properties: ["transform"],
+          mode: args[0].current.dataset.motion,
+          preset: parameterSamples.get(input[1])?.preset,
+          clock: input[1],
+          immediate: input[2],
+          target: input[0].target,
+          revision: input[0],
+          zeroClock: parameterClockIsZero(input[1]),
+          commits: 1,
+        });
+      return result;
+    };
+    controller.dispose = () => {
+      presentationSamples.delete(controller);
+      return dispose();
+    };
+    return controller;
+  }
   if (kind === "createViewportReveal") {
     const register = controller.register.bind(controller);
     const targets = new Set(),

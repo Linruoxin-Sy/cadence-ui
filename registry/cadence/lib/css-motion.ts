@@ -41,6 +41,16 @@ function familyStyle(text: string | null, family: "transition" | "animation") {
     )
     .join(";");
 }
+function paintStyle(text: string | null) {
+  return (text ?? "")
+    .split(";")
+    .filter((declaration) =>
+      /^\s*(?:color(?:-scheme)?|background[\w-]*|opacity|filter|[\w-]*blend[\w-]*|--(?!motion-|cadence-|ease-)[\w-]+)\s*:/.test(
+        declaration,
+      ),
+    )
+    .join(";");
+}
 
 function releaseFamily(owner: FamilyOwner | null) {
   if (!owner) return;
@@ -278,7 +288,12 @@ export function useStateColor<T extends MotionElement>(
   externalRef: Ref<T> | undefined,
   cm: CadenceMotion,
   owned: readonly ColorProperty[],
-  options: { immediate?: boolean; readability?: "verified" | "immediate" } = {},
+  options: {
+    immediate?: boolean;
+    readability?: "verified" | "immediate";
+    readabilityGate?: (node: MotionElement) => boolean;
+    readabilityScope?: (node: MotionElement) => Element | null;
+  } = {},
 ) {
   const previousMode = useRef<CadenceMode>(cm.mode);
   const ownership = useRef<FamilyOwner | null>(null);
@@ -338,7 +353,15 @@ export function useStateColor<T extends MotionElement>(
       const clock = transitionFor("state.color", mode, { timeScale: cm.timeScale }, cm.scope);
       const invalid = node.matches('[aria-invalid="true"], [data-invalid]:not([data-invalid="false"])');
       const seconds =
-        immediate || focus || invalid || env.hidden || env.immediate || env.themeOwned ? 0 : (clock.duration ?? 0);
+        immediate ||
+        focus ||
+        invalid ||
+        env.hidden ||
+        env.immediate ||
+        env.themeOwned ||
+        (options.readabilityGate && !options.readabilityGate(node))
+          ? 0
+          : (clock.duration ?? 0);
       const old = ownership.current;
       // Flush suppressed cascade before restoring a clock, never an old target.
       if (old?.allowed && old.applied["transition-duration"] === "0s" && seconds > 0)
@@ -361,7 +384,10 @@ export function useStateColor<T extends MotionElement>(
       previousMode.current = mode;
     };
     const checkShadows = () => {
-      if (alive && ownership.current?.node === node && ownership.current.allowed) cancelUnsafeShadows(node, owned);
+      if (alive && ownership.current?.node === node && ownership.current.allowed) {
+        if (options.readabilityGate) update(environment);
+        cancelUnsafeShadows(node, owned);
+      }
     };
     const focusIn = () => {
       if (!alive) return;
@@ -385,8 +411,13 @@ export function useStateColor<T extends MotionElement>(
       if (
         records.some(
           (record) =>
+            (options.readabilityGate &&
+              record.attributeName === "style" &&
+              record.target instanceof Element &&
+              paintStyle(record.oldValue) !== paintStyle(record.target.getAttribute("style"))) ||
             record.attributeName !== "style" ||
-            familyStyle(record.oldValue, "transition") !== familyStyle(node.getAttribute("style"), "transition"),
+            (record.target === node &&
+              familyStyle(record.oldValue, "transition") !== familyStyle(node.getAttribute("style"), "transition")),
         )
       )
         update(environment);
@@ -396,6 +427,27 @@ export function useStateColor<T extends MotionElement>(
       attributeOldValue: true,
       attributeFilter: ["aria-invalid", "data-invalid", "class", "style"],
     });
+    const region = options.readabilityScope?.(node);
+    const relatedFocus = () => {
+      if (alive) update(environment);
+    };
+    if (region) {
+      observer.observe(region, {
+        subtree: true,
+        attributes: true,
+        attributeOldValue: true,
+        attributeFilter: ["class", "style", "aria-invalid", "data-invalid"],
+      });
+      region.addEventListener("focusin", relatedFocus);
+      region.addEventListener("focusout", relatedFocus);
+      let ancestor = region.parentElement;
+      for (let depth = 0; ancestor && depth < 32; depth++, ancestor = ancestor.parentElement)
+        observer.observe(ancestor, {
+          attributes: true,
+          attributeOldValue: true,
+          attributeFilter: ["class", "style", "data-theme", "data-color-scheme"],
+        });
+    }
     return (release = true) => {
       alive = false;
       forgetColor();
@@ -405,6 +457,8 @@ export function useStateColor<T extends MotionElement>(
       node.removeEventListener("transitionrun", checkShadows);
       node.removeEventListener("focusin", focusIn);
       node.removeEventListener("focusout", focusOut);
+      region?.removeEventListener("focusin", relatedFocus);
+      region?.removeEventListener("focusout", relatedFocus);
       if (release) {
         releaseFamily(ownership.current);
         ownership.current = null;

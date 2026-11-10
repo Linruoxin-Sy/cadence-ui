@@ -160,7 +160,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
               const s = getComputedStyle(el);
               return { transform: s.transform, transition: s.transitionDuration, animation: s.animationName };
             });
-            expect(styles).toEqual({ transform: "none", transition: "0s", animation: "none" });
+            expect(styles.transform).toBe("none");
+            expect(styles.animation).toBe("none");
+            if (mode === "none")
+              expect(styles.transition.split(",").every((v) => Number.parseFloat(v) === 0)).toBe(true);
+            else expect(styles.transition.split(",").some((v) => Number.parseFloat(v) > 0)).toBe(true);
           }
           if (mode === "full") {
             // Filled markers use immediate placement to preserve selected-label contrast.
