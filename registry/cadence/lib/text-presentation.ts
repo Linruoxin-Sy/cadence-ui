@@ -37,6 +37,8 @@ export interface TextPresentationCommit {
   visible?: boolean;
   capture?: Capture;
   sourceRetired?: boolean;
+  /** Expected prior display when a compound primitive changes renderer in an editor. */
+  nativeBaseline?: string;
 }
 
 /** Internal plain-string boundary. One native Text node; no child traversal,
@@ -60,8 +62,11 @@ export function createTextPresentation(
   let requested = snapshot.value;
   let alive = true,
     editing = nativeTextContext(host),
+    nativeOwned = false,
     baseline = true;
   let generation = 0;
+  let retainedValue: string | undefined;
+  let retainedEntity: unknown;
   let lease: MotionLease | null = null;
   let active = new Set<object>();
   let handoffWork = 0;
@@ -143,10 +148,14 @@ export function createTextPresentation(
   const restrictions = () => {
     const next = nativeTextContext(host);
     if (next !== editing) {
+      retainedValue = !next && (nativeOwned || host.textContent !== requested) ? requested : undefined;
+      retainedEntity = current?.entity;
       editing = next;
-      baseline = true;
+      nativeOwned = false;
+      baseline = retainedValue === undefined;
       stop();
       snapshot = createTextSnapshot(host.textContent ?? "", current?.locale);
+      current = null;
     }
     if (
       !plain() ||
@@ -161,6 +170,7 @@ export function createTextPresentation(
     if (changes.some((change) => change.type !== "attributes") || signature() !== paintSignature) stop();
     restrictions();
     if (changes.some((change) => change.type !== "attributes")) {
+      if (editing) nativeOwned = true;
       snapshot = createTextSnapshot(host.textContent ?? "", current?.locale);
       baseline = true;
     }
@@ -321,7 +331,24 @@ export function createTextPresentation(
       const sameEntity = current !== null && Object.is(options.entity, current.entity);
       const previous = current;
       const clock = cm.parameters(binding);
+      if (!editing && retainedValue !== undefined) {
+        if (value === retainedValue && Object.is(options.entity, retainedEntity)) {
+          current = options;
+          options.capture?.dispose();
+          return;
+        }
+        retainedValue = undefined;
+        if (!Object.is(options.entity, retainedEntity)) baseline = true;
+      }
+      if (editing && host.textContent !== (previous ? requested : (options.nativeBaseline ?? requested)))
+        nativeOwned = true;
       current = options;
+      if (editing && nativeOwned) {
+        requested = value;
+        stop();
+        options.capture?.dispose();
+        return;
+      }
       if (previous?.revision === revision && value === requested && sameEntity) {
         if (
           !revision.current() ||

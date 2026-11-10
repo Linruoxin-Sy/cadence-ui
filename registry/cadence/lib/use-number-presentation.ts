@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useInsertionEffect, useLayoutEffect, useRef } from "react";
 import type { MotionHostRef } from "./motion-ref";
 import { createMotionTransaction } from "./motion-transaction";
 import { createNumberSnapshot, type NumberDisplay, type NumericValue } from "./number-plan";
@@ -9,25 +9,34 @@ import type { CadenceMotion } from "./provider";
 
 const committed = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-/** Numeric display adapter. Return the actual SSR value once, retain one native
- * Text node and commit formatting only when accepted inputs change. */
+/** Quantity controller on one retained native host, including compound primitive dispatch. */
 export function useNumberPresentation(
   host: MotionHostRef<HTMLElement>,
   value: NumericValue,
   cm: CadenceMotion,
   entity: unknown,
   options: Partial<
-    Pick<NumberPresentationCommit, "cause" | "direction" | "compact" | "visible" | "externalGeometry">
-  > & { display?: NumberDisplay; revision?: NumberPresentationCommit["revision"] } = {},
+    Pick<
+      NumberPresentationCommit,
+      "cause" | "direction" | "compact" | "visible" | "externalGeometry" | "retainEditedContent" | "nativeBaseline"
+    >
+  > & {
+    display?: NumberDisplay;
+    revision?: NumberPresentationCommit["revision"];
+    enabled?: boolean;
+    initialText?: string;
+  } = {},
   supplied?: ReturnType<typeof createMotionTransaction>,
 ) {
   const initial = useRef<string | null>(null);
-  if (initial.current === null) initial.current = createNumberSnapshot(value, options.display).text;
+  if (initial.current === null)
+    initial.current = options.initialText ?? createNumberSnapshot(value, options.display).text;
   const local = useRef<ReturnType<typeof createMotionTransaction> | null>(null);
   if (!local.current) local.current = createMotionTransaction();
   const transaction = supplied ?? local.current;
-  const connected = useRef<{
+  type Connection = {
     element: HTMLElement;
+    host: MotionHostRef<HTMLElement>;
     identity: object | undefined;
     transaction: typeof transaction;
     controller: ReturnType<typeof createNumberPresentation>;
@@ -35,27 +44,46 @@ export function useNumberPresentation(
     value?: NumericValue;
     display?: NumberDisplay;
     snapshot?: ReturnType<typeof createNumberSnapshot>;
-  } | null>(null);
+    dispose(): void;
+  };
+  const connected = useRef<Connection | null>(null);
+  const enabled = options.enabled !== false;
+  useInsertionEffect(() => {
+    if (!enabled) connected.current?.dispose();
+  }, [enabled]);
   committed(() => {
-    const old = connected.current;
-    if (old && (old.element !== host.current || old.identity !== host.identity || old.transaction !== transaction)) {
-      connected.current = null;
-      old.controller.dispose();
+    if (!enabled) {
+      connected.current?.dispose();
+      return;
     }
-    if (!connected.current && host.current)
-      connected.current = {
+    const old = connected.current;
+    if (
+      old &&
+      (old.host !== host ||
+        old.element !== host.current ||
+        old.identity !== host.identity ||
+        old.transaction !== transaction)
+    )
+      old.dispose();
+    if (!connected.current && host.current) {
+      const connection: Connection = {
         element: host.current,
+        host,
         identity: host.identity,
         transaction,
         controller: createNumberPresentation(host.current, transaction),
         source: {},
+        dispose() {
+          if (connected.current === connection) connected.current = null;
+          if (host.invalidate === connection.dispose) host.invalidate = undefined;
+          connection.controller.dispose();
+        },
       };
+      connected.current = connection;
+    }
     const connection = connected.current;
-    host.invalidate = () => {
-      connected.current = null;
-      connection?.controller.dispose();
-    };
     if (!connection) return;
+    host.invalidate = connection.dispose;
     if (!connection.snapshot || !Object.is(value, connection.value) || options.display !== connection.display) {
       connection.snapshot = createNumberSnapshot(value, options.display);
       connection.value = value;
@@ -71,14 +99,6 @@ export function useNumberPresentation(
       direction: cm.reduced ? undefined : options.direction,
     });
   });
-  committed(
-    () => () => {
-      const old = connected.current;
-      connected.current = null;
-      old?.controller.dispose();
-      host.invalidate = undefined;
-    },
-    [host],
-  );
+  committed(() => () => connected.current?.dispose(), []);
   return initial.current;
 }

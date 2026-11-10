@@ -5,9 +5,24 @@ import {
   cssImplementationExports,
   cssPolicyCapabilities,
   implementedForm,
+  parameterWriterForms,
 } from "../../scripts/motion-manifest.mjs";
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
+
+describe("retained surface presence form", () => {
+  const surface = readFileSync("registry/cadence/lib/surface-presence.ts", "utf8");
+  it("recognises the installed opacity owner and rejects a missing writer or imported binding", () => {
+    expect(parameterWriterForms(surface)).toEqual(["enter.pop/opacity", "exit.fade/opacity"]);
+    for (const candidate of [
+      surface.replaceAll("node.animate(", "missing("),
+      surface.replaceAll('owner.begin(revision, ["opacity"]', 'missing(revision, ["opacity"]'),
+      surface.replaceAll('from "./motion"', 'from "@/motion"'),
+      `// ${surface.replaceAll("\n", "\n// ")}`,
+    ])
+      expect(parameterWriterForms(candidate)).toEqual([]);
+  });
+});
 
 describe("installed numeric form", () => {
   const number = readFileSync("registry/cadence/animated-number/index.tsx", "utf8");

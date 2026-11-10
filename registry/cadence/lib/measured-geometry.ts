@@ -2,6 +2,7 @@
 
 import { animateSingleValue, motionValue, type Transition } from "motion/react";
 import { createContext } from "react";
+import { motionLimits } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import type { MotionHostRef } from "./motion-ref";
 import {
@@ -17,6 +18,8 @@ type Axis = "width" | "height";
 export const GeometryScope = createContext<{
   controller: ReturnType<typeof createMeasuredGeometry>;
   transaction: ReturnType<typeof createMotionTransaction>;
+  /** A compound adapter can coalesce descendant commits at its surviving owner. */
+  request?: () => void;
 } | null>(null);
 export type GeometryTarget = {
   size: number;
@@ -76,6 +79,10 @@ type Adapter = {
   axes: readonly Axis[];
   /** Native sizing adapter work is distinct from decorative participation. */
   maintained?: boolean;
+  /** A real intrinsic content box keeps its destination width during shell resize. */
+  destinationWidth?: boolean;
+  /** Wrapper-free hosts observe bounded real child boxes for passive reflow. */
+  observeChildren?: boolean;
   /** Read natural layout only. The one real content tree must be independent of the written axis. */
   measure(reason: Reason): GeometryDestination | null;
 };
@@ -120,6 +127,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     const registration = transaction.register(node);
     const values = { width: motionValue(0), height: motionValue(0) };
     const effects: Partial<Record<Axis, Animation>> = {};
+    let contentWidth: Animation | null = null;
     const stops = new Set<() => void>();
     let baseline: GeometryDestination | null = null;
     let lease: MotionLease | null = null;
@@ -128,9 +136,32 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     let restricted = false;
     let stamp = "";
     let writingMode = "";
+    let naturalWidth = 0;
+    let naturalHeight = 0;
+    const naturalChildren = new Map<Element, { width: number; height: number }>();
+    let constraints = "";
+    const constraintSignature = () =>
+      JSON.stringify([
+        node.className,
+        ...[
+          "width",
+          "height",
+          "min-width",
+          "min-height",
+          "max-width",
+          "max-height",
+          "overflow",
+          "padding",
+          "box-sizing",
+          "display",
+          "gap",
+        ].map((property) => node.style.getPropertyValue(property)),
+      ]);
     let sampled: Partial<Record<Axis, { size: number; velocity: number }>> = {};
     const current = () => alive && host.current === node && host.identity === identity && node.isConnected;
     const release = () => {
+      contentWidth?.cancel();
+      contentWidth = null;
       for (const stop of stops) stop();
       stops.clear();
       for (const axis of ["width", "height"] as const) {
@@ -173,6 +204,23 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           return null;
         }
         const result = adapter.measure(reason);
+        naturalWidth = content.offsetWidth;
+        naturalHeight = content.offsetHeight;
+        if (adapter.observeChildren) {
+          const children = Array.from(content.children).slice(0, motionLimits.collectionVisuals);
+          for (const child of naturalChildren.keys())
+            if (!children.includes(child)) {
+              observer.unobserve(child);
+              naturalChildren.delete(child);
+            }
+          for (const child of children)
+            if (child instanceof HTMLElement) {
+              if (!naturalChildren.has(child)) observer.observe(child, { box: "border-box" });
+              naturalChildren.set(child, { width: child.offsetWidth, height: child.offsetHeight });
+            }
+          constraints = constraintSignature();
+          attributes.takeRecords();
+        }
         // RO sizes are border-box layout units; rounding matches offset sizes.
         writingMode = content.ownerDocument.defaultView?.getComputedStyle(content).writingMode ?? "";
         const vertical = /^(vertical|sideways)/.test(writingMode);
@@ -253,6 +301,11 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
             continue;
           }
           values[axis].jump(start as number);
+          if (axis === "width" && adapter.destinationWidth && content !== node) {
+            const natural = naturalGeometry(content);
+            if (natural && typeof content.animate === "function")
+              contentWidth = content.animate({ width: `${natural.width}px` }, { duration: 0, fill: "both" });
+          }
           // A replace-effect overlays CSS without capturing/restoring caller
           // declarations. Cancelling exposes the latest auto/flex/grid policy.
           const effect = node.animate(
@@ -281,6 +334,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
               if (effects[axis] === effect) delete effects[axis];
               if (!--pending) {
                 running = false;
+                contentWidth?.cancel();
+                contentWidth = null;
                 permit.finish();
               }
             },
@@ -319,16 +374,54 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     const view = node.ownerDocument.defaultView;
     const observer = new ResizeObserver((entries) => {
       if (delegated()) return;
+      if (
+        adapter.observeChildren &&
+        entries.some(({ target }) => {
+          const baseline = naturalChildren.get(target);
+          return (
+            baseline &&
+            target instanceof HTMLElement &&
+            (baseline.width !== target.offsetWidth || baseline.height !== target.offsetHeight)
+          );
+        })
+      ) {
+        passive();
+        return;
+      }
+      // A wrapper-free adapter may observe its own natural shell. Its owned
+      // WAAPI axis is not a passive layout cause; an unowned axis still is.
+      if (adapter.observeChildren && content === node && running && baseline) {
+        const box = naturalGeometry(node);
+        if (
+          box &&
+          (["width", "height"] as const).every(
+            (axis) =>
+              adapter.axes.includes(axis) ||
+              Math.round(box[axis]) === Math.round(axis === "width" ? naturalWidth : naturalHeight),
+          )
+        )
+          return;
+      }
       const entry = entries.find((entry) => entry.target === content);
       const box = entry?.borderBoxSize?.[0];
       if (box && `${Math.round(box.inlineSize)}/${Math.round(box.blockSize)}` === stamp) return;
       passive();
     });
     observer.observe(content, { box: "border-box" });
-    const attributes = new MutationObserver(() => {
-      if (!delegated() && view?.getComputedStyle(content).writingMode !== writingMode) passive();
+    const attributes = new MutationObserver((records) => {
+      if (
+        !delegated() &&
+        (view?.getComputedStyle(content).writingMode !== writingMode ||
+          (adapter.observeChildren &&
+            (constraintSignature() !== constraints || records.some((record) => record.type !== "attributes"))))
+      )
+        passive();
     });
-    attributes.observe(content, { attributes: true, attributeFilter: ["style", "class"] });
+    attributes.observe(content, {
+      attributes: true,
+      attributeFilter: ["style", "class"],
+      ...(adapter.observeChildren ? { childList: true, characterData: true, subtree: true } : {}),
+    });
     const unsubscribeEnvironment = subscribeMotionEnvironment(node.ownerDocument, (state) => {
       restricted = state.hidden || state.immediate || state.reduced;
       if (restricted) passive();

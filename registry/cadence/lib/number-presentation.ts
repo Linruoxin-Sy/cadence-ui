@@ -35,6 +35,9 @@ export interface NumberPresentationCommit {
   /** A separate geometry/fill engine cannot promise this reel's phase. The
    * composition shares the semantic revision but uses an immediate readout. */
   externalGeometry?: boolean;
+  /** React child displays retain native edits; explicit controlled value APIs restore their value. */
+  retainEditedContent?: boolean;
+  nativeBaseline?: string;
 }
 
 let maskId = 0;
@@ -59,6 +62,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
     editing = nativeTextContext(host),
     nativeOwned = false;
   let current: NumberPresentationCommit | null = null;
+  let retained: { text: string; format: string; entity: unknown } | null = null;
   let snapshot: NumberSnapshot | null = null;
   let lease: MotionLease | null = null;
   let generation = 0;
@@ -103,6 +107,10 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   const restrict = () => {
     const next = nativeTextContext(host);
     if (editing !== next) {
+      retained =
+        !next && current?.retainEditedContent && (nativeOwned || host.textContent !== current.snapshot.text)
+          ? { text: current.snapshot.text, format: current.snapshot.formatKey, entity: current.entity }
+          : null;
       editing = next;
       nativeOwned = false;
       baseline = true;
@@ -127,6 +135,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
     stop();
     restrict();
     if (changes.some((change) => change.type !== "attributes")) {
+      if (editing) nativeOwned = true;
       snapshot = null;
       baseline = true;
     }
@@ -275,6 +284,18 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
         bindMotionParameters(options.compact ? numberCompact : numberRoll, "number.roll/reels"),
       );
       const nextClock = parameters.kind === "reel" ? JSON.stringify(parameters.transition) : "";
+      if (!editing && retained) {
+        if (
+          options.snapshot.text === retained.text &&
+          options.snapshot.formatKey === retained.format &&
+          Object.is(options.entity, retained.entity)
+        ) {
+          current = options;
+          stop();
+          return;
+        }
+        retained = null;
+      }
       const retime = nextClock !== clock;
       clock = nextClock;
       const eligible =
@@ -295,7 +316,8 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       // Once native input owns this editor (or its buffer differs from the last
       // accepted prop), mode/clock/prop commits cannot restore display text.
       // Clean controlled display updates retain their existing native semantics.
-      if (editing && host.textContent !== (previous?.snapshot.text ?? options.snapshot.text)) nativeOwned = true;
+      if (editing && host.textContent !== (previous?.snapshot.text ?? options.nativeBaseline ?? options.snapshot.text))
+        nativeOwned = true;
       if ((editing && nativeOwned) || !plain() || host.matches("input,textarea,select,option")) {
         stop();
         snapshot = null;

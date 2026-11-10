@@ -10,7 +10,7 @@
   "toc": ["nested", "controlled", "scroll-tracking"],
   "input": ["invalid", "file", "controlled", "disabled-readonly"],
   "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"],
-  "card": ["header-action", "sizes", "content-sized", "boundaries"],
+  "card": ["changing-content", "header-action", "sizes", "content-sized", "boundaries"],
   "aspect-ratio": ["square", "video", "grid"],
   "avatar": ["sizes", "image-fallback", "presence", "group"],
   "skeleton": ["text-lines", "avatar-name", "swap-content", "without-motion"],

@@ -150,7 +150,7 @@ for (const mode of ["full", "reduced", "none"] as const)
 
 for (const mode of ["full", "reduced", "none"] as const)
   for (const os of [false, true])
-    test(`Card examples: fixed sizes and immediate content measurement ${mode}/${os}`, async ({ page }) => {
+    test(`Card examples: native sizes and focused content measurement ${mode}/${os}`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
       await page.goto(`/components/card?motion=${mode}&variant=sm`);
       await page.waitForLoadState("networkidle");
@@ -200,7 +200,7 @@ for (const mode of ["full", "reduced", "none"] as const)
         .evaluate((button) => (button as HTMLButtonElement).click());
       await expect(toggle).toBeFocused();
       await expect(toggle).toHaveAttribute("data-motion", "none");
-      await expect(fit).toContainText("The surface follows its own content immediately.");
+      await expect(fit).toContainText("The surface follows its own content.");
       await page.setViewportSize({ width: 390, height: 1000 });
       await expect
         .poll(() =>

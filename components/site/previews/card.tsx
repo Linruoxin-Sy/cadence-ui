@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence } from "motion/react";
 import { useRef, useState } from "react";
 import { Badge } from "@/registry/cadence/badge";
 import { Button } from "@/registry/cadence/button";
@@ -13,6 +14,57 @@ import {
   CardTitle,
 } from "@/registry/cadence/card";
 import { PreviewStack } from "./shell";
+
+function ChangingCard() {
+  const [ready, setReady] = useState(false);
+  const [count, setCount] = useState(19);
+  const [show, setShow] = useState(true);
+  const [compact, setCompact] = useState(false);
+  const [muted, setMuted] = useState(false);
+  return (
+    <div className="flex w-full flex-col items-start gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setReady((value) => !value)}>
+          Update record
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setCount((value) => value + 1)}>
+          Add seat
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setCompact((value) => !value)}>
+          Change density
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setMuted((value) => !value)}>
+          Change surface
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setShow((value) => !value)}>
+          {show ? "Hide record" : "Show record"}
+        </Button>
+      </div>
+      <AnimatePresence>
+        {show && (
+          <Card
+            key="record"
+            fit="content"
+            size={compact ? "sm" : "default"}
+            className={muted ? "max-w-full bg-muted" : "max-w-full"}
+            style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+          >
+            <CardHeader>
+              <CardTitle className="whitespace-nowrap">{ready ? "Release ready" : "Release pending"}</CardTitle>
+              <CardDescription className="whitespace-nowrap">
+                {ready ? "Review complete" : "Awaiting review"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="whitespace-nowrap">{count}</CardContent>
+            <CardFooter>
+              <span className="text-xs text-muted-foreground">Seats in this workspace</span>
+            </CardFooter>
+          </Card>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 function CardHeaderAction() {
   return (
@@ -61,7 +113,7 @@ function ContentSizedCard() {
         </CardHeader>
         <CardContent>
           {expanded
-            ? "The surface follows its own content immediately. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows."
+            ? "The surface follows its own content. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows."
             : "Short content."}
         </CardContent>
         <CardFooter>
@@ -122,6 +174,7 @@ function CardSpecimen() {
 }
 
 const examples = {
+  "changing-content": ChangingCard,
   "header-action": CardHeaderAction,
   sizes: CardSizes,
   "content-sized": ContentSizedCard,

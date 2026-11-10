@@ -86,6 +86,21 @@
     "item": "/r/cadence-utils.json"
   },
   {
+    "name": "cadence-surface-presence",
+    "type": "registry:lib",
+    "title": "Surface presence controller",
+    "description": "Opacity-only retained surface lifecycle without duplicated content or resting-style writes.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [],
+    "registryDependencies": [
+      "@cadence/cadence-provider"
+    ],
+    "docs": "/r/cadence-surface-presence.md",
+    "item": "/r/cadence-surface-presence.json"
+  },
+  {
     "name": "cadence-provider",
     "type": "registry:lib",
     "title": "Provider",
@@ -298,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -406,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -443,7 +458,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -482,7 +497,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -519,7 +534,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -558,7 +573,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -595,7 +610,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -607,15 +622,42 @@
     "categories": [
       "layout"
     ],
-    "dependencies": [],
+    "dependencies": [
+      "motion"
+    ],
     "registryDependencies": [
-      "@cadence/cadence-utils"
+      "@cadence/cadence-motion",
+      "@cadence/cadence-utils",
+      "@cadence/cadence-provider",
+      "@cadence/cadence-geometry",
+      "@cadence/cadence-text",
+      "@cadence/cadence-number",
+      "@cadence/cadence-surface-presence"
     ],
     "since": "0.2.0",
     "tier": "T0",
     "batch": "B1",
-    "motion": [],
-    "intensity": "subtle",
+    "motion": [
+      "enter.pop",
+      "exit.fade",
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
+      }
+    ],
+    "intensity": "medium",
     "complexity": "S",
     "upstream": {
       "registry": "shadcn",
@@ -623,16 +665,59 @@
       "version": "2026-10"
     },
     "motionProfile": {
-      "scope": "static",
-      "travel": "none",
-      "coordination": "independent",
-      "reason": "Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+      "scope": "surface",
+      "travel": "compact",
+      "coordination": "group",
+      "reason": "One retained surface envelope and measured size transaction coordinate direct display changes, quantity reels and disjoint readable paint without rewriting rich content."
     },
     "motionCoverage": {
       "schema": 1,
-      "effects": {}
+      "effects": {
+        "enter.pop/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "card",
+            "reason": "Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."
+          }
+        ],
+        "exit.fade/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "card",
+            "reason": "Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "card",
+            "reason": "Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "card",
+            "reason": "Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "card",
+            "reason": "Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "card",
+            "reason": "Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."
+          }
+        ]
+      }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -669,7 +754,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -708,7 +793,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -763,7 +848,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -802,7 +887,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -842,7 +927,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -884,7 +969,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -925,7 +1010,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -967,7 +1052,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1009,7 +1094,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -1049,7 +1134,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -1089,7 +1174,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -1144,7 +1229,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -1212,7 +1297,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -1265,7 +1350,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -1317,7 +1402,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -1368,7 +1453,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -1420,7 +1505,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -1473,7 +1558,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -1551,7 +1636,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1604,7 +1689,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1655,7 +1740,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1722,7 +1807,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1788,7 +1873,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1854,7 +1939,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -1920,7 +2005,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -1988,7 +2073,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -2054,7 +2139,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -2135,7 +2220,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -2211,7 +2296,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -2286,7 +2371,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -2361,7 +2446,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -2436,7 +2521,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -2521,7 +2606,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -2603,7 +2688,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -2669,7 +2754,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -2725,7 +2810,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -2780,7 +2865,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -2849,7 +2934,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -2886,7 +2971,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -2944,7 +3029,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -2983,7 +3068,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -3035,7 +3120,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -3094,7 +3179,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -3173,7 +3258,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -3213,7 +3298,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -3321,7 +3406,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -3413,7 +3498,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -3504,7 +3589,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -3570,7 +3655,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -3623,7 +3708,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -3683,7 +3768,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -3735,7 +3820,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -3787,7 +3872,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -3841,7 +3926,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -3893,7 +3978,7 @@
         ]
       }
     },
-    "sourceSha": "7fac1fd1",
+    "sourceSha": "f2de760c",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

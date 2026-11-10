@@ -154,13 +154,14 @@ export function observeCopiedController(controller, kind, args, source) {
   const origin = currentExecution();
   controllerOrigins.set(controller, origin);
   controllerSources.set(controller, source);
-  if (kind === "createInlinePresence") {
+  if (kind === "createInlinePresence" || kind === "createSurfacePresence") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);
     controller.commit = (...input) => {
       const offset = parameterCalls.length;
       const result = withController(controller, () => commit(...input));
-      const form = input[0].present ? "data.transition/opacity" : "exit.fade/opacity";
+      const entrance = kind === "createSurfacePresence" ? "enter.pop/opacity" : "data.transition/opacity";
+      const form = input[0].present ? entrance : "exit.fade/opacity";
       {
         const policy = parameterCalls.slice(offset).find((call) => call.form === form);
         presentationSamples.set(controller, {
@@ -168,7 +169,7 @@ export function observeCopiedController(controller, kind, args, source) {
           node: args[0],
           origin,
           form,
-          supportedForms: ["data.transition/opacity", "exit.fade/opacity"],
+          supportedForms: [entrance, "exit.fade/opacity"],
           mode: input[0].cm.mode,
           properties: ["opacity"],
           preset: policy?.preset,

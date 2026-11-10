@@ -2,15 +2,15 @@
 title: Card
 description: Grouping related content, such as a summary or a record.
 category: layout
-motion: []
-intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motion: ["enter.pop","exit.fade",{"recipe":"state.color","form":"css-transition"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"}]
+intensity: "medium"
+motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"One retained surface envelope and measured size transaction coordinate direct display changes, quantity reels and disjoint readable paint without rewriting rich content."}
+motionCoverage: {"schema":1,"effects":{"enter.pop/one-shot":[{"relationship":"default","owner":"card","reason":"Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."}],"exit.fade/one-shot":[{"relationship":"default","owner":"card","reason":"Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."}],"state.color/css-transition":[{"relationship":"default","owner":"card","reason":"Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."}],"geometry.resize/measured":[{"relationship":"default","owner":"card","reason":"Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."}],"text.change/changed-runs":[{"relationship":"default","owner":"card","reason":"Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."}],"number.roll/reels":[{"relationship":"default","owner":"card","reason":"Card integrates the executor on its root and named display/surface parts; nested geometry delegates once and rich/native content remains caller-owned."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: []
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["motion"]
+registryDeps: ["@cadence/cadence-motion","@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text","@cadence/cadence-number","@cadence/cadence-surface-presence"]
 ---
 
 ## Installation
@@ -38,13 +38,7 @@ npx shadcn@latest add @cadence/badge
 
 [Manual installation files](https://cadence.dev/r/card.json)
 
-Card needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `card/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves. Preserve the component's
-`"use client"` directive: the optional `fit="content"` uses the browser's native
-`ResizeObserver` to measure content height and apply it immediately, with no interpolation
-or additional observer package. Before measurement, server-rendered cards use natural
-content layout. Card has no animation in full, reduced or none mode.
+Card installs its relative shared motion, geometry, text and quantity helpers. The provider is optional; without one, Card follows the system preference. Follow the generated setup above, including the shared theme CSS. Keep the `"use client"` directive. Server-rendered and no-JavaScript cards remain naturally sized and visible; hydration does not replay the first screen.
 
 For the action compositions, follow [Button's installation](/components/button#installation),
 including its dependencies and motion setup. To reproduce the top preview, also follow
@@ -52,7 +46,7 @@ including its dependencies and motion setup. To reproduce the top preview, also 
 packages are already included above. Button and Badge are composition dependencies,
 not dependencies of Card. Compact renders neither, and the body example snippets do not
 render Badge, so their unused imports can be omitted. React's `useRef` and `useState`
-are used only by Content-sized and need no additional package beyond the React setup
+are used by the changing-content examples and need no additional package beyond the React setup
 above; their unused imports in the other snippets can also be omitted.
 
 ## Usage
@@ -82,6 +76,47 @@ export function Plan() {
         <Button variant="outline">Open plan</Button>
       </CardFooter>
     </Card>
+  );
+}
+```
+
+## Changing content
+
+Update the record, add a seat, change its density or surface colour, or hide and reinsert it. Direct strings in Title, Description and Content use changed-only replacement; direct numbers keep their existing formatting and roll supported changed places. Rich children remain untouched. Change the surface independently to see its colour feedback; a concurrent ancestor paint transition uses native text as a safe fallback. The example explicitly selects plain monospace typography with normal font features so the native/canvas glyph correspondence is measurable; unverified shaping keeps native paint. A surviving `AnimatePresence` parent retains the one real Card for its exit.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { AnimatePresence } from "motion/react";
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/cadence/card";
+
+export function ChangingCard() {
+  const [ready, setReady] = useState(false);
+  const [count, setCount] = useState(19);
+  const [show, setShow] = useState(true);
+  const [compact, setCompact] = useState(false);
+  const [muted, setMuted] = useState(false);
+  return (
+    <div className="flex w-full flex-col items-start gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setReady(value => !value)}>Update record</Button>
+        <Button variant="outline" size="sm" onClick={() => setCount(value => value + 1)}>Add seat</Button>
+        <Button variant="outline" size="sm" onClick={() => setCompact(value => !value)}>Change density</Button>
+        <Button variant="outline" size="sm" onClick={() => setMuted(value => !value)}>Change surface</Button>
+        <Button variant="outline" size="sm" onClick={() => setShow(value => !value)}>{show ? "Hide record" : "Show record"}</Button>
+      </div>
+      <AnimatePresence>
+        {show && <Card key="record" fit="content" size={compact ? "sm" : "default"} className={muted ? "max-w-full bg-muted" : "max-w-full"} style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>
+          <CardHeader><CardTitle className="whitespace-nowrap">{ready ? "Release ready" : "Release pending"}</CardTitle><CardDescription className="whitespace-nowrap">{ready ? "Review complete" : "Awaiting review"}</CardDescription></CardHeader>
+          <CardContent className="whitespace-nowrap">{count}</CardContent>
+          <CardFooter><span className="text-xs text-muted-foreground">Seats in this workspace</span></CardFooter>
+        </Card>}
+      </AnimatePresence>
+    </div>
   );
 }
 ```
@@ -145,7 +180,7 @@ export function CardSizes() {
 
 ## Content-sized
 
-`fit="content"` measures its own flow box with a ResizeObserver and applies the height immediately, even in a stretching grid. Toggle the caller-owned text to compare it with a normal card; the same shell and caller ref remain in place. Narrowing the parent wraps the text and remeasures it. This is geometry, with no animation in any mode. Use it when differing content heights carry information; ordinary card grids usually should line up.
+`fit="content"` hugs its real flow box, even in a stretching grid. One geometry owner measures final layout and interpolates only safe owned axes in full mode. Toggle the caller-owned text to compare it with a normal card; the same shell and caller ref remain in place. Narrowing the parent wraps the text and remeasures it. Reduced and none commit geometry immediately. Wrapping width, focused editors, constrained axes and any dimension that would conceal required content keep native layout. Use it when differing content heights carry information; ordinary card grids usually should line up.
 
 <ComponentExample name="content-sized" />
 
@@ -164,7 +199,7 @@ export function ContentSizedCard() {
     <div className="grid w-full max-w-lg grid-cols-1 items-stretch gap-4 sm:grid-cols-2">
       <Card fit="content" ref={fitRef} data-testid="fit-card" className="max-w-sm">
         <CardHeader><CardTitle>Content fit</CardTitle></CardHeader>
-        <CardContent>{expanded ? "The surface follows its own content immediately. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows." : "Short content."}</CardContent>
+        <CardContent>{expanded ? "The surface follows its own content. A caller ref still reaches the same measured shell while the text wraps as the viewport narrows." : "Short content."}</CardContent>
         <CardFooter><Button variant="outline" onClick={() => setExpanded((value) => !value)}>Toggle content</Button></CardFooter>
       </Card>
       <Card>
@@ -175,6 +210,8 @@ export function ContentSizedCard() {
   );
 }
 ```
+
+Fit owns its native block height even with a stretching `h-full` class; use an ordinary Card for an explicit fixed height. External min/max constraints still apply.
 
 ## Section boundaries
 
@@ -229,27 +266,26 @@ export function CardBoundaries() {
 
 Every part sets `data-slot`, so CSS can reach it:
 `[&>[data-slot=card-header]]:gap-4`. Under `fit="content"` the parts are wrapped
-in one `data-slot="card-flow"` box, which is the element the height is measured
+in one `data-slot="card-flow"` box. Its header releases inline-size containment so the title participates in intrinsic fit width. The flow supplies the natural destination and keeps that destination width only during an eligible width flight, then releases it. This is the element the height is measured
 from — style the parts from the shell as before, and the flow box only if you
 need the measured layer itself.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Card declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: One retained surface envelope and measured size transaction coordinate direct display changes, quantity reels and disjoint readable paint without rewriting rich content.
 
-No motion (T0). A card does not fade, lift, or scale in. If a group of cards should
-appear in sequence, that is a page-level `list.stagger` decision made by the parent,
-not a property of the card.
+| Phase | Properties | Token | Interruptible |
+| --- | --- | --- | --- |
+| Independent insertion | root opacity; first SSR/hydration stays visible | `enter.pop/one-shot` | Yes |
+| Retained removal | root opacity; inert and hidden from accessibility immediately | `exit.fade/one-shot` | Yes, reinsert the same key |
+| Content or density change | measured owned height and safe nonwrapping fit width | `geometry.resize/measured` | Yes, latest destination |
+| Direct display string | changed graphemes only, no stagger | `text.change/changed-runs` | Yes |
+| Direct quantity | changed decimal places with exact prior output | `number.roll/reels` | Yes |
+| Palette change | explicit background, foreground, border and fixed-topology shadow properties at disjoint owners | `state.color/css-transition` | Yes |
+| reduced | short opacity/colour; geometry and quantities immediate | Same recipes, no travel or reels | Live cancellation |
+| none / zero clock | immediate current semantic target; no duration or delay | Same recipes, zero clock | Cancels active work |
 
-`fit="content"` adds no row to the table below: the measured height is applied as
-soon as it is known, so there is no phase, no interpolation, and no reduced-motion
-branch to keep — the geometry is information, and both modes render it identically.
-
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+An ancestor Card owns the same entrance and resize cause once. Independently overridden text colours have their own owner; ordinary inherited paint stays at the ancestor. Unknown caller palettes, transition/animation owners, unsafe shaping or pixel transport use immediate local fallbacks. Passive viewport/font/media reflow is native. Strings such as `00123` remain text. Forms, media, rich JSX and actual editable contexts retain their native content and lifetimes. Returning from editing retains a native-edited buffer as the baseline without replay; a later changed display value resumes caller output. There is no automatic hover lift on the plain Card surface.
 
 ## Accessibility
 
@@ -264,23 +300,15 @@ branch to keep — the geometry is information, and both modes render it identic
 
 ## Responsiveness and performance
 
-Cards follow their parent layout by default. The caller owns grid columns and narrow-screen
-wrapping; size="sm" changes spacing, not a breakpoint. With fit="content", CSS resolves width and a
-ResizeObserver measures content height after mount, applying it immediately without interpolation.
-SSR uses natural content layout before measurement.
+Cards follow their parent grid/flex layout. The caller owns columns, overflow and narrow-screen wrapping; `size="sm"` changes spacing, not a breakpoint. Fit uses natural fit-content CSS with one existing card-flow and no cloned children or permanent pixel height. Unsupported, hidden, constrained or focus-sensitive geometry resolves natively. Temporary animation locks release to current caller CSS; later viewport changes stay responsive.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. The optional Card observer is
-client code and is disconnected on cleanup. Server-rendered markup does not imply that every
-interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own
-shipped source; dependencies and application bundles are measured separately.
+Card includes client motion, colour, measured geometry and bounded text/quantity helpers. Observers and active writers are retired on cleanup; rich body content is not traversed into animated display parts. Shared workload limits bound decoration and latest-target fallback. The historical T0 4 KiB own-source gzip reference is advisory under ADR-023; shared runtime and page costs are separate and performance governance remains deferred. No-JavaScript HTML stays readable, while example controls require hydration.
 
 ## Notes for AI
 
 - Use `CardFooter` for actions, not a bare `div` — it keeps spacing consistent when
   `size` changes.
-- Do not add hover lift to a card that is not interactive. Motion on a static card
-  is decoration (P9).
+- Do not add hover lift to a card that is not interactive. Independent content/presence changes already have their own owners.
 - `fit="content"` is opt-in and per card. A grid of cards is meant to line up; only
   reach for the content-sized variant when the differences between cards are the
   information.

@@ -13,10 +13,18 @@ afterEach(() => {
   document.getSelection()?.removeAllRanges();
 });
 
-function Pilot({ value, entity = "same" }: { value: number | bigint; entity?: string }) {
+function Pilot({
+  value,
+  entity = "same",
+  retainEditedContent,
+}: {
+  value: number | bigint;
+  entity?: string;
+  retainEditedContent?: boolean;
+}) {
   const { node, ref } = useMotionHostRef<HTMLSpanElement>();
   const cm = useCadenceMotion(node);
-  const text = useNumberPresentation(node, value, cm, entity, { cause: "independent" });
+  const text = useNumberPresentation(node, value, cm, entity, { cause: "independent", retainEditedContent });
   return (
     <span ref={ref} data-testid="number" data-slot="internal-number-pilot" data-motion={cm.mode}>
       {text}
@@ -30,6 +38,28 @@ function Policy({ receive }: { receive(cm: ReturnType<typeof useCadenceMotion>):
 }
 
 describe("internal numeric native boundary", () => {
+  it.each(["full", "reduced", "none"] as const)(
+    "%s preserves a dirty numeric editor until a new display revision",
+    (mode) => {
+      const draw = (editing: boolean, value: number, entity = "first") => (
+        <CadenceProvider mode={mode}>
+          <div contentEditable={editing} suppressContentEditableWarning>
+            <Pilot value={value} entity={entity} retainEditedContent />
+          </div>
+        </CadenceProvider>
+      );
+      const view = render(draw(true, 19));
+      const text = view.getByTestId("number").firstChild as Text;
+      text.replaceData(0, text.length, "Typed quantity");
+      view.rerender(draw(true, 20));
+      expect(text.data).toBe("Typed quantity");
+      view.rerender(draw(false, 20));
+      expect(text.data).toBe("Typed quantity");
+      view.rerender(draw(false, 21));
+      expect(text.data).toBe("21");
+      expect(view.getByTestId("number").firstChild).toBe(text);
+    },
+  );
   it.each(["full", "reduced", "none"] as const)("%s commits exact semantic targets with one native Text", (mode) => {
     const ui = (value: number | bigint) => (
       <CadenceProvider mode={mode}>

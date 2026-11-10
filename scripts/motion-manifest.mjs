@@ -256,16 +256,22 @@ export function parameterWriterForms(source) {
 /** The native factory has no raw caller clock or arbitrary property endpoint.
  * Runtime receipts still have to prove the executing installed factory bytes. */
 function inlinePresenceForms(source) {
-  if (!source.includes("function createInlinePresence(")) return [];
+  const factory = source.includes("function createSurfacePresence(") ? "createSurfacePresence" : "createInlinePresence";
+  if (!source.includes(`function ${factory}(`)) return [];
   const selected = motionSource(source);
   if (
-    !selected.source.includes("function createInlinePresence(") ||
-    !selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")) ||
+    !selected.source.includes(`function ${factory}(`) ||
+    !selected.imports.some(
+      (entry) => entry.name === "bindMotionParameters" && entry.path.startsWith(".") && entry.path.endsWith("/motion"),
+    ) ||
     !selected.source.includes("node.animate(") ||
     !selected.source.includes('owner.begin(revision, ["opacity"]')
   )
     return [];
-  return ["data.transition/opacity", "exit.fade/opacity"].filter((form) => selected.source.includes(`"${form}"`));
+  return [
+    factory === "createSurfacePresence" ? "enter.pop/opacity" : "data.transition/opacity",
+    "exit.fade/opacity",
+  ].filter((form) => selected.source.includes(`"${form}"`));
 }
 
 export function parameterWriterBindings(source) {

@@ -98,7 +98,8 @@ describe("minimal installed coverage", () => {
       "not the reached installed integration",
     );
     expect(migrationProblems("v2").join("\n")).toContain("legacy evidence cannot certify v2");
-    const staticItem = registry.items.find((item: { name: string }) => item.name === "card");
+    const staticItem = { name: "static-fixture", meta: { motion: [], motionCoverage: { schema: 1, effects: {} } } };
+    expect(motionCoverageProblems(staticItem)).toEqual([]);
     expect(staticItem.meta.motionCoverage.effects).toEqual({});
     expect(staticItem.meta.motionCoverage).not.toHaveProperty("capabilities");
   });

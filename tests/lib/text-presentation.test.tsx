@@ -31,6 +31,44 @@ function Pilot({ value, entity = "same" }: { value: string; entity?: string }) {
 // These tests prove exact/native fallbacks. Actual raster/mask/WAAPI execution is
 // intentionally tested by tests/runtime/text-presentation.mjs in real Chromium.
 describe("internal native text boundary", () => {
+  it("retires a native buffer on an explicit display entity replacement", () => {
+    const draw = (editing: boolean, entity: string) => (
+      <div contentEditable={editing} suppressContentEditableWarning>
+        <Pilot value="Original" entity={entity} />
+      </div>
+    );
+    const view = render(draw(true, "first"));
+    const text = view.getByTestId("text").firstChild as Text;
+    text.replaceData(0, text.length, "Typed");
+    view.rerender(draw(false, "first"));
+    expect(text.data).toBe("Typed");
+    view.rerender(draw(false, "second"));
+    expect(text.data).toBe("Original");
+  });
+  it.each(["full", "reduced", "none"] as const)(
+    "%s retains a live native edit through caller revisions and establishes its display baseline",
+    async (mode) => {
+      const draw = (editable: boolean, value: string) => (
+        <CadenceProvider mode={mode}>
+          <div contentEditable={editable} suppressContentEditableWarning>
+            <Pilot value={value} />
+          </div>
+        </CadenceProvider>
+      );
+      const view = render(draw(true, "Original"));
+      const host = view.getByTestId("text"),
+        text = host.firstChild as Text;
+      act(() => text.replaceData(0, text.length, "Typed draft"));
+      await act(async () => {});
+      view.rerender(draw(true, "Ignored while editing"));
+      expect(host.textContent).toBe("Typed draft");
+      view.rerender(draw(false, "Ignored while editing"));
+      expect(host.textContent).toBe("Typed draft");
+      view.rerender(draw(false, "Accepted display revision"));
+      expect(host.textContent).toBe("Accepted display revision");
+      expect(host.firstChild).toBe(text);
+    },
+  );
   it.each(["full", "reduced", "none"] as const)("%s keeps one Text node and retained native ranges", (mode) => {
     const ui = (value: string) => (
       <CadenceProvider mode={mode}>
