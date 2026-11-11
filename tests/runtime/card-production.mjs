@@ -74,6 +74,9 @@ try {
       assert.equal(await card.locator('[data-slot="card-title"]').textContent(), "Release ready");
       const text = await page.locator("[data-cadence-text-layer] canvas").count();
       if (effective !== "none") assert(text > 0, "production record update must actually paint changed text");
+      await page.evaluate(() => {
+        window.cardTextPaint = [...document.querySelectorAll("[data-cadence-text-layer]")];
+      });
       await content.getByRole("button", { name: "Change surface", exact: true }).click();
       await page.waitForTimeout(35);
       const surface = await card.evaluate(
@@ -84,11 +87,14 @@ try {
       );
       if (effective !== "none") assert(surface > 0, "production surface action must animate its own background");
       else assert.equal(surface, 0);
-      assert.equal(
-        await page.locator("[data-cadence-text-layer]").count(),
-        0,
-        "ancestor paint must cancel active raster text",
-      );
+      if (effective !== "none")
+        assert(
+          await page.evaluate(
+            () => window.cardTextPaint.length > 0 && window.cardTextPaint.every((n) => n.isConnected),
+          ),
+          "known ancestor background paint must preserve eligible changed-text layers",
+        );
+      else assert.equal(await page.locator("[data-cadence-text-layer]").count(), 0);
       assert.equal(await card.locator('[data-slot="card-title"]').textContent(), "Release ready");
       assert(
         await card
@@ -110,6 +116,18 @@ try {
       const reels = await page.locator("[data-cadence-reel]").count();
       if (effective === "full") assert(reels > 0, "production Card must paint quantity reels");
       else assert.equal(reels, 0);
+      await content.getByRole("button", { name: "Change surface", exact: true }).click();
+      await content.getByRole("button", { name: "Add seat", exact: true }).click();
+      await page.waitForTimeout(35);
+      const paintedQuantity = await card.evaluate((node) => ({
+        value: node.querySelector('[data-slot="card-content"]').textContent,
+        reels: document.querySelectorAll("[data-cadence-reel]").length,
+        surface: node.getAnimations().filter((a) => a.effect.getKeyframes().some((f) => "backgroundColor" in f)).length,
+      }));
+      assert.equal(paintedQuantity.value, "21");
+      assert.equal(paintedQuantity.reels, 0, "numeric reels retain their strict stable-ancestor-paint policy");
+      if (effective !== "none")
+        assert(paintedQuantity.surface > 0, "numeric fallback must preserve the independent surface owner");
       await content.getByRole("button", { name: "Change density", exact: true }).click();
       await page.waitForTimeout(35);
       const geometry = await card.evaluate(
@@ -144,7 +162,9 @@ try {
       }));
       assert.equal(concurrent.title, "Release pending");
       assert(concurrent.sameText);
-      assert.equal(concurrent.textLayers, 0, "same-commit ancestor paint uses exact immediate native text");
+      if (effective !== "none")
+        assert(concurrent.textLayers > 0, "same-commit known background paint permits changed-text drawing");
+      else assert.equal(concurrent.textLayers, 0);
       if (effective !== "none") assert(concurrent.surface > 0);
       else assert.equal(concurrent.surface, 0);
       await content.screenshot({ path: path.join(output, `${os}-${mode}-concurrent.png`) });
@@ -166,7 +186,7 @@ try {
       );
       assert.equal(await page.locator("[data-cadence-reel],[data-cadence-text-layer]").count(), 0);
       assert.deepEqual(errors, []);
-      report.cases.push({ mode, os, effective, text, surface, reels, geometry, concurrent, errors });
+      report.cases.push({ mode, os, effective, text, surface, reels, paintedQuantity, geometry, concurrent, errors });
       await context.close();
     }
   for (const width of [390, 1280])

@@ -303,7 +303,12 @@ acceptance distinction. The design and installed behaviour remain distinguishabl
 
 ### Phase 2: Shared capabilities and primitive contracts
 
-The internal measured-geometry scope has an initial CodeBlock fold adapter. It uses explicit committed revisions, one outer owner per compound axis and natural-layout destinations, with temporary replace effects over native sizing. This limited integration does not migrate CodeBlock's other capabilities or the remaining disclosure, surface and control adapters. Component-level motion v2 markers remain gated by their complete contracts.
+The internal measured-geometry scope supports the CodeBlock fold adapter and the five pilots' owned
+axes. It uses explicit committed revisions, one outer owner per compound axis and natural-layout
+destinations, with temporary replace effects over native sizing. Equal native Text writes preserve
+an existing flight; real content, input and constraint changes retain their invalidation priority.
+This integration does not migrate CodeBlock's other capabilities or the remaining catalogue adapters.
+Component-level motion v2 markers remain gated by their complete contracts.
 
 Each internal geometry scope coordinates one cause; independent lifetimes use separate scopes and may share the transaction for aggregate budgets. React adapters bind physical cleanup through `useMotionHostRef`. Imperative adapters must dispose their registration/scope from their actual native lifecycle and register a fresh baseline on reconnection; there is no general DOM-removal scanner. A natural-region observer also rejects unavailable boxes defensively, without treating their missing layout as a zero-size destination.
 
@@ -319,9 +324,10 @@ plain-string DOM controller and React adapter now consume that planning with act
 native Range proof, bounded pixel-only opacity paint, native selection/editing exclusions, transaction
 budgets and live cancellation. The semantic value remains one native Text node; no inline splitting
 or typography override is used. Unknown scripts/features, highlights, layout or clipping stay immediate.
-Existing captured-origin support composes only a complete single-unit destination; partial strings
-remain changed-only local replacements. The original 59 component owners do not yet import these
-text modules. AnimatedText exposes this controller as a standalone string renderer with its own registry
+Captured-origin support composes one proven contiguous changed Range for Select; retained text never
+joins that flight, and unsupported correspondence stays local or immediate. The five pilots adopt
+these text modules; the remaining original catalogue owners are pending. AnimatedText exposes this
+controller as a standalone string renderer with its own registry
 item and changed-runs declaration. Original catalogue slot adoption, complete shared-stage acceptance and
 the overall v2 schema/evidence marker remain separate migration work. Unsupported correspondence
 remains native immediate, including the rejected DPR2 raster mapping.
@@ -497,8 +503,15 @@ root presence or content-driven outer-host geometry follows the separate target 
 
 Button, Badge, Card, Tabs and Select have individual functional v2 adoption with installed/runtime evidence.
 Their shared content/geometry, conservative native fallbacks and property ownership are the pilot baseline.
-The five-pilot cross-component acceptance gate remains separate from these individual adoptions;
-catalogue rollout and performance governance remain open.
+Their cross-component functional gate is covered by `tests/runtime/pilots.mjs` against copied registry
+payloads. Button/Badge share content revisions without replacing retained Text; nested Card and
+Tabs parts delegate a same-cause axis to one outer geometry owner. Tabs preserves the native panel
+mount/form policy, while portalled Select keeps its proven changed-run flight separate from Base UI's
+native popup lifecycle. Ref handoff, nested modes and equal native Text writes preserve eligible unrelated work;
+real invalidation, mode cancellation and unmount retire only current owners. These are reviewed
+pilot patterns, not automatic adoption by another family or permission to weaken its individual
+contract. Catalogue rollout, complete shared-stage/cross-library acceptance and performance governance
+remain open.
 
 Depends on Phase 2. Card establishes nested ownership; Tabs establishes retained selection and panel ownership; use Select to prove popup lifecycle and
 multiple coordinated writers on distinct parts. For each pilot, update source, actual recipes,

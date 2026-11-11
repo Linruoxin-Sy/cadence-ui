@@ -729,6 +729,16 @@ try {
     assert.equal(s.layoutHeight, s.pre);
     assert.equal(s.effects, 0);
     await page.evaluate(() => window.updateGeometry({ popup: false, expanded: false }));
+    // The next case mutates the real viewport's box model. Wait for the native
+    // portal-to-inline host replacement, rather than writing the retired popup.
+    await page.waitForFunction(() => {
+      const viewport = document.querySelector("[data-slot=code-block-viewport]");
+      return (
+        viewport &&
+        document.getElementById("root").contains(viewport) &&
+        window.geometryCommits?.at(-1)?.popup === false
+      );
+    });
     return { closedWriter: state, reopened: s };
   });
   await check("fixed native pre with borders keeps fold lines and releases without a size jump", async () => {

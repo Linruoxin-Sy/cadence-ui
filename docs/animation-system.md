@@ -1447,7 +1447,10 @@ semantic tree, native formatting, caller ref and geometry owner remain intact.
 
 ### Native event boundary for press controls
 
-Button, Toggle and ToggleGroupItem share `lib/press-button.tsx`; their default renderer uses `motion.create()` around a native button adapter.
+The migrated Button keeps Base UI's native event/ref target and uses a separate parameter-backed
+`ControlSpan` only when its plain label supplies a safe press visual. Its root hit/anchor geometry
+stays native; rich/custom targets use the documented local fallback. Legacy Toggle and ToggleGroupItem
+share `lib/press-button.tsx`; their default renderer uses `motion.create()` around a native button adapter.
 React `onAnimationStart`, `onDrag`, `onDragStart` and `onDragEnd` travel in a private
 prop bag to the native button, beyond Motion's reserved-prop filtering. These remain
 React native events, including capture/bubble, cancellation and the real currentTarget;
@@ -1518,6 +1521,11 @@ feedback may still run. Batched A → B → A with no committed B has no B prese
 the later A is a real reversal from current paint. An unchanged semantic target preserves an eligible
 current flight rather than restarting or forcibly settling it. Mode, clock, environment, ownership
 and lifetime changes still apply even when that target is unchanged.
+
+Native equal-value DOM writes are not content revisions either. Replacing a textarea's default
+Text node with equal text, or writing the same character data, preserves an eligible enclosing
+geometry flight. Actual content, native input and layout/constraint changes retain their normal
+invalidation priority; this does not suppress mutation observation or authorize stale dimensions.
 
 Direct-input provenance survives a delayed controlled echo when the existing primitive/integration
 can identify it. A Slider value accepted after pointer release is not thereby an unrelated

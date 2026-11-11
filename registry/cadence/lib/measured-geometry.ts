@@ -423,14 +423,29 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         !delegated() &&
         (view?.getComputedStyle(content).writingMode !== writingMode ||
           (adapter.observeChildren &&
-            (constraintSignature() !== constraints || records.some((record) => record.type !== "attributes"))))
+            (constraintSignature() !== constraints ||
+              records.some((record) => {
+                if (record.type === "characterData") return record.oldValue !== record.target.nodeValue;
+                if (record.type !== "childList") return false;
+                // React may replace a textarea's default Text on an equal-value
+                // rerender. No content/layout changed, so keep the current owner.
+                return (
+                  record.addedNodes.length !== record.removedNodes.length ||
+                  Array.from(record.addedNodes).some((node, index) => {
+                    const removed = record.removedNodes[index];
+                    return node.nodeType !== 3 || removed?.nodeType !== 3 || node.nodeValue !== removed.nodeValue;
+                  })
+                );
+              }))))
       )
         passive();
     });
     attributes.observe(content, {
       attributes: true,
       attributeFilter: ["style", "class"],
-      ...(adapter.observeChildren ? { childList: true, characterData: true, subtree: true } : {}),
+      ...(adapter.observeChildren
+        ? { childList: true, characterData: true, characterDataOldValue: true, subtree: true }
+        : {}),
     });
     const unsubscribeEnvironment = subscribeMotionEnvironment(node.ownerDocument, (state) => {
       restricted = state.hidden || state.immediate || state.reduced;
