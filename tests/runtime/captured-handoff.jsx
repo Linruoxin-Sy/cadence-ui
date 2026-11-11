@@ -30,6 +30,11 @@ function Pilot({ state, set }) {
         <Select
           key={state.key}
           name="choice"
+          items={[
+            { value: state.object ? { key: "AAA", label: "AAA" } : "AAA", label: "AAA" },
+            { value: state.object ? { key: "BBB", label: "BBB" } : "BBB", label: "BBB" },
+            { value: "AAB", label: "AAB" },
+          ]}
           value={state.object ? { key: state.value, label: state.value } : state.value}
           isItemEqualToValue={state.object ? (a, b) => a.key === b.key : undefined}
           itemToStringValue={state.object ? (value) => value.key : undefined}
@@ -41,10 +46,20 @@ function Pilot({ state, set }) {
             else set((old) => ({ ...old, value: state.object ? value.label : value }));
           }}
         >
-          <SelectTrigger aria-label="Pilot" className="font-mono" style={{ width: 200 }}>
-            <SelectValue>{state.object ? (value) => value?.label : undefined}</SelectValue>
+          <SelectTrigger
+            aria-label="Pilot"
+            className="font-mono"
+            style={{ width: 200, fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+          >
+            <SelectValue>
+              {state.format ? (value) => (typeof value === "object" ? value?.label : value) : undefined}
+            </SelectValue>
           </SelectTrigger>
-          <SelectContent className="font-mono" alignItemWithTrigger={false}>
+          <SelectContent
+            className="font-mono"
+            style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+            alignItemWithTrigger={false}
+          >
             <SelectItem value={state.object ? { key: "AAA", label: "AAA" } : "AAA"}>AAA</SelectItem>
             <SelectItem value={state.object ? { key: "BBB", label: "BBB" } : "BBB"}>
               {state.rich ? <b>BBB</b> : "BBB"}
@@ -57,7 +72,11 @@ function Pilot({ state, set }) {
         <SelectTrigger aria-label="Independent" className="font-mono">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="font-mono" alignItemWithTrigger={false}>
+        <SelectContent
+          className="font-mono"
+          style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+          alignItemWithTrigger={false}
+        >
           <SelectItem value="AAA">AAA</SelectItem>
           <SelectItem value="BBB">BBB</SelectItem>
         </SelectContent>

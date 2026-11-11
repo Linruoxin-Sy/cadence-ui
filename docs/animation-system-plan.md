@@ -276,10 +276,10 @@ existing performance task is post-migration governance, not a functional complet
   integration establishes coordinated trigger reflow, text/number/colour adoption or full
   component-v2 conformance. An internal captured-origin coordinator supplies one-use capture,
   aggregate shell/paint preflight and immediate cancellation without destination replay. Select
-  adopts it only for bounded disjoint plain ASCII labels; retained/shaped/rich labels remain native
-  until the changed-run renderer can supply exact eligibility. Invalid mapping exposes the current
-  destination rather than tracking the retired source. These scoped forms do not establish full
-  Select migration. The remaining dependencies and global budget gates stay pending.
+  composes it with the changed-run renderer for one bounded shaping-safe changed Range, preserving
+  retained native characters. Unsafe mapping/rich callbacks use local diff or immediate fallback.
+  Invalid mapping exposes the current destination rather than tracking the retired source.
+  The complete shared-stage and cross-library gates remain separate; performance governance is deferred.
 - Existing engine adapters preserve native geometry, direct gestures and ref/event ownership while
   cancelling their autonomous work. Embla retains actual effective option precedence; Recharts retains
   per-series action progress across native handle recreation; Calendar and Toc retain their distinct
@@ -495,9 +495,10 @@ root presence or content-driven outer-host geometry follows the separate target 
 
 ### Phase 3: Five pilots
 
-Button, Badge, Card and Tabs have individual functional v2 adoption with installed/runtime evidence. Their
-shared content/geometry, conservative native fallbacks and property ownership are the pilot baseline;
-this does not complete the other pilots or performance governance.
+Button, Badge, Card, Tabs and Select have individual functional v2 adoption with installed/runtime evidence.
+Their shared content/geometry, conservative native fallbacks and property ownership are the pilot baseline.
+The five-pilot cross-component acceptance gate remains separate from these individual adoptions;
+catalogue rollout and performance governance remain open.
 
 Depends on Phase 2. Card establishes nested ownership; Tabs establishes retained selection and panel ownership; use Select to prove popup lifecycle and
 multiple coordinated writers on distinct parts. For each pilot, update source, actual recipes,

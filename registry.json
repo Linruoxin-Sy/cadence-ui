@@ -2337,13 +2337,25 @@
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
         "@cadence/cadence-provider",
-        "@cadence/cadence-handoff"
+        "@cadence/cadence-handoff",
+        "@cadence/cadence-text",
+        "@cadence/cadence-geometry"
       ],
       "files": [
         {
           "path": "registry/cadence/select/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/select/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/select-motion.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/select-motion.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/select-colour.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/select-colour.ts"
         }
       ],
       "meta": {
@@ -2352,12 +2364,37 @@
         "batch": "B5",
         "motion": [
           {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
             "recipe": "popup.anchored",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "handoff",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
           },
-          "geometry.resize",
-          "handoff",
-          "state.morph"
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
         ],
         "intensity": "expressive",
         "complexity": "L",
@@ -2370,43 +2407,72 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "identity",
-          "reason": "The selected label transfers between the popup and trigger while trigger geometry follows the owned label."
+          "reason": "A safely mapped changed label run transfers from the real option to the trigger while independent text, geometry and scoped paint owners coordinate the accepted value."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "data.transition/one-shot": [
               {
                 "relationship": "default",
                 "owner": "select",
-                "reason": "Select integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
               }
             ],
-            "geometry.resize/one-shot": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "default",
                 "owner": "select",
-                "reason": "Select integrates owned size transitions at its own parts, using the reached installed executor."
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
               }
             ],
             "handoff/one-shot": [
               {
                 "relationship": "default",
                 "owner": "select",
-                "reason": "Select integrates selected-label ownership transfer at its own parts, using the reached installed executor."
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
               }
             ],
             "state.morph/one-shot": [
               {
                 "relationship": "default",
                 "owner": "select",
-                "reason": "Select integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "select",
+                "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
               }
             ]
           }
         }
       }
     },
+
     {
       "name": "combobox",
       "type": "registry:ui",

@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/select`
 - Type: registry:ui
 - Since: 0.4.0
-- Motion recipes: popup.anchored, geometry.resize, handoff, state.morph
+- Motion recipes: data.transition, popup.anchored, exit.fade, geometry.resize, handoff, state.morph, state.color, text.change
 
 ## Installation
 
@@ -33,6 +33,8 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — direct registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -55,7 +57,17 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | select | `@components/cadence/select/index.tsx` | [JSON files[].content](https://cadence.dev/r/select.json) |
+| select | `@components/cadence/lib/select-motion.tsx` | [JSON files[].content](https://cadence.dev/r/select.json) |
+| select | `@components/cadence/lib/select-colour.ts` | [JSON files[].content](https://cadence.dev/r/select.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -64,6 +76,10 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
 
 [Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: select](https://cadence.dev/r/select.json)
 
@@ -220,7 +236,8 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine files in the target list, including every shared `lib/` file.
+Copy every file in the generated target list, including the shared text, geometry,
+paint and presence controllers.
 Keep the mirrored `cadence/` tree, relative imports and `"use client"` directives
 intact. The provider files and `motion` are required imports even though the
 popup itself uses CSS transitions; wrapping your application in
@@ -229,8 +246,9 @@ popup itself uses CSS transitions; wrapping your application in
 Complete the base theme setup linked above, including Cadence's easing tokens,
 and ensure Tailwind scans the copied files. These payloads contain no additional
 Select-specific CSS or assets. Full mode animates the measured value-slot width,
-the pointer label handoff, the check and the popup. Reduced makes width changes
-instant, skips the handoff and removes scale while retaining opacity; none
+the changed-run pointer handoff, text replacement, scoped colours, the check and
+the popup. Reduced makes geometry instant, skips flight and scale, and retains
+short changed-run opacity and eligible colour feedback; none
 removes authored transitions from the first frame. Standalone Select follows
 the system motion preference; a nested full scope still respects system
 reduced motion.
@@ -634,6 +652,76 @@ export function Placement() {
 }
 ```
 
+## Changing selection
+
+A pointer choice between **Plan AAA** and **Plan BBB** can transfer only the changed
+`AAA` / `BBB` run. The `Plan ` prefix stays native and still. External selection and
+label updates use local changed-run replacement. Toggle options changes the real
+collection. This controlled example vetoes outside/focus dismissal so its update buttons
+can change a still-visible popup; Escape and item selection keep their native close paths.
+Base UI keeps focus, placement and scrolling. When focus is inside the
+popup or aligned-item sizing owns its height, that axis settles immediately.
+Change seats composes `AnimatedNumber`; a numeric option value or label is an identity.
+Remove and insert the control to see its independent trigger entrance.
+
+<ComponentExample name="changing-selection" />
+
+This example also needs `Button` and `AnimatedNumber`:
+
+```install
+npx shadcn@latest add @cadence/button @cadence/animated-number
+```
+
+The explicit font settings below demonstrate the actual-font proof path. Connected
+scripts, non-default shaping features, wrapping and unverified mappings keep exact
+native text immediately. The component does not change consumer typography to force
+an effect. Use a client module for the state and callbacks.
+
+```tsx
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { AnimatedNumber } from "@/components/cadence/animated-number";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/cadence/select";
+
+export function ChangingSelection() {
+  const [value, setValue] = useState<string | null>("a");
+  const [ready, setReady] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [quantity, setQuantity] = useState(19);
+  const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const plans = [{value:"a",label:ready?"Plan A ready":"Plan AAA"},{value:"b",label:ready?"Plan B ready":"Plan BBB"}];
+  const items = [...plans, {value:"seats",label:<span>Seats <AnimatedNumber value={quantity} /></span>}, ...(expanded ? ["c","d","e"].map(key=>({value:key,label:`Extra plan ${key.toUpperCase()}`})) : [])];
+  const typography = {fontFamily:'"Courier New", monospace', fontFeatureSettings:"normal"};
+  return <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      {visible && <Select items={items} value={value} onValueChange={setValue} open={open} onOpenChange={(next, details) => {
+          if (!next && (details.reason === "outside-press" || details.reason === "focus-out")) details.cancel();
+          else setOpen(next);
+        }} modal={false}>
+        <SelectTrigger aria-label="Changing plan" style={typography}><SelectValue placeholder="Choose a plan" /></SelectTrigger>
+        <SelectContent alignItemWithTrigger={false} style={typography}>
+          <SelectGroup><SelectLabel>{ready?"Plans available":"Plans pending"}</SelectLabel>
+            {plans.map(item=><SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+            <SelectItem value="seats"><span>Seats <AnimatedNumber value={quantity} /></span></SelectItem>
+            {expanded && ["c","d","e"].map(key=><SelectItem key={key} value={key}>Extra plan {key.toUpperCase()}</SelectItem>)}
+          </SelectGroup>
+        </SelectContent>
+      </Select>}
+      <output className="text-sm text-muted-foreground">Selected: {value ?? "none"}</output>
+    </div>
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <Button variant="outline" onClick={()=>setValue(value==="a"?"b":"a")}>Change selection</Button>
+      <Button variant="outline" onClick={()=>setReady(!ready)}>Update labels</Button>
+      <Button variant="outline" onClick={()=>{setExpanded(!expanded);setOpen(true);}}>Toggle options</Button>
+      <Button variant="outline" onClick={()=>{setQuantity(quantity===19?20:19);setOpen(true);}}>Change seats</Button>
+      <Button variant="outline" onClick={()=>{setVisible(!visible);setOpen(false);}}>{visible?"Remove control":"Insert control"}</Button>
+    </div>
+  </div>;
+}
+
+```
+
 ## When to use
 
 - Choosing one value from a list that is too long for radios but too short to need search.
@@ -655,45 +743,62 @@ export function Placement() {
 | `SelectValue` | `placeholder` | The selected label, or the placeholder when empty. |
 | `SelectContent` | `side`, `align`, `sideOffset`, `alignOffset`, `alignItemWithTrigger` | Portals, positions, and sizes to `--anchor-width`. |
 | `SelectItem` | `value`, `disabled` | Renders the label and the check indicator. |
-| `SelectGroup` / `SelectLabel` | group props | Purely structural. |
+| `SelectGroup` / `SelectLabel` | group props | The group stays structural; a primitive label owns changed text and foreground. |
 | `SelectSeparator` | separator props | A single hairline. |
 | `SelectScrollUpButton` / `SelectScrollDownButton` | scroll-arrow props | Appear only when the list overflows. |
 
 ## Motion contract
 
-Authored intensity is **expressive**: The selected label transfers between the popup and trigger while trigger geometry follows the owned label.
+Authored intensity is **expressive**: A safely mapped changed label run transfers from the real option to the trigger while independent text, geometry and scoped paint owners coordinate the accepted value.
+Semantics and native focus are already final.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| pointer selection | value slot width | `geometry.resize/one-shot` | yes (physics-defined, clamped) |
-| pointer selection | label `x`/`y` from the item to the trigger | `handoff/one-shot` | yes |
-| pointer selection | check `scale` / `opacity` | `state.morph/one-shot` | yes |
-| open / close | popup `opacity` / `scale` | `popup.anchored/css-transition` | yes |
-| reduced | width jumps, no flight, no scale; opacity stays | – | – |
-| none | every duration is zero | – | – |
+| later independent trigger insertion | opacity | `data.transition/one-shot` | yes; parent entrance consumes the same cause, focus settles entry |
+| popup opening | opacity / scale | `popup.anchored/one-shot` | yes; actual focused content settles entry immediately |
+| popup closing | opacity | `exit.fade/one-shot` | yes; Base UI waits for actual native animation handles |
+| accepted value or known option-set revision | one measured width / eligible popup height | `geometry.resize/measured` | yes; native allocation/alignment and readable bounds win |
+| eligible real-source choice | changed-run translation only | `handoff/one-shot` | yes; never transfers retained characters |
+| selection indicator | opacity / scale | `state.morph/one-shot` | yes |
+| trigger, value, popup, option, label, rule and scroll controls | scoped surface / foreground / border / shadow colours | `state.color/css-transition` | yes; focused or invalid regions settle all owned paint |
+| primitive value, item and group label changes | changed-only opacity, no stagger | `text.change/changed-runs` | yes; unchanged native Text identity survives |
+| reduced | intrinsic geometry, no flight or scale; short changed-run opacity and eligible colours | – | yes |
+| none / zero recipe clock | current semantic target, zero duration and delay | – | yes |
 
-The trigger keeps one native label laid out at its destination width. A pointer selection may
-transfer a bounded plain ASCII label only when the previous and next labels share no character.
-Labels with retained characters, shaping, rich content or an unavailable visible origin use the
-current native value immediately. This conservative path does not implement changed-text diffing.
-Keyboard selection has no captured pointer origin and remains immediate.
+The value uses one real native label and one separate width shell. Growth that would
+clip committed text is immediate; safe shrinking never crosses the readable final
+width. Fixed caller constraints retain native truncation. Passive resize, fonts and
+placement corrections establish current geometry immediately. Popup size stays
+native while `alignItemWithTrigger`, scrolling or focused descendants need it.
 
-The flight uses a clipped, paint-only layer with no text node, DOM id, form control or second
-component tree. It adds no scroll extent, scroll anchor or snap target. A moved destination,
-differential scrolling, viewport correction or invalid placement cancels the flight and exposes the
-already-current value; the layer never chases either endpoint. Native popup retirement may outlive
-the captured source. Hiding the document, printing, reduced/none mode or a zero handoff clock also
-settles the transfer. Restoration does not replay the consumed revision. Trigger reflow can therefore
-omit the transfer while the separate legacy width animation continues.
+The selection presentation owner chooses one eligible contiguous run flight or local
+diff. Multiple changed runs, a retained island, missing/offscreen source, multiple
+values, a rich render callback or an uncertain shaping/range mapping never borrow an
+origin. An unsafe local diff displays the exact native label immediately. Numeric
+option keys and labels remain identities; an explicit `AnimatedNumber` has its own contract.
 
-Each portal resolves token durations from its local provider, including `full` nested inside
-`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
-geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The site header changes the inherited motion mode on the same component tree, including each named example. Base UI `className(state)` and `style(state)` callbacks are evaluated
-before merging; caller utilities and styles win. Native `render`, events and ref cleanup
-remain owned by the primitive. A cancelled selection
-does not fly the pointer label over the current value. Natural text width is observed
-separately from the animated outer slot, including content and viewport changes.
+A request is not acceptance. Capture is scoped to the actual Select, trigger host and
+matching accepted native event. Rejected requests retire their source. Base UI exposes
+no request token for asynchronous controlled echoes, so uncorrelated delayed values
+use local replacement. Native reset/restoration cancels decoration and establishes a
+current baseline; cancelled reset keeps the accepted presentation.
+
+The inert, clipped paint layer contains no second interactive tree or accessible label.
+A captured origin is frozen. Native source-popup retirement may leave an accepted
+flight running under its surviving trigger. Differential scroll, changed destination
+mapping, viewport/anchor invalidation, removal, hidden/print, live reduction, none or
+zero clock retires obsolete work. A cancelled flight reveals its current destination
+without starting another fade for that consumed change. Returning to full or reopening
+does not replay a retired origin. Visible trigger text/width owners survive popup closure
+and asynchronous label updates; hidden option changes establish their next baseline.
+
+Each portal resolves its local mode/tokens/clock, including nested full inside none,
+subject to the OS preference. Base UI retains selection, focus, typeahead, form values,
+placement, exit completion, `render`, ref cleanup and class/style callbacks.
+Closed retained popup content is inert and hidden from the accessibility tree; its
+original form/state tree remains mounted under Base UI’s retention policy. Caller
+classes and styles merge last. Independent property owners may run together; they never
+race the same width, opacity, transform or paint property.
 
 ## Keyboard interactions
 
@@ -723,18 +828,14 @@ errors; this component does not validate or install a form-state library.
 
 The popup is at least `--anchor-width` wide and caps at `--available-height`, so it flips and scrolls
 inside the viewport. `alignItemWithTrigger` keeps the selected item over the trigger when space permits;
-touch opening disables this alignment and uses anchored placement. The width animation is short and only touches the
-trigger, so a select in a toolbar does not reflow the page beyond its own row.
+touch opening disables this alignment and uses anchored placement. The value shell owns intrinsic width; a fixed-width trigger retains its existing allocation and truncation. Native placement and passive reflow remain immediate.
 
 ## Performance
 
-- One measured width animation and, on pointer selection, one absolutely positioned label for the
-  duration of the handoff. No blur and no shadow animation.
-- Width is a layout property; it is allowed only on this T3 component and only through
-  `geometry.resize`, which jumps under reduced and none.
-- The list renders every supplied item without virtualisation; the component adds no per-item animation beyond the check
-  indicator.
-- Budget: T3 (12 KB gzip). If a page animates several selects at once, only the open one moves.
+- Work is bounded to one captured run and the current text/geometry revisions; new targets cancel obsolete paint rather than queueing it.
+- The real option list is not virtualised. Primitive label and scoped paint owners preserve native collection identity.
+- Temporary width/height overlays release to current native sizing on completion or cancellation. No hidden copy of consumer content is rendered for measurement.
+- Historical T3 source and page/runtime budgets are advisory under ADR-023. Functional migration does not certify numerical cost, CLS or real-device frame-rate acceptance; performance governance follows full-library migration.
 
 ## Notes for AI
 

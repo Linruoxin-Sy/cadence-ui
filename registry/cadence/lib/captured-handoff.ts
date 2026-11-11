@@ -65,12 +65,29 @@ export function captureHandoffOrigin(
   text: string,
   frame: HTMLElement | null = null,
   retirementRoot: HTMLElement = source,
+  range?: readonly [number, number],
 ) {
-  if (!text || text.length > motionLimits.changedGraphemes || !plain(source, text) || !usable(source)) return null;
+  const label = source.textContent ?? "";
+  if (!text || text.length > motionLimits.changedGraphemes || !plain(source, label) || !usable(source)) return null;
+  const run = range ? source.ownerDocument.createRange() : null;
+  if (range) {
+    if (
+      !range.every(Number.isInteger) ||
+      range[0] < 0 ||
+      range[1] <= range[0] ||
+      range[1] > label.length ||
+      !source.firstChild ||
+      label.slice(...range) !== text
+    )
+      return null;
+    run?.setStart(source.firstChild, range[0]);
+    run?.setEnd(source.firstChild, range[1]);
+    if (run?.getClientRects().length !== 1) return null;
+  } else if (label !== text) return null;
   const chain = [source, ...ancestors(source)];
   const styles = chain.map(signature);
   if (styles.some((style) => style === null) || (frame && !frame.contains(source))) return null;
-  const rect = source.getBoundingClientRect();
+  const rect = run?.getBoundingClientRect() ?? source.getBoundingClientRect();
   if (!finite(rect)) return null;
   const view = source.ownerDocument.defaultView;
   if (!view || rect.left < 0 || rect.top < 0 || rect.right > view.innerWidth || rect.bottom > view.innerHeight)
@@ -103,6 +120,7 @@ export function captureHandoffOrigin(
     // A local layer travels with its frame. Only genuinely common *outer*
     // scrolling is harmless; scrolling either endpoint inside the frame is not.
     const target = event.target;
+    if (retired && target instanceof Node && retirementRoot.contains(target)) return;
     if (frame && target instanceof Node && target !== frame && target.contains(frame)) return;
     if (target === doc || chain.includes(target as HTMLElement)) invalidate();
   };
@@ -154,6 +172,12 @@ export function captureHandoffOrigin(
       listeners.add(notify);
       return () => listeners.delete(notify);
     },
+    /** The adapter has observed the matching accepted native commit. Authorize
+     * that source subtree's retirement before mutation/resize delivery, without
+     * consuming the one eventual presentation claim or reviving invalid paint. */
+    retire() {
+      retired = true;
+    },
     take(allowRetirement: boolean) {
       if (consumed) return false;
       consumed = true;
@@ -162,8 +186,9 @@ export function captureHandoffOrigin(
     },
     current(retired: boolean) {
       if (!valid || (!source.isConnected && !retired)) return false;
-      if (source.isConnected && (!plain(source, text) || (!retired && !usable(source)))) return false;
-      if (source.isConnected && chain.some((node, i) => i > 0 && chain[i - 1]?.parentElement !== node)) return false;
+      if (!retired && source.isConnected && (!plain(source, label) || !usable(source))) return false;
+      if (!retired && source.isConnected && chain.some((node, i) => i > 0 && chain[i - 1]?.parentElement !== node))
+        return false;
       if (
         chain.some(
           (node, i) =>
@@ -171,7 +196,13 @@ export function captureHandoffOrigin(
         )
       )
         return false;
-      if (chain.some((node, i) => node.scrollLeft !== scrolls[i]?.[0] || node.scrollTop !== scrolls[i]?.[1])) {
+      if (
+        chain.some(
+          (node, i) =>
+            !(retired && retirementRoot.contains(node)) &&
+            (node.scrollLeft !== scrolls[i]?.[0] || node.scrollTop !== scrolls[i]?.[1]),
+        )
+      ) {
         // Ignore outer common scrolling only in local coordinates.
         if (
           !frame ||
@@ -213,6 +244,8 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
       fallback(): void;
       terminal(reason: "complete" | "cancel"): void;
       slot?: string;
+      /** Proven native changed run; masking is owned by the text renderer. */
+      run?: { current(): boolean; bounds(): DOMRect; conceal(): (() => void) | null };
     }) {
       if (!alive) return;
       const { revision, capture, destination, transition } = options;
@@ -249,7 +282,7 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
         !revision.current() ||
         !options.current() ||
         !capture.current(options.sourceRetired) ||
-        !plain(destination, capture.text) ||
+        !(options.run ? options.run.current() : plain(destination, capture.text)) ||
         !usable(destination)
       )
         return fallback();
@@ -285,7 +318,7 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
         })
       )
         return fallback();
-      const rect = destination.getBoundingClientRect();
+      const rect = options.run?.bounds() ?? destination.getBoundingClientRect();
       const frameRect = frame?.getBoundingClientRect();
       if (
         !finite(rect) ||
@@ -357,6 +390,7 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
         y = motionValue(capture.rect.top - rect.top);
       let effect: Animation | null = null,
         hidden: Animation | null = null;
+      let reveal: (() => void) | null = null;
       let done = false;
       const offs: (() => void)[] = [];
       const observer = new ResizeObserver(() => {
@@ -372,10 +406,10 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
         destination.isConnected &&
         destination.style.opacity === nativeOpacity &&
         capture.current(options.sourceRetired) &&
-        plain(destination, capture.text) &&
+        (options.run ? options.run.current() : plain(destination, capture.text)) &&
         chain.every((node, i) => signature(node) === styles[i] && (i === 0 || chain[i - 1]?.parentElement === node)) &&
         (() => {
-          const now = destination.getBoundingClientRect();
+          const now = options.run?.bounds() ?? destination.getBoundingClientRect();
           return ["left", "top", "width", "height"].every((key) =>
             frame && (key === "left" || key === "top")
               ? now[key as keyof Box] - frame.getBoundingClientRect()[key as "left" | "top"] ===
@@ -390,6 +424,7 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
         y.stop();
         effect?.cancel();
         hidden?.cancel();
+        reveal?.();
         observer.disconnect();
         mutations.disconnect();
         for (const off of offs) off();
@@ -406,17 +441,25 @@ export function createCapturedHandoff(transaction = createMotionTransaction()) {
         changedGraphemes: capture.text.length,
       };
       const lease = registration.begin(revision, ["transform"], work, stop);
-      const visibilityLease = visibility.begin(revision, ["opacity"], {}, stop);
+      const visibilityLease = visibility.begin(revision, [options.run ? "text.change" : "opacity"], {}, stop);
       if (!lease?.current() || !visibilityLease?.current()) {
         registration.dispose();
         visibility.dispose();
         return fallback();
       }
+      if (options.run) {
+        reveal = options.run.conceal();
+        if (!reveal) {
+          registration.dispose();
+          visibility.dispose();
+          return fallback();
+        }
+      }
       started = true;
       layer.append(paint);
       (frame ?? doc.body).append(layer);
       effect = paint.animate({}, { duration: 0, fill: "both" });
-      hidden = destination.animate({ opacity: 0 }, { duration: 0, fill: "both" });
+      if (!options.run) hidden = destination.animate({ opacity: 0 }, { duration: 0, fill: "both" });
       const write = () => {
         if (!done && lease.current())
           (effect?.effect as KeyframeEffect | null)?.setKeyframes({

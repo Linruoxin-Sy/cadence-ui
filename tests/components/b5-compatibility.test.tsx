@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/registry/cadence/dropdown-menu";
+import { duration, reducedDurationScale } from "@/registry/cadence/lib/motion";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/registry/cadence/menubar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/cadence/select";
@@ -21,6 +22,7 @@ import {
   ToastViewport,
   useToastManager,
 } from "@/registry/cadence/toast";
+import { parameterCalls } from "../motion-observer";
 
 it("Combobox guards hidden tab stops without inert and restores caller ownership", async () => {
   const view = render(
@@ -278,7 +280,36 @@ it("select preserves typed callbacks, render, refs, events, controlled updates a
   expect(node.tagName).toBe("SECTION");
   expect(node).toHaveClass("callback", "p-8", "shadow-none");
   expect(node.style.opacity).toBe("0.9");
-  expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0.32s");
+  const expectNativeClock = (mode: "full" | "reduced" | "none") => {
+    const policy = parameterCalls
+      .filter((call) => call.form === "popup.anchored/presence" && call.origin?.exports.includes("SelectContent"))
+      .at(-1);
+    expect(policy?.mode).toBe(mode);
+    const parameters = policy?.result as {
+      kind: string;
+      opacity: { duration: number };
+      spatial: { duration?: number };
+    };
+    expect(parameters.kind).toBe("visual");
+    expect(parameters.opacity.duration).toBeCloseTo(
+      mode === "none" ? 0 : duration.base * 2 * (mode === "reduced" ? reducedDurationScale : 1),
+    );
+    if (mode !== "full") expect(parameters.spatial.duration).toBe(0);
+    expect(node.style.getPropertyValue("--cadence-time-scale")).toBe("2");
+    expect(node.style.opacity).toBe("0.9");
+    // The caller's opacity remains authoritative; policy resolution cannot
+    // authorize an independent timed appearance writer on that property.
+    expect(
+      node
+        .getAnimations?.()
+        .some(
+          (animation) =>
+            animation.playState === "running" &&
+            (animation.effect as KeyframeEffect | null)?.getKeyframes().some((frame) => "opacity" in frame),
+        ) ?? false,
+    ).toBe(false);
+  };
+  expectNativeClock("full");
   expect(node.querySelector(".item-callback")).toBeInTheDocument();
   fireEvent.keyDown(node, { key: "a" });
   expect(key).toHaveBeenCalledWith("keydown");
@@ -286,12 +317,8 @@ it("select preserves typed callbacks, render, refs, events, controlled updates a
     view.rerender(example(mode));
     expect(document.querySelector('[data-slot="select-content"]')).toBe(node);
     expect(node).toHaveAttribute("data-motion", mode);
-    if (mode === "none") {
-      expect(node.className).toContain("transition-none");
-      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
-      expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-    }
-    if (mode === "reduced") expect(node.className).toContain("transition-opacity");
+    expectNativeClock(mode);
+    if (mode === "none") expect(node.style.transitionDuration).toBe("0s");
   }
   view.rerender(example("none", false));
   view.unmount();

@@ -600,24 +600,24 @@ It also clears the private held gesture: native disabled can swallow pointerup, 
 re-enabling the button must not revive that cancelled press. Base owns focus/activation.
 Slider uses Base's dragging state, rather than tap, and likewise resolves a disabled thumb
 to scale one with a zero clock. CodeBlock copy glyphs explicitly snap scale under reduced.
-Select's measured value uses intrinsic `width: auto` in reduced/none. Base can commit
-new label text in its own subtree before the parent's ResizeObserver runs; a cached
-numeric width must not survive that paint. A single MotionValue owns width in every
-mode: jump it to auto and synchronously write that same auto target under reduced/none,
-stopping its spring. Switching the style from a MotionValue to a React string permits
-an older queued Motion render to overwrite React's auto. Keep the numeric measurement
-in the target ref; full resolves its first auto measurement instantly, then springs
-on later label changes. The synchronous write is the same prepaint fold policy as CodeBlock.
+Select's value shell uses the shared clamped `geometry.resize/measured` owner. The
+native label lays out at its final no-wrap width once; safe shrinking interpolates,
+while growth that would clip the new label and reduced/none use current intrinsic
+layout immediately. Temporary constraints release rather than maintaining a stale
+numeric width. Base UI remains the sole popup placement/aligned-height/scroll owner.
 
-Select's internal captured-origin adapter only transfers bounded plain disjoint labels until the
-changed-run renderer is integrated. Capture belongs to the accepted native selection event and is
-consumed once; missing/unsafe or formatter-incompatible labels stay immediate. A frozen source may
-retire under its popup's actual lifetime. The paint-only clipped layer owns no interactive subtree
-or scroll extent. A lost source/destination mapping cancels the transfer and exposes the current
-native destination without a second replacement effect; it never follows a moving item or trigger.
-A genuinely local frame may retain common outer scrolling because both endpoints and its layer move
-together. Viewport, differential scroll and passive placement corrections invalidate cross-space
-captures. These hooks and the conservative pilot do not implement text diffing or full Select v2.
+Select composes the changed-run renderer with one captured-origin handoff. A bounded
+single shaping-safe changed Range can transfer from the actual option to its native
+Value Text node; retained glyphs are not masked or moved. Stable native popup placement
+translations are compatible with native Range viewport boxes; scale, rotation, active
+placement movement and unverified shaping remain immediate fallbacks. Multiple runs
+and missing/uncorrelated origins choose local diff. Captures bind the actual request,
+accepted value and trigger lifetime; asynchronous controlled echoes without a native
+request token do not retain an origin. A frozen source may retire with its popup.
+Changed destination/paint-layer mapping cancels a running transfer and reveals the
+already-current value without replaying a local replacement. The independently owned
+trigger/value transaction survives popup closure; hidden option updates establish a
+baseline. Numerical performance acceptance remains deferred under ADR-023.
 
 ### 3.0 Sidebar composition
 
@@ -1258,9 +1258,17 @@ take precedence. Mask removal and canvas cancellation expose the exact current n
 This requires Custom Highlight and constructable stylesheet support, with immediate fallback when
 unavailable. No glyph inline-block, typography override, extra text tree or outer geometry writer is added.
 A temporary empty baseline probe must leave native layout rectangles unchanged and is removed before paint.
+The changed-text controller explicitly permits known background, border-colour and box-shadow
+transitions on its ancestor chain: these change neither glyph ink nor its coordinate map, so their
+native transition events do not cancel that text writer. Foreground colour, opacity, geometry and
+unknown animation properties still reject proof and cancel active text on native transition start.
+No shared surface writer is cancelled by the text owner. Numeric presentation retains its existing
+stricter stable-ancestor-paint preflight and cancellation policy; the text-only opt-in does not
+certify simultaneous reels and ancestor paint.
 Entering editing cancels paint without rewriting its existing tree; leaving editing establishes a
-fresh baseline. The existing captured-origin adapter can compose only when the entire destination
-is its one safe incoming unit; partial-string mappings stay local until a Range-aware handoff exists.
+fresh baseline. A captured-origin adapter may compose with one proven contiguous incoming changed Range;
+only that Range is concealed, while retained native characters stay visible. Multiple changed runs,
+unsafe shaping and uncorrelated origins keep the local or immediate path.
 AnimatedText uses this strategy; it does not certify the remaining catalogue components. See the
 [Custom Highlight model](https://www.w3.org/TR/css-highlight-api-1/) for DOM-independent range styling.
 On Windows, pixel paint can use grayscale antialiasing while resting native text uses LCD subpixel

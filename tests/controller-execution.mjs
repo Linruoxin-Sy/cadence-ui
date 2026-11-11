@@ -154,6 +154,40 @@ export function observeCopiedController(controller, kind, args, source) {
   const origin = currentExecution();
   controllerOrigins.set(controller, origin);
   controllerSources.set(controller, source);
+  if (kind === "createSelectPopup" || kind === "createCapturedHandoff") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    controller.commit = (...input) => {
+      const offset = parameterCalls.length;
+      const result = withController(controller, () => commit(...input));
+      const popup = kind === "createSelectPopup",
+        options = input[0];
+      const form = popup ? (options.open ? "popup.anchored/presence" : "exit.fade/opacity") : "handoff/value";
+      const policy = popup
+        ? parameterCalls.slice(offset).find((call) => call.form === form)
+        : parameterSamples.get(options.transition);
+      presentationSamples.set(controller, {
+        controller,
+        node: popup ? args[0] : options.destination,
+        origin: popup ? origin : (policy?.origin ?? currentExecution()),
+        form,
+        supportedForms: popup ? ["popup.anchored/presence", "exit.fade/opacity"] : undefined,
+        mode: popup ? options.cm.mode : options.destination.dataset.motion,
+        properties: popup ? (options.open ? ["opacity", "transform"] : ["opacity"]) : ["transform"],
+        preset: policy?.preset,
+        zeroClock: parameterClockIsZero(popup ? policy?.result : options.transition),
+        target: popup ? options.open : options.revision.target,
+        revision: popup ? undefined : options.revision,
+        commits: (presentationSamples.get(controller)?.commits ?? 0) + 1,
+      });
+      return result;
+    };
+    controller.dispose = () => {
+      presentationSamples.delete(controller);
+      dispose();
+    };
+    return controller;
+  }
   if (kind === "createInlinePresence" || kind === "createSurfacePresence") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);

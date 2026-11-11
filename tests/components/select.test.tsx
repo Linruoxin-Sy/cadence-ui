@@ -1,17 +1,27 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/registry/cadence/select";
 import { expectMotionContract } from "../motion-contract";
+import {
+  expectV2MotionAction,
+  expectV2MotionInsertion,
+  expectV2NativeBoundaries,
+  prepareV2MotionPlan,
+} from "../motion-v2-contract";
 
 function Demo({ mode }: { mode?: "full" | "reduced" | "none" }) {
   return (
@@ -77,6 +87,7 @@ function ObjectDemo({
 }
 
 describe("Select", () => {
+  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
   it("retains native object equality, formatter arguments and explicit undefined uncontrolled values", async () => {
     const next = { id: "next", label: "Next.js" },
       remix = { id: "remix", label: "Remix" };
@@ -101,7 +112,7 @@ describe("Select", () => {
     expect(request).toHaveBeenCalledWith(remix);
     expect(trigger).toHaveTextContent("Remix");
     expect(format).toHaveBeenLastCalledWith({ id: "remix", label: "Remix" });
-    expect(document.querySelector('[data-slot="select-handoff"]')).not.toBeInTheDocument();
+    expect(document.querySelector("[data-cadence-handoff-paint]")).not.toBeInTheDocument();
     view.unmount();
     render(
       <Select value={undefined} defaultValue="next" modal={false}>
@@ -179,27 +190,27 @@ describe("Select", () => {
     expect(trigger).toHaveTextContent("Next.js");
   });
 
-  it("sizes the value slot from its measured content", async () => {
+  it("keeps native width when intrinsic layout is unavailable", async () => {
     const { container, rerender } = render(<Demo />);
     const value = container.querySelector('[data-slot="select-value"]') as HTMLElement;
     Object.defineProperty(value, "scrollWidth", { configurable: true, get: () => 160 });
 
     rerender(<Demo />);
-    await waitFor(() => expect(value.style.width).toBe("160px"));
+    expect(value.style.width).toBe("");
   });
 
-  it("uses intrinsic reduced/none width and retains the measured value for full", async () => {
+  it("releases temporary width in every mode without inventing a hidden measurement", async () => {
     const { container, rerender } = render(<Demo mode="reduced" />);
     const value = container.querySelector('[data-slot="select-value"]') as HTMLElement;
     Object.defineProperty(value, "scrollWidth", { configurable: true, get: () => 96 });
 
     rerender(<Demo mode="reduced" />);
-    expect(value.style.width).toBe("auto");
+    expect(value.style.width).toBe("");
     rerender(<Demo mode="none" />);
-    expect(value.style.width).toBe("auto");
+    expect(value.style.width).toBe("");
     expect(container.querySelector('[data-slot="select-value"]')).toBe(value);
     rerender(<Demo mode="full" />);
-    await waitFor(() => expect(value.style.width).toBe("96px"));
+    expect(value.style.width).toBe("");
   });
 
   it("does not invent a flight from rectangles without visible native layout or replay retained label text", async () => {
@@ -207,7 +218,7 @@ describe("Select", () => {
     const trigger = screen.getByRole("combobox", { name: "Framework" });
     await openSelect(trigger);
     await userEvent.click(screen.getByRole("option", { name: "Remix" }));
-    expect(document.querySelector('[data-slot="select-handoff"]')).not.toBeInTheDocument();
+    expect(document.querySelector("[data-cadence-handoff-paint]")).not.toBeInTheDocument();
     expect(trigger).toHaveTextContent("Remix");
     expect(trigger.textContent?.match(/Remix/g)).toHaveLength(1);
   });
@@ -218,7 +229,7 @@ describe("Select", () => {
     await openSelect(trigger);
     await userEvent.click(screen.getByRole("option", { name: "Remix" }));
 
-    expect(document.querySelector('[data-slot="select-handoff"]')).not.toBeInTheDocument();
+    expect(document.querySelector("[data-cadence-handoff-paint]")).not.toBeInTheDocument();
     expect(trigger).toHaveTextContent("Remix");
   });
 
@@ -230,7 +241,7 @@ describe("Select", () => {
     await userEvent.keyboard("{Enter}");
 
     expect(screen.getByRole("listbox")).toBeInTheDocument();
-    expect(document.querySelector('[data-slot="select-handoff"]')).not.toBeInTheDocument();
+    expect(document.querySelector("[data-cadence-handoff-paint]")).not.toBeInTheDocument();
   });
 
   it("carries the mode on the trigger for reduced motion", () => {
@@ -248,4 +259,214 @@ it.each(["full", "reduced", "none"] as const)("asserts the shared %s popup contr
   render(<Demo mode={mode} />);
   await openSelect(screen.getByRole("combobox", { name: "Framework" }));
   expectMotionContract(mode, { instantImperative: true });
+});
+
+describe("Select v2 owners", () => {
+  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
+  it.each(["full", "reduced", "none"] as const)(
+    "executes native accepted content/colour/size owners in %s",
+    async (mode) => {
+      const draw = (label = "Plan A", paint = false, open = true, selected = "a") => (
+        <CadenceProvider mode={mode} timeScale={0}>
+          <Select
+            items={[{ value: "a", label }]}
+            value={selected}
+            open={open}
+            modal={false}
+            onOpenChange={(open, details) => {
+              details.preventUnmountOnClose();
+              if (!open) view.rerender(draw("Plan ready", false, false, "b"));
+            }}
+          >
+            <SelectTrigger aria-label="Direct" style={{ color: paint ? "#222" : "#111" }}>
+              <SelectValue style={{ color: paint ? "#333" : "#222" }} />
+            </SelectTrigger>
+            <SelectContent alignItemWithTrigger={false} style={{ backgroundColor: paint ? "#eee" : "#ddd" }}>
+              <SelectGroup>
+                <SelectLabel style={{ color: paint ? "#333" : "#222" }}>{label}</SelectLabel>
+                <SelectItem value="a" style={{ color: paint ? "#333" : "#222" }}>
+                  {label}
+                </SelectItem>
+                <SelectSeparator style={{ backgroundColor: paint ? "#bbb" : "#aaa" }} />
+                <SelectScrollUpButton keepMounted style={{ backgroundColor: paint ? "#ccc" : "#bbb" }} />
+                <SelectScrollDownButton keepMounted style={{ backgroundColor: paint ? "#ccc" : "#bbb" }} />
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </CadenceProvider>
+      );
+      const view = render(draw());
+      await waitFor(() => expect(screen.getByRole("listbox")).toBeInTheDocument());
+      await expectV2MotionAction("select", "select.value.change", mode, () => view.rerender(draw("Plan B")));
+      await expectV2MotionAction("select", "select.value.replace", mode, () => view.rerender(draw("Plan C")));
+      await expectV2MotionAction("select", "select.handoff.transfer", mode, () => view.rerender(draw("Plan D")));
+      await expectV2MotionAction("select", "select.width.resize", mode, () =>
+        view.rerender(draw("Plan with a longer name")),
+      );
+      await expectV2MotionAction("select", "select.content.resize", mode, () => view.rerender(draw("Plan pending")));
+      await expectV2MotionAction("select", "select.label.change", mode, () => view.rerender(draw("Plan ready")));
+      await expectV2MotionAction("select", "select.surface.colour", mode, () =>
+        view.rerender(draw("Plan ready", true)),
+      );
+      await expectV2MotionAction("select", "select.foreground.colour", mode, () =>
+        view.rerender(draw("Plan ready", false)),
+      );
+      await expectV2MotionAction("select", "select.scroll.colour", mode, () => view.rerender(draw("Plan ready", true)));
+      await expectV2MotionAction("select", "select.separator.colour", mode, () =>
+        view.rerender(draw("Plan ready", false)),
+      );
+      await expectV2MotionAction("select", "select.indicator.select", mode, () =>
+        view.rerender(draw("Plan ready", false, true, "b")),
+      );
+      expectMotionContract(mode, { policy: ["color"] });
+      // Keep Base's closing owner through its own prevent-unmount contract.
+      await expectV2MotionAction("select", "select.content.exit", mode, async () => {
+        await userEvent.keyboard("{Escape}");
+      });
+      await expectV2MotionAction("select", "select.content.enter", mode, () =>
+        view.rerender(draw("Plan ready", false, true, "b")),
+      );
+      await expectV2NativeBoundaries("select");
+    },
+  );
+  it.each(["full", "reduced", "none"] as const)(
+    "executes later trigger insertion on its real host in %s",
+    async (mode) => {
+      const computed = window.getComputedStyle.bind(window);
+      const style = vi.spyOn(window, "getComputedStyle").mockImplementation(
+        (node) =>
+          new Proxy(computed(node), {
+            get(target, key) {
+              if (key === "opacity") return "1";
+              if (key === "visibility") return "visible";
+              const value = Reflect.get(target, key);
+              return typeof value === "function" ? value.bind(target) : value;
+            },
+          }),
+      );
+      const animate = vi.fn(function (this: HTMLElement, frames: Keyframe[]) {
+        let reject: ((reason?: unknown) => void) | undefined;
+        const finished = new Promise<void>((_, no) => {
+          reject = no;
+        });
+        return {
+          finished,
+          playState: "running",
+          effect: { getKeyframes: () => frames, getTiming: () => ({ duration: 100 }) },
+          cancel() {
+            reject?.(new Error("cancelled"));
+          },
+          finish() {},
+        } as unknown as Animation;
+      });
+      const old = HTMLElement.prototype.animate;
+      HTMLElement.prototype.animate = animate;
+      try {
+        const draw = (show: boolean) => (
+          <CadenceProvider mode={mode}>
+            <Select defaultValue="a">
+              {show && (
+                <SelectTrigger aria-label="Inserted">
+                  <SelectValue />
+                </SelectTrigger>
+              )}
+              <SelectContent>
+                <SelectItem value="a">Alpha</SelectItem>
+              </SelectContent>
+            </Select>
+          </CadenceProvider>
+        );
+        const view = render(draw(false));
+        await expectV2MotionInsertion("select", "select.trigger.enter", mode, () => view.rerender(draw(true)));
+        expect(screen.getByRole("combobox", { name: "Inserted" })).toHaveTextContent("Alpha");
+        if (mode !== "none") expect(animate).toHaveBeenCalled();
+        view.unmount();
+      } finally {
+        HTMLElement.prototype.animate = old;
+        style.mockRestore();
+      }
+    },
+  );
+});
+
+it("preserves native render, callback style and React 19 ref cleanup on the same host", async () => {
+  const oldCleanup = vi.fn(),
+    nextCleanup = vi.fn(),
+    first = vi.fn(() => oldCleanup),
+    second = vi.fn(() => nextCleanup);
+  const valueRef = vi.fn();
+  const draw = (ref: typeof first, label: string, mode: "full" | "none") => (
+    <CadenceProvider mode={mode}>
+      <Select items={[{ value: "a", label }]} value="a" modal={false}>
+        <SelectTrigger
+          aria-label="Rendered"
+          ref={ref}
+          render={<button type="button" data-custom="trigger" />}
+          className={() => "w-48"}
+          style={() => ({ borderWidth: 2 })}
+        >
+          <SelectValue ref={valueRef} render={<span data-custom="value" />} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="a">{label}</SelectItem>
+        </SelectContent>
+      </Select>
+    </CadenceProvider>
+  );
+  const view = render(draw(first, "Alpha", "full"));
+  const trigger = screen.getByRole("combobox", { name: "Rendered" }),
+    value = trigger.querySelector('[data-custom="value"]');
+  expect(first).toHaveBeenLastCalledWith(trigger);
+  expect(valueRef).toHaveBeenCalledWith(value);
+  expect(trigger).toHaveClass("w-48");
+  expect(trigger.style.borderWidth).toBe("2px");
+  view.rerender(draw(second, "Beta", "none"));
+  expect(screen.getByRole("combobox", { name: "Rendered" })).toBe(trigger);
+  expect(trigger.querySelector('[data-custom="value"]')).toBe(value);
+  expect(trigger).toHaveTextContent("Beta");
+  expect(oldCleanup).toHaveBeenCalledOnce();
+  expect(second).toHaveBeenLastCalledWith(trigger);
+  expect(trigger).toHaveAttribute("data-motion", "none");
+  view.unmount();
+  expect(nextCleanup).toHaveBeenCalledOnce();
+});
+
+it("keeps multiple object equality scalar and submits repeated native values", async () => {
+  const a = { id: "a", label: "Alpha" },
+    b = { id: "b", label: "Beta" };
+  const equal = vi.fn((item: typeof a, value: typeof a) => {
+    expect(Array.isArray(item)).toBe(false);
+    expect(Array.isArray(value)).toBe(false);
+    return item.id === value.id;
+  });
+  const view = render(
+    <form>
+      <Select
+        multiple
+        name="plans"
+        defaultValue={[a]}
+        items={[
+          { value: a, label: "Alpha" },
+          { value: b, label: "Beta" },
+        ]}
+        isItemEqualToValue={equal}
+        itemToStringValue={(item) => item.id}
+        modal={false}
+      >
+        <SelectTrigger aria-label="Object plans">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={a}>Alpha</SelectItem>
+          <SelectItem value={b}>Beta</SelectItem>
+        </SelectContent>
+      </Select>
+    </form>,
+  );
+  await openSelect(screen.getByRole("combobox", { name: "Object plans" }));
+  await userEvent.click(screen.getByRole("option", { name: "Beta" }));
+  expect(screen.getByRole("combobox", { name: "Object plans" })).toHaveTextContent("Alpha");
+  expect(screen.getByRole("combobox", { name: "Object plans" })).toHaveTextContent("Beta");
+  expect(new FormData(view.container.querySelector("form") as HTMLFormElement).getAll("plans")).toEqual(["a", "b"]);
+  expect(document.querySelector("[data-cadence-handoff-layer]")).toBeNull();
 });

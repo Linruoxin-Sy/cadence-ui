@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useInsertionEffect, useLayoutEffect, useRef } from "react";
+import type { createCapturedHandoff } from "./captured-handoff";
 import type { MotionHostRef } from "./motion-ref";
 import { createMotionTransaction } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
@@ -17,10 +18,18 @@ export function useTextPresentation(
   options: Partial<
     Pick<
       TextPresentationCommit,
-      "locale" | "granularity" | "characterStagger" | "visible" | "capture" | "sourceRetired" | "nativeBaseline"
+      | "locale"
+      | "granularity"
+      | "characterStagger"
+      | "visible"
+      | "capture"
+      | "sourceRetired"
+      | "deferHandoff"
+      | "nativeBaseline"
     >
   > & { enabled?: boolean; initialText?: string } = {},
   supplied?: ReturnType<typeof createMotionTransaction>,
+  handoff?: ReturnType<typeof createCapturedHandoff>,
 ) {
   const initial = useRef(options.initialText ?? value);
   const local = useRef<ReturnType<typeof createMotionTransaction> | null>(null);
@@ -61,7 +70,7 @@ export function useTextPresentation(
         host,
         identity: host.identity,
         transaction,
-        controller: createTextPresentation(host.current, transaction),
+        controller: createTextPresentation(host.current, transaction, handoff, Boolean(handoff)),
         source: {},
         dispose() {
           if (connected.current === connection) connected.current = null;

@@ -404,6 +404,86 @@ export async function expectV2MotionAction(
   return records;
 }
 
+/** A genuinely new host has no before-registration to compare. Observe its
+ * real insertion action instead of faking an exit solely to certify entrance. */
+export async function expectV2MotionInsertion(
+  item: string,
+  binding: string,
+  mode: Mode,
+  insert: () => void | Promise<void>,
+) {
+  const root = process.cwd(),
+    plan = await planFor(root);
+  const actions = plan.actions.filter((action) => action.item === item && action.binding === binding);
+  expect(actions.length).toBeGreaterThan(0);
+  const selection = actions.map((action) => ({ anchor: action.anchor, slot: action.slot }));
+  expect(expectJointMotionEvidence(mode, document, [], selection)).toHaveLength(0);
+  await insert();
+  const observed = expectJointMotionEvidence(mode, document, [], selection),
+    rows: V2ActionRecord[] = [];
+  for (const action of actions) {
+    expect(["data.transition/opacity", "enter.pop/opacity", "enter.pop/surface"]).toContain(action.targetForm);
+    const found = observed.filter((record) => matches(record, action, root));
+    expect(found).toHaveLength(1);
+    const record = found[0];
+    if (!record) throw new Error("missing actual inserted owner");
+    const node = jointPhysicalHost(record);
+    expect(node?.isConnected).toBe(true);
+    expect(record.form).toBe(action.targetForm);
+    expect(record.mode).toBe(mode);
+    expect(record.properties).toEqual(action.properties);
+    expect(record.preset).toBe(action.preset);
+    expect(record.owner.instance).toBe(record.host.instance);
+    expect(record.source).toBeTruthy();
+    for (const receipt of [record.host, record.owner, record.source]) {
+      if (!receipt) throw new Error("missing inserted controller source");
+      const file = Object.keys(action.sources).find(
+        (file) => path.resolve(root, file).replaceAll("\\", "/") === receipt.module,
+      );
+      expect(file).toBeTruthy();
+      expect(receipt.digest).toBe(file && action.sources[file]);
+    }
+    if (mode === "full") {
+      expect(record.zeroClock, "entrance proof uses a real positive clock").toBe(false);
+      for (const property of action.properties) expect(record.propertyWrites?.[property] ?? 0).toBeGreaterThan(0);
+      expect(record.writes ?? 0).toBeGreaterThan(0);
+    }
+    expectMotionContract(mode, { ownerLocal: node ? [node] : [] });
+    rows.push({
+      item,
+      binding,
+      preset: action.preset,
+      form: action.targetForm,
+      mode,
+      relationship: action.relationship,
+      anchor: action.anchor,
+      slot: action.slot,
+      site: action.site,
+      properties: action.properties,
+      sources: loadedSources(root, action.sources),
+      changed: true,
+      policy: true,
+      live: Boolean(node?.isConnected),
+      controller: record.controller,
+      host: record.host.physical,
+      instance: record.host.instance,
+      scope: record.owner.instance,
+    });
+  }
+  const verified = JSON.stringify(rows);
+  onTestFinished(({ task }) => {
+    const rows: V2ActionRecord[] = JSON.parse(verified);
+    task.meta.cadenceV2 ??= [];
+    task.meta.cadenceV2.push(...rows);
+    const payload = { test: task.id, kind: "actions", rows };
+    task.meta.cadenceV2Signed ??= [];
+    task.meta.cadenceV2Signed.push({
+      ...payload,
+      signature: createHmac("sha256", evidenceKey).update(JSON.stringify(payload)).digest("hex"),
+    });
+  });
+}
+
 /** Native and N/A boundaries use real exported parts and physical hosts. They
  * never manufacture a recipe, provider or mode branch for a static tier label. */
 export async function expectV2NativeBoundaries(item: string, options: { root?: string; container?: ParentNode } = {}) {

@@ -338,6 +338,8 @@ selection, find and clipboard; inert, aria-hidden canvas cells contain no text n
 cancel decoration. Editing retains the existing tree, caret, composition and undo owner; this helper is
 a display primitive, not an editable number field. Announcements belong to a caller-owned status region.
 
+Ancestor paint transitions retain the numeric renderer’s stable-paint safety boundary: they keep exact native digits or cancel active reels. The changed-text surface-paint policy does not change this numeric contract.
+
 ## Responsiveness and performance
 
 Native typography, wrapping and whitespace are preserved; no tabular-nums or containing block is added.

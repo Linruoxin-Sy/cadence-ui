@@ -110,7 +110,7 @@ describe("Card", () => {
       ),
     ).toBeGreaterThan(0);
   });
-  beforeAll(() => prepareV2MotionPlan());
+  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
   it.each(["full", "reduced", "none"] as const)("executes each actual part in %s", async (mode) => {
     const draw = (value: string | number, paint = false, size?: "default" | "sm") => (
       <CadenceProvider mode={mode} timeScale={0}>

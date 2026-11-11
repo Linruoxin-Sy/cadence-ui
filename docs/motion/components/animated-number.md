@@ -50,6 +50,10 @@ Restoration never replays. Keyed entities start fresh.
 The public API denotes independent quantities; query/filter, delayed direct-input and reset/restoration
 readouts use native JSX. Internal known compositions preserve their accepted cause and semantic revision.
 
+The numeric renderer retains stable ancestor paint as a prerequisite. An ancestor paint transition
+keeps exact native digits or cancels active reels; the changed-text surface-paint opt-in is not a
+numeric capability.
+
 ## Geometry and performance
 
 One native current Text, inert canvas decoration, no changed font metrics or tabular override. Integer

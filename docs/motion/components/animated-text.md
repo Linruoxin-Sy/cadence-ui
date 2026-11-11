@@ -42,6 +42,9 @@ document, selection/find/copy, entering editing and physical removal retire deco
 editing establishes a fresh baseline without replaying edits. Native refs, events and focus stay on
 the span; arbitrary child traversal and rich-content rewriting are excluded by the string API.
 
+Known ancestor background, border-colour and box-shadow transitions remain independent of text.
+Foreground, opacity, geometry and unknown transitions reject proof or cancel current text paint.
+
 ## Geometry and performance
 
 The shared proof keeps native whitespace, wrapping and typography. It accepts only proven ASCII

@@ -33,27 +33,34 @@ export async function installSelectCancellationProbe(page: Page) {
         const node = document.querySelector('[data-slot="select-content"]');
         if (node && node.getAttribute("data-motion") === phase) {
           const style = getComputedStyle(node);
-          const properties = node
-            .getAnimations()
-            .flatMap((animation) =>
-              (animation.effect as KeyframeEffect)
-                .getKeyframes()
-                .flatMap((frame) =>
-                  Object.keys(frame).filter((key) =>
-                    ["opacity", "scale", "transform", "translate", "filter"].includes(key),
-                  ),
+          const animations = node.getAnimations().filter((animation) => animation.playState === "running");
+          const properties = animations.flatMap((animation) =>
+            (animation.effect as KeyframeEffect)
+              .getKeyframes()
+              .flatMap((frame) =>
+                Object.keys(frame).filter((key) =>
+                  ["opacity", "scale", "transform", "translate", "filter"].includes(key),
                 ),
-            );
+              ),
+          );
           const frame = {
             mode: phase,
             opacity: Number(style.opacity),
             scale: style.scale,
-            duration: style.transitionDuration,
+            duration: animations.length
+              ? `${Math.max(...animations.map((animation) => Number(animation.effect?.getTiming().duration) || 0)) / 1000}s`
+              : "0s",
             same: !saved || node === saved,
             properties,
           };
           frames.push(frame);
-          if (phase === "full" && frame.opacity > 0 && frame.opacity < 1 && properties.includes("scale")) {
+          if (
+            phase === "full" &&
+            frame.opacity > 0 &&
+            frame.opacity < 1 &&
+            node.hasAttribute("data-closed") &&
+            properties.includes("opacity")
+          ) {
             saved = node;
             phase = "reduced";
             commit(phase);

@@ -170,6 +170,8 @@ export function componentExecutionPlugin(additionalItems = []) {
                 "createTabsLayout",
                 "createTabsItem",
                 "createInlinePresence",
+                "createSelectPopup",
+                "createCapturedHandoff",
                 "createSurfacePresence",
                 ...(normalized.endsWith("/lib/css-motion.ts") ? ["acquireFamily"] : []),
               ].includes(node.name?.text)
@@ -397,7 +399,6 @@ export function componentExecutionPlugin(additionalItems = []) {
                 result.name,
                 f.updateJsxExpression(
                   result.initializer,
-                  result.initializer.dotDotDotToken,
                   f.createCallExpression(f.createIdentifier("observeTransitionComposite"), undefined, [
                     result.initializer.expression,
                     f.createArrayLiteralExpression(parts),

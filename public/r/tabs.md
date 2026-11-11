@@ -678,9 +678,9 @@ Focus/focus-within or an owner's invalid state cancels that region's whole colou
 independent eligible colour may continue. Unchanged labels never fade to disguise marker travel.
 
 Native editing, selection/copy, unsupported rich text, font/paint correspondence and shared finite-work
-limits retain their native safety boundaries. An ancestor colour transition can cancel raster text/reels;
-this keeps current native text readable while eligible colour continues, without claiming concurrent
-raster support. Changing a primitive string to a number keeps the same native span/Text identity.
+limits retain their native safety boundaries. Known background, border-colour and box-shadow
+transitions remain independent of changed text. Foreground, opacity, geometry and unknown transitions
+keep native text or cancel its paint. Reels retain the stricter stable-ancestor-paint boundary. Changing a primitive string to a number keeps the same native span/Text identity.
 
 ## Accessibility
 

@@ -236,8 +236,8 @@ describe("real new-item entry", () => {
         rmSync(temp, { recursive: true, force: true });
       }
     },
-    15000,
-  ); // Copies writable docs and runs two complete registry/target audits per tier.
+    30000,
+  ); // Copies writable docs and runs two complete five-pilot registry/target audits per tier.
 });
 
 function ExampleFixture() {

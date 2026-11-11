@@ -271,11 +271,40 @@ export function calledRecipes(source) {
   );
 }
 
+/** Fixed-property factories used by the Select adapter. This recognises live
+ * installed executor code, never an arbitrary recipe string or registration. */
+function selectPresentationForms(source) {
+  const selected = motionSource(source);
+  if (!selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")))
+    return [];
+  if (
+    selected.source.includes("function createSelectPopup(") &&
+    selected.source.includes("node.animate(") &&
+    selected.source.includes("owner.begin(") &&
+    selected.source.includes('"popup.anchored/presence"') &&
+    selected.source.includes('"exit.fade/opacity"')
+  )
+    return ["popup.anchored/presence", "exit.fade/opacity"];
+  if (
+    selected.source.includes("function createTextPresentation(") &&
+    selected.source.includes('"handoff/value"') &&
+    selected.source.includes("handoff.commit(accepted)") &&
+    selected.source.includes("capture: options.capture") &&
+    selected.source.includes("run.after[0]")
+  )
+    return ["handoff/value"];
+  return [];
+}
+
 /** Parameter-backed shared controls retain their exact property form. The
  * binding must reach a rendered shared controller's real transition prop. */
 export function parameterWriterForms(source) {
   return [
-    ...new Set([...parameterWriterBindings(source).map((binding) => binding.form), ...inlinePresenceForms(source)]),
+    ...new Set([
+      ...parameterWriterBindings(source).map((binding) => binding.form),
+      ...inlinePresenceForms(source),
+      ...selectPresentationForms(source),
+    ]),
   ];
 }
 
@@ -682,7 +711,13 @@ export function cssPolicyBindings(source) {
               )
           )
             continue;
-          used.push({ kind: entry.kind, properties: entry.properties, loop: entry.loop, slot: slot.text });
+          used.push({
+            kind: entry.kind,
+            properties: entry.properties,
+            loop: entry.loop,
+            slot: slot.text,
+            offset: node.getStart(tree),
+          });
         }
       }
     }
@@ -717,6 +752,7 @@ export function cssPolicyBindings(source) {
             properties: entry.properties,
             loop: entry.loop,
             slot: slot?.initializer && ts.isStringLiteral(slot.initializer) ? slot.initializer.text : null,
+            offset: node.getStart(tree),
           });
           current = entry.parent;
         }

@@ -4,7 +4,16 @@
   "kbd": ["single", "combination", "tooltip"],
   "separator": ["horizontal", "vertical", "decorative"],
   "label": ["wrapping", "disabled"],
-  "select": ["sizes", "groups", "controlled", "form-submission", "disabled-invalid", "multiple", "placement"],
+  "select": [
+    "sizes",
+    "groups",
+    "controlled",
+    "form-submission",
+    "disabled-invalid",
+    "multiple",
+    "placement",
+    "changing-selection"
+  ],
   "tabs": [
     "controlled",
     "vertical",

@@ -44,7 +44,7 @@ export function installedTargetForm(form, parameterized = false) {
     return "state.color/css-transition";
   if (
     parameterized &&
-    /^(data\.transition\/(opacity|determinate)|enter\.pop\/(opacity|surface)|exit\.fade\/opacity|feedback\.press\/scale|state\.morph\/indicator|layout\.move\/position|popup\.anchored\/(presence|edge|edge-exit|ending|opacity-enter|opacity-exit)|scroll\.navigate\/scroll)$/.test(
+    /^(data\.transition\/(opacity|determinate)|enter\.pop\/(opacity|surface)|exit\.fade\/opacity|feedback\.press\/scale|state\.morph\/indicator|layout\.move\/position|popup\.anchored\/(presence|edge|edge-exit|ending|opacity-enter|opacity-exit)|handoff\/value|scroll\.navigate\/scroll)$/.test(
       form,
     )
   )

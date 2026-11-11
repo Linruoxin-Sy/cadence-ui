@@ -8,7 +8,7 @@ import { expectMotionContract } from "../motion-contract";
 import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 describe("Badge", () => {
-  beforeAll(() => prepareV2MotionPlan());
+  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
   it.each(["full", "reduced", "none"] as const)("executes owned display/size/paint changes in %s", async (mode) => {
     const draw = (value: string | number, paint = false) => (
       <CadenceProvider mode={mode} timeScale={0}>

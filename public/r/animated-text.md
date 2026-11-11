@@ -309,6 +309,8 @@ decoration is inert and aria-hidden. Selection, copy and find cancel decoration.
 separate caller-owned status region only when appropriate. Inherited editing cancels decoration and preserves
 the editor's native text tree, caret, composition and undo ownership; leave live editing to the application.
 
+Known ancestor background, border-colour and box-shadow transitions remain independent of changed text. Foreground, opacity, geometry and unknown transitions keep exact native text or cancel active paint.
+
 ## Responsiveness and performance
 
 Native whitespace, newlines, typography and wrapping stay intact. Resize, scrolling, font changes or uncertain

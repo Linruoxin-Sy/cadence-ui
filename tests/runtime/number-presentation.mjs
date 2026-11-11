@@ -178,6 +178,38 @@ try {
           accepted: () => accepted,
         };
       };
+      for (const [property, initial, target] of [
+        ["background-color", "white", "black"],
+        ["border-top-color", "black", "white"],
+        ["box-shadow", "0 0 0 1px black", "0 0 0 1px white"],
+      ]) {
+        root.style.setProperty(property, initial);
+        const f = fixture(1),
+          text = f.host.firstChild;
+        f.commit(2);
+        check(`real numeric paint before ${property}`, Boolean(layer(f.host)));
+        root.style.transition = `${property} 1s`;
+        getComputedStyle(root).getPropertyValue(property);
+        root.style.setProperty(property, target);
+        await frames(2);
+        check(
+          `real numeric ancestor ${property} clock`,
+          root.getAnimations().some((a) => a.playState === "running" && a.transitionProperty === property),
+        );
+        check(
+          `numeric ${property} still cancels current reels`,
+          !layer(f.host) && f.host.firstChild === text && f.host.textContent === "2",
+        );
+        f.commit(3);
+        check(
+          `numeric ${property} still rejects new reels`,
+          !layer(f.host) && f.host.firstChild === text && f.host.textContent === "3",
+        );
+        f.dispose();
+        for (const animation of root.getAnimations()) animation.cancel();
+        root.style.cssText = "";
+        await frames(2);
+      }
       await frames();
       const host = document.getElementById("owned"),
         text = host.firstChild;

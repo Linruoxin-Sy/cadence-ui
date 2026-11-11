@@ -301,7 +301,7 @@ export function Plan() {
 
 ## Changing content
 
-Update the record, add a seat, change its density or surface colour, or hide and reinsert it. Direct strings in Title, Description and Content use changed-only replacement; direct numbers keep their existing formatting and roll supported changed places. Rich children remain untouched. Change the surface independently to see its colour feedback; a concurrent ancestor paint transition uses native text as a safe fallback. The example explicitly selects plain monospace typography with normal font features so the native/canvas glyph correspondence is measurable; unverified shaping keeps native paint. A surviving `AnimatePresence` parent retains the one real Card for its exit.
+Update the record, add a seat, change its density or surface colour, or hide and reinsert it. Direct strings in Title, Description and Content use changed-only replacement; direct numbers keep their existing formatting and roll supported changed places. Rich children remain untouched. Change the surface independently to see its colour feedback; known background, border-colour and box-shadow transitions remain independent of changed text. Foreground, opacity, geometry and unknown transitions keep native text or cancel its paint. Reels retain the stricter stable-ancestor-paint boundary. The example explicitly selects plain monospace typography with normal font features so the native/canvas glyph correspondence is measurable; unverified shaping keeps native paint. A surviving `AnimatePresence` parent retains the one real Card for its exit.
 
 <ComponentExample name="changing-content" />
 

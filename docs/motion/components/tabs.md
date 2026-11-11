@@ -72,6 +72,11 @@ then permits only the documented colour feedback; radius/thickness are not `stat
 
 Apply the [shared owner precedence](../presets.md#31-effective-modes-and-clock-ownership) per actual trigger, list track and decorative marker region. DOM focus/focus-within or that region's own invalid state cancels its colour clock and settles its whole declared paint. A focused trigger therefore gates its own and the containing track's paint; the separately painted nonfocusable marker can retain verified colour feedback. Active selection alone is not DOM focus, and the colour gate does not itself cancel the independent marker geometry.
 
+Known background, border-colour and box-shadow transitions do not invalidate eligible changed-text
+paint. Foreground, opacity, geometry and unknown transitions retain the shared native text fallback
+and cancellation boundary. Quantity reels still require stable ancestor paint; the changed-text
+opt-in grants no concurrent numeric-paint guarantee.
+
 ## Interruption and lifecycle
 
 The marker and panel transaction belong to this Tabs instance. Sibling or nested Tabs may repeat

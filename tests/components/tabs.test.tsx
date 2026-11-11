@@ -61,7 +61,7 @@ function Controlled({ change }: { change: (value: unknown) => void }) {
 }
 
 describe("Tabs", () => {
-  beforeAll(() => prepareV2MotionPlan());
+  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
   it("preserves arbitrary tab value identity without serializing application objects", () => {
     const first: { self?: unknown } = {};
     first.self = first;

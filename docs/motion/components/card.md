@@ -56,7 +56,12 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 
 The `text`/`value` regions address only the named plain display parts. `foreground` coordinates paint on the declared hosts; an inherited colour runs at its ancestor owner once, while an explicitly overridden foreground has its own disjoint controller. Structural/media children are not added to the text renderer merely because they inherit that paint.
 
-The current §3.6 raster strategy certifies stable ancestor paint, not glyph correspondence during an ancestor CSS paint transition. A concurrent Card palette/text revision therefore keeps exact current native text and its Text identity while eligible Card colour feedback continues; starting that paint transition also cancels an already-running raster replacement. This is the shared unsupported-correspondence safety boundary, not proof of simultaneous raster-text and colour animation. Verify the concurrent semantic/cancellation path as well as the independently visible effects.
+The [shared raster policy](../../animation-system.md#36-changed-text) permits changed text during
+known ancestor background, border-colour and box-shadow transitions. Foreground, opacity, geometry
+or unknown transitions keep exact current native text and cancel active raster replacement.
+Quantity reels retain the stricter stable-ancestor-paint boundary: any such ancestor transition
+uses native digits or cancels a current reel. None of these safety paths cancels the independently
+owned Card paint. Verify concurrent semantics and retained Text identity, plus each eligible writer.
 
 ## Interruption and lifecycle
 

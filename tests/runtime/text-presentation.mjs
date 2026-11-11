@@ -504,6 +504,63 @@ try {
           check("exact clipped text", f.host.textContent === "abcdXfghij");
           f.dispose();
         });
+        for (const [property, initial, target, third] of [
+          ["background-color", "white", "black", "gray"],
+          ["border-top-color", "black", "white", "gray"],
+          ["box-shadow", "0 0 0 1px black", "0 0 0 1px white", "0 0 0 1px gray"],
+        ])
+          await test(`independent ${property} permits and preserves changed text`, async () => {
+            const f = make("Save", { containerStyle: `${property}:${initial};transition:${property} 1s` }),
+              text = f.host.firstChild;
+            getComputedStyle(f.container).getPropertyValue(property);
+            f.container.style.setProperty(property, target);
+            await frame();
+            check(
+              "real surface clock",
+              f.container.getAnimations().some((a) => a.playState === "running" && a.transitionProperty === property),
+            );
+            f.commit("Same");
+            check("independent changed-run paint", all(f.host).length > 0 && f.host.firstChild === text);
+            f.container.style.setProperty(property, third);
+            await frame();
+            check("surface transitionrun cannot cancel text", all(f.host).length > 0);
+            f.dispose();
+          });
+        CSS.registerProperty({
+          name: "--cadence-proof-unknown",
+          syntax: "<number>",
+          inherits: false,
+          initialValue: "0",
+        });
+        for (const [property, initial, target] of [
+          ["color", "black", "white"],
+          ["opacity", "1", "0.5"],
+          ["transform", "none", "translateX(4px)"],
+          ["--cadence-proof-unknown", "0", "1"],
+        ])
+          await test(`${property} rejects proof and cancels actual changed-text paint`, async () => {
+            const f = make("Save", { containerStyle: `${property}:${initial};transition:${property} 1s` }),
+              text = f.host.firstChild;
+            f.commit("Same");
+            check("positive text before conflicting transition", all(f.host).length > 0);
+            getComputedStyle(f.container).getPropertyValue(property);
+            f.container.style.setProperty(property, target);
+            await frame();
+            check(
+              "real conflicting native clock",
+              f.container.getAnimations().some((a) => a.playState === "running" && a.transitionProperty === property),
+            );
+            check(
+              "native transition cancels active paint",
+              all(f.host).length === 0 && f.host.firstChild === text && f.host.textContent === "Same",
+            );
+            f.commit("Save");
+            check(
+              "active conflicting clock rejects new proof",
+              all(f.host).length === 0 && f.host.firstChild === text && f.host.textContent === "Save",
+            );
+            f.dispose();
+          });
         await test("unknown containing blocks and shaped clipping never acquire paint", () => {
           for (const style of ["contain:paint", "clip-path:circle(40%)", "transform:scale(1.1)"]) {
             const f = make("Save", { containerStyle: style }),

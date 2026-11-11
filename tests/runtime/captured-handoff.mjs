@@ -573,6 +573,22 @@ try {
     assert.equal(await flight.count(), 1);
     return result;
   });
+  await test("real Select transfers only a single changed range while retaining native AA", async () => {
+    await reset();
+    const before = await page
+      .getByRole("combobox", { name: "Pilot", exact: true })
+      .locator("[data-select-value-text]")
+      .evaluate((n) => {
+        window.nativeSelectText = n.firstChild;
+        return n.textContent;
+      });
+    const trigger = await select("AAB");
+    await flight.waitFor({ state: "attached" });
+    assert.equal(await flight.getAttribute("data-cadence-flight-text"), "B");
+    assert.equal(await trigger.locator('[data-slot="select-value"]').textContent(), "AAB");
+    assert(await trigger.locator("[data-select-value-text]").evaluate((n) => n.firstChild === window.nativeSelectText));
+    return { before, changedRun: "B", retained: "AA" };
+  });
   for (const mode of ["reduced", "none"])
     await test(`real Select ${mode} starts and stays native`, async () => {
       await reset();
@@ -585,7 +601,7 @@ try {
   for (const [name, patch, label] of [
     ["rejected request", { reject: true }, "BBB"],
     ["delayed accepted echo", { delay: true }, "BBB"],
-    ["retained characters", {}, "AAB"],
+    ["callback formatter", { format: true }, "BBB"],
     ["rich label", { rich: true }, "BBB"],
   ])
     await test(`real Select ${name} never borrows an unsafe origin`, async () => {

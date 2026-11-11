@@ -21,7 +21,7 @@ export default defineConfig({
   },
   test: {
     // Run subprocess-heavy gates serially after ordinary tests. Keep every
-    // existing deadline/assertion; do not make a busy pool hide gate failures.
+    // assertion; cold full-library audit deadlines are set in their suites.
     maxWorkers: 4,
     reporters: ["default", "./tests/motion-contract-reporter.mjs"],
     environment: "jsdom",

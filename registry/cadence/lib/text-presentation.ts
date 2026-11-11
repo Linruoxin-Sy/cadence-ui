@@ -3,6 +3,7 @@
 import type { createCapturedHandoff } from "./captured-handoff";
 import {
   bindMotionParameters,
+  handoffValue,
   motionLimits,
   motionMilliseconds,
   resolveStaggerParameters,
@@ -20,6 +21,7 @@ import {
   ownedTextHighlights,
   proveTextLayout,
   selectedTextContext,
+  textSurfacePaint,
 } from "./text-layout";
 
 const binding = bindMotionParameters(textReplace, "text.change/changed-runs");
@@ -37,6 +39,8 @@ export interface TextPresentationCommit {
   visible?: boolean;
   capture?: Capture;
   sourceRetired?: boolean;
+  /** Compound Select commits its sole size owner before claiming destination paint. */
+  deferHandoff?: boolean;
   /** Expected prior display when a compound primitive changes renderer in an editor. */
   nativeBaseline?: string;
 }
@@ -51,6 +55,7 @@ export function createTextPresentation(
   /** Native composition supplies a dedicated coordinator only when it owns origins.
    * This controller disposes it; ordinary text never reaches the handoff engine. */
   handoff?: ReturnType<typeof createCapturedHandoff>,
+  sharedHandoff = false,
 ) {
   const registration = transaction.register(host);
   const doc = host.ownerDocument,
@@ -179,7 +184,7 @@ export function createTextPresentation(
   const transition = (event: TransitionEvent) => {
     // Capture sees sibling/descendant feedback too. Only this host's actual
     // ancestor chain can invalidate its raster correspondence.
-    if (chain.includes(event.target as HTMLElement)) stop();
+    if (chain.includes(event.target as HTMLElement) && !textSurfacePaint(event.propertyName)) stop();
   };
   for (let node: HTMLElement | null = host; node; node = node.parentElement) {
     chain.push(node);
@@ -331,6 +336,8 @@ export function createTextPresentation(
       const sameEntity = current !== null && Object.is(options.entity, current.entity);
       const previous = current;
       const clock = cm.parameters(binding);
+      const transfer = cm.parameters(bindMotionParameters(handoffValue, "handoff/value"));
+      const transferClock = transfer.kind === "handoff" ? transfer.spatial : { duration: 0 };
       if (!editing && retainedValue !== undefined) {
         if (value === retainedValue && Object.is(options.entity, retainedEntity)) {
           current = options;
@@ -362,8 +369,7 @@ export function createTextPresentation(
           Number(clock.enter.duration) === 0
         )
           stop(); // live-text-policy
-        if (capturedCommit)
-          handoff?.commit({ ...capturedCommit, transition: cm.transition("handoff"), immediate: cm.reduced });
+        if (capturedCommit) handoff?.commit({ ...capturedCommit, transition: transferClock, immediate: cm.reduced });
         if (options.capture !== previous.capture) options.capture?.dispose();
         return;
       }
@@ -407,11 +413,11 @@ export function createTextPresentation(
         clock.kind === "text" &&
         Number(clock.enter.duration) > 0 &&
         available();
-      const before = canAnimate ? proveTextLayout(host, snapshot) : null;
+      const before = canAnimate ? proveTextLayout(host, snapshot, { surfacePaint: true }) : null;
       const text = exact(value, diff);
       if (!sameEntity) snapshot = createTextSnapshot(value, options.locale);
       baseline = false;
-      const after = before && proveTextLayout(host, snapshot);
+      const after = before && proveTextLayout(host, snapshot, { surfacePaint: true });
       mutations.takeRecords();
       const proof =
         before &&
@@ -424,6 +430,17 @@ export function createTextPresentation(
         });
       if (!proof || proof.immediate || clock.kind !== "text" || !view || !highlights) {
         options.capture?.dispose();
+        handoff?.commit({
+          revision,
+          capture: null,
+          destination: host,
+          transition: transferClock,
+          immediate: cm.reduced,
+          sourceRetired: true,
+          current: () => alive && current?.revision === revision,
+          fallback() {},
+          terminal() {},
+        });
         return;
       }
       const incoming = diff.runs.flatMap((run) => run.incoming),
@@ -565,17 +582,19 @@ export function createTextPresentation(
           stop();
         } // Unsupported/CSP/native failure never leaves hidden text.
       };
-      // The existing handoff owns an HTMLElement, not a native Range. Compose
-      // only the actual complete one-unit destination; partial labels stay local.
+      // The same shaped native snapshot proves the one contiguous incoming run.
+      // Only that Range is concealed; retained glyphs remain ordinary native ink.
+      const run = diff.runs.length === 1 ? diff.runs[0] : null;
       if (
         handoff &&
         options.capture &&
-        diff.runs.length === 1 &&
-        incoming.length === 1 &&
-        outgoing.length === 0 &&
-        options.capture.text === value &&
-        value === incoming[0]?.text
+        run &&
+        incoming.length > 0 &&
+        options.capture.text === run.incoming.map((unit) => unit.text).join("")
       ) {
+        const range = doc.createRange();
+        range.setStart(text, run.after[0]);
+        range.setEnd(text, run.after[1]);
         const epoch = generation;
         active = proposed;
         handoffWork = incoming.length;
@@ -583,7 +602,7 @@ export function createTextPresentation(
           revision,
           capture: options.capture,
           destination: host,
-          transition: cm.transition("handoff"),
+          transition: transferClock,
           immediate: cm.reduced,
           sourceRetired: options.sourceRetired ?? false,
           current: () => alive && current?.revision === revision && options.visible !== false,
@@ -596,8 +615,46 @@ export function createTextPresentation(
             }
           },
           slot: "text-handoff-paint",
+          run:
+            !options.deferHandoff && options.capture.text === value
+              ? undefined
+              : {
+                  current: () =>
+                    host.firstChild === text &&
+                    host.textContent === value &&
+                    range.toString() === options.capture?.text,
+                  bounds: () => range.getBoundingClientRect(),
+                  conceal() {
+                    const name = `cadence-text-${++nextMask}`;
+                    const sheet = new view.CSSStyleSheet();
+                    sheet.replaceSync(`::highlight(${name}) { color: transparent; }`);
+                    const highlight = new view.Highlight(range);
+                    const release = () => {
+                      if (highlights.get(name) === highlight) highlights.delete(name);
+                      known.delete(highlight);
+                      doc.adoptedStyleSheets = doc.adoptedStyleSheets.filter((candidate) => candidate !== sheet);
+                    };
+                    try {
+                      known.add(highlight);
+                      doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet];
+                      highlights.set(name, highlight);
+                      if (view.getComputedStyle(host, `::highlight(${name})`).color === "rgba(0, 0, 0, 0)")
+                        return release;
+                    } catch {
+                      /* Native/CSP failure exposes exact current text. */
+                    }
+                    release();
+                    return null;
+                  },
+                },
         };
-        handoff.commit(capturedCommit);
+        const accepted = capturedCommit;
+        const transfer = () => {
+          if (alive && capturedCommit === accepted && generation === epoch) handoff.commit(accepted);
+          else options.capture?.dispose();
+        };
+        if (options.deferHandoff) queueMicrotask(transfer);
+        else transfer();
         return;
       }
       options.capture?.dispose();
@@ -608,7 +665,8 @@ export function createTextPresentation(
       if (!alive) return;
       alive = false;
       stop();
-      handoff?.dispose();
+      if (sharedHandoff) handoff?.cancel();
+      else handoff?.dispose();
       registration.dispose();
       mutations.disconnect();
       resize.disconnect();

@@ -18,15 +18,15 @@ for (const theme of ["light", "dark"] as const) {
       });
       for (const name of ["Framework", "Framework, small"]) {
         const trigger = page.locator('[data-preview="select"]').getByRole("combobox", { name, exact: true });
-        // Each pair retains at least one character. Until changed-run integration,
-        // none may replay the entire label through the legacy transfer path.
+        // The site typography keeps this specimen on the conservative native path.
+        // The source-proof changing-selection example covers partial-run flight.
         for (const label of ["Astro", "Next.js", "Remix"]) {
           await trigger.click();
           await expect(trigger).toHaveAttribute("aria-expanded", "true");
           const listId = await trigger.getAttribute("aria-controls");
           await page.locator(`[id="${listId}"]`).getByRole("option", { name: label, exact: true }).click();
           await expect(trigger.locator('[data-slot="select-value"]')).toHaveText(label);
-          await expect(page.locator('[data-slot="select-handoff"]')).toHaveCount(0);
+          await expect(page.locator("[data-cadence-handoff-paint]")).toHaveCount(0);
           await expect(trigger.locator('[data-slot="select-value"]')).toHaveCSS("opacity", "1");
           await expect(page.locator(`[id="${listId}"]`)).toBeHidden();
           await expect(trigger).toBeFocused();

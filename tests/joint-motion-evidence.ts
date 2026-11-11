@@ -325,7 +325,9 @@ export function expectJointMotionEvidence(
       own(sample.node, sample.properties);
       const realController = sample.controller ?? controller;
       const painted =
-        sample.form.startsWith("text.change/") || sample.form.startsWith("number.roll/")
+        sample.form.startsWith("text.change/") ||
+        sample.form.startsWith("number.roll/") ||
+        sample.form === "handoff/value"
           ? controllerPropertyWrites.get(realController)
           : nativePropertyWrites.get(sample.node);
       records.push({

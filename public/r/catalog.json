@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -458,7 +458,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -497,7 +497,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -534,7 +534,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -573,7 +573,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -610,7 +610,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -717,7 +717,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -754,7 +754,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -793,7 +793,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -848,7 +848,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -887,7 +887,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -927,7 +927,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -969,7 +969,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1010,7 +1010,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1052,7 +1052,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1094,7 +1094,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -1134,7 +1134,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -1174,7 +1174,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -1229,7 +1229,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -1297,7 +1297,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -1350,7 +1350,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -1402,7 +1402,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -1453,7 +1453,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -1505,7 +1505,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -1558,7 +1558,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -1636,7 +1636,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1689,7 +1689,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1740,7 +1740,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1807,7 +1807,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1873,7 +1873,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1939,7 +1939,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -2005,7 +2005,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -2073,7 +2073,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -2139,7 +2139,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -2160,19 +2160,46 @@
       "@cadence/cadence-motion",
       "@cadence/cadence-utils",
       "@cadence/cadence-provider",
-      "@cadence/cadence-handoff"
+      "@cadence/cadence-handoff",
+      "@cadence/cadence-text",
+      "@cadence/cadence-geometry"
     ],
     "since": "0.4.0",
     "tier": "T3",
     "batch": "B5",
     "motion": [
       {
+        "recipe": "data.transition",
+        "form": "one-shot"
+      },
+      {
         "recipe": "popup.anchored",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "exit.fade",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "handoff",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.morph",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.color",
         "form": "css-transition"
       },
-      "geometry.resize",
-      "handoff",
-      "state.morph"
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      }
     ],
     "intensity": "expressive",
     "complexity": "L",
@@ -2185,42 +2212,70 @@
       "scope": "surface",
       "travel": "compact",
       "coordination": "identity",
-      "reason": "The selected label transfers between the popup and trigger while trigger geometry follows the owned label."
+      "reason": "A safely mapped changed label run transfers from the real option to the trigger while independent text, geometry and scoped paint owners coordinate the accepted value."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "popup.anchored/css-transition": [
+        "data.transition/one-shot": [
           {
             "relationship": "default",
             "owner": "select",
-            "reason": "Select integrates popup opening at its own parts, using the reached installed executor."
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
           }
         ],
-        "geometry.resize/one-shot": [
+        "popup.anchored/one-shot": [
           {
             "relationship": "default",
             "owner": "select",
-            "reason": "Select integrates owned size transitions at its own parts, using the reached installed executor."
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+          }
+        ],
+        "exit.fade/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "select",
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "select",
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
           }
         ],
         "handoff/one-shot": [
           {
             "relationship": "default",
             "owner": "select",
-            "reason": "Select integrates selected-label ownership transfer at its own parts, using the reached installed executor."
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
           }
         ],
         "state.morph/one-shot": [
           {
             "relationship": "default",
             "owner": "select",
-            "reason": "Select integrates local state/glyph feedback at its own parts, using the reached installed executor."
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "select",
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "select",
+            "reason": "Select integrates this exact form at its own native trigger, value, popup, item or scoped paint region."
           }
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -2296,7 +2351,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -2371,7 +2426,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -2446,7 +2501,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -2521,7 +2576,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -2606,7 +2661,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -2688,7 +2743,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -2754,7 +2809,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -2810,7 +2865,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -2865,7 +2920,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -2992,7 +3047,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -3029,7 +3084,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -3087,7 +3142,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -3126,7 +3181,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -3178,7 +3233,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -3237,7 +3292,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -3316,7 +3371,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -3356,7 +3411,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -3464,7 +3519,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -3556,7 +3611,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -3647,7 +3702,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -3713,7 +3768,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -3766,7 +3821,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -3826,7 +3881,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -3878,7 +3933,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -3930,7 +3985,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -3984,7 +4039,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -4036,7 +4091,7 @@
         ]
       }
     },
-    "sourceSha": "5e41cd0d",
+    "sourceSha": "c0f25266",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

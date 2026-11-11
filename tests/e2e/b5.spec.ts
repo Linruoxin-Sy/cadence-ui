@@ -105,10 +105,15 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           const popup = page.locator(`[data-slot="${slot(id)}"]`);
           await expect(popup).toHaveAttribute("data-motion", expected);
           const entry = await samples(page);
-          if (expected === "none") expect(entry.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
-          else expect(entry.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
-          if (expected === "full") expect(entry.some((f) => f.scale < 0.999)).toBe(true);
-          else expect(entry.every((f) => f.scale === 1)).toBe(true);
+          if (id === "select") {
+            expect(entry.filter((f) => f.opacity > 0).every((f) => f.opacity === 1 && f.scale === 1)).toBe(true);
+            await expect(page.getByRole("option", { selected: true })).toBeFocused();
+          } else {
+            if (expected === "none") expect(entry.every((f) => f.opacity === 1 && f.animations === 0)).toBe(true);
+            else expect(entry.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
+            if (expected === "full") expect(entry.some((f) => f.scale < 0.999)).toBe(true);
+            else expect(entry.every((f) => f.scale === 1)).toBe(true);
+          }
           await popup.evaluate((n) => {
             (window as unknown as { saved: Element }).saved = n;
           });
@@ -123,7 +128,11 @@ for (const reducedMotion of ["no-preference", "reduce"] as const)
           await start(page, id);
           await open(page, id);
           await expect(popup).toHaveAttribute("data-motion", effectiveMode("full", reducedMotion === "reduce"));
-          expect((await samples(page)).some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
+          const reopened = await samples(page);
+          if (id === "select") {
+            expect(reopened.filter((f) => f.opacity > 0).every((f) => f.opacity === 1 && f.scale === 1)).toBe(true);
+            await expect(page.getByRole("option", { selected: true })).toBeFocused();
+          } else expect(reopened.some((f) => f.opacity > 0 && f.opacity < 1)).toBe(true);
           await mode(page, "none");
           await expect(popup).toHaveAttribute("data-motion", "none");
           await start(page, id);
@@ -137,6 +146,9 @@ for (const colorScheme of ["light", "dark"] as const)
     for (const id of ids)
       for (const viewportWidth of ["combobox", "command", "toast"].includes(id) ? [1280, 390] : [undefined])
         test(`${id} full page and open surface axe${viewportWidth ? ` ${viewportWidth}` : ""}`, async ({ page }) => {
+          // Select performs four complete page/expanded-surface axe audits,
+          // including its larger installed source graph; retain every assertion.
+          if (id === "select") test.setTimeout(120000);
           const errors: string[] = [];
           page.on("pageerror", (e) => errors.push(e.message));
           await page.route("https://github.com/shadcn.png", (r) =>
@@ -187,15 +199,16 @@ test.describe("B5 active transition interruption", () => {
       await page.waitForLoadState("networkidle");
       await mode(page, "full");
       if (id === "select") {
-        await installSelectCancellationProbe(page);
         await open(page, id);
+        await installSelectCancellationProbe(page);
+        await page.keyboard.press("Escape");
         const proof = await selectCancellationProof(page);
         await test.info().attach("native-select-live-cancellation", {
           body: JSON.stringify(proof),
           contentType: "application/json",
         });
         expect(proof.error).toBeUndefined();
-        expect(proof.frames.some((frame) => frame.mode === "full" && frame.properties.includes("scale"))).toBe(true);
+        expect(proof.frames.some((frame) => frame.mode === "full" && frame.properties.includes("opacity"))).toBe(true);
         const reduced = proof.frames.filter((frame) => frame.mode === "reduced");
         expect(reduced).toHaveLength(1);
         expect(reduced[0]?.same).toBe(true);
@@ -207,7 +220,7 @@ test.describe("B5 active transition interruption", () => {
           stopped.every(
             (frame) =>
               frame.same &&
-              frame.opacity === 1 &&
+              frame.opacity === 0 &&
               frame.scale === "none" &&
               frame.duration === "0s" &&
               frame.properties.length === 0,
@@ -486,7 +499,7 @@ for (const preference of ["no-preference", "reduce"] as const)
           const tick = () => {
             const n = document.querySelector('[data-preview="select"] [data-slot="select-value"]') as HTMLElement;
             const text = n?.firstElementChild;
-            const flight = document.querySelector('[data-slot="select-handoff"]');
+            const flight = document.querySelector("[data-cadence-handoff-paint]");
             if (n && text) {
               const s = flight ? getComputedStyle(flight) : null;
               w.selectFrames.push({
@@ -517,9 +530,8 @@ for (const preference of ["no-preference", "reduce"] as const)
           contentType: "application/json",
         });
         if (expected === "full") {
-          // Next.js -> Astro retains text. Whole-label transfer must stay off
-          // until changed-run integration; the disjoint-label pilot has separate
-          // executed engine coverage in tests/runtime/captured-handoff.mjs.
+          // Default site shaping keeps this specimen native; the separate
+          // changing-selection example proves the eligible partial-run flight.
           expect(frames.every((f) => !f.flight)).toBe(true);
           expect(frames.some((f) => Math.abs(f.width - f.natural) > 1)).toBe(true);
         } else {
@@ -530,7 +542,7 @@ for (const preference of ["no-preference", "reduce"] as const)
         await trigger.click();
         await page.getByRole("option", { name: "Next.js", exact: true }).click();
         await mode(page, "reduced");
-        await expect(page.locator('[data-slot="select-handoff"]')).toHaveCount(0);
+        await expect(page.locator("[data-cadence-handoff-paint]")).toHaveCount(0);
         const value = trigger.locator('[data-slot="select-value"]');
         const live = await value.evaluate((n) => ({
           delta: Math.abs(n.getBoundingClientRect().width - (n.firstElementChild?.getBoundingClientRect().width ?? 0)),

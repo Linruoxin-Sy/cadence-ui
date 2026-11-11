@@ -44,10 +44,30 @@ export function selectedTextContext(host: HTMLElement) {
   return false;
 }
 
+/** These CSS paint properties change neither glyph ink nor its coordinate map.
+ * Foreground, opacity, layout and unknown engine properties stay fail-closed. */
+export function textSurfacePaint(property: string) {
+  return /^(background-color|border-(top|right|bottom|left)-color|box-shadow)$/.test(
+    property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
+  );
+}
+function surfaceOnlyAnimation(animation: Animation) {
+  const frames = (animation.effect as KeyframeEffect | null)?.getKeyframes?.();
+  if (!frames?.length) return false;
+  const properties = frames.flatMap((frame) =>
+    Object.keys(frame).filter((key) => !["offset", "computedOffset", "easing", "composite"].includes(key)),
+  );
+  return properties.length > 0 && properties.every(textSurfacePaint);
+}
+
 /** Conservative actual-font raster correspondence, never an ASCII-only proof.
  * Unsupported scripts/features remain exact native text. No typography overrides.
  */
-export function proveTextLayout(host: HTMLElement, snapshot: TextSnapshot): TextLayout | null {
+export function proveTextLayout(
+  host: HTMLElement,
+  snapshot: TextSnapshot,
+  { surfacePaint = false }: { surfacePaint?: boolean } = {},
+): TextLayout | null {
   const view = host.ownerDocument.defaultView;
   const css = view?.getComputedStyle(host);
   const viewport = view?.visualViewport;
@@ -87,7 +107,14 @@ export function proveTextLayout(host: HTMLElement, snapshot: TextSnapshot): Text
       style.visibility !== "visible" ||
       style.display === "none" ||
       style.opacity !== "1" ||
-      style.transform !== "none" ||
+      (style.transform !== "none" &&
+        (() => {
+          // Native popup placement is a stable translation, not glyph scaling.
+          // Range boxes already contain that viewport mapping. Active transforms
+          // remain rejected by the animation check below and layout invalidation.
+          const matrix = new DOMMatrixReadOnly(style.transform);
+          return !matrix.is2D || matrix.a !== 1 || matrix.d !== 1 || matrix.b !== 0 || matrix.c !== 0;
+        })()) ||
       style.translate !== "none" ||
       style.scale !== "none" ||
       style.rotate !== "none" ||
@@ -100,7 +127,7 @@ export function proveTextLayout(host: HTMLElement, snapshot: TextSnapshot): Text
       style.contentVisibility !== "visible" ||
       /transform|filter|perspective/.test(style.willChange) ||
       !["normal", "1"].includes(style.zoom) ||
-      node.getAnimations().length > 0
+      node.getAnimations().some((animation) => !surfacePaint || !surfaceOnlyAnimation(animation))
     )
       return null;
   }

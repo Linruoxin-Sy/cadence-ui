@@ -12,6 +12,7 @@ import { motionSource, valueExports } from "./motion-source.mjs";
 export const digest = (source) => createHash("sha256").update(source).digest("hex");
 const canonical = (value) => JSON.stringify([...value].sort());
 const formProperties = {
+  "handoff/value": ["transform"],
   "text.change/changed-runs": ["opacity"],
   "number.roll/reels": ["transform"],
   "reveal/viewport": ["opacity", "transform"],
@@ -41,7 +42,17 @@ export function motionHostRegions(source, exported) {
   const selected = motionSource(source, [exported]).source;
   const tree = ts.createSourceFile("component.tsx", selected, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const hosts = [];
+  const componentExports = valueExports(source);
   const visit = (node) => {
+    // Public child components own their own execution/refs. Private surfaces
+    // remain in this export; a reachable sibling export cannot lend its host.
+    if (
+      ts.isFunctionDeclaration(node) &&
+      node.name &&
+      componentExports.has(node.name.text) &&
+      node.name.text !== exported
+    )
+      return;
     const opening = ts.isJsxElement(node) ? node.openingElement : ts.isJsxSelfClosingElement(node) ? node : null;
     if (opening) {
       const slot = opening.attributes.properties.find(
@@ -348,7 +359,9 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
     }
     for (const native of (adoption.nativeActions ?? []).filter((native) => native.item === id)) {
       const source = await read(native.file);
-      const hosts = motionHostRegions(source, native.anchor.split("#")[1]);
+      let hosts = motionHostRegions(source, native.anchor.split("#")[1]);
+      const region = contract.regions?.[native.part];
+      if (region) hosts = hosts.filter((host) => region.includes(host.slot));
       if (!hosts.length) {
         report(`${native.binding}: native physical host required`);
         continue;
@@ -394,7 +407,7 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
           !actions.some(
             (action) =>
               action.item === id &&
-              action.anchor === `${id}#${exported}` &&
+              action.site === `${id}:${policy.offset}` &&
               action.slot === policy.slot &&
               (policy.kind === "useStateColor"
                 ? action.targetForm.startsWith("state.color/")

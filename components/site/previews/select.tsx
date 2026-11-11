@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { AnimatedNumber } from "@/registry/cadence/animated-number";
 import { Button } from "@/registry/cadence/button";
 import {
   Select,
@@ -239,7 +240,114 @@ function Placement() {
   );
 }
 
+function ChangingSelection() {
+  const [value, setValue] = useState<string | null>("a");
+  const [ready, setReady] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [quantity, setQuantity] = useState(19);
+  const [open, setOpen] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const plans = [
+    { value: "a", label: ready ? "Plan A ready" : "Plan AAA" },
+    { value: "b", label: ready ? "Plan B ready" : "Plan BBB" },
+  ];
+  const items = [
+    ...plans,
+    {
+      value: "seats",
+      label: (
+        <span>
+          Seats <AnimatedNumber value={quantity} />
+        </span>
+      ),
+    },
+    ...(expanded ? ["c", "d", "e"].map((key) => ({ value: key, label: `Extra plan ${key.toUpperCase()}` })) : []),
+  ];
+  const typography = { fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" };
+  return (
+    <PreviewStack>
+      <PreviewRow>
+        {visible && (
+          <Select
+            items={items}
+            value={value}
+            onValueChange={setValue}
+            open={open}
+            onOpenChange={(next, details) => {
+              if (!next && (details.reason === "outside-press" || details.reason === "focus-out")) details.cancel();
+              else setOpen(next);
+            }}
+            modal={false}
+          >
+            <SelectTrigger aria-label="Changing plan" style={typography}>
+              <SelectValue placeholder="Choose a plan" />
+            </SelectTrigger>
+            <SelectContent alignItemWithTrigger={false} style={typography}>
+              <SelectGroup>
+                <SelectLabel>{ready ? "Plans available" : "Plans pending"}</SelectLabel>
+                {plans.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+                <SelectItem value="seats">
+                  <span>
+                    Seats <AnimatedNumber value={quantity} />
+                  </span>
+                </SelectItem>
+                {expanded &&
+                  ["c", "d", "e"].map((key) => (
+                    <SelectItem key={key} value={key}>
+                      Extra plan {key.toUpperCase()}
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+        <output className="text-sm text-muted-foreground">Selected: {value ?? "none"}</output>
+      </PreviewRow>
+      <PreviewRow>
+        <Button variant="outline" onClick={() => setValue(value === "a" ? "b" : "a")}>
+          Change selection
+        </Button>
+        <Button variant="outline" onClick={() => setReady(!ready)}>
+          Update labels
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setExpanded(!expanded);
+            setOpen(true);
+          }}
+        >
+          Toggle options
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setQuantity(quantity === 19 ? 20 : 19);
+            setOpen(true);
+          }}
+        >
+          Change seats
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setVisible(!visible);
+            setOpen(false);
+          }}
+        >
+          {visible ? "Remove control" : "Insert control"}
+        </Button>
+      </PreviewRow>
+    </PreviewStack>
+  );
+}
+
 const examples = {
+  "changing-selection": ChangingSelection,
   sizes: Sizes,
   multiple: Multiple,
   placement: Placement,
