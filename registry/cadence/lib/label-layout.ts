@@ -116,7 +116,7 @@ export function observeLabelConstraints(host: HTMLElement, content: HTMLElement,
 }
 
 /** Measure one real label at destination width; never size interactive rich content. */
-export function labelGeometry(host: HTMLElement, content: HTMLElement): GeometryDestination | null {
+export function labelGeometry(host: HTMLElement, content: HTMLElement, focusSafe = false): GeometryDestination | null {
   const css = getComputedStyle(host),
     typed = host.computedStyleMap?.();
   const natural = naturalGeometry(host);
@@ -127,7 +127,7 @@ export function labelGeometry(host: HTMLElement, content: HTMLElement): Geometry
     nativeTextContext(host) ||
     host.closest('[hidden],[inert],[aria-hidden="true"]') ||
     selectedTextContext(host) ||
-    host.contains(host.ownerDocument.activeElement) ||
+    (!focusSafe && host.contains(host.ownerDocument.activeElement)) ||
     css.writingMode !== "horizontal-tb" ||
     !["flex", "inline-flex", "block", "inline-block"].includes(css.display)
   )

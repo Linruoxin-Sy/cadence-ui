@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/button-group`
 - Type: registry:ui
 - Since: 0.2.0
-
+- Motion recipes: data.transition, exit.fade, layout.move, geometry.resize, state.color, text.change, number.roll
 
 ## Installation
 
@@ -31,9 +31,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
-- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -54,6 +57,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
@@ -61,7 +65,19 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button-group | `@components/cadence/button-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
+| button-group | `@components/cadence/lib/button-group-layout.ts` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
+| button-group | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
+| button-group | `@components/cadence/lib/kbd-layout.ts` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
+| button-group | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
@@ -72,6 +88,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button-group](https://cadence.dev/r/button-group.json)
 
@@ -228,11 +250,10 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Keep `button-group/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the
-listed relative paths. Button Group imports Separator even when you do not
-render `ButtonGroupSeparator`; both components share the `cn` helper.
-Separator installs its shared motion/geometry runtime and follows its own presence,
-orientation, definite-length and colour contract. The optional provider controls its mode. Keep their source files'
+Copy the complete manual file list at its listed relative paths. Button Group includes shared
+presence, geometry, text, numeric and colour controllers, and imports Separator even when
+`ButtonGroupSeparator` is omitted. Separator retains its own rule owner. The optional provider
+controls modes and clocks. Keep the source files'
 `"use client"` directives. In Next.js App Router, a Server Component can render
 these client parts with serializable props. Calling the exported
 `buttonGroupVariants` function belongs in a `"use client"` module.
@@ -246,10 +267,9 @@ npx shadcn@latest add @cadence/button
 ```
 
 For manual installation, follow Button's Manual tab and copy every listed file,
-including its motion and provider helpers, into the same relative tree. Button
-adds `motion` to the package list above; its provider files are required imports,
-while wrapping the application is optional. Button's press scale plays only in
-full mode and is dropped in reduced and none. The group adds no animation.
+including its motion and provider helpers, into the same relative tree. Button retains its own
+press, colour, plain-label and quantity feedback. The group consumes the same geometry cause once
+and moves a separate segment layer; it introduces no selection state or shared highlight.
 
 Usage, Vertical and the top preview also use `lucide-react` for their plus/minus
 icons. Install it when keeping those icons; Button Group and Button themselves
@@ -400,6 +420,46 @@ export function GroupRules() {
 }
 ```
 
+## Changing joined actions
+
+Stable keys keep existing controls and their native refs intact when a middle action arrives or leaves.
+Save changes only its owned label; More/ Less changes membership; Copy increments the directly owned
+page quantity. The output's native live region announces the final value immediately.
+
+<ComponentExample name="changing" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ButtonGroup, ButtonGroupText } from "@/components/cadence/button-group";
+
+export function ChangingActions() {
+  const [more, setMore] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [pages, setPages] = useState(99);
+  return (
+    <ButtonGroup aria-label="Document actions" style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>
+      <Button key="save" variant="outline" size="sm" onClick={() => setSaved(value => !value)}>
+        {saved ? "Saved" : "Save"}
+      </Button>
+      {more && <Button key="duplicate" variant="outline" size="sm" onClick={() => setPages(value => value + 1)}>Copy</Button>}
+      <ButtonGroupText key="pages" render={<output aria-label="Pages" aria-live="polite" />} className="px-2">{pages}</ButtonGroupText>
+      <ButtonGroupText key="status" render={<output aria-label="Document status" />} className="px-2">{saved ? "Saved" : "Ready"}</ButtonGroupText>
+      <Button key="more" variant="outline" size="sm" onClick={() => setMore(value => !value)}>{more ? "Less" : "More"}</Button>
+    </ButtonGroup>
+  );
+}
+```
+
+This motion specimen uses the verified Courier New / normal feature configuration. Components keep
+caller typography; unknown font features use the native immediate text/number fallback.
+Direct strings use changed-run text; direct numbers are quantities with compact reels. Mixed JSX,
+including `{zoom}%` in the zoom examples, retains its caller-owned structure. Native render elements
+such as this output keep their actual host. Render callbacks, editable content and unknown member
+layouts keep immediate native presentation.
+
 ## When to use
 
 - Two to five controls that act on the same object: bold/italic/underline, cut/copy,
@@ -422,32 +482,42 @@ export function GroupRules() {
 | Part                    | Props                     | Notes                                                          |
 | ----------------------- | ------------------------- | -------------------------------------------------------------- |
 | `ButtonGroup`           | `orientation`, native div | `horizontal \| vertical`; `role="group"`, `data-orientation`.  |
-| `ButtonGroupText`       | `render`, native div      | Static label; swapped element via Base UI `render`.            |
+| `ButtonGroupText`       | `render`, native div      | Label/readout; direct strings and quantities enhance their retained native host. |
 | `ButtonGroupSeparator`  | `Separator` props         | Vertical by default; `self-stretch`, `bg-input`.               |
 | `buttonGroupVariants`   | `orientation`             | Exported for composing a custom group root.                    |
 
-The joining rules are `[&>*]` selectors, so any child that renders a `data-slot` — a
-button, an input, a select trigger — participates without a prop.
+Joining applies to direct controls and internal safe segment layers. Control `data-slot` values,
+native refs and events stay on their original hosts. Stable React keys enable membership/reorder
+motion. Rich/render-callback controls, native editors and unknown layouts keep native structure
+and immediate collection geometry. No toolbar arrow-key model is added.
 
 `ButtonGroupSeparator` accepts Base state callbacks for `className` and `style`, merged after defaults. `ButtonGroupText` uses native string classes and style objects.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Button Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: A single joined-group destination coordinates segment opacity, compact reflow, changed labels and quantity reels without selection state or duplicate child press feedback.
 
-No motion (T0). The group does not animate. Adjacent buttons share a border, and the
-only depth cue is `focus-visible:relative` plus `z-10`, which lifts the focused
-control above its neighbours so its ring is not clipped.
+T0 remains the historical source/profile category.
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+| Recipe / form | Properties | Preset | Interruptible |
+| --- | --- | --- | --- |
+| `data.transition/one-shot` | Independent group/new segment opacity; inherited rule entry/orientation replacement | `presence.inline` | Yes; initial SSR/hydration stays visible |
+| `exit.fade/one-shot` | Paint-only removed segment opacity; inherited rule exit | `presence.exit` | Yes; the removed control unregisters immediately |
+| `layout.move/one-shot` | Stable keyed segment-layer position on the orientation axis | `layout.compact` | Yes; independent of child press |
+| `geometry.resize/measured` | One bounded natural group axis; inherited definite rule length | `geometry.compact` | Yes; no chasing child spring frames |
+| `state.color/css-transition` | Text surface, border, shadow and foreground; inherited rule background | `state.color` | Yes; unknown/unreadable paint paths stay immediate |
+| `text.change/changed-runs` | Only changed runs in direct plain ButtonGroupText | `text.replace`, stagger none | Yes; retained text stays retained |
+| `number.roll/reels` | Direct numeric quantities in ButtonGroupText | `number.compact` | Yes; exact semantic value commits immediately |
+| reduced | Short eligible segment/text opacity and colour; immediate layout and quantities | Reduced policy | Active spatial work cancels |
+| none / zero clock | Current content and native geometry immediately; zero presentation delay | Immediate policy | Existing one-shot writers cancel |
 
-ButtonGroupSeparator inherits Separator’s rule effects; group stretching remains native.
-The buttons inside keep their own press feedback; the group never adds a second
-animation on top of it.
+An independent group entrance includes its initial controls once. Composed Button and Separator
+retain their own later actions and mode scopes. Removed controls leave their tab, form and ref
+registrations immediately; only a bounded inert plain-text visual may finish its exit. Unavailable
+identities/layers, clipping, native size engines and dependent geometry use the affected immediate
+fallback. Parent removal cancels subordinate work. Ordinary focused controls can follow safe member
+layers; focused/composing editors and captured pointers settle affected geometry without replay on
+blur/release. Orientation and responsive reflow commit natively.
 
 ## Accessibility
 
@@ -466,11 +536,14 @@ Groups use intrinsic width and a caller-selected orientation; no breakpoint swit
 automatically. Stack or constrain long groups at the application level rather than hiding focused
 controls.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
-HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
-contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
-The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
-application bundles are measured separately.
+SSR, first hydration and no-JavaScript markup expose final content; hydrated state changes use
+the shared controllers. Automatic collection work is bounded before member measurement, includes
+retained outgoing visuals and the group shell, and keeps only the latest target. Rich content,
+editing and dependent geometry preserve native layout rather than measurement clones.
+
+The historical T0 4 KiB own-source comparison, shared runtime/page costs, CLS and device FPS remain
+advisory/deferred under ADR-023. Functional migration does not establish performance acceptance.
+Composed controls retain their own dependencies; complete installation files are required.
 
 ## Notes for AI
 

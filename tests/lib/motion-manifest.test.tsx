@@ -8,8 +8,38 @@ import {
   implementedForm,
   parameterWriterForms,
 } from "../../scripts/motion-manifest.mjs";
+import { inheritedSlotOverrides } from "../../scripts/motion-v2.mjs";
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
+
+it("requires the actual bounded group projection factory, not a declaration or similar clock", () => {
+  const source = readFileSync("registry/cadence/lib/button-group-layout.ts", "utf8");
+  expect(parameterWriterForms(source)).toEqual(["layout.move/position"]);
+  for (const broken of [
+    source.replaceAll("host.animate(", "missing("),
+    source.replaceAll("registerTextGeometry(", "missing("),
+    source.replaceAll('owner.begin(input.revision, ["transform"]', 'missing(input.revision, ["transform"]'),
+    source.replaceAll('from "./motion"', 'from "@/motion"'),
+  ])
+    expect(parameterWriterForms(broken)).toEqual([]);
+});
+it("specializes an inherited slot only through its exact live imported adapter", () => {
+  const source =
+    'import { Separator as Rule } from "../separator"; export function Adapter() { return <Rule data-slot="group-rule" />; } export function Unrelated() { return <span data-slot="false-rule" />; }';
+  const find = (text: string, selected = "Adapter", dependency = "Separator") =>
+    inheritedSlotOverrides(
+      text,
+      selected,
+      "registry/cadence/group/index.tsx",
+      "registry/cadence/separator/index.tsx",
+      dependency,
+    );
+  expect(find(source)).toEqual(["group-rule"]);
+  expect(find(source, "Unrelated")).toEqual([]);
+  expect(find(source, "Adapter", "Different")).toEqual([]);
+  expect(find(source.replace('"../separator"', '"../other"'))).toEqual([]);
+  expect(find(source.replace('data-slot="group-rule"', "data-slot={slot}"))).toEqual([]);
+});
 
 it("requires actual key geometry/projection writers and current native geometry authority", () => {
   const key = readFileSync("registry/cadence/lib/kbd-layout.ts", "utf8");

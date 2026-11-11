@@ -217,6 +217,11 @@
           "target": "@components/cadence/lib/motion-ref.ts"
         },
         {
+          "path": "registry/cadence/lib/group-member.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/group-member.ts"
+        },
+        {
           "path": "registry/cadence/lib/inline-presence.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/inline-presence.ts"
@@ -1459,21 +1464,68 @@
       "title": "Button Group",
       "description": "Toolbars and related actions on the same object.",
       "categories": ["form", "layout"],
-      "dependencies": ["@base-ui/react", "class-variance-authority"],
-      "registryDependencies": ["@cadence/cadence-utils", "@cadence/separator"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/separator",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/button-group/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/button-group/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/button-group-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/button-group-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/label-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/label-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/kbd-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/kbd-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          "layout.move",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
+        "intensity": "medium",
         "complexity": "S",
         "upstream": {
           "registry": "shadcn",
@@ -1481,14 +1533,84 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Button Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "A single joined-group destination coordinates segment opacity, compact reflow, changed labels and quantity reels without selection state or duplicate child press feedback."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "ButtonGroupSeparator reaches the migrated Separator rule owner once; passive group stretching remains native."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "ButtonGroupSeparator reaches the migrated Separator rule owner once; passive group stretching remains native."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "ButtonGroupSeparator reaches the migrated Separator rule owner once; passive group stretching remains native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "ButtonGroupSeparator reaches the migrated Separator rule owner once; passive group stretching remains native."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "button-group",
+                "reason": "Button Group integrates the exact group, safe segment or readout owner; native editing, unknown member layouts and composed controls retain their own authority."
+              }
+            ]
+          }
         }
       }
     },
@@ -4040,6 +4162,11 @@
                 "relationship": "inherited",
                 "owner": "button",
                 "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "SidebarSeparator reaches the same shared presence factory through Separator’s independent rule owner; native stretch remains immediate and Sidebar retains its legacy migration state."
               }
             ]
           }

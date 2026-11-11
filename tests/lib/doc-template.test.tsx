@@ -58,7 +58,7 @@ const without = (source: string, title: string) =>
   source.replace(new RegExp(`## ${title}\\n[\\s\\S]*?(?=\\n## |$)`), "");
 
 // biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; full-catalogue AST/registry subprocesses need startup headroom under full-suite I/O contention.
-describe("real registry template entry", { timeout: 15_000 }, () => {
+describe("real registry template entry", { timeout: 30_000 }, () => {
   it("validates all current tier/block bodies directly", async () => {
     expect(await checkDocTemplates(root, registry)).toEqual([]);
   }, 15_000);

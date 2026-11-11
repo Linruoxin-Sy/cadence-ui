@@ -958,6 +958,27 @@ transaction. Descendants register their real natural regions and defer flushing 
 committed child content. The coordinator resolves natural destinations before starting the sole outer
 axis writer. Scope registration alone is not component adoption; unknown external layout stays native.
 
+A compound content revision can capture and release its existing geometry overlays in the
+before-layout commit phase, so descendant text/readout proofs see native destination allocation.
+The surviving parent consumes that captured origin once when it commits the complete destination.
+Unchanged renders do not prepare or retire a valid flight; passive cancellation discards pending
+origins instead of replaying them.
+An orientation-axis parent delegates only that actual axis. A registered descendant may own an
+independent cross axis; its native echo through ancestor boxes is not a passive constraint edit.
+Ignore that echo only for the exact currently leased Animation/property/target in the same scope.
+Unknown, retired, unrelated or differently scoped engines still invalidate the affected geometry.
+Directional geometry evidence records only the actual applicable axis. When a contract supports
+both axes, both real orientations must execute in each mode within the same passing test; the
+signed property union must equal the full declared set. Each row independently retains its real
+host/controller lifetime, source, preset and policy checks. Other forms still require exact property
+sets per row; cross-test unions, extra axes and a missing direction cannot certify the contract.
+
+A known action-group adapter may prove that an ordinary focused control can follow its stable
+member layer without clipping its ring or disturbing editing. That per-registration focus predicate
+does not exempt native editors, composition or pointer capture; other geometry registrations keep
+their immediate focus policy. Leaving an editing/focus exclusion establishes the current native
+baseline without replaying the consumed revision.
+
 | Cause                                                | Default target behaviour                                          |
 | ---------------------------------------------------- | ----------------------------------------------------------------- |
 | Label/value/icon content revision                    | Animate the affected intrinsic axis from its current visual size  |
@@ -1270,6 +1291,12 @@ policy. The target label must already use its final native width and retain exac
 native display anchors transport pixels without a second position writer. A data attribute,
 declaration, matching timing or connected controller is insufficient. Only that proven writer's
 width/height constraints and pure translations may be omitted from the text paint signature.
+The actual native anchor mapping is checked against the current host. At unit device scale,
+one 1/64 CSS-pixel layout unit may separate quantized anchor coordinates from a finer projected
+DOM rectangle; subtract the measured mapped origin so the initial pixel offset is zero. Larger
+mismatches still reject transport. This tolerance grants no geometry, host, mode or lease authority.
+Text/reel size observers compare these proven non-scaling boxes in native layout units too,
+so finer transform arithmetic cannot impersonate a content-size revision.
 Unknown animations, foreground/opacity, scaling, expired or retired leases and unrelated hosts stay
 rejected. During that opted-in text presentation a bounded animation-identity/property audit checks this
 authority without layout or Range reads; failed authority cancels paint, keeps the exact native Text
@@ -1277,6 +1304,10 @@ and never revives an old revision. Normal geometry completion may release to nat
 the independent text clock finishes. Mode/zero-clock/native editing/copy and unmount still cancel
 their applicable writers; existing work and raster limits are unchanged. Unknown geometry and
 unknown animation properties still reject proof and cancel active text on native transition start.
+An eligible live switch to reduced captures current changed-run opacity and uses the short clock
+with no stagger delay; none/zero cancels the mask and paint immediately. Eligible existing CSS
+colour transitions similarly keep their eased phase on the short reduced clock through their one
+native CSS owner. Native editing, unsafe mapping and readability rejection still take precedence.
 No shared surface writer is cancelled by the text owner. Numeric presentation retains its existing
 stricter stable-ancestor-paint preflight and cancellation policy; the text-only opt-in does not
 certify simultaneous reels and ancestor paint.

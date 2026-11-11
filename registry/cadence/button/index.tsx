@@ -17,6 +17,7 @@ import {
 import { cn } from "../lib/cn";
 import { ControlSpan } from "../lib/control-animation";
 import { useStateColor } from "../lib/css-motion";
+import { registerGroupControl } from "../lib/group-member";
 import { createInlinePresence } from "../lib/inline-presence";
 import { createMeasuredGeometry, GeometryScope, naturalGeometry } from "../lib/measured-geometry";
 import { bindMotionParameters, feedbackPress, geometryCompact } from "../lib/motion";
@@ -469,5 +470,7 @@ function ButtonNumber({
     </span>
   );
 }
+
+registerGroupControl(Button);
 
 export { buttonVariants };

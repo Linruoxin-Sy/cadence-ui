@@ -300,6 +300,47 @@ export function observeCopiedController(controller, kind, args, source) {
     };
     return controller;
   }
+  if (kind === "createGroupPositions") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    const keys = new Map();
+    controller.commit = (input) => {
+      const offset = parameterCalls.length;
+      const result = withController(controller, () => commit(input));
+      const policy = parameterCalls.slice(offset).find((call) => call.form === "layout.move/position");
+      for (const [host, key] of keys)
+        if (!input.boxes.has(host)) {
+          presentationSamples.delete(key);
+          keys.delete(host);
+        }
+      for (const host of input.boxes.keys()) {
+        const key = keys.get(host) ?? {};
+        keys.set(host, key);
+        presentationSamples.set(key, {
+          controller,
+          origin,
+          node: host,
+          form: "layout.move/position",
+          properties: ["transform"],
+          mode: input.cm.mode,
+          preset: policy?.preset,
+          clock: policy?.result?.transition,
+          immediate: input.cm.reduced || !input.available,
+          zeroClock: parameterClockIsZero(policy?.result),
+          target: input.revision.target,
+          revision: input.revision,
+          commits: (presentationSamples.get(key)?.commits ?? 0) + 1,
+        });
+      }
+      return result;
+    };
+    controller.dispose = () => {
+      for (const key of keys.values()) presentationSamples.delete(key);
+      keys.clear();
+      return dispose();
+    };
+    return controller;
+  }
   if (kind === "createTabsLayout") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller),

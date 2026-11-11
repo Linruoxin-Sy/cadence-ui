@@ -171,13 +171,24 @@ export async function expectV2MotionAction(
   binding: string,
   mode: Mode,
   exercise: () => void | Promise<void>,
-  options: { root?: string; container?: ParentNode } = {},
+  options: { root?: string; container?: ParentNode; properties?: string[] } = {},
 ) {
   const root = options.root ?? process.cwd(),
     container = options.container ?? document;
   const plan = await planFor(root);
   const engine = await vi.importActual<typeof import("motion/react")>("motion/react");
-  const actions = plan.actions.filter((action) => action.item === item && action.binding === binding);
+  const actions = plan.actions
+    .filter((action) => action.item === item && action.binding === binding)
+    .map((action) => {
+      if (!options.properties) return action;
+      expect(action.targetForm, "only measured geometry may select its applicable axis").toBe(
+        "geometry.resize/measured",
+      );
+      expect(options.properties.length).toBeGreaterThan(0);
+      expect(options.properties).toEqual([...new Set(options.properties)].sort());
+      expect(options.properties.every((property) => action.properties.includes(property))).toBe(true);
+      return { ...action, properties: options.properties };
+    });
   expect(actions.length, "declared v2 action").toBeGreaterThan(0);
   const selection = actions.map((action) => ({ anchor: action.anchor, slot: action.slot }));
   const before = expectJointMotionEvidence(mode, container, [], selection);

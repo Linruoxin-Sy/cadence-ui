@@ -79,7 +79,15 @@ export async function checkMotionImplementations(
     install(item);
     const reachable = new Map();
     const visit = async (file, names, via) => {
-      const key = `${file}#${names?.slice().sort().join(",") ?? "*"}`;
+      // A local adapter and an inherited adapter may execute the same shared
+      // factory. Retain each real nearest integration owner, not just whichever
+      // path happened to reach that source first.
+      const owner =
+        [...via, file]
+          .reverse()
+          .map((entry) => entry.match(/^registry\/cadence\/([^/]+)\/index\.tsx(?:#|$)/)?.[1])
+          .find(Boolean) ?? item.name;
+      const key = `${owner}\0${file}#${names?.slice().sort().join(",") ?? "*"}`;
       if (reachable.has(key)) return;
       const scanned = motionSource(await read(file), names);
       reachable.set(key, { file, source: scanned.source, via });

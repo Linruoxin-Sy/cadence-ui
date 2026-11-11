@@ -46,11 +46,19 @@ export function documentPresentation(doc: Document) {
 }
 
 /** No host or lifecycle retention. Children commit before this initial baseline. */
-export function MotionPresentation({ children, scope: supplied }: { children: ReactNode; scope?: PresentationScope }) {
+export function MotionPresentation({
+  children,
+  scope: supplied,
+  consumeEntrance = false,
+}: {
+  children: ReactNode;
+  scope?: PresentationScope;
+  consumeEntrance?: boolean;
+}) {
   const [local] = useState(createPresentationScope);
   const scope = supplied ?? local;
   committed(() => {
-    scope.presented = true;
+    scope.presented = !consumeEntrance;
   });
   return <Context.Provider value={scope}>{children}</Context.Provider>;
 }

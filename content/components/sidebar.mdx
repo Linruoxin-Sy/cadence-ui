@@ -5,7 +5,7 @@ category: navigation
 motion: [{"recipe":"layout.move","form":"size-linked"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"data.transition","form":"one-shot"}]
 intensity: medium
 motionProfile: {"scope":"surface","travel":"extended","coordination":"group","reason":"The reserved gap and panel position share a size-linked owner while destination-width labels stay readable."}
-motionCoverage: {"schema":1,"effects":{"layout.move/size-linked":[{"relationship":"default","owner":"sidebar","reason":"Sidebar integrates size-linked panel position at its own parts, using the reached installed executor."}],"geometry.resize/measured":[{"relationship":"default","owner":"sidebar","reason":"Sidebar integrates owned size transitions at its own parts, using the reached installed executor."},{"relationship":"inherited","owner":"button","reason":"The selected live composition reaches button's installed geometry.resize/measured owner; this is inherited execution, not a second local writer."},{"relationship":"inherited","owner":"separator","reason":"SidebarSeparator reaches Separator’s definite-length geometry owner; native stretch remains immediate and no second local writer is added."}],"data.transition/one-shot":[{"relationship":"default","owner":"sidebar","reason":"Sidebar integrates the existing content/data/status phase at its own parts, using the reached installed executor."},{"relationship":"inherited","owner":"button","reason":"The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."}]}}
+motionCoverage: {"schema":1,"effects":{"layout.move/size-linked":[{"relationship":"default","owner":"sidebar","reason":"Sidebar integrates size-linked panel position at its own parts, using the reached installed executor."}],"geometry.resize/measured":[{"relationship":"default","owner":"sidebar","reason":"Sidebar integrates owned size transitions at its own parts, using the reached installed executor."},{"relationship":"inherited","owner":"button","reason":"The selected live composition reaches button's installed geometry.resize/measured owner; this is inherited execution, not a second local writer."},{"relationship":"inherited","owner":"separator","reason":"SidebarSeparator reaches Separator’s definite-length geometry owner; native stretch remains immediate and no second local writer is added."}],"data.transition/one-shot":[{"relationship":"default","owner":"sidebar","reason":"Sidebar integrates the existing content/data/status phase at its own parts, using the reached installed executor."},{"relationship":"inherited","owner":"button","reason":"The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."},{"relationship":"inherited","owner":"separator","reason":"SidebarSeparator reaches the same shared presence factory through Separator’s independent rule owner; native stretch remains immediate and Sidebar retains its legacy migration state."}]}}
 complexity: L
 tier: T3
 since: 0.5.0
@@ -1891,6 +1891,10 @@ Separator. Passive stretch remains native; these inherited effects do not migrat
 
 Mobile delegates `popup.anchored` / `exit.fade` to Sheet. Button press, tooltip popup and Skeleton pulse
 are owned by those dependencies, not extra Sidebar recipes. Their effective mode follows the provider.
+
+SidebarSeparator inherits Separator’s independent `data.transition/one-shot` rule entrance.
+Native stretching stays immediate. This records the existing dependency owner; Sidebar retains
+its legacy migration state.
 
 ## Accessibility
 

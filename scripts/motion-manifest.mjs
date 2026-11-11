@@ -311,8 +311,27 @@ export function parameterWriterForms(source) {
       ...inlinePresenceForms(source),
       ...selectPresentationForms(source),
       ...kbdPresentationForms(source),
+      ...groupPositionForms(source),
     ]),
   ];
+}
+
+/** Fixed collection-layer projection. Authored clocks and the executing factory
+ * are required; runtime source/host/action receipts remain a separate gate. */
+function groupPositionForms(source) {
+  const selected = motionSource(source);
+  return selected.source.includes("function createGroupPositions(") &&
+    selected.imports.some(
+      (entry) => entry.name === "bindMotionParameters" && entry.path.startsWith(".") && entry.path.endsWith("/motion"),
+    ) &&
+    selected.source.includes('bindMotionParameters(layoutCompact, "layout.move/position")') &&
+    selected.source.includes('owner.begin(input.revision, ["transform"]') &&
+    selected.source.includes("host.animate(") &&
+    selected.source.includes("registerTextGeometry(") &&
+    selected.source.includes("animateSingleValue(phase,") &&
+    selected.source.includes(".setKeyframes(")
+    ? ["layout.move/position"]
+    : [];
 }
 
 /** Fixed key border-box/projection executor; no caller property or clock input. */

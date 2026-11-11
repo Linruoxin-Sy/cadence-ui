@@ -101,10 +101,43 @@ export function GroupRules() {
   );
 }
 
+export function ChangingActions() {
+  const [more, setMore] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [pages, setPages] = useState(99);
+  return (
+    <div className="w-full">
+      <ButtonGroup
+        aria-label="Document actions"
+        style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+      >
+        <Button key="save" variant="outline" size="sm" onClick={() => setSaved((value) => !value)}>
+          {saved ? "Saved" : "Save"}
+        </Button>
+        {more && (
+          <Button key="duplicate" variant="outline" size="sm" onClick={() => setPages((value) => value + 1)}>
+            Copy
+          </Button>
+        )}
+        <ButtonGroupText key="pages" render={<output aria-label="Pages" aria-live="polite" />} className="px-2">
+          {pages}
+        </ButtonGroupText>
+        <ButtonGroupText key="status" render={<output aria-label="Document status" />} className="px-2">
+          {saved ? "Saved" : "Ready"}
+        </ButtonGroupText>
+        <Button key="more" variant="outline" size="sm" onClick={() => setMore((value) => !value)}>
+          {more ? "Less" : "More"}
+        </Button>
+      </ButtonGroup>
+    </div>
+  );
+}
+
 const examples = {
   vertical: VerticalControls,
   "static-text": GroupWithText,
   separator: GroupRules,
+  changing: ChangingActions,
 };
 
 export function ButtonGroupPreview({ example }: { example?: string }) {

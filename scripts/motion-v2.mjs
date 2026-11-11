@@ -81,6 +81,33 @@ export function motionHostRegions(source, exported) {
   return hosts;
 }
 
+/** A composition may specialize a dependency's native data-slot. Only a literal
+ * JSX use of that exact imported export in the selected adapter establishes it;
+ * metadata, a sibling export or a similarly named local cannot supply this edge. */
+export function inheritedSlotOverrides(source, exported, file, dependencyFile, dependencyExport) {
+  const selected = motionSource(source, [exported]);
+  const imports = selected.imports.filter((entry) => {
+    if (entry.name !== dependencyExport || !entry.path.startsWith(".")) return false;
+    const base = path.posix.normalize(path.posix.join(path.posix.dirname(file), entry.path));
+    return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.tsx`].includes(dependencyFile);
+  });
+  const names = new Set(imports.map((entry) => entry.local));
+  const tree = ts.createSourceFile("adapter.tsx", selected.source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const slots = new Set();
+  const visit = (node) => {
+    const opening = ts.isJsxElement(node) ? node.openingElement : ts.isJsxSelfClosingElement(node) ? node : null;
+    if (opening && names.has(opening.tagName.getText(tree))) {
+      const attribute = opening.attributes.properties.find(
+        (attr) => ts.isJsxAttribute(attr) && attr.name.getText(tree) === "data-slot",
+      );
+      if (attribute?.initializer && ts.isStringLiteral(attribute.initializer)) slots.add(attribute.initializer.text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(tree);
+  return [...slots];
+}
+
 /** An explicitly native/N/A boundary cannot hide authored animation. Legacy
  * CSS/pseudo-element clocks and raw engine props have no source-bound parameter
  * executor here; reject them rather than guessing a named preset from timing. */
@@ -271,6 +298,23 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
         }
       let hosts = candidates;
       const region = contract.regions?.[contract.bindings.get(binding.binding).part];
+      if (binding.relationship === "inherited" && region) {
+        const overrides = new Set();
+        for (const selection of selections.filter((selection) => selection.file === `registry/cadence/${id}/index.tsx`))
+          for (const selected of selection.selected)
+            for (const slot of inheritedSlotOverrides(
+              await read(selection.file),
+              selected,
+              selection.file,
+              file,
+              exported,
+            ))
+              if (region.includes(slot)) overrides.add(slot);
+        if (overrides.size)
+          hosts = hosts
+            .filter((host) => host.file === file)
+            .flatMap((host) => [...overrides].map((slot) => ({ ...host, authoredSlot: host.slot, slot })));
+      }
       if (region) hosts = hosts.filter((host) => region.includes(host.slot));
       if (["text.change/changed-runs", "number.roll/reels"].includes(binding.targetForm))
         hosts = hosts.filter((host) =>
@@ -304,7 +348,7 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
         }
         if (binding.targetForm.startsWith("state.color/")) {
           const policies = cssPolicyBindings(motionSource(source, [exported]).source).filter(
-            (policy) => policy.kind === "useStateColor" && policy.slot === host.slot,
+            (policy) => policy.kind === "useStateColor" && policy.slot === (host.authoredSlot ?? host.slot),
           );
           if (policies.length === 1) properties = policies[0].properties;
         }
@@ -437,15 +481,16 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
   return { problems, actions, boundaries };
 }
 
-/** One record already joins the entire physical action. Never join numerical
- * identities across tests/workers; all relationships are checked within a row. */
+/** Every row joins its actual physical action. Direction-specific geometry may
+ * cover its declared axes in multiple real calls within ONE passing test/mode;
+ * never borrow an axis, identity or source from another test/worker. */
 export function motionV2ExecutionProblems(id, plan, tests) {
   const problems = [];
   const passed = tests.filter((test) => test.passed);
   for (const action of plan.actions.filter((action) => action.item === id)) {
     for (const mode of ["full", "reduced", "none"]) {
-      const found = passed.some((test) =>
-        (test.records ?? []).some((record) => {
+      const found = passed.some((test) => {
+        const records = (test.records ?? []).filter((record) => {
           if (
             record.binding !== action.binding ||
             record.item !== id ||
@@ -456,7 +501,14 @@ export function motionV2ExecutionProblems(id, plan, tests) {
             record.site !== action.site
           )
             return false;
-          if (canonical(record.properties ?? []) !== canonical(action.properties)) return false;
+          if (action.targetForm === "geometry.resize/measured") {
+            if (
+              !record.properties?.length ||
+              new Set(record.properties).size !== record.properties.length ||
+              record.properties.some((property) => !action.properties.includes(property))
+            )
+              return false;
+          } else if (canonical(record.properties ?? []) !== canonical(action.properties)) return false;
           if (
             !record.changed ||
             !record.policy ||
@@ -474,8 +526,12 @@ export function motionV2ExecutionProblems(id, plan, tests) {
           )
             return false;
           return Object.entries(action.sources).every(([file, sha]) => record.sources?.[file] === sha);
-        }),
-      );
+        });
+        return action.targetForm === "geometry.resize/measured"
+          ? canonical([...new Set(records.flatMap((record) => record.properties))].sort()) ===
+              canonical(action.properties)
+          : records.length > 0;
+      });
       if (!found)
         problems.push(
           `${id}: v2 execute ${action.binding} on ${action.anchor}/${action.slot} with exact source/property/preset policy in ${mode}`,

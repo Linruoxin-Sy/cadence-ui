@@ -257,14 +257,17 @@ export function followTextLayout(host: HTMLElement, layer: HTMLElement, revoke: 
     const mapped = layer.getBoundingClientRect();
     if (
       view.getComputedStyle(host).getPropertyValue("anchor-name") !== name ||
-      mapped.left !== origin.left ||
-      mapped.top !== origin.top
+      Math.abs(mapped.left - origin.left) > textProofLimits.coordinateUnit ||
+      Math.abs(mapped.top - origin.top) > textProofLimits.coordinateUnit
     ) {
       dispose();
       return null;
     }
-    layer.style.left = `calc(anchor(${name} left) - ${origin.left}px)`;
-    layer.style.top = `calc(anchor(${name} top) - ${origin.top}px)`;
+    // Native anchor coordinates quantize to a layout unit, while a projected
+    // getBoundingClientRect can retain finer precision. Cancel that measured
+    // initial offset; larger/different mappings still fail closed above.
+    layer.style.left = `calc(anchor(${name} left) - ${mapped.left}px)`;
+    layer.style.top = `calc(anchor(${name} top) - ${mapped.top}px)`;
     observer.observe(host, { attributes: true, attributeFilter: [attribute] });
     return dispose;
   } catch {

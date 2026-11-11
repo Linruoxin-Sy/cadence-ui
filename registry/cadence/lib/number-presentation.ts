@@ -158,7 +158,14 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
   let expectedSize = host.getBoundingClientRect();
   const resize = new ResizeObserver(() => {
     const box = host.getBoundingClientRect();
-    if (box.width !== expectedSize.width || box.height !== expectedSize.height) stop();
+    if (
+      ["width", "height"].some(
+        (axis) =>
+          Math.round(box[axis as "width" | "height"] / textProofLimits.coordinateUnit) !==
+          Math.round(expectedSize[axis as "width" | "height"] / textProofLimits.coordinateUnit),
+      )
+    )
+      stop();
     expectedSize = box;
   });
   resize.observe(host);

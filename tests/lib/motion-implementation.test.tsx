@@ -8,6 +8,27 @@ import { calledRecipes, implementedForm } from "../../scripts/motion-manifest.mj
 import negatives from "../fixtures/motion/implementation-negative.json";
 
 describe("exact live installed implementations", () => {
+  it("retains local and inherited adapters that execute the identical shared presence factory", async () => {
+    const registry = JSON.parse(await readFile("registry.json", "utf8"));
+    const result = await checkMotionImplementations(process.cwd(), registry, ["button-group"]);
+    expect(result.problems).toEqual([]);
+    for (const recipe of ["data.transition", "exit.fade"]) {
+      const owners = [
+        ...new Set(
+          result.references["button-group"]
+            .filter((reference: { recipe: string }) => reference.recipe === recipe)
+            .map(implementationOwner),
+        ),
+      ].sort();
+      expect(owners).toEqual(["button-group", "separator"]);
+    }
+    const selected = { items: registry.items.filter((item: { name: string }) => item.name === "button-group") };
+    expect(checkMotionCoverage(selected, result)).toEqual([]);
+    selected.items[0].meta.motionCoverage.effects["exit.fade/one-shot"].pop();
+    expect(checkMotionCoverage(selected, result).join("\n")).toContain(
+      "reached integration separator missing ownership",
+    );
+  });
   it("retains all independent installed owners for the same form without treating an imported executor as a new owner", async () => {
     const registry = JSON.parse(await readFile("registry.json", "utf8"));
     const result = await checkMotionImplementations(process.cwd(), registry, ["data-table"]);

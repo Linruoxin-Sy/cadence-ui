@@ -86,7 +86,7 @@ limits on which capabilities a component may acquire.
 | `empty` — resting state               | T0   | none                                                                |
 | `item` — list row                     | T0   | none                                                                |
 | `field` — labelled control            | T0   | none                                                                |
-| `button-group` — joined controls      | T0   | none                                                                |
+| `button-group` — joined controls      | T0   | [7 recipes](content/components/button-group.mdx#motion-contract)    |
 | `input-group` — framed field          | T0   | none                                                                |
 | `breadcrumb` — trail                  | T0   | none                                                                |
 | `pagination` — page navigation        | T0   | none                                                                |

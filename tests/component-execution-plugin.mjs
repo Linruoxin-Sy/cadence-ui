@@ -169,6 +169,7 @@ export function componentExecutionPlugin(additionalItems = []) {
                 "createMeasuredGeometry",
                 "createTabsLayout",
                 "createTabsItem",
+                "createGroupPositions",
                 "createKbdKey",
                 "createKbdExtent",
                 "createInlinePresence",

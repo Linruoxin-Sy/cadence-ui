@@ -88,6 +88,11 @@ type Adapter = {
   textGeometry?: boolean;
   /** Wrapper-free hosts observe bounded real child boxes for passive reflow. */
   observeChildren?: boolean;
+  /** A known compound can preserve an ordinary focused control on its safe layer.
+   * Native editing/capture exclusions remain the adapter's explicit obligation. */
+  focusSafe?: (active: Element | null) => boolean;
+  /** Prove native allocation of an unowned axis from a currently leased child. */
+  nativeEcho?: (source: HTMLElement, target: HTMLElement, axis: Axis) => boolean;
   /** Read natural layout only. The one real content tree must be independent of the written axis. */
   measure(reason: Reason): GeometryDestination | null;
 };
@@ -120,6 +125,7 @@ export function naturalGeometry(element: HTMLElement): { width: number; height: 
  */
 export function createMeasuredGeometry(transaction = createMotionTransaction()) {
   const owners = new Set<ReturnType<typeof makeOwner>>();
+  const prepared = new Set<ReturnType<typeof makeOwner>>();
   let policy: GeometryPolicy = { reduced: true, transition: { duration: 0 } };
   let closed = false;
   let flushing = false;
@@ -193,6 +199,28 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       current,
       baseline: () => baseline,
       restricted: () => restricted,
+      emitting(axis: Axis) {
+        const animation = effects[axis];
+        const frames = (animation?.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
+        return (
+          !!animation &&
+          animation.playState !== "idle" &&
+          !!lease?.current() &&
+          !policy.reduced &&
+          policy.available !== false &&
+          policy.transition.duration !== 0 &&
+          (animation.effect as KeyframeEffect | null)?.target === node &&
+          frames.length > 0 &&
+          frames.length <= motionLimits.collectionVisuals &&
+          frames.some((frame) => axis in frame) &&
+          frames.every((frame) =>
+            Object.keys(frame).every(
+              (key) => key === axis || ["offset", "computedOffset", "easing", "composite"].includes(key),
+            ),
+          ) &&
+          safeEngines()
+        );
+      },
       capture() {
         sampled = {};
         if (!running || !current()) return;
@@ -384,6 +412,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         if (!alive) return;
         alive = false;
         owners.delete(owner);
+        prepared.delete(owner);
         registration.dispose();
         allocation?.dispose();
         release();
@@ -409,6 +438,36 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       );
     const input = () => flush(null, "focus");
     const view = node.ownerDocument.defaultView;
+    const safeEngines = () => {
+      const handles = node.getAnimations();
+      return (
+        handles.length <= motionLimits.collectionVisuals &&
+        handles.every((handle) => {
+          if (Object.values(effects).includes(handle)) return true;
+          const frames = (handle.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
+          return (
+            frames.length <= motionLimits.collectionVisuals &&
+            frames.every(
+              (frame) =>
+                !Object.keys(frame).some((key) =>
+                  /^(?:width|height|minWidth|maxWidth|minHeight|maxHeight|flexBasis|transform|translate|scale|rotate|padding|gap)$/.test(
+                    key,
+                  ),
+                ),
+            )
+          );
+        })
+      );
+    };
+    const emitted = (target: Element, axis: Axis) =>
+      target instanceof HTMLElement &&
+      safeEngines() &&
+      [...owners].some(
+        (other) =>
+          other !== owner &&
+          other.emitting(axis) &&
+          (target === other.node || (!adapter.axes.includes(axis) && adapter.nativeEcho?.(other.node, target, axis))),
+      );
     const observer = new ResizeObserver((entries) => {
       if (delegated()) return;
       if (
@@ -418,7 +477,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           return (
             baseline &&
             target instanceof HTMLElement &&
-            (baseline.width !== target.offsetWidth || baseline.height !== target.offsetHeight)
+            ((baseline.width !== target.offsetWidth && !emitted(target, "width")) ||
+              (baseline.height !== target.offsetHeight && !emitted(target, "height")))
           );
         })
       ) {
@@ -427,13 +487,14 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       }
       // A wrapper-free adapter may observe its own natural shell. Its owned
       // WAAPI axis is not a passive layout cause; an unowned axis still is.
-      if (adapter.observeChildren && content === node && running && baseline) {
+      if (adapter.observeChildren && content === node && baseline) {
         const box = naturalGeometry(node);
         if (
           box &&
           (["width", "height"] as const).every(
             (axis) =>
-              adapter.axes.includes(axis) ||
+              owner.emitting(axis) ||
+              emitted(node, axis) ||
               Math.round(box[axis]) === Math.round(axis === "width" ? naturalWidth : naturalHeight),
           )
         )
@@ -504,7 +565,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         for (const owner of group) owner.apply(null, null, new Set());
         return;
       }
-      for (const owner of participants) owner.capture();
+      for (const owner of participants) if (!prepared.has(owner)) owner.capture();
       for (const owner of group) owner.release();
       const destinations = new Map<(typeof group)[number], GeometryDestination | null>();
       const maintained = group.filter((owner) => owner.adapter.maintained);
@@ -528,7 +589,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       const immediate =
         policy.reduced || policy.available === false || policy.transition.duration === 0 || !revision?.current();
       for (const owner of group) {
-        const focused = owner.node.contains(owner.node.ownerDocument.activeElement);
+        const active = owner.node.ownerDocument.activeElement;
+        const focused = owner.node.contains(active) && !owner.adapter.focusSafe?.(active);
         const axes = new Set<Axis>();
         if (!immediate && !focused && !owner.restricted())
           for (const axis of owner.adapter.axes) if (!delegated(owner, axis)) axes.add(axis);
@@ -538,10 +600,36 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       for (const owner of owners) owner.apply(null, null, new Set());
       throw error;
     } finally {
+      prepared.clear();
       flushing = false;
     }
   };
   return {
+    /** Known accepted content/policy only. Descendant layout callbacks need
+     * natural destination allocation, while the parent retains its true origin. */
+    prepare() {
+      if (closed || flushing) return;
+      const group = [...owners].filter((owner) => owner.current());
+      const participants = group.filter((owner) =>
+        owner.adapter.axes.some(
+          (axis) =>
+            !group.some(
+              (parent) => parent !== owner && parent.adapter.axes.includes(axis) && parent.node.contains(owner.node),
+            ),
+        ),
+      );
+      if (!collectMotionVisuals(new Set(participants.map((owner) => owner.node)))) {
+        for (const owner of group) owner.apply(null, null, new Set());
+        prepared.clear();
+        return;
+      }
+      for (const owner of participants)
+        if (!prepared.has(owner)) {
+          owner.capture();
+          prepared.add(owner);
+        }
+      for (const owner of group) owner.release();
+    },
     register(adapter: Adapter) {
       if (closed) throw new Error("Geometry scope is closed");
       const owner = makeOwner(adapter);
@@ -564,6 +652,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     dispose() {
       closed = true;
       for (const owner of [...owners]) owner.dispose();
+      prepared.clear();
     },
   };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { type Ref, useCallback, useEffect, useInsertionEffect, useLayoutEffect, useRef, useState } from "react";
-import { type CadenceMode, transitionFor } from "./motion";
+import { type CadenceMode, motionMilliseconds, transitionFor } from "./motion";
 import { type MotionEnvironment, subscribeMotionEnvironment } from "./motion-environment";
 import { motionScopeStyle } from "./motion-scope";
 import {
@@ -283,6 +283,36 @@ function cancelColors(node: MotionElement, owned: readonly ColorProperty[]) {
   }
 }
 
+/** Reconcile the existing CSS owner, retaining its actual eased phase. No
+ * sampled colour is pinned inline and no second property writer is allocated. */
+function retimeColors(node: MotionElement, owned: readonly ColorProperty[], seconds: number) {
+  for (const animation of node.getAnimations?.() ?? []) {
+    const effect = animation.effect as KeyframeEffect | null;
+    if (
+      !("transitionProperty" in animation) ||
+      effect?.target !== node ||
+      effect.pseudoElement ||
+      !owned.includes(String(animation.transitionProperty) as ColorProperty)
+    )
+      continue;
+    const timing = effect.getTiming();
+    const duration = Number(timing.duration);
+    const time = typeof animation.currentTime === "number" ? animation.currentTime : null;
+    if (!Number.isFinite(duration) || duration <= 0 || time === null) {
+      animation.cancel();
+      continue;
+    }
+    const phase = Math.max(0, Math.min(1, (time - (timing.delay ?? 0)) / duration));
+    const next = motionMilliseconds(seconds);
+    try {
+      effect.updateTiming({ duration: next, delay: 0 });
+      animation.currentTime = phase * next;
+    } catch {
+      animation.cancel();
+    }
+  }
+}
+
 /** One explicit CSS colour owner. It never samples/pins colour targets inline. */
 export function useStateColor<T extends MotionElement>(
   externalRef: Ref<T> | undefined,
@@ -378,7 +408,8 @@ export function useStateColor<T extends MotionElement>(
         old,
       );
       if (ownership.current.allowed) {
-        if (seconds === 0 || (previousMode.current === "full" && mode !== "full")) cancelColors(node, owned);
+        if (seconds === 0) cancelColors(node, owned);
+        else if (previousMode.current === "full" && mode === "reduced") retimeColors(node, owned, seconds);
         cancelUnsafeShadows(node, owned);
       }
       previousMode.current = mode;

@@ -231,7 +231,14 @@ export function createTextPresentation(
   let expectedSize = host.getBoundingClientRect();
   const resize = new ResizeObserver(() => {
     const box = host.getBoundingClientRect();
-    if (box.width !== expectedSize.width || box.height !== expectedSize.height) stop();
+    if (
+      ["width", "height"].some(
+        (axis) =>
+          Math.round(box[axis as "width" | "height"] / textProofLimits.coordinateUnit) !==
+          Math.round(expectedSize[axis as "width" | "height"] / textProofLimits.coordinateUnit),
+      )
+    )
+      stop();
     expectedSize = box;
   });
   resize.observe(host);
@@ -385,8 +392,7 @@ export function createTextPresentation(
       if (previous?.revision === revision && value === requested && sameEntity) {
         if (
           !revision.current() ||
-          cm.reduced !== previous.cm.reduced ||
-          cm.mode !== previous.cm.mode ||
+          cm.mode === "none" ||
           options.granularity !== previous.granularity ||
           options.locale !== previous.locale ||
           options.stripGeometry !== previous.stripGeometry ||
@@ -396,6 +402,61 @@ export function createTextPresentation(
           Number(clock.enter.duration) === 0
         )
           stop(); // live-text-policy
+        else if (layer && (cm.reduced !== previous.cm.reduced || cm.mode !== previous.cm.mode)) {
+          const nextSignature = signature();
+          const box = host.getBoundingClientRect();
+          if (
+            !lease?.current() ||
+            nextSignature.some((value, index) => !value || value.paint !== paintSignature[index]?.paint) ||
+            (["width", "height"] as const).some(
+              (axis) =>
+                Math.round(box[axis] / textProofLimits.coordinateUnit) !==
+                Math.round(expectedSize[axis] / textProofLimits.coordinateUnit),
+            ) ||
+            !proveTextLayout(host, snapshot, {
+              surfacePaint: true,
+              geometryMode: options.stripGeometry ? cm.mode : undefined,
+            })
+          ) {
+            stop();
+            return;
+          }
+          // A compound downgrade has already released its spatial overlay in
+          // before-layout. Accept that proven final allocation, never arbitrary
+          // paint changes, before the pending ancestor mutation audit runs.
+          expectedSize = box;
+          paintSignature = nextSignature;
+          mutations.takeRecords();
+          // A permitted opacity flight survives a live policy edit. Capture
+          // actual paint before cancelling its old clock; discard all stagger
+          // delays and keep the current native mask and destination.
+          const paints = [...layer.querySelectorAll("canvas")];
+          const from = paints.map((canvas) => view?.getComputedStyle(canvas).opacity ?? "1");
+          const old = animations;
+          const epoch = ++generation;
+          animations = [];
+          for (const animation of old) animation.cancel();
+          try {
+            for (const [index, canvas] of paints.entries()) {
+              const entering = canvas.dataset.cadenceTextKind === "enter";
+              const transition = entering ? clock.enter : clock.exit;
+              animations.push(
+                canvas.animate([{ opacity: from[index] }, { opacity: entering ? 1 : 0 }], {
+                  duration: motionMilliseconds(Number(transition.duration)),
+                  delay: 0,
+                  easing: `cubic-bezier(${cm.scope.tokens.ease[entering ? "out" : "in"].join(",")})`,
+                  fill: "both",
+                }),
+              );
+            }
+          } catch {
+            stop();
+            return;
+          }
+          void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
+            if (alive && generation === epoch && lease?.current()) stop();
+          });
+        }
         if (capturedCommit) handoff?.commit({ ...capturedCommit, transition: transferClock, immediate: cm.reduced });
         if (options.capture !== previous.capture) options.capture?.dispose();
         return;
