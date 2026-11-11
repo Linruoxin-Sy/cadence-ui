@@ -12,6 +12,7 @@ import {
   SidebarMenuSkeleton,
   SidebarMenuSubButton,
   SidebarProvider,
+  SidebarSeparator,
   SidebarTrigger,
   useSidebar,
 } from "@/registry/cadence/sidebar";
@@ -36,6 +37,7 @@ function Example({
       <SidebarProvider open={open} onOpenChange={onOpenChange}>
         <Sidebar>
           <SidebarInput aria-label="Search" />
+          <SidebarSeparator />
           <SidebarMenuButton render={<a href="#content" />}>Projects</SidebarMenuButton>
         </Sidebar>
         <SidebarInset render={<section aria-label="Workspace content" />}>

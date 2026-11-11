@@ -161,6 +161,7 @@ describe("current registry inventory and real part references", () => {
       "button",
       "badge",
       "kbd",
+      "separator",
       "label",
       "card",
       "toggle",

@@ -208,7 +208,7 @@ export function observeCopiedController(controller, kind, args, source) {
           properties: ["opacity"],
           preset: policy?.preset,
           zeroClock: parameterClockIsZero(policy?.result),
-          target: input[0].present,
+          target: { present: input[0].present, revision: input[0].revision },
           commits: (presentationSamples.get(controller)?.commits ?? 0) + 1,
         });
       }

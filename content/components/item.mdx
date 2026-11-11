@@ -27,9 +27,9 @@ npx shadcn@latest add @cadence/item
 
 Keep `item/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the listed relative
 paths. Item imports Separator even when you do not render `ItemSeparator`; both
-components share the `cn` helper. Item and Separator are static T0 components in
-full, reduced and none modes; no motion runtime, provider or additional
-item-specific CSS is required beyond the base theme and Tailwind utilities.
+components share the `cn` helper. Keep Separator’s listed shared runtime files too;
+ItemSeparator inherits its presence, orientation, definite-length and colour effects.
+An optional provider controls its mode.
 Keep the source files' `"use client"` directives for Base UI behavior. The Usage
 and body examples can render these client parts from a Server Component in
 Next.js App Router; they do not call the exported variant functions or add event
@@ -322,7 +322,8 @@ write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 
 Authored intensity is **subtle**: Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
-No motion (T0). A row does not lift on hover or slide on mount. The only transition
+The row adds no local motion. ItemSeparator inherits Separator’s delivered rule effects.
+A row does not lift on hover or slide on mount. The only transition
 is `transition-colors` on the row and on a link inside it — state feedback that
 costs nothing and never moves the text the user is reading.
 
@@ -354,7 +355,8 @@ that animates itself cannot be interrupted by the next render.
 Items fill available width and allow wrapping. The caller owns text overflow and action placement in
 narrow containers; large collections need application pagination or virtualization.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+The row adds no local interpolation; Separator installs its shared motion runtime.
+Base UI behavior requires hydration; native
 HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
 contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
 The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and

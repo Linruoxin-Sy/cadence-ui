@@ -80,6 +80,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
 | skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
 | tooltip | `@components/cadence/tooltip/index.tsx` | [JSON files[].content](https://cadence.dev/r/tooltip.json) |
@@ -2128,6 +2129,9 @@ owns panel placement and suppresses this coupled animation. Unsupported or unava
 uses immediate native layout. Focused editing in the Sidebar/Inset, native pointer capture, passive
 width/viewport changes and live mode downgrades settle both dependent properties. The same desktop
 panel and input nodes survive toggles.
+
+SidebarSeparator delegates definite-length geometry and its other independent rule effects to
+Separator. Passive stretch remains native; these inherited effects do not migrate the remaining Sidebar contract.
 
 Mobile delegates `popup.anchored` / `exit.fade` to Sheet. Button press, tooltip popup and Skeleton pulse
 are owned by those dependencies, not extra Sidebar recipes. Their effective mode follows the provider.

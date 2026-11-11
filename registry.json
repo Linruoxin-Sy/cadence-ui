@@ -793,20 +793,36 @@
       "title": "Separator",
       "description": "Dividing sections, menu groups, and toolbars.",
       "categories": ["layout"],
-      "dependencies": ["@base-ui/react"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": ["@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/cadence-geometry"],
       "files": [
         {
           "path": "registry/cadence/separator/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/separator/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/separator-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/separator-layout.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -815,14 +831,43 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "A single rule fades for independent presence and orientation replacement, interpolates definite owned lengths and transitions its scoped background."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "separator",
+                "reason": "Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "separator",
+                "reason": "Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "separator",
+                "reason": "Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "separator",
+                "reason": "Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."
+              }
+            ]
+          }
         }
       }
     },
@@ -3978,6 +4023,11 @@
                 "relationship": "inherited",
                 "owner": "button",
                 "reason": "The selected live composition reaches button's installed geometry.resize/measured owner; this is inherited execution, not a second local writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "SidebarSeparator reaches Separator’s definite-length geometry owner; native stretch remains immediate and no second local writer is added."
               }
             ],
             "data.transition/one-shot": [

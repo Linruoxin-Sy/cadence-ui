@@ -2,15 +2,15 @@
 title: Separator
 description: Dividing sections, menu groups, and toolbars.
 category: layout
-motion: []
+motion: ["data.transition","exit.fade",{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"A single rule fades for independent presence and orientation replacement, interpolates definite owned lengths and transitions its scoped background."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"separator","reason":"Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."}],"exit.fade/one-shot":[{"relationship":"default","owner":"separator","reason":"Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."}],"geometry.resize/measured":[{"relationship":"default","owner":"separator","reason":"Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."}],"state.color/css-transition":[{"relationship":"default","owner":"separator","reason":"Separator integrates one rule opacity channel, definite length geometry and scoped background; passive stretch and caller engines retain native ownership."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: ["@base-ui/react"]
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["@base-ui/react","motion"]
+registryDeps: ["@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry"]
 ---
 
 ## Installation
@@ -25,12 +25,11 @@ npx shadcn@latest add @cadence/separator
 
 [Manual installation files](https://cadence.dev/r/separator.json)
 
-Separator needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `separator/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves.
+Keep the listed component and shared runtime files at their relative install paths. The optional
+CadenceProvider controls inherited modes and clocks; without it Separator follows system preference.
 
-All examples on this page use Separator alone and need no additional dependencies. A vertical
-separator needs a parent with a defined height, as shown in the Vertical example.
+The changing example uses Motion's AnimatePresence from Separator's installed dependencies to retain
+exits. A vertical separator needs a parent with a defined height, as shown in the Vertical example.
 
 ## Usage
 
@@ -111,6 +110,26 @@ export function VisualRule() {
 }
 ```
 
+## Changing a boundary
+
+Change orientation, definite length or colour on the same rule. An independently inserted rule fades;
+a retained removal fades out. The current orientation and semantic role update immediately.
+
+<ComponentExample name="changing" />
+
+```tsx
+import { Separator } from "@/components/cadence/separator";
+
+export function SizedRule({ vertical, length }: { vertical: boolean; length: number }) {
+  return <Separator orientation={vertical ? "vertical" : "horizontal"}
+    style={{ [vertical ? "height" : "width"]: length }} />;
+}
+```
+
+The demo uses Motion's AnimatePresence to retain exits. Parent removal without retention is immediate.
+Initial server output and hydration remain visible. Parent stretch and percentage sizes follow native
+layout immediately; a definite authored length receives measured interpolation when its native box is safe.
+
 ## When to use
 
 - Between groups inside a menu, a card footer, or a settings list.
@@ -138,19 +157,24 @@ size the rule from CSS: `data-[orientation=vertical]:h-8`.
 
 Base UI state callbacks for `className` are evaluated before merging caller classes last.
 `style` accepts an object or a state callback and is forwarded to the primitive.
+Explicit caller `role` and `aria-hidden` overrides remain authoritative on a present rule.
+A retained exiting rule becomes inert and hidden from the accessibility tree immediately.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: A single rule fades for independent presence and orientation replacement, interpolates definite owned lengths and transitions its scoped background.
 
-No motion (T0). A boundary that animates draws the eye to the wrong thing; if the
-layout changes, the surrounding `accordion` or `collapsible` owns that animation.
+| Recipe | Owner and full behaviour | reduced | none |
+| --- | --- | --- | --- |
+| `data.transition/one-shot` | Independent entry and orientation replacement share rule opacity. | Short opacity. | Immediate. |
+| `exit.fade/one-shot` | Retained removal on the same opacity owner; re-entry reverses current paint. | Short opacity. | Immediate. |
+| `geometry.resize/measured` | Definite length on the current axis, spring.sizeCompact; old axis releases before orientation replacement. A coordinating parent consumes descendant axes. | Native target size immediately. | Native target size immediately. |
+| `state.color/css-transition` | Scoped background-color, duration.fast and ease.out; current theme/context wins. | Short colour. | Zero duration and delay. |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+One real rule keeps its DOM identity through orientation changes. Parent appearance is consumed once;
+there are no text, number, hover, press or rotation effects. Passive reflow, unknown sizes, conflicting
+caller engines and unsupported native geometry stay immediate. Temporary pixel overlays are released
+on completion, cancellation, parent close and unmount, exposing the current caller CSS.
 
 ## Accessibility
 
@@ -165,7 +189,8 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
 Horizontal separators fill available width; vertical separators need a parent with a defined height.
 Orientation is caller-owned, with no automatic breakpoint.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+Separator uses the shared Motion geometry and opacity executors plus scoped CSS colour policy. T0
+is a historical source-budget label. Base UI behavior requires hydration; native
 HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
 works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
 source; dependencies and application bundles are measured separately.

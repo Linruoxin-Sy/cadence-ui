@@ -28,9 +28,8 @@ npx shadcn@latest add @cadence/button-group
 Keep `button-group/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the
 listed relative paths. Button Group imports Separator even when you do not
 render `ButtonGroupSeparator`; both components share the `cn` helper.
-Button Group and Separator are static T0 components in full, reduced and none
-modes; no motion runtime, provider or additional item-specific CSS is required
-beyond the base theme and Tailwind utilities. Keep their source files'
+Separator installs its shared motion/geometry runtime and follows its own presence,
+orientation, definite-length and colour contract. The optional provider controls its mode. Keep their source files'
 `"use client"` directives. In Next.js App Router, a Server Component can render
 these client parts with serializable props. Calling the exported
 `buttonGroupVariants` function belongs in a `"use client"` module.
@@ -243,6 +242,7 @@ control above its neighbours so its ring is not clipped.
 | reduced | none       | –     | –             |
 | none    | none       | –     | –             |
 
+ButtonGroupSeparator inherits Separator’s rule effects; group stretching remains native.
 The buttons inside keep their own press feedback; the group never adds a second
 animation on top of it.
 

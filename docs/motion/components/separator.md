@@ -1,6 +1,6 @@
 # Separator motion contract
 
-Status: target design; implementation and verification pending.
+Status: implemented contract; functional evidence is required by the per-item v2 gate.
 
 Separator quietly marks a structural boundary when that boundary is introduced or changes orientation. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
@@ -10,7 +10,8 @@ Separator quietly marks a structural boundary when that boundary is introduced o
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
+  "axes": { "rule": ["width", "height"] },
   "parts": {
     "rule": ["separator#Separator"]
   }
@@ -53,6 +54,17 @@ Use one rule and at most one retained decorative outgoing rule; no per-frame mea
 
 ## Acceptance scenarios
 
-Target acceptance; not executed: insert/remove a rule between sections; parent resize; explicit length change; horizontal-to-vertical changes mid-transition; decorative and semantic roles; no fictitious text/number effects; all modes and zero clock.
+Required regression scenarios: insert/remove a rule between sections; parent resize; explicit length change; horizontal-to-vertical changes mid-transition; decorative and semantic roles; no fictitious text/number effects; all modes and zero clock.
 
-Also pending: orientation replacement during entry, then removal/reinsertion before completion; exactly one opacity writer and the latest orientation survive.
+Also exercise orientation replacement during entry, then removal/reinsertion before completion; exactly one opacity writer and the latest orientation survive.
+
+Definite authored CSS lengths (including pixel-resolved utility classes) supply measurable destinations.
+Percentage, auto, stretch, unresolved expressions, external geometry engines, rich render content and
+unsupported coordinate mappings use immediate native layout. Initial SSR/hydration is visible. A
+direction change cancels the old axis before measuring the new one, keeping rule thickness native.
+Native shrink-wrap may follow that definite rule length; its own layout frames do not create a
+passive resize cause. Caller dimension engines on the rule or its ancestors revoke interpolation.
+Percentage/expression min/max constraints retain native layout rather than guessing an independent box.
+Finite native CSS lengths may exceed the viewport: a shrink starts at the current rule length,
+without a viewport-derived presentation cap. The single measured rule and latest-target controller
+keep work bounded; current native pixel min/max constraints remain authoritative.

@@ -75,6 +75,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | label | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/label.json) |
 | label | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/label.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | field | `@components/cadence/field/index.tsx` | [JSON files[].content](https://cadence.dev/r/field.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
@@ -252,10 +253,8 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 
 Keep `field/index.tsx`, `label/index.tsx`, `separator/index.tsx` and `lib/cn.ts`
 at the listed relative paths. Field imports Label and Separator even when you do
-not render those parts; all three components share the `cn` helper. Field, Label
-and Separator are static T0 components in full, reduced and none modes; no motion
-runtime, provider or additional item-specific CSS is required beyond the base
-theme and Tailwind utilities. Keep the source files' `"use client"` directives.
+not render those parts. Keep their listed shared runtime files too. Label and Separator
+retain their own delivered motion contracts; the optional provider controls their modes. Keep the source files' `"use client"` directives.
 In Next.js App Router, a Server Component can render these client parts with
 serializable props. Calling the exported `fieldVariants` function belongs in a
 `"use client"` module; none of the examples below calls it.
@@ -552,7 +551,8 @@ export function ChoiceCard() {
 
 Authored intensity is **subtle**: Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
-No motion (T0). A field never animates — not on mount, not when the error appears.
+The Field wrapper adds no local motion. FieldLabel inherits Label’s delivered effects, and
+the rule in FieldSeparator inherits Separator’s effects. These do not migrate the remaining Field parts.
 The error is the one thing the user must read immediately; fading or sliding it in
 delays the only information that matters, and it moves the control the user's cursor
 is in.
@@ -598,7 +598,8 @@ FieldGroup establishes a named container. Responsive orientation switches from c
 md container query; explicit vertical and horizontal orientations remain caller-selected. Labels,
 error text and controls must fit the available width.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+The wrapper adds no local interpolation; its Label and Separator dependencies install their shared
+motion runtime. This wrapper renders HTML/CSS; interactive
 children and application handlers still need their own client code. Composed controls retain their
 own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
 works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped

@@ -53,60 +53,60 @@ import { CadenceProvider } from "@/components/cadence/lib/provider";
 The table records currently shipped recipe declarations and compatibility tiers, not v2 completion or
 limits on which capabilities a component may acquire.
 
-| Component                             | Tier | Motion                                                               |
-| ------------------------------------- | ---- | -------------------------------------------------------------------- |
-| `animated-number` — quantities        | T1   | `number.roll`                                                        |
-| `animated-text` — changed text        | T1   | `text.change`                                                        |
-| `button` — action trigger             | T1   | `feedback.press`                                                     |
-| `badge` — status label                | T0   | none                                                                 |
-| `kbd` — key or shortcut hint          | T0   | [6 recipes](content/components/kbd.mdx#motion-contract)              |
-| `separator` — group boundary          | T0   | none                                                                 |
-| `label` — control name                | T0   | none                                                                 |
-| `input` — single-line field           | T0   | none                                                                 |
-| `textarea` — multi-line field         | T0   | none                                                                 |
-| `card` — grouped surface              | T0   | none                                                                 |
-| `toc` — document section navigation   | T3   | `layout.shared`, `scroll.navigate`                                   |
-| `aspect-ratio` — reserved media box   | T0   | none                                                                 |
-| `avatar` — image with fallback        | T0   | none                                                                 |
-| `skeleton` — loading placeholder      | T4   | `data.transition`                                                    |
-| `dialog` — modal window               | T2   | `popup.anchored`, `exit.fade`                                        |
-| `alert-dialog` — confirmation         | T2   | `popup.anchored`, `exit.fade`                                        |
-| `popover` — anchored panel            | T2   | `popup.anchored`, `exit.fade`                                        |
-| `tooltip` — hint on hover             | T2   | `popup.anchored`, `exit.fade`                                        |
-| `hover-card` — preview panel          | T2   | `popup.anchored`, `exit.fade`                                        |
-| `sheet` — edge panel                  | T2   | `popup.anchored`, `exit.fade`                                        |
-| `drawer` — bottom sheet               | T2   | `popup.anchored`, `exit.fade`                                        |
-| `select` — single choice              | T3   | `popup.anchored`, `geometry.resize`, `handoff`, `state.morph`        |
-| `combobox` — searchable choice        | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `dropdown-menu` — actions menu        | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `context-menu` — right-click menu     | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `menubar` — application menu          | T2   | `popup.anchored`, `exit.fade`, `state.morph`                         |
-| `command` - searchable actions        | T2   | `popup.anchored`, `exit.fade`                                        |
-| `alert` — state message               | T0   | none                                                                 |
-| `empty` — resting state               | T0   | none                                                                 |
-| `item` — list row                     | T0   | none                                                                 |
-| `field` — labelled control            | T0   | none                                                                 |
-| `button-group` — joined controls      | T0   | none                                                                 |
-| `input-group` — framed field          | T0   | none                                                                 |
-| `breadcrumb` — trail                  | T0   | none                                                                 |
-| `pagination` — page navigation        | T0   | none                                                                 |
-| `spinner` — indeterminate wait        | T4   | `data.transition`                                                    |
-| `checkbox` — binary choice            | T1   | `state.morph`                                                        |
-| `radio-group` — exclusive choice      | T1   | `state.morph`                                                        |
-| `switch` — on/off control             | T1   | `state.morph`                                                        |
-| `slider` — range control              | T1   | `feedback.press`                                                     |
-| `toggle` — pressed state              | T1   | `feedback.press`                                                     |
-| `toggle-group` — toolbar and segments | T3   | `feedback.press`, `layout.shared`, `state.morph`                     |
-| `input-otp` — one-time code           | T1   | `state.morph`                                                        |
-| `progress` — determinate completion   | T4   | `data.transition`                                                    |
-| `code-block` — code surface           | T5   | `geometry.resize`, `state.morph`, `data.transition`, `layout.shared` |
-| `chart` — data visualisation          | T4   | `data.transition`                                                    |
-| `calendar` — date selection           | T4   | `data.transition`                                                    |
-| `resizable` — adjustable split panels | T0   | none                                                                 |
-| `sidebar` — workspace navigation      | T3   | `layout.move`                                                        |
-| `data-table` — payments composition   | T2   | `feedback.press`, `state.morph`, `popup.anchored`, `exit.fade`       |
-| `date-picker` — calendar composition  | T2   | `feedback.press`, `popup.anchored`, `exit.fade`, `data.transition`   |
-| `navigation-menu` — site navigation   | T3   | `popup.anchored`, `exit.fade`, `geometry.resize`                     |
+| Component                             | Tier | Motion                                                              |
+| ------------------------------------- | ---- | ------------------------------------------------------------------- |
+| `animated-number` — quantities        | T1   | `number.roll`                                                       |
+| `animated-text` — changed text        | T1   | `text.change`                                                       |
+| `button` — action trigger             | T1   | [7 recipes](content/components/button.mdx#motion-contract)          |
+| `badge` — status label                | T0   | [6 recipes](content/components/badge.mdx#motion-contract)           |
+| `kbd` — key or shortcut hint          | T0   | [6 recipes](content/components/kbd.mdx#motion-contract)             |
+| `separator` — group boundary          | T0   | [4 recipes](content/components/separator.mdx#motion-contract)       |
+| `label` — control name                | T0   | [5 recipes](content/components/label.mdx#motion-contract)           |
+| `input` — single-line field           | T0   | none                                                                |
+| `textarea` — multi-line field         | T0   | none                                                                |
+| `card` — grouped surface              | T0   | [6 recipes](content/components/card.mdx#motion-contract)            |
+| `toc` — document section navigation   | T3   | `layout.shared`, `scroll.navigate`                                  |
+| `aspect-ratio` — reserved media box   | T0   | none                                                                |
+| `avatar` — image with fallback        | T0   | none                                                                |
+| `skeleton` — loading placeholder      | T4   | `data.transition`                                                   |
+| `dialog` — modal window               | T2   | `popup.anchored`, `exit.fade`                                       |
+| `alert-dialog` — confirmation         | T2   | `popup.anchored`, `exit.fade`                                       |
+| `popover` — anchored panel            | T2   | `popup.anchored`, `exit.fade`                                       |
+| `tooltip` — hint on hover             | T2   | `popup.anchored`, `exit.fade`                                       |
+| `hover-card` — preview panel          | T2   | `popup.anchored`, `exit.fade`                                       |
+| `sheet` — edge panel                  | T2   | `popup.anchored`, `exit.fade`                                       |
+| `drawer` — bottom sheet               | T2   | `popup.anchored`, `exit.fade`                                       |
+| `select` — single choice              | T3   | [8 recipes](content/components/select.mdx#motion-contract)          |
+| `combobox` — searchable choice        | T2   | [3 recipes](content/components/combobox.mdx#motion-contract)        |
+| `dropdown-menu` — actions menu        | T2   | [3 recipes](content/components/dropdown-menu.mdx#motion-contract)   |
+| `context-menu` — right-click menu     | T2   | [3 recipes](content/components/context-menu.mdx#motion-contract)    |
+| `menubar` — application menu          | T2   | [3 recipes](content/components/menubar.mdx#motion-contract)         |
+| `command` - searchable actions        | T2   | `popup.anchored`, `exit.fade`                                       |
+| `alert` — state message               | T0   | none                                                                |
+| `empty` — resting state               | T0   | none                                                                |
+| `item` — list row                     | T0   | none                                                                |
+| `field` — labelled control            | T0   | none                                                                |
+| `button-group` — joined controls      | T0   | none                                                                |
+| `input-group` — framed field          | T0   | none                                                                |
+| `breadcrumb` — trail                  | T0   | none                                                                |
+| `pagination` — page navigation        | T0   | none                                                                |
+| `spinner` — indeterminate wait        | T4   | `data.transition`                                                   |
+| `checkbox` — binary choice            | T1   | `state.morph`                                                       |
+| `radio-group` — exclusive choice      | T1   | `state.morph`                                                       |
+| `switch` — on/off control             | T1   | `state.morph`                                                       |
+| `slider` — range control              | T1   | `feedback.press`                                                    |
+| `toggle` — pressed state              | T1   | [6 recipes](content/components/toggle.mdx#motion-contract)          |
+| `toggle-group` — toolbar and segments | T3   | [8 recipes](content/components/toggle-group.mdx#motion-contract)    |
+| `input-otp` — one-time code           | T1   | `state.morph`                                                       |
+| `progress` — determinate completion   | T4   | `data.transition`                                                   |
+| `code-block` — code surface           | T5   | [4 recipes](content/components/code-block.mdx#motion-contract)      |
+| `chart` — data visualisation          | T4   | `data.transition`                                                   |
+| `calendar` — date selection           | T4   | `data.transition`                                                   |
+| `resizable` — adjustable split panels | T0   | none                                                                |
+| `sidebar` — workspace navigation      | T3   | [3 recipes](content/components/sidebar.mdx#motion-contract)         |
+| `data-table` — payments composition   | T2   | [4 recipes](content/components/data-table.mdx#motion-contract)      |
+| `date-picker` — calendar composition  | T2   | [4 recipes](content/components/date-picker.mdx#motion-contract)     |
+| `navigation-menu` — site navigation   | T3   | [3 recipes](content/components/navigation-menu.mdx#motion-contract) |
 
 Component scope, batches, compatibility tiers and future work are listed in
 [docs/parity-plan.md](docs/parity-plan.md).

@@ -1559,34 +1559,212 @@ Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tok
 1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
 
 ```package-manager
-npm install clsx tailwind-merge @base-ui/react
+npm install clsx tailwind-merge motion @base-ui/react
 ```
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
 | Item | Target file | Full source |
 | --- | --- | --- |
 | cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
 
 4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
 
-No additional item-specific CSS configuration is required beyond the base theme.
+Merge the CSS from [cadence-theme](https://cadence.dev/r/cadence-theme.json) into your global stylesheet after your base theme:
 
-Separator needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `separator/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves.
+```css
+@theme inline {
+  --color-sidebar: var(--sidebar, var(--card));
+  --color-sidebar-foreground: var(--sidebar-foreground, var(--card-foreground));
+  --color-sidebar-primary: var(--sidebar-primary, var(--primary));
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground, var(--primary-foreground));
+  --color-sidebar-accent: var(--sidebar-accent, var(--accent));
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground, var(--accent-foreground));
+  --color-sidebar-border: var(--sidebar-border, var(--border));
+  --color-sidebar-ring: var(--sidebar-ring, var(--ring));
+}
 
-All examples on this page use Separator alone and need no additional dependencies. A vertical
-separator needs a parent with a defined height, as shown in the Vertical example.
+:root {
+
+}
+
+@layer base {
+  :root {
+    --motion-source-duration-instant: 0.1s;
+    --motion-source-duration-fast: 0.16s;
+    --motion-source-duration-base: 0.22s;
+    --motion-source-duration-slow: 0.32s;
+    --motion-source-duration-page: 0.45s;
+    --motion-distance-xs: 4px;
+    --motion-distance-sm: 8px;
+    --motion-distance-md: 12px;
+    --motion-distance-lg: 24px;
+    --motion-distance-xl: 48px;
+    --motion-scale-in: 0.96;
+    --motion-scale-pop: 1.02;
+    --motion-scale-press: 0.97;
+    --motion-rotation-half-turn: 180deg;
+    --motion-stagger-char: 0.012s;
+    --motion-stagger-word: 0.035s;
+    --motion-stagger-item: 0.05s;
+    --motion-spring-press-duration: 0.24s;
+    --motion-spring-press-bounce: 0.12;
+    --motion-spring-snappy-duration: 0.26s;
+    --motion-spring-snappy-bounce: 0;
+    --motion-spring-travel-duration: 0.3s;
+    --motion-spring-travel-bounce: 0;
+    --motion-spring-smooth-duration: 0.4s;
+    --motion-spring-smooth-bounce: 0;
+    --motion-spring-morph-duration: 0.42s;
+    --motion-spring-morph-bounce: 0;
+    --motion-spring-size-compact-duration: 0.28s;
+    --motion-spring-size-compact-bounce: 0;
+    --motion-spring-size-panel-duration: 0.36s;
+    --motion-spring-size-panel-bounce: 0;
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-source-version: 1;
+    --motion-stagger-reveal: 0.055s;
+  }
+  [data-cadence-scope] {
+    --motion-source-duration-instant: var(--cadence-inherited-motion-source-duration-instant, inherit);
+    --motion-source-duration-fast: var(--cadence-inherited-motion-source-duration-fast, inherit);
+    --motion-source-duration-base: var(--cadence-inherited-motion-source-duration-base, inherit);
+    --motion-source-duration-slow: var(--cadence-inherited-motion-source-duration-slow, inherit);
+    --motion-source-duration-page: var(--cadence-inherited-motion-source-duration-page, inherit);
+    --motion-distance-xs: var(--cadence-inherited-motion-distance-xs, inherit);
+    --motion-distance-sm: var(--cadence-inherited-motion-distance-sm, inherit);
+    --motion-distance-md: var(--cadence-inherited-motion-distance-md, inherit);
+    --motion-distance-lg: var(--cadence-inherited-motion-distance-lg, inherit);
+    --motion-distance-xl: var(--cadence-inherited-motion-distance-xl, inherit);
+    --motion-scale-in: var(--cadence-inherited-motion-scale-in, inherit);
+    --motion-scale-pop: var(--cadence-inherited-motion-scale-pop, inherit);
+    --motion-scale-press: var(--cadence-inherited-motion-scale-press, inherit);
+    --motion-rotation-half-turn: var(--cadence-inherited-motion-rotation-half-turn, inherit);
+    --motion-stagger-char: var(--cadence-inherited-motion-stagger-char, inherit);
+    --motion-stagger-word: var(--cadence-inherited-motion-stagger-word, inherit);
+    --motion-stagger-item: var(--cadence-inherited-motion-stagger-item, inherit);
+    --ease-cadence-out: var(--cadence-inherited-ease-cadence-out, inherit);
+    --ease-cadence-in-out: var(--cadence-inherited-ease-cadence-in-out, inherit);
+    --ease-cadence-in: var(--cadence-inherited-ease-cadence-in, inherit);
+    --motion-spring-press-duration: var(--cadence-inherited-motion-spring-press-duration, inherit);
+    --motion-spring-press-bounce: var(--cadence-inherited-motion-spring-press-bounce, inherit);
+    --motion-spring-snappy-duration: var(--cadence-inherited-motion-spring-snappy-duration, inherit);
+    --motion-spring-snappy-bounce: var(--cadence-inherited-motion-spring-snappy-bounce, inherit);
+    --motion-spring-travel-duration: var(--cadence-inherited-motion-spring-travel-duration, inherit);
+    --motion-spring-travel-bounce: var(--cadence-inherited-motion-spring-travel-bounce, inherit);
+    --motion-spring-smooth-duration: var(--cadence-inherited-motion-spring-smooth-duration, inherit);
+    --motion-spring-smooth-bounce: var(--cadence-inherited-motion-spring-smooth-bounce, inherit);
+    --motion-spring-morph-duration: var(--cadence-inherited-motion-spring-morph-duration, inherit);
+    --motion-spring-morph-bounce: var(--cadence-inherited-motion-spring-morph-bounce, inherit);
+    --motion-spring-size-compact-duration: var(--cadence-inherited-motion-spring-size-compact-duration, inherit);
+    --motion-spring-size-compact-bounce: var(--cadence-inherited-motion-spring-size-compact-bounce, inherit);
+    --motion-spring-size-panel-duration: var(--cadence-inherited-motion-spring-size-panel-duration, inherit);
+    --motion-spring-size-panel-bounce: var(--cadence-inherited-motion-spring-size-panel-bounce, inherit);
+    --motion-stagger-reveal: var(--cadence-inherited-motion-stagger-reveal, inherit);
+  }
+  [data-motion='full'] {
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+  }
+  [data-motion='reduced'] {
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+  }
+  [data-motion='none'] {
+    --motion-duration-instant: calc(0s + 0s * 1);
+    --motion-duration-fast: calc(0s + 0s * 1);
+    --motion-duration-base: calc(0s + 0s * 1);
+    --motion-duration-slow: calc(0s + 0s * 1);
+    --motion-duration-page: calc(0s + 0s * 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    }
+    [data-motion='full'] {
+      --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    }
+  }
+}
+@theme static {
+  --ease-cadence-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-cadence-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-cadence-in: cubic-bezier(0.7, 0, 0.84, 0);
+}
+```
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
+
+Keep the listed component and shared runtime files at their relative install paths. The optional
+CadenceProvider controls inherited modes and clocks; without it Separator follows system preference.
+
+The changing example uses Motion's AnimatePresence from Separator's installed dependencies to retain
+exits. A vertical separator needs a parent with a defined height, as shown in the Vertical example.
 
 ## Usage
 
@@ -1667,6 +1845,26 @@ export function VisualRule() {
 }
 ```
 
+## Changing a boundary
+
+Change orientation, definite length or colour on the same rule. An independently inserted rule fades;
+a retained removal fades out. The current orientation and semantic role update immediately.
+
+<ComponentExample name="changing" />
+
+```tsx
+import { Separator } from "@/components/cadence/separator";
+
+export function SizedRule({ vertical, length }: { vertical: boolean; length: number }) {
+  return <Separator orientation={vertical ? "vertical" : "horizontal"}
+    style={{ [vertical ? "height" : "width"]: length }} />;
+}
+```
+
+The demo uses Motion's AnimatePresence to retain exits. Parent removal without retention is immediate.
+Initial server output and hydration remain visible. Parent stretch and percentage sizes follow native
+layout immediately; a definite authored length receives measured interpolation when its native box is safe.
+
 ## When to use
 
 - Between groups inside a menu, a card footer, or a settings list.
@@ -1694,19 +1892,24 @@ size the rule from CSS: `data-[orientation=vertical]:h-8`.
 
 Base UI state callbacks for `className` are evaluated before merging caller classes last.
 `style` accepts an object or a state callback and is forwarded to the primitive.
+Explicit caller `role` and `aria-hidden` overrides remain authoritative on a present rule.
+A retained exiting rule becomes inert and hidden from the accessibility tree immediately.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Separator declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: A single rule fades for independent presence and orientation replacement, interpolates definite owned lengths and transitions its scoped background.
 
-No motion (T0). A boundary that animates draws the eye to the wrong thing; if the
-layout changes, the surrounding `accordion` or `collapsible` owns that animation.
+| Recipe | Owner and full behaviour | reduced | none |
+| --- | --- | --- | --- |
+| `data.transition/one-shot` | Independent entry and orientation replacement share rule opacity. | Short opacity. | Immediate. |
+| `exit.fade/one-shot` | Retained removal on the same opacity owner; re-entry reverses current paint. | Short opacity. | Immediate. |
+| `geometry.resize/measured` | Definite length on the current axis, spring.sizeCompact; old axis releases before orientation replacement. A coordinating parent consumes descendant axes. | Native target size immediately. | Native target size immediately. |
+| `state.color/css-transition` | Scoped background-color, duration.fast and ease.out; current theme/context wins. | Short colour. | Zero duration and delay. |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+One real rule keeps its DOM identity through orientation changes. Parent appearance is consumed once;
+there are no text, number, hover, press or rotation effects. Passive reflow, unknown sizes, conflicting
+caller engines and unsupported native geometry stay immediate. Temporary pixel overlays are released
+on completion, cancellation, parent close and unmount, exposing the current caller CSS.
 
 ## Accessibility
 
@@ -1721,7 +1924,8 @@ layout changes, the surrounding `accordion` or `collapsible` owns that animation
 Horizontal separators fill available width; vertical separators need a parent with a defined height.
 Orientation is caller-owned, with no automatic breakpoint.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+Separator uses the shared Motion geometry and opacity executors plus scoped CSS colour policy. T0
+is a historical source-budget label. Base UI behavior requires hydration; native
 HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
 works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
 source; dependencies and application bundles are measured separately.
@@ -4801,12 +5005,16 @@ Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tok
 1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
 
 ```package-manager
-npm install clsx tailwind-merge @base-ui/react class-variance-authority
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 ```
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -4814,10 +5022,36 @@ npm install clsx tailwind-merge @base-ui/react class-variance-authority
 | Item | Target file | Full source |
 | --- | --- | --- |
 | cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | item | `@components/cadence/item/index.tsx` | [JSON files[].content](https://cadence.dev/r/item.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
 
@@ -4825,13 +5059,162 @@ npm install clsx tailwind-merge @base-ui/react class-variance-authority
 
 4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
 
-No additional item-specific CSS configuration is required beyond the base theme.
+Merge the CSS from [cadence-theme](https://cadence.dev/r/cadence-theme.json) into your global stylesheet after your base theme:
+
+```css
+@theme inline {
+  --color-sidebar: var(--sidebar, var(--card));
+  --color-sidebar-foreground: var(--sidebar-foreground, var(--card-foreground));
+  --color-sidebar-primary: var(--sidebar-primary, var(--primary));
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground, var(--primary-foreground));
+  --color-sidebar-accent: var(--sidebar-accent, var(--accent));
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground, var(--accent-foreground));
+  --color-sidebar-border: var(--sidebar-border, var(--border));
+  --color-sidebar-ring: var(--sidebar-ring, var(--ring));
+}
+
+:root {
+
+}
+
+@layer base {
+  :root {
+    --motion-source-duration-instant: 0.1s;
+    --motion-source-duration-fast: 0.16s;
+    --motion-source-duration-base: 0.22s;
+    --motion-source-duration-slow: 0.32s;
+    --motion-source-duration-page: 0.45s;
+    --motion-distance-xs: 4px;
+    --motion-distance-sm: 8px;
+    --motion-distance-md: 12px;
+    --motion-distance-lg: 24px;
+    --motion-distance-xl: 48px;
+    --motion-scale-in: 0.96;
+    --motion-scale-pop: 1.02;
+    --motion-scale-press: 0.97;
+    --motion-rotation-half-turn: 180deg;
+    --motion-stagger-char: 0.012s;
+    --motion-stagger-word: 0.035s;
+    --motion-stagger-item: 0.05s;
+    --motion-spring-press-duration: 0.24s;
+    --motion-spring-press-bounce: 0.12;
+    --motion-spring-snappy-duration: 0.26s;
+    --motion-spring-snappy-bounce: 0;
+    --motion-spring-travel-duration: 0.3s;
+    --motion-spring-travel-bounce: 0;
+    --motion-spring-smooth-duration: 0.4s;
+    --motion-spring-smooth-bounce: 0;
+    --motion-spring-morph-duration: 0.42s;
+    --motion-spring-morph-bounce: 0;
+    --motion-spring-size-compact-duration: 0.28s;
+    --motion-spring-size-compact-bounce: 0;
+    --motion-spring-size-panel-duration: 0.36s;
+    --motion-spring-size-panel-bounce: 0;
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-source-version: 1;
+    --motion-stagger-reveal: 0.055s;
+  }
+  [data-cadence-scope] {
+    --motion-source-duration-instant: var(--cadence-inherited-motion-source-duration-instant, inherit);
+    --motion-source-duration-fast: var(--cadence-inherited-motion-source-duration-fast, inherit);
+    --motion-source-duration-base: var(--cadence-inherited-motion-source-duration-base, inherit);
+    --motion-source-duration-slow: var(--cadence-inherited-motion-source-duration-slow, inherit);
+    --motion-source-duration-page: var(--cadence-inherited-motion-source-duration-page, inherit);
+    --motion-distance-xs: var(--cadence-inherited-motion-distance-xs, inherit);
+    --motion-distance-sm: var(--cadence-inherited-motion-distance-sm, inherit);
+    --motion-distance-md: var(--cadence-inherited-motion-distance-md, inherit);
+    --motion-distance-lg: var(--cadence-inherited-motion-distance-lg, inherit);
+    --motion-distance-xl: var(--cadence-inherited-motion-distance-xl, inherit);
+    --motion-scale-in: var(--cadence-inherited-motion-scale-in, inherit);
+    --motion-scale-pop: var(--cadence-inherited-motion-scale-pop, inherit);
+    --motion-scale-press: var(--cadence-inherited-motion-scale-press, inherit);
+    --motion-rotation-half-turn: var(--cadence-inherited-motion-rotation-half-turn, inherit);
+    --motion-stagger-char: var(--cadence-inherited-motion-stagger-char, inherit);
+    --motion-stagger-word: var(--cadence-inherited-motion-stagger-word, inherit);
+    --motion-stagger-item: var(--cadence-inherited-motion-stagger-item, inherit);
+    --ease-cadence-out: var(--cadence-inherited-ease-cadence-out, inherit);
+    --ease-cadence-in-out: var(--cadence-inherited-ease-cadence-in-out, inherit);
+    --ease-cadence-in: var(--cadence-inherited-ease-cadence-in, inherit);
+    --motion-spring-press-duration: var(--cadence-inherited-motion-spring-press-duration, inherit);
+    --motion-spring-press-bounce: var(--cadence-inherited-motion-spring-press-bounce, inherit);
+    --motion-spring-snappy-duration: var(--cadence-inherited-motion-spring-snappy-duration, inherit);
+    --motion-spring-snappy-bounce: var(--cadence-inherited-motion-spring-snappy-bounce, inherit);
+    --motion-spring-travel-duration: var(--cadence-inherited-motion-spring-travel-duration, inherit);
+    --motion-spring-travel-bounce: var(--cadence-inherited-motion-spring-travel-bounce, inherit);
+    --motion-spring-smooth-duration: var(--cadence-inherited-motion-spring-smooth-duration, inherit);
+    --motion-spring-smooth-bounce: var(--cadence-inherited-motion-spring-smooth-bounce, inherit);
+    --motion-spring-morph-duration: var(--cadence-inherited-motion-spring-morph-duration, inherit);
+    --motion-spring-morph-bounce: var(--cadence-inherited-motion-spring-morph-bounce, inherit);
+    --motion-spring-size-compact-duration: var(--cadence-inherited-motion-spring-size-compact-duration, inherit);
+    --motion-spring-size-compact-bounce: var(--cadence-inherited-motion-spring-size-compact-bounce, inherit);
+    --motion-spring-size-panel-duration: var(--cadence-inherited-motion-spring-size-panel-duration, inherit);
+    --motion-spring-size-panel-bounce: var(--cadence-inherited-motion-spring-size-panel-bounce, inherit);
+    --motion-stagger-reveal: var(--cadence-inherited-motion-stagger-reveal, inherit);
+  }
+  [data-motion='full'] {
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+  }
+  [data-motion='reduced'] {
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+  }
+  [data-motion='none'] {
+    --motion-duration-instant: calc(0s + 0s * 1);
+    --motion-duration-fast: calc(0s + 0s * 1);
+    --motion-duration-base: calc(0s + 0s * 1);
+    --motion-duration-slow: calc(0s + 0s * 1);
+    --motion-duration-page: calc(0s + 0s * 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    }
+    [data-motion='full'] {
+      --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    }
+  }
+}
+@theme static {
+  --ease-cadence-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-cadence-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-cadence-in: cubic-bezier(0.7, 0, 0.84, 0);
+}
+```
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
 
 Keep `item/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the listed relative
 paths. Item imports Separator even when you do not render `ItemSeparator`; both
-components share the `cn` helper. Item and Separator are static T0 components in
-full, reduced and none modes; no motion runtime, provider or additional
-item-specific CSS is required beyond the base theme and Tailwind utilities.
+components share the `cn` helper. Keep Separator’s listed shared runtime files too;
+ItemSeparator inherits its presence, orientation, definite-length and colour effects.
+An optional provider controls its mode.
 Keep the source files' `"use client"` directives for Base UI behavior. The Usage
 and body examples can render these client parts from a Server Component in
 Next.js App Router; they do not call the exported variant functions or add event
@@ -5124,7 +5507,8 @@ write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 
 Authored intensity is **subtle**: Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
-No motion (T0). A row does not lift on hover or slide on mount. The only transition
+The row adds no local motion. ItemSeparator inherits Separator’s delivered rule effects.
+A row does not lift on hover or slide on mount. The only transition
 is `transition-colors` on the row and on a link inside it — state feedback that
 costs nothing and never moves the text the user is reading.
 
@@ -5156,7 +5540,8 @@ that animates itself cannot be interrupted by the next render.
 Items fill available width and allow wrapping. The caller owns text overflow and action placement in
 narrow containers; large collections need application pagination or virtualization.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
+The row adds no local interpolation; Separator installs its shared motion runtime.
+Base UI behavior requires hydration; native
 HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
 contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
 The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
@@ -5242,6 +5627,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | label | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/label.json) |
 | label | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/label.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | field | `@components/cadence/field/index.tsx` | [JSON files[].content](https://cadence.dev/r/field.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
@@ -5419,10 +5805,8 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 
 Keep `field/index.tsx`, `label/index.tsx`, `separator/index.tsx` and `lib/cn.ts`
 at the listed relative paths. Field imports Label and Separator even when you do
-not render those parts; all three components share the `cn` helper. Field, Label
-and Separator are static T0 components in full, reduced and none modes; no motion
-runtime, provider or additional item-specific CSS is required beyond the base
-theme and Tailwind utilities. Keep the source files' `"use client"` directives.
+not render those parts. Keep their listed shared runtime files too. Label and Separator
+retain their own delivered motion contracts; the optional provider controls their modes. Keep the source files' `"use client"` directives.
 In Next.js App Router, a Server Component can render these client parts with
 serializable props. Calling the exported `fieldVariants` function belongs in a
 `"use client"` module; none of the examples below calls it.
@@ -5719,7 +6103,8 @@ export function ChoiceCard() {
 
 Authored intensity is **subtle**: Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
 
-No motion (T0). A field never animates — not on mount, not when the error appears.
+The Field wrapper adds no local motion. FieldLabel inherits Label’s delivered effects, and
+the rule in FieldSeparator inherits Separator’s effects. These do not migrate the remaining Field parts.
 The error is the one thing the user must read immediately; fading or sliding it in
 delays the only information that matters, and it moves the control the user's cursor
 is in.
@@ -5765,7 +6150,8 @@ FieldGroup establishes a named container. Responsive orientation switches from c
 md container query; explicit vertical and horizontal orientations remain caller-selected. Labels,
 error text and controls must fit the available width.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
+The wrapper adds no local interpolation; its Label and Separator dependencies install their shared
+motion runtime. This wrapper renders HTML/CSS; interactive
 children and application handlers still need their own client code. Composed controls retain their
 own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
 works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
@@ -5798,12 +6184,16 @@ Use React 19, TypeScript and Tailwind CSS v4 with the shadcn semantic colour tok
 1. Install the component's complete recursive npm dependencies (versions are preserved). Example-only packages are listed separately below when needed.
 
 ```package-manager
-npm install clsx tailwind-merge @base-ui/react class-variance-authority
+npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 ```
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -5811,10 +6201,36 @@ npm install clsx tailwind-merge @base-ui/react class-variance-authority
 | Item | Target file | Full source |
 | --- | --- | --- |
 | cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
+| cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/native-div.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/press-button.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-scope.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/css-motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-environment.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-transaction.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | button-group | `@components/cadence/button-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/button-group.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+
+[Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
 
@@ -5822,14 +6238,162 @@ npm install clsx tailwind-merge @base-ui/react class-variance-authority
 
 4. Apply the required CSS/configuration below, then follow [Usage](#usage) for the component imports and composition.
 
-No additional item-specific CSS configuration is required beyond the base theme.
+Merge the CSS from [cadence-theme](https://cadence.dev/r/cadence-theme.json) into your global stylesheet after your base theme:
+
+```css
+@theme inline {
+  --color-sidebar: var(--sidebar, var(--card));
+  --color-sidebar-foreground: var(--sidebar-foreground, var(--card-foreground));
+  --color-sidebar-primary: var(--sidebar-primary, var(--primary));
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground, var(--primary-foreground));
+  --color-sidebar-accent: var(--sidebar-accent, var(--accent));
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground, var(--accent-foreground));
+  --color-sidebar-border: var(--sidebar-border, var(--border));
+  --color-sidebar-ring: var(--sidebar-ring, var(--ring));
+}
+
+:root {
+
+}
+
+@layer base {
+  :root {
+    --motion-source-duration-instant: 0.1s;
+    --motion-source-duration-fast: 0.16s;
+    --motion-source-duration-base: 0.22s;
+    --motion-source-duration-slow: 0.32s;
+    --motion-source-duration-page: 0.45s;
+    --motion-distance-xs: 4px;
+    --motion-distance-sm: 8px;
+    --motion-distance-md: 12px;
+    --motion-distance-lg: 24px;
+    --motion-distance-xl: 48px;
+    --motion-scale-in: 0.96;
+    --motion-scale-pop: 1.02;
+    --motion-scale-press: 0.97;
+    --motion-rotation-half-turn: 180deg;
+    --motion-stagger-char: 0.012s;
+    --motion-stagger-word: 0.035s;
+    --motion-stagger-item: 0.05s;
+    --motion-spring-press-duration: 0.24s;
+    --motion-spring-press-bounce: 0.12;
+    --motion-spring-snappy-duration: 0.26s;
+    --motion-spring-snappy-bounce: 0;
+    --motion-spring-travel-duration: 0.3s;
+    --motion-spring-travel-bounce: 0;
+    --motion-spring-smooth-duration: 0.4s;
+    --motion-spring-smooth-bounce: 0;
+    --motion-spring-morph-duration: 0.42s;
+    --motion-spring-morph-bounce: 0;
+    --motion-spring-size-compact-duration: 0.28s;
+    --motion-spring-size-compact-bounce: 0;
+    --motion-spring-size-panel-duration: 0.36s;
+    --motion-spring-size-panel-bounce: 0;
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-source-version: 1;
+    --motion-stagger-reveal: 0.055s;
+  }
+  [data-cadence-scope] {
+    --motion-source-duration-instant: var(--cadence-inherited-motion-source-duration-instant, inherit);
+    --motion-source-duration-fast: var(--cadence-inherited-motion-source-duration-fast, inherit);
+    --motion-source-duration-base: var(--cadence-inherited-motion-source-duration-base, inherit);
+    --motion-source-duration-slow: var(--cadence-inherited-motion-source-duration-slow, inherit);
+    --motion-source-duration-page: var(--cadence-inherited-motion-source-duration-page, inherit);
+    --motion-distance-xs: var(--cadence-inherited-motion-distance-xs, inherit);
+    --motion-distance-sm: var(--cadence-inherited-motion-distance-sm, inherit);
+    --motion-distance-md: var(--cadence-inherited-motion-distance-md, inherit);
+    --motion-distance-lg: var(--cadence-inherited-motion-distance-lg, inherit);
+    --motion-distance-xl: var(--cadence-inherited-motion-distance-xl, inherit);
+    --motion-scale-in: var(--cadence-inherited-motion-scale-in, inherit);
+    --motion-scale-pop: var(--cadence-inherited-motion-scale-pop, inherit);
+    --motion-scale-press: var(--cadence-inherited-motion-scale-press, inherit);
+    --motion-rotation-half-turn: var(--cadence-inherited-motion-rotation-half-turn, inherit);
+    --motion-stagger-char: var(--cadence-inherited-motion-stagger-char, inherit);
+    --motion-stagger-word: var(--cadence-inherited-motion-stagger-word, inherit);
+    --motion-stagger-item: var(--cadence-inherited-motion-stagger-item, inherit);
+    --ease-cadence-out: var(--cadence-inherited-ease-cadence-out, inherit);
+    --ease-cadence-in-out: var(--cadence-inherited-ease-cadence-in-out, inherit);
+    --ease-cadence-in: var(--cadence-inherited-ease-cadence-in, inherit);
+    --motion-spring-press-duration: var(--cadence-inherited-motion-spring-press-duration, inherit);
+    --motion-spring-press-bounce: var(--cadence-inherited-motion-spring-press-bounce, inherit);
+    --motion-spring-snappy-duration: var(--cadence-inherited-motion-spring-snappy-duration, inherit);
+    --motion-spring-snappy-bounce: var(--cadence-inherited-motion-spring-snappy-bounce, inherit);
+    --motion-spring-travel-duration: var(--cadence-inherited-motion-spring-travel-duration, inherit);
+    --motion-spring-travel-bounce: var(--cadence-inherited-motion-spring-travel-bounce, inherit);
+    --motion-spring-smooth-duration: var(--cadence-inherited-motion-spring-smooth-duration, inherit);
+    --motion-spring-smooth-bounce: var(--cadence-inherited-motion-spring-smooth-bounce, inherit);
+    --motion-spring-morph-duration: var(--cadence-inherited-motion-spring-morph-duration, inherit);
+    --motion-spring-morph-bounce: var(--cadence-inherited-motion-spring-morph-bounce, inherit);
+    --motion-spring-size-compact-duration: var(--cadence-inherited-motion-spring-size-compact-duration, inherit);
+    --motion-spring-size-compact-bounce: var(--cadence-inherited-motion-spring-size-compact-bounce, inherit);
+    --motion-spring-size-panel-duration: var(--cadence-inherited-motion-spring-size-panel-duration, inherit);
+    --motion-spring-size-panel-bounce: var(--cadence-inherited-motion-spring-size-panel-bounce, inherit);
+    --motion-stagger-reveal: var(--cadence-inherited-motion-stagger-reveal, inherit);
+  }
+  [data-motion='full'] {
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 1 * var(--cadence-time-scale, 1) + 0s * 1));
+  }
+  [data-motion='reduced'] {
+    --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+  }
+  [data-motion='none'] {
+    --motion-duration-instant: calc(0s + 0s * 1);
+    --motion-duration-fast: calc(0s + 0s * 1);
+    --motion-duration-base: calc(0s + 0s * 1);
+    --motion-duration-slow: calc(0s + 0s * 1);
+    --motion-duration-page: calc(0s + 0s * 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    }
+    [data-motion='full'] {
+      --motion-duration-instant: var(--cadence-effective-instant, calc(var(--motion-source-duration-instant) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-fast: var(--cadence-effective-fast, calc(var(--motion-source-duration-fast) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-base: var(--cadence-effective-base, calc(var(--motion-source-duration-base) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-slow: var(--cadence-effective-slow, calc(var(--motion-source-duration-slow) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+      --motion-duration-page: var(--cadence-effective-page, calc(var(--motion-source-duration-page) * 0.6 * var(--cadence-time-scale, 1) + 0s * 1));
+    }
+  }
+}
+@theme static {
+  --ease-cadence-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-cadence-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-cadence-in: cubic-bezier(0.7, 0, 0.84, 0);
+}
+```
+
+The provider files above are required imports. Wrapping your application is optional; standalone components respect the system motion preference. To control a subtree, wrap it once:
+
+```tsx
+import { CadenceProvider } from "@/components/cadence/lib/provider";
+
+export function MotionRoot({ children }: { children: React.ReactNode }) {
+  return <CadenceProvider mode="full">{children}</CadenceProvider>;
+}
+```
 
 Keep `button-group/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the
 listed relative paths. Button Group imports Separator even when you do not
 render `ButtonGroupSeparator`; both components share the `cn` helper.
-Button Group and Separator are static T0 components in full, reduced and none
-modes; no motion runtime, provider or additional item-specific CSS is required
-beyond the base theme and Tailwind utilities. Keep their source files'
+Separator installs its shared motion/geometry runtime and follows its own presence,
+orientation, definite-length and colour contract. The optional provider controls its mode. Keep their source files'
 `"use client"` directives. In Next.js App Router, a Server Component can render
 these client parts with serializable props. Calling the exported
 `buttonGroupVariants` function belongs in a `"use client"` module.
@@ -6042,6 +6606,7 @@ control above its neighbours so its ring is not clipped.
 | reduced | none       | –     | –             |
 | none    | none       | –     | –             |
 
+ButtonGroupSeparator inherits Separator’s rule effects; group stretching remains native.
 The buttons inside keep their own press feedback; the group never adds a second
 animation on top of it.
 
@@ -33462,6 +34027,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
 | skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
 | tooltip | `@components/cadence/tooltip/index.tsx` | [JSON files[].content](https://cadence.dev/r/tooltip.json) |
@@ -35510,6 +36076,9 @@ owns panel placement and suppresses this coupled animation. Unsupported or unava
 uses immediate native layout. Focused editing in the Sidebar/Inset, native pointer capture, passive
 width/viewport changes and live mode downgrades settle both dependent properties. The same desktop
 panel and input nodes survive toggles.
+
+SidebarSeparator delegates definite-length geometry and its other independent rule effects to
+Separator. Passive stretch remains native; these inherited effects do not migrate the remaining Sidebar contract.
 
 Mobile delegates `popup.anchored` / `exit.fade` to Sheet. Button press, tooltip popup and Skeleton pulse
 are owned by those dependencies, not extra Sidebar recipes. Their effective mode follows the provider.

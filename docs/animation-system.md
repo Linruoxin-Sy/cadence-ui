@@ -889,6 +889,8 @@ Minimum loading duration and delayed application commits are outside the animati
 
 The internal inline-presence executor implements `presence.inline` and `presence.exit` as one
 opacity channel on the original host. It captures finite clocks and reverses from current paint.
+An adapter may supply a committed replacement revision on that same channel. Replacement while
+present fades the current semantic host; exit takes priority and ignores replacement revisions.
 Entrance releases to current disabled/caller opacity; a completed exit keeps a zero-opacity envelope
 while the parent waits for independently retained descendants, including at zero clock. Caller paint
 can revoke that envelope without restoring stale styles. Its adapter supplies actual parent retention and

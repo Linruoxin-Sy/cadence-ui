@@ -8,6 +8,8 @@ import type { CadenceMotion } from "./provider";
 export type InlinePresenceCommit = {
   present: boolean;
   enter: boolean;
+  /** A committed replacement shares the existing opacity channel. */
+  revision?: unknown;
   cm: CadenceMotion;
   complete?: () => void;
 };
@@ -160,7 +162,17 @@ export function createInlinePresence(node: HTMLElement, transaction = createMoti
       // Resolve both clocks on every committed policy, including static baselines.
       input.cm.parameters(bindMotionParameters(presenceInline, "data.transition/opacity"));
       input.cm.parameters(bindMotionParameters(presenceExit, "exit.fade/opacity"));
-      const change = previous ? previous.present !== input.present : input.enter || !input.present;
+      const change = previous
+        ? previous.present !== input.present || (input.present && !Object.is(previous.revision, input.revision))
+        : input.enter || !input.present;
+      // Reconcile committed caller paint before consuming its mutation records.
+      // A replacement may retarget this channel; an unrelated render must not
+      // leave an old opacity envelope over a newer caller declaration.
+      const nextCallerStyle = opacityStyle();
+      const mutations = observer.takeRecords();
+      if (!change && (nextCallerStyle !== callerStyle || mutations.some((record) => record.attributeName !== "style")))
+        settle();
+      callerStyle = nextCallerStyle;
       if (change) {
         const from = animation ? node.ownerDocument.defaultView?.getComputedStyle(node).opacity : undefined;
         cancel();

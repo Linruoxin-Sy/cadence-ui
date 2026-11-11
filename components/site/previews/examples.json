@@ -2,7 +2,7 @@
   "button": ["variants", "sizes", "links", "composition", "disabled", "changing-content", "presence"],
   "badge": ["variants", "icon", "link", "changing-content", "presence"],
   "kbd": ["single", "combination", "tooltip", "changing"],
-  "separator": ["horizontal", "vertical", "decorative"],
+  "separator": ["horizontal", "vertical", "decorative", "changing"],
   "label": ["wrapping", "disabled", "changing"],
   "select": [
     "sizes",
