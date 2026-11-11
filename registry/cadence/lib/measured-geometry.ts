@@ -10,6 +10,7 @@ import {
   createMotionTransaction,
   type MotionLease,
   type MotionRevision,
+  registerTextGeometry,
 } from "./motion-transaction";
 
 type Axis = "width" | "height";
@@ -82,7 +83,9 @@ type Adapter = {
   /** Native sizing adapter work is distinct from decorative participation. */
   maintained?: boolean;
   /** A real intrinsic content box keeps its destination width during shell resize. */
-  destinationWidth?: boolean;
+  destinationWidth?: boolean | (() => number | null);
+  /** Explicit non-scaling final-width display adapter; current leases prove its text map. */
+  textGeometry?: boolean;
   /** Wrapper-free hosts observe bounded real child boxes for passive reflow. */
   observeChildren?: boolean;
   /** Read natural layout only. The one real content tree must be independent of the written axis. */
@@ -127,9 +130,11 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     if (!node) throw new Error("Geometry registration requires its committed host");
     const identity = host.identity;
     const registration = transaction.register(node);
+    const allocation = adapter.textGeometry && content !== node ? transaction.register(content) : null;
     const values = { width: motionValue(0), height: motionValue(0) };
     const effects: Partial<Record<Axis, Animation>> = {};
     let contentWidth: Animation | null = null;
+    let contentLease: MotionLease | null = null;
     let flexBlock: Animation | null = null;
     const stops = new Set<() => void>();
     let baseline: GeometryDestination | null = null;
@@ -165,6 +170,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
     const release = () => {
       contentWidth?.cancel();
       contentWidth = null;
+      contentLease?.cancel();
+      contentLease = null;
       flexBlock?.cancel();
       flexBlock = null;
       for (const stop of stops) stop();
@@ -309,8 +316,24 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           values[axis].jump(start as number);
           if (axis === "width" && adapter.destinationWidth && content !== node) {
             const natural = naturalGeometry(content);
-            if (natural && typeof content.animate === "function")
-              contentWidth = content.animate({ width: `${natural.width}px` }, { duration: 0, fill: "both" });
+            if (natural && typeof content.animate === "function") {
+              const width = typeof adapter.destinationWidth === "function" ? adapter.destinationWidth() : natural.width;
+              if (width === null || !Number.isFinite(width) || width < 0) continue;
+              if (allocation && revision)
+                contentLease = allocation.begin(revision, ["width", "min-width", "max-width"], {}, () => {
+                  contentWidth?.cancel();
+                  contentWidth = null;
+                });
+              if (!allocation || contentLease?.current())
+                contentWidth = content.animate(
+                  {
+                    width: `${width}px`,
+                    ...(allocation ? { minWidth: `${width}px`, maxWidth: `${width}px` } : {}),
+                  },
+                  { duration: 0, fill: "both" },
+                );
+              if (contentWidth && contentLease) registerTextGeometry(contentWidth, contentLease, "full");
+            }
           }
           // A replace-effect overlays CSS without capturing/restoring caller
           // declarations. Cancelling exposes the latest auto/flex/grid policy.
@@ -321,6 +344,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           const initial = { [axis]: `${Math.min(max, Math.max(min, start as number))}px` };
           const effect = node.animate([initial, initial], { duration: 0, fill: "both" });
           effects[axis] = effect;
+          if (adapter.textGeometry) registerTextGeometry(effect, lease, "full");
           const permit = lease;
           const write = (value: number) => {
             if (current() && permit.current())
@@ -344,6 +368,8 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
                 running = false;
                 contentWidth?.cancel();
                 contentWidth = null;
+                contentLease?.finish();
+                contentLease = null;
                 flexBlock?.cancel();
                 flexBlock = null;
                 permit.finish();
@@ -359,6 +385,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         alive = false;
         owners.delete(owner);
         registration.dispose();
+        allocation?.dispose();
         release();
         for (const stop of stops) stop();
         observer.disconnect();

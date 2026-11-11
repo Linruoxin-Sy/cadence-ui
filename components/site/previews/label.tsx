@@ -1,6 +1,7 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
+import { Button } from "@/registry/cadence/button";
 import { Checkbox } from "@/registry/cadence/checkbox";
 import { Input } from "@/registry/cadence/input";
 import { Label } from "@/registry/cadence/label";
@@ -31,7 +32,48 @@ function Disabled() {
   );
 }
 
-const examples = { wrapping: Wrapping, disabled: Disabled };
+function Changing() {
+  const id = useId();
+  const [work, setWork] = useState(false);
+  const [quantity, setQuantity] = useState(19);
+  return (
+    <div className="flex w-full flex-col items-start gap-5">
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setWork((value) => !value)}>
+          Rename field
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setQuantity((value) => (value === 19 ? 20 : 19))}>
+          Change quantity
+        </Button>
+      </div>
+      <div className="grid w-full max-w-sm gap-3">
+        <Label
+          htmlFor={`${id}-email`}
+          className="w-fit"
+          style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+        >
+          {work ? "Work email address" : "Email address"}
+        </Label>
+        <Input id={`${id}-email`} type="email" defaultValue="ada@example.com" />
+      </div>
+      <div className="grid gap-3">
+        <Label
+          htmlFor={`${id}-count`}
+          className="w-fit"
+          style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+        >
+          {quantity}
+        </Label>
+        <input id={`${id}-count`} type="checkbox" aria-describedby={`${id}-hint`} />
+        <span id={`${id}-hint`} className="text-sm text-muted-foreground">
+          Available seats; the number is a quantity.
+        </span>
+      </div>
+    </div>
+  );
+}
+
+const examples = { wrapping: Wrapping, disabled: Disabled, changing: Changing };
 
 function LabelSpecimen() {
   const id = useId();

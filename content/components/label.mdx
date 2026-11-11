@@ -2,15 +2,15 @@
 title: Label
 description: Naming inputs, selects, and other form controls.
 category: form
-motion: []
+motion: ["data.transition",{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Label declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Local opacity, changed name runs, compact quantity reels and readable intrinsic sizing preserve the native label association."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"label","reason":"Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."}],"geometry.resize/measured":[{"relationship":"default","owner":"label","reason":"Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."}],"state.color/css-transition":[{"relationship":"default","owner":"label","reason":"Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."}],"text.change/changed-runs":[{"relationship":"default","owner":"label","reason":"Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."}],"number.roll/reels":[{"relationship":"default","owner":"label","reason":"Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: []
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["motion"]
+registryDeps: ["@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text","@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -39,10 +39,10 @@ npx shadcn@latest add @cadence/checkbox
 
 [Manual installation files](https://cadence.dev/r/label.json)
 
-Label needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `label/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves. Associate the label with a
-control using `htmlFor` and a matching `id`, or wrap the control as shown below.
+Install the complete listed closure and shared Cadence theme. The optional CadenceProvider
+controls mode and clock; without it, Label follows system preference. Keep the listed
+relative paths so copied helpers resolve. Associate the label with a control using
+`htmlFor` and a matching `id`, or wrap the control as shown below.
 
 For Usage and Disabled, also copy [Input's source file](https://cadence.dev/r/input.json)
 to `@components/cadence/input/index.tsx` and install its additional package:
@@ -131,6 +131,34 @@ export function DisabledFields() {
 }
 ```
 
+## Changing names and quantities
+
+The control keeps its value, focus and selection when its label changes. Direct strings
+replace only changed text. A direct number declares a display quantity and rolls changed
+places; identifiers such as `"007"` stay strings. Rich labels, links and required markers
+retain their native structure. Changing the name never delays its accessible value.
+
+<ComponentExample name="changing" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Label } from "@/components/cadence/label";
+
+export function ChangingName() {
+  const id = useId();
+  const [work, setWork] = useState(false);
+  return (
+    <div className="grid gap-3">
+      <button type="button" onClick={() => setWork((value) => !value)}>Rename field</button>
+      <Label htmlFor={id}>{work ? "Work email address" : "Email address"}</Label>
+      <input id={id} type="email" defaultValue="ada@example.com" />
+    </div>
+  );
+}
+```
+
 ## When to use
 
 - Every input, textarea, select, checkbox, radio, switch, and slider that needs a
@@ -159,16 +187,21 @@ All native `label` props are forwarded.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Label declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: Local opacity, changed name runs, compact quantity reels and readable intrinsic sizing preserve the native label association.
+Initial SSR and hydration remain visible.
 
-No motion (T0). A label is text; the only thing it reacts to is the disabled state,
-which is an opacity change on a token, not an animation.
+| Recipe | Owner and full behaviour | reduced | none |
+| ------ | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | Independent later insertion; root opacity only. A presenting parent consumes its initial child entrance. | Short opacity. | Immediate. |
+| `geometry.resize/measured` | Measured intrinsic width and destination-width block size; a coordinating parent consumes the child axes. Passive reflow and unsafe/clipped growth stay immediate. | Native size immediately. | Native size immediately. |
+| `state.color/css-transition` | Scoped foreground only. Verified readable neutral paths may transition; actual DOM focus-within or invalid state makes paint immediate. Unknown palettes and an inherited colour owner remain immediate. | Short eligible colour. | Zero duration and delay. |
+| `text.change/changed-runs` | Direct strings replace changed graphemes with no stagger; native label/Text and unchanged content survive. Rich descendants remain native. | Short changed-only opacity, no travel. | Exact text immediately. |
+| `number.roll/reels` | Direct quantities roll changed decimal places using exact React output. Strings remain text. Unsupported notation remains exact and immediate. | Final value immediately. | Final value immediately. |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+Rapid revisions converge on the latest value. Live mode downgrade and zero clock cancel
+active writers. Parent removal owns retention; Label creates no second activation target.
+An external `htmlFor` control's focus does not create DOM focus-within on the label.
+There is no floating label or input event handler.
 
 ## Accessibility
 
@@ -183,10 +216,13 @@ which is an opacity change on a token, not an animation.
 Labels use flex layout and inherit their available width. Keep long labels readable beside controls;
 the caller owns stacking and responsive field layout.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Server-rendered markup does not
-imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
-this item's own shipped source; dependencies and application bundles are measured separately.
+Label uses the shared motion, text/number, colour and optional measurement runtime.
+One primitive display is enhanced; mixed rich content and unknown typography retain native
+paint without changing caller font features. Labels rewrap at final width, and growth that
+could hide the name settles immediately. A native label/control association works without
+JavaScript; application rename controls need hydration. The historical T0 4 KiB gzip source
+reference excludes dependencies and remains advisory under ADR-023. Functional migration
+does not certify page cost, device FPS or performance governance.
 
 ## Notes for AI
 

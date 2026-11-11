@@ -42,13 +42,17 @@ for (const mode of MODES)
       await expect(top.getByRole("textbox", { name: "Slug" })).toBeDisabled();
       await expect(top.getByRole("checkbox", { name: "Disabled preference" })).toBeDisabled();
       expect(
-        await top.getByText("Disabled preference", { exact: true }).evaluate((node) => getComputedStyle(node).opacity),
+        await top
+          .getByText("Disabled preference", { exact: true })
+          .evaluate((node) => getComputedStyle(node.closest("label") as HTMLLabelElement).opacity),
       ).toBe("0.5");
       for (const name of ["Slug", "Workspace"]) {
         await expect(disabled.getByRole("textbox", { name })).toBeDisabled();
-        expect(await disabled.getByText(name, { exact: true }).evaluate((node) => getComputedStyle(node).opacity)).toBe(
-          "0.5",
-        );
+        expect(
+          await disabled
+            .getByText(name, { exact: true })
+            .evaluate((node) => getComputedStyle(node.closest("label") as HTMLLabelElement).opacity),
+        ).toBe("0.5");
       }
       await field.focus();
       const original = await field.elementHandle();
@@ -62,6 +66,44 @@ for (const mode of MODES)
       expect(await field.evaluate((node, before) => node === before, original)).toBe(true);
       await expect(wrappedBox).toBeChecked();
       await expect(topBox).not.toBeChecked();
+    });
+
+for (const mode of MODES)
+  for (const os of [false, true])
+    test(`Label changed name and quantity retain native input ${mode}/${os}`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: os ? "reduce" : "no-preference" });
+      await page.goto(`/components/label?motion=${mode}`);
+      await page.waitForLoadState("networkidle");
+      const demo = page.locator('[data-component-example="label/changing"]');
+      await demo.scrollIntoViewIfNeeded();
+      const label = demo.locator('[data-slot="label"]').first();
+      await expect(label).toHaveAttribute("data-motion", effectiveMode(mode, os));
+      const input = demo.getByRole("textbox");
+      await expect(input).toHaveAccessibleName("Email address");
+      const before = await input.elementHandle();
+      await input.fill("retained@example.com");
+      // Email keeps native keyboard selection but does not expose selectionStart/End.
+      await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+      await input.press("Control+Home");
+      await input.press("Shift+ArrowRight");
+      await input.press("Control+c");
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("r");
+      await demo.getByRole("button", { name: "Rename field" }).evaluate((node: HTMLButtonElement) => node.click());
+      await expect(input).toHaveAccessibleName("Work email address");
+      await expect(input).toBeFocused();
+      await expect(input).toHaveValue("retained@example.com");
+      expect(await input.evaluate((node, old) => node === old, before)).toBe(true);
+      expect(await input.evaluate((node: HTMLInputElement) => [node.selectionStart, node.selectionEnd])).toEqual([
+        null,
+        null,
+      ]);
+      await input.press("Control+c");
+      expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("r");
+      await demo.getByRole("button", { name: "Change quantity" }).click();
+      await expect(demo.getByRole("checkbox", { name: "20", exact: true })).toBeVisible();
+      await demo.getByRole("button", { name: "Rename field" }).click();
+      await expect(label).toHaveText("Email address");
+      await expect(label).toHaveAttribute("for", (await input.getAttribute("id")) as string);
     });
 
 test("Label native associations also work without JavaScript", async ({ browser, baseURL }) => {

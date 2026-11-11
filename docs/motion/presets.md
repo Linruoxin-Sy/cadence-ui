@@ -224,6 +224,12 @@ two-cell reel cannot safely share the phase, show the latest readout immediately
 independently from its current presentation. Do not fabricate intermediate values, add reel cells or
 retry a queued obsolete transaction. The semantic value is always current.
 
+Label's `label.root.resize` uses `geometry.compact` at the final text width. Its
+explicit non-scaling measured adapter may register its current width/height leases with
+the changed-text geometry proof; arbitrary or retired animations remain unsupported.
+This does not grant a second text/size writer or change typography. Clipped growth and
+block growth that would obscure the name resolve immediately; eligible shrink remains bounded.
+
 ### 3.1 Effective modes and clock ownership
 
 Preset clocks do not establish sequencing dependencies. Sidebar's label presence uses its size

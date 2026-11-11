@@ -28,8 +28,9 @@ describe("Field", () => {
 
     expect(screen.getByRole("textbox", { name: "Email" })).toBeInTheDocument();
     expect(screen.getByText("We only use this to send receipts.")).toHaveAttribute("data-slot", "field-description");
-    expect(screen.getByText("Email")).toHaveAttribute("data-slot", "field-label");
-    expect(screen.getByText("Email").tagName).toBe("LABEL");
+    const label = screen.getByText("Email").closest("label");
+    expect(label).toHaveAttribute("data-slot", "field-label");
+    expect(label).toHaveAttribute("for", "email");
   });
 
   it("exposes orientation through data-orientation", () => {

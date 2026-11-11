@@ -232,7 +232,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -327,7 +327,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -419,7 +419,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -452,7 +452,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -467,7 +467,25 @@
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -476,16 +494,52 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
+          "scope": "local",
+          "travel": "compact",
           "coordination": "independent",
-          "reason": "Label declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "Local opacity, changed name runs, compact quantity reels and readable intrinsic sizing preserve the native label association."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "label",
+                "reason": "Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "label",
+                "reason": "Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "label",
+                "reason": "Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "label",
+                "reason": "Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "label",
+                "reason": "Label integrates its root and direct primitive display owners; parent transactions, rich descendants and unsafe native layout retain their explicit owners."
+              }
+            ]
+          }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -518,7 +572,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -551,7 +605,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -646,7 +700,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -679,7 +733,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -712,7 +766,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -759,7 +813,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -792,7 +846,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -826,7 +880,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -860,7 +914,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -893,7 +947,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -927,7 +981,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -960,7 +1014,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -993,7 +1047,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1026,7 +1080,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1072,7 +1126,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1129,7 +1183,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1172,7 +1226,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1215,7 +1269,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1258,7 +1312,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1301,7 +1355,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1393,7 +1447,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1524,7 +1578,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1567,7 +1621,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1610,7 +1664,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1667,7 +1721,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1724,7 +1778,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1781,7 +1835,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1838,7 +1892,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1895,7 +1949,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -1952,7 +2006,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2075,7 +2129,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2140,7 +2194,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2205,7 +2259,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2270,7 +2324,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2335,7 +2389,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2407,7 +2461,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2474,7 +2528,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2531,7 +2585,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2577,7 +2631,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2623,7 +2677,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2735,7 +2789,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2768,7 +2822,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2816,7 +2870,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2849,7 +2903,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2892,7 +2946,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -2938,7 +2992,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3006,7 +3060,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3039,7 +3093,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3125,7 +3179,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3205,7 +3259,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3285,7 +3339,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3340,7 +3394,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3383,7 +3437,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3435,7 +3489,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3482,7 +3536,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3529,7 +3583,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3576,7 +3630,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     },
     {
@@ -3623,7 +3677,7 @@
             ]
           }
         },
-        "sourceSha": "66122ec2"
+        "sourceSha": "fddc45c1"
       }
     }
   ]

@@ -269,7 +269,8 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const result = spawnSync(
         process.execPath,
         [path.join(root, "node_modules/vitest/vitest.mjs"), "run", "--config", config],
-        { cwd: root, encoding: "utf8", timeout: 30000 },
+        // The nine migrated owners now require a larger cold source/action audit.
+        { cwd: root, encoding: "utf8", timeout: 60000 },
       );
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
@@ -300,8 +301,16 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
           expect(output).toMatch(new RegExp(`button: v2 execute ${action} on [^\\n]+ in ${mode}`));
       expect(output).not.toContain("spinner: execute expectMotionContract");
       expect(output).not.toContain("badge: execute expectMotionContract");
-      for (const id of ["spinner", "label"])
-        expect(output).toContain(`${id}: v2 ${id}.root.enter: no source-bound action plan`);
+      for (const id of ["spinner"]) expect(output).toContain(`${id}: v2 ${id}.root.enter: no source-bound action plan`);
+      for (const action of [
+        "label.root.enter",
+        "label.root.resize",
+        "label.root.colour",
+        "label.text.replace",
+        "label.value.roll",
+      ])
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toMatch(new RegExp(`label: v2 execute ${action} on [^\\n]+ in ${mode}`));
       for (const id of ["aspect-ratio", "input"])
         expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
       expect(output).toContain("aspect-ratio: state.color/css-transition: missing installed ownership");
@@ -344,5 +353,5 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
     } finally {
       if (!process.env.CADENCE_GATE_EVIDENCE) await rm(fixture, { recursive: true, force: true });
     }
-  }, 40000);
+  }, 70000);
 });

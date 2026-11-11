@@ -3,7 +3,7 @@
   "badge": ["variants", "icon", "link", "changing-content", "presence"],
   "kbd": ["single", "combination", "tooltip", "changing"],
   "separator": ["horizontal", "vertical", "decorative"],
-  "label": ["wrapping", "disabled"],
+  "label": ["wrapping", "disabled", "changing"],
   "select": [
     "sizes",
     "groups",
