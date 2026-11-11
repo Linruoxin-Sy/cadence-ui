@@ -90,6 +90,15 @@ export function unboundMotionSyntax(source) {
   const writers = new Set(),
     frames = new Set();
   const geometryPolicies = new Set();
+  const retention = new Set();
+  for (const statement of tree.statements) {
+    if (!ts.isImportDeclaration(statement) || statement.moduleSpecifier.text !== "motion/react") continue;
+    const bindings = statement.importClause?.namedBindings;
+    if (bindings && ts.isNamedImports(bindings))
+      for (const entry of bindings.elements) {
+        if ((entry.propertyName ?? entry.name).text === "AnimatePresence") retention.add(entry.name.text);
+      }
+  }
   const collectPolicies = (node) => {
     if (
       ts.isVariableDeclaration(node) &&
@@ -121,6 +130,13 @@ export function unboundMotionSyntax(source) {
   const visit = (node) => {
     if (
       ts.isJsxAttribute(node) &&
+      !(
+        node.name.getText(tree) === "initial" &&
+        retention.has(node.parent.parent.tagName?.getText(tree)) &&
+        node.initializer &&
+        ts.isJsxExpression(node.initializer) &&
+        node.initializer.expression?.kind === ts.SyntaxKind.FalseKeyword
+      ) &&
       /^(?:animate|initial|exit|whileTap|whileHover|whileFocus|whileInView|layout|layoutId)$/.test(
         node.name.getText(tree),
       )

@@ -14,7 +14,7 @@ for (const mode of MODES)
       const single = page.locator('[data-component-example="kbd/single"]');
       await expect(single.locator("kbd")).toHaveText("Esc");
       const combo = page.locator('[data-component-example="kbd/combination"]');
-      await expect(combo.locator('[data-slot="kbd-group"] > kbd')).toHaveText(["Ctrl", "Shift", "P"]);
+      await expect(combo.locator('[data-slot="kbd-group"] [data-slot="kbd"]')).toHaveText(["Ctrl", "Shift", "P"]);
       for (const card of [top, single, combo]) {
         await expect(card).toHaveAttribute("data-preview-motion", effectiveMode(mode, os));
         expect(await card.locator("kbd").evaluateAll((nodes) => nodes.every((node) => node.tabIndex === -1))).toBe(
@@ -28,7 +28,7 @@ for (const mode of MODES)
       const tooltip = page.getByRole("tooltip");
       await expect(tooltip).toBeVisible();
       await expect(tooltip).toHaveAttribute("data-motion", effectiveMode(mode, os));
-      await expect(tooltip.locator('[data-slot="kbd-group"] > kbd')).toHaveText(["⌘", "S"]);
+      await expect(tooltip.locator('[data-slot="kbd-group"] [data-slot="kbd"]')).toHaveText(["⌘", "S"]);
       expect(await trigger.getAttribute("aria-describedby")).toBe(await tooltip.getAttribute("id"));
       expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual(
         [],

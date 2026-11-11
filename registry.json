@@ -680,21 +680,52 @@
       "title": "Kbd",
       "description": "Keyboard shortcuts in tooltips, menus, and command lists.",
       "categories": ["utility"],
-      "dependencies": [],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["motion"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text"
+      ],
       "files": [
         {
           "path": "registry/cadence/kbd/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/kbd/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/kbd-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/kbd-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          "layout.move",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
+        "intensity": "medium",
         "complexity": "S",
         "upstream": {
           "registry": "shadcn",
@@ -702,14 +733,57 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "local",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Short key opacity and changed label runs accompany bounded key sizing and identity-preserving chord reflow."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "kbd",
+                "reason": "Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "kbd",
+                "reason": "Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "kbd",
+                "reason": "Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "kbd",
+                "reason": "Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "kbd",
+                "reason": "Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "kbd",
+                "reason": "Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."
+              }
+            ]
+          }
         }
       }
     },

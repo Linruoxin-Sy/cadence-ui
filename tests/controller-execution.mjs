@@ -220,6 +220,44 @@ export function observeCopiedController(controller, kind, args, source) {
     };
     return controller;
   }
+  if (kind === "createKbdKey" || kind === "createKbdExtent") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    const keys = [{}, {}];
+    controller.commit = (...input) => {
+      const offset = parameterCalls.length;
+      const result = withController(controller, () => commit(...input));
+      const options = input[0];
+      for (const [index, form, properties] of [
+        [0, "geometry.resize/measured", ["width"]],
+        ...(kind === "createKbdKey" ? [[1, "layout.move/position", ["transform"]]] : []),
+      ]) {
+        const policy = parameterCalls.slice(offset).find((call) => call.form === form);
+        if (args[0].current)
+          presentationSamples.set(keys[index], {
+            controller,
+            origin,
+            node: args[0].current,
+            form,
+            properties,
+            mode: options.cm.mode,
+            preset: policy?.preset,
+            clock: policy?.result?.transition,
+            immediate: options.cm.reduced || !options.available,
+            zeroClock: parameterClockIsZero(policy?.result),
+            target: options.revision.target,
+            revision: options.revision,
+            commits: (presentationSamples.get(keys[index])?.commits ?? 0) + 1,
+          });
+      }
+      return result;
+    };
+    controller.dispose = () => {
+      for (const key of keys) presentationSamples.delete(key);
+      return dispose();
+    };
+    return controller;
+  }
   if (kind === "createMeasuredGeometry") {
     const hosts = new Map(),
       register = controller.register.bind(controller),

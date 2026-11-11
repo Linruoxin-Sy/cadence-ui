@@ -11,6 +11,22 @@ import {
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+it("requires actual key geometry/projection writers and current native geometry authority", () => {
+  const key = readFileSync("registry/cadence/lib/kbd-layout.ts", "utf8");
+  expect(parameterWriterForms(key)).toEqual(["geometry.resize/measured", "layout.move/position"]);
+  for (const broken of [
+    key.replaceAll("node.animate(", "missing("),
+    key.replaceAll("registerTextGeometry(", "missing("),
+    key.replaceAll('from "./motion"', 'from "@/motion"'),
+  ])
+    expect(parameterWriterForms(broken)).toEqual([]);
+  const widthOnly = key.replaceAll(
+    'positionOwner.begin(input.revision, ["transform"]',
+    'missing(input.revision, ["transform"]',
+  );
+  expect(parameterWriterForms(widthOnly)).not.toContain("layout.move/position");
+});
+
 it("recognises entrance-only opacity without advertising retained exit", () => {
   const entrance = readFileSync("registry/cadence/lib/inline-entrance.ts", "utf8");
   expect(parameterWriterForms(entrance)).toEqual(["data.transition/opacity"]);

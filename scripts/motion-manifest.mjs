@@ -140,6 +140,12 @@ function detectImplementedForm(source, recipe, form) {
   if (form === "one-shot" && parameterWriterForms(source).some((target) => target.startsWith(`${recipe}/`)))
     return form;
   if (
+    recipe === "geometry.resize" &&
+    form === "measured" &&
+    kbdPresentationForms(source).includes("geometry.resize/measured")
+  )
+    return form;
+  if (
     recipe === "layout.move" &&
     form === "one-shot" &&
     imports("createTabsItem", "tabs-layout") &&
@@ -304,8 +310,28 @@ export function parameterWriterForms(source) {
       ...parameterWriterBindings(source).map((binding) => binding.form),
       ...inlinePresenceForms(source),
       ...selectPresentationForms(source),
+      ...kbdPresentationForms(source),
     ]),
   ];
+}
+
+/** Fixed key border-box/projection executor; no caller property or clock input. */
+function kbdPresentationForms(source) {
+  const selected = motionSource(source);
+  if (
+    !(selected.source.includes("function createKbdKey(") || selected.source.includes("function createKbdExtent(")) ||
+    !selected.imports.some(
+      (entry) => entry.name === "bindMotionParameters" && entry.path.startsWith(".") && entry.path.endsWith("/motion"),
+    ) ||
+    !selected.source.includes("node.animate(") ||
+    !selected.source.includes("registerTextGeometry(") ||
+    !selected.source.includes('owner.begin(input.revision, ["width"]')
+  )
+    return [];
+  return [
+    "geometry.resize/measured",
+    ...(selected.source.includes('positionOwner.begin(input.revision, ["transform"]') ? ["layout.move/position"] : []),
+  ].filter((form) => selected.source.includes(`"${form}"`));
 }
 
 /** The native factory has no raw caller clock or arbitrary property endpoint.
@@ -324,7 +350,7 @@ function inlinePresenceForms(source) {
       (entry) => entry.name === "bindMotionParameters" && entry.path.startsWith(".") && entry.path.endsWith("/motion"),
     ) ||
     !selected.source.includes("node.animate(") ||
-    !selected.source.includes('owner.begin(revision, ["opacity"]')
+    !/owner\.begin\(\s*revision,\s*\["opacity"\]/.test(selected.source)
   )
     return [];
   return [

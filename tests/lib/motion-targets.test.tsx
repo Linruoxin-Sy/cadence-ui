@@ -160,6 +160,7 @@ describe("current registry inventory and real part references", () => {
     expect([...result.contracts].filter(([, contract]) => contract.migration === "v2").map(([id]) => id)).toEqual([
       "button",
       "badge",
+      "kbd",
       "card",
       "toggle",
       "toggle-group",

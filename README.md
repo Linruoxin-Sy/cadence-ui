@@ -59,7 +59,7 @@ limits on which capabilities a component may acquire.
 | `animated-text` — changed text        | T1   | `text.change`                                                        |
 | `button` — action trigger             | T1   | `feedback.press`                                                     |
 | `badge` — status label                | T0   | none                                                                 |
-| `kbd` — key or shortcut hint          | T0   | none                                                                 |
+| `kbd` — key or shortcut hint          | T0   | [6 recipes](content/components/kbd.mdx#motion-contract)              |
 | `separator` — group boundary          | T0   | none                                                                 |
 | `label` — control name                | T0   | none                                                                 |
 | `input` — single-line field           | T0   | none                                                                 |

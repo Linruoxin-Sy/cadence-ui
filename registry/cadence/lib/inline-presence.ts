@@ -13,8 +13,7 @@ export type InlinePresenceCommit = {
 };
 
 /** Opacity only, on the original retained host. Never writes a resting opacity. */
-export function createInlinePresence(node: HTMLElement) {
-  const transaction = createMotionTransaction();
+export function createInlinePresence(node: HTMLElement, transaction = createMotionTransaction()) {
   const owner = transaction.register(node);
   let current: InlinePresenceCommit | null = null;
   let lease: MotionLease | null = null;
@@ -80,7 +79,10 @@ export function createInlinePresence(node: HTMLElement) {
     const epoch = ++generation;
     const revision = transaction.revision("presence", input.present, node);
     let handle: Animation | null = null;
-    lease = owner.begin(revision, ["opacity"], {}, () => handle?.cancel());
+    lease = owner.begin(revision, ["opacity"], { collectionVisuals: new Set([node]) }, (settled) => {
+      handle?.cancel();
+      if (settled && alive && current?.present === false) current.complete?.();
+    });
     if (!lease?.current()) return;
     const owned = lease;
     handle = node.animate(

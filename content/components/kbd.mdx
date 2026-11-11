@@ -2,15 +2,15 @@
 title: Kbd
 description: Keyboard shortcuts in tooltips, menus, and command lists.
 category: utility
-motion: []
-intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motion: ["data.transition","exit.fade","layout.move",{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"}]
+intensity: medium
+motionProfile: {"scope":"local","travel":"compact","coordination":"group","reason":"Short key opacity and changed label runs accompany bounded key sizing and identity-preserving chord reflow."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"kbd","reason":"Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."}],"exit.fade/one-shot":[{"relationship":"default","owner":"kbd","reason":"Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."}],"layout.move/one-shot":[{"relationship":"default","owner":"kbd","reason":"Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."}],"geometry.resize/measured":[{"relationship":"default","owner":"kbd","reason":"Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."}],"state.color/css-transition":[{"relationship":"default","owner":"kbd","reason":"Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."}],"text.change/changed-runs":[{"relationship":"default","owner":"kbd","reason":"Kbd integrates the exact key or chord property owner; native labels, rich content and unsafe geometry preserve immediate semantic targets."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: []
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["motion"]
+registryDeps: ["@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text"]
 ---
 
 ## Installation
@@ -31,9 +31,7 @@ npx shadcn@latest add @cadence/button @cadence/tooltip
 
 [Manual installation files](https://cadence.dev/r/kbd.json)
 
-Kbd needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `kbd/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves.
+Install the complete listed closure and shared Cadence theme. The optional CadenceProvider controls mode and clock; without it, Kbd follows system preference. Keep the listed relative paths so copied helpers resolve.
 
 For the Inside a tooltip example, also follow the installation instructions for
 [Button](/components/button#installation) and [Tooltip](/components/tooltip#installation),
@@ -116,6 +114,27 @@ export function SaveHint() {
 }
 ```
 
+## Changing shortcuts
+
+Keep stable React keys for physical chord members. Primitive labels replace only changed runs;
+numeric key names remain text. The app owns platform selection and shortcut handlers.
+
+<ComponentExample name="changing" />
+
+```tsx
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Kbd, KbdGroup } from "@/components/cadence/kbd";
+
+export function PlatformHint() {
+  const [windows, setWindows] = useState(false);
+  return <>
+    <Button onClick={() => setWindows(value => !value)}>Change platform</Button>
+    <KbdGroup><Kbd key="modifier">{windows ? "Ctrl" : "⌘"}</Kbd><Kbd key="key">K</Kbd></KbdGroup>
+  </>;
+}
+```
+
 ## When to use
 
 - A shortcut hinted next to a command: search, save, new item.
@@ -141,16 +160,20 @@ KbdGroup keeps the pinned native div prop type while rendering a `kbd` element.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Kbd declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: Short key opacity and changed label runs accompany bounded key sizing and identity-preserving chord reflow. Initial SSR/hydration content stays readable and does not replay an entrance.
 
-No motion (T0). A key hint is a label; it must not pulse or slide while the user
-is reading it.
+| Recipe | Owner / properties | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| `data.transition/one-shot` | Group or independently inserted key; opacity | Short entrance, consumed once by the parent | Short opacity | Immediate |
+| `exit.fade/one-shot` | Retained removed key; opacity | Fade before lifecycle removal | Short opacity | Immediate removal |
+| `geometry.resize/measured` | Measured key and group width, separate owners | Clamped width continuity where readable | Immediate width | Immediate width |
+| `layout.move/one-shot` | Surviving key position | Stable identity and bounded reflow | Immediate placement | Immediate placement |
+| `text.change/changed-runs` | Primitive key label; changed-runs opacity | Changed runs only, no stagger | Short changed opacity | Exact final text immediately |
+| `state.color/css-transition` | Key background, foreground and border | Scoped colour feedback | Short colour feedback | Zero clock |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+Live downgrade cancels spatial writers; none or a zero clock cancels one-shot work without changing the shortcut. New revisions replace pending targets. Caller keys preserve surviving native key and Text identity. Group removal consumes child exits. Rich JSX keeps its own structure and can compose AnimatedText explicitly. A numeric shortcut such as 9 → 10 never becomes a counter.
+
+The group measures committed destination boxes rather than following animated key widths. Unsafe overlapping labels, clipping, unsupported coordinate maps and native focus/editing commit geometry immediately. Passive viewport/font reflow stays native. Tooltip retains popup placement and its own presence contract. Its intrinsic popup consumes the chord’s final allocation immediately; internal key widths/reflow can continue without a second popup size spring. Parent closure cancels the chord’s local envelope. Unknown palettes commit colour immediately.
 
 ## Accessibility
 
@@ -166,10 +189,7 @@ is reading it.
 Keys and key groups use intrinsic inline sizes. The caller owns wrapping or scrolling long shortcut
 descriptions; these labels do not register keyboard shortcuts.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Server-rendered markup does not
-imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
-this item's own shipped source; dependencies and application bundles are measured separately.
+T0 remains the historical documentation/source-budget label. Kbd now uses the shared client motion runtime; its 4 KiB gzip source comparison is advisory under ADR-023. Functional migration does not certify page/runtime, CLS or device FPS budgets. Server/no-JS markup stays readable; application actions and enhanced changes need hydration. Long descriptions wrap outside the single-line chord; the caller owns constrained overflow.
 
 ## Notes for AI
 
