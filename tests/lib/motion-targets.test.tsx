@@ -161,13 +161,14 @@ describe("current registry inventory and real part references", () => {
       "button",
       "badge",
       "card",
+      "toggle",
       "select",
       "tabs",
     ]);
     expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(
       true,
     );
-  }, 10000); // Cold source/installation audit now covers all five pilots.
+  }, 10000); // Cold source/installation audit covers pilots and migrated catalogue items.
   it("rejects real source/dependency/index drift and accepts an extended actual inventory", async () => {
     await mkdir(path.join(root, ".cache"), { recursive: true });
     const temp = await mkdtemp(path.join(root, ".cache", "motion-target-fixture-"));

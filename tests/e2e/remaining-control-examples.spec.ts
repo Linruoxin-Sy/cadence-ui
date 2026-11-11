@@ -65,13 +65,16 @@ for (const os of ["no-preference", "reduce"] as const)
       const top = page.locator('[data-preview="toggle-group"]');
       await expect(top.getByRole("group")).toHaveCount(1);
       await expect(top.getByRole("combobox")).toHaveCount(0);
-      expect(
-        await page
-          .locator(
-            '[data-component-example^="toggle-group/"]:not([data-component-example$="/without-motion"]) [data-motion]',
-          )
-          .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
-      ).toEqual([effectiveMode(mode, os === "reduce")]);
+      await expect
+        .poll(
+          async () =>
+            await page
+              .locator(
+                '[data-component-example^="toggle-group/"]:not([data-component-example$="/without-motion"]) [data-motion]',
+              )
+              .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("data-motion")))]),
+        )
+        .toEqual([effectiveMode(mode, os === "reduce")]);
       await top.getByRole("button", { name: "Align left", exact: true }).focus();
       await page.keyboard.press("ArrowLeft");
       await expect(top.getByRole("button", { name: "Align right", exact: true })).toBeFocused();

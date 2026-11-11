@@ -274,8 +274,19 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
       expect(result.status, output).toBe(1);
-      for (const id of ["toggle", "checkbox", "switch"])
-        expect(output).toContain(`${id}: execute expectMotionContract`);
+      for (const id of ["checkbox", "switch"]) expect(output).toContain(`${id}: execute expectMotionContract`);
+      // Toggle is now v2: a dead helper call must fail every exact action/mode,
+      // rather than borrowing the old legacy adoption diagnostic.
+      for (const action of [
+        "toggle.root.enter",
+        "toggle.root.exit",
+        "toggle.feedback.press",
+        "toggle.root.colour",
+        "toggle.label.change",
+        "toggle.root.resize",
+      ])
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toMatch(new RegExp(`toggle: v2 execute ${action} on [^\\n]+ in ${mode}`));
       for (const action of [
         "button.root.enter",
         "button.root.exit",

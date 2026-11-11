@@ -7,6 +7,29 @@ import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Toggle } from "@/registry/cadence/toggle";
 import { PreviewStack } from "./shell";
 
+export function ChangingToggle() {
+  const [expanded, setExpanded] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const [large, setLarge] = useState(false);
+  return (
+    <div className="grid w-full justify-items-start gap-3">
+      <Toggle
+        style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+        pressed={pressed}
+        onPressedChange={setPressed}
+        size={large ? "lg" : "sm"}
+      >
+        {expanded ? "Preview with formatting" : "Preview"}
+      </Toggle>
+      <Button variant="outline" onClick={() => setExpanded((value) => !value)}>
+        Change label
+      </Button>
+      <Button variant="outline" onClick={() => setLarge((value) => !value)}>
+        Change size
+      </Button>
+    </div>
+  );
+}
 export function ToggleVariants() {
   return (
     <div className="flex flex-wrap gap-3">
@@ -133,7 +156,9 @@ function Specimen() {
 export function TogglePreview({ example }: { example?: string }) {
   return (
     <PreviewStack>
-      {example === "variants" ? (
+      {example === "changing-label" ? (
+        <ChangingToggle />
+      ) : example === "variants" ? (
         <ToggleVariants />
       ) : example === "sizes" ? (
         <ToggleSizes />

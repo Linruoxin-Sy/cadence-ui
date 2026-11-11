@@ -190,6 +190,8 @@ function ToggleGroupItem({ className, children, variant, size, render, ...props 
       className={(state) =>
         cn(
           toggleVariants({ size: resolvedSize }),
+          // Preserve the legacy group paint clock until its separate migration.
+          "transition-[color,background-color,box-shadow]",
           "relative w-auto min-w-0 shrink-0 rounded-md px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-pressed:bg-transparent data-pressed:text-foreground",
           resolvedVariant === "segmented" && "rounded-full",
           joined &&

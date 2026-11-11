@@ -202,3 +202,12 @@ it("controlled group owns item value, callbacks, roving focus and canceled chang
   expect(b).toBeDisabled();
   expect(screen.getByRole("group")).toHaveStyle({ opacity: 0.6 });
 });
+
+it("keeps legacy group paint feedback while Toggle owns its v2 paint policy", () => {
+  render(
+    <ToggleGroup>
+      <ToggleGroupItem value="native">Native</ToggleGroupItem>
+    </ToggleGroup>,
+  );
+  expect(screen.getByRole("button")).toHaveClass("transition-[color,background-color,box-shadow]");
+});

@@ -1730,7 +1730,13 @@
       "description": "Bold, italic, preview, and other on/off modes.",
       "categories": ["form"],
       "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text"
+      ],
       "files": [
         {
           "path": "registry/cadence/toggle/index.tsx",
@@ -1742,7 +1748,23 @@
         "since": "0.3.0",
         "tier": "T1",
         "batch": "B3",
-        "motion": ["feedback.press"],
+        "motion": [
+          "feedback.press",
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -1754,7 +1776,7 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Press feedback scales the active control in place."
+          "reason": "Independent opacity, content sizing and changed label runs accompany scoped selection colours and an inner press layer."
         },
         "motionCoverage": {
           "schema": 1,
@@ -1763,7 +1785,42 @@
               {
                 "relationship": "default",
                 "owner": "toggle",
-                "reason": "Toggle integrates press feedback at its own parts, using the reached installed executor."
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
               }
             ]
           }
@@ -2472,7 +2529,6 @@
         }
       }
     },
-
     {
       "name": "combobox",
       "type": "registry:ui",

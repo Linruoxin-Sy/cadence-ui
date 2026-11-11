@@ -10655,6 +10655,9 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -10676,6 +10679,15 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | toggle | `@components/cadence/toggle/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -10683,6 +10695,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
 
 [Source files: toggle](https://cadence.dev/r/toggle.json)
 
@@ -10839,17 +10857,14 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, keeping `toggle/index.tsx` beside the shared `lib/`
-directory and preserving the relative imports and `"use client"` directives.
-The default renderer imports `press-button.tsx`, which reaches
-`control-animation.tsx` and `native-div.tsx`; copy every file in the motion,
-utilities and provider payloads. The provider files and `motion` package are
-required imports even when you do not wrap the application in a provider.
+Copy the complete payload dependency closure, keeping `toggle/index.tsx` beside
+its shared `lib/` directory and preserving relative imports and client directives.
+The geometry and text registry dependencies are required imports even without a provider.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. Toggle needs no additional item-specific CSS or external asset. The
-default renderer uses `feedback.press` for its press scale in full; reduced and
-none keep scale at one with a zero clock. Pressed colours still communicate
+default renderer uses `feedback.press` for its primitive label press scale in full; reduced and
+none keep the inner scale at rest. Pressed colours still communicate
 state in every mode. Standalone toggles follow the system motion preference;
 the optional `CadenceProvider` controls a subtree's mode and timing. A nested
 full scope still respects system reduced motion.
@@ -10861,18 +10876,18 @@ They need this example-only dependency; Toggle itself does not:
 npm install lucide-react
 ```
 
-Controlled and Inside a form also need [Button](/components/button):
+Changing label, Controlled and Inside a form also need [Button](/components/button):
 
 ```install
 npx shadcn@latest add @cadence/button
 ```
 
-For manual installation, follow Button's Manual tab and add `button/index.tsx`.
-Its npm dependencies and shared files are already in Toggle's installation
-graph. Variants, Sizes, Disabled and Explicit motion scopes need only Toggle
+For manual installation, follow Button's Manual tab and copy its complete recursive
+payload, including its numeric presentation dependency; Toggle alone does not install
+Button's full source closure. Variants, Sizes, Disabled and Explicit motion scopes need only Toggle
 and the included helpers. The site's preview shell is not consumer setup.
 
-In Next.js App Router, Controlled and Inside a form need a client module for
+In Next.js App Router, Changing label, Controlled and Inside a form need a client module for
 `useState`, change handlers and click or submit handlers. Usage, Variants,
 Sizes, With a label, Disabled and Explicit motion scopes can be composed in a
 synchronous Server Component with the shown JSX and serializable props. A
@@ -11112,6 +11127,34 @@ export function StaticToggle() {
 }
 ```
 
+## Changing label
+
+<ComponentExample name="changing-label" />
+
+```tsx
+import { useState } from "react"
+import { Toggle } from "@/components/cadence/toggle"
+import { Button } from "@/components/cadence/button"
+
+export function ChangingToggle() {
+  const [expanded, setExpanded] = useState(false)
+  const [pressed, setPressed] = useState(false)
+  const [large, setLarge] = useState(false)
+  return <div className="grid w-full justify-items-start gap-3">
+    <Toggle style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+      pressed={pressed} onPressedChange={setPressed} size={large ? "lg" : "sm"}>
+      {expanded ? "Preview with formatting" : "Preview"}
+    </Toggle>
+    <Button variant="outline" onClick={() => setExpanded(value => !value)}>Change label</Button>
+    <Button variant="outline" onClick={() => setLarge(value => !value)}>Change size</Button>
+  </div>
+}
+```
+
+Selection, label replacement, shell sizing and release can run together. This example
+uses a font with proven native/canvas correspondence; unsupported shaping keeps exact native text. Rich icon
+labels keep their exact JSX and an icon-only button still needs an accessible name.
+
 ## When to use
 
 - A formatting or mode command that stays on until it is turned off: bold,
@@ -11140,7 +11183,7 @@ export function StaticToggle() {
 
 `toggleVariants` is exported, so a custom part can share the same classes.
 
-The default press button preserves native React `onAnimationStart`, `onDrag`,
+The default button preserves native React `onAnimationStart`, `onDrag`,
 `onDragStart` and `onDragEnd` events, including capture and cancellation. Callback
 and object refs follow the same button; replacing a callback runs its React 19
 cleanup before assigning the next ref. A caller `render` replaces the default
@@ -11148,20 +11191,28 @@ renderer and owns spreading its supplied props.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Press feedback scales the active control in place.
+Authored intensity is **subtle**: Independent opacity, content sizing and changed label runs accompany scoped selection colours and an inner press layer.
 
-Recipe: `feedback.press/one-shot`. The button compresses to 0.97 while the pointer is down
-and springs back on release.
+| Phase | Properties | Recipe | Interruptible |
+| ----- | ---------- | ------ | ------------- |
+| Independent insertion | opacity; parent presentation takes precedence | `data.transition/one-shot` | yes |
+| Parent-retained removal | opacity | `exit.fade/one-shot` | yes |
+| Pointer/keyboard hold and release | inner scale; native hit target stays stable | `feedback.press/one-shot` | yes |
+| Selection, hover, focus, disabled | scoped background, foreground, border, shadow | `state.color/css-transition` | yes |
+| Label/size revision | measured width/height on unconstrained safe axes | `geometry.resize/measured` | yes |
+| Primitive label revision | retained graphemes, changed-run opacity | `text.change/changed-runs` | yes |
 
-| Phase   | Properties       | Token            | Interruptible |
-| ------- | ---------------- | ---------------- | ------------- |
-| press   | `scale 1 → 0.97` | `feedback.press/one-shot` | yes           |
-| release | `scale 0.97 → 1` | `feedback.press/one-shot` | yes           |
-| reduced | no scale; the pressed background is the only change | – | – |
-| none    | no scale         | –                | –             |
+Full plays applicable effects. Reduced keeps short opacity/colour and makes geometry
+immediate, without press scale. None settles every property and label immediately.
+Live downgrades cancel current clocks; zero timeScale retains the native held state.
+Selected state follows Base UI immediately and survives release and timing changes.
 
-The pressed background is a colour transition, which is state feedback and stays
-in every mode — otherwise a `none` user could not see the state.
+Direct string and number children are option labels, including numeric-looking text:
+they use changed runs, never implicit numeric reels. Rich JSX and custom render
+structures retain caller ownership. A safe inner press layer is supplied for primitive
+labels with the default renderer; other structures receive colour feedback. Caller
+paint/unknown backgrounds settle text immediately when a readable transition cannot
+be established. Explicitly constrained axes and passive viewport/font reflow stay immediate.
 
 ## Keyboard interactions
 
@@ -11197,16 +11248,15 @@ scaling the button with a transform, which would blur the icon.
 
 ## Performance
 
-One Motion element, pressing only on pointer down. No layout animation, no
-measurement.
+One bounded label transaction and one measured shell; no recursive rich-child rewriting.
+Numerical performance acceptance is deferred under ADR-023.
 
 ## Notes for AI
 
 - Use `toggle` for a command that stays on; use `switch` for a preference that
   saves itself.
 - Always provide `aria-label` for icon-only toggles.
-- Do not add a `state.morph` label swap to a toggle; the press scale is the whole
-  contract.
+- Preserve option identity: direct numbers are labels, not counters.
 
 # Toggle Group
 
@@ -11239,6 +11289,9 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
 - [@cadence/toggle](https://cadence.dev/r/toggle.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -11261,6 +11314,15 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/popup-presence.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | toggle | `@components/cadence/toggle/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle.json) |
 | toggle-group | `@components/cadence/toggle-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
 
@@ -11269,6 +11331,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
 
 [Source files: toggle](https://cadence.dev/r/toggle.json)
 

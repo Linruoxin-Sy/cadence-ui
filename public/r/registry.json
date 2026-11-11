@@ -232,7 +232,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -327,7 +327,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -360,7 +360,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -393,7 +393,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -426,7 +426,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -459,7 +459,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -492,7 +492,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -587,7 +587,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -620,7 +620,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -653,7 +653,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -700,7 +700,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -733,7 +733,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -767,7 +767,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -801,7 +801,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -834,7 +834,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -868,7 +868,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -901,7 +901,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -934,7 +934,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -967,7 +967,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1013,7 +1013,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1070,7 +1070,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1113,7 +1113,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1156,7 +1156,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1199,7 +1199,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1242,7 +1242,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1258,7 +1258,21 @@
         "tier": "T1",
         "batch": "B3",
         "motion": [
-          "feedback.press"
+          "feedback.press",
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
         ],
         "intensity": "subtle",
         "complexity": "S",
@@ -1271,7 +1285,7 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Press feedback scales the active control in place."
+          "reason": "Independent opacity, content sizing and changed label runs accompany scoped selection colours and an inner press layer."
         },
         "motionCoverage": {
           "schema": 1,
@@ -1280,12 +1294,47 @@
               {
                 "relationship": "default",
                 "owner": "toggle",
-                "reason": "Toggle integrates press feedback at its own parts, using the reached installed executor."
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "toggle",
+                "reason": "Toggle integrates this executor on its exact root or safe owned label region; native and composed boundaries retain immediate fallbacks."
               }
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1352,7 +1401,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1395,7 +1444,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1438,7 +1487,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1495,7 +1544,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1552,7 +1601,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1609,7 +1658,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1666,7 +1715,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1723,7 +1772,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1780,7 +1829,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1903,7 +1952,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -1968,7 +2017,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2033,7 +2082,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2098,7 +2147,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2163,7 +2212,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2235,7 +2284,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2302,7 +2351,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2359,7 +2408,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2405,7 +2454,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2451,7 +2500,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2563,7 +2612,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2596,7 +2645,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2644,7 +2693,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2677,7 +2726,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2720,7 +2769,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2766,7 +2815,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2834,7 +2883,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2867,7 +2916,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -2953,7 +3002,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3033,7 +3082,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3113,7 +3162,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3168,7 +3217,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3211,7 +3260,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3263,7 +3312,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3310,7 +3359,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3357,7 +3406,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3404,7 +3453,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     },
     {
@@ -3451,7 +3500,7 @@
             ]
           }
         },
-        "sourceSha": "48778445"
+        "sourceSha": "19c55205"
       }
     }
   ]
