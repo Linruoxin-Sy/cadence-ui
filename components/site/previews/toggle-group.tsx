@@ -1,6 +1,7 @@
 "use client";
 import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react";
 import { useState } from "react";
+import { AnimatedNumber } from "@/registry/cadence/animated-number";
 import { Button } from "@/registry/cadence/button";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
@@ -154,6 +155,88 @@ export function StaticGroup() {
     </CadenceProvider>
   );
 }
+export function ChangingGroup() {
+  const [value, setValue] = useState(["week"]);
+  const [long, setLong] = useState(false);
+  const [large, setLarge] = useState(false);
+  const [multiple, setMultiple] = useState(false);
+  const [reorder, setReorder] = useState(false);
+  const [quantity, setQuantity] = useState(19);
+  const day = (
+    <ToggleGroupItem key="day" value="day">
+      {long ? "Day overview" : "Day"}
+    </ToggleGroupItem>
+  );
+  const week = (
+    <ToggleGroupItem key="week" value="week">
+      Week
+    </ToggleGroupItem>
+  );
+  return (
+    <div className="grid w-full justify-items-start gap-4">
+      <ToggleGroup
+        aria-label="Changing range"
+        style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+        variant="segmented"
+        value={value}
+        onValueChange={setValue}
+        multiple={multiple}
+        size={large ? "lg" : "default"}
+      >
+        {reorder ? [week, day] : [day, week]}
+        <ToggleGroupItem value="month">Month</ToggleGroupItem>
+      </ToggleGroup>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" onClick={() => setLong(!long)}>
+          Change label
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setLarge(!large)}>
+          Change size
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setReorder(!reorder)}>
+          Reorder items
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setLong(!long);
+            setLarge(!large);
+            setValue([value[0] === "month" ? "week" : "month"]);
+          }}
+        >
+          Change together
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            setMultiple(!multiple);
+            setValue(["week"]);
+          }}
+        >
+          {multiple ? "Use single selection" : "Use multiple selection"}
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => setValue([])}>
+          Clear selection
+        </Button>
+      </div>
+      <p className="text-sm text-muted-foreground" role="status">
+        Selected: {value.join(", ") || "none"}
+      </p>
+      <ToggleGroup aria-label="Explicit quantities" value={["items"]} variant="outline">
+        <ToggleGroupItem value="identity">2026</ToggleGroupItem>
+        <ToggleGroupItem value="items">
+          <span>Items</span>
+          <AnimatedNumber value={quantity} />
+        </ToggleGroupItem>
+      </ToggleGroup>
+      <Button variant="outline" size="sm" onClick={() => setQuantity(quantity + 1)}>
+        Add an item
+      </Button>
+    </div>
+  );
+}
 function Specimen() {
   return (
     <ToggleGroup variant="outline" defaultValue={["left"]} aria-label="Text alignment">
@@ -190,6 +273,8 @@ export function ToggleGroupPreview({ example }: { example?: string }) {
         <DisabledGroups />
       ) : example === "without-motion" ? (
         <StaticGroup />
+      ) : example === "changing-content" ? (
+        <ChangingGroup />
       ) : (
         <Specimen />
       )}

@@ -64,7 +64,9 @@ describe("real registry template entry", { timeout: 15_000 }, () => {
   }, 15_000);
   it("accepts all 59 real tier/block bodies through the CLI", () => {
     expect(entry(badgePath, badge).status).toBe(0);
-  }, 15_000);
+    // This cold success path checks the entire expanding catalogue. Its finite
+    // operational deadline is separate from component performance acceptance.
+  }, 30_000);
   it.each([
     ["missing performance", without(badge, "Responsiveness and performance"), "expected one ## Responsive behavior"],
     ["missing required rationale", without(badge, "When to use"), "expected one ## When to use"],
@@ -143,16 +145,16 @@ describe("real registry template entry", { timeout: 15_000 }, () => {
       writeFileSync(path.join(fixture, badgePath), badge);
     }
   });
-  it("requires standard-tier keyboard coverage and input ownership", () => {
-    for (const [name, heading] of [
-      ["dialog", "Keyboard interactions"],
-      ["input", "Validation and data ownership"],
-    ] as const) {
-      const file = `content/components/${name}.mdx`;
-      const result = entry(file, without(readFileSync(file, "utf8"), heading));
-      expect(result.status).toBe(1);
-      expect(result.output).toContain(`${file}: expected one ## ${heading}`);
-    }
+  // Each real CLI rejection keeps the same deadline and yields its own receipt.
+  // Combining both cold full-catalogue subprocesses exceeded the single deadline.
+  it.each([
+    ["dialog", "Keyboard interactions"],
+    ["input", "Validation and data ownership"],
+  ] as const)("requires %s coverage: %s", (name, heading) => {
+    const file = `content/components/${name}.mdx`;
+    const result = entry(file, without(readFileSync(file, "utf8"), heading));
+    expect(result.status).toBe(1);
+    expect(result.output).toContain(`${file}: expected one ## ${heading}`);
   });
   it("allows extra examples, API parts, fences and comments", () => {
     const catalogPath = path.join(fixture, "components/site/previews/examples.json");

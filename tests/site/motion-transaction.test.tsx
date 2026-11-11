@@ -2,10 +2,49 @@ import { describe, expect, it, vi } from "vitest";
 import {
   collectMotionVisuals,
   createMotionTransaction,
+  knownTextGeometry,
   type MotionSettlement,
+  registerTextGeometry,
 } from "@/registry/cadence/lib/motion-transaction";
 
 describe("committed motion ownership", () => {
+  it("keeps text geometry proof scoped to a live lease and rejects unrelated properties", () => {
+    const scope = createMotionTransaction(),
+      host = document.createElement("div"),
+      owner = scope.register(host);
+    document.body.append(host);
+    const lease = owner.begin(scope.revision("content", 1), ["transform", "width"], {}, () => {});
+    if (!lease) throw new Error("missing geometry owner");
+    let frames: Keyframe[] = [{ transform: "translate(12px,0px)" }];
+    const animation = { effect: { target: host, getKeyframes: () => frames } } as unknown as Animation;
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    registerTextGeometry(animation, lease, "full");
+    expect(knownTextGeometry(animation, "full")).toBe(true);
+    frames = [{}];
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    frames = [{ transform: "translate(12px,0px)" }];
+    expect(knownTextGeometry(animation, "reduced")).toBe(false);
+    expect(knownTextGeometry(animation, "none")).toBe(false);
+    const foreign = document.createElement("div");
+    document.body.append(foreign);
+    (animation.effect as KeyframeEffect).target = foreign;
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    (animation.effect as KeyframeEffect).target = host;
+    frames = [{ transform: "scale(0.97)" }];
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    frames = [{ transform: "translate(1e+-2px,0px)" }];
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    frames = [{ opacity: 0.5 }];
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    frames = [{ height: "30px" }];
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    frames = [{ width: "120px" }];
+    expect(knownTextGeometry(animation, "full")).toBe(true);
+    lease.cancel();
+    expect(knownTextGeometry(animation, "full")).toBe(false);
+    host.remove();
+    foreign.remove();
+  });
   it("preflights proposed shells/markers against still-active visuals before adapter reads", () => {
     const scope = createMotionTransaction();
     const host = {},

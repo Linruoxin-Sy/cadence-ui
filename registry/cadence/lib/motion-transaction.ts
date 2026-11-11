@@ -1,3 +1,4 @@
+import type { CadenceMode } from "./motion";
 import { motionLimits } from "./motion";
 
 export type MotionCause =
@@ -29,6 +30,66 @@ export interface MotionSettlement {
 }
 type Active = { entity: unknown; work: Work; revoke(settle?: boolean): (() => void) | undefined };
 const writers = new WeakMap<object, Map<string, object>>();
+const textGeometry = new WeakMap<Animation, { lease: MotionLease; mode: CadenceMode }>();
+const leaseGeometry = new WeakMap<MotionLease, { host: object; properties: string[] }>();
+
+/** Internal proof for final-width, non-scaling strip projections. A bare caller
+ * animation, an expired owner or a changed property family never gets this path. */
+export function registerTextGeometry(animation: Animation, lease: MotionLease, mode: CadenceMode) {
+  textGeometry.set(animation, { lease, mode });
+}
+export function knownTextGeometry(animation: Animation, mode?: CadenceMode) {
+  const source = textGeometry.get(animation),
+    proof = source && leaseGeometry.get(source.lease);
+  if (
+    mode !== "full" ||
+    source?.mode !== mode ||
+    !source.lease.current() ||
+    !proof ||
+    (animation.effect as KeyframeEffect | null)?.target !== proof.host
+  )
+    return false;
+  if (typeof Element === "undefined" || !(proof.host instanceof Element) || !proof.host.isConnected) return false;
+  const frames = (animation.effect as KeyframeEffect | null)?.getKeyframes?.() ?? [];
+  if (frames.length > motionLimits.collectionVisuals) return false;
+  const properties = frames
+    .flatMap((frame) => Object.keys(frame))
+    .filter((key) => !["offset", "computedOffset", "easing", "composite"].includes(key));
+  if (!properties.length) return false;
+  return (
+    frames.length > 0 &&
+    frames.every((frame) =>
+      Object.entries(frame).every(([key, value]) => {
+        if (["offset", "computedOffset", "easing", "composite"].includes(key)) return true;
+        if (!proof.properties.includes(key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`))) return false;
+        if (key === "transform") {
+          const match = typeof value === "string" && value.match(/^translate\(([-\d.e+]+)px,\s*([-\d.e+]+)px\)$/);
+          return !!match && match.slice(1).every((part) => Number.isFinite(Number(part)));
+        }
+        return ["width", "height", "minWidth", "maxWidth", "minHeight", "maxHeight", "flex", "justifyContent"].includes(
+          key,
+        );
+      }),
+    )
+  );
+}
+export function textGeometryProperties(node: HTMLElement, mode?: CadenceMode) {
+  const result = new Set<string>();
+  const animations = node.getAnimations?.() ?? [];
+  if (animations.length > motionLimits.collectionVisuals) return result;
+  for (const animation of animations) {
+    const frames = (animation.effect as KeyframeEffect | null)?.getKeyframes?.() ?? [];
+    if (frames.length > motionLimits.collectionVisuals) return new Set<string>();
+    const keys = frames
+      .flatMap((frame) =>
+        Object.keys(frame).map((key) => key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)),
+      )
+      .filter((key) => /^(?:width|height|min-width|max-width|min-height|max-height|transform)$/.test(key));
+    if (keys.length && !knownTextGeometry(animation, mode)) return new Set<string>();
+    if (knownTextGeometry(animation, mode)) for (const key of keys) result.add(key);
+  }
+  return result;
+}
 
 /** Preflight a known render/registration set before measuring or allocating copies. */
 export function collectMotionVisuals(visuals: ReadonlySet<object>): readonly object[] | null {
@@ -253,6 +314,7 @@ export function createMotionTransaction() {
           };
           const record: Active = { entity, work: requested, revoke };
           current = lease;
+          leaseGeometry.set(lease, { host, properties: owned });
           for (const property of owned) family.set(property, identity);
           active.add(record);
           return lease;

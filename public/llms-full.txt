@@ -11293,6 +11293,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
 - [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
 - [@cadence/toggle](https://cadence.dev/r/toggle.json) — direct registry dependency.
+- [@cadence/cadence-selection](https://cadence.dev/r/cadence-selection.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -11324,7 +11325,13 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
 | toggle | `@components/cadence/toggle/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle.json) |
+| cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-selection | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | toggle-group | `@components/cadence/toggle-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
+| toggle-group | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
+| toggle-group | `@components/cadence/lib/selection-strip.ts` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
+| toggle-group | `@components/cadence/lib/toggle-group-colour.ts` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
+| toggle-group | `@components/cadence/lib/toggle-group-motion.tsx` | [JSON files[].content](https://cadence.dev/r/toggle-group.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -11339,6 +11346,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
 
 [Source files: toggle](https://cadence.dev/r/toggle.json)
+
+[Source files: cadence-selection](https://cadence.dev/r/cadence-selection.json)
 
 [Source files: toggle-group](https://cadence.dev/r/toggle-group.json)
 
@@ -11495,21 +11504,20 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten target files, preserving the sibling `toggle/`, `toggle-group/`
+Copy every listed target, preserving the sibling `toggle/`, `toggle-group/`
 and shared `lib/` directories, relative imports and `"use client"` directives.
-The group imports Toggle's variant classes, and its default item renderer
-reaches `press-button.tsx`, `control-animation.tsx` and `native-div.tsx`.
-Copy every file in the listed payloads; the provider files and `motion` package
-are required imports even without an application provider wrapper.
+The group shares Toggle's variant classes and the installed motion executors.
+Provider files and `motion` are required imports even without a provider wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
-files. No additional item-specific CSS or external asset is required. In full,
-`feedback.press` scales item content, `layout.shared` moves a decorative fill
-within each single-selection group, and `state.morph` fades/scales local fills
-in multiple selection. Reduced drops press scale and shared travel but keeps
-local opacity feedback; none settles all three immediately. Standalone groups
-follow the system motion preference. The optional `CadenceProvider` controls
-mode and timing; a nested full scope still respects system reduced motion.
+files. No extra item CSS or external asset is required. Full mode provides one
+group entrance, coordinated strip geometry/reflow, a shared single-selection
+plate or local multiple-selection indicators, scoped colours, changed primitive
+text and safe inner press feedback. Reduced settles geometry and scale while
+retaining short opacity/colour; none settles every property immediately. A full
+zero clock preserves the accepted held pose and settles timing immediately.
+Standalone groups follow the system preference; nested full scopes still respect
+system reduced motion.
 
 Usage, the top specimen, Multiple and Vertical use icons. They need this
 example-only package; Toggle Group itself does not:
@@ -11852,6 +11860,52 @@ export function StaticGroup() {
 }
 ```
 
+## Changing content
+
+Change a label, size or item order independently, or use Change together to revise
+selection and layout in one commit. Clear removes the plate; restoration starts
+at the current item. Multiple selection keeps local decorations attached to their
+own items. Numeric-looking option labels remain identities. An explicitly composed
+[Animated Number](/components/animated-number) owns the Items quantity.
+
+<ComponentExample name="changing-content" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/cadence/toggle-group";
+
+export function ChangingRange() {
+  const [long, setLong] = useState(false);
+  const [value, setValue] = useState(["week"]);
+  return (
+    <div className="grid justify-items-start gap-3">
+      <ToggleGroup
+        variant="segmented"
+        value={value}
+        onValueChange={setValue}
+        aria-label="Changing range"
+        style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+      >
+        <ToggleGroupItem value="day">{long ? "Day overview" : "Day"}</ToggleGroupItem>
+        <ToggleGroupItem value="week">Week</ToggleGroupItem>
+        <ToggleGroupItem value="month">Month</ToggleGroupItem>
+      </ToggleGroup>
+      <Button variant="outline" onClick={() => setLong(!long)}>Change label</Button>
+    </div>
+  );
+}
+```
+
+This example also uses Button and Animated Number. Install them for the full live
+composition; their motion remains separately owned:
+
+```install
+npx shadcn@latest add @cadence/button @cadence/animated-number
+```
+
 ## When to use
 
 - A small set of modes that belong to one control: text alignment, view density,
@@ -11893,38 +11947,54 @@ export function StaticGroup() {
 | `disabled`  | `boolean`| `false` | Keeps it visible but unpressable.    |
 | `className` | `string` / state callback | –       | Merged last.                         |
 
-The default press button preserves native React `onAnimationStart`, `onDrag`,
-`onDragStart` and `onDragEnd` events, including capture and cancellation. Callback
-and object refs follow the same button; replacing a callback runs its React 19
-cleanup before assigning the next ref. A caller `render` replaces the default
-renderer and owns spreading its supplied props.
+Native React animation/drag events, cancellation and React 19 callback/object
+refs stay on the original target. Both Base UI `render` forms receive their native
+props and state. Rich JSX and custom item renders keep their content structure
+and omit automatic press/text enhancement when safe separation is unavailable.
 
 ## Motion contract
 
-Authored intensity is **medium**: A shared selected highlight moves among stable controls, alongside local press and glyph feedback.
+Authored intensity is **medium**: One group entrance and measured strip coordinate shared or local selection, retained item reflow, primitive changed runs and independent press feedback.
 
-Single selection uses one shared decorative fill scoped to each group. Multiple
-selection keeps one local fill per item. Neither changes the buttons' layout
-boxes; corner changes that join neighboring fills are immediate state styling.
+| Phase | Properties | Token | Interruptible |
+| ----- | ---------- | ----- | ------------- |
+| insertion | root opacity, no item stagger | `data.transition/one-shot` | yes |
+| single selection | one plate transform in group-content coordinates | `layout.shared/selection` | yes |
+| multiple selection | local indicator opacity and scale | `state.morph/one-shot` | yes |
+| press / release | safe inner content scale | `feedback.press/one-shot` | yes |
+| label, set or size revision | measured strip dimensions | `geometry.resize/measured` | yes |
+| retained item reflow | item translation, coupled to selection plate | `layout.move/one-shot` | yes |
+| state / variant | scoped track, item foreground, indicator surface and border/shadow paint | `state.color/css-transition` | yes |
+| primitive label revision | changed-run opacity, retained native Text node | `text.change/changed-runs` | yes |
+| reduced | immediate layout/plate/press; short eligible opacity and colour | – | yes |
+| none | final selection, text and every property; zero duration/delay | – | yes |
 
-| Phase   | Properties       | Token            | Interruptible |
-| ------- | ---------------- | ---------------- | ------------- |
-| press   | `scale 1 → 0.97` | `feedback.press/one-shot` | yes           |
-| release | `scale 0.97 → 1` | `feedback.press/one-shot` | yes           |
-| single selection | fill transform between items | `layout.shared/one-shot` | yes |
-| multiple selection | fill opacity and `scale 0.96 → 1` | `state.morph/one-shot` | yes |
-| reduced | shared fill jumps; local fills fade; no press scale | – | – |
-| none | immediate selection, opacity and press state; zero duration | – | – |
+First placement and restoration after an empty selection are immediate. A
+controlled request never moves the plate before the value is accepted. Single
+and multiple decorations belong to this group instance, so equal item values in
+another group cannot share a plate or press origin. Multi-select has no travelling
+shared plate and single-select has no second selected fill under it.
 
-Press scale applies only to the content, keeping the button and decorative fill
-in the group's common stacking context. A travelling fill stays below all labels
-and icons, including the items it crosses and the focused destination.
+The group lays exact labels out at their final widths, then projects safe retained
+positions and strip extent from one snapshot. A fixed selection follows that same
+projection. A safe simultaneous selection/reflow composes the selection clock and strip
+projection once in the same plate writer. An unsafe custom adapter, missing source,
+focused or held layout settles the affected geometry together; independent press/text/colour owners
+remain eligible under their actual mode. Growth never introduces truncation. Passive
+font/viewport changes settle immediately. Caller scrolling is preserved.
 
-Full mode uses the velocity-preserving shared spring. Reduced, none and a zero
-recipe clock render a static single-selection fill, cancelling an in-flight
-projection without replacing the focused button. Local fills keep opacity under
-reduced and settle immediately under none. All animated parts expose
-`data-motion`; every duration, scale and spring comes from Cadence tokens.
+The actual rendered plate/track/foreground palette is checked across the affected
+labels. Unknown or unreadable combinations place the plate and known affected paint
+immediately. Focus feedback is immediate. Rich children remain composed and only an
+explicit quantitative child rolls digits; an ordinary numeric option label uses
+text replacement. Native editing, copying and selection take precedence over paint.
+
+A live downgrade cancels existing spatial writers. None cancels every clock; a zero
+clock in full instead retains a held `scale.press` pose until release. Disabling,
+blur or a changed native action clears local feedback without changing selection.
+SSR and no-JS show the current selected decoration and exact text; hydration does
+not replay an entrance. Later insertion has one root opacity owner, with parent
+appearance taking precedence.
 
 ## Keyboard interactions
 
@@ -11965,10 +12035,14 @@ switch to `orientation="vertical"` or replace the group with a `select`.
 
 ## Performance
 
-One shared layout identity per single-selection group; Motion measures the fill
-when selection changes. Multiple selection uses one local opacity/scale fill per
-item. Press feedback stays on demand. No observers, timers or render-time layout
-reads; use small option sets rather than long lists.
+One bounded registration set and natural measurement strip per group; one
+shared selection projection or item-local indicator controls. Geometry is read
+only after commit, with one ResizeObserver for the group/selected target and
+bounded environment invalidation. Changed-text paint uses the shared finite-work
+transaction, preserving one current accessible/copyable value. Rich or unsupported
+layouts retain native exact content. No timers, per-glyph observers or render-time
+layout reads. Performance governance is deferred under ADR-023; historical budget
+exceedances and unmeasured device performance remain unresolved.
 
 ## Notes for AI
 
@@ -26741,6 +26815,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-selection | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
@@ -26755,7 +26830,6 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | tabs | `@components/cadence/tabs/index.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 | tabs | `@components/cadence/lib/tabs-motion.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
-| tabs | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 | tabs | `@components/cadence/lib/tabs-colour.ts` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)

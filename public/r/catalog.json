@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -458,7 +458,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -497,7 +497,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -534,7 +534,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -573,7 +573,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -610,7 +610,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -717,7 +717,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -754,7 +754,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -793,7 +793,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -848,7 +848,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -887,7 +887,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -927,7 +927,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -969,7 +969,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1010,7 +1010,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1052,7 +1052,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1094,7 +1094,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -1134,7 +1134,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -1174,7 +1174,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -1229,7 +1229,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -1297,7 +1297,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -1350,7 +1350,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -1402,7 +1402,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -1453,7 +1453,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -1505,7 +1505,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -1609,7 +1609,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -1630,15 +1630,45 @@
       "@cadence/cadence-motion",
       "@cadence/cadence-provider",
       "@cadence/cadence-utils",
-      "@cadence/toggle"
+      "@cadence/toggle",
+      "@cadence/cadence-selection"
     ],
     "since": "0.3.0",
     "tier": "T3",
     "batch": "B3",
     "motion": [
-      "feedback.press",
-      "layout.shared",
-      "state.morph"
+      {
+        "recipe": "data.transition",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "layout.shared",
+        "form": "selection"
+      },
+      {
+        "recipe": "state.morph",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "feedback.press",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "layout.move",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      }
     ],
     "intensity": "medium",
     "complexity": "M",
@@ -1659,35 +1689,70 @@
       "scope": "collection",
       "travel": "compact",
       "coordination": "group",
-      "reason": "A shared selected highlight moves among stable controls, alongside local press and glyph feedback."
+      "reason": "One group entrance and measured strip coordinate shared or local selection, retained item reflow, primitive changed runs and independent press feedback."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "feedback.press/one-shot": [
+        "data.transition/one-shot": [
           {
             "relationship": "default",
             "owner": "toggle-group",
-            "reason": "Toggle Group integrates press feedback at its own parts, using the reached installed executor."
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
           }
         ],
-        "layout.shared/one-shot": [
+        "layout.shared/selection": [
           {
             "relationship": "default",
             "owner": "toggle-group",
-            "reason": "Toggle Group integrates selected-indicator continuity at its own parts, using the reached installed executor."
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
           }
         ],
         "state.morph/one-shot": [
           {
             "relationship": "default",
             "owner": "toggle-group",
-            "reason": "Toggle Group integrates local state/glyph feedback at its own parts, using the reached installed executor."
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+          }
+        ],
+        "feedback.press/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "toggle-group",
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "toggle-group",
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+          }
+        ],
+        "layout.move/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "toggle-group",
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "toggle-group",
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "toggle-group",
+            "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
           }
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -1740,7 +1805,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -1791,7 +1856,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -1858,7 +1923,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -1924,7 +1989,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -1990,7 +2055,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -2056,7 +2121,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -2124,7 +2189,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -2190,7 +2255,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -2326,7 +2391,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -2402,7 +2467,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -2477,7 +2542,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -2552,7 +2617,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -2627,7 +2692,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -2712,7 +2777,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -2794,7 +2859,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -2860,7 +2925,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -2916,7 +2981,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -2971,7 +3036,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -3098,7 +3163,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -3135,7 +3200,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -3193,7 +3258,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -3232,7 +3297,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -3284,7 +3349,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -3343,7 +3408,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -3422,7 +3487,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -3462,7 +3527,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -3570,7 +3635,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -3662,7 +3727,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -3753,7 +3818,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -3819,7 +3884,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -3872,7 +3937,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -3932,7 +3997,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -3984,7 +4049,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -4036,7 +4101,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -4090,7 +4155,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -4142,7 +4207,7 @@
         ]
       }
     },
-    "sourceSha": "19c55205",
+    "sourceSha": "8332a014",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

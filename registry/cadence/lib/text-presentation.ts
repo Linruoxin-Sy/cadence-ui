@@ -11,7 +11,13 @@ import {
   textReplace,
 } from "./motion";
 import { type MotionEnvironment, subscribeMotionEnvironment } from "./motion-environment";
-import { createMotionTransaction, type MotionLease, type MotionRevision } from "./motion-transaction";
+import {
+  createMotionTransaction,
+  knownTextGeometry,
+  type MotionLease,
+  type MotionRevision,
+  textGeometryProperties,
+} from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
 import { boundTextRevision, changedTextGroups, createTextSnapshot, diffText, shapeTextDiff } from "./text-diff";
 import {
@@ -21,6 +27,7 @@ import {
   ownedTextHighlights,
   proveTextLayout,
   selectedTextContext,
+  surfaceOnlyAnimation,
   textSurfacePaint,
 } from "./text-layout";
 
@@ -43,6 +50,8 @@ export interface TextPresentationCommit {
   deferHandoff?: boolean;
   /** Expected prior display when a compound primitive changes renderer in an editor. */
   nativeBaseline?: string;
+  /** Final-width selection-strip adapter; authority still requires real current leases. */
+  stripGeometry?: boolean;
 }
 
 /** Internal plain-string boundary. One native Text node; no child traversal,
@@ -82,53 +91,70 @@ export function createTextPresentation(
   let mask: { name: string; highlight: Highlight; sheet: CSSStyleSheet } | null = null;
   let environment: MotionEnvironment = { hidden: false, immediate: false, reduced: false, themeOwned: false };
   const signature = () =>
-    chain
-      .map((node) => {
-        const css = view?.getComputedStyle(node);
-        return (
-          css &&
-          [
-            css.font,
-            css.color,
-            css.whiteSpace,
-            css.letterSpacing,
-            css.wordSpacing,
-            css.textTransform,
-            css.textDecorationLine,
-            css.fontFeatureSettings,
-            css.fontVariationSettings,
-            css.opacity,
-            css.visibility,
-            css.display,
-            css.width,
-            css.height,
-            css.transform,
-            css.translate,
-            css.scale,
-            css.rotate,
-            css.filter,
-            css.perspective,
-            css.position,
-            css.overflowX,
-            css.overflowY,
-            css.clipPath,
-            css.maskImage,
-            css.backdropFilter,
-            css.contentVisibility,
-            css.contain,
-            css.willChange,
-            css.borderTopLeftRadius,
-            css.borderTopRightRadius,
-            css.borderBottomLeftRadius,
-            css.borderBottomRightRadius,
-            css.zoom,
-          ].join("/")
-        );
-      })
-      .join("|");
-  let paintSignature = "";
+    chain.map((node) => {
+      const css = view?.getComputedStyle(node);
+      return css
+        ? {
+            paint: [
+              css.font,
+              css.color,
+              css.whiteSpace,
+              css.letterSpacing,
+              css.wordSpacing,
+              css.textTransform,
+              css.textDecorationLine,
+              css.fontFeatureSettings,
+              css.fontVariationSettings,
+              css.opacity,
+              css.visibility,
+              css.display,
+              css.translate,
+              css.scale,
+              css.rotate,
+              css.filter,
+              css.perspective,
+              css.position,
+              css.overflowX,
+              css.overflowY,
+              css.clipPath,
+              css.maskImage,
+              css.backdropFilter,
+              css.contentVisibility,
+              css.contain,
+              css.willChange,
+              css.borderTopLeftRadius,
+              css.borderTopRightRadius,
+              css.borderBottomLeftRadius,
+              css.borderBottomRightRadius,
+              css.zoom,
+            ].join("/"),
+            width: css.width,
+            height: css.height,
+            transform: css.transform,
+          }
+        : null;
+    });
+  let auditFrame: number | null = null;
+  let paintSignature: ReturnType<typeof signature> = [];
+  const sameSignature = () => {
+    const next = signature();
+    return next.every((value, index) => {
+      const before = paintSignature[index];
+      const node = chain[index];
+      if (!value || !before || !node || value.paint !== before.paint) return false;
+      const geometry = current?.stripGeometry ? textGeometryProperties(node, current.cm.mode) : new Set<string>();
+      return (
+        ([...geometry].some((key) => /^(?:width|min-width|max-width)$/.test(key)) || value.width === before.width) &&
+        ([...geometry].some((key) => /^(?:height|min-height|max-height)$/.test(key)) ||
+          value.height === before.height) &&
+        (geometry.has("transform") || value.transform === before.transform)
+      );
+    });
+  };
   const plain = () => host.childNodes.length <= 1 && (!host.firstChild || host.firstChild.nodeType === 3);
   const stop = () => {
+    if (auditFrame !== null) view?.cancelAnimationFrame(auditFrame);
+    auditFrame = null;
     generation++;
     const old = animations;
     animations = [];
@@ -172,7 +198,7 @@ export function createTextPresentation(
       stop();
   };
   const mutations = new MutationObserver((changes) => {
-    if (changes.some((change) => change.type !== "attributes") || signature() !== paintSignature) stop();
+    if (changes.some((change) => change.type !== "attributes") || !sameSignature()) stop();
     restrictions();
     if (changes.some((change) => change.type !== "attributes")) {
       if (editing) nativeOwned = true;
@@ -363,6 +389,7 @@ export function createTextPresentation(
           cm.mode !== previous.cm.mode ||
           options.granularity !== previous.granularity ||
           options.locale !== previous.locale ||
+          options.stripGeometry !== previous.stripGeometry ||
           cm.timeScale === 0 ||
           options.visible === false ||
           clock.kind !== "text" ||
@@ -413,11 +440,12 @@ export function createTextPresentation(
         clock.kind === "text" &&
         Number(clock.enter.duration) > 0 &&
         available();
-      const before = canAnimate ? proveTextLayout(host, snapshot, { surfacePaint: true }) : null;
+      const geometryMode = options.stripGeometry ? cm.mode : undefined;
+      const before = canAnimate ? proveTextLayout(host, snapshot, { surfacePaint: true, geometryMode }) : null;
       const text = exact(value, diff);
       if (!sameEntity) snapshot = createTextSnapshot(value, options.locale);
       baseline = false;
-      const after = before && proveTextLayout(host, snapshot, { surfacePaint: true });
+      const after = before && proveTextLayout(host, snapshot, { surfacePaint: true, geometryMode });
       mutations.takeRecords();
       const proof =
         before &&
@@ -562,6 +590,33 @@ export function createTextPresentation(
           doc.body.append(layer);
           releaseLayoutAnchor = followTextLayout(host, layer, stop);
           if (!releaseLayoutAnchor) throw new Error("Native display anchor unavailable");
+          const audit = () => {
+            auditFrame = null;
+            if (!alive || !layer || !lease?.current() || !current) {
+              stop();
+              return;
+            }
+            let count = 0;
+            for (const node of chain) {
+              if (!node.getAnimations) {
+                stop();
+                return;
+              }
+              const handles = node.getAnimations();
+              count += handles.length;
+              if (
+                count > motionLimits.collectionVisuals ||
+                handles.some(
+                  (animation) => !knownTextGeometry(animation, current?.cm.mode) && !surfaceOnlyAnimation(animation),
+                )
+              ) {
+                stop();
+                return;
+              }
+            }
+            auditFrame = view.requestAnimationFrame(audit);
+          };
+          if (options.stripGeometry) auditFrame = view.requestAnimationFrame(audit);
           for (const { canvas, incoming: entering, index } of paints) {
             const transition = entering ? clock.enter : clock.exit;
             const animation = canvas.animate(

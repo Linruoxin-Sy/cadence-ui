@@ -1,10 +1,15 @@
 "use client";
 
 import { animateSingleValue, motionValue, type Transition } from "motion/react";
-import { motionLimits } from "./motion";
+import { type CadenceMode, motionLimits } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
 import type { MotionHostRef } from "./motion-ref";
-import { createMotionTransaction, type MotionLease, type MotionRevision } from "./motion-transaction";
+import {
+  createMotionTransaction,
+  type MotionLease,
+  type MotionRevision,
+  registerTextGeometry,
+} from "./motion-transaction";
 import type { SelectionBox } from "./selection-projection";
 
 export type TabsStripSnapshot = {
@@ -17,9 +22,12 @@ export type TabsStripSnapshot = {
   blockSize: number;
   velocity?: number;
   crossWidth?: number;
+  crossHeight?: number;
   selected?: HTMLElement;
   clipped?: boolean;
+  crossClipped?: boolean;
   velocities?: Map<HTMLElement, { x: number; y: number }>;
+  markerVelocity?: SelectionBox;
 };
 
 /** A trigger owns its transform; the list supplies its one shared projection. */
@@ -31,6 +39,7 @@ export function createTabsItem(host: MotionHostRef<HTMLElement>, transaction = c
   let revision: MotionRevision | null = null,
     immediate = true;
   let clock = "";
+  let mode: CadenceMode = "none";
   let effect: Animation | null = null,
     lease: MotionLease | null = null;
   const cancel = () => {
@@ -41,8 +50,10 @@ export function createTabsItem(host: MotionHostRef<HTMLElement>, transaction = c
     old?.cancel();
   };
   return {
-    commit(next: MotionRevision, transition: Transition, instant: boolean) {
+    commit(next: MotionRevision, transition: Transition, instant: boolean, policy: CadenceMode) {
+      if (revision !== next) cancel();
       revision = next;
+      mode = policy;
       clock = JSON.stringify(transition);
       immediate = instant || transition.duration === 0;
       if (immediate) cancel();
@@ -57,6 +68,7 @@ export function createTabsItem(host: MotionHostRef<HTMLElement>, transaction = c
       lease = owner.begin(revision, ["transform"], { collectionVisuals: visuals }, cancel);
       if (!lease) return false;
       effect = node.animate({}, { duration: 0, fill: "both" });
+      registerTextGeometry(effect, lease, mode);
       return true;
     },
     write(x: number, y: number) {
@@ -73,7 +85,8 @@ export function createTabsItem(host: MotionHostRef<HTMLElement>, transaction = c
 
 /** One clamped projection for strip extent, retained positions and marker attachment.
  * Natural endpoints are read by the adapter after releasing these overlays.
- * A concurrent selection cannot borrow this clock: that transaction settles as a unit.
+ * An optional selection path has its own clock, composed with this projection
+ * by the same marker writer. Existing adapters without that path keep their policy.
  */
 export function createTabsLayout(
   host: MotionHostRef<HTMLElement>,
@@ -84,12 +97,14 @@ export function createTabsLayout(
   const phase = motionValue(1);
   const extent = motionValue(0);
   const cross = motionValue(0);
+  const selectionPhase = motionValue(1);
   let previous: MotionRevision | null = null;
   let baseline: TabsStripSnapshot | null = null;
-  let path: { from: TabsStripSnapshot; to: TabsStripSnapshot } | null = null;
+  let path: { from: TabsStripSnapshot; to: TabsStripSnapshot; selection?: SelectionBox } | null = null;
   let alive = true;
   let restricted = false;
   let signature = "";
+  let generation = 0;
   const effects = new Map<HTMLElement, Animation>();
   const leases: MotionLease[] = [];
   const owners: ReturnType<typeof transaction.register>[] = [];
@@ -101,6 +116,37 @@ export function createTabsLayout(
     width: interpolate(a.width, b.width),
     height: interpolate(a.height, b.height),
   });
+  const markerSample = (velocity = false): SelectionBox | null => {
+    if (!path?.to.marker) return null;
+    const targetItem = path.to.selected && path.to.items.get(path.to.selected);
+    const previousItem = path.to.selected && path.from.items.get(path.to.selected);
+    const sourceItem = path.from.selected && path.from.items.get(path.from.selected);
+    const finalSource = path.from.selected && path.to.items.get(path.from.selected);
+    const p = progress(),
+      q = Math.max(0, Math.min(1, selectionPhase.get()));
+    const result = { ...path.to.marker };
+    for (const key of ["x", "y", "width", "height"] as const) {
+      // Native labels already use destination dimensions. Position projects with
+      // reflow; selection changes its four bounds along a separate smooth clock.
+      const shift =
+        key === "x" || key === "y" ? (previousItem?.[key] ?? targetItem?.[key] ?? 0) - (targetItem?.[key] ?? 0) : 0;
+      const end = path.to.marker[key] + shift * (1 - p);
+      const sourceShift = sourceItem && finalSource ? finalSource[key] - sourceItem[key] : 0;
+      const start = (path.selection?.[key] ?? end) + (path.selection ? sourceShift * p : 0);
+      result[key] = velocity
+        ? path.selection
+          ? ((1 - q) * sourceShift - q * shift) * phase.getVelocity() + (end - start) * selectionPhase.getVelocity()
+          : -shift * phase.getVelocity()
+        : path.selection
+          ? start + (end - start) * q
+          : end;
+    }
+    if (!velocity) {
+      result.width = Math.max(0, result.width);
+      result.height = Math.max(0, result.height);
+    }
+    return result;
+  };
   const sample = (): TabsStripSnapshot | null =>
     path
       ? {
@@ -112,20 +158,8 @@ export function createTabsLayout(
           items: new Map(
             [...path.to.items].map(([node, target]) => [node, box(path?.from.items.get(node) ?? target, target)]),
           ),
-          marker:
-            path.to.marker && path.to.selected && path.to.items.get(path.to.selected)
-              ? (() => {
-                  const target = path.to.items.get(path.to.selected),
-                    before = path.from.items.get(path.to.selected);
-                  if (!target) return path.to.marker;
-                  const item = box(before ?? target, target);
-                  return {
-                    ...path.to.marker,
-                    x: item.x + path.to.marker.x - target.x,
-                    y: item.y + path.to.marker.y - target.y,
-                  };
-                })()
-              : path.to.marker,
+          marker: markerSample(),
+          markerVelocity: markerSample(true) ?? undefined,
           strip: path.to.strip,
           inlineSize: path.to.inlineSize,
           blockSize: path.to.blockSize,
@@ -146,13 +180,22 @@ export function createTabsLayout(
                   Math.min(path.from.crossWidth ?? path.to.crossWidth, path.to.crossWidth),
                   Math.min(Math.max(path.from.crossWidth ?? path.to.crossWidth, path.to.crossWidth), cross.get()),
                 ),
+          crossHeight:
+            path.to.crossHeight === undefined
+              ? undefined
+              : Math.max(
+                  Math.min(path.from.crossHeight ?? path.to.crossHeight, path.to.crossHeight),
+                  Math.min(Math.max(path.from.crossHeight ?? path.to.crossHeight, path.to.crossHeight), cross.get()),
+                ),
           selected: path.to.selected,
         }
       : baseline;
   const cancel = () => {
+    generation++;
     phase.stop();
     extent.stop();
     cross.stop();
+    selectionPhase.stop();
     path = null;
     for (const effect of effects.values()) effect.cancel();
     effects.clear();
@@ -177,6 +220,7 @@ export function createTabsLayout(
           ? {
               [current.axis]: `${current.size}px`,
               ...(current.crossWidth === undefined ? {} : { width: `${current.crossWidth}px` }),
+              ...(current.crossHeight === undefined ? {} : { height: `${current.crossHeight}px` }),
               justifyContent: "flex-start",
             }
           : node === current.strip
@@ -185,7 +229,7 @@ export function createTabsLayout(
                 minWidth: `${current.inlineSize}px`,
                 maxWidth: `${current.inlineSize}px`,
                 flex: "none",
-                ...(current.axis === "height"
+                ...(current.axis === "height" || current.crossHeight !== undefined
                   ? {
                       height: `${current.blockSize}px`,
                       minHeight: `${current.blockSize}px`,
@@ -206,6 +250,7 @@ export function createTabsLayout(
   const off = phase.on("change", write);
   const offSize = extent.on("change", write);
   const offCross = cross.on("change", write);
+  const offSelection = selectionPhase.on("change", write);
   const unsubscribe = host.current
     ? subscribeMotionEnvironment(host.current.ownerDocument, (environment) => {
         restricted = environment.hidden || environment.reduced || environment.immediate;
@@ -232,8 +277,10 @@ export function createTabsLayout(
       positionTransition: Transition,
       immediate: boolean,
       origin: TabsStripSnapshot | null = baseline,
+      selection?: { from: SelectionBox; transition: Transition },
+      mode: CadenceMode = "none",
     ) {
-      const clock = JSON.stringify([transition, positionTransition]);
+      const clock = JSON.stringify([transition, positionTransition, selection?.transition]);
       const same = revision === previous;
       previous = revision;
       const retime = signature !== clock;
@@ -253,14 +300,35 @@ export function createTabsLayout(
           return (start.items.get(node) ?? target)[axis] + target[extent] > (start.items.get(next[0]) ?? next[1])[axis];
         });
         if (overlaps)
-          origin = { ...destination, size: origin.size, crossWidth: origin.crossWidth, velocity: origin.velocity };
+          origin = {
+            ...destination,
+            size: origin.size,
+            crossWidth: origin.crossWidth,
+            crossHeight: origin.crossHeight,
+            velocity: origin.velocity,
+          };
+        // Final-width labels cannot overlap just to preserve a tween. Selection
+        // can still travel, while affected item positions settle as one field.
         if (destination.clipped && origin.size < destination.size) origin = { ...origin, size: destination.size };
+        if (destination.crossClipped) {
+          if (
+            destination.crossWidth !== undefined &&
+            (origin.crossWidth ?? destination.crossWidth) < destination.crossWidth
+          )
+            origin = { ...origin, crossWidth: destination.crossWidth };
+          if (
+            destination.crossHeight !== undefined &&
+            (origin.crossHeight ?? destination.crossHeight) < destination.crossHeight
+          )
+            origin = { ...origin, crossHeight: destination.crossHeight };
+        }
       }
       const unchanged =
         origin &&
         destination &&
         origin.size === destination.size &&
         origin.crossWidth === destination.crossWidth &&
+        origin.crossHeight === destination.crossHeight &&
         origin.items.size === destination.items.size &&
         [...destination.items].every(([node, target]) => {
           const before = origin.items.get(node);
@@ -272,7 +340,7 @@ export function createTabsLayout(
           );
         });
       if (
-        unchanged ||
+        (unchanged && !selection) ||
         !alive ||
         !destination ||
         !origin ||
@@ -315,14 +383,35 @@ export function createTabsLayout(
         const lease = owner.begin(revision, properties, { collectionVisuals: nodes }, cancel);
         if (!lease) return false;
         leases.push(lease);
-        effects.set(node, node.animate({}, { duration: 0, fill: "both" }));
+        const effect = node.animate({}, { duration: 0, fill: "both" });
+        effects.set(node, effect);
+        if (node !== marker.current) registerTextGeometry(effect, lease, mode);
         return true;
       };
-      if (!add(host.current, [destination.axis])) {
+      if (
+        !add(host.current, [
+          ...new Set([
+            destination.axis,
+            "justify-content",
+            ...(destination.crossWidth === undefined ? [] : ["width"]),
+            ...(destination.crossHeight === undefined ? [] : ["height"]),
+          ]),
+        ])
+      ) {
         cancel();
         return;
       }
-      if (!add(destination.strip, ["width", "min-width", "max-width", "flex"])) {
+      if (
+        !add(destination.strip, [
+          "width",
+          "min-width",
+          "max-width",
+          "flex",
+          ...(destination.axis === "height" || destination.crossHeight !== undefined
+            ? ["height", "min-height", "max-height"]
+            : []),
+        ])
+      ) {
         cancel();
         return;
       }
@@ -336,12 +425,16 @@ export function createTabsLayout(
         return;
       }
       phase.jump(0);
+      selectionPhase.jump(selection ? 0 : 1);
       extent.jump(origin.size);
-      cross.jump(origin.crossWidth ?? destination.crossWidth ?? 0);
-      path = { from: origin, to: destination };
+      cross.jump(origin.crossWidth ?? origin.crossHeight ?? destination.crossWidth ?? destination.crossHeight ?? 0);
+      path = { from: origin, to: destination, selection: selection?.from };
       write();
-      let pending = destination.crossWidth === undefined ? 2 : 3;
+      const crossTarget = destination.crossWidth ?? destination.crossHeight;
+      let pending = (crossTarget === undefined ? 2 : 3) + (selection ? 1 : 0);
+      const run = generation;
       const complete = () => {
+        if (run !== generation) return;
         if (!--pending) cancel();
       };
       animateSingleValue(extent, destination.size, {
@@ -354,8 +447,23 @@ export function createTabsLayout(
         velocity: coherent ? Math.max(0, rate) : 0,
         onComplete: complete,
       });
-      if (destination.crossWidth !== undefined)
-        animateSingleValue(cross, destination.crossWidth, { ...transition, onComplete: complete });
+      if (crossTarget !== undefined) animateSingleValue(cross, crossTarget, { ...transition, onComplete: complete });
+      if (selection) {
+        const rates = (["x", "y", "width", "height"] as const).flatMap((key) => {
+          const delta = (destination.marker?.[key] ?? selection.from[key]) - selection.from[key];
+          return delta ? [(origin.markerVelocity?.[key] ?? 0) / delta] : [];
+        });
+        const rate = rates[0] ?? 0;
+        animateSingleValue(selectionPhase, 1, {
+          ...selection.transition,
+          velocity: rates.every(
+            (value) => Math.abs(value - rate) <= Number.EPSILON * Math.max(1, Math.abs(value), Math.abs(rate)),
+          )
+            ? Math.max(0, rate)
+            : 0,
+          onComplete: complete,
+        });
+      }
     },
     invalidate() {
       cancel();
@@ -367,6 +475,7 @@ export function createTabsLayout(
       off();
       offSize();
       offCross();
+      offSelection();
       unsubscribe();
     },
   };

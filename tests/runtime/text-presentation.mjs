@@ -634,6 +634,23 @@ try {
           );
           caller.dispose();
         });
+        await test("selection-strip policy cancels unknown native width without replacing Text", async () => {
+          const f = make("Save", { containerStyle: "display:flex;justify-content:center;width:250px" });
+          const text = f.host.firstChild;
+          f.commit("Same", { stripGeometry: true });
+          check("actual text paint before unknown geometry", all(f.host).length > 0);
+          const width = f.container.animate([{ width: "250px" }, { width: "150px" }], { duration: 500, fill: "both" });
+          await frame();
+          check(
+            "unknown width revokes paint and preserves native Text",
+            all(f.host).length === 0 && f.host.firstChild === text && f.host.textContent === "Same",
+          );
+          width.cancel();
+          f.commit("Save", { stripGeometry: true });
+          f.commit("Same", { stripGeometry: true });
+          check("next eligible revision paints", all(f.host).length > 0);
+          f.dispose();
+        });
         await test("foreign rich child tree is untouched", () => {
           const f = make("Save");
           f.dispose();

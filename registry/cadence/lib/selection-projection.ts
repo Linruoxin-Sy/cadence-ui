@@ -55,6 +55,13 @@ export function createSelectionProjection(host: MotionHostRef<HTMLElement>, tran
     }
   });
   return {
+    /** Current visual coordinates, without measuring a projected DOM rectangle. */
+    sample(): SelectionBox | null {
+      if (!current() || !box) return null;
+      if (!running) return { ...box };
+      const [x, y, right, bottom] = presentation() as [number, number, number, number];
+      return { x, y, width: right - x, height: bottom - y };
+    },
     commit(revision: MotionRevision, destination: SelectionBox | null, transition: Transition, immediate: boolean) {
       if (!current()) {
         cancel();

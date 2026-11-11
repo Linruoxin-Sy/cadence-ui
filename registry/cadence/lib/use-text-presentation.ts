@@ -26,6 +26,7 @@ export function useTextPresentation(
       | "sourceRetired"
       | "deferHandoff"
       | "nativeBaseline"
+      | "stripGeometry"
     >
   > & { enabled?: boolean; initialText?: string } = {},
   supplied?: ReturnType<typeof createMotionTransaction>,

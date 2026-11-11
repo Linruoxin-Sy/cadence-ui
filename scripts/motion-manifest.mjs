@@ -311,7 +311,11 @@ export function parameterWriterForms(source) {
 /** The native factory has no raw caller clock or arbitrary property endpoint.
  * Runtime receipts still have to prove the executing installed factory bytes. */
 function inlinePresenceForms(source) {
-  const factory = source.includes("function createSurfacePresence(") ? "createSurfacePresence" : "createInlinePresence";
+  const factory = source.includes("function createSurfacePresence(")
+    ? "createSurfacePresence"
+    : source.includes("function createInlineEntrance(")
+      ? "createInlineEntrance"
+      : "createInlinePresence";
   if (!source.includes(`function ${factory}(`)) return [];
   const selected = motionSource(source);
   if (

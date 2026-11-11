@@ -170,6 +170,7 @@ export function componentExecutionPlugin(additionalItems = []) {
                 "createTabsLayout",
                 "createTabsItem",
                 "createInlinePresence",
+                "createInlineEntrance",
                 "createSelectPopup",
                 "createCapturedHandoff",
                 "createSurfacePresence",

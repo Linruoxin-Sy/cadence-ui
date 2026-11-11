@@ -322,7 +322,7 @@ export function TabsListSurface({
           transition,
           selectionPolicy.reduced || shape !== "line" || !safe || coordinated || wasReflowing,
         );
-        layout.commit(sizeRevision, snapshot, sizeClock, positionClock, !coordinated, origin);
+        layout.commit(sizeRevision, snapshot, sizeClock, positionClock, !coordinated, origin, undefined, policy.mode);
         mutations.takeRecords();
         if (alive && node.current === list) list.toggleAttribute("data-marker-ready", Boolean(box));
       };
@@ -509,6 +509,7 @@ export function useTabsTrigger(
           scope.transaction.revision("content", content, node),
           parameters.transition,
           cm.reduced,
+          cm.mode,
         );
       list?.set(identity, { host, value, active, content, item: connected.current.item });
     }

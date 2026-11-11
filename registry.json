@@ -267,6 +267,11 @@
           "path": "registry/cadence/lib/selection-projection.ts",
           "type": "registry:lib",
           "target": "@components/cadence/lib/selection-projection.ts"
+        },
+        {
+          "path": "registry/cadence/lib/tabs-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/tabs-layout.ts"
         }
       ]
     },
@@ -1838,20 +1843,74 @@
         "@cadence/cadence-motion",
         "@cadence/cadence-provider",
         "@cadence/cadence-utils",
-        "@cadence/toggle"
+        "@cadence/toggle",
+        "@cadence/cadence-selection"
       ],
       "files": [
         {
           "path": "registry/cadence/toggle-group/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/toggle-group/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
+        },
+        {
+          "path": "registry/cadence/lib/selection-strip.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/selection-strip.ts"
+        },
+        {
+          "path": "registry/cadence/lib/toggle-group-colour.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/toggle-group-colour.ts"
+        },
+        {
+          "path": "registry/cadence/lib/toggle-group-motion.tsx",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/toggle-group-motion.tsx"
         }
       ],
       "meta": {
         "since": "0.3.0",
         "tier": "T3",
         "batch": "B3",
-        "motion": ["feedback.press", "layout.shared", "state.morph"],
+        "motion": [
+          {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "layout.shared",
+            "form": "selection"
+          },
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "feedback.press",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "layout.move",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
+        ],
         "intensity": "medium",
         "complexity": "M",
         "upstream": {
@@ -1871,30 +1930,65 @@
           "scope": "collection",
           "travel": "compact",
           "coordination": "group",
-          "reason": "A shared selected highlight moves among stable controls, alongside local press and glyph feedback."
+          "reason": "One group entrance and measured strip coordinate shared or local selection, retained item reflow, primitive changed runs and independent press feedback."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "feedback.press/one-shot": [
+            "data.transition/one-shot": [
               {
                 "relationship": "default",
                 "owner": "toggle-group",
-                "reason": "Toggle Group integrates press feedback at its own parts, using the reached installed executor."
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
               }
             ],
-            "layout.shared/one-shot": [
+            "layout.shared/selection": [
               {
                 "relationship": "default",
                 "owner": "toggle-group",
-                "reason": "Toggle Group integrates selected-indicator continuity at its own parts, using the reached installed executor."
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
               }
             ],
             "state.morph/one-shot": [
               {
                 "relationship": "default",
                 "owner": "toggle-group",
-                "reason": "Toggle Group integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+              }
+            ],
+            "feedback.press/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "toggle-group",
+                "reason": "Toggle Group integrates this form at its root, committed item, selected decoration or owned primitive label."
               }
             ]
           }
@@ -3186,11 +3280,6 @@
           "path": "registry/cadence/lib/tabs-motion.tsx",
           "type": "registry:lib",
           "target": "@components/cadence/lib/tabs-motion.tsx"
-        },
-        {
-          "path": "registry/cadence/lib/tabs-layout.ts",
-          "type": "registry:lib",
-          "target": "@components/cadence/lib/tabs-layout.ts"
         },
         {
           "path": "registry/cadence/lib/tabs-colour.ts",

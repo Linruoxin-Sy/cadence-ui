@@ -61,6 +61,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | cadence-selection | `@components/cadence/lib/selection-projection.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
+| cadence-selection | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-selection.json) |
 | cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
@@ -75,7 +76,6 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | tabs | `@components/cadence/tabs/index.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 | tabs | `@components/cadence/lib/tabs-motion.tsx` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
-| tabs | `@components/cadence/lib/tabs-layout.ts` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 | tabs | `@components/cadence/lib/tabs-colour.ts` | [JSON files[].content](https://cadence.dev/r/tabs.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)

@@ -2,8 +2,10 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type ComponentProps, createRef } from "react";
 import { expect, it, vi } from "vitest";
+import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { Toggle } from "@/registry/cadence/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/registry/cadence/toggle-group";
+import { expectMotionContract } from "../motion-contract";
 
 it.each(["toggle", "item"])("delivers native animationstart through %s default renderer", (kind) => {
   const listener = vi.fn();
@@ -203,11 +205,22 @@ it("controlled group owns item value, callbacks, roving focus and canceled chang
   expect(screen.getByRole("group")).toHaveStyle({ opacity: 0.6 });
 });
 
-it("keeps legacy group paint feedback while Toggle owns its v2 paint policy", () => {
-  render(
-    <ToggleGroup>
-      <ToggleGroupItem value="native">Native</ToggleGroupItem>
-    </ToggleGroup>,
+it.each(["full", "reduced", "none"] as const)("executes the group's scoped paint policy in %s", (mode) => {
+  const draw = (paint: boolean) => (
+    <CadenceProvider mode={mode}>
+      <ToggleGroup>
+        <ToggleGroupItem value="native" style={{ color: paint ? "rgb(20, 20, 20)" : "rgb(30, 30, 30)" }}>
+          Native
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </CadenceProvider>
   );
-  expect(screen.getByRole("button")).toHaveClass("transition-[color,background-color,box-shadow]");
+  const view = render(draw(false));
+  const button = screen.getByRole("button");
+  view.rerender(draw(true));
+  fireEvent.click(button);
+  expect(screen.getByRole("button")).toBe(button);
+  expect(button).toHaveAttribute("aria-pressed", "true");
+  expect(button).not.toHaveClass("transition-[color,background-color,box-shadow]");
+  expectMotionContract(mode, { policy: ["color"] });
 });

@@ -11,6 +11,17 @@ import {
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+it("recognises entrance-only opacity without advertising retained exit", () => {
+  const entrance = readFileSync("registry/cadence/lib/inline-entrance.ts", "utf8");
+  expect(parameterWriterForms(entrance)).toEqual(["data.transition/opacity"]);
+  for (const broken of [
+    entrance.replaceAll("node.animate(", "missing("),
+    entrance.replaceAll('owner.begin(revision, ["opacity"]', 'missing(revision, ["opacity"]'),
+    entrance.replaceAll('from "./motion"', 'from "@/motion"'),
+  ])
+    expect(parameterWriterForms(broken)).toEqual([]);
+});
+
 describe("Tabs compound execution paths", () => {
   const tabs = readFileSync("registry/cadence/lib/tabs-motion.tsx", "utf8");
   it("requires connected item/list controllers and their exact bindings", () => {

@@ -162,6 +162,7 @@ describe("current registry inventory and real part references", () => {
       "badge",
       "card",
       "toggle",
+      "toggle-group",
       "select",
       "tabs",
     ]);

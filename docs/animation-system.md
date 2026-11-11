@@ -1260,7 +1260,19 @@ unavailable. No glyph inline-block, typography override, extra text tree or oute
 A temporary empty baseline probe must leave native layout rectangles unchanged and is removed before paint.
 The changed-text controller explicitly permits known background, border-colour and box-shadow
 transitions on its ancestor chain: these change neither glyph ink nor its coordinate map, so their
-native transition events do not cancel that text writer. Foreground colour, opacity, geometry and
+native transition events do not cancel that text writer. The final-width selection-strip adapter may
+also explicitly opt into preserving changed-text paint through its own non-scaling geometry. Admission
+requires the actual Animation, exact effect target and property set, current transaction lease and committed full-mode
+policy. The target label must already use its final native width and retain exact font/raster proof;
+native display anchors transport pixels without a second position writer. A data attribute,
+declaration, matching timing or connected controller is insufficient. Only that proven writer's
+width/height constraints and pure translations may be omitted from the text paint signature.
+Unknown animations, foreground/opacity, scaling, expired or retired leases and unrelated hosts stay
+rejected. During that opted-in text presentation a bounded animation-identity/property audit checks this
+authority without layout or Range reads; failed authority cancels paint, keeps the exact native Text
+and never revives an old revision. Normal geometry completion may release to native layout while
+the independent text clock finishes. Mode/zero-clock/native editing/copy and unmount still cancel
+their applicable writers; existing work and raster limits are unchanged. Unknown geometry and
 unknown animation properties still reject proof and cancel active text on native transition start.
 No shared surface writer is cancelled by the text owner. Numeric presentation retains its existing
 stricter stable-ancestor-paint preflight and cancellation policy; the text-only opt-in does not

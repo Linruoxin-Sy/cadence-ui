@@ -1,4 +1,5 @@
-import { textProofLimits } from "./motion";
+import { type CadenceMode, textProofLimits } from "./motion";
+import { knownTextGeometry } from "./motion-transaction";
 import type { TextSnapshot, TextUnit } from "./text-diff";
 
 type Box = Pick<DOMRect, "left" | "top" | "width" | "height">;
@@ -51,7 +52,7 @@ export function textSurfacePaint(property: string) {
     property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
   );
 }
-function surfaceOnlyAnimation(animation: Animation) {
+export function surfaceOnlyAnimation(animation: Animation) {
   const frames = (animation.effect as KeyframeEffect | null)?.getKeyframes?.();
   if (!frames?.length) return false;
   const properties = frames.flatMap((frame) =>
@@ -66,7 +67,7 @@ function surfaceOnlyAnimation(animation: Animation) {
 export function proveTextLayout(
   host: HTMLElement,
   snapshot: TextSnapshot,
-  { surfacePaint = false }: { surfacePaint?: boolean } = {},
+  { surfacePaint = false, geometryMode }: { surfacePaint?: boolean; geometryMode?: CadenceMode } = {},
 ): TextLayout | null {
   const view = host.ownerDocument.defaultView;
   const css = view?.getComputedStyle(host);
@@ -127,7 +128,12 @@ export function proveTextLayout(
       style.contentVisibility !== "visible" ||
       /transform|filter|perspective/.test(style.willChange) ||
       !["normal", "1"].includes(style.zoom) ||
-      node.getAnimations().some((animation) => !surfacePaint || !surfaceOnlyAnimation(animation))
+      node
+        .getAnimations()
+        .some(
+          (animation) =>
+            !knownTextGeometry(animation, geometryMode) && (!surfacePaint || !surfaceOnlyAnimation(animation)),
+        )
     )
       return null;
   }

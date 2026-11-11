@@ -6,7 +6,9 @@ async function aligned(button: Locator) {
   await expect
     .poll(() =>
       button.evaluate((el) => {
-        const fill = el.querySelector('[data-slot="toggle-group-indicator"]');
+        const fill = el
+          .closest('[data-slot="toggle-group"]')
+          ?.querySelector(':scope > [data-slot="toggle-group-indicator"]');
         if (!fill) return Infinity;
         const a = el.getBoundingClientRect(),
           b = fill.getBoundingClientRect();
@@ -76,7 +78,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await page.keyboard.press("Space");
         await aligned(day);
         await page.keyboard.press("Space");
-        await expect(range.locator('[data-slot="toggle-group-indicator"]')).toHaveCount(0);
+        await expect(range.locator('[data-slot="toggle-group-indicator"]')).toBeHidden();
 
         const marks = page
           .locator('[data-component-example="toggle-group/multiple"]')
@@ -89,7 +91,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await expect
           .poll(() =>
             italic
-              .locator('[data-slot="toggle-group-indicator"]')
+              .locator('[data-slot="toggle-group-local-indicator"]')
               .evaluate((el) => Number(getComputedStyle(el).opacity)),
           )
           .toBe(1);
@@ -104,13 +106,15 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
         await bold.click();
         await expect
           .poll(() =>
-            bold.locator('[data-slot="toggle-group-indicator"]').evaluate((el) => Number(getComputedStyle(el).opacity)),
+            bold
+              .locator('[data-slot="toggle-group-local-indicator"]')
+              .evaluate((el) => Number(getComputedStyle(el).opacity)),
           )
           .toBe(0);
         if (mode !== "full") {
           expect(
             await italic
-              .locator('[data-slot="toggle-group-indicator"]')
+              .locator('[data-slot="toggle-group-local-indicator"]')
               .evaluate((el) => getComputedStyle(el).transform),
           ).toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
         }
@@ -140,7 +144,9 @@ test("live downgrade cancels shared movement and preserves focused controls", as
     const samples = [];
     for (let i = 0; i < 5; i++) {
       await new Promise(requestAnimationFrame);
-      const fill = el.querySelector('[data-slot="toggle-group-indicator"]');
+      const fill = el
+        .closest('[data-slot="toggle-group"]')
+        ?.querySelector(':scope > [data-slot="toggle-group-indicator"]');
       if (!fill) throw Error("Missing fill after downgrade");
       samples.push({
         transform: getComputedStyle(fill).transform,
@@ -154,7 +160,8 @@ test("live downgrade cancels shared movement and preserves focused controls", as
   await aligned(month);
   expect(
     await month
-      .locator('[data-slot="toggle-group-indicator"]')
+      .locator('xpath=ancestor::*[@data-slot="toggle-group"]')
+      .locator(':scope > [data-slot="toggle-group-indicator"]')
       .evaluate((el) => ({ transform: getComputedStyle(el).transform, animations: el.getAnimations().length })),
   ).toEqual({ transform: "none", animations: 0 });
   await expect(month).toBeFocused();

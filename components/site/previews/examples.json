@@ -64,7 +64,8 @@
     "sizes",
     "controlled",
     "disabled",
-    "without-motion"
+    "without-motion",
+    "changing-content"
   ],
   "input-otp": ["controlled", "invalid", "disabled", "without-separator", "paste", "without-motion"],
   "progress": ["labelled", "indeterminate", "complete", "range", "composed", "caller-progress", "without-motion"],
