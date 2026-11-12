@@ -120,6 +120,41 @@ declarations and requires animated test files; the test reporter
 requires three-mode helper adoption. Neither replaces the animation review or browser evidence for
 running cancellation, first paint, nested providers and measured geometry.
 
+## Verification loop
+
+`pnpm check` is the gate and CI runs it on every pull request. Do not run it after every edit: most of
+its wall clock is `cli-gates`, which cold-starts `check-registry.mjs` and installs real consumers into
+temporary projects. Choose the layer that can still fail:
+
+| Layer   | Command                                                    | When                                                                                        |
+| ------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Static  | `pnpm check:static`                                        | After editing source, metadata or docs, before staging anything                              |
+| Scoped  | `pnpm test:local tests/components/<id>.test.tsx`           | While iterating on one component                                                             |
+| Shared  | `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` hit | Once, when the component's own suite is green, to catch shared-gate assumptions             |
+| Gates   | `pnpm test:gate`                                           | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts |
+| Full    | `pnpm test`                                                | Once per change set, in the background, while the handoff is being written                    |
+
+Rules that came out of timing two migration sessions on this repository:
+
+- **Locate a red full run in 30 seconds.** Read the first failing stack's file path, not the summary
+  line. Run that one file with `pnpm exec vitest run <file>`. If it passes, the full-run failure was
+  host or sandbox noise: record it in [the quarantine list](docs/testing-quarantine.md) and stop
+  re-running neighbours. If it fails, fix that file. Re-running a long suite because its name looks
+  related is the most expensive way to learn nothing.
+- One full run per change set, not one before and one after the last fix. Quote the counts that run
+  produced, and list the assertions repaired afterwards as repaired-but-not-covered-by-that-count. A
+  second full run only to refresh a number is the largest avoidable cost in a migration task.
+- `vitest --changed` is local feedback, never a merge gate: it cannot see the cross-file assumptions
+  the gate suites assert.
+- Long-tail suites are not a local loop. `tests/lib/doc-template.test.tsx` alone takes minutes because
+  it installs real consumers; run it when you changed what it installs, not to confirm a colour owner.
+- Gate fixtures must stay declarative. Never use a live registry component as a "static" sample in a
+  fixture: when that component migrates, unrelated suites turn red and the migration is forced to edit
+  someone else's test. Add the shape you need under `tests/fixtures/` instead.
+
+Known or currently unexplained failures in the full run are recorded in
+[the quarantine list](docs/testing-quarantine.md); everything not listed there must pass.
+
 ## Style
 
 - Formatting, import order, and lint rules are Biome's. Run `pnpm format` (or `pnpm lint:fix`) instead of
