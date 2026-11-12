@@ -66,7 +66,7 @@ limits on which capabilities a component may acquire.
 | `textarea` — multi-line field         | T0   | none                                                                |
 | `card` — grouped surface              | T0   | [6 recipes](content/components/card.mdx#motion-contract)            |
 | `toc` — document section navigation   | T3   | `layout.shared`, `scroll.navigate`                                  |
-| `aspect-ratio` — reserved media box   | T0   | none                                                                |
+| `aspect-ratio` — reserved media box   | T0   | [4 recipes](content/components/aspect-ratio.mdx#motion-contract)    |
 | `avatar` — image with fallback        | T0   | none                                                                |
 | `skeleton` — loading placeholder      | T4   | `data.transition`                                                   |
 | `dialog` — modal window               | T2   | `popup.anchored`, `exit.fade`                                       |

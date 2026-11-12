@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { AspectRatio } from "@/registry/cadence/aspect-ratio";
 import { PreviewStack } from "./shell";
 
@@ -58,6 +59,26 @@ function RatioGrid() {
   );
 }
 
+function RatioSwitch() {
+  const [wide, setWide] = useState(true);
+  const image =
+    "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 320 240%22%3E%3Crect width=%22320%22 height=%22240%22 fill=%22%23334155%22/%3E%3Ccircle cx=%22240%22 cy=%2264%22 r=%2228%22 fill=%22%23fbbf24%22/%3E%3Cpath d=%22M0 240V180L100 80L240 240ZM120 240L240 120L320 200V240Z%22 fill=%22%2394a3b8%22/%3E%3C/svg%3E";
+  return (
+    <div className="grid w-full max-w-md gap-3">
+      <AspectRatio ratio={wide ? 16 / 9 : 1} className="overflow-hidden rounded-lg bg-muted">
+        <img src={image} alt="Illustrated mountains and sun" className="size-full object-cover" />
+      </AspectRatio>
+      <button
+        type="button"
+        onClick={() => setWide((current) => !current)}
+        className="justify-self-start rounded-md border px-3 py-1.5 text-sm"
+      >
+        {wide ? "Square it" : "Widen it"}
+      </button>
+    </div>
+  );
+}
+
 function AspectRatioSpecimen() {
   return (
     <div className="flex w-full flex-wrap items-center justify-center gap-4">
@@ -74,7 +95,7 @@ function AspectRatioSpecimen() {
   );
 }
 
-const examples = { square: SquareImage, video: VideoFrame, grid: RatioGrid };
+const examples = { square: SquareImage, video: VideoFrame, grid: RatioGrid, switch: RatioSwitch };
 
 export function AspectRatioPreview({ example }: { example?: string }) {
   if (example !== undefined) {
