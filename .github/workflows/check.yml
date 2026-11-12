@@ -1,0 +1,39 @@
+# The same gate a contributor runs locally: `pnpm check`.
+#
+# `cli-gates` lives here rather than in a local loop. Those suites cold-start
+# `check-registry.mjs` and install real consumers into temporary projects, so their
+# wall clock tracks host throughput; running them on every local edit only buys
+# waiting. Keep this job as a required status check on the default branch, otherwise
+# the long-tail verification has no owner.
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # `registry:check` compares payload freshness against the built output, and
+      # the gate suites read `public/r`, so the payloads are part of the gate.
+      - run: pnpm registry:build
+      - run: pnpm check
+      # Browser, installation and performance evidence remain separate obligations;
+      # this job certifies source, metadata, docs and unit/runtime records only.
