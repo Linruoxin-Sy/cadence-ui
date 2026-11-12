@@ -12,6 +12,22 @@ import { inheritedSlotOverrides } from "../../scripts/motion-v2.mjs";
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+it("requires Empty's current-media opacity writer, scoped lease and exact data-update binding", () => {
+  const source = readFileSync("registry/cadence/lib/empty-media.ts", "utf8");
+  expect(parameterWriterForms(source)).toEqual(["data.transition/opacity"]);
+  for (const broken of [
+    source.replaceAll("node.animate(", "missing("),
+    source.replaceAll('owner.begin(revision, ["opacity"]', 'missing(revision, ["opacity"]'),
+    source.replaceAll('transaction.revision("state", input.key, node)', 'transaction.revision("state", null, node)'),
+    source.replaceAll(
+      'bindMotionParameters(dataUpdate, "data.transition/opacity")',
+      'bindMotionParameters(dataUpdate, "enter.pop/opacity")',
+    ),
+    source.replaceAll('from "./motion"', 'from "@/motion"'),
+  ])
+    expect(parameterWriterForms(broken)).toEqual([]);
+});
+
 it("requires both exact Alert icon opacity writers and a bounded retained visual", () => {
   const source = readFileSync("registry/cadence/lib/alert-icon.ts", "utf8");
   expect(parameterWriterForms(source)).toEqual(["data.transition/opacity"]);

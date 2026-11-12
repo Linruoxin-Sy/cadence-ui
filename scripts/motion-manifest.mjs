@@ -310,11 +310,27 @@ export function parameterWriterForms(source) {
       ...parameterWriterBindings(source).map((binding) => binding.form),
       ...inlinePresenceForms(source),
       ...alertIconForms(source),
+      ...emptyMediaForms(source),
       ...selectPresentationForms(source),
       ...kbdPresentationForms(source),
       ...groupPositionForms(source),
     ]),
   ];
+}
+
+/** Current-media opacity executor; no arbitrary property/clock endpoints. */
+function emptyMediaForms(source) {
+  const selected = motionSource(source);
+  return selected.source.includes("function createEmptyMedia(") &&
+    selected.imports.some(
+      (entry) => entry.name === "bindMotionParameters" && entry.path.startsWith(".") && entry.path.endsWith("/motion"),
+    ) &&
+    selected.source.includes('bindMotionParameters(dataUpdate, "data.transition/opacity")') &&
+    selected.source.includes('owner.begin(revision, ["opacity"]') &&
+    selected.source.includes('transaction.revision("state", input.key, node)') &&
+    selected.source.includes("node.animate(")
+    ? ["data.transition/opacity"]
+    : [];
 }
 
 /** Alert's fixed opacity pair on a known inert SVG snapshot and original icon.

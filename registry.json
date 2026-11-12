@@ -1430,21 +1430,54 @@
       "title": "Empty",
       "description": "Lists, tables, and panels with nothing to show yet.",
       "categories": ["feedback", "layout"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/empty/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/empty/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/empty-media.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/empty-media.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "enter.pop",
+          "exit.fade",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          "data.transition"
+        ],
+        "intensity": "medium",
         "complexity": "S",
         "upstream": {
           "registry": "shadcn",
@@ -1452,14 +1485,64 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Empty declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "One empty region coordinates surface opacity, readable height, changed display text, quantity reels and local media replacement while recovery controls retain native ownership."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "empty",
+                "reason": "Empty integrates its root, current media and three named display parts; parent region geometry delegates once and rich content and recovery controls retain their native owners."
+              }
+            ]
+          }
         }
       }
     },

@@ -188,14 +188,22 @@ export function observeCopiedController(controller, kind, args, source) {
     };
     return controller;
   }
-  if (["createInlinePresence", "createInlineEntrance", "createSurfacePresence", "createAlertIcon"].includes(kind)) {
+  if (
+    [
+      "createInlinePresence",
+      "createInlineEntrance",
+      "createSurfacePresence",
+      "createAlertIcon",
+      "createEmptyMedia",
+    ].includes(kind)
+  ) {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);
     controller.commit = (...input) => {
       const offset = parameterCalls.length;
       const result = withController(controller, () => commit(...input));
       const entrance = kind === "createSurfacePresence" ? "enter.pop/opacity" : "data.transition/opacity";
-      const entranceOnly = kind === "createInlineEntrance" || kind === "createAlertIcon";
+      const entranceOnly = kind === "createInlineEntrance" || kind === "createAlertIcon" || kind === "createEmptyMedia";
       const form = entranceOnly || input[0].present ? entrance : "exit.fade/opacity";
       {
         const policy = parameterCalls.slice(offset).find((call) => call.form === form);
