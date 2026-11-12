@@ -203,10 +203,10 @@ describe("Item v2", () => {
         </ItemGroup>
       </CadenceProvider>
     );
-    const view = render(draw(0));
+    const view = render(draw());
     const nodes = refs.map((ref) => ref.current);
-    for (const stage of [0, 1, 0]) {
-      view.rerender(draw(stage));
+    for (let pass = 0; pass < 3; pass += 1) {
+      view.rerender(draw());
       nodes.forEach((node, index) => {
         expect(refs[index]?.current).toBe(node);
         if (index) expect(node).toHaveAttribute("data-slot", slots[index]);
