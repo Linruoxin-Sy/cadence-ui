@@ -517,6 +517,22 @@ labels do not wait for a success animation, filter results do not wait for old r
 closed/reopened panel keeps the actual current focus owner. Single-active-item indicators may be shared;
 multi-select controls retain independent selected states rather than forcing a single moving pill.
 
+Name the host and the owner before writing the row. An action binding asserts two separate things: the
+physical DOM host that carries the written property, and the execution instance that owns the write
+(`local`, `inherited`, `composed` or `native`). A row whose property lands on a parent while its owner is
+a child part, or the reverse, reads correctly and still has no certifiable action: the gate derives
+`site`, slot and property subset from the installed bytes, not from the design's intent. Answer three
+things on the row before implementing: which part and anchor the property lands on, which instance owns
+it, and whether that is local or cross-instance. A parent that drives a sibling's transform is not a local
+action on the parent, and a part that a dependency paints is inherited rather than default.
+
+`node scripts/motion-probe.mjs --id <id>` prints the plan the gate would derive for an existing contract
+(action rows, per-binding preset, form, `site`, slot and property subset) together with the blocking
+problems. Use `--draft <file.md>` while the contract is still a candidate file outside the catalogue. A
+probe that returns "no plan" for a non-native binding, or an ambiguous region, means the binding's host is
+unresolved; resolve it in the contract before writing source, because the correction then touches one file
+instead of four. A binding declared `native` is expected to have no runtime plan.
+
 ## 5. Catalogue
 
 The original 59 component contracts remain migration targets. The catalogue also includes the
