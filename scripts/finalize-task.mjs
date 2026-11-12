@@ -75,10 +75,11 @@ if (!taskId) throw new Error("--task <id> is required");
 if (!commits.length) throw new Error("--commits <sha,...> is required");
 if (!summaryFile && !summaryInline) throw new Error("--summary-file or --summary is required");
 if (summaryFile && summaryInline) throw new Error("pass --summary-file or --summary, not both");
-for (const sha of commits) if (!/^[0-9a-f]{7,40}$/i.test(sha)) throw new Error(`not a commit sha: ${sha}`);
+const resolvedCommits = [];
 for (const sha of commits) {
+  if (!/^[0-9a-f]{7,40}$/i.test(sha)) throw new Error(`not a commit sha: ${sha}`);
   try {
-    execFileSync("git", ["cat-file", "-e", `${sha}^{commit}`], { cwd: repo, stdio: "ignore" });
+    resolvedCommits.push(execFileSync("git", ["rev-parse", `${sha}^{commit}`], { cwd: repo, encoding: "utf8" }).trim());
   } catch {
     throw new Error(`commit ${sha} is not in ${repo}`);
   }
@@ -88,10 +89,13 @@ const queue = JSON.parse(await readFile(queuePath, "utf8"));
 if (!Array.isArray(queue.tasks)) throw new Error(`${queuePath} has no tasks array`);
 const task = queue.tasks.find((entry) => entry.id === taskId);
 if (!task) throw new Error(`unknown task ${taskId}`);
-const finalCommit = commits.at(-1);
-if (task.status === "complete" && task.commit === finalCommit && !force) {
-  console.log(`${taskId} is already complete at ${finalCommit}; nothing to write.`);
-  process.exit(0);
+const finalCommit = resolvedCommits.at(-1);
+if (task.status === "complete" && !force) {
+  if (task.commit === finalCommit) {
+    console.log(`${taskId} is already complete at ${finalCommit}; nothing to write.`);
+    process.exit(0);
+  }
+  throw new Error(`${taskId} is already complete at ${task.commit}; pass --force to replace it`);
 }
 
 const summary = (summaryFile ? await readFile(path.resolve(repo, summaryFile), "utf8") : summaryInline).trim();
@@ -131,7 +135,7 @@ if (dryRun) {
     JSON.stringify(
       {
         task: taskId,
-        commits,
+        commits: resolvedCommits,
         currentHead: finalCommit,
         nextTask: nextId,
         queue: queuePath,
