@@ -177,7 +177,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         spinner: `it.each(['full','reduced','none'])('positive %s',(mode)=>{render(<CadenceProvider mode={mode}><Spinner/></CadenceProvider>);expectMotionContract(mode)});`,
         badge: `it('T0 needs no helper',()=>{expect(true).toBe(true)});`,
         label: `it('static v2 cannot bypass the migration gate',()=>{expect(true).toBe(true)});`,
-        "aspect-ratio": `it.each(['full','reduced','none'])('another recipe cannot certify new colour %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
+        avatar: `it.each(['full','reduced','none'])('another recipe cannot certify new colour %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
         input:
           colorImports +
           `it.each(['full','reduced','none'])('executed colour needs explicit policy evidence %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button><Color/></CadenceProvider>);expectMotionContract(mode)});`,
@@ -235,7 +235,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       }
       for (const file of ["docs/motion/presets.md", "docs/motion/README.md"])
         await writeFile(path.join(fixture, file), await readFile(path.join(root, file)));
-      for (const id of ["aspect-ratio", "input"])
+      for (const id of ["avatar", "input"])
         stagedRegistry.items.find((item: { name: string }) => item.name === id).meta.motion = [
           { recipe: "state.color", form: "css-transition" },
         ];
@@ -311,9 +311,9 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       ])
         for (const mode of ["full", "reduced", "none"])
           expect(output).toMatch(new RegExp(`label: v2 execute ${action} on [^\\n]+ in ${mode}`));
-      for (const id of ["aspect-ratio", "input"])
+      for (const id of ["avatar", "input"])
         expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
-      expect(output).toContain("aspect-ratio: state.color/css-transition: missing installed ownership");
+      expect(output).toContain("avatar: state.color/css-transition: missing installed ownership");
       expect(output).toContain(
         "slider: feedback.press/one-shot: owner button is not the reached installed integration",
       );

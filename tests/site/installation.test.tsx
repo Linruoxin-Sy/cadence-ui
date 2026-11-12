@@ -80,7 +80,7 @@ describe("shared installation plan", () => {
   });
 
   it("uses the actual static graph without inventing motion or provider dependencies", () => {
-    const plan = installationPlan(registry.items, "aspect-ratio");
+    const plan = installationPlan(registry.items, "avatar");
     expect(plan.provider).toBe(false);
     expect(plan.dependencies).not.toContain("motion");
     expect(manualInstructions(plan)).not.toContain("CadenceProvider");
