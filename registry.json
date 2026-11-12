@@ -1178,20 +1178,42 @@
       "title": "Aspect Ratio",
       "description": "Images, videos, and embeds that must keep their shape.",
       "categories": ["layout"],
-      "dependencies": [],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/aspect-ratio/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/aspect-ratio/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/aspect-ratio-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/aspect-ratio-layout.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
+        "motion": [
+          "enter.pop",
+          "exit.fade",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -1200,14 +1222,43 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Aspect Ratio declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "Aspect Ratio fades its own reserved wrapper, interpolates the one physical dimension a ratio change moved and transitions an authored wrapper surface; media decode and parent resizing keep native ownership."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "aspect-ratio",
+                "reason": "Aspect Ratio integrates its wrapper entrance on the retained reserved host; caller media and containing regions keep their own entrances."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "aspect-ratio",
+                "reason": "Aspect Ratio fades the same retained wrapper on exit without cloning media, overlays or their resources."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "aspect-ratio",
+                "reason": "Aspect Ratio owns the one ratio-dependent physical axis after a committed ratio change; parent constraints and image decode stay native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "aspect-ratio",
+                "reason": "Aspect Ratio owns the wrapper surface palette it paints; descendant text and caller interactive children keep their own colour owners."
+              }
+            ]
+          }
         }
       }
     },
