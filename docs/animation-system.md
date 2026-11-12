@@ -967,6 +967,20 @@ An orientation-axis parent delegates only that actual axis. A registered descend
 independent cross axis; its native echo through ancestor boxes is not a passive constraint edit.
 Ignore that echo only for the exact currently leased Animation/property/target in the same scope.
 Unknown, retired, unrelated or differently scoped engines still invalidate the affected geometry.
+An existing zero-duration native height mirror can preserve text opacity through its own exact
+write: it measures its one real direct content child, owns the host's height lease, and records
+the actual old/new style strings. Only that current receipt authorizes intrinsic ancestor-height
+echoes when the text controller receives the matching mutation; it grants no width, paint or
+transform exception. Text and numeric pixel layers retain an exact inherited paint/width/transform
+signature across that receipt; numeric host-size observation remains active. Redundant mirror
+writes do not emit a style mutation. Foreign writes, other changed mutations, retired leases and native animations
+retain their cancellation paths. This is native sizing coordination, not an invented Animation or
+an authored resize clock.
+An adapter can identify its exact inert, absolutely positioned decorative host by ref. Its bounded
+outgoing visual mutations do not change natural content and must not cancel a concurrent semantic
+resize. This exclusion applies only while that same host remains inert, hidden from accessibility
+and out of flow; ordinary content, caller lookalike attributes and a changed layout policy still
+invalidate the affected geometry. The adapter never excludes arbitrary caller descendants.
 Directional geometry evidence records only the actual applicable axis. When a contract supports
 both axes, both real orientations must execute in each mode within the same passing test; the
 signed property union must equal the full declared set. Each row independently retains its real
@@ -1273,7 +1287,18 @@ The internal plain-string controller keeps one native Text node, including its r
 It proves the actual font's whole-string raster against independently painted units and reads the
 real host's native Range boxes only at commits. It never splits the semantic tree to obtain opacity
 targets: native text-run rounding itself can change layout when Text nodes are split. Raster proof
-and aggregate local paint are limited to 262144 pixels and a 4096-pixel axis; unsupported font
+can include a finite computed pixel letter spacing when the native Canvas text-spacing property
+round-trips that exact value, changes the measured advance for nonzero spacing, and the same
+whole-string/unit raster proof still matches byte for byte. Carry that spacing into every glyph
+texture; retain the original CSS, native Range positions and existing clipping/geometry tolerances.
+Missing/ineffective Canvas spacing, unknown font features or failed raster correspondence stays
+native and immediate. This does not authorize a typography override or general shaping fallback.
+An ASCII space collapsed at a native soft wrap may expose exactly two zero-width Range fragments.
+Accept that non-painting boundary only when both fragments have finite positive height and the
+actual font's space has zero left/right ink extent; keep the first native zero-width position.
+Non-space, positive-width or other fragmented units remain unsupported. No glyph geometry or
+clipping tolerance changes, and the whole-string/unit raster equality remains mandatory.
+Raster proof and aggregate local paint are limited to 262144 pixels and a 4096-pixel axis; unsupported font
 features, scripts, clipping or correspondence remain immediate. A private CSS Custom Highlight range
 temporarily masks only the incoming changed paint while pixel-only canvases own opacity. This is a
 static visibility mask, not a state-colour tween; foreign highlights, selection/find and native editing

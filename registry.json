@@ -1308,21 +1308,54 @@
       "title": "Alert",
       "description": "Errors, warnings, and page-level status messages.",
       "categories": ["feedback"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-surface-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/alert/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/alert/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/alert-icon.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/alert-icon.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "enter.pop",
+          "exit.fade",
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          "data.transition"
+        ],
+        "intensity": "medium",
         "complexity": "S",
         "upstream": {
           "registry": "shadcn",
@@ -1330,14 +1363,64 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "surface",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "One live alert surface coordinates opacity, readable height, changed message text, quantity reels and keyed decorative icon replacement; composed actions keep native ownership."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "enter.pop/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ],
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "alert",
+                "reason": "Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."
+              }
+            ]
+          }
         }
       }
     },

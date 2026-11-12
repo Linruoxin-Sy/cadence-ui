@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { createNativeHeightMirror } from "@/registry/cadence/lib/motion-transaction";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -64,14 +65,8 @@ export function MeasuredHeight({ children, className }: MeasuredHeightProps) {
      * inside a collapsed panel, reports zero, and pinning to it would collapse
      * the frame the reader is about to see.
      */
-    const sync = () => {
-      const height = content.getBoundingClientRect().height;
-      if (!height) {
-        box.style.removeProperty("height");
-        return;
-      }
-      box.style.height = `${height}px`;
-    };
+    const mirror = createNativeHeightMirror(box, content);
+    const sync = () => mirror.sync();
 
     sync();
 
@@ -79,7 +74,7 @@ export function MeasuredHeight({ children, className }: MeasuredHeightProps) {
     observer.observe(content);
     return () => {
       observer.disconnect();
-      box.style.removeProperty("height");
+      mirror.dispose();
     };
   }, []);
 

@@ -1,6 +1,6 @@
 # Alert motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated; numerical performance governance remains deferred under ADR-023.
 
 Alert makes a new message noticeable without delaying its announcement or shaking the whole surface. Inherit the [shared contract](../README.md) and [preset catalogue](../presets.md); bindings are internal design names.
 
@@ -10,28 +10,39 @@ Alert makes a new message noticeable without delaying its announcement or shakin
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
+  "regions": {
+    "root": ["alert"],
+    "surface": ["alert"],
+    "rich": ["alert-title", "alert-description"],
+    "text": ["alert-text"],
+    "value": ["alert-number"],
+    "icon": ["alert-icon-visual"],
+    "foreground": ["alert-title", "alert-description"]
+  },
+  "axes": { "root": ["height"] },
   "parts": {
+    "rich": ["alert#AlertTitle", "alert#AlertDescription"],
     "root": ["alert#Alert"],
     "text": ["alert#AlertTitle", "alert#AlertDescription"],
     "value": ["alert#AlertTitle", "alert#AlertDescription"],
     "surface": ["alert#Alert"],
     "icon": ["alert#Alert"],
-    "foreground": ["alert#Alert", "alert#AlertTitle", "alert#AlertDescription"]
+    "foreground": ["alert#AlertTitle", "alert#AlertDescription"]
   }
 }
 ```
 
 ## Capability ownership
 
-| Capability      | Coverage and owner                                                                                                                                                                              | References                                       |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Appearance      | default: alert owns one entrance; inherited when a parent notification/region owner consumes the same cause.                                                                                    | default: `alert.root.enter`, `alert.root.exit`   |
-| Size            | default: alert owns title/description/action-driven block size; a parent may consume outer sibling reflow.                                                                                      | default: `alert.root.resize`                     |
-| Surface colour  | default: alert background/border on variant/context updates; a caller-authored icon surface remains composed content.                                                                           | default: `alert.surface.colour`                  |
-| Text colour     | default: root/title/description and currentColor icon foreground; composed action controls retain their own state owners.                                                                       | default: `alert.foreground.colour`               |
-| Changed text    | default: plain AlertTitle/AlertDescription strings; root-level arbitrary children and rich message content retain composed ownership.                                                           | default: `alert.text.replace`; composed: `@text` |
-| Changed numbers | default: supported direct numeric Title/Description children are quantities using their existing displayed output; identifier/error-code strings remain text, and rich quantities are composed. | default: `alert.value.roll`; composed: `@value`  |
+| Capability      | Coverage and owner                                                                                                                                                                              | References                                                 |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Appearance      | default: alert owns one entrance; inherited when a parent notification/region owner consumes the same cause.                                                                                    | default: `alert.root.enter`, `alert.root.exit`             |
+| Size            | default: alert owns title/description/action-driven block size; a parent may consume outer sibling reflow.                                                                                      | default: `alert.root.resize`                               |
+| Surface colour  | default: alert background/border on variant/context updates; a caller-authored icon surface remains composed content.                                                                           | default: `alert.surface.colour`                            |
+| Text colour     | default: root/title/description and currentColor icon foreground; composed action controls retain their own state owners.                                                                       | default: `alert.surface.colour`, `alert.foreground.colour` |
+| Changed text    | default: plain AlertTitle/AlertDescription strings; root-level arbitrary children and rich message content retain composed ownership.                                                           | default: `alert.text.replace`; composed: `@rich`           |
+| Changed numbers | default: supported direct numeric Title/Description children are quantities using their existing displayed output; identifier/error-code strings remain text, and rich quantities are composed. | default: `alert.value.roll`; composed: `@rich`             |
 
 ## Choreography and modes
 
@@ -41,16 +52,16 @@ The presence.exit bindings below select the exit.fade recipe, not a popup ending
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Message insertion/removal / alert and retained parent | Surface opacity entrance/exit; role=alert and committed message are immediate.                       | Short opacity.                                           | Immediate. | `alert.root.enter` → `presence.surface` → `enter.pop/opacity`; `alert.root.exit` → `presence.exit` → `exit.fade/opacity`                                                                               |
 | Message/action content changes / alert                | Changed-only text, stagger:none, or quantity reels; measured height adjusts in the same transaction. | Short changed-text opacity; quantity/geometry immediate. | Immediate. | `alert.text.replace` → `text.replace` → `text.change/changed-runs`; `alert.value.roll` → `number.compact` → `number.roll/reels`; `alert.root.resize` → `geometry.content` → `geometry.resize/measured` |
-| Variant/context change / root and foreground owners   | Scoped colour transition.                                                                            | Short colour.                                            | Immediate. | `alert.surface.colour` → `state.color` → `state.color/surface`; `alert.foreground.colour` → `state.color` → `state.color/foreground`                                                                   |
+| Variant/context change / root and foreground owners   | Scoped colour transition.                                                                            | Short colour.                                            | Immediate. | `alert.surface.colour` → `state.color` → `state.color/surface-foreground`; `alert.foreground.colour` → `state.color` → `state.color/foreground`                                                        |
 | Explicit keyed icon replacement / existing icon child | Bounded opacity crossfade; no automatic SVG path morph.                                              | Short opacity.                                           | Immediate. | `alert.icon.replace` → `data.update` → `data.transition/opacity`                                                                                                                                       |
 
-The foreground binding coordinates the root and explicit title/description overrides; inherited title/currentColor icon paint follows that root once, without a second glyph controller. The text/value bindings address Title and Description only. An arbitrary direct root child is not discovered by scanning the alert grid.
+The root binding owns its combined surface/foreground CSS family once; the foreground binding owns explicit title/description overrides. Inherited title/currentColor icon paint follows the root without a second glyph controller. This grouping preserves all original colour actions while giving the actual combined writer an exact form. The text/value bindings address Title and Description only. An arbitrary direct root child is not discovered by scanning the alert grid.
 
 ## Interruption and lifecycle
 
 New messages replace pending targets, never wait for an earlier exit, and do not reannounce unchanged content through visual duplicates. Alert has no built-in close state: caller removal needs a surviving presence owner for exit. Reappearance retargets retained opacity/height. Live reduction cancels geometry/reels; none or zero clock also cancels message fades, colours and icon effects. Removed actions cannot retain tab stops.
 
-The current root remains the only live `role=alert` region. Retained icon/text/surface visuals are hidden from accessibility and copy semantics; do not remount the live region to obtain a new entrance. Parent close/removal cancels local effects, and stale icon completion cannot restore an outdated variant or message. A focusable action disappearing follows caller/native focus behavior immediately rather than remaining operable until fade completion.
+By default, the current root remains the only live `role=alert` region. Original native defaults and explicit caller `role` (including `undefined`), live attributes and `data-slot` overrides remain forwarded, together with native events, classes/styles and refs. A retained exiting root has no role and is inert/aria-hidden; reappearance restores the caller's values on that same root. Retained icon/text/surface visuals are hidden from accessibility and copy semantics; do not remount the live region to obtain a new entrance. Parent close/removal cancels local effects, and stale icon completion cannot restore an outdated variant or message. A focusable action disappearing follows caller/native focus behavior immediately rather than remaining operable until fade completion.
 
 ## Geometry and performance
 
@@ -60,8 +71,10 @@ Keep the incoming direct SVG and existing grid/selector contract intact. A retai
 
 ## Acceptance scenarios
 
-Target acceptance; not executed: default/destructive changes; icon added/removed; concurrent title/description/action changes; error-code versus count content; repeated message updates without duplicate announcements; caller removal; all modes and zero clock during resize.
+Required acceptance: default/destructive changes; icon added/removed; concurrent title/description/action changes; error-code versus count content; repeated message updates without duplicate announcements; caller removal; all modes and zero clock during resize.
 
-Also pending: update root foreground with an inheriting currentColor icon and an independently coloured description; each property has one owner and arbitrary root children keep their structure.
+Required composition: update root foreground with an inheriting currentColor icon and an independently coloured description; each property has one owner and arbitrary root children keep their structure.
 
-Also pending: an icon swaps while an AlertAction is focused and its description expands, then the alert closes; preserve one grid column/name/announcement and no clipped action or stale icon overlay.
+Required composition: an icon swaps while an AlertAction is focused and its description expands, then the alert closes; preserve one grid column/name/announcement and no clipped action or stale icon overlay.
+
+The internal `alert-icon-visual` span is always inert, empty at rest and absolutely positioned. It retains at most one safe outgoing SVG and never participates in the icon-column selector. Explicit keyed, aria-hidden icons with bounded static shape children may crossfade with the original incoming SVG. Unknown SVG/style/transform or native-opacity ownership commits immediately. A superseding icon retires active layers immediately; it never queues an older icon. Root geometry has its own clock; an ancestor can coordinate its outer allocation without lending permission to a reduced/none Alert.

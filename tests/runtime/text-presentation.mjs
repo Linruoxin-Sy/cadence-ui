@@ -462,7 +462,6 @@ try {
           ["abc", "אבג", "direction:rtl"],
           ["é👩🏽‍💻", "é👨‍👩‍👧‍👦", ""],
           ["a\nb\tc", "a\nB\tc", "white-space:pre-wrap"],
-          ["Save", "Saved", "letter-spacing:2px"],
           ["Save", "Saved", "text-transform:uppercase"],
         ]) {
           await test(`unsafe typography stays native exact: ${JSON.stringify(before)} ${style}`, () => {
@@ -475,10 +474,72 @@ try {
             f.dispose();
           });
         }
-        await test("real wrapping matches unsplit reference without inline-block or font override", () => {
+        for (const spacing of ["-0.35px", "2px"])
+          await test(`proven native letter spacing ${spacing}`, async () => {
+            const f = make("Save", { style: `letter-spacing:${spacing}` }),
+              text = f.host.firstChild,
+              style = f.host.style.cssText;
+            f.commit("Saved");
+            await frame();
+            check(
+              "exact native text and identity",
+              f.host.textContent === "Saved" && f.host.firstChild === text && f.host.style.cssText === style,
+            );
+            check(
+              "actual changed glyph texture",
+              [...document.querySelectorAll("[data-cadence-text-layer]")]
+                .filter((layer) => layer.dataset.cadenceTextOwner === f.host.id)
+                .some((layer) =>
+                  [...layer.querySelectorAll("canvas")].some((canvas) =>
+                    canvas
+                      .getContext("2d")
+                      .getImageData(0, 0, canvas.width, canvas.height)
+                      .data.some((value, index) => index % 4 === 3 && value > 0),
+                  ),
+                ),
+            );
+            f.dispose();
+          });
+        await test("ineffective Canvas letter spacing never lends native typography proof", () => {
+          const prototype = CanvasRenderingContext2D.prototype,
+            original = Object.getOwnPropertyDescriptor(prototype, "letterSpacing");
+          try {
+            Object.defineProperty(prototype, "letterSpacing", {
+              configurable: true,
+              get() {
+                return "0px";
+              },
+              set() {},
+            });
+            const f = make("Save", { style: "letter-spacing:-0.35px" }),
+              text = f.host.firstChild;
+            f.commit("Saved");
+            check("native exact", f.host.textContent === "Saved" && f.host.firstChild === text);
+            check("no unproven fade", all(f.host).length === 0);
+            f.dispose();
+          } finally {
+            if (original) Object.defineProperty(prototype, "letterSpacing", original);
+            else delete prototype.letterSpacing;
+          }
+        });
+        await test("real wrapping paints changed glyphs and matches unsplit reference without font override", async () => {
           const style = "display:block;width:100px;white-space:normal";
           const f = make("one two three four", { style });
+          const text = f.host.firstChild;
+          check("real wrapped-space proof", proveTextLayout(f.host, createTextSnapshot(f.host.textContent)) !== null);
           f.commit("one two three five");
+          await frame();
+          check("actual changed glyph animation", all(f.host).length > 0);
+          check("native Text retained", f.host.firstChild === text);
+          check(
+            "real changed ink",
+            [...document.querySelectorAll(`[data-cadence-text-owner="${f.host.id}"] canvas`)].some((canvas) =>
+              canvas
+                .getContext("2d")
+                .getImageData(0, 0, canvas.width, canvas.height)
+                .data.some((v, i) => i % 4 === 3 && v > 0),
+            ),
+          );
           const reference = document.createElement("span");
           reference.style.cssText = style;
           reference.textContent = f.host.textContent;
@@ -493,6 +554,22 @@ try {
             ),
           );
           f.dispose();
+        });
+        await test("fragmented visible glyphs cannot borrow collapsed-space proof", () => {
+          const original = Range.prototype.getClientRects;
+          try {
+            Range.prototype.getClientRects = function () {
+              const rects = original.call(this);
+              return this.toString() === "S" && rects.length === 1 ? [rects[0], rects[0]] : rects;
+            };
+            const f = make("Save");
+            check("visible fragmentation rejects", proveTextLayout(f.host, createTextSnapshot("Save")) === null);
+            f.commit("Saved");
+            check("exact native fallback", f.host.textContent === "Saved" && all(f.host).length === 0);
+            f.dispose();
+          } finally {
+            Range.prototype.getClientRects = original;
+          }
         });
         await test("truncation paint respects clipping and native scroll extent", () => {
           const f = make("abcdefghij", {

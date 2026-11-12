@@ -2,15 +2,15 @@
 title: Alert
 description: Errors, warnings, and page-level status messages.
 category: feedback
-motion: []
-intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motion: ["enter.pop","exit.fade",{"recipe":"state.color","form":"css-transition"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"},"data.transition"]
+intensity: medium
+motionProfile: {"scope":"surface","travel":"compact","coordination":"group","reason":"One live alert surface coordinates opacity, readable height, changed message text, quantity reels and keyed decorative icon replacement; composed actions keep native ownership."}
+motionCoverage: {"schema":1,"effects":{"enter.pop/one-shot":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}],"exit.fade/one-shot":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}],"state.color/css-transition":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}],"geometry.resize/measured":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}],"text.change/changed-runs":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}],"number.roll/reels":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}],"data.transition/one-shot":[{"relationship":"default","owner":"alert","reason":"Alert integrates its stable root, named readouts and bounded inert icon visual; arbitrary rich content and action controls retain their native owners."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: ["class-variance-authority"]
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["class-variance-authority","motion"]
+registryDeps: ["@cadence/cadence-motion","@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text","@cadence/cadence-number","@cadence/cadence-surface-presence"]
 ---
 
 ## Installation
@@ -25,35 +25,26 @@ npx shadcn@latest add @cadence/alert
 
 [Manual installation files](https://cadence.dev/r/alert.json)
 
-Keep `alert/index.tsx` and `lib/cn.ts` at the listed relative paths so the shared
-`cn` import resolves. Alert is a static T0 component in full, reduced and none
-modes; no motion runtime, provider or additional item-specific CSS is required
-beyond the base theme and Tailwind utilities. Alert's source has no `"use client"`
-directive and can be rendered on the server.
+Copy every file in the Manual list at its listed relative path. Alert uses `motion`
+and `class-variance-authority`, plus the shared provider, measured geometry, text,
+number, colour and surface-presence helpers. It is a client component; its initial
+server-rendered message remains visible and hydration does not replay entrance.
+`CadenceProvider` is optional and controls full, reduced or none and the shared clock.
 
-Usage, Destructive and the top preview use icons from `lucide-react`; With an
-action uses the same package. Install it when keeping those icons:
+The icon examples use `lucide-react`. Changing messages and With an action also use
+[Button](/components/button); install them when retaining those examples:
 
 ```package-manager
 npm install lucide-react
 ```
 
-With an action also uses [Button](/components/button). Install it when using that
-example:
-
 ```install
 npx shadcn@latest add @cadence/button
 ```
 
-For a manual Button installation, follow its Manual tab and copy every shared
-motion and provider file it lists. Button adds `@base-ui/react` and `motion` to
-the packages listed above; wrapping the application in its provider is optional.
-Its press scale runs in full mode and is dropped in reduced and none modes;
-Alert itself remains static. Keep the example's `"use client"` directive for
-React state and event handlers. The caller owns dismissal and remounting.
-
-Without an icon needs only Alert and native content. No example needs image
-assets, and the site's preview frame is not consumer setup.
+The caller owns message data, dismissal and remounting. A surviving `AnimatePresence`
+owner from `motion/react` permits exit; immediate caller unmount has no retained exit.
+No example needs image assets or the site's preview frame.
 
 ## Usage
 
@@ -72,9 +63,82 @@ export function QuotaNotice() {
 }
 ```
 
+## Changing messages
+
+Message semantics update immediately in one live region. Only changed primitive title/description
+text fades; direct numeric children are quantities and roll, while strings such as `ERR_042`
+remain text. The original direct icon keeps the grid column. A keyed decorative replacement
+can crossfade through one inert outgoing visual. Rich descriptions and action controls retain
+their existing nodes and native behavior. The title keeps its one-line clamp and tracking. Change tone switches the palette while keeping the current message.
+
+<ComponentExample name="changing" />
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { AnimatePresence } from "motion/react";
+import { CircleAlertIcon, TriangleAlertIcon } from "lucide-react";
+import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/cadence/alert";
+import { Button } from "@/components/cadence/button";
+
+export function ChangingAlert() {
+  const [failed, setFailed] = useState(false);
+  const [destructive, setDestructive] = useState(false);
+  const [count, setCount] = useState(19);
+  const [show, setShow] = useState(true);
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" variant="outline" onClick={() => setFailed((value) => !value)}>
+          Update message
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setCount((value) => value + 1)}>
+          Add retry
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setDestructive((value) => !value)}>
+          Change tone
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setShow((value) => !value)}>
+          {show ? "Hide message" : "Show message"}
+        </Button>
+      </div>
+      <AnimatePresence>
+        {show && (
+          <Alert
+            key="message"
+            variant={destructive ? "destructive" : "default"}
+            style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}
+          >
+            {failed ? (
+              <TriangleAlertIcon key="warning" aria-hidden="true" />
+            ) : (
+              <CircleAlertIcon key="info" aria-hidden="true" />
+            )}
+            <AlertTitle>{failed ? "Deploy failed" : "Deploy pending"}</AlertTitle>
+            <AlertDescription>
+              {failed ? "ERR_042: previous release live. Retry this build." : "Awaiting build result."}
+            </AlertDescription>
+            <AlertAction>
+              <Button size="sm" variant="outline" onClick={() => setShow(false)}>
+                Dismiss
+              </Button>
+            </AlertAction>
+          </Alert>
+        )}
+      </AnimatePresence>
+      <Alert style={{ fontFamily: '"Courier New", monospace', fontFeatureSettings: "normal" }}>
+        <AlertTitle>Retries remaining</AlertTitle>
+        <AlertDescription>{count}</AlertDescription>
+      </Alert>
+    </div>
+  );
+}
+```
+
 ## With an action
 
-`AlertAction` occupies a separate column spanning both text rows. Dismiss clears the caller-owned message; Show alert mounts it again. Alert does not own dismissal state or provide an `onClose` prop. The composed Button inherits the header motion settings.
+`AlertAction` occupies a separate column spanning both text rows. Dismiss clears the caller-owned message; Show alert mounts it again. Alert does not own dismissal state or provide an `onClose` prop. The composed Button inherits the ambient Cadence settings.
 
 <ComponentExample name="action" />
 
@@ -177,26 +241,39 @@ Destructive descriptions use the full destructive text token for readable contra
 
 ## Motion contract
 
-Authored intensity is **subtle**: Alert declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: One live alert surface coordinates opacity, readable height, changed message text, quantity reels and keyed decorative icon replacement; composed actions keep native ownership.
 
-No motion (T0). An alert that slides or fades in draws attention to the animation
-instead of the message, and a message that is already on screen when the page loads
-did not change — animating it is decoration (P9).
+The surface coordinates its changed content without travel or child entrance cascades. The root has one combined surface/foreground paint owner;
+explicit title and description colours have their own disjoint owners. The currentColor icon
+inherits root paint once. Buttons retain their own interaction contract.
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+| Recipe / form | Full | Reduced | None |
+| --- | --- | --- | --- |
+| `enter.pop/one-shot` | Dynamic surface opacity entrance; no initial SSR/hydration replay | Short opacity | Immediate |
+| `exit.fade/one-shot` | Retained opacity exit; actions become inert and the outgoing region loses its role immediately | Short opacity | Immediate removal |
+| `geometry.resize/measured` | Clamped, readable message/action height at destination width | Immediate | Immediate |
+| `state.color/css-transition` | Scoped readable root and explicit foreground colour feedback | Short colour | Zero duration and delay |
+| `text.change/changed-runs` | Primitive Title/Description string: changed-only opacity, no stagger; unchanged Text identity survives | Short changed opacity | Exact text immediately |
+| `number.roll/reels` | Direct numeric Title/Description quantity: compact place-value reels; semantic value immediate | Exact number immediately | Exact number immediately |
+| `data.transition/one-shot` | Explicit keyed decorative SVG: bounded outgoing/incoming opacity; no SVG path morph | Short opacity | Immediate |
 
-The border and text colours are state feedback on the design tokens; they are not
-animated and carry no timing.
+Repeated updates replace the current target without queuing obsolete messages. Live reduced
+settles geometry/reels, and none or zero clock cancels all local effects. Reopening a retained
+surface uses the current message without remounting the live region. A parent entrance consumes
+the same cause once; independent later message updates keep their own owners.
+
+Height interpolation only exposes safe remaining space. If final content would clip, focus/editing
+would drift, sizing is constrained, the map is unknown, or a native writer owns an axis, that axis
+commits immediately. Icon retention requires an explicit key, aria-hidden SVG and bounded static
+shapes. Unsupported SVG/style/transforms or native opacity ownership replace immediately. Rapid
+icon replacement retires existing layers immediately. Arbitrary root children and rich descriptions
+are never recursively tokenized. Unknown font features keep the native text/number fallback and
+caller typography.
 
 ## Accessibility
 
-- `role="alert"` makes the alert an assertive live region. Mount it when the state
-  appears; do not keep a permanent alert in the tree and toggle its text, because
-  every change interrupts whatever the screen reader was saying.
+- `role="alert"` makes the alert an assertive live region. Mount it when a meaningful state appears; update its committed message only when
+  the status changes. Visual copies are inert and hidden; they add no live regions or names.
 - The icon is decorative — mark it `aria-hidden` if it duplicates the title. An
   icon inside a link or a button is different: that one needs its own name.
 - `variant="destructive"` is colour plus a title that says what happened. Never rely
@@ -210,10 +287,15 @@ Alerts fill their parent and reserve separate columns for icon, text and optiona
 action labels short or adapt the composition for narrow containers; the caller owns long-content
 wrapping.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Server-rendered markup does not
-imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
-this item's own shipped source; dependencies and application bundles are measured separately.
+T0 is a compatibility/documentation tier. Alert uses the shared motion runtime and bounded
+known-slot work. Passive wrapping and unsupported geometry settle natively; required content and
+action focus rings remain visible. The initial SSR/no-JS message is visible; hydrated handlers
+require JavaScript. The demo uses Courier New with normal font features to expose the supported
+text path; consumers keep their existing typography and native fallback for unknown features.
+
+The historical 4 KiB gzip own-source reference and component/page/runtime/FPS/CLS budgets are
+advisory during functional migration under ADR-023. This migration makes no performance acceptance
+claim; separate performance governance remains pending.
 
 ## Notes for AI
 

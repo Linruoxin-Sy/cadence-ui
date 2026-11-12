@@ -32,6 +32,72 @@ type Active = { entity: unknown; work: Work; revoke(settle?: boolean): (() => vo
 const writers = new WeakMap<object, Map<string, object>>();
 const textGeometry = new WeakMap<Animation, { lease: MotionLease; mode: CadenceMode }>();
 const leaseGeometry = new WeakMap<MotionLease, { host: object; properties: string[] }>();
+const nativeHeightEchoes = new WeakMap<
+  HTMLElement,
+  {
+    lease: MotionLease;
+    content: HTMLElement;
+    before: string | null;
+    after: string | null;
+  }
+>();
+
+/** Internal native maintainer receipt. The caller actually owns/writes height;
+ * a matching attribute, zero-duration Animation or claimed scope is insufficient. */
+function registerNativeHeightEcho(host: HTMLElement, content: HTMLElement, lease: MotionLease, before: string | null) {
+  const source = { lease, content, before, after: host.getAttribute("style") };
+  const proof = leaseGeometry.get(lease);
+  if (
+    lease.current() &&
+    proof?.host === host &&
+    proof.properties.length === 1 &&
+    proof.properties[0] === "height" &&
+    content.parentElement === host &&
+    host.childElementCount === 1
+  )
+    nativeHeightEchoes.set(host, source);
+  return () => {
+    if (nativeHeightEchoes.get(host) === source) nativeHeightEchoes.delete(host);
+  };
+}
+
+/** Exact native mirror writes may change intrinsic allocation up the same real
+ * ancestry. Other properties, caller writes and any unverified mutation stay strict. */
+export function nativeTextHeightEcho(changes: readonly MutationRecord[], host: HTMLElement): ReadonlySet<HTMLElement> {
+  if (changes.length > motionLimits.collectionVisuals) return new Set();
+  const owners: HTMLElement[] = [];
+  for (const change of changes) {
+    if (change.type !== "attributes" || change.attributeName !== "style" || !(change.target instanceof HTMLElement))
+      return new Set();
+    const node = change.target,
+      style = node.getAttribute("style");
+    if (style === change.oldValue) continue;
+    const source = nativeHeightEchoes.get(node),
+      proof = source && leaseGeometry.get(source.lease);
+    if (
+      !source?.lease.current() ||
+      proof?.host !== node ||
+      proof.properties.length !== 1 ||
+      proof.properties[0] !== "height" ||
+      source.before !== change.oldValue ||
+      source.after !== style ||
+      source.content.parentElement !== node ||
+      node.childElementCount !== 1 ||
+      !source.content.contains(host)
+    )
+      return new Set();
+    owners.push(node);
+  }
+  const result = new Set<HTMLElement>();
+  if (!owners.length) return result;
+  let depth = 0;
+  for (let node = host.parentElement; node; node = node.parentElement) {
+    if (++depth > motionLimits.collectionVisuals) return new Set();
+    const height = node.computedStyleMap?.().get("height")?.toString();
+    if (owners.includes(node) || ["auto", "fit-content", "max-content"].includes(height ?? "")) result.add(node);
+  }
+  return result;
+}
 
 /** Internal proof for final-width, non-scaling strip projections. A bare caller
  * animation, an expired owner or a changed property family never gets this path. */
@@ -326,6 +392,40 @@ export function createMotionTransaction() {
         },
       };
       return registration;
+    },
+  };
+}
+
+/** Native, all-mode size maintenance for one real content child. No second
+ * content tree, tween, caller clock or synthetic animation is introduced. */
+export function createNativeHeightMirror(host: HTMLElement, content: HTMLElement) {
+  const transaction = createMotionTransaction(),
+    owner = transaction.register(host);
+  let clear: (() => void) | undefined;
+  return {
+    sync() {
+      const height = content.getBoundingClientRect().height;
+      if (host.style.height === (height ? `${height}px` : "")) return;
+      clear?.();
+      clear = undefined;
+      if (!height) {
+        owner.begin(transaction.revision("layout", null, content), ["height"], {}, () => {})?.finish();
+        host.style.removeProperty("height");
+        return;
+      }
+      const lease = owner.begin(transaction.revision("layout", height, content), ["height"], {}, () => {
+        clear?.();
+        clear = undefined;
+      });
+      const before = host.getAttribute("style");
+      host.style.height = `${height}px`;
+      if (lease) clear = registerNativeHeightEcho(host, content, lease, before);
+    },
+    dispose() {
+      clear?.();
+      clear = undefined;
+      owner.dispose();
+      host.style.removeProperty("height");
     },
   };
 }

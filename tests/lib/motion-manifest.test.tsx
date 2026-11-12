@@ -12,6 +12,20 @@ import { inheritedSlotOverrides } from "../../scripts/motion-v2.mjs";
 
 const source = readFileSync("registry/cadence/accordion/index.tsx", "utf8");
 
+it("requires both exact Alert icon opacity writers and a bounded retained visual", () => {
+  const source = readFileSync("registry/cadence/lib/alert-icon.ts", "utf8");
+  expect(parameterWriterForms(source)).toEqual(["data.transition/opacity"]);
+  for (const broken of [
+    source.replaceAll("node.animate(", "missing("),
+    source.replaceAll("next.svg.animate(", "missing("),
+    source.replaceAll('owner.begin(revision, ["opacity"]', 'missing(revision, ["opacity"]'),
+    source.replaceAll('incoming.begin(revision, ["opacity"]', 'missing(revision, ["opacity"]'),
+    source.replaceAll("node.replaceChildren(previous.copy)", "missing(previous.copy)"),
+    source.replaceAll('from "./motion"', 'from "@/motion"'),
+  ])
+    expect(parameterWriterForms(broken)).toEqual([]);
+});
+
 it("requires the actual bounded group projection factory, not a declaration or similar clock", () => {
   const source = readFileSync("registry/cadence/lib/button-group-layout.ts", "utf8");
   expect(parameterWriterForms(source)).toEqual(["layout.move/position"]);

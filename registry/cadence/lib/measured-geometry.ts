@@ -88,6 +88,9 @@ type Adapter = {
   textGeometry?: boolean;
   /** Wrapper-free hosts observe bounded real child boxes for passive reflow. */
   observeChildren?: boolean;
+  /** Exact adapter-owned, inert out-of-flow decoration; never caller content.
+   * Its finite visual lifecycle cannot reclassify a semantic resize as passive. */
+  decoration?: HTMLElement | null;
   /** A known compound can preserve an ordinary focused control on its safe layer.
    * Native editing/capture exclusions remain the adapter's explicit obligation. */
   focusSafe?: (active: Element | null) => boolean;
@@ -247,7 +250,9 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
         naturalWidth = content.offsetWidth;
         naturalHeight = content.offsetHeight;
         if (adapter.observeChildren) {
-          const children = Array.from(content.children).slice(0, motionLimits.collectionVisuals);
+          const children = Array.from(content.children)
+            .filter((child) => child !== adapter.decoration)
+            .slice(0, motionLimits.collectionVisuals);
           for (const child of naturalChildren.keys())
             if (!children.includes(child)) {
               observer.unobserve(child);
@@ -375,6 +380,10 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           if (adapter.textGeometry) registerTextGeometry(effect, lease, "full");
           const permit = lease;
           const write = (value: number) => {
+            if (current() && permit.current() && !safeEngines()) {
+              cancel();
+              return;
+            }
             if (current() && permit.current())
               (effect.effect as KeyframeEffect | null)?.setKeyframes({
                 [axis]: `${Math.min(max, Math.max(min, value))}px`,
@@ -443,7 +452,7 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
       return (
         handles.length <= motionLimits.collectionVisuals &&
         handles.every((handle) => {
-          if (Object.values(effects).includes(handle)) return true;
+          if (Object.values(effects).includes(handle) || handle === flexBlock) return true;
           const frames = (handle.effect as KeyframeEffect | null)?.getKeyframes() ?? [];
           return (
             frames.length <= motionLimits.collectionVisuals &&
@@ -513,6 +522,16 @@ export function createMeasuredGeometry(transaction = createMotionTransaction()) 
           (adapter.observeChildren &&
             (constraintSignature() !== constraints ||
               records.some((record) => {
+                const decoration = adapter.decoration;
+                if (
+                  decoration?.parentElement === content &&
+                  decoration.inert &&
+                  decoration.getAttribute("aria-hidden") === "true" &&
+                  view?.getComputedStyle(decoration).position === "absolute" &&
+                  decoration.contains(record.target)
+                )
+                  return false;
+                if (decoration?.contains(record.target)) return true;
                 if (record.type === "characterData") return record.oldValue !== record.target.nodeValue;
                 if (record.type !== "childList") return false;
                 // React may replace a textarea's default Text on an equal-value

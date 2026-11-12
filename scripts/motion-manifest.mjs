@@ -309,11 +309,30 @@ export function parameterWriterForms(source) {
     ...new Set([
       ...parameterWriterBindings(source).map((binding) => binding.form),
       ...inlinePresenceForms(source),
+      ...alertIconForms(source),
       ...selectPresentationForms(source),
       ...kbdPresentationForms(source),
       ...groupPositionForms(source),
     ]),
   ];
+}
+
+/** Alert's fixed opacity pair on a known inert SVG snapshot and original icon.
+ * Presence registration or a recipe string alone supplies no implementation. */
+function alertIconForms(source) {
+  const selected = motionSource(source);
+  return selected.source.includes("function createAlertIcon(") &&
+    selected.imports.some(
+      (entry) => entry.name === "bindMotionParameters" && entry.path.startsWith(".") && entry.path.endsWith("/motion"),
+    ) &&
+    selected.source.includes('bindMotionParameters(dataUpdate, "data.transition/opacity")') &&
+    selected.source.includes('owner.begin(revision, ["opacity"]') &&
+    selected.source.includes('incoming.begin(revision, ["opacity"]') &&
+    selected.source.includes("node.animate(") &&
+    selected.source.includes("next.svg.animate(") &&
+    selected.source.includes("node.replaceChildren(previous.copy)")
+    ? ["data.transition/opacity"]
+    : [];
 }
 
 /** Fixed collection-layer projection. Authored clocks and the executing factory

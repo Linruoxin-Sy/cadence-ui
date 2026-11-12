@@ -23,6 +23,7 @@ export type TextLayout = {
   descent: number;
   baseline: number;
   kerning: CanvasFontKerning;
+  letterSpacing: string;
 };
 
 /** Actual inherited editing, including plaintext-only and explicit false islands. */
@@ -92,7 +93,7 @@ export function proveTextLayout(
     css.textTransform !== "none" ||
     css.textShadow !== "none" ||
     css.textDecorationLine !== "none" ||
-    !["normal", "0px"].includes(css.letterSpacing) ||
+    (css.letterSpacing !== "normal" && !/^-?(?:\d+(?:\.\d+)?|\.\d+)px$/.test(css.letterSpacing)) ||
     !["normal", "0px"].includes(css.wordSpacing) ||
     css.fontFeatureSettings !== "normal" ||
     css.fontVariationSettings !== "normal" ||
@@ -142,6 +143,17 @@ export function proveTextLayout(
   if (!context) return null;
   context.font = css.font;
   context.fontKerning = css.fontKerning as CanvasFontKerning;
+  const letterSpacing = css.letterSpacing === "normal" ? "0px" : css.letterSpacing;
+  if (letterSpacing !== "0px") {
+    if (typeof context.letterSpacing !== "string") return null;
+    context.letterSpacing = letterSpacing;
+    if (context.letterSpacing !== letterSpacing) return null;
+    const spaced = context.measureText(snapshot.value).width;
+    context.letterSpacing = "0px";
+    const unspaced = context.measureText(snapshot.value).width;
+    context.letterSpacing = letterSpacing;
+    if (snapshot.value && spaced === unspaced) return null;
+  }
   const metrics = context.measureText(snapshot.value);
   const padding = Math.ceil(Number.parseFloat(css.fontSize));
   const ascent = metrics.fontBoundingBoxAscent,
@@ -161,6 +173,7 @@ export function proveTextLayout(
   canvas.height = height;
   context.font = css.font;
   context.fontKerning = css.fontKerning as CanvasFontKerning;
+  if (typeof context.letterSpacing === "string") context.letterSpacing = letterSpacing;
   context.fillText(snapshot.value, padding, padding + ascent);
   const whole = context.getImageData(0, 0, width, height).data;
   context.clearRect(0, 0, width, height);
@@ -181,7 +194,19 @@ export function proveTextLayout(
     range.setStart(text, start);
     range.setEnd(text, start + unit.text.length);
     const rects = range.getClientRects();
-    if (rects.length !== 1) return null;
+    if (rects.length !== 1) {
+      const ink = context.measureText(unit.text);
+      if (
+        unit.text !== " " ||
+        rects.length !== 2 ||
+        ink.actualBoundingBoxLeft !== 0 ||
+        ink.actualBoundingBoxRight !== 0 ||
+        [...rects].some(
+          (rect) => rect.width !== 0 || ![rect.left, rect.top, rect.height].every(Number.isFinite) || rect.height <= 0,
+        )
+      )
+        return null;
+    }
     const box = rects[0];
     if (!box || ![box.left, box.top, box.width, box.height].every(Number.isFinite) || box.height <= 0) return null;
     boxes.set(unit.identity, { left: box.left, top: box.top, width: box.width, height: box.height });
@@ -215,6 +240,7 @@ export function proveTextLayout(
     descent,
     baseline,
     kerning: css.fontKerning as CanvasFontKerning,
+    letterSpacing,
   };
 }
 
@@ -349,6 +375,8 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
   const context = canvas.getContext("2d");
   if (!context) return null;
   context.font = layout.font;
+  context.fontKerning = layout.kerning;
+  if (typeof context.letterSpacing === "string") context.letterSpacing = layout.letterSpacing;
   const metrics = context.measureText(unit.text);
   const inkLeft = Math.min(box.left, box.left - metrics.actualBoundingBoxLeft);
   const inkRight = Math.max(box.left + box.width, box.left + metrics.actualBoundingBoxRight);
@@ -381,6 +409,7 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
   context.scale(ratio, ratio);
   context.font = layout.font;
   context.fontKerning = layout.kerning;
+  if (typeof context.letterSpacing === "string") context.letterSpacing = layout.letterSpacing;
   context.fillStyle = layout.color;
   context.fillText(unit.text, box.left - left, box.top - top + layout.baseline);
   Object.assign(canvas.style, {
@@ -395,4 +424,51 @@ export function outgoingTextPaint(host: HTMLElement, unit: TextUnit, layout: Tex
   canvas.setAttribute("aria-hidden", "true");
   canvas.dataset.cadenceTextPaint = "";
   return canvas;
+}
+
+/** Exact inherited paint/allocation signature for native-height receipt coordination. */
+export function textPaintSignature(chain: readonly HTMLElement[], view: Window | null) {
+  return chain.map((node) => {
+    const css = view?.getComputedStyle(node);
+    return css
+      ? {
+          paint: [
+            css.font,
+            css.color,
+            css.whiteSpace,
+            css.letterSpacing,
+            css.wordSpacing,
+            css.textTransform,
+            css.textDecorationLine,
+            css.fontFeatureSettings,
+            css.fontVariationSettings,
+            css.opacity,
+            css.visibility,
+            css.display,
+            css.translate,
+            css.scale,
+            css.rotate,
+            css.filter,
+            css.perspective,
+            css.position,
+            css.overflowX,
+            css.overflowY,
+            css.clipPath,
+            css.maskImage,
+            css.backdropFilter,
+            css.contentVisibility,
+            css.contain,
+            css.willChange,
+            css.borderTopLeftRadius,
+            css.borderTopRightRadius,
+            css.borderBottomLeftRadius,
+            css.borderBottomRightRadius,
+            css.zoom,
+          ].join("/"),
+          width: css.width,
+          height: css.height,
+          transform: css.transform,
+        }
+      : null;
+  });
 }

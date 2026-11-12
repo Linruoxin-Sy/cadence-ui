@@ -3,7 +3,12 @@
 import { animateSingleValue, motionValue, type Transition } from "motion/react";
 import { bindMotionParameters, motionLimits, numberCompact, numberRoll, textProofLimits } from "./motion";
 import { subscribeMotionEnvironment } from "./motion-environment";
-import { createMotionTransaction, type MotionLease, type MotionRevision } from "./motion-transaction";
+import {
+  createMotionTransaction,
+  type MotionLease,
+  type MotionRevision,
+  nativeTextHeightEcho,
+} from "./motion-transaction";
 import {
   boundNumberRevision,
   type NumberPlan,
@@ -21,6 +26,7 @@ import {
   ownedTextHighlights,
   proveTextLayout,
   selectedTextContext,
+  textPaintSignature,
 } from "./text-layout";
 
 export interface NumberPresentationCommit {
@@ -127,12 +133,32 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       stop();
   };
   const chain: HTMLElement[] = [];
+  let paintSignature: ReturnType<typeof textPaintSignature> = [];
   const transition = (event: TransitionEvent) => {
     // A sibling's hover/focus transition does not move or repaint this glyph.
     if (chain.includes(event.target as HTMLElement)) stop();
   };
   const observer = new MutationObserver((changes) => {
-    stop();
+    const nativeHeight = nativeTextHeightEcho(changes, host);
+    const next = nativeHeight.size ? textPaintSignature(chain, view) : [];
+    const echoed =
+      next.length > 0 &&
+      next.length === paintSignature.length &&
+      next.every((value, index) => {
+        const before = paintSignature[index];
+        const node = chain[index];
+        return (
+          value &&
+          before &&
+          node &&
+          value.paint === before.paint &&
+          value.width === before.width &&
+          value.transform === before.transform &&
+          (nativeHeight.has(node) || value.height === before.height)
+        );
+      });
+    if (echoed) paintSignature = next;
+    else stop();
     restrict();
     if (changes.some((change) => change.type !== "attributes")) {
       if (editing) nativeOwned = true;
@@ -144,6 +170,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
     chain.push(node);
     observer.observe(node, {
       attributes: true,
+      attributeOldValue: true,
       attributeFilter: ["class", "style", "hidden", "inert", "aria-hidden", "dir", "contenteditable"],
     });
     node.addEventListener("transitionrun", transition, true);
@@ -246,7 +273,19 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
     });
   const boxKey = (layout: NonNullable<ReturnType<typeof proveTextLayout>>, identity: object) => {
     const box = layout.boxes.get(identity);
-    return box ? [box.left, box.top, box.width, box.height, layout.font, layout.color, layout.baseline].join("/") : "";
+    return box
+      ? [
+          box.left,
+          box.top,
+          box.width,
+          box.height,
+          layout.font,
+          layout.color,
+          layout.baseline,
+          layout.kerning,
+          layout.letterSpacing,
+        ].join("/")
+      : "";
   };
   const play = (revision: MotionRevision, transition: Transition) => {
     const records = lanes;
@@ -360,6 +399,7 @@ export function createNumberPresentation(host: HTMLElement, transaction = create
       snapshot = plan.snapshot;
       baseline = false;
       const after = before && proveTextLayout(host, textSnapshot(snapshot));
+      paintSignature = textPaintSignature(chain, view);
       observer.takeRecords();
       if (
         !before ||

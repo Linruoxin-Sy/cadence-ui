@@ -16,6 +16,7 @@ import {
   knownTextGeometry,
   type MotionLease,
   type MotionRevision,
+  nativeTextHeightEcho,
   textGeometryProperties,
 } from "./motion-transaction";
 import type { CadenceMotion } from "./provider";
@@ -28,6 +29,7 @@ import {
   proveTextLayout,
   selectedTextContext,
   surfaceOnlyAnimation,
+  textPaintSignature,
   textSurfacePaint,
 } from "./text-layout";
 
@@ -90,66 +92,32 @@ export function createTextPresentation(
   let releaseLayoutAnchor: (() => void) | null = null;
   let mask: { name: string; highlight: Highlight; sheet: CSSStyleSheet } | null = null;
   let environment: MotionEnvironment = { hidden: false, immediate: false, reduced: false, themeOwned: false };
-  const signature = () =>
-    chain.map((node) => {
-      const css = view?.getComputedStyle(node);
-      return css
-        ? {
-            paint: [
-              css.font,
-              css.color,
-              css.whiteSpace,
-              css.letterSpacing,
-              css.wordSpacing,
-              css.textTransform,
-              css.textDecorationLine,
-              css.fontFeatureSettings,
-              css.fontVariationSettings,
-              css.opacity,
-              css.visibility,
-              css.display,
-              css.translate,
-              css.scale,
-              css.rotate,
-              css.filter,
-              css.perspective,
-              css.position,
-              css.overflowX,
-              css.overflowY,
-              css.clipPath,
-              css.maskImage,
-              css.backdropFilter,
-              css.contentVisibility,
-              css.contain,
-              css.willChange,
-              css.borderTopLeftRadius,
-              css.borderTopRightRadius,
-              css.borderBottomLeftRadius,
-              css.borderBottomRightRadius,
-              css.zoom,
-            ].join("/"),
-            width: css.width,
-            height: css.height,
-            transform: css.transform,
-          }
-        : null;
-    });
+  const signature = () => textPaintSignature(chain, view);
   let auditFrame: number | null = null;
   let paintSignature: ReturnType<typeof signature> = [];
-  const sameSignature = () => {
+  const sameSignature = (nativeHeight: ReadonlySet<HTMLElement> = new Set()) => {
     const next = signature();
-    return next.every((value, index) => {
+    const valid = next.every((value, index) => {
       const before = paintSignature[index];
       const node = chain[index];
       if (!value || !before || !node || value.paint !== before.paint) return false;
       const geometry = current?.stripGeometry ? textGeometryProperties(node, current.cm.mode) : new Set<string>();
       return (
         ([...geometry].some((key) => /^(?:width|min-width|max-width)$/.test(key)) || value.width === before.width) &&
-        ([...geometry].some((key) => /^(?:height|min-height|max-height)$/.test(key)) ||
+        (nativeHeight.has(node) ||
+          [...geometry].some((key) => /^(?:height|min-height|max-height)$/.test(key)) ||
           value.height === before.height) &&
         (geometry.has("transform") || value.transform === before.transform)
       );
     });
+    if (valid && nativeHeight.size)
+      for (const [index, node] of chain.entries()) {
+        const current = next[index],
+          previous = paintSignature[index];
+        if (nativeHeight.has(node) && current && previous)
+          paintSignature[index] = { ...previous, height: current.height };
+      }
+    return valid;
   };
   const plain = () => host.childNodes.length <= 1 && (!host.firstChild || host.firstChild.nodeType === 3);
   const stop = () => {
@@ -198,7 +166,8 @@ export function createTextPresentation(
       stop();
   };
   const mutations = new MutationObserver((changes) => {
-    if (changes.some((change) => change.type !== "attributes") || !sameSignature()) stop();
+    const nativeHeight = current?.stripGeometry ? nativeTextHeightEcho(changes, host) : new Set<HTMLElement>();
+    if (changes.some((change) => change.type !== "attributes") || !sameSignature(nativeHeight)) stop();
     restrictions();
     if (changes.some((change) => change.type !== "attributes")) {
       if (editing) nativeOwned = true;
@@ -216,6 +185,7 @@ export function createTextPresentation(
     chain.push(node);
     mutations.observe(node, {
       attributes: true,
+      attributeOldValue: true,
       attributeFilter: ["class", "style", "hidden", "inert", "dir", "contenteditable"],
     });
     node.addEventListener("transitionrun", transition, true);
