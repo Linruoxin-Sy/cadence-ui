@@ -9,6 +9,7 @@ in `content/docs/` and `content/components/`; component inventory and install me
 | [Overall design](overall-design.md)                             | Changing architecture, install paths, shared code, APIs, themes or the build    |
 | [Animation system](animation-system.md)                         | Changing tokens, recipes, modes, engine integration or motion tests             |
 | [Individual component motion](motion/README.md)                 | Designing or reviewing one component's parts, choreography and six capabilities |
+| [Motion evidence recipes](motion/evidence-recipes.md)           | Writing source that the gates can certify, or diagnosing a record that will not join |
 | [Motion presets and bindings](motion/presets.md)                | Selecting component rhythm or changing shared parameter assignments             |
 | [Animation system rollout](animation-system-plan.md)            | Choosing a v2 migration task, its dependencies or its acceptance evidence       |
 | [Site and distribution](documentation-site-and-distribution.md) | Changing MDX, previews, site controls, registry HTTP or snapshots               |

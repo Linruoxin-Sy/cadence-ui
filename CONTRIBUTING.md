@@ -21,6 +21,8 @@ validation.
 - Read the component's individual target contract in [the motion catalogue](docs/motion/README.md)
   and the [preset assignments](docs/motion/presets.md). Design every component's choreography separately;
   global style guides visual choices while the common execution contract stays mandatory.
+- When an action is declared but no runtime record joins it, read the
+  [evidence recipes](docs/motion/evidence-recipes.md) before re-reading the checker source.
 - Check `content/components/` and the open issues to see whether the component already exists; recipes
   are listed in the [animation system](docs/animation-system.md).
 - Search existing issues before opening a new one.

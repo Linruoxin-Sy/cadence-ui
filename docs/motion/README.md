@@ -567,3 +567,7 @@ exported part is assessed within its component file. Do not silently rename a fi
 its registry id. The scaffold and target checker enforce the internal references described in §2.1;
 runtime implementation, semantic review and performance acceptance remain separate obligations.
 Temporary review reports belong in `.cache/`, not in this directory.
+
+When a declared action exists but no record joins it, read the [evidence recipes](evidence-recipes.md)
+before re-reading the checker: they record the source shapes that produce a joinable record, and the
+ones that silently do not. They describe current practice only; a recipe never widens a contract.
