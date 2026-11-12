@@ -319,8 +319,18 @@ export function useStateColor<T extends MotionElement>(
   cm: CadenceMotion,
   owned: readonly ColorProperty[],
   options: {
+    /** Settle this owner at 0s on every commit, regardless of the colour clock. */
     immediate?: boolean;
     readability?: "verified" | "immediate";
+    /**
+     * Runtime predicate for hosts whose current paint makes a colour tween
+     * unreadable. The CSS connection re-evaluates it, but the insertion-effect
+     * fast path in this hook runs before that connection and cannot see the gate: it
+     * rewrites `transition-duration` from the token clock on every render. If
+     * the gate can be false for this host, pass the same condition as
+     * `immediate` too. Otherwise the fast path overwrites a gated `0s` with the
+     * token duration and the colour family is recorded as a conflict.
+     */
     readabilityGate?: (node: MotionElement) => boolean;
     readabilityScope?: (node: MotionElement) => Element | null;
   } = {},
@@ -345,6 +355,9 @@ export function useStateColor<T extends MotionElement>(
     }
     const node = record.node;
     const env = environmentRef.current;
+    // This path runs before the CSS connection, so it cannot consult
+    // readabilityGate. Callers whose gate can be false must pass the same
+    // condition as `immediate`; see the option's contract above.
     const suppress =
       immediate ||
       node === node.ownerDocument.activeElement ||
