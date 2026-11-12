@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "name": "static-fixture",
+      "type": "registry:ui",
+      "title": "Static fixture",
+      "description": "A deliberately motion-free registry item used by gate fixtures.",
+      "files": [
+        {
+          "path": "tests/fixtures/static-graph/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/cadence/static-fixture/index.tsx"
+        }
+      ],
+      "dependencies": [],
+      "registryDependencies": []
+    }
+  ]
+}

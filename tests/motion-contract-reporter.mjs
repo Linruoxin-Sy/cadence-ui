@@ -15,7 +15,10 @@ const registry = JSON.parse(readFileSync(new URL("../registry.json", import.meta
 /** Check successful runtime evidence, including when a whole contract suite is skipped. */
 export default class MotionContractReporter {
   constructor(options = {}) {
-    this.root = options.root ?? process.cwd();
+    // Default to the reporter's own package root, not process.cwd(): a gate
+    // fixture copies this file next to its staged registry and must read the
+    // staged source it wrote, not the checkout that spawned it.
+    this.root = options.root ?? fileURLToPath(new URL("../", import.meta.url));
     this.contractRoot = options.root ?? fileURLToPath(new URL("../", import.meta.url));
     this.registry = options.root ? JSON.parse(readFileSync(path.join(this.root, "registry.json"), "utf8")) : registry;
   }

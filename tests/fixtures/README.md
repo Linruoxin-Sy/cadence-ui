@@ -19,3 +19,7 @@ These fixtures neither install planned recipes nor certify runtime v2 behaviour.
 motion-coverage/ contains negative installed-ownership declarations. They reject unknown/missing
 schema, relationships and owners, false inapplicable effects and placeholder reasons. The tests
 keep target assessments separate from exact delivered forms and actual live integration evidence.
+
+static-graph/ and motion-contract-static/ declare dedicated static fixtures. Gate suites use them
+instead of borrowing a live registry component as a "static" sample: a later migration must not turn
+an unrelated fixture red. They are not installable registry source.

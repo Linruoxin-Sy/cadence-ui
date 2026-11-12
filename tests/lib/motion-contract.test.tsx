@@ -177,7 +177,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         spinner: `it.each(['full','reduced','none'])('positive %s',(mode)=>{render(<CadenceProvider mode={mode}><Spinner/></CadenceProvider>);expectMotionContract(mode)});`,
         badge: `it('T0 needs no helper',()=>{expect(true).toBe(true)});`,
         label: `it('static v2 cannot bypass the migration gate',()=>{expect(true).toBe(true)});`,
-        avatar: `it.each(['full','reduced','none'])('another recipe cannot certify new colour %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
+        "static-fixture": `it.each(['full','reduced','none'])('another recipe cannot certify new colour %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
         input:
           colorImports +
           `it.each(['full','reduced','none'])('executed colour needs explicit policy evidence %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button><Color/></CadenceProvider>);expectMotionContract(mode)});`,
@@ -235,10 +235,53 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       }
       for (const file of ["docs/motion/presets.md", "docs/motion/README.md"])
         await writeFile(path.join(fixture, file), await readFile(path.join(root, file)));
-      for (const id of ["avatar", "input"])
-        stagedRegistry.items.find((item: { name: string }) => item.name === id).meta.motion = [
-          { recipe: "state.color", form: "css-transition" },
-        ];
+      // Use a dedicated static fixture instead of borrowing a live component's
+      // metadata and contract. A live component may migrate later and turn this
+      // assertion red for a reason unrelated to the gate.
+      const staticItem = {
+        name: "static-fixture",
+        type: "registry:ui",
+        title: "Static fixture",
+        description: "A deliberately motion-free gate fixture.",
+        dependencies: [],
+        registryDependencies: [],
+        files: [
+          {
+            path: "registry/cadence/static-fixture/index.tsx",
+            type: "registry:ui",
+            target: "@components/cadence/static-fixture/index.tsx",
+          },
+        ],
+        meta: {
+          since: "0.0.0",
+          tier: "T0",
+          batch: "B1",
+          motion: [{ recipe: "state.color", form: "css-transition" }],
+          intensity: "subtle",
+          complexity: "S",
+          upstream: { registry: "shadcn", style: "base-ui", version: "2026-10" },
+          motionProfile: {
+            scope: "local",
+            travel: "none",
+            coordination: "independent",
+            reason: "Gate fixture declares one colour recipe without an installed owner.",
+          },
+          motionCoverage: { schema: 1, effects: {} },
+        },
+      };
+      stagedRegistry.items.push(staticItem);
+      await mkdir(path.join(fixture, "registry/cadence/static-fixture"), { recursive: true });
+      await writeFile(
+        path.join(fixture, "registry/cadence/static-fixture/index.tsx"),
+        await readFile(path.join(root, "tests/fixtures/motion-contract-static/index.tsx")),
+      );
+      await writeFile(
+        path.join(fixture, "docs/motion/components/static-fixture.md"),
+        await readFile(path.join(root, "tests/fixtures/motion-contract-static/contract.md")),
+      );
+      const inputItem = stagedRegistry.items.find((item: { name: string }) => item.name === "input");
+      if (!inputItem) throw new Error("input fixture missing");
+      inputItem.meta.motion = [{ recipe: "state.color", form: "css-transition" }];
       const loopItem = stagedRegistry.items.find((item: { name: string }) => item.name === "skeleton");
       const sliderItem = stagedRegistry.items.find((item: { name: string }) => item.name === "slider");
       Object.assign(sliderItem.meta.motionCoverage.effects["feedback.press/one-shot"][0], {
@@ -256,6 +299,8 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       );
       await writeFile(path.join(fixture, "registry.json"), JSON.stringify(stagedRegistry));
       for (const id of Object.keys(cases)) {
+        // The static fixture contract lives with the fixture, not in the catalogue.
+        if (id === "static-fixture") continue;
         let contract = await readFile(path.join(root, `docs/motion/components/${id}.md`), "utf8");
         if (["spinner", "label"].includes(id))
           contract = contract.replace('"migration": "legacy"', '"migration": "v2"');
@@ -311,9 +356,9 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       ])
         for (const mode of ["full", "reduced", "none"])
           expect(output).toMatch(new RegExp(`label: v2 execute ${action} on [^\\n]+ in ${mode}`));
-      for (const id of ["avatar", "input"])
+      for (const id of ["static-fixture", "input"])
         expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
-      expect(output).toContain("avatar: state.color/css-transition: missing installed ownership");
+      expect(output).toContain("static-fixture: state.color/css-transition: missing installed ownership");
       expect(output).toContain(
         "slider: feedback.press/one-shot: owner button is not the reached installed integration",
       );

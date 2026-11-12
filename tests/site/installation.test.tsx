@@ -16,6 +16,8 @@ import {
 } from "@/scripts/installation.mjs";
 
 const registry = JSON.parse(await readFile("registry.json", "utf8"));
+// A dedicated static item, not a live component that may migrate later.
+const staticFixtureRegistry = JSON.parse(await readFile("tests/fixtures/static-graph/registry.json", "utf8"));
 function PanelCount({ children }: { children: ReactNode }) {
   return <section data-panels={Children.count(children)}>{children}</section>;
 }
@@ -79,10 +81,13 @@ describe("shared installation plan", () => {
     expect(installationPlan(registry.items, "date-picker").registryDependencies.some((dep) => !dep.direct)).toBe(true);
   });
 
-  it("uses the actual static graph without inventing motion or provider dependencies", () => {
-    const plan = installationPlan(registry.items, "avatar");
+  it("uses a dedicated static fixture graph without inventing motion or provider dependencies", () => {
+    const plan = installationPlan(staticFixtureRegistry.items, "static-fixture");
     expect(plan.provider).toBe(false);
     expect(plan.dependencies).not.toContain("motion");
+    expect(plan.files.map((file: { target: string }) => file.target)).toEqual([
+      "@components/cadence/static-fixture/index.tsx",
+    ]);
     expect(manualInstructions(plan)).not.toContain("CadenceProvider");
     expect(manualInstructions(installationPlan([{ name: "static", files: [] }], "static"))).toContain(
       "No additional runtime packages.",
