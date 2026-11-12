@@ -21,13 +21,13 @@ non-native binding means the host is unresolved. See
 - [ ] Scoped suite: `pnpm test:local tests/components/<id>.test.tsx`.
 - [ ] Shared hits: `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` path.
 - [ ] Gate suites when contracts, presets, metadata, MDX templates or gate scripts changed:
-      `pnpm test:gate`.
+  `pnpm test:gate`.
 - [ ] One full `pnpm test` per change set, in the background. Paste the file/test counts and say
-      explicitly whether any failure is a known entry in
-      [docs/testing-quarantine.md](docs/testing-quarantine.md).
+  explicitly whether any failure is a known entry in
+  [docs/testing-quarantine.md](docs/testing-quarantine.md).
 - [ ] No test was skipped, excluded or edited to hide a failure.
 - [ ] Native/API/accessibility behavior and all three modes are covered; browser, buildId and
-      screenshot evidence is stated as done or explicitly left unresolved.
+  screenshot evidence is stated as done or explicitly left unresolved.
 
 ## Notes for review
 

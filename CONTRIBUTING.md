@@ -128,13 +128,13 @@ running cancellation, first paint, nested providers and measured geometry.
 its wall clock is `cli-gates`, which cold-starts `check-registry.mjs` and installs real consumers into
 temporary projects. Choose the layer that can still fail:
 
-| Layer   | Command                                                    | When                                                                                        |
-| ------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Static  | `pnpm check:static`                                        | After editing source, metadata or docs, before staging anything                              |
-| Scoped  | `pnpm test:local tests/components/<id>.test.tsx`           | While iterating on one component                                                             |
-| Shared  | `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` hit | Once, when the component's own suite is green, to catch shared-gate assumptions             |
-| Gates   | `pnpm test:gate`                                           | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts |
-| Full    | `pnpm test`                                                | Once per change set, in the background, while the handoff is being written                    |
+| Layer  | Command                                                           | When                                                                                         |
+| ------ | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Static | `pnpm check:static`                                               | After editing source, metadata or docs, before staging anything                              |
+| Scoped | `pnpm test:local tests/components/<id>.test.tsx`                  | While iterating on one component                                                             |
+| Shared | `pnpm exec vitest run <file>` for each `grep -rl <id> tests/` hit | Once, when the component's own suite is green, to catch shared-gate assumptions              |
+| Gates  | `pnpm test:gate`                                                  | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts |
+| Full   | `pnpm test`                                                       | Once per change set, in the background, while the handoff is being written                   |
 
 [`.github/workflows/check.yml`](.github/workflows/check.yml) runs the gate on `ubuntu-latest`; its job
 is named `check`. Repository settings must make `check` a required status check on `main` — that is
@@ -160,6 +160,12 @@ Rules that came out of timing two migration sessions on this repository:
 
 Known or currently unexplained failures in the full run are recorded in
 [the quarantine list](docs/testing-quarantine.md); everything not listed there must pass.
+
+Record five numbers in the handoff, not a total wall clock: full runs (target 1), longest single wait
+while iterating (target ≤ 6 min), retreats caused by a binding the gate could not certify (target 0),
+new implicit gate rules (target 0; each one becomes an evidence recipe), and pre-commit gate time
+(target ≤ 5 min). Total wall clock mostly describes the host; these five describe whether the loop
+actually changed.
 
 ## Style
 
