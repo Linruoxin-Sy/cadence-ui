@@ -5603,20 +5603,22 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
-- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
-- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
-- [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
 | Item | Target file | Full source |
 | --- | --- | --- |
-| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
 | cadence-motion | `@components/cadence/lib/motion.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
 | cadence-motion | `@components/cadence/lib/geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-motion.json) |
+| cadence-utils | `@components/cadence/lib/cn.ts` | [JSON files[].content](https://cadence.dev/r/cadence-utils.json) |
 | cadence-provider | `@components/cadence/lib/provider.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/popup-style.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/control-animation.tsx` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
@@ -5635,19 +5637,30 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
-| separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
-| separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | item | `@components/cadence/item/index.tsx` | [JSON files[].content](https://cadence.dev/r/item.json) |
-
-[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
+| item | `@components/cadence/lib/item-layout.ts` | [JSON files[].content](https://cadence.dev/r/item.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
+
+[Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
 
 [Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
-[Source files: separator](https://cadence.dev/r/separator.json)
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: item](https://cadence.dev/r/item.json)
 
@@ -5804,11 +5817,11 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Keep `item/index.tsx`, `separator/index.tsx` and `lib/cn.ts` at the listed relative
-paths. Item imports Separator even when you do not render `ItemSeparator`; both
-components share the `cn` helper. Keep Separator’s listed shared runtime files too;
-ItemSeparator inherits its presence, orientation, definite-length and colour effects.
-An optional provider controls its mode.
+Keep `item/index.tsx`, `lib/item-layout.ts` and the shared `motion`, `provider`,
+`geometry`, `text` and `number` files at the listed relative paths. `ItemSeparator`
+renders the Base UI Separator primitive directly and owns its own rule opacity and
+rule background, so Item needs no other registry item. An optional provider controls
+its mode.
 Keep the source files' `"use client"` directives for Base UI behavior. The Usage
 and body examples can render these client parts from a Server Component in
 Next.js App Router; they do not call the exported variant functions or add event
@@ -5829,14 +5842,14 @@ npx shadcn@latest add @cadence/button
 ```
 
 For a manual Button installation, follow its Manual tab and copy every shared
-motion and provider file it lists. Button adds `motion` to the packages listed
-above; wrapping the application in its provider is optional. Its press scales in
-full mode and drops that scale in reduced and none modes, while Item remains
-static. Put the preview's download event handler in a `"use client"` module; the
-caller owns the download content and browser action. The body examples do not
-need Button. A whole-row link uses a native anchor through `render`, needs no
-extra registry item and does not gain Button's press animation. Variants,
-Separators and A whole-row link need no example-only packages.
+motion and provider file it lists. Item already lists `motion`; wrapping the
+application in its provider is optional. Button’s press scales in full mode and
+drops that scale in reduced and none modes, while Item’s own effects stay
+independent of that control. Put the preview's download event handler in a
+`"use client"` module; the caller owns the download content and browser action.
+The body examples do not need Button. A whole-row link uses a native anchor
+through `render`, needs no extra registry item and keeps Item’s own row effects.
+Variants, Separators and A whole-row link need no example-only packages.
 
 ## Usage
 
@@ -6093,27 +6106,52 @@ export function ItemMetadata() {
 `Item` writes `data-slot="item"`, `data-variant`, and `data-size`; the other parts
 write their own `data-slot` (`item-media`, `item-content`, `item-title`,
 `item-description`, `item-actions`, `item-header`, `item-footer`,
-`item-separator`).
+`item-separator`). Every animated part also writes `data-motion` with the effective
+mode, and a plain display part wraps its own `item-text` or `item-number` span.
 
 `ItemSeparator` accepts Base state callbacks for `className` and `style`; caller classes are merged last. `Item` render props use native string classes and style objects.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **medium**: Item coordinates one row's presence, content-driven block size, changed display text and scoped surface paint; ItemGroup places retained rows from committed boxes while composed controls keep their own owners.
 
-The row adds no local motion. ItemSeparator inherits Separator’s delivered rule effects.
-A row does not lift on hover or slide on mount. The only transition
-is `transition-colors` on the row and on a link inside it — state feedback that
-costs nothing and never moves the text the user is reading.
+| Cause / owner | Recipe / form | Full | Reduced | None |
+| --- | --- | --- | --- | --- |
+| Row insert / retained removal, Item | `data.transition/one-shot`, `exit.fade/one-shot` | One row opacity entrance or fade | Short opacity | Immediate |
+| Header/footer/content or explicit size change, Item | `geometry.resize/measured` | Measured block height | Immediate | Immediate |
+| Group inserted, ItemGroup | `data.transition/one-shot` | One group envelope | Short opacity | Immediate |
+| Media or action region insert/remove | `data.transition/one-shot`, `exit.fade/one-shot` | That region only | Short opacity | Immediate |
+| Supplied media visual replaced, ItemMedia | `data.transition/one-shot` | Local opacity replacement | Short opacity | Immediate |
+| Plain title, description, content, header and footer strings | `text.change/changed-runs` | Changed-only opacity, no stagger | Short opacity | Immediate |
+| Direct numeric children in those parts | `number.roll/reels` | Compact place-value reels | Immediate | Immediate |
+| Row/media surfaces and explicit title/description foreground | `state.color/css-transition` | Scoped colour | Short colour | Immediate |
+| ItemSeparator rule insertion/removal and colour | `data.transition/one-shot`, `exit.fade/one-shot`, `state.color/css-transition` | One rule opacity channel and scoped rule background | Short opacity and colour | Immediate |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+Appearance, safe block height, surface/foreground, owned strings and quantities are
+default capabilities. A row owns its own committed block height; ItemGroup writes no
+row geometry, so a retained sibling follows that box instead of a second writer.
+An explicitly rendered rule keeps one opacity channel and one rule background; its
+length follows the group's layout instead of an authored size writer. Rich children,
+links, inputs and controls retain their structure and their own motion owners.
 
-If a list should arrive in sequence, that is `list.stagger` on the parent. A row
-that animates itself cannot be interrupted by the next render.
+Mount an Item inside `AnimatePresence` to retain its exit; without a surviving owner,
+removal is immediate. An exiting row or region is inert and aria-hidden, keeps no
+duplicate action in keyboard order, and never clones its child tree to fade. Rapid
+record updates keep the same row identity and retarget its height. None and zero
+clock cancel pending effects; live reduction also finishes height interpolation and
+reels. Restoring full does not replay a settled action.
+
+Media replacement tracks the direct supplied visual's type, key or image `src`. Give
+same-type illustrations distinct keys when replacing them. Only the current media
+host fades; title and actions do not re-enter, artwork is never cloned, and late image
+readiness does not restore a removed region. Native editing, focused controls,
+unsupported typography/paint and competing native property writers retain immediate
+presentation.
+
+The shared readout renderer requires stable foreground paint. When a known
+`state.color` foreground change happens with a copy or quantity update, that colour
+controller keeps its tween and the readout exposes the latest native text/number
+immediately. Surface-only background/border changes do not cancel changed-text paint.
 
 ## Accessibility
 
@@ -6134,8 +6172,9 @@ that animates itself cannot be interrupted by the next render.
 Items fill available width and allow wrapping. The caller owns text overflow and action placement in
 narrow containers; large collections need application pagination or virtualization.
 
-The row adds no local interpolation; Separator installs its shared motion runtime.
-Base UI behavior requires hydration; native
+The row measures its own committed block height only, staying bounded by the shared
+collection limit and falling back to native layout when a caller dimension engine,
+unresolved constraint or oversized group makes the destination unprovable. Base UI behavior requires hydration; native
 HTML behavior remains browser-owned. Composed controls retain their own dependencies and motion
 contracts. Server-rendered markup does not imply that every interaction works without JavaScript.
 The registry enforces a 4 KiB gzip budget for this item's own shipped source; dependencies and
