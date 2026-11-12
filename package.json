@@ -22,9 +22,12 @@
     "parity:check": "node scripts/parity.mjs",
     "llms:build": "node scripts/build-llms.mjs",
     "test": "vitest run",
+    "test:local": "vitest run --project runtime",
+    "test:gate": "vitest run --project cli-gates",
     "test:site-js": "pnpm build && playwright test tests/e2e/site-js-budget.spec.ts",
     "test:e2e": "pnpm build && playwright test",
-    "check": "pnpm typecheck && pnpm lint && pnpm registry:check && pnpm parity:check && pnpm test"
+    "check:static": "pnpm typecheck && pnpm lint && pnpm registry:check && pnpm parity:check",
+    "check": "pnpm check:static && pnpm test"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
