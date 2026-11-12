@@ -270,7 +270,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         process.execPath,
         [path.join(root, "node_modules/vitest/vitest.mjs"), "run", "--config", config],
         // The nine migrated owners now require a larger cold source/action audit.
-        { cwd: root, encoding: "utf8", timeout: 60000 },
+        { cwd: root, encoding: "utf8", timeout: 120000 },
       );
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);

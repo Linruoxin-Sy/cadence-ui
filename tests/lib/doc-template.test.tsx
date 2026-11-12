@@ -1,8 +1,9 @@
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
 import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { setImmediate as yieldToEventLoop } from "node:timers/promises";
+import { promisify } from "node:util";
 import { compileMDX } from "next-mdx-remote/rsc";
 import { renderToStaticMarkup } from "react-dom/server";
 import remarkGfm from "remark-gfm";
@@ -36,6 +37,20 @@ afterAll(() => rmSync(fixture, { recursive: true, force: true }));
 // between cases; otherwise a long suite can exhaust Vitest's RPC deadline.
 afterEach(() => yieldToEventLoop());
 
+// Awaiting the CLI keeps the worker's event loop free to answer Vitest's task-update
+// RPC. A blocking spawnSync here holds it for the whole audit (~45-60s on a loaded
+// machine), which trips the harness RPC deadline even though the assertions are fine.
+async function execCapture(args: string[], opts: { cwd: string; env?: NodeJS.ProcessEnv } = { cwd: root }) {
+  const run = promisify(execFile);
+  try {
+    const out = await run(process.execPath, args, { ...opts, encoding: "utf8", maxBuffer: 64 << 20 });
+    return { status: 0, stdout: out.stdout, stderr: out.stderr };
+  } catch (error) {
+    const failed = error as { code?: number; stdout?: string; stderr?: string };
+    return { status: failed.code ?? 1, stdout: failed.stdout ?? "", stderr: failed.stderr ?? "" };
+  }
+}
+
 function entry(file: string, source: string, fresh = false) {
   writeFileSync(path.join(fixture, file), source);
   if (fresh) freshDocs(fixture, path.basename(file, ".mdx"), source);
@@ -58,15 +73,15 @@ const without = (source: string, title: string) =>
   source.replace(new RegExp(`## ${title}\\n[\\s\\S]*?(?=\\n## |$)`), "");
 
 // biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; full-catalogue AST/registry subprocesses need startup headroom under full-suite I/O contention.
-describe("real registry template entry", { timeout: 30_000 }, () => {
+describe("real registry template entry", { timeout: 90_000 }, () => {
   it("validates all current tier/block bodies directly", async () => {
     expect(await checkDocTemplates(root, registry)).toEqual([]);
-  }, 15_000);
+  }, 90_000);
   it("accepts all 59 real tier/block bodies through the CLI", () => {
     expect(entry(badgePath, badge).status).toBe(0);
     // This cold success path checks the entire expanding catalogue. Its finite
     // operational deadline is separate from component performance acceptance.
-  }, 30_000);
+  }, 90_000);
   it.each([
     ["missing performance", without(badge, "Responsiveness and performance"), "expected one ## Responsive behavior"],
     ["missing required rationale", without(badge, "When to use"), "expected one ## When to use"],
@@ -180,7 +195,7 @@ describe("real registry template entry", { timeout: 30_000 }, () => {
 describe("real new-item entry", () => {
   it.each(["T0", "T1", "T2", "T3", "T4", "T5"])(
     "generates legal %s docs with input ownership",
-    (tier) => {
+    async (tier) => {
       const temp = mkdtempSync(path.join(os.tmpdir(), "cadence-template-scaffold-"));
       try {
         cpSync(path.join(root, "content"), path.join(temp, "content"), { recursive: true });
@@ -193,8 +208,7 @@ describe("real new-item entry", () => {
         cpSync(path.join(root, "docs"), path.join(temp, "docs"), { recursive: true });
         cpSync(path.join(root, "app"), path.join(temp, "app"), { recursive: true });
         cpSync(path.join(root, "registry"), path.join(temp, "registry"), { recursive: true });
-        const result = spawnSync(
-          process.execPath,
+        const result = await execCapture(
           [
             path.join(root, "scripts/new-item.mjs"),
             "--name",
@@ -208,20 +222,19 @@ describe("real new-item entry", () => {
             "--input",
             ...(tier === "T0" ? [] : ["--motion", "reveal"]),
           ],
-          { cwd: temp, encoding: "utf8" },
+          { cwd: temp },
         );
         expect(result.status, result.stderr).toBe(0);
         const route = readFileSync(path.join(temp, "app/(site)/components/fixture/page.tsx"), "utf8");
         expect(route).toContain('import { FixturePreview } from "@/components/site/previews/fixture"');
         expect(route).toContain('<ComponentPage id="fixture" preview={FixturePreview} />');
         const run = () =>
-          spawnSync(process.execPath, [path.join(root, "scripts/check-registry.mjs")], {
+          execCapture([path.join(root, "scripts/check-registry.mjs")], {
             cwd: temp,
-            encoding: "utf8",
             env: { ...process.env, CADENCE_IMPLEMENTATION_CACHE: path.join(temp, ".cache/implementation") },
           });
         // Stubs intentionally fail implementation/payload checks; the actual entry must accept their body.
-        const accepted = run();
+        const accepted = await run();
         expect(accepted.stderr).not.toContain("content/components/fixture.mdx:");
         const file = path.join(temp, "content/components/fixture.mdx");
         const doc = readFileSync(file, "utf8");
@@ -231,14 +244,17 @@ describe("real new-item entry", () => {
           JSON.parse(readFileSync(path.join(temp, "components/site/previews/examples.json"), "utf8")).fixture,
         ).toEqual(["composition"]);
         writeFileSync(file, without(doc, "Responsiveness and performance"));
-        const rejected = run();
+        const rejected = await run();
         expect(rejected.status).toBe(1);
         expect(rejected.stderr).toContain("content/components/fixture.mdx: expected one ## Responsive behavior");
       } finally {
         rmSync(temp, { recursive: true, force: true });
       }
     },
-    30000,
+    // Hang guard, not a performance assertion: each tier copies writable docs and runs
+    // two complete five-pilot registry/target audits, so wall clock tracks host throughput
+    // (12.5s alone here, >30s under full-suite load). 90s keeps a real hang detectable.
+    90_000,
   ); // Copies writable docs and runs two complete five-pilot registry/target audits per tier.
 });
 

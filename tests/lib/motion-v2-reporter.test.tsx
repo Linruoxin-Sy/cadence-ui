@@ -78,7 +78,7 @@ afterEach(()=>cleanup());const root=${JSON.stringify(fixture)};
     const run = spawnSync(
       process.execPath,
       [path.join(root, "node_modules/vitest/vitest.mjs"), "run", ...files, "--config", config],
-      { cwd: root, encoding: "utf8", timeout: 30000 },
+      { cwd: root, encoding: "utf8", timeout: 120000 },
     );
     const output = run.stdout + run.stderr;
     await put(`${name}.log`, output);

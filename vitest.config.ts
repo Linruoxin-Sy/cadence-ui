@@ -22,6 +22,15 @@ export default defineConfig({
   test: {
     // Run subprocess-heavy gates serially after ordinary tests. Keep every
     // assertion; cold full-library audit deadlines are set in their suites.
+    //
+    // Per-test deadlines below are hang guards, not performance acceptance: several
+    // suites cold-start `check-registry.mjs` or parse the whole live catalogue in a
+    // fresh fixture, so their wall clock tracks host throughput (AV scanning, disk
+    // pressure) far more than code regression. Vitest's 5s default is not a budget
+    // this project ever adopted, so the floor is raised globally and explicit but
+    // tight values were lifted to match. A real hang still trips 120s.
+    testTimeout: 120_000,
+    hookTimeout: 120_000,
     maxWorkers: 4,
     reporters: ["default", "./tests/motion-contract-reporter.mjs"],
     environment: "jsdom",

@@ -40,7 +40,7 @@ export default {root:${JSON.stringify(fixture)},plugins:[componentExecutionPlugi
     {
       cwd: root,
       encoding: "utf8",
-      timeout: 30000,
+      timeout: 120000,
       env: { ...process.env, CADENCE_JOINT_REPORT: report },
     },
   );

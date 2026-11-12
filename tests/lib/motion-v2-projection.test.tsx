@@ -64,7 +64,7 @@ it.each(['full','reduced','none'])('actual scalar %s',async mode=>{const draw=ch
     const run = spawnSync(
       process.execPath,
       [path.join(root, "node_modules/vitest/vitest.mjs"), "run", "--config", config],
-      { cwd: root, encoding: "utf8", timeout: 30000 },
+      { cwd: root, encoding: "utf8", timeout: 120000 },
     );
     const output = run.stdout + run.stderr;
     await put(`${name}.log`, output);
@@ -95,7 +95,7 @@ it('actual scalar teardown after native host removal',()=>{const draw=changed=><
     const run = spawnSync(
       process.execPath,
       [path.join(root, "node_modules/vitest/vitest.mjs"), "run", "--config", config],
-      { cwd: root, encoding: "utf8", timeout: 30000 },
+      { cwd: root, encoding: "utf8", timeout: 120000 },
     );
     const output = run.stdout + run.stderr;
     await put(broken ? "live-broken.log" : "live-actual.log", output);

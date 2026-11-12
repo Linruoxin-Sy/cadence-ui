@@ -57,8 +57,12 @@ async function entry(file: string, source: string, fresh = false) {
   }
 }
 
+// The deadline is a hang guard, not a performance assertion: each case cold-starts
+// `check-registry.mjs` in a fresh fixture, which measures host throughput rather than
+// regression (a clean ab731bf4 snapshot fails the same 15s deadline). Keep it generous;
+// 60s still catches real hangs while tolerating AV/IO contention on developer machines.
 // biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; full-catalogue AST/registry subprocesses need startup headroom under full-suite I/O contention.
-describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
+describe("registry:check motion docs entry", { timeout: 60_000 }, () => {
   it("requires an animated component's actual test file", async () => {
     const file = path.join(fixture, "tests/components/button.test.tsx");
     const source = readFileSync(file, "utf8");
@@ -70,7 +74,7 @@ describe("registry:check motion docs entry", { timeout: 15_000 }, () => {
     } finally {
       writeFileSync(file, source);
     }
-  }, 15_000);
+  }, 60_000);
 
   it("accepts all 63 real contracts, including T0, composed, viewport, continuous, CSS and engine forms", async () => {
     expect(

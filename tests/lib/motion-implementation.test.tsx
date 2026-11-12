@@ -7,7 +7,10 @@ import { checkMotionImplementations } from "../../scripts/motion-implementation.
 import { calledRecipes, implementedForm } from "../../scripts/motion-manifest.mjs";
 import negatives from "../fixtures/motion/implementation-negative.json";
 
-describe("exact live installed implementations", () => {
+// The deadline is a hang guard, not a performance assertion: parsing the live installed
+// catalogue takes ~3.4s alone and exceeds Vitest's 5s default under full-suite load.
+// biome-ignore lint/correctness/usePlaywrightValidDescribeCallback: This is Vitest's suite timeout overload; live full-library implementation parsing needs startup headroom under full-suite I/O contention.
+describe("exact live installed implementations", { timeout: 60_000 }, () => {
   it("retains local and inherited adapters that execute the identical shared presence factory", async () => {
     const registry = JSON.parse(await readFile("registry.json", "utf8"));
     const result = await checkMotionImplementations(process.cwd(), registry, ["button-group"]);
