@@ -84,7 +84,7 @@ limits on which capabilities a component may acquire.
 | `command` - searchable actions        | T2   | `popup.anchored`, `exit.fade`                                       |
 | `alert` — state message               | T0   | [7 recipes](content/components/alert.mdx#motion-contract)           |
 | `empty` — resting state               | T0   | [7 recipes](content/components/empty.mdx#motion-contract)           |
-| `item` — list row                     | T0   | none                                                                |
+| `item` — list row                     | T0   | [6 recipes](content/components/item.mdx#motion-contract)            |
 | `field` — labelled control            | T0   | none                                                                |
 | `button-group` — joined controls      | T0   | [7 recipes](content/components/button-group.mdx#motion-contract)    |
 | `input-group` — framed field          | T0   | none                                                                |
