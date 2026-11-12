@@ -1552,21 +1552,52 @@
       "title": "Item",
       "description": "Rows in lists of files, members, and invoices.",
       "categories": ["data", "layout"],
-      "dependencies": ["@base-ui/react", "class-variance-authority"],
-      "registryDependencies": ["@cadence/cadence-utils", "@cadence/separator"],
+      "dependencies": ["@base-ui/react", "class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/item/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/item/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/item-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/item-layout.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
-        "intensity": "subtle",
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
+        "intensity": "medium",
         "complexity": "M",
         "upstream": {
           "registry": "shadcn",
@@ -1574,14 +1605,57 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
-          "travel": "none",
-          "coordination": "independent",
-          "reason": "Item declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "scope": "collection",
+          "travel": "compact",
+          "coordination": "group",
+          "reason": "Item coordinates one row's presence, content-driven block size, changed display text and scoped surface paint; ItemGroup places retained rows from committed boxes while composed controls keep their own owners."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "item",
+                "reason": "Item integrates its row entrance, the media and action regions and the current supplied media visual; composed controls and rich child content retain their native owners."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "item",
+                "reason": "Item integrates its row exit and the media/action region exit on the same retained hosts; no outgoing interactive copy is created."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "item",
+                "reason": "Item owns its content/header/footer-driven block height after commitment; ItemGroup writes no row geometry and the rule follows layout."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "item",
+                "reason": "Item replaces changed runs in the plain title, description, content, header and footer displays; composed rich content keeps its own owner."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "item",
+                "reason": "Item reels direct display quantities in the same known plain parts; identifiers and composed metrics remain textual or composed."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "item",
+                "reason": "Item owns the row and media surface-foreground paint plus explicit title and description foreground; ItemSeparator delegates its rule colour."
+              }
+            ]
+          }
         }
       }
     },
