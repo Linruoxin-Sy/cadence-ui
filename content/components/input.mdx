@@ -2,15 +2,15 @@
 title: Input
 description: Names, emails, search queries, and other short text.
 category: form
-motion: []
+motion: ["data.transition",{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Input declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"Input fades its own later insertion, transitions only the chrome and foreground it paints, and interpolates one explicitly authored box while the editor is unfocused; typing, selection, autofill and parent resizing keep native ownership."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"input","reason":"Input owns its independent insertion opacity on the native control; a presenting Field or group entrance is inherited and parent removal keeps native focus cleanup."}],"geometry.resize/measured":[{"relationship":"default","owner":"input","reason":"Input owns only an explicitly authored border box while the editor is unfocused; parent width, file internals, autofill and passive reflow stay native."}],"state.color/css-transition":[{"relationship":"default","owner":"input","reason":"Input owns the background, foreground, border and ring paint it declares; focus-within, invalid state and unverified palettes settle that paint immediately."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: ["@base-ui/react"]
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["@base-ui/react","motion"]
+registryDeps: ["@cadence/cadence-utils","@cadence/cadence-motion","@cadence/cadence-provider","@cadence/cadence-geometry"]
 ---
 
 ## Installation
@@ -39,10 +39,11 @@ npx shadcn@latest add @cadence/button
 
 [Manual installation files](https://cadence.dev/r/input.json)
 
-Input needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `input/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves. Give the input an accessible
-name with a label and matching `htmlFor` / `id` as shown in Usage.
+Input needs the files and packages listed above: the component, the shared library files
+the registry installs with it, and the motion runtime they use. No additional item-specific
+CSS is required. Keep `input/index.tsx` and the `lib/` files at the listed relative paths so
+the shared imports resolve. Give the input an accessible name with a label and matching
+`htmlFor` / `id` as shown in Usage.
 
 For the labelled compositions, follow [Label's installation](/components/label#installation)
 and copy its component file alongside Input; the shared `lib/cn.ts` and its packages are
@@ -217,20 +218,24 @@ Base UI state callbacks for `className` are evaluated before merging caller clas
 
 ## Motion contract
 
-Authored intensity is **subtle**: Input declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: Input fades its own later insertion, transitions only the chrome and foreground it paints, and interpolates one explicitly authored box while the editor is unfocused; typing, selection, autofill and parent resizing keep native ownership.
 
-No motion (T0). An input that grows, slides, or fades while the user types is a
-bug: it moves the caret under the user's eyes.
+The native control stays the only editor node. Cadence never mirrors, copies or
+re-measures the value, so typing, selection, composition and autofill are always the
+browser's own.
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+| Recipe | Owner and full behaviour | reduced | none |
+| ------ | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | Independent insertion of a later-mounted field fades the control's own opacity. A presenting Field or group owns the entrance instead, and focus, typing or a missing presenting parent keeps native paint. | Short opacity. | Immediate. |
+| `state.color/css-transition` | Background, foreground, border and the scoped focus/invalid shadow. DOM focus-within, invalid state, a theme-owned switch and any palette we cannot prove settle every declared property at its target; otherwise an authored colour change transitions. | Short eligible colour. | Zero duration and delay. |
+| `geometry.resize/measured` | One explicitly authored border box, measured once from the committed box outside the interpolated origin and clamped to the available parent. A focused editor, typing, selection, pointer work, passive parent or font reflow, file internals and a caller transition on the same axis all commit final geometry immediately. | Immediate size. | Immediate size. |
 
-`transition-[color,box-shadow]` exists for the focus ring and the invalid border.
-Both are colour/shadow state feedback on the design tokens, take no space, and do
-not run on mount.
+Focus and invalid changes retarget directly; there is no shake, queued warning or
+validation logic. Entering composition or editing cancels any conflicting size work, and
+blur does not replay skipped work. Parent removal owns any exit, so the control is never
+held in a retained fade that postpones native focus cleanup. Live reduction finishes
+geometry, and `none` or a zero clock also cancels colour and opacity without leaving a
+copied value behind.
 
 ## Accessibility
 
@@ -260,12 +265,15 @@ are wired.
 ## Responsiveness and performance
 
 The input fills its parent and uses base text sizing below the md breakpoint. Constrain the parent
-in grids; native input types retain browser keyboards, editing and form behavior.
+in grids; native input types retain browser keyboards, editing and form behavior, and the
+component adds no wrapper element around the control.
 
-T0 adds no authored animation runtime or interpolation. Base UI behavior requires hydration; native
-HTML behavior remains browser-owned. Server-rendered markup does not imply that every interaction
-works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
-source; dependencies and application bundles are measured separately.
+Cadence adds one shared motion runtime for the insertion opacity, the chrome paint and the
+optional measured box; the editor itself is never duplicated or mirrored, and no per-keystroke
+measurement, observer or text layer is created. Numeric source budgets remain advisory under
+ADR-023 and are not a performance pass. Base UI behavior requires hydration; native HTML
+behavior remains browser-owned, and server-rendered markup does not imply that every
+interaction works without JavaScript.
 
 ## Notes for AI
 

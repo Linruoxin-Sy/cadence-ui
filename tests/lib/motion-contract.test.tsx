@@ -357,8 +357,14 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       ])
         for (const mode of ["full", "reduced", "none"])
           expect(output).toMatch(new RegExp(`label: v2 execute ${action} on [^\\n]+ in ${mode}`));
-      for (const id of ["static-fixture", "input"])
-        expect(output).toContain(`${id}: execute color policy in full, reduced, none`);
+      // Input has since migrated, so its dead helper call must fail the strict v2
+      // action/mode matrix instead of the legacy adoption diagnostic.
+      expect(output).toContain("static-fixture: execute color policy in full, reduced, none");
+      expect(output).not.toContain("input: execute color policy");
+      for (const mode of ["full", "reduced", "none"])
+        expect(output).toContain(
+          `input: v2 execute input.root.colour on input#Input/input with exact source/property/preset policy in ${mode}`,
+        );
       expect(output).toContain("static-fixture: state.color/css-transition: missing installed ownership");
       expect(output).toContain(
         "slider: feedback.press/one-shot: owner button is not the reached installed integration",

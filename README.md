@@ -62,7 +62,7 @@ limits on which capabilities a component may acquire.
 | `kbd` — key or shortcut hint          | T0   | [6 recipes](content/components/kbd.mdx#motion-contract)             |
 | `separator` — group boundary          | T0   | [4 recipes](content/components/separator.mdx#motion-contract)       |
 | `label` — control name                | T0   | [5 recipes](content/components/label.mdx#motion-contract)           |
-| `input` — single-line field           | T0   | none                                                                |
+| `input` — single-line field           | T0   | [3 recipes](content/components/input.mdx#motion-contract)           |
 | `textarea` — multi-line field         | T0   | none                                                                |
 | `card` — grouped surface              | T0   | [6 recipes](content/components/card.mdx#motion-contract)            |
 | `toc` — document section navigation   | T3   | `layout.shared`, `scroll.navigate`                                  |
