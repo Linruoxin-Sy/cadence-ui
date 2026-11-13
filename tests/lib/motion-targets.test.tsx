@@ -163,6 +163,7 @@ describe("current registry inventory and real part references", () => {
       "kbd",
       "separator",
       "label",
+      "input",
       "card",
       "aspect-ratio",
       "avatar",
