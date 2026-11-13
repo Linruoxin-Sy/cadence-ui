@@ -1268,36 +1268,103 @@
       "title": "Avatar",
       "description": "People in comments, assignees, and member lists.",
       "categories": ["data"],
-      "dependencies": ["@base-ui/react"],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["@base-ui/react", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/avatar/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/avatar/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/avatar-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/avatar-layout.ts"
+        },
+        {
+          "path": "registry/cadence/lib/empty-media.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/empty-media.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
-        "intensity": "subtle",
-        "complexity": "S",
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          { "recipe": "geometry.resize", "form": "measured" },
+          { "recipe": "text.change", "form": "changed-runs" },
+          { "recipe": "number.roll", "form": "reels" },
+          { "recipe": "state.color", "form": "css-transition" }
+        ],
+        "intensity": "medium",
+        "complexity": "M",
         "upstream": {
           "registry": "shadcn",
           "style": "base-ui",
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "collection",
           "travel": "none",
-          "coordination": "independent",
-          "reason": "Avatar declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "coordination": "group",
+          "reason": "Avatar coordinates an avatar group's presence and membership extent while each avatar owns its own size, retained image paint, changed text and scoped palette."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "avatar",
+                "reason": "Avatar integrates the avatar, badge, group and later count-tile entrances plus the current retained image paint; Base UI availability and caller media keep their native owners."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "avatar",
+                "reason": "Avatar fades a retained avatar, badge, group or count tile on its original host without cloning children or their resources."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "avatar",
+                "reason": "Avatar owns an explicit size change and AvatarGroup owns the membership-driven extent; image decode and parent constraints stay native."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "avatar",
+                "reason": "Avatar replaces changed runs in plain fallback initials, badge copy and count labels; rich caller children keep their own owners."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "avatar",
+                "reason": "Avatar reels a direct numeric count value on the count display; formatted strings and identity numbers remain text."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "avatar",
+                "reason": "Avatar owns the fallback, badge and count surface-foreground palette it paints; the transparent root and caller-composed controls keep their own owners."
+              }
+            ]
+          }
         }
       }
     },
