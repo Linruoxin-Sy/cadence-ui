@@ -158,9 +158,10 @@ describe("expectMotionContract", () => {
   });
   it("fails the actual Vitest entry for unused, dead, skipped and incomplete adoption", async () => {
     const root = process.cwd();
-    const fixture = await mkdtemp(
-      path.join(process.env.CADENCE_GATE_EVIDENCE ?? path.join(root, ".cache"), "motion-contract-gate-"),
-    );
+    const fixtureRoot = process.env.CADENCE_GATE_EVIDENCE ?? path.join(root, ".cache");
+    // A clean CI checkout has no `.cache`; create the parent before mkdtemp.
+    await mkdir(fixtureRoot, { recursive: true });
+    const fixture = await mkdtemp(path.join(fixtureRoot, "motion-contract-gate-"));
     try {
       await mkdir(path.join(fixture, "tests/components"), { recursive: true });
       const imports = `import {render,cleanup} from '@testing-library/react';
