@@ -232,7 +232,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -327,7 +327,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -419,7 +419,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -492,7 +492,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -579,7 +579,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -594,7 +594,17 @@
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -603,16 +613,38 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Input declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "Input fades its own later insertion, transitions only the chrome and foreground it paints, and interpolates one explicitly authored box while the editor is unfocused; typing, selection, autofill and parent resizing keep native ownership."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "input",
+                "reason": "Input owns its independent insertion opacity on the native control; a presenting Field or group entrance is inherited and parent removal keeps native focus cleanup."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "input",
+                "reason": "Input owns only an explicitly authored border box while the editor is unfocused; parent width, file internals, autofill and passive reflow stay native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "input",
+                "reason": "Input owns the background, foreground, border and ring paint it declares; focus-within, invalid state and unverified palettes settle that paint immediately."
+              }
+            ]
+          }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -645,7 +677,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -740,7 +772,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -813,7 +845,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -908,7 +940,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -955,7 +987,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1058,7 +1090,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1162,7 +1194,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1258,7 +1290,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1291,7 +1323,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1415,7 +1447,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1448,7 +1480,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1481,7 +1513,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1514,7 +1546,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1560,7 +1592,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1617,7 +1649,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1660,7 +1692,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1703,7 +1735,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1746,7 +1778,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1789,7 +1821,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -1881,7 +1913,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2012,7 +2044,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2055,7 +2087,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2098,7 +2130,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2155,7 +2187,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2212,7 +2244,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2269,7 +2301,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2326,7 +2358,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2383,7 +2415,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2440,7 +2472,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2563,7 +2595,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2628,7 +2660,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2693,7 +2725,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2758,7 +2790,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2823,7 +2855,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2895,7 +2927,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -2962,7 +2994,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3019,7 +3051,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3065,7 +3097,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3111,7 +3143,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3223,7 +3255,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3256,7 +3288,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3304,7 +3336,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3337,7 +3369,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3380,7 +3412,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3426,7 +3458,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3494,7 +3526,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3527,7 +3559,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3602,6 +3634,11 @@
                 "relationship": "inherited",
                 "owner": "separator",
                 "reason": "SidebarSeparator reaches Separator’s definite-length geometry owner; native stretch remains immediate and no second local writer is added."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "SidebarInput renders the installed Input control, whose own measured box stays its owner; Sidebar adds no second size writer to the field."
               }
             ],
             "data.transition/one-shot": [
@@ -3619,11 +3656,16 @@
                 "relationship": "inherited",
                 "owner": "separator",
                 "reason": "SidebarSeparator reaches the same shared presence factory through Separator’s independent rule owner; native stretch remains immediate and Sidebar retains its legacy migration state."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "SidebarInput renders the installed Input control, so the reached entrance opacity belongs to input; Sidebar adds no second writer to the field."
               }
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3703,7 +3745,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3783,7 +3825,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3838,7 +3880,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3881,7 +3923,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3933,7 +3975,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -3980,7 +4022,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -4027,7 +4069,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -4074,7 +4116,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     },
     {
@@ -4121,7 +4163,7 @@
             ]
           }
         },
-        "sourceSha": "0e10e826"
+        "sourceSha": "a752dc51"
       }
     }
   ]
