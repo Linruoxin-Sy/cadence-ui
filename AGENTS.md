@@ -83,6 +83,13 @@ These follow from the documents above; the documents are authoritative if they d
   `lint-staged` (Biome on the staged files only), which formats and re-stages; it does not replace
   `pnpm check`. Do not reach for `--no-verify` to get work onto `main`; move existing work with
   `git switch -c feature/<topic> <commit>` instead.
+- **Run repository commands through pnpm.** Use `pnpm <script>` for a `package.json` script,
+  `pnpm exec <bin>` for a binary this repo already installs, and `pnpm dlx <pkg>` for a package it does
+  not — never `npx`, `npm exec`, `yarn` or `bun` in scripts, tests, CI or the notes that describe working
+  here. A bare `pnpm <bin>` is not a shortcut: it only resolves scripts. The one exception is the
+  user-facing install copy `npx shadcn@latest add @cadence/<id>`, which `components/site/package-manager.ts`
+  rewrites per selected manager; leave those MDX and payload lines in their npm form and do not add a
+  manager-specific twin beside them. See [CONTRIBUTING.md](CONTRIBUTING.md#package-manager).
 - **No `@/` aliases in shipped source.** Files under `registry/cadence/**` use relative imports only (`../lib/motion`), because the source tree mirrors the install tree. `@/` is fine in site code.
 - **Shared code lives in `registry/cadence/lib/`.** Never reach for a host path such as `@/lib/utils`.
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
@@ -94,7 +101,7 @@ These follow from the documents above; the documents are authoritative if they d
 - **Base UI `render`, not `asChild`.** Use `data-slot` on every part and merge classes with `cn()` (user classes last).
 - **UI only, no validation (P11).** Never import `zod`, `react-hook-form`, `@hookform/resolvers`, `yup`, `valibot`, `joi`, or `superstruct`; never add `schema` / `resolver` / `validate` props. Render invalid state from `aria-invalid` / `data-invalid` only. `registry:check` enforces this.
 - **Match upstream.** Exports, `data-slot` values, props, and their defaults are copied from shadcn; additions are allowed, renames, removals, and silent default changes are not (`meta.upstream` records the pinned style). A difference the visual style forces is recorded in `meta.parity.props` with a reason — `parity:check` fails on an unrecorded difference and on a record that no longer applies.
-- **Upstream tooling is the CLI's `build`, never the skill's `add`.** Cadence authors a registry; it is not a shadcn consumer. There is no `components.json`, and the source tree is a hand-written mirror on purpose. Read upstream from `upstream/manifest.json` or `npx shadcn@latest docs <id>`; never run `shadcn init` / `add` / `apply` here. See [shadcn tooling boundary](#shadcn-tooling-boundary).
+- **Upstream tooling is the CLI's `build`, never the skill's `add`.** Cadence authors a registry; it is not a shadcn consumer. There is no `components.json`, and the source tree is a hand-written mirror on purpose. Read upstream from `upstream/manifest.json` or `pnpm dlx shadcn@latest docs <id>`; never run `shadcn init` / `add` / `apply` here. See [shadcn tooling boundary](#shadcn-tooling-boundary).
 - **Intra-registry dependencies are namespaced.** Use `@cadence/<id>` in `registryDependencies`; a bare name resolves against the default shadcn registry and installs the wrong file.
 - **Docs are data.** `content/components/<id>.mdx` frontmatter must match `registry.json` (title, description, deps, registryDeps, motion, motionCoverage, motionProfile, intensity, complexity, since, tier); the build fails when docs or metadata are missing. Installed coverage records every reached integration owner per exact recipe/form; the internal six-capability target and legacy marker remain separate. Authored profiles describe extent/travel/coordination, never runtime parameters or animation permission.
 - **Docs have a fixed section order, not a fixed section count.** `## Installation` then `## Usage` open every body; everything after them is a flat `##` — one section per example, no `## Examples` wrapper (only `## API` may group props under `### \`Part\``). Order and membership come from §2 of [docs/documentation-site-and-distribution.md](docs/documentation-site-and-distribution.md); how many examples you write is yours. `scripts/new-item.mjs` scaffolds this order.
@@ -160,10 +167,12 @@ pnpm registry:check   # targets, payload freshness, docs coverage, exports, advi
 pnpm test             # unit tests
 pnpm check            # typecheck + lint + registry:check + tests
 node scripts/new-item.mjs --name <id> --tier <T0..T5> --title "Title" --description "Sentence."
+pnpm dlx shadcn@latest docs <id>   # read upstream docs without touching the pin
 ```
 
 Run `pnpm registry:build` before `pnpm check` whenever `registry.json`, `content/`, or shipped source changed —
-the check compares payloads against source and fails on stale artifacts.
+the check compares payloads against source and fails on stale artifacts. Every command above is pnpm's;
+see [the package-manager rule](#rules-that-are-easy-to-break) before reaching for `npx`.
 
 ## Adding a component
 
@@ -193,8 +202,9 @@ direction: reading. The skill is `user-invocable: false` and its description aut
 
 **Allowed**
 
-- `npx shadcn@latest docs <id>` — the live API and examples for the upstream component, when
-  `upstream/manifest.json` gives you the surface but not the intent.
+- `pnpm dlx shadcn@latest docs <id>` — the live API and examples for the upstream component, when
+  `upstream/manifest.json` gives you the surface but not the intent. `dlx`, not `exec`: the docs you
+  read should be the current release, not the pinned `devDependencies` build.
 - `pnpm registry:build` — `scripts/build-registry.mjs` shells out to `shadcn build` to emit `public/r/*.json`.
   That is the only shadcn invocation in the pipeline, and it takes an explicit registry path, not a project.
 - `.agents/skills/shadcn/registry.md` — the registry schema (item types, `include`, dependency rules), which
