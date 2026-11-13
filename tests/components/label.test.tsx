@@ -53,7 +53,7 @@ describe("Label", () => {
 });
 
 describe("Label v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it.each(["full", "reduced", "none"] as const)("executes each owned action with native naming in %s", async (mode) => {
     const draw = (value: string | number, colour = false) => (
       <CadenceProvider mode={mode} timeScale={0}>

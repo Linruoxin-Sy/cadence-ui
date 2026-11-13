@@ -59,7 +59,7 @@ function StaticExample({ variant }: { variant?: "default" | "icon" }) {
 }
 
 describe("Empty", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
 
   it.each(["full", "reduced", "none"] as const)(
     "preserves all six native parts and explicit overrides in %s",

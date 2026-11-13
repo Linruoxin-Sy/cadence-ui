@@ -8,7 +8,7 @@ import { expectMotionContract } from "../motion-contract";
 import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 describe("Toggle v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
+  beforeAll(() => prepareV2MotionPlan()); // Cold full-library source/installation audit.
   it.each(["full", "none"] as const)("removes a real AnimatePresence child at zero clock in %s", async (mode) => {
     const draw = (visible: boolean) => (
       <CadenceProvider mode={mode} timeScale={0}>

@@ -9,7 +9,7 @@ import { expectMotionContract } from "../motion-contract";
 import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
 
 describe("ToggleGroup v2 actions", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it.each(["full", "reduced", "none"] as const)(
     "executes content, layout, paint and native boundaries in %s",
     async (mode) => {

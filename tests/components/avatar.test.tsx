@@ -100,7 +100,7 @@ describe("Avatar", () => {
 });
 
 describe("Avatar v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
 
   it.each(["full", "reduced", "none"] as const)("executes the standalone avatar actions in %s", async (mode) => {
     type State = {

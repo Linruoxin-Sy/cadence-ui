@@ -87,7 +87,7 @@ function ObjectDemo({
 }
 
 describe("Select", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
+  beforeAll(() => prepareV2MotionPlan()); // Cold full-library source/installation audit.
   it("retains native object equality, formatter arguments and explicit undefined uncontrolled values", async () => {
     const next = { id: "next", label: "Next.js" },
       remix = { id: "remix", label: "Remix" };
@@ -262,7 +262,7 @@ it.each(["full", "reduced", "none"] as const)("asserts the shared %s popup contr
 });
 
 describe("Select v2 owners", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000); // Cold full-library source/installation audit.
+  beforeAll(() => prepareV2MotionPlan()); // Cold full-library source/installation audit.
   it.each(["full", "reduced", "none"] as const)(
     "executes native accepted content/colour/size owners in %s",
     async (mode) => {

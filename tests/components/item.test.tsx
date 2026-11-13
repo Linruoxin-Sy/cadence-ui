@@ -152,7 +152,7 @@ describe("Item", () => {
 });
 
 describe("Item v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
 
   it.each(["full", "reduced", "none"] as const)("preserves every native part, ref and caller prop in %s", (mode) => {
     const slots = [

@@ -36,7 +36,7 @@ describe("Kbd", () => {
 });
 
 describe("Kbd v2 actions", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it.each(["full", "reduced", "none"] as const)("owns changed labels, sizes, reflow and paint in %s", async (mode) => {
     const draw = (label: string | number, paint = false) => (
       <CadenceProvider mode={mode} timeScale={0}>
