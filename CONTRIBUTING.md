@@ -50,6 +50,45 @@ pnpm dev
 The docs site renders every component from `registry/cadence/**`, so you can iterate on a component and
 its preview in one place.
 
+## Branch and merge policy
+
+`main` is protected. Every change reaches it through a pull request; direct pushes, force pushes and
+branch deletion are rejected, including for administrators. The required status is `check`, and the
+branch must be up to date with `main` before merging.
+
+Name the branch with one of these prefixes:
+
+| Prefix      | Alias   | Use                                                               |
+| ----------- | ------- | ----------------------------------------------------------------- |
+| `feature/`  | `feat/` | New functionality or an enhancement to existing functionality     |
+| `bugfix/`   | `fix/`  | A non-urgent, ordinary bug fix                                    |
+| `hotfix/`   | —       | An urgent production fix, usually branched directly from `main`   |
+| `release/`  | —       | Release preparation, for example `release/v1.2.0`                 |
+| `chore/`    | —       | Non-code housekeeping such as dependency or configuration changes |
+| `docs/`     | —       | Documentation-only changes                                        |
+| `refactor/` | —       | Refactoring that does not change external behavior                |
+
+Examples: `feature/avatar-motion`, `bugfix/select-focus`, `hotfix/toc-no-js`,
+`release/v1.2.0`, `chore/pnpm-10`, `docs/pr-only-workflow`, `refactor/motion-runtime`.
+
+- Branch from an up-to-date `main`. One focused change per branch; do not mix a component migration
+  with an unrelated docs or chore change.
+- Open the PR with `gh pr create --base main --head <branch>` or the web UI, and keep the PR template's
+  motion-contract review and verification sections.
+- Do not merge until `check` is green. `check` aggregates the parallel CI jobs; a failed, cancelled or
+  skipped leg fails it.
+- `hotfix/` still goes through a PR. Urgency changes the review priority, not the merge path.
+- Delete the branch after merge and never reuse a merged branch name.
+
+```bash
+git switch main
+git pull --ff-only
+git switch -c feature/<topic>
+# ... commit ...
+git push -u origin feature/<topic>
+gh pr create --base main --head feature/<topic>
+```
+
 ## Scaffold a component
 
 ```bash
