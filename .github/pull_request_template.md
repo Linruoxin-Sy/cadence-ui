@@ -2,6 +2,11 @@
 
 <!-- One or two sentences. Link the migration task or issue. -->
 
+## Branch
+
+- [ ] The branch uses one of `feature/`, `bugfix/`, `hotfix/`, `release/`, `chore/`, `docs/` or
+  `refactor/`, as defined in [CONTRIBUTING.md](CONTRIBUTING.md#branch-and-merge-policy).
+
 ## Motion contract review
 
 Answer these for every action row you add or change, before writing source:
