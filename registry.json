@@ -1072,20 +1072,40 @@
       "title": "Textarea",
       "description": "Comments, descriptions, and other longer text.",
       "categories": ["form"],
-      "dependencies": [],
-      "registryDependencies": ["@cadence/cadence-utils"],
+      "dependencies": ["motion"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry"
+      ],
       "files": [
         {
           "path": "registry/cadence/textarea/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/textarea/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B1",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -1094,14 +1114,36 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Textarea declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "Textarea fades its own later insertion, transitions only the chrome and foreground it paints, and interpolates one explicit rows or authored-height revision while the editor is unfocused; typing, field-sizing growth, selection and pointer resizing keep native ownership."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "textarea",
+                "reason": "Textarea owns its independent insertion opacity on the native control; a presenting Field or group entrance is inherited and parent removal keeps native focus cleanup."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "textarea",
+                "reason": "Textarea owns only an explicit rows or authored block revision while the editor is unfocused; field-sizing growth, value reflow, pointer resizing and parent sizing stay native."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "textarea",
+                "reason": "Textarea owns the background, foreground, border and ring paint it declares; focus-within, invalid state and unverified palettes settle that paint immediately."
+              }
+            ]
+          }
         }
       }
     },
