@@ -2,15 +2,15 @@
 title: Input Group
 description: Currency fields, URLs, and inputs with inline actions.
 category: form
-motion: []
+motion: ["data.transition","exit.fade",{"recipe":"layout.move","form":"one-shot"},{"recipe":"state.color","form":"css-transition"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"},{"recipe":"feedback.press","form":"one-shot"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"The frame owns one insertion, its surface paint and its committed block extent while addons keep their own presence and positions and every composed control keeps its own entrance, colour, box, press and label owners."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"input-group","reason":"The frame commits one later-insertion opacity and each addon owns its own insertion channel; a presenting parent or a hidden host keeps native paint."},{"relationship":"inherited","owner":"input","reason":"The composed Input keeps its independent insertion opacity on its own native control inside the frame."},{"relationship":"inherited","owner":"textarea","reason":"The composed Textarea keeps its own insertion opacity rather than receiving a second frame writer."},{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps Button's own insertion opacity on its own host."}],"exit.fade/one-shot":[{"relationship":"default","owner":"input-group","reason":"A retained keyed addon fades out on its own opacity channel before its completion removes it; an unkeyed removal commits immediately."},{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps Button's own exit when its membership ends, without a second writer from the frame."}],"layout.move/one-shot":[{"relationship":"default","owner":"input-group","reason":"Retained addons project their previous box onto the committed destination through one transform owner, separate from the frame box and any press transform."}],"state.color/css-transition":[{"relationship":"default","owner":"input-group","reason":"The frame owns its border, background and shadow paint; focus-within, invalid state, a theme switch and an unverified palette settle it immediately."},{"relationship":"inherited","owner":"input","reason":"The composed Input keeps its own chrome and foreground owner on the native control instead of a competing frame writer."},{"relationship":"inherited","owner":"textarea","reason":"The composed Textarea keeps its own chrome and foreground owner on the native control."},{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps Button's own colour owner and its light/dark variant boundary."}],"geometry.resize/measured":[{"relationship":"default","owner":"input-group","reason":"The frame owns only its committed block extent and yields it to a focused editor, a pointer or composition gesture, a caller clock and an unreadable destination."},{"relationship":"inherited","owner":"input","reason":"The composed Input keeps its own authored border box while unfocused; the frame never writes the editor."},{"relationship":"inherited","owner":"textarea","reason":"The composed Textarea keeps its explicit rows or authored block revision and its field-sizing growth."},{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps its own intrinsic box and never registers a press or frame displacement."}],"text.change/changed-runs":[{"relationship":"default","owner":"input-group","reason":"Plain display strings in InputGroupText or an addon replace only their changed runs; rich children keep their own composed owners."},{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps Button's changed-run label owner once."}],"number.roll/reels":[{"relationship":"default","owner":"input-group","reason":"A direct display quantity in InputGroupText or an addon reels on its own host; editable values and identifier-like affixes never roll."},{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps Button's quantity reel owner once."}],"feedback.press/one-shot":[{"relationship":"inherited","owner":"button","reason":"A composed InputGroupButton keeps Button's single press visual on its inner feedback layer; the frame adds no press writer."}]}}
 complexity: M
 tier: T0
 since: 0.2.0
-deps: ["class-variance-authority"]
-registryDeps: ["@cadence/button", "@cadence/cadence-utils", "@cadence/input", "@cadence/textarea"]
+deps: ["class-variance-authority","motion"]
+registryDeps: ["@cadence/button","@cadence/cadence-utils","@cadence/input","@cadence/textarea","@cadence/cadence-text","@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -25,7 +25,7 @@ npx shadcn@latest add @cadence/input-group
 
 [Manual installation files](https://cadence.dev/r/input-group.json)
 
-Copy all 12 files in the target list, keeping `input-group/index.tsx`,
+Copy every file in the target list, keeping `input-group/index.tsx`,
 `button/index.tsx`, `input/index.tsx`, `textarea/index.tsx` and the shared `lib/`
 files in the listed relative tree. Input Group imports Button, Input and Textarea
 even when a composition does not render every part. Its Button dependency needs
@@ -33,10 +33,12 @@ the motion and provider helpers; those files are required imports, while wrappin
 the application in `CadenceProvider` is optional. No additional item-specific CSS
 is required beyond the base theme and Tailwind utilities.
 
-The frame, addons, text and controls add no authored motion in full, reduced or
-none mode. `InputGroupButton` composes Button's press feedback: it scales only in
-full mode and drops that scale in reduced and none. Focus and invalid colour/ring
-changes are state feedback, not motion.
+The frame owns one insertion opacity, its own border/background/shadow paint and
+its committed block size; a keyed addon fades in and out and projects its retained
+position, and plain display text and quantities change in place. `InputGroupButton`
+composes Button, so it keeps Button's press, colour, label, quantity and exit
+owners instead of gaining a second writer. The control keeps native editing: Cadence
+never mirrors the value, moves the caret or measures a keystroke.
 
 Usage and the top preview also use [Kbd](/components/kbd). Install it when keeping
 the shortcut hint:
@@ -300,17 +302,30 @@ shows the ring.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: The frame owns one insertion, its surface paint and its committed block extent while addons keep their own presence and positions and every composed control keeps its own entrance, colour, box, press and label owners.
 
-No motion (T0). The frame never animates. `transition-[color,box-shadow]` covers the
-focus ring and the invalid border — state feedback that takes no space and does not
-run on mount.
+The control stays the only editor node: typing, composition, selection, autofill and
+the value are the browser's. The frame never interpolates the inline axis, because
+`w-full` makes that size the parent's, and it yields the block axis to a focused
+editor, a pointer or composition gesture and any caller clock on the same axis.
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+| Recipe | Owner and full behaviour | reduced | none |
+| ------ | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | The frame fades once on a later insertion, and each addon runs its own later-insertion opacity on its own host. A presenting parent, a hidden host or a missing presenting document keeps native paint. | Short opacity. | Immediate. |
+| `exit.fade/one-shot` | A retained keyed addon fades its own opacity out before its completion removes it; an unkeyed removal commits immediately instead of inventing an identity. | Short opacity. | Immediate removal. |
+| `layout.move/one-shot` | Retained addons project their previous committed box onto the destination through one transform owner, separate from the frame box and from any press transform. | Final positions immediately. | Final positions immediately. |
+| `geometry.resize/measured` | One committed block revision of the frame, measured after commitment and clamped to the CSS min/max height. A focused editor, a pointer or composition gesture, an unreadable destination and a caller clock on the block axis all settle immediately. | Immediate height. | Immediate height. |
+| `state.color/css-transition` | The frame owns its border, background and shadow; InputGroupText owns its display foreground. DOM focus-within, invalid state, a theme-owned switch and any palette we cannot prove settle the declared properties at their target. | Short eligible colour. | Zero duration and delay. |
+| `text.change/changed-runs` | Plain strings in InputGroupText or an addon replace only their changed runs with `stagger: none`; rich children keep their own composed owners and an editable value never becomes a text surrogate. | Changed-run opacity only. | Final text. |
+| `number.roll/reels` | A direct display quantity in InputGroupText or an addon reels on its own host and shares the frame's geometry transaction only when the displayed content actually changes. | Final digits immediately. | Final digits immediately. |
+| `feedback.press/one-shot` | A composed `InputGroupButton` keeps Button's single press visual on Button's own inner layer; the frame adds no press writer and moves no editor. | Inherited no-scale feedback. | Native activation without animation. |
+
+Removing an addon cancels its measurement and position work before the exit
+completes, and a retained addon is inert and `aria-hidden` while it fades. Live
+reduction settles frame and addon geometry and quantity reels while permitted
+addon and changed-run opacity and eligible colour reconcile under their reduced
+contracts. `none` or a zero clock settles one-shot work at the effective target,
+and returning to full never replays a consumed membership or content change.
 
 ## Accessibility
 
@@ -343,11 +358,12 @@ The group fills its parent and permits shrinking. Block-start/end addons use col
 addons share the input row. The caller owns long addon labels, button wrapping and narrow-screen
 composition.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Composed controls retain their
-own dependencies and motion contracts. Server-rendered markup does not imply that every interaction
-works without JavaScript. The registry enforces a 4 KiB gzip budget for this item's own shipped
-source; dependencies and application bundles are measured separately.
+The frame adds one opacity channel, one block-size owner and one transform projection per
+retained addon; it duplicates no editor, value mirror or per-keystroke measurement. Composed
+controls retain their own dependencies and motion contracts, and interactive children and
+application handlers still need their own client code. Server-rendered markup does not imply
+that every interaction works without JavaScript. The tier's gzip figure is an advisory
+reference under ADR-023, not a functional limit.
 
 ## Notes for AI
 
