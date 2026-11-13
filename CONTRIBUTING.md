@@ -50,6 +50,32 @@ pnpm dev
 The docs site renders every component from `registry/cadence/**`, so you can iterate on a component and
 its preview in one place.
 
+## Package manager
+
+This repository is pnpm-only (`packageManager` pins the version). Run commands through pnpm's own
+runner instead of `npx`, `npm exec`, `yarn` or `bun`, so each one resolves the same lockfile and the
+same installed version:
+
+| Situation                                  | Use               | Example                              |
+| ------------------------------------------ | ----------------- | ------------------------------------ |
+| A script declared in `package.json`        | `pnpm <script>`   | `pnpm check`                         |
+| A binary already installed as a dependency | `pnpm exec <bin>` | `pnpm exec biome check .`            |
+| A package this repository does not install | `pnpm dlx <pkg>`  | `pnpm dlx shadcn@latest docs button` |
+
+`pnpm <name>` resolves package scripts only: a bare binary name fails with "Unknown script", which is
+why an installed binary needs `pnpm exec` (or `pnpm dlx` when you deliberately want a version outside
+the pin — `pnpm dlx shadcn@latest docs <id>` reads upstream documentation instead of the
+`devDependencies` build). Scripts in `scripts/**` already call installed binaries through
+`node_modules/.bin` for the same reason; no `npx` remains in the pipeline.
+
+`npx` itself is not banned from the repository's text. The user-facing install instructions —
+`npx shadcn@latest add @cadence/<id>` in `content/**` and the generated `public/r/**` — stay in their
+npm form on purpose: the site's package-manager fence rewrites that exact line to `pnpm dlx`,
+`yarn dlx` or `bunx` for the reader's selection, and `components/site/package-manager.ts` is the only
+place that mapping lives. Keep those unchanged, and never hand-write a manager-specific variant next
+to them. The convention covers commands that act on this repository: scripts, tests, CI, and the notes
+that tell contributors and agents how to work here.
+
 ## Branch and merge policy
 
 `main` is protected. Every change reaches it through a pull request; direct pushes, force pushes and
