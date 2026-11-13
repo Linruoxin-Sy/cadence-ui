@@ -164,6 +164,7 @@ describe("current registry inventory and real part references", () => {
       "separator",
       "label",
       "input",
+      "textarea",
       "card",
       "aspect-ratio",
       "avatar",

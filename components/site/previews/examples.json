@@ -27,7 +27,7 @@
   "chart": ["bar", "line", "area", "pie", "legends", "tooltips", "live-data"],
   "toc": ["nested", "controlled", "scroll-tracking"],
   "input": ["invalid", "file", "controlled", "disabled-readonly"],
-  "textarea": ["auto-growing", "resizable", "invalid", "disabled-readonly", "controlled"],
+  "textarea": ["auto-growing", "resizable", "rows-revision", "invalid", "disabled-readonly", "controlled"],
   "card": ["changing-content", "header-action", "sizes", "content-sized", "boundaries"],
   "aspect-ratio": ["square", "video", "grid", "switch"],
   "avatar": ["sizes", "image-fallback", "changing", "presence", "group"],
