@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckIcon } from "lucide-react";
+import { useState } from "react";
 import {
   Avatar,
   AvatarBadge,
@@ -9,9 +10,11 @@ import {
   AvatarGroupCount,
   AvatarImage,
 } from "@/registry/cadence/avatar";
+import { Button } from "@/registry/cadence/button";
 import { PreviewStack } from "./shell";
 
 const portrait = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#e2e8f0"/><circle cx="20" cy="15" r="7" fill="#475569"/><path d="M5 40a15 15 0 0 1 30 0" fill="#475569"/></svg>')}`;
+const alternatePortrait = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#dbeafe"/><circle cx="20" cy="15" r="7" fill="#1d4ed8"/><path d="M5 40a15 15 0 0 1 30 0" fill="#1d4ed8"/></svg>')}`;
 
 function AvatarSpecimen() {
   return (
@@ -109,12 +112,47 @@ export function AvatarGroups() {
   );
 }
 
+export function AvatarChanging() {
+  const [large, setLarge] = useState(false);
+  const [alternate, setAlternate] = useState(false);
+  const [count, setCount] = useState(1);
+  const person = alternate
+    ? { src: alternatePortrait, initials: "GH", name: "Grace Hopper" }
+    : { src: portrait, initials: "AL", name: "Ada Lovelace" };
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex items-center gap-4">
+        <Avatar size={large ? "lg" : "default"} aria-label={person.name}>
+          <AvatarImage src={person.src} alt={person.name} keepMounted />
+          <AvatarFallback>{person.initials}</AvatarFallback>
+        </Avatar>
+        <AvatarGroup aria-label="Reviewers">
+          <AvatarGroupCount aria-label={`${count} more reviewers`}>{count}</AvatarGroupCount>
+        </AvatarGroup>
+      </div>
+      <div className="flex flex-wrap justify-center gap-3">
+        <Button variant="outline" onClick={() => setAlternate((value) => !value)}>
+          Swap identity
+        </Button>
+        <Button variant="outline" onClick={() => setLarge((value) => !value)}>
+          Toggle size
+        </Button>
+        <Button variant="outline" onClick={() => setCount((value) => value + 1)}>
+          Add reviewer
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function AvatarPreview({ example }: { example?: string }) {
   const content =
     example === "sizes" ? (
       <AvatarSizes />
     ) : example === "image-fallback" ? (
       <AvatarImageAndFallback />
+    ) : example === "changing" ? (
+      <AvatarChanging />
     ) : example === "presence" ? (
       <AvatarPresence />
     ) : example === "group" ? (

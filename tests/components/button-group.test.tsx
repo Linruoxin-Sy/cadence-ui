@@ -71,7 +71,7 @@ describe("ButtonGroup", () => {
 });
 
 describe("Button Group v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it("keeps native controls across plain/rich revisions and never retains unknown caller controls", () => {
     const cleanup = vi.fn(),
       ref = vi.fn(() => cleanup);

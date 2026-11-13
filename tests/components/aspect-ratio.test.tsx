@@ -77,7 +77,7 @@ describe("AspectRatio", () => {
 });
 
 describe("AspectRatio v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it.each(["full", "reduced", "none"] as const)("executes every reserved-wrapper action in %s", async (mode) => {
     const draw = ({ present = true, ratio = 16 / 9, paint = "#555" } = {}) => (
       <CadenceProvider mode={mode} timeScale={0}>

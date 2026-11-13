@@ -37,7 +37,7 @@ function Example({
 }
 
 describe("Alert", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it.each(["full", "reduced", "none"] as const)(
     "preserves original native defaults, explicit overrides, props and ref lifetime in %s",
     (mode) => {

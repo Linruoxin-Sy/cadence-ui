@@ -36,7 +36,7 @@ describe("Separator", () => {
 });
 
 describe("Separator v2", () => {
-  beforeAll(() => prepareV2MotionPlan(), 30000);
+  beforeAll(() => prepareV2MotionPlan());
   it.each(["full", "reduced", "none"] as const)("executes each rule action in %s", async (mode) => {
     const draw = (
       present = true,
