@@ -1,10 +1,6 @@
-# The same gate a contributor runs locally: `pnpm check`.
-#
-# `cli-gates` lives here rather than in a local loop. Those suites cold-start
-# `check-registry.mjs` and install real consumers into temporary projects, so their
-# wall clock tracks host throughput; running them on every local edit only buys
-# waiting. Keep this job as a required status check on the default branch, otherwise
-# the long-tail verification has no owner.
+# `pnpm check` is the local equivalent. CI runs the same commands as independent
+# jobs so one long gate cannot serialize the rest; `check` aggregates them and is
+# the only required status on main.
 name: check
 
 on:
@@ -20,9 +16,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  prepare:
+    # Build the payloads once; every test and registry job downloads this artifact.
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -31,9 +28,114 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # `registry:check` compares payload freshness against the built output, and
-      # the gate suites read `public/r`, so the payloads are part of the gate.
       - run: pnpm registry:build
-      - run: pnpm check
-      # Browser, installation and performance evidence remain separate obligations;
-      # this job certifies source, metadata, docs and unit/runtime records only.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: registry-payloads
+          # The three paths share `public` as their least common ancestor, so the
+          # artifact contains `r/...` and the two llms files. Download into
+          # `public` to restore the checkout layout.
+          path: |
+            public/r
+            public/llms.txt
+            public/llms-full.txt
+          retention-days: 1
+          if-no-files-found: error
+
+  static:
+    # typecheck, lint and parity do not need the payload build, so they start
+    # immediately and run beside `prepare`.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        command: [typecheck, lint, parity:check]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm ${{ matrix.command }}
+
+  registry-check:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: registry-payloads
+          path: public
+      - run: pnpm registry:check
+
+  runtime:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: registry-payloads
+          path: public
+      - run: pnpm test:local
+
+  gate:
+    # One job per cli-gate file. They are subprocess-heavy but independent, and
+    # the slowest file no longer waits behind doc-template or motion-docs.
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        file:
+          - tests/lib/doc-template.test.tsx
+          - tests/lib/motion-docs.test.tsx
+          - tests/lib/motion-v2-reporter.test.tsx
+          - tests/lib/motion-contract.test.tsx
+          - tests/lib/motion-v2-projection.test.tsx
+          - tests/lib/motion-targets.test.tsx
+          - tests/lib/joint-motion-reporter.test.tsx
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: registry-payloads
+          path: public
+      - run: pnpm test:gate ${{ matrix.file }}
+
+  check:
+    # The required status. It fails when any fan-out job failed, was cancelled or
+    # was skipped; individual job names are diagnostics, not merge requirements.
+    if: always()
+    needs: [prepare, static, registry-check, runtime, gate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every gate job
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}
+        run: exit 1

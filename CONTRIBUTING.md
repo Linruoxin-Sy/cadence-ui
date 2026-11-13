@@ -136,9 +136,10 @@ temporary projects. Choose the layer that can still fail:
 | Gates  | `pnpm test:gate`                                                  | Only when the change touches contracts, presets, metadata, MDX templates or the gate scripts |
 | Full   | `pnpm test`                                                       | Once per change set, in the background, while the handoff is being written                   |
 
-[`.github/workflows/check.yml`](.github/workflows/check.yml) runs the gate on `ubuntu-latest`; its job
-is named `check`. Repository settings must make `check` a required status check on `main` — that is
-admin configuration, not a file in this repository, so changing it needs owner access.
+[`.github/workflows/check.yml`](.github/workflows/check.yml) runs the gate on `ubuntu-latest`. It fans
+the commands out into parallel jobs — typecheck, lint, parity, registry check, runtime tests and one
+job per `cli-gates` file — and aggregates them into a single `check` job. Only `check` is a required
+status on `main`; it fails when any fan-out job fails, is cancelled or is skipped.
 
 Rules that came out of timing two migration sessions on this repository:
 
