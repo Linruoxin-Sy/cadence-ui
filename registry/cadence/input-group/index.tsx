@@ -520,9 +520,9 @@ export interface InputGroupButtonProps
  * A button inside the frame. It sizes itself from the addon scale rather than the
  * page scale, so a clear button does not tower over a 36px field.
  *
- * `data-slot="input-group-button"` is the composition's own name for this part:
- * Button keeps its press, colour, label and geometry owners, and the group
- * contract points at one local host for them.
+ * It renders Button itself, so the composed action keeps Button's own
+ * `data-slot="button"` and owners; a caller may retarget the slot (Combobox names
+ * it `input-group-button`), but the group contract still points at Button's host.
  */
 function InputGroupButton({
   className,
