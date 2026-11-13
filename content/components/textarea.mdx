@@ -2,15 +2,15 @@
 title: Textarea
 description: Comments, descriptions, and other longer text.
 category: form
-motion: []
+motion: ["data.transition",{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"}]
 intensity: subtle
-motionProfile: {"scope":"static","travel":"none","coordination":"independent","reason":"Textarea declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."}
-motionCoverage: {"schema":1,"effects":{}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"Textarea fades its own later insertion, transitions only the chrome and foreground it paints, and interpolates one explicit rows or authored-height revision while the editor is unfocused; typing, field-sizing growth, selection and pointer resizing keep native ownership."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"textarea","reason":"Textarea owns its independent insertion opacity on the native control; a presenting Field or group entrance is inherited and parent removal keeps native focus cleanup."}],"geometry.resize/measured":[{"relationship":"default","owner":"textarea","reason":"Textarea owns only an explicit rows or authored block revision while the editor is unfocused; field-sizing growth, value reflow, pointer resizing and parent sizing stay native."}],"state.color/css-transition":[{"relationship":"default","owner":"textarea","reason":"Textarea owns the background, foreground, border and ring paint it declares; focus-within, invalid state and unverified palettes settle that paint immediately."}]}}
 complexity: S
 tier: T0
 since: 0.2.0
-deps: []
-registryDeps: ["@cadence/cadence-utils"]
+deps: ["motion"]
+registryDeps: ["@cadence/cadence-utils","@cadence/cadence-motion","@cadence/cadence-provider","@cadence/cadence-geometry"]
 ---
 
 ## Installation
@@ -39,16 +39,17 @@ npx shadcn@latest add @cadence/button
 
 [Manual installation files](https://cadence.dev/r/textarea.json)
 
-Textarea needs only the two files and packages listed above; no motion runtime, provider or
-additional item-specific CSS is required. Keep `textarea/index.tsx` and `lib/cn.ts` at the
-listed relative paths so the shared `cn` import resolves. Give the textarea an accessible
+Textarea needs the files and packages listed above: the component, the shared library
+files the registry installs with it, and the motion runtime they use. No additional
+item-specific CSS is required. Keep `textarea/index.tsx` and the `lib/` files at the
+listed relative paths so the shared imports resolve. Give the textarea an accessible
 name with a label and matching `htmlFor` / `id` as shown in Usage. Content-driven growth
 uses CSS `field-sizing: content` through Tailwind's `field-sizing-content` utility;
 there is no JavaScript auto-grow fallback.
 
 For the labelled compositions, follow [Label's installation](/components/label#installation)
-and copy its component file alongside Textarea; the shared `lib/cn.ts` and its packages are
-already included above. For the Controlled example's action, follow
+and copy its component file alongside Textarea; the shared `lib/` files and their
+packages are already included above. For the Controlled example's action, follow
 [Button's installation](/components/button#installation), including its dependencies and
 motion setup. Label and Button are example dependencies, not dependencies of Textarea.
 Button is rendered only in Controlled; the unused `Button` and `useState` imports in the
@@ -73,7 +74,7 @@ export function Comment() {
 
 ## Auto-growing
 
-`field-sizing-content` lets a supporting browser grow the box as you type. This example caps growth at `max-h-48`, then scrolls its contents. There is no JavaScript resize fallback or height animation.
+`field-sizing-content` lets a supporting browser grow the box as you type. This example caps growth at `max-h-48`, then scrolls its contents. Growth keeps native ownership: there is no JavaScript resize fallback and no height transition behind the caret.
 
 <ComponentExample name="auto-growing" />
 
@@ -98,7 +99,7 @@ export function GrowingTextarea() {
 
 ## Resizable by the user
 
-`field-sizing-fixed` opts out of content-driven sizing so the browser’s vertical resize handle controls the height. `resize-y` preserves the parent’s width; the minimum and maximum keep resizing bounded.
+`field-sizing-fixed` opts out of content-driven sizing so the browser’s vertical resize handle controls the height. `resize-y` preserves the parent’s width; the minimum and maximum keep resizing bounded. Dragging the handle is a native interaction: the height follows the pointer with no easing.
 
 <ComponentExample name="resizable" />
 
@@ -116,6 +117,35 @@ export function ResizableTextarea() {
     <div className="grid w-full max-w-sm gap-2">
       <Label htmlFor={id}>Resizable note</Label>
       <Textarea id={id} rows={3} className="field-sizing-fixed resize-y min-h-24 max-h-64" defaultValue="Drag the lower corner to make more room." />
+    </div>
+  );
+}
+```
+
+## Explicit height revision
+
+A caller-owned `rows` change is the one size change Cadence animates. Opting out of content sizing makes `rows` the author of the block, so switching the row count while the editor is unfocused interpolates the height once; typing, a focused editor and the browser's own resize handle stay immediate.
+
+<ComponentExample name="rows-revision" />
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { Button } from "@/components/cadence/button";
+import { Label } from "@/components/cadence/label";
+import { Textarea } from "@/components/cadence/textarea";
+
+export function RowsRevisionTextarea() {
+  const id = useId();
+  const [rows, setRows] = useState(3);
+  return (
+    <div className="grid w-full max-w-sm gap-3">
+      <Label htmlFor={id}>Review note</Label>
+      <Textarea id={id} rows={rows} className="field-sizing-fixed" defaultValue={"Ready for review.\nSecond line."} />
+      <Button variant="outline" onClick={() => setRows((current) => (current === 3 ? 7 : 3))}>
+        {rows === 3 ? "Give me more room" : "Restore the shorter box"}
+      </Button>
     </div>
   );
 }
@@ -180,7 +210,7 @@ export function TextareaAvailability() {
 
 ## Controlled value and character count
 
-The caller owns the text, native `maxLength` and its described character count. The external action replaces only this draft. This counter communicates the limit without adding a validation API.
+The caller owns the text, native `maxLength` and its described character count. The external action replaces only this draft. This counter communicates the limit without adding a validation API. A controlled value update is native reflow, so it never animates the box.
 
 <ComponentExample name="controlled" />
 
@@ -231,17 +261,24 @@ All native `textarea` props are forwarded, including `rows`, `maxLength`,
 
 ## Motion contract
 
-Authored intensity is **subtle**: Textarea declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: Textarea fades its own later insertion, transitions only the chrome and foreground it paints, and interpolates one explicit rows or authored-height revision while the editor is unfocused; typing, field-sizing growth, selection and pointer resizing keep native ownership.
 
-No motion (T0). Growth is the browser sizing the box, not an animation: on a
-`field-sizing-content` textarea the height changes with the text as you type, and
-a transition on it would lag behind the caret.
+The native control stays the only editor node. Cadence never duplicates the
+editor, mirrors the value or measures each keystroke, so typing, composition,
+selection and `field-sizing` growth stay the browser's own.
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
+| Recipe | Owner and full behaviour | reduced | none |
+| ------ | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | Independent insertion of a later-mounted field fades the control's own opacity. A presenting Field or group owns the entrance instead, and focus, a hidden host or a missing presenting parent keeps native paint. | Short opacity. | Immediate. |
+| `state.color/css-transition` | Background, foreground, border and the scoped focus/invalid shadow. DOM focus-within, invalid state, a theme-owned switch and any palette we cannot prove settle every declared property at its target; otherwise an authored colour change transitions. | Short eligible colour. | Zero duration and delay. |
+| `geometry.resize/measured` | One explicit block revision — a caller `rows` change or an authored px height — measured once from the committed box at the final width and clamped to the CSS min/max height. A focused editor, typing, composition, pointer work and the native resize handle, value-driven reflow, `field-sizing` growth, passive wrapping and a caller clock on the same axis all commit final geometry immediately. | Immediate height. | Immediate height. |
+
+Focus and invalid changes retarget directly; there is no shake, queued warning or
+validation logic. Entering composition or editing cancels any conflicting size work, and
+blur does not replay skipped work. Parent removal owns any exit, so the control is never
+held in a retained fade that postpones native focus cleanup. Live reduction finishes
+geometry, and `none` or a zero clock also cancels colour and opacity without leaving a
+copied value behind. A native scroll position is never reset for an animation.
 
 ## Accessibility
 
@@ -252,6 +289,8 @@ a transition on it would lag behind the caret.
   in typing reads as a broken field.
 - `resize-y` keeps the horizontal layout stable; full `resize` lets a long word
   break the page.
+- The height transition never clips the focus outline or the visible text; when the
+  destination would scroll, the box settles at its native size instead.
 
 ## Validation and data ownership
 
@@ -273,10 +312,12 @@ The textarea fills its parent, has a minimum height and uses CSS field-sizing-co
 supported. The browser owns growth and user resizing; provide a height or overflow policy for long
 text when needed. There is no JavaScript auto-grow fallback.
 
-T0 adds no authored animation runtime or interpolation. This wrapper renders HTML/CSS; interactive
-children and application handlers still need their own client code. Server-rendered markup does not
-imply that every interaction works without JavaScript. The registry enforces a 4 KiB gzip budget for
-this item's own shipped source; dependencies and application bundles are measured separately.
+The motion runtime adds one opacity entrance, a scoped colour clock on the paint the
+component declares, and one measured block-height owner for an eligible `rows` or
+authored-height revision. Active typing, passive resizing and `field-sizing` growth do
+no measurement, and no transition runs behind the caret. This item's own shipped source
+budget remains advisory under ADR-023; dependencies and application bundles are measured
+separately.
 
 ## Notes for AI
 
@@ -284,3 +325,5 @@ this item's own shipped source; dependencies and application bundles are measure
   is the CSS-only answer and it matches upstream.
 - Never own the character count in component state. Render it next to the field and
   wire it through `aria-describedby`.
+- Do not animate a value change, a width change or a native resize. Only an explicit
+  `rows` or authored px height is eligible, and only while the editor is unfocused.

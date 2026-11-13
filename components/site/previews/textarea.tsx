@@ -31,6 +31,20 @@ function ResizableTextarea() {
   );
 }
 
+function RowsRevisionTextarea() {
+  const id = useId();
+  const [rows, setRows] = useState(3);
+  return (
+    <div className="grid w-full max-w-sm gap-3">
+      <Label htmlFor={id}>Review note</Label>
+      <Textarea id={id} rows={rows} className="field-sizing-fixed" defaultValue={"Ready for review.\nSecond line."} />
+      <Button variant="outline" onClick={() => setRows((current) => (current === 3 ? 7 : 3))}>
+        {rows === 3 ? "Give me more room" : "Restore the shorter box"}
+      </Button>
+    </div>
+  );
+}
+
 function InvalidTextarea() {
   const id = useId();
   return (
@@ -106,6 +120,7 @@ function TextareaSpecimen() {
 const examples = {
   "auto-growing": GrowingTextarea,
   resizable: ResizableTextarea,
+  "rows-revision": RowsRevisionTextarea,
   invalid: InvalidTextarea,
   "disabled-readonly": TextareaAvailability,
   controlled: ControlledTextarea,
