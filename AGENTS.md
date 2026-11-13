@@ -71,6 +71,11 @@ Supporting material outside `docs/`:
 
 These follow from the documents above; the documents are authoritative if they disagree.
 
+- **Never push to `main`; every change lands through a PR.** `main` is protected and direct, force and
+  deletion pushes are rejected. Branch with `feature/`, `bugfix/`, `hotfix/`, `release/`, `chore/`,
+  `docs/` or `refactor/` as defined in
+  [CONTRIBUTING.md](CONTRIBUTING.md#branch-and-merge-policy). `check` is the required aggregate status;
+  do not merge before it is green.
 - **No `@/` aliases in shipped source.** Files under `registry/cadence/**` use relative imports only (`../lib/motion`), because the source tree mirrors the install tree. `@/` is fine in site code.
 - **Shared code lives in `registry/cadence/lib/`.** Never reach for a host path such as `@/lib/utils`.
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
