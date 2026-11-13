@@ -89,6 +89,47 @@ git push -u origin feature/<topic>
 gh pr create --base main --head feature/<topic>
 ```
 
+### Enforcement
+
+The policy above is checked, not remembered. Husky runs the committed hooks in `.husky/`, and one
+predicate — `scripts/branch-policy.mjs` — runs at every place work could reach `main`:
+
+| Layer                             | What runs                                                                                     | Refuses                                                                                     |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `pre-commit` / `pre-merge-commit` | `.husky/pre-commit` → `node scripts/branch-policy.mjs --commit`, then `pnpm exec lint-staged` | a commit on `main` or on a detached HEAD, and any branch name outside the table above       |
+| `pre-push`                        | `.husky/pre-push` → `node scripts/branch-policy.mjs --push`                                   | a push (including force, delete or tag-to-branch) whose destination is `main` or unnamed    |
+| CI                                | the `branch-policy` job in [check.yml](.github/workflows/check.yml) → `--ci`                  | a pull request whose head branch is protected or unnamed; fails the required `check` status |
+
+`"prepare": "husky"` is why a clone needs no separate step: `pnpm install` installs the dispatcher in
+`.husky/_`, points the repository-local `core.hooksPath` at it and picks up every hook file in `.husky/`.
+Nothing outside that checkout is touched, and outside a git work tree husky exits without failing the
+install. Re-run it after adding a hook:
+
+```bash
+pnpm install        # or: pnpm exec husky
+pnpm branch:check   # validate the checked-out branch without committing
+pnpm lint:staged    # run the staged-file pass on demand
+```
+
+`lint-staged` formats and re-stages only the files a commit actually contains, using the Biome command in
+[`lint-staged.config.mjs`](lint-staged.config.mjs). It keeps the hook cheap and is not a gate: `pnpm check`
+still decides whether a change may merge, so a commit that skipped the hook is repaired with `pnpm lint:fix`
+before the pull request.
+
+Hooks are local and can be skipped with `--no-verify`; that is for repairing your own history, never for
+landing work. The remote still rejects the push, so branch protection stays the authority:
+
+- require a pull request before merging, dismissing stale approvals (this repository requires zero
+  approvals, because a sole maintainer cannot approve their own pull request);
+- block direct pushes, force pushes and branch deletion, including for administrators (`enforce_admins`);
+- require the `check` status with a branch up to date with `main` (strict).
+
+Confirm those settings with `gh api repos/{owner}/{repo}/branches/main/protection` before relying on the
+guards; a ruleset change on GitHub can silently loosen them.
+
+A pull request from a fork is held to the same naming rule. When a contributor's branch is named
+otherwise, re-home the commits onto a `feature/` branch in this repository instead of weakening the gate.
+
 ## Scaffold a component
 
 ```bash

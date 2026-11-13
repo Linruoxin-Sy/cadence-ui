@@ -1,0 +1,3 @@
+# git passes the refs being pushed on stdin; the guard refuses a destination that
+# is `main` before the remote has to. Branch protection stays the real authority.
+node scripts/branch-policy.mjs --push

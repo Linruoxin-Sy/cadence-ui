@@ -71,11 +71,18 @@ Supporting material outside `docs/`:
 
 These follow from the documents above; the documents are authoritative if they disagree.
 
-- **Never push to `main`; every change lands through a PR.** `main` is protected and direct, force and
-  deletion pushes are rejected. Branch with `feature/`, `bugfix/`, `hotfix/`, `release/`, `chore/`,
-  `docs/` or `refactor/` as defined in
-  [CONTRIBUTING.md](CONTRIBUTING.md#branch-and-merge-policy). `check` is the required aggregate status;
-  do not merge before it is green.
+- **`main` is merge-only: open a branch before touching a file.** `main` is protected and direct, force and
+  deletion pushes are rejected there. Start every task on a branch named `feature/`, `bugfix/`, `hotfix/`,
+  `release/`, `chore/`, `docs/` or `refactor/` as defined in
+  [CONTRIBUTING.md](CONTRIBUTING.md#branch-and-merge-policy), and land it through a pull request; `check`
+  is the required aggregate status and nothing merges before it is green. The rule is enforced, not
+  advisory: the husky hooks in `.husky/` — installed by `pnpm install` through `"prepare": "husky"`,
+  which also points `core.hooksPath` at `.husky/_` — run `scripts/branch-policy.mjs` and refuse a commit
+  on `main` or a detached HEAD and any push whose destination is `main`, while the `branch-policy` job
+  fails `check` for a pull request from a branch outside the naming scheme. `pre-commit` then runs
+  `lint-staged` (Biome on the staged files only), which formats and re-stages; it does not replace
+  `pnpm check`. Do not reach for `--no-verify` to get work onto `main`; move existing work with
+  `git switch -c feature/<topic> <commit>` instead.
 - **No `@/` aliases in shipped source.** Files under `registry/cadence/**` use relative imports only (`../lib/motion`), because the source tree mirrors the install tree. `@/` is fine in site code.
 - **Shared code lives in `registry/cadence/lib/`.** Never reach for a host path such as `@/lib/utils`.
 - **Never hard-code motion values.** Use the presets in `registry/cadence/lib/motion.ts` and the recipes listed in the animation system document; a new recipe means editing that document first.
