@@ -1,6 +1,0 @@
-#!/bin/sh
-# Refuses a push whose destination is a protected branch, and any branch outside
-# the naming policy. See CONTRIBUTING.md#branch-and-merge-policy.
-set -eu
-root=$(git rev-parse --show-toplevel)
-exec node "$root/scripts/branch-policy.mjs" --push

@@ -1,0 +1,5 @@
+# `main` is merge-only. The branch guard runs first so a forbidden commit fails
+# before formatting touches any file; lint-staged then fixes and re-stages what
+# this commit actually contains. `pnpm check` is still the gate — this is not it.
+node scripts/branch-policy.mjs --commit
+pnpm exec lint-staged

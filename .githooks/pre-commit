@@ -1,6 +1,0 @@
-#!/bin/sh
-# Refuses a commit on a protected branch. Work happens on a branch; see
-# CONTRIBUTING.md#branch-and-merge-policy. Installed by scripts/install-hooks.mjs.
-set -eu
-root=$(git rev-parse --show-toplevel)
-exec node "$root/scripts/branch-policy.mjs" --commit

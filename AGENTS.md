@@ -76,10 +76,12 @@ These follow from the documents above; the documents are authoritative if they d
   `release/`, `chore/`, `docs/` or `refactor/` as defined in
   [CONTRIBUTING.md](CONTRIBUTING.md#branch-and-merge-policy), and land it through a pull request; `check`
   is the required aggregate status and nothing merges before it is green. The rule is enforced, not
-  advisory: `.githooks/pre-commit`, `pre-merge-commit` and `pre-push` run `scripts/branch-policy.mjs` and
-  refuse a commit on `main` or a detached HEAD and any push whose destination is `main`, while the
-  `branch-policy` job fails `check` for a pull request from a branch outside the naming scheme. Do not
-  reach for `--no-verify` to get work onto `main`; move existing work with
+  advisory: the husky hooks in `.husky/` — installed by `pnpm install` through `"prepare": "husky"`,
+  which also points `core.hooksPath` at `.husky/_` — run `scripts/branch-policy.mjs` and refuse a commit
+  on `main` or a detached HEAD and any push whose destination is `main`, while the `branch-policy` job
+  fails `check` for a pull request from a branch outside the naming scheme. `pre-commit` then runs
+  `lint-staged` (Biome on the staged files only), which formats and re-stages; it does not replace
+  `pnpm check`. Do not reach for `--no-verify` to get work onto `main`; move existing work with
   `git switch -c feature/<topic> <commit>` instead.
 - **No `@/` aliases in shipped source.** Files under `registry/cadence/**` use relative imports only (`../lib/motion`), because the source tree mirrors the install tree. `@/` is fine in site code.
 - **Shared code lives in `registry/cadence/lib/`.** Never reach for a host path such as `@/lib/utils`.

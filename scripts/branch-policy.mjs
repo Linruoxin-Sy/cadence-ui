@@ -10,9 +10,9 @@
  *   node scripts/branch-policy.mjs --branch feature/x   # validate one name
  *   node scripts/branch-policy.mjs            # validate the checked-out branch
  *
- * Hooks are installed by `node scripts/install-hooks.mjs` (`pnpm install` runs it).
- * They are a guard rail, not the authority: branch protection on the remote still
- * rejects a push that skips a hook with `--no-verify`.
+ * Hooks are the husky files in `.husky/`, installed by `"prepare": "husky"` on
+ * `pnpm install`. They are a guard rail, not the authority: branch protection on the
+ * remote still rejects a push that skips a hook with `--no-verify`.
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
