@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -522,7 +522,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -604,7 +604,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -701,7 +701,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -776,7 +776,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -850,7 +850,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -957,7 +957,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -1040,7 +1040,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -1147,7 +1147,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -1202,7 +1202,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -1318,7 +1318,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -1435,7 +1435,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -1544,7 +1544,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1585,7 +1585,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1722,7 +1722,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1735,18 +1735,48 @@
       "form"
     ],
     "dependencies": [
-      "class-variance-authority"
+      "class-variance-authority",
+      "motion"
     ],
     "registryDependencies": [
       "@cadence/button",
       "@cadence/cadence-utils",
       "@cadence/input",
-      "@cadence/textarea"
+      "@cadence/textarea",
+      "@cadence/cadence-text",
+      "@cadence/cadence-number"
     ],
     "since": "0.2.0",
     "tier": "T0",
     "batch": "B2",
-    "motion": [],
+    "motion": [
+      "data.transition",
+      "exit.fade",
+      {
+        "recipe": "layout.move",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
+      },
+      {
+        "recipe": "feedback.press",
+        "form": "one-shot"
+      }
+    ],
     "intensity": "subtle",
     "complexity": "M",
     "upstream": {
@@ -1755,16 +1785,133 @@
       "version": "2026-10"
     },
     "motionProfile": {
-      "scope": "static",
+      "scope": "local",
       "travel": "none",
       "coordination": "independent",
-      "reason": "Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+      "reason": "The frame owns one insertion, its surface paint and its committed block extent while addons keep their own presence and positions and every composed control keeps its own entrance, colour, box, press and label owners."
     },
     "motionCoverage": {
       "schema": 1,
-      "effects": {}
+      "effects": {
+        "data.transition/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "The frame commits one later-insertion opacity and each addon owns its own insertion channel; a presenting parent or a hidden host keeps native paint."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input",
+            "reason": "The composed Input keeps its independent insertion opacity on its own native control inside the frame."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "textarea",
+            "reason": "The composed Textarea keeps its own insertion opacity rather than receiving a second frame writer."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps Button's own insertion opacity on its own host."
+          }
+        ],
+        "exit.fade/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "A retained keyed addon fades out on its own opacity channel before its completion removes it; an unkeyed removal commits immediately."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps Button's own exit when its membership ends, without a second writer from the frame."
+          }
+        ],
+        "layout.move/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "Retained addons project their previous box onto the committed destination through one transform owner, separate from the frame box and any press transform."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "The frame owns its border, background and shadow paint; focus-within, invalid state, a theme switch and an unverified palette settle it immediately."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input",
+            "reason": "The composed Input keeps its own chrome and foreground owner on the native control instead of a competing frame writer."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "textarea",
+            "reason": "The composed Textarea keeps its own chrome and foreground owner on the native control."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps Button's own colour owner and its light/dark variant boundary."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "The frame owns only its committed block extent and yields it to a focused editor, a pointer or composition gesture, a caller clock and an unreadable destination."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input",
+            "reason": "The composed Input keeps its own authored border box while unfocused; the frame never writes the editor."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "textarea",
+            "reason": "The composed Textarea keeps its explicit rows or authored block revision and its field-sizing growth."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps its own intrinsic box and never registers a press or frame displacement."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "Plain display strings in InputGroupText or an addon replace only their changed runs; rich children keep their own composed owners."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps Button's changed-run label owner once."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "input-group",
+            "reason": "A direct display quantity in InputGroupText or an addon reels on its own host; editable values and identifier-like affixes never roll."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps Button's quantity reel owner once."
+          }
+        ],
+        "feedback.press/one-shot": [
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "A composed InputGroupButton keeps Button's single press visual on its inner feedback layer; the frame adds no press writer."
+          }
+        ]
+      }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -1804,7 +1951,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -1844,7 +1991,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -1899,7 +2046,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -1967,7 +2114,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -2020,7 +2167,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -2072,7 +2219,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -2123,7 +2270,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -2175,7 +2322,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -2279,7 +2426,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -2422,7 +2569,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -2475,7 +2622,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -2526,7 +2673,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -2593,7 +2740,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -2659,7 +2806,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -2725,7 +2872,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -2791,7 +2938,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -2859,7 +3006,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -2925,7 +3072,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -3061,7 +3208,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -3137,7 +3284,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -3212,7 +3359,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -3287,7 +3434,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -3362,7 +3509,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -3447,7 +3594,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -3529,7 +3676,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -3595,7 +3742,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -3651,7 +3798,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -3706,7 +3853,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -3833,7 +3980,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -3870,7 +4017,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -3928,7 +4075,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -3967,7 +4114,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -4019,7 +4166,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -4078,7 +4225,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -4157,7 +4304,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -4197,7 +4344,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -4325,7 +4472,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -4417,7 +4564,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -4508,7 +4655,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -4574,7 +4721,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -4627,7 +4774,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -4687,7 +4834,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -4739,7 +4886,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -4791,7 +4938,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -4845,7 +4992,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -4897,7 +5044,7 @@
         ]
       }
     },
-    "sourceSha": "65c6b34c",
+    "sourceSha": "7f868c39",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

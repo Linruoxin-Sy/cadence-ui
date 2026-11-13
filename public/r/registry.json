@@ -232,7 +232,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -327,7 +327,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -419,7 +419,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -492,7 +492,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -579,7 +579,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -644,7 +644,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -709,7 +709,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -804,7 +804,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -877,7 +877,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -972,7 +972,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1019,7 +1019,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1122,7 +1122,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1226,7 +1226,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1322,7 +1322,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1355,7 +1355,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1479,7 +1479,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1494,7 +1494,34 @@
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          {
+            "recipe": "layout.move",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          {
+            "recipe": "feedback.press",
+            "form": "one-shot"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "M",
         "upstream": {
@@ -1503,16 +1530,133 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Input Group declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "The frame owns one insertion, its surface paint and its committed block extent while addons keep their own presence and positions and every composed control keeps its own entrance, colour, box, press and label owners."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "The frame commits one later-insertion opacity and each addon owns its own insertion channel; a presenting parent or a hidden host keeps native paint."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "The composed Input keeps its independent insertion opacity on its own native control inside the frame."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "textarea",
+                "reason": "The composed Textarea keeps its own insertion opacity rather than receiving a second frame writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps Button's own insertion opacity on its own host."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "A retained keyed addon fades out on its own opacity channel before its completion removes it; an unkeyed removal commits immediately."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps Button's own exit when its membership ends, without a second writer from the frame."
+              }
+            ],
+            "layout.move/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "Retained addons project their previous box onto the committed destination through one transform owner, separate from the frame box and any press transform."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "The frame owns its border, background and shadow paint; focus-within, invalid state, a theme switch and an unverified palette settle it immediately."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "The composed Input keeps its own chrome and foreground owner on the native control instead of a competing frame writer."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "textarea",
+                "reason": "The composed Textarea keeps its own chrome and foreground owner on the native control."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps Button's own colour owner and its light/dark variant boundary."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "The frame owns only its committed block extent and yields it to a focused editor, a pointer or composition gesture, a caller clock and an unreadable destination."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input",
+                "reason": "The composed Input keeps its own authored border box while unfocused; the frame never writes the editor."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "textarea",
+                "reason": "The composed Textarea keeps its explicit rows or authored block revision and its field-sizing growth."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps its own intrinsic box and never registers a press or frame displacement."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "Plain display strings in InputGroupText or an addon replace only their changed runs; rich children keep their own composed owners."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps Button's changed-run label owner once."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "input-group",
+                "reason": "A direct display quantity in InputGroupText or an addon reels on its own host; editable values and identifier-like affixes never roll."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps Button's quantity reel owner once."
+              }
+            ],
+            "feedback.press/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed InputGroupButton keeps Button's single press visual on its inner feedback layer; the frame adds no press writer."
+              }
+            ]
+          }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1545,7 +1689,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1578,7 +1722,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1624,7 +1768,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1681,7 +1825,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1724,7 +1868,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1767,7 +1911,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1810,7 +1954,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1853,7 +1997,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -1945,7 +2089,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2076,7 +2220,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2119,7 +2263,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2162,7 +2306,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2219,7 +2363,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2276,7 +2420,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2333,7 +2477,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2390,7 +2534,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2447,7 +2591,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2504,7 +2648,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2627,7 +2771,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2692,7 +2836,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2757,7 +2901,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2822,7 +2966,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2887,7 +3031,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -2959,7 +3103,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3026,7 +3170,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3083,7 +3227,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3129,7 +3273,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3175,7 +3319,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3287,7 +3431,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3320,7 +3464,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3368,7 +3512,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3401,7 +3545,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3444,7 +3588,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3490,7 +3634,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3558,7 +3702,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3591,7 +3735,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3697,7 +3841,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3777,7 +3921,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3857,7 +4001,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3912,7 +4056,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -3955,7 +4099,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -4007,7 +4151,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -4054,7 +4198,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -4101,7 +4245,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -4148,7 +4292,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     },
     {
@@ -4195,7 +4339,7 @@
             ]
           }
         },
-        "sourceSha": "65c6b34c"
+        "sourceSha": "7f868c39"
       }
     }
   ]
