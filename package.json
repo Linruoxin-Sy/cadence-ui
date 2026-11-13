@@ -7,6 +7,9 @@
   "type": "module",
   "packageManager": "pnpm@10.34.5",
   "scripts": {
+    "prepare": "node scripts/install-hooks.mjs",
+    "hooks:install": "node scripts/install-hooks.mjs",
+    "branch:check": "node scripts/branch-policy.mjs",
     "dev": "next dev",
     "build": "pnpm registry:build && next build",
     "start": "next start",

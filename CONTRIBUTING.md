@@ -89,6 +89,40 @@ git push -u origin feature/<topic>
 gh pr create --base main --head feature/<topic>
 ```
 
+### Enforcement
+
+The policy above is checked, not remembered. One predicate — `scripts/branch-policy.mjs` — runs at every
+place work could reach `main`:
+
+| Layer                             | What runs                                                                    | Refuses                                                                                     |
+| --------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `pre-commit` / `pre-merge-commit` | `.githooks/*` → `node scripts/branch-policy.mjs --commit`                    | a commit on `main` or on a detached HEAD, and any branch name outside the table above       |
+| `pre-push`                        | `.githooks/pre-push` → `node scripts/branch-policy.mjs --push`               | a push (including force, delete or tag-to-branch) whose destination is `main` or unnamed    |
+| CI                                | the `branch-policy` job in [check.yml](.github/workflows/check.yml) → `--ci` | a pull request whose head branch is protected or unnamed; fails the required `check` status |
+
+Hooks live in `.githooks/` in the repository and are selected by `core.hooksPath`, so a clone needs one
+command — `pnpm install` already runs it through `prepare`:
+
+```bash
+pnpm hooks:install   # git config --local core.hooksPath .githooks
+pnpm branch:check    # validate the checked-out branch without committing
+```
+
+Outside a git work tree `hooks:install` is a no-op, so it never fails an install. Hooks are local and can
+be skipped with `--no-verify`; that is for repairing your own history, never for landing work. The remote
+still rejects the push, so branch protection stays the authority:
+
+- require a pull request before merging, dismissing stale approvals (this repository requires zero
+  approvals, because a sole maintainer cannot approve their own pull request);
+- block direct pushes, force pushes and branch deletion, including for administrators (`enforce_admins`);
+- require the `check` status with a branch up to date with `main` (strict).
+
+Confirm those settings with `gh api repos/{owner}/{repo}/branches/main/protection` before relying on the
+guards; a ruleset change on GitHub can silently loosen them.
+
+A pull request from a fork is held to the same naming rule. When a contributor's branch is named
+otherwise, re-home the commits onto a `feature/` branch in this repository instead of weakening the gate.
+
 ## Scaffold a component
 
 ```bash

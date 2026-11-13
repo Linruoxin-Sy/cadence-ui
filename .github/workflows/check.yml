@@ -1,6 +1,7 @@
 # `pnpm check` is the local equivalent. CI runs the same commands as independent
 # jobs so one long gate cannot serialize the rest; `check` aggregates them and is
-# the only required status on main.
+# the only required status on main. `branch-policy` has no local equivalent: the
+# committed hooks guard the same rule on the machine that commits.
 name: check
 
 on:
@@ -60,6 +61,16 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm ${{ matrix.command }}
+
+  branch-policy:
+    # `main` is merge-only: a pull request must come from a named work branch, and a
+    # `push` run here is the merge commit of an approved pull request, so it passes.
+    # No install: the guard is plain Node.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: node scripts/branch-policy.mjs --ci
 
   registry-check:
     needs: prepare
@@ -132,7 +143,7 @@ jobs:
     # The required status. It fails when any fan-out job failed, was cancelled or
     # was skipped; individual job names are diagnostics, not merge requirements.
     if: always()
-    needs: [prepare, static, registry-check, runtime, gate]
+    needs: [prepare, static, branch-policy, registry-check, runtime, gate]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -1,0 +1,6 @@
+#!/bin/sh
+# A merge commit on main changes main without a commit message being written
+# elsewhere. Same rule as pre-commit. See CONTRIBUTING.md#branch-and-merge-policy.
+set -eu
+root=$(git rev-parse --show-toplevel)
+exec node "$root/scripts/branch-policy.mjs" --commit
