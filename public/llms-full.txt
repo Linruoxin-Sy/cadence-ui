@@ -12357,10 +12357,11 @@ npm install clsx tailwind-merge motion @base-ui/react
 
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
-- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -12383,13 +12384,20 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
 | switch | `@components/cadence/switch/index.tsx` | [JSON files[].content](https://cadence.dev/r/switch.json) |
+| switch | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/switch.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
 
 [Source files: switch](https://cadence.dev/r/switch.json)
 
@@ -12546,22 +12554,28 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine files in the target list, including every file from the motion,
-utilities and provider payloads. Keep `switch/index.tsx` beside the shared `lib/`
-directory with its relative imports and the sources' `"use client"` directives
-intact. The thumb uses `ControlSpan`, whose imports also reach `native-div.tsx`
-and `press-button.tsx`; copying only `provider.tsx` is not enough. The provider
-files and `motion` package are required even without an application wrapper.
+Copy every file in the target list, including the shared `inline-entrance.ts` and
+every file from the motion, geometry, utilities and provider payloads. Keep
+`switch/index.tsx` beside the shared `lib/` directory with its relative imports
+and the sources' `"use client"` directives intact. The thumb uses `ControlSpan`,
+whose imports also reach `native-div.tsx` and `press-button.tsx`; the measured
+size transaction also needs `measured-geometry.ts`. Copying only `provider.tsx`
+is not enough. The provider files and `motion` package are required even without
+an application wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. There is no additional Switch-specific CSS, icon package or external
 asset. `state.morph` animates only the thumb's horizontal transform in full;
 reduced and none jump to the checked endpoint without travel animation. The
-track colour is state feedback. Both `default` and `sm` measure their own travel
-with `ResizeObserver`; the first measured position settles immediately, including
-an initially checked switch in none. Standalone switches follow the system
-motion preference. The optional `CadenceProvider` controls a subtree's mode and
-timing; a nested full scope still respects system reduced motion.
+thumb's endpoint is measured from the rendered track and thumb — never a
+hard-coded pixel value — so both `default` and `sm`, and a caller restyle, land
+flush; the first measurement and a passive resize are painted immediately,
+including an initially checked switch in none. The track and the thumb each own
+one scoped colour transaction. An explicit `size` change interpolates the
+measured track box and remeasures the endpoint, while a passive layout change
+stays native. Standalone switches follow the system motion preference. The
+optional `CadenceProvider` controls a subtree's mode and timing; a nested full
+scope still respects system reduced motion.
 
 Usage, the top specimen and the labelled examples also need
 [Label](/components/label). Controlled additionally uses [Button](/components/button).
@@ -12833,21 +12847,25 @@ export function StaticSwitch() {
 
 ## Motion contract
 
-Authored intensity is **subtle**: The thumb travels only within its switch track.
+Authored intensity is **subtle**: The thumb travels only within its measured track, the track and the thumb each own one scoped palette, and an explicit size revision remeasures the endpoint.
 
-Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
-while the track recolours. The travel distance is measured from the rendered track
-and thumb — no hard-coded pixel value — so a custom size still lands flush.
+The thumb is the protagonist. It travels between two measured endpoints — the
+distance is read from the track and the thumb, never written down — while the
+track and the thumb each run one state paint transaction. Nothing else in the
+control moves.
 
-| Phase   | Properties                         | Token          | Interruptible |
-| ------- | ---------------------------------- | -------------- | ------------- |
-| on      | `translateX 0 → track − thumb`     | `state.morph/one-shot`  | yes           |
-| off     | the same distance, reversed        | `state.morph/one-shot`  | yes           |
-| reduced | no travel animation; the thumb jumps to the new end | – | –     |
-| none    | no transition                      | –              | –             |
+| Recipe / form | Owner and full behaviour | reduced | none |
+| ------------- | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | One opacity entrance on a switch inserted into an already-presented page. A presenting parent (such as an entering field), a hidden or unusable control and an already-visible switch keep native paint, and the thumb never sweeps in. | Short opacity. | Immediate. |
+| `state.morph/one-shot` | The thumb's own endpoint revision: the measured travel with a non-overshooting indicator spring. The first measurement and a passive font/viewport/caller-layout change paint the endpoint immediately, and a rapid toggle retargets the same thumb host. | Position immediately. | Position immediately. |
+| `state.color/css-transition` | The track's background, border and focus-ring paint on one clock, and the thumb's own fill on its own host. Real DOM focus and a palette we cannot prove settle all of that paint at its target. | Short eligible colour. | Zero duration and delay. |
+| `geometry.resize/measured` | An explicit `size` change interpolates the measured track box. The thumb endpoint is remeasured from the same change and held to the interval that stays valid through the whole transaction, then painted at the exact measured endpoint. | Final geometry immediately. | Final geometry immediately. |
 
 Under `reduced` the thumb still ends up in the right place: position is state, not
-decoration. What is dropped is the animation, so the movement is instant.
+decoration. What is dropped is the travel animation and the size interpolation.
+Under `none` the thumb, the track box and every colour reach their target with
+zero duration and delay. A native form reset stays Base UI's own path: Cadence
+adds no callback, revision or replay for it.
 
 ## Keyboard interactions
 
@@ -12887,15 +12905,19 @@ shrinking the track.
 
 ## Performance
 
-One `ResizeObserver` per switch measures the travel, so a font or layout change
-does not desynchronise the thumb. The animation itself is a single `transform`
-transition with no layout reads during interaction.
+One `ResizeObserver` pair per switch measures the track and the thumb, so a font
+or layout change does not desynchronise the endpoint; an owned size writer is
+excluded from that read. The animation itself is a single `transform`
+transition, one scoped colour family on the track and one on the thumb, plus one
+measured width/height transaction when the `size` prop changes. No layout read
+happens during interaction.
 
 ## Notes for AI
 
 - Use `switch` only for immediate settings. If there is a Save button, use
   `checkbox`.
-- Do not animate the track colour as motion; colour is state feedback.
+- The track and thumb colours are one scoped state transaction, not decorative
+  motion; do not add a second colour writer or animate unrelated properties.
 - Keep the label outside the switch. A switch with no label has no accessible name.
 
 # Slider
