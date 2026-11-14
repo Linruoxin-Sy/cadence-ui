@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -522,7 +522,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -604,7 +604,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -701,7 +701,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -776,7 +776,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -850,7 +850,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -957,7 +957,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -1040,7 +1040,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -1147,7 +1147,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -1202,7 +1202,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -1318,7 +1318,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -1435,7 +1435,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -1544,7 +1544,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1672,7 +1672,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1809,7 +1809,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1998,7 +1998,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -2038,7 +2038,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -2078,7 +2078,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -2133,7 +2133,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -2201,7 +2201,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -2276,7 +2276,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -2350,7 +2350,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -2436,7 +2436,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -2510,7 +2510,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -2614,7 +2614,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -2757,7 +2757,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -2833,7 +2833,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -2884,7 +2884,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -2951,7 +2951,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -3017,7 +3017,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -3083,7 +3083,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -3149,7 +3149,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -3217,7 +3217,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -3283,7 +3283,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -3419,7 +3419,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -3440,21 +3440,29 @@
       "@cadence/cadence-motion",
       "@cadence/cadence-utils",
       "@cadence/cadence-provider",
-      "@cadence/input-group"
+      "@cadence/input-group",
+      "@cadence/button"
     ],
     "since": "0.4.0",
     "tier": "T2",
     "batch": "B5",
     "motion": [
       {
+        "recipe": "data.transition",
+        "form": "one-shot"
+      },
+      {
         "recipe": "popup.anchored",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.color",
         "form": "css-transition"
       },
       {
-        "recipe": "exit.fade",
-        "form": "css-transition"
-      },
-      "state.morph"
+        "recipe": "state.morph",
+        "form": "one-shot"
+      }
     ],
     "intensity": "medium",
     "complexity": "L",
@@ -3467,35 +3475,62 @@
       "scope": "surface",
       "travel": "compact",
       "coordination": "independent",
-      "reason": "Combobox opens and closes its existing popup surface; content and native focus retain their current owners."
+      "reason": "The popup owns one anchored envelope and one scoped surface paint, each chip, standalone trigger and chips frame keeps its own insertion and paint, and the item tick morphs on a retained host without moving rows."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "popup.anchored/css-transition": [
+        "data.transition/one-shot": [
           {
             "relationship": "default",
             "owner": "combobox",
-            "reason": "Combobox integrates popup opening at its own parts, using the reached installed executor."
+            "reason": "Combobox integrates this exact form at its own native popup, chips frame, chip or standalone trigger."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input-group",
+            "reason": "The composed Input Group frame and Button keep their own migrated insertion owner inside this composition; the editor is Base UI's native input."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The composed Input Group frame and Button keep their own migrated insertion owner inside this composition; the editor is Base UI's native input."
           }
         ],
-        "exit.fade/css-transition": [
+        "popup.anchored/one-shot": [
           {
             "relationship": "default",
             "owner": "combobox",
-            "reason": "Combobox integrates popup closing at its own parts, using the reached installed executor."
+            "reason": "The popup surface owns one anchored entrance and its anchored ending on its own rendered host; Base UI keeps the portal, placement and dismissal."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "combobox",
+            "reason": "The popup, option row, chip pill, chips frame, standalone trigger and separator rule each own scoped paint on their own host."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "input-group",
+            "reason": "The composed Input Group frame and Button keep their own migrated colour owner inside this composition; the editor keeps Base UI's native paint."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The composed Input Group frame and Button keep their own migrated colour owner inside this composition; the editor keeps Base UI's native paint."
           }
         ],
         "state.morph/one-shot": [
           {
             "relationship": "default",
             "owner": "combobox",
-            "reason": "Combobox integrates local state/glyph feedback at its own parts, using the reached installed executor."
+            "reason": "Each option keeps one retained tick host that morphs from the committed selected state without moving the row."
           }
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -3570,7 +3605,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -3645,7 +3680,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -3720,7 +3755,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -3805,7 +3840,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -3887,7 +3922,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -3953,7 +3988,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -4009,7 +4044,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -4064,7 +4099,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -4191,7 +4226,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -4228,7 +4263,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -4286,7 +4321,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -4325,7 +4360,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -4377,7 +4412,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -4436,7 +4471,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -4515,7 +4550,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -4555,7 +4590,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -4683,7 +4718,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -4775,7 +4810,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -4866,7 +4901,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -4932,7 +4967,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -4985,7 +5020,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -5045,7 +5080,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -5097,7 +5132,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -5149,7 +5184,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -5203,7 +5238,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -5255,7 +5290,7 @@
         ]
       }
     },
-    "sourceSha": "f3fec9a8",
+    "sourceSha": "a51ca364",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }
