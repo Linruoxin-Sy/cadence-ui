@@ -7127,14 +7127,13 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 2. Copy the following registry dependencies in the listed dependency order. Each JSON link exposes every file's full `content` and `target`; copy all files, including multi-file helpers.
 
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
-- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — transitive registry dependency.
+- [@cadence/cadence-motion](https://cadence.dev/r/cadence-motion.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
-- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — transitive registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
-- [@cadence/label](https://cadence.dev/r/label.json) — direct registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -7170,12 +7169,10 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
-| label | `@components/cadence/label/index.tsx` | [JSON files[].content](https://cadence.dev/r/label.json) |
-| label | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/label.json) |
-| label | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/label.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | field | `@components/cadence/field/index.tsx` | [JSON files[].content](https://cadence.dev/r/field.json) |
+| field | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/field.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
@@ -7190,8 +7187,6 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
 
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
-
-[Source files: label](https://cadence.dev/r/label.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
 
@@ -7350,10 +7345,11 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Keep `field/index.tsx`, `label/index.tsx`, `separator/index.tsx` and `lib/cn.ts`
-at the listed relative paths. Field imports Label and Separator even when you do
-not render those parts. Keep their listed shared runtime files too. Label and Separator
-retain their own delivered motion contracts; the optional provider controls their modes. Keep the source files' `"use client"` directives.
+Keep `field/index.tsx`, `separator/index.tsx`, `lib/cn.ts` and the listed
+`lib/` motion files at their relative paths. Field renders Separator for
+`FieldSeparator` even when you do not render that part, and keeps its own local
+motion owners; Separator retains its own delivered motion contract and the
+optional provider controls both modes. Keep the source files' `"use client"` directives.
 In Next.js App Router, a Server Component can render these client parts with
 serializable props. Calling the exported `fieldVariants` function belongs in a
 `"use client"` module; none of the examples below calls it.
@@ -7382,7 +7378,8 @@ need `button/index.tsx`. Button adds `motion`, and Checkbox adds `motion` and
 `lucide-react`. Wrapping the application in their provider is optional.
 Button drops its press scale in reduced and none modes;
 Checkbox keeps an opacity-only indicator in reduced and changes instantly in
-none. Field stays static in all three modes.
+none. Field keeps a short opacity and immediate geometry in reduced and commits
+instantly in none.
 
 Keep the documented example compositions and top preview's existing `"use client"`
 boundaries. The error example needs a client boundary for its state and event
@@ -7632,38 +7629,38 @@ export function ChoiceCard() {
 | Part               | Props                        | Notes                                                          |
 | ------------------ | ---------------------------- | -------------------------------------------------------------- |
 | `Field`            | `orientation`, native props  | `vertical \| horizontal \| responsive`; `role="group"`, `data-orientation`. |
-| `FieldLabel`       | `Label` props                | A real `label`; click focuses the control.                      |
+| `FieldLabel`       | native props for `label`     | A real `label`; click focuses the control.                      |
 | `FieldTitle`       | native div props             | Label-weight text that is not tied to a control.                |
 | `FieldDescription` | native props for `p`         | Muted help text, balanced in horizontal orientation.            |
 | `FieldError`       | `errors`, native div props   | `errors`: `{ message?: string }[]`. `role="alert"`, `null` when empty. |
 | `FieldGroup`       | native div props             | Container query root; vertical rhythm between fields.           |
-| `FieldContent`     | native div props             | Control plus description/error stack.                           |
+| `FieldContent`     | native div props             | Control plus description/error stack; owns the message block.    |
 | `FieldSet`         | native props for `fieldset`  | Groups related fields; pairs with `FieldLegend`.                |
 | `FieldLegend`      | `variant`                    | `legend \| label` sizes the legend text.                        |
-| `FieldSeparator`   | `children`                   | Rule with optional centred text; exposes `data-content`.        |
+| `FieldSeparator`   | `children`, `ruleStyle`      | Rule with optional centred text; exposes `data-content`. `ruleStyle` authors the composed rule's own length and paint. |
 
 `data-slot` values: `field`, `field-label`, `field-description`, `field-error`,
 `field-group`, `field-content`, `field-set`, `field-legend`, `field-separator`,
-`field-separator-content`.
+`field-separator-content`, `field-text`, `field-number`.
 
 ## Motion contract
 
-Authored intensity is **subtle**: Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged.
+Authored intensity is **subtle**: FieldContent owns one measured helper/error block while each message row, structure entry, display run and colour owner settles independently on its own host.
+Initial SSR and hydration remain visible.
 
-The Field wrapper adds no local motion. FieldLabel inherits Label’s delivered effects, and
-the rule in FieldSeparator inherits Separator’s effects. These do not migrate the remaining Field parts.
-The error is the one thing the user must read immediately; fading or sliding it in
-delays the only information that matters, and it moves the control the user's cursor
-is in.
+| Recipe | Owner and full behaviour | reduced | none |
+| ------ | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | Independent Field, FieldSet, FieldGroup and message-row insertion, opacity only; a presenting ancestor consumes the nested structure entrance. | Short opacity. | Immediate. |
+| `exit.fade/one-shot` | A message row retained by its own presence scope fades out before the caller-owned completion removes it; a retained slot that resolves to nothing removes immediately. | Short opacity. | Immediate. |
+| `geometry.resize/measured` | FieldContent owns the one measured message block at the final width; a focused editor, a captured pointer, a caller clock, an unreadable destination or a passive resize settles it immediately. | Native block size immediately. | Native block size immediately. |
+| `state.color/css-transition` | FieldLabel owns its surface and foreground together; title, legend, description and error own their foreground. DOM focus-within or an invalid state settles all declared paint immediately, and the composed rule keeps Separator's own background owner. | Short eligible colour. | Zero duration and delay. |
+| `text.change/changed-runs` | Direct strings replace changed graphemes with no stagger on one display host; rich descendants and the multi-error list keep their own structure. | Short changed-only opacity, no travel. | Exact text immediately. |
+| `number.roll/reels` | A direct quantity rolls changed decimal places with exact React output; identifiers supplied as text stay exact and immediate. | Final value immediately. | Final value immediately. |
 
-| Phase   | Properties | Token | Interruptible |
-| ------- | ---------- | ----- | ------------- |
-| –       | none       | –     | –             |
-| reduced | none       | –     | –             |
-| none    | none       | –     | –             |
-
-`data-[invalid=true]` recolours the field's text on the destructive token. That is a
-colour change, not a motion, and it is never the only signal.
+Rapid revisions converge on the latest value, and a returning message is never removed
+by an obsolete exit callback. Live mode downgrade and a zero clock cancel active
+writers. `data-[invalid=true]` recolours the field's text on the destructive token:
+that is a colour change, not a motion, and it is never the only signal.
 
 ## Accessibility
 
