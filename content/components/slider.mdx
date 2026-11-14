@@ -2,10 +2,10 @@
 title: Slider
 description: Volume, brightness, zoom, and price ranges.
 category: form
-motion: [feedback.press]
+motion: ["data.transition", {"recipe":"feedback.press","form":"one-shot"}, {"recipe":"state.color","form":"css-transition"}]
 intensity: subtle
-motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"Thumb feedback stays on the direct manipulation control; native value input is immediate."}
-motionCoverage: {"schema":1,"effects":{"feedback.press/one-shot":[{"relationship":"default","owner":"slider","reason":"Slider integrates press feedback at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"The native thumb stays on Base UI input geometry, a decorative face owns the press scale, and each track, range and thumb part owns one scoped palette; value input and a readout stay immediate."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"slider","reason":"Slider owns one opacity entrance on a later-inserted root with already-correct value geometry; a presenting parent, a hidden host or an unusable control keeps native paint."}],"feedback.press/one-shot":[{"relationship":"default","owner":"slider","reason":"The decorative thumb face owns the press scale while the native positional layer keeps its coordinate box, hit target and focus ring unscaled."}],"state.color/css-transition":[{"relationship":"default","owner":"slider","reason":"The track, the range, the thumb ring and the thumb face each own one scoped paint set; real DOM focus or invalid state settles that owner's declared paint immediately in every mode."}]}}
 complexity: M
 tier: T1
 since: 0.3.0
@@ -25,18 +25,23 @@ npx shadcn@latest add @cadence/slider
 
 [Manual installation files](https://cadence.dev/r/slider.json)
 
-Copy all nine target files, keeping `slider/index.tsx` beside the shared `lib/`
-directory, the relative imports intact and the sources' `"use client"` directives.
-The thumb imports `ControlDiv` from `control-animation.tsx`; that module also
-reaches `native-div.tsx` and `press-button.tsx`. Copy every file in the provider,
+Copy every file in Slider's target list, keeping `slider/index.tsx` beside the
+shared `lib/` directory, the relative imports intact and the sources'
+`"use client"` directives. The thumb layer imports `ControlSpan` from
+`control-animation.tsx`; that module also reaches `native-div.tsx` and
+`press-button.tsx`. The root entrance is the shared `inline-entrance.ts`, and the
+scoped paint owners come from `css-motion.ts`. Copy every file in the provider,
 motion and utilities payloads, even when you do not wrap the application in a
 provider. The provider files and `motion` package remain required imports.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. Slider needs no additional item-specific CSS, icon package or external
-asset. `feedback.press` scales only the dragged thumb in full; reduced and none
-keep its scale at one with a zero clock. Pointer and keyboard values still
-update immediately in every mode, and the fill has no authored transition.
+asset. A later-inserted slider fades in once on its root; the decorative thumb
+face owns the press scale in full, while reduced and none keep that scale at one
+with a zero clock. Pointer and keyboard values still update immediately in every
+mode, and the fill is never animated: it follows Base UI's accepted geometry.
+The track, the range, the thumb ring and the thumb face each own one scoped
+colour clock, and real DOM focus settles that owner's paint immediately.
 Standalone sliders follow the system motion preference. The optional
 `CadenceProvider` controls a subtree's mode and timing; nested full still
 respects system reduced motion.
@@ -352,20 +357,31 @@ Base UI's `format`, `locale`, and `minStepsBetweenValues` are forwarded unchange
 
 ## Motion contract
 
-Authored intensity is **subtle**: Thumb feedback stays on the direct manipulation control; native value input is immediate.
+Authored intensity is **subtle**: The native thumb stays on Base UI input geometry, a decorative face owns the press scale, and each track, range and thumb part owns one scoped palette; value input and a readout stay immediate.
 
-Recipe: `feedback.press/one-shot`. The dragged thumb compresses to 0.97 and springs back on
-release — the same press language as `button` and `toggle`.
+The thumb is the protagonist: a decorative face compresses while the thumb is dragged and
+springs back on release, the same press language as `button` and `toggle`. The native
+positional layer keeps the coordinate box, the hit target and the focus ring, so the press
+never moves what the pointer is aiming at or clips the ring.
 
-| Phase   | Properties              | Token            | Interruptible |
-| ------- | ----------------------- | ---------------- | ------------- |
-| drag    | `scale 1 → 0.97`        | `feedback.press/one-shot` | yes           |
-| release | `scale 0.97 → 1`        | `feedback.press/one-shot` | yes           |
-| reduced | no scale; the ring grows on focus/hover | – | –             |
-| none    | no scale                | –                | –             |
+| Recipe / form | Owner and full behaviour | reduced | none |
+| ------------- | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | One opacity entrance on a slider inserted into an already-presented page, with already-correct value geometry. A presenting parent, a hidden host and an already-visible control keep native paint. | Short opacity. | Immediate. |
+| `feedback.press/one-shot` | The decorative thumb face scales to 0.97 while the drag is accepted and springs back on release; the native thumb never moves. | No scale; the ring and the fill carry the interaction. | No tween. |
+| `state.color/css-transition` | The track, the range, the thumb ring and the thumb face each own one scoped paint set on one clock. Real DOM focus settles that owner's declared paint at its target, and a palette we cannot prove does the same. | Short eligible colour. | Zero duration and delay. |
 
-The fill is deliberately not animated: it is glued to the pointer, and a
-transition would make it trail the thumb by one frame per move.
+Value input is never animated: the fill and the thumb follow Base UI's accepted geometry
+immediately, so a transition would make the fill trail the pointer by one frame per move.
+The range extent, thumb placement and indicator measurement therefore stay with the
+primitive in every mode. A programmatic value is also placed immediately: there is no
+verified single-owner adapter for an authored retarget, so Slider does not claim a second
+position writer. A composed numeric readout belongs to its own display owner; it may roll
+on a discrete committed change and must stay immediate during direct manipulation.
+
+Live reduction removes the press scale and settles the entrance and colour clocks, while
+the accepted value, native capture and an active pointer or keyboard operation keep their
+current position. `none` and a zero clock cancel every writer and delay. A native form reset
+stays Base UI's own path: Cadence adds no callback, revision or replay for it.
 
 ## Keyboard interactions
 
@@ -405,11 +421,13 @@ covers the whole control, so drag targets stay reachable.
 ## Performance
 
 The value updates on pointer move without React re-rendering the whole form: Base
-UI moves the thumb with a CSS custom property, and Motion animates only the press
-scale. No `layout` animation, no measurement per frame.
+UI moves the thumb and the range with its own layout, and one Motion element per
+thumb face animates only the press scale. The scoped colour families are CSS
+transitions on short-lived state changes, with no `layout` animation, no
+measurement per frame and no observer or roller per pointer event.
 
 ## Notes for AI
 
 - A numeric value renders one thumb; an array renders one thumb per entry. Omitting both values retains the upstream two-thumb default.
-- Do not animate the fill. Motion here is press feedback only.
+- Do not animate the fill or the thumb's position. Motion here is press scale, one root entrance and scoped colour only.
 - Pair with an `input` when the exact number must be typeable.
