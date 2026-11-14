@@ -2,15 +2,15 @@
 title: Accordion
 description: Reveal related sections while keeping their headings easy to scan.
 category: layout
-motion: [{"recipe":"geometry.resize","form":"css-transition"}]
+motion: [{"recipe":"data.transition","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"},{"recipe":"state.morph","form":"one-shot"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"}]
 intensity: medium
-motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes."}
-motionCoverage: {"schema":1,"effects":{"geometry.resize/css-transition":[{"relationship":"default","owner":"accordion","reason":"Accordion integrates owned size transitions at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"Each disclosure panel owns one measured block size, its retained content paint and an in-place glyph indicator; trigger and item paint stay local to their own region."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"accordion","reason":"Accordion integrates one opacity entrance at its retained content paint and at each later-inserted item host."}],"exit.fade/one-shot":[{"relationship":"default","owner":"accordion","reason":"Accordion retains the closing content body while Base UI still owns the panel and fades its own paint."}],"state.morph/one-shot":[{"relationship":"default","owner":"accordion","reason":"The trigger crossfades its two existing glyphs in place through the shared indicator control."}],"geometry.resize/measured":[{"relationship":"default","owner":"accordion","reason":"The panel owns one measured block-size transaction over its natural inner body while open and idle."}],"state.color/css-transition":[{"relationship":"default","owner":"accordion","reason":"Trigger surface/foreground and item border paint transition under one focus-aware colour owner each."}],"text.change/changed-runs":[{"relationship":"default","owner":"accordion","reason":"Directly owned plain trigger and content strings replace only their changed graphemes."}],"number.roll/reels":[{"relationship":"default","owner":"accordion","reason":"A supported direct numeric trigger or content quantity rolls only its changed places."}]}}
 complexity: M
 tier: T3
 since: 0.4.0
-deps: ["@base-ui/react", "motion", "lucide-react"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+deps: ["@base-ui/react","motion","lucide-react"]
+registryDeps: ["@cadence/cadence-motion","@cadence/cadence-utils","@cadence/cadence-provider","@cadence/cadence-geometry","@cadence/cadence-text","@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -25,19 +25,19 @@ npx shadcn@latest add @cadence/accordion
 
 [Manual installation files](https://cadence.dev/r/accordion.json)
 
-Copy all nine target files, keeping `accordion/index.tsx` and the shared
+Copy all thirty-one target files, keeping `accordion/index.tsx` and the shared
 `lib/` directory in the same `cadence/` tree. Preserve relative imports and
 the sources' `"use client"` directives. Copy every file in the motion,
-utilities and provider payloads, including helpers not imported by Accordion
-directly. The provider files and `motion` package are required imports even
-without the optional `CadenceProvider` wrapper.
+utilities, provider, geometry, text and number payloads, including helpers not
+imported by Accordion directly. The provider files and `motion` package are
+required imports even without the optional `CadenceProvider` wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the
 copied files. Include the Cadence duration and easing tokens used by the
 disclosure classes. No additional item-specific CSS or external asset is
-required. Keep the inner measurement wrapper: full mode transitions the
-nonnegative measured panel height, while reduced and none update it
-immediately. Initially open server-rendered content retains its natural height.
+required. Base UI owns the panel's open/close endpoint phase; once the panel is
+open the shared measured owner follows a direct plain-string content revision.
+Initially open server-rendered content retains its natural height.
 Standalone components follow the system preference; use `CadenceProvider`
 to choose a product mode or override an inherited scope.
 
@@ -323,7 +323,7 @@ export function WithoutMotionExample() {
 ### `AccordionTrigger`
 
 All Base UI Trigger props pass through, including `render`, `ref`, and `nativeButton`. A heading wraps
-the trigger. Two decorative icons swap immediately with `aria-expanded`; no rotation is animated.
+the trigger. Two decorative icons crossfade in place as `aria-expanded` changes; no rotation is animated.
 
 ### `AccordionContent`
 
@@ -333,18 +333,25 @@ Root and Item classes merge last.
 
 ## Motion contract
 
-Authored intensity is **medium**: The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes.
+Authored intensity is **medium**: Each disclosure panel owns one measured block size, its retained content paint and an in-place glyph indicator; trigger and item paint stay local to their own region.
 
-| Phase | Properties | Token | Interruptible |
+| Phase | Animated properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |
-| Initially open | Natural height, no entrance | — | — |
-| Reduced | Instant height, no transform | Zero duration | Yes |
-| None | Instant height, no transform or transition | Zero duration | Yes |
+| Open / close / content resize | Measured block size clamped at zero; the primitive owns the open/close endpoint pair | `geometry.resize/measured` (`spring.morph`) | Yes, native reversal from the current size |
+| Open / close; retained inner content paint | Opacity on the inner body only | `data.transition/one-shot` / `exit.fade/one-shot` | Yes, re-entry reverses the current paint |
+| Expanded state | Two existing glyphs crossfade in place; no rotation, scale or path morph | `state.morph/one-shot` | Yes, the latest expanded state wins |
+| Trigger focus/hover/disabled paint | Scoped foreground and border colour; focus and an unprovable palette are immediate | `state.color/css-transition` | Yes, latest committed colour |
+| Item border paint | Scoped border colour on the item only | `state.color/css-transition` | Yes, latest committed colour |
+| Plain trigger/content text | Changed graphemes only, no stagger | `text.change/changed-runs` | Yes, the newest diff replaces the old target |
+| Direct numeric trigger/content quantity | Changed place values only | `number.roll/reels` | Yes, retargets the current reel |
+| Later item insertion | One opacity envelope on that item | `data.transition/one-shot` | Yes, a presenting parent suppresses it |
+| Initially open / reduced / none | Natural height and final paint, no entrance | `data.transition/one-shot` | Yes |
 
-The CSS form preserves position on interruption rather than spring velocity. Base UI owns panel
-mounting, hidden state, keyboard navigation, and find-in-page behavior. An inner ResizeObserver
-retargets changes in content without observing the animated panel itself. The closed size is zero.
+Base UI owns panel mounting, hidden state, the native disclosure endpoint pair, keyboard navigation, and
+find-in-page behavior. The panel keeps one block-size owner: its native phase runs while the primitive opens or
+closes, and the shared measured owner follows a direct plain-string content revision only while the panel is open
+and idle. Reduced and none resolve the primitive's clock to zero, so a closing body commits immediately instead of
+holding empty space. Rich caller children keep their native text identity.
 
 ## Accessibility
 
@@ -369,8 +376,9 @@ remeasured when wrapping changes; there is no fixed maximum height or breakpoint
 
 ## Performance
 
-T3 budget: 12 KB gzip. One observer per mounted content slot; closed panels unmount by default.
-Measurements run after commit and on content resize, never during render. No timers drive motion.
+T3 source ceiling: 12 KB gzip, an advisory reference under ADR-023 rather than a functional gate. One geometry
+owner and one presence owner per mounted panel; closed panels unmount by default. Measurements run after commit
+and on a direct plain-string content revision, never during render. No timers drive motion.
 Server-rendered initially open content keeps its natural size before hydration.
 
 ## Notes for AI
