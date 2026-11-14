@@ -191,6 +191,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         reveal: `it.each(['full','reduced','none'])('attributes cannot certify viewport %s',mode=>{render(<div data-slot="reveal" data-motion={mode}>Visible</div>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Visible')})});`,
         "reveal-group": `import {Reveal} from '@/registry/cadence/reveal';it.each(['full','reduced','none'])('ungrouped reveal cannot certify a group %s',mode=>{render(<CadenceProvider mode={mode}><Reveal>Visible</Reveal></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Visible')})});`,
         slider: `it.each(['full','reduced','none'])('another component cannot certify a slider %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
+        tooltip: `it.each(['full','reduced','none'])('another component cannot certify a tooltip %s',mode=>{render(<CadenceProvider mode={mode}><Button>Existing motion</Button></CadenceProvider>);expectMotionContract(mode)});`,
         tabs: `import {Tabs,TabsList,TabsTrigger} from '@/registry/cadence/tabs';it.each(['full','reduced','none'])('selection cannot certify absent panel content %s',mode=>{render(<CadenceProvider mode={mode}><Tabs defaultValue="a"><TabsList><TabsTrigger value="a">A</TabsTrigger></TabsList></Tabs></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('A')})});`,
         popover: `import {Popover,PopoverTrigger} from '@/registry/cadence/popover';it.each(['full','reduced','none'])('trigger and copied CSS cannot certify a popup %s',mode=>{render(<CadenceProvider mode={mode}><Popover><PopoverTrigger>Open</PopoverTrigger><span data-slot="popover-content" data-motion={mode} className="transition-opacity duration-0">Fake panel</span></Popover></CadenceProvider>);expectMotionContract(mode,{behavior:()=>expect(document.body.textContent).toContain('Fake panel')})});`,
       };
@@ -285,13 +286,13 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       if (!inputItem) throw new Error("input fixture missing");
       inputItem.meta.motion = [{ recipe: "state.color", form: "css-transition" }];
       const loopItem = stagedRegistry.items.find((item: { name: string }) => item.name === "skeleton");
-      const sliderItem = stagedRegistry.items.find((item: { name: string }) => item.name === "slider");
-      Object.assign(sliderItem.meta.motionCoverage.effects["feedback.press/one-shot"][0], {
+      const tooltipItem = stagedRegistry.items.find((item: { name: string }) => item.name === "tooltip");
+      Object.assign(tooltipItem.meta.motionCoverage.effects["popup.anchored/css-transition"][0], {
         relationship: "inherited",
         owner: "button",
       });
-      sliderItem.registryDependencies.push("@cadence/button");
-      delete sliderItem.meta.motionProfile;
+      tooltipItem.registryDependencies.push("@cadence/button");
+      delete tooltipItem.meta.motionProfile;
       loopItem.meta.motion = [];
       loopItem.files = [{ path: "registry/cadence/skeleton/index.tsx" }];
       await mkdir(path.join(fixture, "registry/cadence/skeleton"), { recursive: true });
@@ -365,6 +366,25 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
           );
       for (const capability of ["Size", "Changed text", "Changed numbers"])
         expect(output).toContain(`radio-group: v2 verify ${capability}/@root`);
+      // Slider is v2 too: the skipped contract must fail every exact action row
+      // (including each of the four scoped colour owners) and every boundary.
+      for (const [binding, slot] of [
+        ["slider.root.enter", "slider"],
+        ["slider.thumb.press", "slider-thumb-face"],
+        ["slider.surface.colour", "slider-track"],
+        ["slider.surface.colour", "slider-range"],
+        ["slider.surface.colour", "slider-thumb"],
+        ["slider.surface.colour", "slider-thumb-face"],
+      ] as const)
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toContain(
+            `slider: v2 execute ${binding} on slider#Slider/${slot} with exact source/property/preset policy in ${mode}`,
+          );
+      for (const capability of ["Text colour", "Changed text"])
+        expect(output).toContain(`slider: v2 verify ${capability}/@root`);
+      expect(output).toContain("slider: v2 verify Changed numbers/@readout");
+      for (const binding of ["slider.position.input", "slider.position.update"])
+        expect(output).toContain(`slider: v2 verify Native ${binding}/@position`);
       // Toggle is now v2: a dead helper call must fail every exact action/mode,
       // rather than borrowing the old legacy adoption diagnostic.
       for (const action of [
@@ -410,9 +430,9 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         );
       expect(output).toContain("static-fixture: state.color/css-transition: missing installed ownership");
       expect(output).toContain(
-        "slider: feedback.press/one-shot: owner button is not the reached installed integration",
+        "tooltip: popup.anchored/css-transition: owner button is not the reached installed integration",
       );
-      expect(output).toContain("slider: explicit authored motionProfile required");
+      expect(output).toContain("tooltip: explicit authored motionProfile required");
       expect(output).toContain("skeleton: execute loop policy in full, reduced, none");
       for (const [id, form] of [
         ["animated-text", "text.change/changed-runs"],
@@ -420,7 +440,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         ["reveal", "reveal/viewport"],
       ])
         expect(output).toContain(`${id}: execute ${form} controller policy in full, reduced, none`);
-      for (const id of ["slider", "reveal-group"])
+      for (const id of ["tooltip", "reveal-group"])
         expect(output).toContain(`${id}: execute actual component parts in full, reduced, none`);
       expect(output).not.toContain("reveal-group: execute reveal/viewport controller policy");
       for (const [action, part, slot] of [
@@ -443,7 +463,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
           );
       expect(output).not.toContain("tabs: execute layout.shared/selection controller policy");
       expect(output).toContain("popover: execute popup.anchored/css-transition CSS owner in full, reduced, none");
-      for (const id of ["animated-text", "animated-number", "reveal", "reveal-group", "slider"])
+      for (const id of ["animated-text", "animated-number", "reveal", "reveal-group", "tooltip"])
         expect(output).toContain(`${id}: mount the actual registry component in full, reduced, none`);
     } finally {
       if (!process.env.CADENCE_GATE_EVIDENCE) await rm(fixture, { recursive: true, force: true });
