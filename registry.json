@@ -4506,7 +4506,14 @@
       "description": "Reveal optional detail with a standalone disclosure.",
       "categories": ["layout"],
       "dependencies": ["@base-ui/react", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/collapsible/index.tsx",
@@ -4520,8 +4527,28 @@
         "batch": "B6",
         "motion": [
           {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
             "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -4535,16 +4562,51 @@
           "scope": "surface",
           "travel": "extended",
           "coordination": "independent",
-          "reason": "The disclosure content changes height for open and close with one existing CSS size writer."
+          "reason": "Each disclosure shell owns one measured block size while its retained inner body owns the content paint; the trigger keeps its own colour and display owners."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "geometry.resize/css-transition": [
+            "data.transition/one-shot": [
               {
                 "relationship": "default",
                 "owner": "collapsible",
-                "reason": "Collapsible integrates owned size transitions at its own parts, using the reached installed executor."
+                "reason": "Collapsible integrates one opacity entrance at its retained inner content paint when the panel opens."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "collapsible",
+                "reason": "Collapsible fades its own inner content paint while the primitive still retains the closing panel."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "collapsible",
+                "reason": "The panel shell owns one measured block-size transaction over its natural inner body while open and idle."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "collapsible",
+                "reason": "Defined trigger surface and foreground paint transition under one focus-aware colour owner."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "collapsible",
+                "reason": "Directly owned plain trigger and body strings replace only their changed graphemes."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "collapsible",
+                "reason": "A supported direct numeric trigger or body quantity rolls only its changed places."
               }
             ]
           }

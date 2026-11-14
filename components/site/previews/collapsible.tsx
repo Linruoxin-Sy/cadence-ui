@@ -127,8 +127,8 @@ export function ChangingContentExample() {
         </Button>
         {details && (
           <p className="mt-4">
-            The disclosure follows content changes and responsive wrapping. Reduced and none modes update its height
-            instantly.
+            The disclosure measures its natural body and clamps the open shell to it. A plain-string body revision
+            animates; reduced and none modes update immediately.
           </p>
         )}
       </CollapsibleContent>
