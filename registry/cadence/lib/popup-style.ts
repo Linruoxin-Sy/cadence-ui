@@ -77,9 +77,10 @@ export function popupStyle<S>(
  * CSS form documented for `geometry.resize`, and reduced/none resolve the clock to
  * zero so the closed body commits immediately without holding empty space.
  */
-export function disclosurePanelClasses(cm: CadenceMotion) {
+export function disclosurePanelClasses(cm: CadenceMotion, base = "h-(--accordion-panel-height)") {
   return cn(
-    "h-(--accordion-panel-height) overflow-hidden data-[starting-style]:h-0 data-[ending-style]:h-0",
+    base,
+    "overflow-hidden data-[starting-style]:h-0 data-[ending-style]:h-0",
     cm.reduced
       ? "transition-none duration-0"
       : "transition-[height] duration-(--motion-duration-slow) ease-cadence-out",
