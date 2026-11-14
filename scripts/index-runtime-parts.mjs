@@ -43,7 +43,11 @@ const parts = {
   "toggle-group": [
     "toggle-group-item PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press",
   ],
-  "input-otp": ["input-otp-slot > unslotted character motion.span | Motion controls | state.morph"],
+  "input-otp": [
+    "input-otp-group entrance | WAAPI opacity | data.transition",
+    "input-otp-slot character span | changed-run opacity | text.change",
+    "input-otp-slot | CSS colour policy | state.color",
+  ],
   progress: [
     "progress-indicator NativeControlDiv determinate scaleX | Motion controls | data.transition",
     "same indicator indeterminate pulse | CSS animation | data.transition",
