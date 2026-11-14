@@ -1,10 +1,16 @@
 # Collapsible motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
-Collapsible is a quiet, general disclosure: the body opens from its trigger without prescribing an arrow, a heading style or an accordion relationship. `CollapsibleContent` owns its shell and the existing content-inner measurement surface; the trigger's actual children remain the caller's choice.
-
-Use the [shared contract](../README.md) and [preset definitions](../presets.md). Local bindings describe target design, not installable API.
+Collapsible is a quiet, general disclosure: the body opens from its trigger without prescribing an arrow, a
+heading style or an accordion relationship. The panel's block axis follows the primitive's native open/close
+phase, its retained inner body carries the content paint, and a plain trigger string keeps its own display
+host. `CollapsibleContent` owns its shell and the content-inner measurement surface; the trigger's actual
+children remain the caller's choice. This contract covers `Collapsible`, `CollapsibleTrigger` and
+`CollapsibleContent`, including the content-inner, trigger-label, trigger-value, content-label and
+content-value slots. It inherits the [common contract](../README.md) and [presets](../presets.md); bindings
+below are design references, not public props or recipe identifiers.
 
 ## Contract references
 
@@ -12,69 +18,99 @@ Use the [shared contract](../README.md) and [preset definitions](../presets.md).
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "content": ["collapsible#CollapsibleContent"],
+    "content-paint": ["collapsible#CollapsibleContent"],
     "trigger": ["collapsible#CollapsibleTrigger"],
     "label": ["collapsible#CollapsibleTrigger", "collapsible#CollapsibleContent"],
     "value": ["collapsible#CollapsibleTrigger", "collapsible#CollapsibleContent"]
-  }
+  },
+  "regions": {
+    "content": ["collapsible-content"],
+    "content-paint": ["collapsible-content-inner"],
+    "trigger": ["collapsible-trigger"],
+    "label": ["collapsible-trigger-label", "collapsible-content-label"],
+    "value": ["collapsible-trigger-value", "collapsible-content-value"]
+  },
+  "axes": { "content": ["height"] }
 }
 ```
 
 ## Capability ownership
 
-| Capability      | Applicability and owner                                                                                                                                                                                | References                                                       |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| Appearance      | Default: content opacity accompanies semantic opening/closing. Parent presence suppresses a duplicate same-cause entrance; initial visible content is never re-hidden after SSR.                       | default: `collapsible.content.enter`, `collapsible.content.exit` |
-| Size            | Default: content owns measured block-size for open state and known intrinsic content changes. The root and nested children do not add a second writer.                                                 | default: `collapsible.content.resize`                            |
-| Surface colour  | Default where the trigger defines state surfaces; a bare unstyled trigger receives no invented background. Nested controls inherit their own contracts.                                                | default: `collapsible.trigger.colour`                            |
-| Text colour     | Default for component-defined trigger foreground changes; other text inherits the current semantic colour.                                                                                             | default: `collapsible.trigger.colour`                            |
-| Changed text    | Default for a directly owned plain trigger/body string; arbitrary rich trigger/body content is composed and not recursively rewritten.                                                                 | default: `collapsible.label.replace`; composed: `@label`         |
-| Changed numbers | Default for a supported direct numeric quantity in trigger/body display; composed for nested numeric components. Numeric-looking strings and identifiers remain text; editable descendants never roll. | default: `collapsible.value.change`; composed: `@value`          |
+| Capability      | Application and owner                                                                                                                                                                                                                                                                       | References                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Appearance      | Default: the retained inner content paint owns one short opacity envelope across the panel's own open/close phase. A presenting parent suppresses a duplicate same-cause entrance, and initially open server-rendered content keeps its natural paint instead of replaying an entry.        | default: `collapsible.content-paint.enter`, `collapsible.content-paint.exit` |
+| Size            | Default: the panel shell owns one measured block-size transaction over the inner body while it is open and idle, clamped to the closed and available bounds. The primitive's native disclosure phase keeps the open/close endpoint pair; the root and nested children add no second writer. | default: `collapsible.content.resize`                                        |
+| Surface colour  | Default: a trigger that defines state surfaces owns its scoped background, border and shadow paint; a bare unstyled trigger receives no invented background. A focused or invalid trigger, or an unprovable caller palette, settles that owner's declared paint immediately.                | default: `collapsible.trigger.colour`                                        |
+| Text colour     | Default: the same trigger owner paints its own foreground together with its surface, so plain label text and currentColor glyphs never depend on a second colour family. Body text inherits the semantic foreground without another writer.                                                 | default: `collapsible.trigger.colour`                                        |
+| Changed text    | Default: a directly owned plain trigger or body string replaces only its changed graphemes with no stagger; arbitrary rich trigger and body nodes stay caller-owned and are never parsed or copied.                                                                                         | default: `collapsible.label.replace`; composed: `@label`                     |
+| Changed numbers | Default: a supported direct numeric trigger or body quantity rolls only its changed places and keeps affixes stable. Numeric-looking strings, identifiers and editable descendants remain text, never inferred counters.                                                                    | default: `collapsible.value.change`; composed: `@value`                      |
 
 ## Choreography and modes
 
-| Trigger and owner                                  | Full                                                                                                                       | Reduced                                                                                 | None                                 | Binding → preset → recipe                                                                                                                       |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Open, close or known content update; content shell | Compact clamped block-size continuity from the current size.                                                               | Final natural/closed size immediately.                                                  | Final size immediately.              | `collapsible.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                  |
-| Visibility change; inner paint                     | Opacity entry/exit without vertical translation of reading content.                                                        | Short entry after final open geometry; fully clipped closed body completes immediately. | Immediate semantic visibility.       | `collapsible.content.enter` → `presence.inline` → `data.transition/opacity`; `collapsible.content.exit` → `presence.exit` → `exit.fade/opacity` |
-| Defined trigger state changes                      | Scoped surface/text colour; focus ring immediately. Colour eligibility and immediate-owner priority follow the rule below. | Short colour. Colour obeys the same owner priority.                                     | Final colour immediately.            | `collapsible.trigger.colour` → `state.color` → `state.color/surface-foreground`                                                                 |
-| Direct plain trigger/body text changes             | Changed graphemes/runs only, no stagger; opening presence consumes same-cause body text entry.                             | Short opacity on changed runs only.                                                     | Final text immediately.              | `collapsible.label.replace` → `text.replace` → `text.change/changed-runs`                                                                       |
-| Direct displayed quantity changes                  | Changed place-value reels only; body geometry stays with the content shell.                                                | Final quantity/geometry immediately.                                                    | Final quantity/geometry immediately. | `collapsible.value.change` → `number.compact` → `number.roll/reels`                                                                             |
+| Trigger / owner                                  | Full                                                                                                                 | Reduced                                                                                 | None                                 | Binding → preset → recipe/form                                                                                                                              |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open/close or known content update / panel shell | Compact clamped block-size continuity from the current rendered size; opening and closing are reversible.            | Final natural/closed size immediately.                                                  | Final size immediately.              | `collapsible.content.resize` → `geometry.compact` → `geometry.resize/measured`                                                                              |
+| Open/close; retained inner body paint            | Short opacity entry coordinated with the shell, and a short exit while the primitive still retains the closing body. | Short entry after the final open geometry; fully clipped closed body exits immediately. | Semantic visibility immediately.     | `collapsible.content-paint.enter` → `presence.inline` → `data.transition/opacity`; `collapsible.content-paint.exit` → `presence.exit` → `exit.fade/opacity` |
+| Defined trigger state paint / trigger            | Scoped surface and text colour; focus indication and an unverifiable caller palette are immediate.                   | Short colour feedback under the same owner priority.                                    | Final colours immediately.           | `collapsible.trigger.colour` → `state.color` → `state.color/surface-foreground`                                                                             |
+| Owned plain trigger/body text changes / label    | Changed graphemes/runs only, no stagger; opening presence consumes same-cause body text entry.                       | Short opacity on changed runs only.                                                     | Final text immediately.              | `collapsible.label.replace` → `text.replace` → `text.change/changed-runs`                                                                                   |
+| Direct displayed quantity changes / value        | Changed place-value reels only; body geometry stays with the content shell.                                          | Final quantity/geometry immediately.                                                    | Final quantity/geometry immediately. | `collapsible.value.change` → `number.compact` → `number.roll/reels`                                                                                         |
 
-`trigger.colour` follows the actual trigger/render node: DOM focus/focus-within or that owner's invalid state cancels its colour clock and settles all declared paint immediately in every mode. Other colour revisions require verified intermediate readability, otherwise they are immediate. Focus inside the separate body does not make the trigger a focused owner.
+The panel keeps exactly one block-size writer. Base UI's native disclosure phase owns the pixel endpoint pair
+while it opens or closes (its token-backed disclosure clock is the primitive's own retention signal, and the
+base height is never written by a second owner); once the panel is open and idle, the shared measured owner
+registers on the same host and animates a known content revision. Leaving the idle phase releases that writer
+before the primitive claims the axis again, so the two phases never overlap. `trigger.colour` follows the
+actual trigger/render node: DOM focus/focus-within or that owner's invalid state cancels its colour clock and
+settles all declared paint immediately in every mode. Focus inside the separate body does not make the trigger
+a focused owner, and other colour revisions require verified intermediate readability before they tween.
 
 ## Interruption and lifecycle
 
-- Reverse from the in-flight block-size on a repeated toggle. A close during asynchronous content replacement targets the current valid closed size; subsequent content cannot reopen it.
-- Preserve Base UI state, callbacks, custom render, persistence and hidden-until-found behaviour. Do not add an arrow or impose a delay before a committed action.
-- Descendant geometry updates do not make the ancestor follow every spring frame. Hand off the affected axis or let the ancestor adopt the child's destination immediately.
-- Exit retention never creates accessible or focusable duplicate content. Base UI handles focus and hidden-until-found/beforematch semantics before decorative cleanup; a browser-initiated reopen invalidates the close completion. Unmount cancels observers/writers. Live reduced settles shell geometry and reels before paint; permitted opacity on still-drawable content/changed runs and eligible trigger colour follow their reduced contracts. A closed fully clipped body completes its invisible decorative exit immediately. None or zero recipe clock settles all one-shot work to the effective mode's current visibility/paint; re-enabling animation does not replay an already open body.
-
-Body closure retires text/reel and content-driven resize work; the current close-size/opacity
-transaction remains with the content shell/paint owners. A still-visible Trigger keeps its independently
-committed label, quantity and colour effects; only hiding/removing their actual enclosing boundary
-cancels those too. A body completion cannot erase a later trigger revision or reopen content in
-response to an async body update.
+Reverse from the in-flight block size on a repeated toggle, and let a close during asynchronous content
+replacement target the current valid closed size so later content cannot reopen it. Preserve Base UI state,
+callbacks, custom `render`, persistence and hidden-until-found behaviour, and add no arrow or imposed delay
+before a committed action. Descendant geometry updates do not make the ancestor follow every spring frame;
+the affected axis is handed off or the ancestor adopts the child's destination immediately. Exit retention
+never creates accessible or focusable duplicate content: Base UI handles focus and hidden-until-found /
+beforematch semantics before decorative cleanup, and a browser-initiated reopen invalidates the close
+completion. Unmount cancels observers and writers. A live reduced downgrade settles shell geometry before
+paint, and a closed fully clipped body completes its invisible decorative exit immediately. None or a zero
+recipe clock settles all one-shot work to the effective mode's current visibility, and re-enabling animation
+does not replay an already open body. Body closure retires text/reel and content-driven resize work while the
+still-visible trigger keeps its independently committed label, quantity and colour effects.
 
 ## Geometry and performance
 
-Measure the content-inner natural height and the shell's actual border/padding contribution where box sizing requires it. Avoid feedback from a clipped intermediate measurement. Clamp to closed and available size with no overshoot. Reflow surrounding content through the one shell; clip the body only. Passive font, viewport or unknown-origin changes resolve immediately. Stop observing removed/irrelevant parts and batch nested updates; no per-descendant measurement or render-time layout reads.
-
-The natural inner content lays out at destination inline-size before measurement. Only the separate outer shell changes block-size, so nearby layout moves without per-frame text wrapping inside the disclosure.
-
-Reduced closing commits the closed block-size immediately. A fully clipped/hidden body has no visible exit opacity to retain, so complete that body's decorative exit immediately through the primitive; do not hold empty space just to run a fade. A short opacity entry is permitted after the open geometry is final. On focus/beforematch opening, settle any envelope that would hide the target immediately. This does not replace native persistence, focus or hidden-until-found handling.
+The content-inner body is the one real natural-size region: it is measured outside render, never cloned, and
+the panel shell animates only block size while the text lays out at its destination inline size, so nearby
+layout moves without per-frame text wrapping inside the disclosure. The measured destination is the natural
+inner height plus the shell's own border-box padding and border contribution, clamped to the nonnegative
+closed bound and the current natural extent with no overshoot; padding itself is never animated. Only an open
+or transitioning panel is measured, passive font, viewport or unknown-origin changes resolve immediately
+instead of manufacturing a revision, and the closed size is zero while the panel clips only its own body.
+Settle any envelope that would hide a focus/beforematch target immediately, and keep native persistence,
+focus and hidden-until-found handling authoritative rather than holding empty space to run a fade.
 
 ## Acceptance scenarios
 
-- Pending: change the Trigger label/quantity while closing Content, then deliver a late body update and reopen. The visible Trigger keeps its own current revision; closed body work stays cancelled, native reopening uses current content, and no old completion touches either newer owner.
+Executed in `tests/components/collapsible.test.tsx`: the measured content revision, the retained inner paint
+entrance and exit, the trigger colour owner with an unverifiable caller palette, changed plain trigger/body
+text, changed direct quantities, the native disclosure open/close phase, a live full/reduced/none downgrade
+with a zero clock, and the composed rich-content boundaries on both label and value regions.
 
-- Pending: reverse rapidly with content growth, then close before the latest content arrives; verify state, height and focus agree.
-- Pending: nest disclosures and place one inside a resizing parent; inspect that no two writers chase the same axis.
-- Pending: test custom trigger/render, persisted/searchable content, border-box styles and unmount during exit.
-- Pending: verify full/reduced/none, live mode changes, zero clock and initially open SSR without a hidden flash.
-- Pending: revise a direct body string/quantity while open and while closed, reopen through beforematch, and close around a focused child; only current visible content participates in animation.
+Also pending browser verification: 3 modes × 2 OS preferences, live same-target mode/clock cancellation in a
+real browser, nested disclosures inside a resizing parent, SSR/no-JS/hydration probes, keyboard focus and
+beforematch reopening, long body content with a constrained width, and light/dark × narrow/wide screenshot
+review. jsdom has no layout engine or compiled CSS, so the real block-size interpolation, the primitive's CSS
+retention phase and browser focus settlement are proven here only by their committed revision, source and
+property policy.
 
-- Pending: close a reduced-mode body during its opacity entry, reopen through focus/beforematch and set zero clock with unchanged open state; no empty exit hold, invisible focused content or stale opacity writer remains.
-- Pending: switch to reduced while an open body's size, changed-run opacity and trigger colour are active. Geometry/reels settle while still-drawable permitted paint follows reduced mode; close to a fully clipped body, then apply none/zero without an empty fade hold or replay.
+Delegation gaps are recorded rather than hidden: Base UI owns panel mounting, the native disclosure endpoint
+pair, `keepMounted` / `hiddenUntilFound` and focus, so a closing panel that reports no native clock unmounts
+at close start and the measured owner only animates content revisions while the panel is open and idle; rich
+caller-owned trigger/body nodes keep native text identity; the panel publishes its effect scope to callers'
+composed children but no caller palette is verified for it; and no performance, CLS, interaction-cost or
+real-device FPS measurement was taken (ADR-023 defers performance governance).

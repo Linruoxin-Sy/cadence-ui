@@ -2,15 +2,15 @@
 title: Collapsible
 description: Reveal optional detail with a standalone disclosure.
 category: layout
-motion: [{"recipe":"geometry.resize","form":"css-transition"}]
+motion: [{"recipe":"data.transition","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"},{"recipe":"geometry.resize","form":"measured"},{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"},{"recipe":"number.roll","form":"reels"}]
 intensity: medium
-motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"The disclosure content changes height for open and close with one existing CSS size writer."}
-motionCoverage: {"schema":1,"effects":{"geometry.resize/css-transition":[{"relationship":"default","owner":"collapsible","reason":"Collapsible integrates owned size transitions at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"surface","travel":"extended","coordination":"independent","reason":"Each disclosure shell owns one measured block size while its retained inner body owns the content paint; the trigger keeps its own colour and display owners."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"collapsible","reason":"Collapsible integrates one opacity entrance at its retained inner content paint when the panel opens."}],"exit.fade/one-shot":[{"relationship":"default","owner":"collapsible","reason":"Collapsible fades its own inner content paint while the primitive still retains the closing panel."}],"geometry.resize/measured":[{"relationship":"default","owner":"collapsible","reason":"The panel shell owns one measured block-size transaction over its natural inner body while open and idle."}],"state.color/css-transition":[{"relationship":"default","owner":"collapsible","reason":"Defined trigger surface and foreground paint transition under one focus-aware colour owner."}],"text.change/changed-runs":[{"relationship":"default","owner":"collapsible","reason":"Directly owned plain trigger and body strings replace only their changed graphemes."}],"number.roll/reels":[{"relationship":"default","owner":"collapsible","reason":"A supported direct numeric trigger or body quantity rolls only its changed places."}]}}
 complexity: M
 tier: T3
 since: 0.4.0
 deps: ["@base-ui/react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/cadence-geometry", "@cadence/cadence-text", "@cadence/cadence-number"]
 ---
 
 ## Installation
@@ -25,19 +25,19 @@ npx shadcn@latest add @cadence/collapsible
 
 [Manual installation files](https://cadence.dev/r/collapsible.json)
 
-Copy all nine target files, keeping `collapsible/index.tsx` and the shared
+Copy all thirty target files, keeping `collapsible/index.tsx` and the shared
 `lib/` directory in the same `cadence/` tree. Preserve relative imports and
 the sources' `"use client"` directives. Copy every file in the motion,
-utilities and provider payloads, including helpers not imported by Collapsible
-directly. The provider files and `motion` package are required imports even
-without the optional `CadenceProvider` wrapper.
+utilities, provider, geometry, text and number payloads, including helpers not
+imported by Collapsible directly. The provider files and `motion` package are
+required imports even without the optional `CadenceProvider` wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the
 copied files. Include the Cadence duration and easing tokens used by the
 disclosure classes. No additional item-specific CSS or external asset is
-required. Keep the inner measurement wrapper: full mode transitions the
-nonnegative measured panel height, while reduced and none update it
-immediately. Initially open server-rendered content retains its natural height.
+required. Base UI owns the panel's open/close endpoint phase; once the panel is
+open the shared measured owner follows a direct plain-string content revision.
+Initially open server-rendered content retains its natural height.
 Outer padding and borders remain part of the closing box minimum; put
 decoration on a child when the closing endpoint must reach zero.
 Standalone components follow the system preference; use `CadenceProvider`
@@ -50,7 +50,7 @@ composition with serializable props and children, including element-valued
 `render`, can be authored in a Server Component. Persistent content and
 Custom render retain their client directives; synchronous `useId` alone
 does not require a client caller. A custom Content render must preserve the
-supplied props and measurement children.
+supplied props and the content-inner child slot.
 
 Usage, Controlled, Custom trigger and Changing content additionally use
 `@cadence/button`; Persistent content uses `@cadence/input` and
@@ -247,7 +247,7 @@ export function SearchableExample() {
 
 ## Changing content
 
-The button adds or removes local detail in this example. The inner natural content is observed and the open panel follows its height, including responsive wrapping. Outer padding and borders remain supported; their box minimum persists during closing. Put decoration on a child when the closing endpoint must reach zero.
+The button adds or removes local detail in this example. The inner body is the measured natural surface: a direct plain-string revision to the open body is followed by one clamped block-size transaction, while passive wrapping changes resolve immediately. A rich child insertion is observed as a passive layout change and resolves immediately; pass the body as a plain string when that committed revision should animate. Outer padding and borders remain supported; their box minimum persists during closing. Put decoration on a child when the closing endpoint must reach zero.
 
 <ComponentExample name="changing-content" />
 
@@ -270,8 +270,8 @@ export function ChangingContentExample() {
         </Button>
         {details && (
           <p className="mt-4">
-            The disclosure follows content changes and responsive wrapping. Reduced and none modes update its height
-            instantly.
+            The disclosure measures its natural body and clamps the open shell to it. A plain-string body revision
+            animates; reduced and none modes update immediately.
           </p>
         )}
       </CollapsibleContent>
@@ -370,6 +370,9 @@ export function WithoutMotionExample() {
 
 All Base UI Trigger props pass through, including `disabled`, `nativeButton`, `render`, `ref`, and
 state-based classes/styles. Use `render`, not `asChild`, for a custom element. Supply an accessible name.
+A plain string or number child is rendered inside the trigger's own `collapsible-trigger-label` or
+`collapsible-trigger-value` display slot so changed text replaces only its changed graphemes and a changed
+quantity rolls only its changed places; rich element children render untouched.
 
 ### `CollapsibleContent`
 
@@ -380,27 +383,35 @@ state-based classes/styles. Use `render`, not `asChild`, for a custom element. S
 | `className`, `style`, `render`, `ref` | Base UI Panel props | — | Applied to the outer panel; classes merge last. |
 
 All primitive props remain available. A custom render must preserve supplied children and props,
-including the natural measurement wrapper. The added `collapsible-content-inner` slot is structural.
-Outer padding and borders are supported in both `border-box` and `content-box`; expanded content
-retains its natural height. During closing, CSS keeps the outer padding/border minimum until Base UI
-hides or unmounts the panel. To reach a visually zero-height endpoint before hiding, put that decoration
-on a content child. Caller styles are preserved; padding and borders are never animated.
+including the content-inner child slot. Caller classes and styles stay on the outer panel, and the added
+`collapsible-content-inner` slot is the structural natural-size surface that also owns the content paint;
+a plain string or number body is rendered inside its own `collapsible-content-label` or
+`collapsible-content-value` display slot there. Outer padding and borders are supported in both
+`border-box` and `content-box`; expanded content retains its natural height, and the measured block-size
+target includes that shell contribution. During closing, the primitive keeps the outer padding/border
+minimum until it hides or unmounts the panel. To reach a visually zero-height endpoint before hiding,
+put that decoration on a content child. Caller styles are preserved; padding and borders are never
+animated.
 
 ## Motion contract
 
-Authored intensity is **medium**: The disclosure content changes height for open and close with one existing CSS size writer.
+Authored intensity is **medium**: Each disclosure shell owns one measured block size while its retained inner body owns the content paint; the trigger keeps its own colour and display owners.
 
-| Phase | Properties | Token | Interruptible |
+| Phase | Animated properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native reversal from current position |
-| Initially open | Natural height without entrance | — | — |
-| Reduced | Instant height, no transform | Zero duration | Yes |
-| None | Instant height, no transform or transition | Zero duration | Yes |
+| Open / close / content update | Measured block size clamped at zero; the primitive owns the open/close endpoint pair | `geometry.resize/measured` (`spring.sizeCompact`) | Yes, native reversal from the current size |
+| Open / close; retained inner body paint | Opacity on the inner body only | `data.transition/one-shot` / `exit.fade/one-shot` | Yes, re-entry reverses the current paint |
+| Trigger focus/hover/disabled paint | Scoped surface and text colour; focus and an unprovable palette are immediate | `state.color/css-transition` | Yes, latest committed colour |
+| Plain trigger/body text | Changed graphemes only, no stagger | `text.change/changed-runs` | Yes, the newest diff replaces the old target |
+| Direct numeric trigger/body quantity | Changed place values only | `number.roll/reels` | Yes, retargets the current reel |
+| Initially open / reduced / none | Natural height and final paint, no entrance | `data.transition/one-shot` | Yes |
 
-An inner ResizeObserver watches natural content, never the animated panel. Measurements happen after
-commit, on resize and when outer classes/styles change. Border-box targets include outer vertical
-padding and borders; content-box targets use the natural inner height. Native CSS reversal preserves
-position rather than spring velocity. Base UI owns mounting, hidden state and transition completion. No icon animation or extra recipe is added.
+Base UI owns panel mounting, hidden state, the native disclosure endpoint pair, and find-in-page behavior. The
+panel keeps one block-size owner: its native phase runs while the primitive opens or closes, and the shared
+measured owner follows a direct plain-string content revision only while the panel is open and idle. Reduced and
+none resolve the primitive's clock to zero, so a closing body commits immediately instead of holding empty space.
+The inner body is the only content paint owner; a plain trigger or body string keeps its own changed-run host, and
+a direct numeric quantity keeps its own reel host. Rich caller children keep their native text identity.
 
 ## Accessibility
 
@@ -429,6 +440,7 @@ No timers or render-time measurements drive animation.
 ## Notes for AI
 
 - Use boolean `open`, not Accordion's array value API.
-- Keep content lifecycle props on Content and preserve the measurement wrapper.
+- Keep content lifecycle props on Content and preserve the content-inner child slot.
 - Preserve all three exports and the full/reduced/none branch.
+- A plain string/number child gets its own display host; arbitrary rich children are not rewritten.
 - Related: Accordion for grouped sections; Tabs for alternate views.
