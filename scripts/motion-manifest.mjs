@@ -302,6 +302,23 @@ function selectPresentationForms(source) {
   return [];
 }
 
+/** Fixed-property factories used by the Combobox adapter. The popup pair is an
+ * installed executor, never a recipe string or a registration. */
+function comboboxPresentationForms(source) {
+  const selected = motionSource(source);
+  if (!selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")))
+    return [];
+  if (
+    selected.source.includes("function createComboboxPopup(") &&
+    selected.source.includes("node.animate(") &&
+    selected.source.includes("owner.begin(") &&
+    selected.source.includes('"popup.anchored/presence"') &&
+    selected.source.includes('"popup.anchored/ending"')
+  )
+    return ["popup.anchored/presence", "popup.anchored/ending"];
+  return [];
+}
+
 /** Parameter-backed shared controls retain their exact property form. The
  * binding must reach a rendered shared controller's real transition prop. */
 export function parameterWriterForms(source) {
@@ -312,6 +329,7 @@ export function parameterWriterForms(source) {
       ...alertIconForms(source),
       ...emptyMediaForms(source),
       ...selectPresentationForms(source),
+      ...comboboxPresentationForms(source),
       ...kbdPresentationForms(source),
       ...groupPositionForms(source),
     ]),

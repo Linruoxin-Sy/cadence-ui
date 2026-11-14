@@ -175,6 +175,7 @@ export function componentExecutionPlugin(additionalItems = []) {
                 "createInlinePresence",
                 "createInlineEntrance",
                 "createSelectPopup",
+                "createComboboxPopup",
                 "createCapturedHandoff",
                 "createSurfacePresence",
                 "createAlertIcon",
