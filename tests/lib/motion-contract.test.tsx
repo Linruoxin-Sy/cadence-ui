@@ -322,7 +322,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
       expect(result.status, output).toBe(1);
-      for (const id of ["radio-group", "switch"]) expect(output).toContain(`${id}: execute expectMotionContract`);
+      for (const id of ["switch"]) expect(output).toContain(`${id}: execute expectMotionContract`);
       // Checkbox is v2: a whole skipped contract must fail every exact action,
       // boundary and mode through the strict v2 diagnostics rather than the
       // retired legacy adoption message.
@@ -337,6 +337,19 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
           );
       for (const capability of ["Size", "Changed text", "Changed numbers"])
         expect(output).toContain(`checkbox: v2 verify ${capability}/@root`);
+      // Radio Group is v2 too: the same whole-skipped contract must produce the
+      // exact action and boundary diagnostics on its real parts.
+      for (const [binding, anchor, slot] of [
+        ["radio-group.root.enter", "radio-group#RadioGroup", "radio-group"],
+        ["radio-group.indicator.select", "radio-group#RadioGroupItem", "radio-group-indicator"],
+        ["radio-group.item.colour", "radio-group#RadioGroupItem", "radio-group-item"],
+      ] as const)
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toContain(
+            `radio-group: v2 execute ${binding} on ${anchor}/${slot} with exact source/property/preset policy in ${mode}`,
+          );
+      for (const capability of ["Size", "Changed text", "Changed numbers"])
+        expect(output).toContain(`radio-group: v2 verify ${capability}/@root`);
       // Toggle is now v2: a dead helper call must fail every exact action/mode,
       // rather than borrowing the old legacy adoption diagnostic.
       for (const action of [

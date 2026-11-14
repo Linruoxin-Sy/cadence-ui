@@ -40,7 +40,11 @@ const parts = {
     "checkbox-indicator ControlSpan | Motion controls | state.morph",
     "checkbox root | CSS colour policy | state.color",
   ],
-  "radio-group": ["radio-group-indicator ControlSpan | Motion controls | state.morph"],
+  "radio-group": [
+    "radio-group root entrance | WAAPI opacity | data.transition",
+    "radio-group-indicator ControlSpan | Motion controls | state.morph",
+    "radio-group-item | CSS colour policy | state.color",
+  ],
   switch: ["switch-thumb ControlSpan positional target | Motion controls | state.morph"],
   slider: ["slider-thumb ControlDiv | Base dragging + Motion committed controls | feedback.press"],
   toggle: ["toggle PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],

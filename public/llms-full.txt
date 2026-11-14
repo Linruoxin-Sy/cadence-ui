@@ -11700,6 +11700,7 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | radio-group | `@components/cadence/radio-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/radio-group.json) |
+| radio-group | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/radio-group.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -11862,21 +11863,25 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine files in the target list, including every file from the motion,
-utilities and provider payloads. Keep `radio-group/index.tsx` beside the shared
-`lib/` directory with its relative imports and the sources' `"use client"`
-directives intact. The dot uses `ControlSpan`, whose imports also reach
-`native-div.tsx` and `press-button.tsx`; copying only `provider.tsx` is not enough.
-The provider files and `motion` package are required even without an application
-wrapper.
+Copy every file in the target list, including the shared `inline-entrance.ts` and
+every file from the motion, utilities and provider payloads. Keep
+`radio-group/index.tsx` beside the shared `lib/` directory with its relative
+imports and the sources' `"use client"` directives intact. The dot uses
+`ControlSpan`, whose imports also reach `native-div.tsx` and `press-button.tsx`;
+copying only `provider.tsx` is not enough. The provider files and `motion` package
+are required even without an application wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. There is no additional Radio Group-specific CSS, icon package or external
-asset. Only the dots animate: `state.morph` uses opacity and scale in
-full, keeps opacity with immediate full size in reduced, and settles immediately
-in none, including an initially selected item. Standalone groups follow the
-system motion preference; the optional `CadenceProvider` controls a subtree's
-mode and timing. A nested full scope still respects system reduced motion.
+asset. Only the dots and the group itself animate: `state.morph` fades and scales
+the dot of the actual changed options in full, keeps opacity with immediate full
+size in reduced, and settles immediately in none, including an initially selected
+item. `state.color` owns each item's border, background, ring and dot paint, so
+focus or invalid state applies it at once. A group inserted into an
+already-presented page fades in once; a group inserted with an entering field
+follows that field's entrance instead. Standalone groups follow the system motion
+preference; the optional `CadenceProvider` controls a subtree's mode and timing. A
+nested full scope still respects system reduced motion.
 
 Usage, the top specimen and the labelled examples also need
 [Label](/components/label). Controlled and Native form submission additionally
@@ -12256,18 +12261,23 @@ export function StaticRadio() {
 
 ## Motion contract
 
-Authored intensity is **subtle**: The selected dot changes inside its radio control without moving the option collection.
+Authored intensity is **subtle**: One local group entrance, one dot revision per changed option and one scoped palette per item; the option row and external labels keep their own owners.
 
-Recipe: `state.morph/one-shot`. The dot of the newly selected item fades in and settles
-from 0.96 to full size; the previously selected dot reverses. Nothing else in the
-row moves, so the eye follows the choice.
+The dot is the protagonist — the actual old and new dots exchange, and nothing
+travels across distant options. The group itself can fade in once, and each item
+owns the state paint around it.
 
-| Phase     | Properties                        | Token          | Interruptible |
-| --------- | --------------------------------- | -------------- | ------------- |
-| select    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot`  | yes           |
-| deselect  | the same pair, reversed           | `state.morph/one-shot`  | yes           |
-| reduced   | `opacity` only                    | `state.morph/one-shot`  | yes           |
-| none      | no transition                     | –              | –             |
+| Recipe / form | Owner and full behaviour | reduced | none |
+| ------------- | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | One opacity entrance on a group inserted into an already-presented page. A presenting parent (such as an entering field), a hidden or unusable group and an already-visible group keep native paint, and no option or layout moves. | Short opacity. | Immediate. |
+| `state.morph/one-shot` | Each item's own dot revision: opacity plus the `scale.in` pose to rest, driven only by that item's committed checked state. A rapid arrow or a reversal retargets the same dot means; an unmatched value shows no dot. | Opacity only, the dot appears at full size. | Final dot, or no dot, immediately. |
+| `state.color/css-transition` | The item's border, background, ring and dot `currentColor` paint on one clock. Real DOM focus or invalid state settles all of it at its target, and a palette we cannot prove does the same. | Short eligible colour. | Zero duration and delay. |
+
+The option circle keeps a fixed 16px size and a stable hit target, so neither is
+ever interpolated or scaled: caller layout applies immediately in every mode.
+Live reduction finishes an eligible colour or dot revision, `none` or a zero clock
+cancels them without touching the accepted selection, and a native form reset stays
+Base UI's own path — Cadence adds no callback, revision or replay for it.
 
 ## Keyboard interactions
 
@@ -12309,9 +12319,12 @@ Items stack by default (`grid gap-3`). For a horizontal row of short labels, set
 
 ## Performance
 
-One Motion element per item, each animating only `opacity` and `transform`, and
-only when the selection changes. No layout thrash: the dot is absolutely sized by
-CSS, so no measurement happens.
+One Motion element per item's dot, each animating only `opacity` and `transform`,
+and only when that item's committed selection changes; a regular single-select
+change therefore moves at most the outgoing and incoming dot. The item colour
+policy runs one CSS transition family on the same node. No layout thrash: the dot
+and the circle are sized by CSS, so no measurement or per-option rectangle
+interpolation happens.
 
 ## Notes for AI
 

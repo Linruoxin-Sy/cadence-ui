@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -522,7 +522,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -604,7 +604,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -701,7 +701,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -776,7 +776,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -850,7 +850,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -957,7 +957,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -1040,7 +1040,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -1147,7 +1147,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -1202,7 +1202,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -1318,7 +1318,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -1435,7 +1435,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -1544,7 +1544,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1672,7 +1672,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1809,7 +1809,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1998,7 +1998,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -2038,7 +2038,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -2078,7 +2078,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -2133,7 +2133,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -2201,7 +2201,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -2276,7 +2276,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -2301,7 +2301,15 @@
     "tier": "T1",
     "batch": "B3",
     "motion": [
-      "state.morph"
+      "data.transition",
+      {
+        "recipe": "state.morph",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      }
     ],
     "intensity": "subtle",
     "complexity": "S",
@@ -2314,21 +2322,35 @@
       "scope": "local",
       "travel": "compact",
       "coordination": "independent",
-      "reason": "The selected dot changes inside its radio control without moving the option collection."
+      "reason": "One local group entrance, one dot revision per changed option and one scoped palette per item; the option row and external labels keep their own owners."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
+        "data.transition/one-shot": [
+          {
+            "relationship": "default",
+            "owner": "radio-group",
+            "reason": "Radio Group owns one opacity entrance on a later-inserted group root; a presenting parent, a hidden host or an unusable group keeps native paint."
+          }
+        ],
         "state.morph/one-shot": [
           {
             "relationship": "default",
             "owner": "radio-group",
-            "reason": "Radio Group integrates local state/glyph feedback at its own parts, using the reached installed executor."
+            "reason": "Each option owns the dot revision on its own indicator: opacity and the authored scale pose, with only the actual old and new dots changing."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "radio-group",
+            "reason": "Each option owns its border, background, ring and dot palette; DOM focus, invalid state and an unverified caller palette settle that paint immediately."
           }
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -2379,7 +2401,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -2431,7 +2453,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -2535,7 +2557,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -2678,7 +2700,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -2754,7 +2776,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -2805,7 +2827,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -2872,7 +2894,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -2938,7 +2960,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -3004,7 +3026,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -3070,7 +3092,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -3138,7 +3160,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -3204,7 +3226,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -3340,7 +3362,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -3416,7 +3438,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -3491,7 +3513,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -3566,7 +3588,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -3641,7 +3663,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -3726,7 +3748,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -3808,7 +3830,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -3874,7 +3896,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -3930,7 +3952,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -3985,7 +4007,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -4112,7 +4134,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -4149,7 +4171,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -4207,7 +4229,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -4246,7 +4268,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -4298,7 +4320,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -4357,7 +4379,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -4436,7 +4458,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -4476,7 +4498,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -4604,7 +4626,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -4696,7 +4718,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -4787,7 +4809,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -4853,7 +4875,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -4906,7 +4928,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -4966,7 +4988,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -5018,7 +5040,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -5070,7 +5092,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -5124,7 +5146,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -5176,7 +5198,7 @@
         ]
       }
     },
-    "sourceSha": "5cd183e2",
+    "sourceSha": "69605ee5",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }

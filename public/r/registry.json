@@ -232,7 +232,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -327,7 +327,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -419,7 +419,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -492,7 +492,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -579,7 +579,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -644,7 +644,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -709,7 +709,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -804,7 +804,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -877,7 +877,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -972,7 +972,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1019,7 +1019,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1122,7 +1122,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1226,7 +1226,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1322,7 +1322,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1437,7 +1437,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1561,7 +1561,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1738,7 +1738,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1771,7 +1771,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1804,7 +1804,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1850,7 +1850,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1907,7 +1907,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1972,7 +1972,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -1988,7 +1988,15 @@
         "tier": "T1",
         "batch": "B3",
         "motion": [
-          "state.morph"
+          "data.transition",
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
         ],
         "intensity": "subtle",
         "complexity": "S",
@@ -2001,21 +2009,35 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "The selected dot changes inside its radio control without moving the option collection."
+          "reason": "One local group entrance, one dot revision per changed option and one scoped palette per item; the option row and external labels keep their own owners."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "radio-group",
+                "reason": "Radio Group owns one opacity entrance on a later-inserted group root; a presenting parent, a hidden host or an unusable group keeps native paint."
+              }
+            ],
             "state.morph/one-shot": [
               {
                 "relationship": "default",
                 "owner": "radio-group",
-                "reason": "Radio Group integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "Each option owns the dot revision on its own indicator: opacity and the authored scale pose, with only the actual old and new dots changing."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "radio-group",
+                "reason": "Each option owns its border, background, ring and dot palette; DOM focus, invalid state and an unverified caller palette settle that paint immediately."
               }
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2058,7 +2080,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2101,7 +2123,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2193,7 +2215,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2324,7 +2346,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2389,7 +2411,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2432,7 +2454,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2489,7 +2511,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2546,7 +2568,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2603,7 +2625,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2660,7 +2682,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2717,7 +2739,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2774,7 +2796,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2897,7 +2919,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -2962,7 +2984,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3027,7 +3049,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3092,7 +3114,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3157,7 +3179,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3229,7 +3251,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3296,7 +3318,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3353,7 +3375,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3399,7 +3421,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3445,7 +3467,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3557,7 +3579,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3590,7 +3612,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3638,7 +3660,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3671,7 +3693,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3714,7 +3736,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3760,7 +3782,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3828,7 +3850,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3861,7 +3883,7 @@
           "schema": 1,
           "effects": {}
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -3967,7 +3989,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4047,7 +4069,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4127,7 +4149,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4182,7 +4204,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4225,7 +4247,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4277,7 +4299,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4324,7 +4346,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4371,7 +4393,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4418,7 +4440,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     },
     {
@@ -4465,7 +4487,7 @@
             ]
           }
         },
-        "sourceSha": "5cd183e2"
+        "sourceSha": "69605ee5"
       }
     }
   ]
