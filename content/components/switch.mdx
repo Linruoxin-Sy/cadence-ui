@@ -2,15 +2,15 @@
 title: Switch
 description: Settings that take effect immediately, such as alerts or visibility.
 category: form
-motion: [state.morph]
+motion: ["data.transition",{"recipe":"state.morph","form":"one-shot"},{"recipe":"state.color","form":"css-transition"},{"recipe":"geometry.resize","form":"measured"}]
 intensity: subtle
-motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"The thumb travels only within its switch track."}
-motionCoverage: {"schema":1,"effects":{"state.morph/one-shot":[{"relationship":"default","owner":"switch","reason":"Switch integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"local","travel":"compact","coordination":"independent","reason":"The thumb travels only within its measured track, the track and the thumb each own one scoped palette, and an explicit size revision remeasures the endpoint."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"switch","reason":"Switch owns one opacity entrance on a later-inserted root; a presenting parent, a hidden host or an unusable control keeps native paint."}],"state.morph/one-shot":[{"relationship":"default","owner":"switch","reason":"Switch owns the thumb endpoint revision on its own indicator: the measured travel with a non-overshooting indicator transition and an immediate first measurement."}],"state.color/css-transition":[{"relationship":"default","owner":"switch","reason":"The track owns its background, border and focus-ring paint and the thumb owns its own fill, each on one scoped clock; DOM focus and an unverified caller palette settle that paint immediately."}],"geometry.resize/measured":[{"relationship":"default","owner":"switch","reason":"Switch owns the bounded track box for an explicit size revision, commits the measured destination and remeasures the thumb endpoint from the same change."}]}}
 complexity: S
 tier: T1
 since: 0.3.0
 deps: ["@base-ui/react", "motion"]
-registryDeps: ["@cadence/cadence-provider", "@cadence/cadence-utils"]
+registryDeps: ["@cadence/cadence-geometry", "@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"]
 ---
 
 ## Installation
@@ -25,22 +25,28 @@ npx shadcn@latest add @cadence/switch
 
 [Manual installation files](https://cadence.dev/r/switch.json)
 
-Copy all nine files in the target list, including every file from the motion,
-utilities and provider payloads. Keep `switch/index.tsx` beside the shared `lib/`
-directory with its relative imports and the sources' `"use client"` directives
-intact. The thumb uses `ControlSpan`, whose imports also reach `native-div.tsx`
-and `press-button.tsx`; copying only `provider.tsx` is not enough. The provider
-files and `motion` package are required even without an application wrapper.
+Copy every file in the target list, including the shared `inline-entrance.ts` and
+every file from the motion, geometry, utilities and provider payloads. Keep
+`switch/index.tsx` beside the shared `lib/` directory with its relative imports
+and the sources' `"use client"` directives intact. The thumb uses `ControlSpan`,
+whose imports also reach `native-div.tsx` and `press-button.tsx`; the measured
+size transaction also needs `measured-geometry.ts`. Copying only `provider.tsx`
+is not enough. The provider files and `motion` package are required even without
+an application wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. There is no additional Switch-specific CSS, icon package or external
 asset. `state.morph` animates only the thumb's horizontal transform in full;
 reduced and none jump to the checked endpoint without travel animation. The
-track colour is state feedback. Both `default` and `sm` measure their own travel
-with `ResizeObserver`; the first measured position settles immediately, including
-an initially checked switch in none. Standalone switches follow the system
-motion preference. The optional `CadenceProvider` controls a subtree's mode and
-timing; a nested full scope still respects system reduced motion.
+thumb's endpoint is measured from the rendered track and thumb — never a
+hard-coded pixel value — so both `default` and `sm`, and a caller restyle, land
+flush; the first measurement and a passive resize are painted immediately,
+including an initially checked switch in none. The track and the thumb each own
+one scoped colour transaction. An explicit `size` change interpolates the
+measured track box and remeasures the endpoint, while a passive layout change
+stays native. Standalone switches follow the system motion preference. The
+optional `CadenceProvider` controls a subtree's mode and timing; a nested full
+scope still respects system reduced motion.
 
 Usage, the top specimen and the labelled examples also need
 [Label](/components/label). Controlled additionally uses [Button](/components/button).
@@ -312,21 +318,25 @@ export function StaticSwitch() {
 
 ## Motion contract
 
-Authored intensity is **subtle**: The thumb travels only within its switch track.
+Authored intensity is **subtle**: The thumb travels only within its measured track, the track and the thumb each own one scoped palette, and an explicit size revision remeasures the endpoint.
 
-Recipe: `state.morph/one-shot`. The thumb travels from one end of the track to the other
-while the track recolours. The travel distance is measured from the rendered track
-and thumb — no hard-coded pixel value — so a custom size still lands flush.
+The thumb is the protagonist. It travels between two measured endpoints — the
+distance is read from the track and the thumb, never written down — while the
+track and the thumb each run one state paint transaction. Nothing else in the
+control moves.
 
-| Phase   | Properties                         | Token          | Interruptible |
-| ------- | ---------------------------------- | -------------- | ------------- |
-| on      | `translateX 0 → track − thumb`     | `state.morph/one-shot`  | yes           |
-| off     | the same distance, reversed        | `state.morph/one-shot`  | yes           |
-| reduced | no travel animation; the thumb jumps to the new end | – | –     |
-| none    | no transition                      | –              | –             |
+| Recipe / form | Owner and full behaviour | reduced | none |
+| ------------- | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | One opacity entrance on a switch inserted into an already-presented page. A presenting parent (such as an entering field), a hidden or unusable control and an already-visible switch keep native paint, and the thumb never sweeps in. | Short opacity. | Immediate. |
+| `state.morph/one-shot` | The thumb's own endpoint revision: the measured travel with a non-overshooting indicator spring. The first measurement and a passive font/viewport/caller-layout change paint the endpoint immediately, and a rapid toggle retargets the same thumb host. | Position immediately. | Position immediately. |
+| `state.color/css-transition` | The track's background, border and focus-ring paint on one clock, and the thumb's own fill on its own host. Real DOM focus and a palette we cannot prove settle all of that paint at its target. | Short eligible colour. | Zero duration and delay. |
+| `geometry.resize/measured` | An explicit `size` change interpolates the measured track box. The thumb endpoint is remeasured from the same change and held to the interval that stays valid through the whole transaction, then painted at the exact measured endpoint. | Final geometry immediately. | Final geometry immediately. |
 
 Under `reduced` the thumb still ends up in the right place: position is state, not
-decoration. What is dropped is the animation, so the movement is instant.
+decoration. What is dropped is the travel animation and the size interpolation.
+Under `none` the thumb, the track box and every colour reach their target with
+zero duration and delay. A native form reset stays Base UI's own path: Cadence
+adds no callback, revision or replay for it.
 
 ## Keyboard interactions
 
@@ -366,13 +376,17 @@ shrinking the track.
 
 ## Performance
 
-One `ResizeObserver` per switch measures the travel, so a font or layout change
-does not desynchronise the thumb. The animation itself is a single `transform`
-transition with no layout reads during interaction.
+One `ResizeObserver` pair per switch measures the track and the thumb, so a font
+or layout change does not desynchronise the endpoint; an owned size writer is
+excluded from that read. The animation itself is a single `transform`
+transition, one scoped colour family on the track and one on the thumb, plus one
+measured width/height transaction when the `size` prop changes. No layout read
+happens during interaction.
 
 ## Notes for AI
 
 - Use `switch` only for immediate settings. If there is a Save button, use
   `checkbox`.
-- Do not animate the track colour as motion; colour is state feedback.
+- The track and thumb colours are one scoped state transaction, not decorative
+  motion; do not add a second colour writer or animate unrelated properties.
 - Keep the label outside the switch. A switch with no label has no accessible name.

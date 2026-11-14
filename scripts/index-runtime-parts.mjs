@@ -45,7 +45,13 @@ const parts = {
     "radio-group-indicator ControlSpan | Motion controls | state.morph",
     "radio-group-item | CSS colour policy | state.color",
   ],
-  switch: ["switch-thumb ControlSpan positional target | Motion controls | state.morph"],
+  switch: [
+    "switch root entrance | WAAPI opacity | data.transition",
+    "switch-thumb ControlSpan positional target | Motion controls | state.morph",
+    "switch root | CSS colour policy | state.color",
+    "switch-thumb | CSS colour policy | state.color",
+    "switch root | measured geometry | geometry.resize",
+  ],
   slider: ["slider-thumb ControlDiv | Base dragging + Motion committed controls | feedback.press"],
   toggle: ["toggle PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],
   "toggle-group": [
