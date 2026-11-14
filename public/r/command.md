@@ -84,6 +84,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | input | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | textarea | `@components/cadence/textarea/index.tsx` | [JSON files[].content](https://cadence.dev/r/textarea.json) |
 | input-group | `@components/cadence/input-group/index.tsx` | [JSON files[].content](https://cadence.dev/r/input-group.json) |
+| input-group | `@components/cadence/lib/button-group-layout.ts` | [JSON files[].content](https://cadence.dev/r/input-group.json) |
+| input-group | `@components/cadence/lib/label-layout.ts` | [JSON files[].content](https://cadence.dev/r/input-group.json) |
 | command | `@components/cadence/command/index.tsx` | [JSON files[].content](https://cadence.dev/r/command.json) |
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)

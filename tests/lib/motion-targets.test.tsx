@@ -172,6 +172,7 @@ describe("current registry inventory and real part references", () => {
       "empty",
       "item",
       "button-group",
+      "input-group",
       "toggle",
       "toggle-group",
       "select",
