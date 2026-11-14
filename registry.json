@@ -2567,13 +2567,22 @@
           "path": "registry/cadence/checkbox/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/checkbox/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.3.0",
         "tier": "T1",
         "batch": "B3",
-        "motion": ["state.morph"],
+        "motion": [
+          "data.transition",
+          { "recipe": "state.morph", "form": "one-shot" },
+          { "recipe": "state.color", "form": "css-transition" }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -2585,16 +2594,30 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "The checked indicator appears within the control and keeps its native selection state."
+          "reason": "One local opacity entrance, one indicator mark revision and one scoped box/glyph palette; the hit area, size and external labels keep their own owners."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "checkbox",
+                "reason": "Checkbox owns one opacity entrance on a later-inserted root; a presenting parent, a hidden host or an unusable control keeps native paint."
+              }
+            ],
             "state.morph/one-shot": [
               {
                 "relationship": "default",
                 "owner": "checkbox",
-                "reason": "Checkbox integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "Checkbox owns the glyph revision on its own indicator: opacity and the authored scale pose, with a check-to-minus replacement in place."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "checkbox",
+                "reason": "Checkbox owns its background, foreground, border and scoped ring paint; DOM focus, invalid state and an unverified caller palette settle that paint immediately."
               }
             ]
           }

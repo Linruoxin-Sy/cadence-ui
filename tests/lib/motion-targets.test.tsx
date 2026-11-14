@@ -174,6 +174,7 @@ describe("current registry inventory and real part references", () => {
       "field",
       "button-group",
       "input-group",
+      "checkbox",
       "toggle",
       "toggle-group",
       "input-otp",

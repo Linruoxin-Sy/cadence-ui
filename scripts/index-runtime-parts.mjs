@@ -35,7 +35,11 @@ const parts = {
   button: ["PressButton actual button | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],
   skeleton: ["skeleton | CSS animation pulse | data.transition"],
   spinner: ["spinner SVG | CSS animation spin (single glyph reduced exception) | data.transition"],
-  checkbox: ["checkbox-indicator ControlSpan | Motion controls | state.morph"],
+  checkbox: [
+    "checkbox root entrance | WAAPI opacity | data.transition",
+    "checkbox-indicator ControlSpan | Motion controls | state.morph",
+    "checkbox root | CSS colour policy | state.color",
+  ],
   "radio-group": ["radio-group-indicator ControlSpan | Motion controls | state.morph"],
   switch: ["switch-thumb ControlSpan positional target | Motion controls | state.morph"],
   slider: ["slider-thumb ControlDiv | Base dragging + Motion committed controls | feedback.press"],

@@ -174,6 +174,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         button: `it('unused import',()=>{expect(true).toBe(true)});`,
         toggle: `it('dead call',()=>{if(false) expectMotionContract('full'); expect(true).toBe(true)});`,
         checkbox: `describe.skip('skipped contract',()=>{it.each(['full','reduced','none'])('mode %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)})});`,
+        "radio-group": `describe.skip('skipped contract',()=>{it.each(['full','reduced','none'])('mode %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)})});`,
         switch: `it.each(['full','reduced'])('missing none %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)});`,
         spinner: `it.each(['full','reduced','none'])('positive %s',(mode)=>{render(<CadenceProvider mode={mode}><Spinner/></CadenceProvider>);expectMotionContract(mode)});`,
         badge: `it('T0 needs no helper',()=>{expect(true).toBe(true)});`,
@@ -321,7 +322,21 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
       expect(result.status, output).toBe(1);
-      for (const id of ["checkbox", "switch"]) expect(output).toContain(`${id}: execute expectMotionContract`);
+      for (const id of ["radio-group", "switch"]) expect(output).toContain(`${id}: execute expectMotionContract`);
+      // Checkbox is v2: a whole skipped contract must fail every exact action,
+      // boundary and mode through the strict v2 diagnostics rather than the
+      // retired legacy adoption message.
+      for (const [binding, slot] of [
+        ["checkbox.root.enter", "checkbox"],
+        ["checkbox.indicator.change", "checkbox-indicator"],
+        ["checkbox.root.colour", "checkbox"],
+      ] as const)
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toContain(
+            `checkbox: v2 execute ${binding} on checkbox#Checkbox/${slot} with exact source/property/preset policy in ${mode}`,
+          );
+      for (const capability of ["Size", "Changed text", "Changed numbers"])
+        expect(output).toContain(`checkbox: v2 verify ${capability}/@root`);
       // Toggle is now v2: a dead helper call must fail every exact action/mode,
       // rather than borrowing the old legacy adoption diagnostic.
       for (const action of [
