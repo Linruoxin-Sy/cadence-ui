@@ -2701,19 +2701,43 @@
       "description": "Settings that take effect immediately, such as alerts or visibility.",
       "categories": ["form"],
       "dependencies": ["@base-ui/react", "motion"],
-      "registryDependencies": ["@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "registryDependencies": [
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-utils"
+      ],
       "files": [
         {
           "path": "registry/cadence/switch/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/switch/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.3.0",
         "tier": "T1",
         "batch": "B3",
-        "motion": ["state.morph"],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "S",
         "upstream": {
@@ -2725,16 +2749,37 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "The thumb travels only within its switch track."
+          "reason": "The thumb travels only within its measured track, the track and the thumb each own one scoped palette, and an explicit size revision remeasures the endpoint."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "switch",
+                "reason": "Switch owns one opacity entrance on a later-inserted root; a presenting parent, a hidden host or an unusable control keeps native paint."
+              }
+            ],
             "state.morph/one-shot": [
               {
                 "relationship": "default",
                 "owner": "switch",
-                "reason": "Switch integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "Switch owns the thumb endpoint revision on its own indicator: the measured travel with a non-overshooting indicator transition and an immediate first measurement."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "switch",
+                "reason": "The track owns its background, border and focus-ring paint and the thumb owns its own fill, each on one scoped clock; DOM focus and an unverified caller palette settle that paint immediately."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "switch",
+                "reason": "Switch owns the bounded track box for an explicit size revision, commits the measured destination and remeasures the thumb endpoint from the same change."
               }
             ]
           }
