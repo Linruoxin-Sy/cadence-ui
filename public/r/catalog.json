@@ -313,7 +313,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -421,7 +421,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -522,7 +522,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -604,7 +604,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -701,7 +701,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -776,7 +776,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -850,7 +850,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -957,7 +957,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -1040,7 +1040,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -1147,7 +1147,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -1202,7 +1202,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -1318,7 +1318,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -1435,7 +1435,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -1544,7 +1544,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1672,7 +1672,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1809,7 +1809,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -1998,7 +1998,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -2038,7 +2038,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -2078,7 +2078,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -2133,7 +2133,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -2201,7 +2201,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -2254,7 +2254,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -2306,7 +2306,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -2357,7 +2357,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -2409,7 +2409,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -2513,7 +2513,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -2656,7 +2656,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -2676,13 +2676,22 @@
     "registryDependencies": [
       "@cadence/cadence-motion",
       "@cadence/cadence-provider",
+      "@cadence/cadence-text",
       "@cadence/cadence-utils"
     ],
     "since": "0.3.0",
     "tier": "T1",
     "batch": "B3",
     "motion": [
-      "state.morph"
+      "data.transition",
+      {
+        "recipe": "state.color",
+        "form": "css-transition"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      }
     ],
     "intensity": "subtle",
     "complexity": "M",
@@ -2695,21 +2704,35 @@
       "scope": "local",
       "travel": "none",
       "coordination": "independent",
-      "reason": "The active caret blinks in its native character slot; OTP characters are not animated counters."
+      "reason": "One group entrance, per-slot state paint and changed-character replacements keep the single native input and its caret untouched."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "state.morph/one-shot": [
+        "data.transition/one-shot": [
           {
             "relationship": "default",
             "owner": "input-otp",
-            "reason": "Input OTP integrates local state/glyph feedback at its own parts, using the reached installed executor."
+            "reason": "Input OTP owns one opacity entrance on a later-inserted slot group; hidden, inert and unusable groups keep native paint."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "input-otp",
+            "reason": "Each slot owns its own border, background and character foreground; invalid state, DOM focus-within and unverified palettes settle that paint immediately."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "input-otp",
+            "reason": "Only the character whose code position changed is replaced inside its fixed box; the real input keeps caret, selection, composition and paste."
           }
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -2760,7 +2783,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -2827,7 +2850,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -2893,7 +2916,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -2959,7 +2982,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -3025,7 +3048,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -3093,7 +3116,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -3159,7 +3182,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -3295,7 +3318,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -3371,7 +3394,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -3446,7 +3469,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -3521,7 +3544,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -3596,7 +3619,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -3681,7 +3704,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -3763,7 +3786,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -3829,7 +3852,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -3885,7 +3908,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -3940,7 +3963,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -4067,7 +4090,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -4104,7 +4127,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -4162,7 +4185,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -4201,7 +4224,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -4253,7 +4276,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -4312,7 +4335,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -4391,7 +4414,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -4431,7 +4454,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -4559,7 +4582,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -4651,7 +4674,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -4742,7 +4765,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -4808,7 +4831,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -4861,7 +4884,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -4921,7 +4944,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -4973,7 +4996,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -5025,7 +5048,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -5079,7 +5102,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -5131,7 +5154,7 @@
         ]
       }
     },
-    "sourceSha": "270c74fe",
+    "sourceSha": "16d1db86",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }
