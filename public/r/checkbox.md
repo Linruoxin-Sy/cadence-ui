@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/checkbox`
 - Type: registry:ui
 - Since: 0.3.0
-- Motion recipes: state.morph
+- Motion recipes: data.transition, state.morph, state.color
 
 ## Installation
 
@@ -55,6 +55,7 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | checkbox | `@components/cadence/checkbox/index.tsx` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
+| checkbox | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
@@ -217,21 +218,24 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine files in the target list, including every file from the motion,
-utilities and provider payloads. Keep `checkbox/index.tsx` beside the shared
-`lib/` directory with the relative imports and `"use client"` directives intact.
-The indicator uses `ControlSpan`, whose imports also reach `native-div.tsx` and
-`press-button.tsx`; copying only `provider.tsx` is not enough. The provider files
-and `motion` package are required even without an application wrapper.
+Copy every file in the target list, including the shared `inline-entrance.ts` and
+every file from the motion, utilities and provider payloads. Keep
+`checkbox/index.tsx` beside the shared `lib/` directory with the relative imports
+and `"use client"` directives intact. The indicator uses `ControlSpan`, whose
+imports also reach `native-div.tsx` and `press-button.tsx`; copying only
+`provider.tsx` is not enough. The provider files and `motion` package are required
+even without an application wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the copied
 files. There is no additional Checkbox-specific CSS or asset. `lucide-react`
-supplies the tick and mixed-state icons. Only the indicator animates:
-`state.morph` fades and scales it in full, keeps opacity with immediate full size
-in reduced, and settles immediately in none, including an initially checked
-control. Standalone checkboxes follow the system motion preference; the optional
-`CadenceProvider` controls a subtree's mode and timing. A nested full scope still
-respects the system reduced-motion preference.
+supplies the tick and mixed-state icons. The box paints its own state chrome and
+the indicator carries the mark: `state.morph` fades and scales the mark in full,
+keeps opacity with immediate full size in reduced, and settles immediately in
+none, including an initially checked control. `state.color` owns the background,
+foreground and border paint, and a checkbox inserted into an already-presented
+page fades in once. Standalone checkboxes follow the system motion preference; the
+optional `CadenceProvider` controls a subtree's mode and timing. A nested full
+scope still respects the system reduced-motion preference.
 
 Usage, the top specimen and the labelled examples also need
 [Label](/components/label). Controlled and Native form submission additionally
@@ -570,20 +574,25 @@ All native attributes are forwarded, including `aria-invalid` and
 
 ## Motion contract
 
-Authored intensity is **subtle**: The checked indicator appears within the control and keeps its native selection state.
+Authored intensity is **subtle**: One local opacity entrance, one indicator mark revision and one scoped box/glyph palette; the hit area, size and external labels keep their own owners.
 
-Recipe: `state.morph/one-shot`. The tick is the protagonist — it fades in and settles from
-0.96 to full size when the box is checked, and reverses when it is cleared.
+The tick is the protagonist — it fades in and settles from 0.96 to full size when the
+box is checked or mixed, replaces itself in place when the state changes again, and
+reverses from the current visual state when it is cleared. The box itself owns the
+state paint around it.
 
-| Phase   | Properties                    | Token          | Interruptible |
-| ------- | ----------------------------- | -------------- | ------------- |
-| check   | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot` | yes (re-click) |
-| clear   | the same pair, reversed       | `state.morph/one-shot`  | yes           |
-| reduced | `opacity` only                | `state.morph/one-shot`  | yes           |
-| none    | no transition                 | –              | –             |
+| Recipe / form | Owner and full behaviour | reduced | none |
+| ------------- | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | One opacity entrance on a box inserted into an already-presented page. A presenting parent, a hidden or unusable host and an already-visible control keep native paint, and no hit-area or geometry moves. | Short opacity. | Immediate. |
+| `state.morph/one-shot` | The indicator's own opacity and `scale.in` pose to rest, with the check-to-minus glyph replaced in place. A rapid revision retargets the same mark; clearing reverses from the current state. | Opacity only, the mark appears at full size. | Final glyph immediately. |
+| `state.color/css-transition` | The box's background, foreground, border and scoped ring paint on one clock. Real DOM focus or invalid state settles all of it at its target, and a palette we cannot prove does the same. | Short eligible colour. | Zero duration and delay. |
 
-Only the indicator moves. The box itself keeps a `transition-shadow` for the focus
-ring and the invalid ring, which is colour/shadow state feedback, not motion.
+The box keeps a fixed 16px size and a 44px hit area, so neither is ever interpolated or
+scaled: caller layout applies immediately in every mode. `indeterminate` and the native
+hidden input keep working with no transition at all. Live reduction finishes an eligible
+colour or mark revision, `none` or a zero clock cancels them without touching the accepted
+state, and a native form reset stays Base UI's own path — Cadence adds no callback, revision
+or replay for it.
 
 ## Keyboard interactions
 
@@ -624,9 +633,10 @@ label beside it, not inside it; wrapping a checkbox in a label removes the
 
 ## Performance
 
-No JS animation loop: one Motion element per box, animating only `opacity` and
-`transform`. A list of 50 checkboxes is 50 short transitions on demand, never a
-running loop.
+No JS animation loop and no layout measurement: one Motion element per box, animating
+only `opacity` and `transform`, plus one scoped CSS colour family on the root. A list of
+50 checkboxes is 50 short transitions on demand, never a running loop and never a
+per-control observer.
 
 ## Notes for AI
 
