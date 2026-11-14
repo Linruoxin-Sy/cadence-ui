@@ -1,10 +1,13 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/registry/cadence/collapsible";
 import { CadenceProvider } from "@/registry/cadence/lib/provider";
 import { expectMotionContract } from "../motion-contract";
+import { expectV2MotionAction, expectV2NativeBoundaries, prepareV2MotionPlan } from "../motion-v2-contract";
+
+const modes = ["full", "reduced", "none"] as const;
 
 function Example({ defaultOpen = false, disabled = false }) {
   return (
@@ -47,7 +50,14 @@ describe("Collapsible", () => {
         </CollapsibleContent>
       </Collapsible>,
     );
-    for (const slot of ["collapsible", "collapsible-trigger", "collapsible-content", "collapsible-content-inner"])
+    for (const slot of [
+      "collapsible",
+      "collapsible-trigger",
+      "collapsible-content",
+      "collapsible-content-inner",
+      "collapsible-trigger-label",
+      "collapsible-content-label",
+    ])
       expect(container.querySelector(`[data-slot="${slot}"]`)).toBeTruthy();
     const panel = container.querySelector('[data-slot="collapsible-content"]');
     expect(panel?.tagName).toBe("SECTION");
@@ -138,22 +148,162 @@ describe("Collapsible", () => {
     fireEvent(panel as Element, new Event("beforematch"));
     expect(screen.getByRole("button")).toHaveAttribute("aria-expanded", "true");
   });
+});
 
-  for (const mode of ["full", "reduced", "none"] as const)
-    it(`implements ${mode} geometry and unmounts`, async () => {
-      const { container } = render(
-        <CadenceProvider mode={mode}>
-          <Example defaultOpen />
-        </CadenceProvider>,
-      );
-      const panel = container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
-      expectMotionContract(mode, { parts: [panel] });
-      expect(panel.className.includes("transition-[height]")).toBe(mode === "full");
-      if (mode !== "full") expect(panel).toHaveClass("duration-0", "transition-none");
-      expect(panel.className).not.toMatch(/transform|scale|translate/);
-      expect(panel.style.transform).toBe("");
-      expect(panel.style.getPropertyValue("--cadence-disclosure-height")).toBe("0px");
-      await userEvent.click(screen.getByRole("button", { name: "Details" }));
-      await waitFor(() => expect(container.querySelector('[data-slot="collapsible-content"]')).toBeNull());
+describe("Collapsible v2 motion", () => {
+  beforeAll(() => prepareV2MotionPlan());
+
+  it.each(modes)("executes the measured content revision and changed labels in %s", async (mode) => {
+    const draw = (label: string, body: string) => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>{label}</CollapsibleTrigger>
+          <CollapsibleContent keepMounted>{body}</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>
+    );
+    const view = render(draw("First answer", "First body"));
+    const panel = view.container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
+    await expectV2MotionAction(
+      "collapsible",
+      "collapsible.content.resize",
+      mode,
+      () => view.rerender(draw("First answer", "A longer first body")),
+      { container: view.container },
+    );
+    await expectV2MotionAction(
+      "collapsible",
+      "collapsible.label.replace",
+      mode,
+      () => view.rerender(draw("Second answer", "A longer second body")),
+      { container: view.container },
+    );
+    expect(panel).toBe(view.container.querySelector('[data-slot="collapsible-content"]'));
+    expectMotionContract(mode, { root: view.container, parts: [panel], policy: ["color"] });
+  });
+
+  it.each(modes)("executes changed quantities in %s", async (mode) => {
+    const draw = (value: number) => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>{value}</CollapsibleTrigger>
+          <CollapsibleContent keepMounted>{value}</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>
+    );
+    const view = render(draw(19));
+    await expectV2MotionAction("collapsible", "collapsible.value.change", mode, () => view.rerender(draw(20)), {
+      container: view.container,
     });
+    expect(screen.getByRole("button", { name: "20" })).toBeTruthy();
+    expectMotionContract(mode, { root: view.container });
+  });
+
+  it.each(modes)("executes the trigger colour owner in %s", async (mode) => {
+    const paint = (on: boolean) => ({
+      color: on ? "#112233" : "#445566",
+      borderColor: on ? "#778899" : "#aabbcc",
+    });
+    const draw = (on: boolean) => (
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger style={paint(on)}>Paint</CollapsibleTrigger>
+          <CollapsibleContent>Paint body</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>
+    );
+    const view = render(draw(false));
+    await expectV2MotionAction("collapsible", "collapsible.trigger.colour", mode, () => view.rerender(draw(true)), {
+      container: view.container,
+    });
+    const trigger = view.container.querySelector('[data-slot="collapsible-trigger"]') as HTMLElement;
+    expect(trigger.style.color).toBe("rgb(17, 34, 51)");
+    expect(trigger.dataset.cadenceColor).toContain("color");
+  });
+
+  it.each(modes)("retains the inner content paint in %s", async (mode) => {
+    const user = userEvent.setup();
+    const view = render(
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>Retained</CollapsibleTrigger>
+          <CollapsibleContent keepMounted>Retained body</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>,
+    );
+    const panel = view.container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
+    await expectV2MotionAction(
+      "collapsible",
+      "collapsible.content-paint.exit",
+      mode,
+      () => user.click(screen.getByRole("button", { name: "Retained" })),
+      { container: view.container },
+    );
+    expect(panel).toHaveAttribute("hidden");
+    await expectV2MotionAction(
+      "collapsible",
+      "collapsible.content-paint.enter",
+      mode,
+      () => user.click(screen.getByRole("button", { name: "Retained" })),
+      { container: view.container },
+    );
+    expect(panel).not.toHaveAttribute("hidden");
+    expectMotionContract(mode, { root: view.container, parts: [panel] });
+  });
+
+  it.each(modes)("keeps the composed rich-content regions native in %s", async (mode) => {
+    const view = render(
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>Boundary label</CollapsibleTrigger>
+          <CollapsibleContent>Boundary body</CollapsibleContent>
+        </Collapsible>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>{7}</CollapsibleTrigger>
+          <CollapsibleContent>{7}</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>,
+    );
+    await expectV2NativeBoundaries("collapsible", { container: view.container });
+  });
+
+  it.each(modes)("keeps the semantic open state and unmounts a closed panel in %s", async (mode) => {
+    const view = render(
+      <CadenceProvider mode={mode} timeScale={0}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>Shell</CollapsibleTrigger>
+          <CollapsibleContent>Shell body</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>,
+    );
+    const panel = view.container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
+    expect(panel).not.toHaveAttribute("hidden");
+    if (mode === "full") expect(panel.className).toContain("duration-(--motion-duration-slow)");
+    else expect(panel.className).toContain("transition-none");
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Shell" }));
+    });
+    await waitFor(() => expect(view.container.querySelector('[data-slot="collapsible-content"]')).toBeNull());
+  });
+
+  it("settles a live full to reduced to none downgrade on an unchanged open body", () => {
+    const draw = (mode: (typeof modes)[number]) => (
+      <CadenceProvider mode={mode}>
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger>Downgrade</CollapsibleTrigger>
+          <CollapsibleContent>Downgrade body</CollapsibleContent>
+        </Collapsible>
+      </CadenceProvider>
+    );
+    const view = render(draw("full"));
+    const panel = view.container.querySelector('[data-slot="collapsible-content"]') as HTMLElement;
+    expect(panel).toHaveAttribute("data-motion", "full");
+    view.rerender(draw("reduced"));
+    expect(panel).toHaveAttribute("data-motion", "reduced");
+    expect(panel.className).toContain("transition-none");
+    view.rerender(draw("none"));
+    expect(panel).toHaveAttribute("data-motion", "none");
+    expect(panel.className).toContain("duration-0");
+    expect(panel).not.toHaveAttribute("hidden");
+  });
 });
