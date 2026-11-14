@@ -2,15 +2,16 @@
 title: Combobox
 description: Picking from a long list you can filter by typing.
 category: form
-motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"},"state.morph"]
+motion: [{"recipe":"data.transition","form":"one-shot"},{"recipe":"popup.anchored","form":"one-shot"},{"recipe":"state.color","form":"css-transition"},{"recipe":"state.morph","form":"one-shot"}]
 intensity: medium
-motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Combobox opens and closes its existing popup surface; content and native focus retain their current owners."}
-motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"default","owner":"combobox","reason":"Combobox integrates popup opening at its own parts, using the reached installed executor."}],"exit.fade/css-transition":[{"relationship":"default","owner":"combobox","reason":"Combobox integrates popup closing at its own parts, using the reached installed executor."}],"state.morph/one-shot":[{"relationship":"default","owner":"combobox","reason":"Combobox integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"The popup owns one anchored envelope and one scoped surface paint, each chip, standalone trigger and chips frame keeps its own insertion and paint, and the item tick morphs on a retained host without moving rows."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"combobox","reason":"Combobox integrates this exact form at its own native popup, chips frame, chip or standalone trigger."},{"relationship":"inherited","owner":"input-group","reason":"The composed Input Group frame and Button keep their own migrated insertion owner inside this composition; the editor is Base UI's native input."},{"relationship":"inherited","owner":"button","reason":"The composed Input Group frame and Button keep their own migrated insertion owner inside this composition; the editor is Base UI's native input."}],"popup.anchored/one-shot":[{"relationship":"default","owner":"combobox","reason":"The popup surface owns one anchored entrance and its anchored ending on its own rendered host; Base UI keeps the portal, placement and dismissal."}],"state.color/css-transition":[{"relationship":"default","owner":"combobox","reason":"The popup, option row, chip pill, chips frame, standalone trigger and separator rule each own scoped paint on their own host."},{"relationship":"inherited","owner":"input-group","reason":"The composed Input Group frame and Button keep their own migrated colour owner inside this composition; the editor keeps Base UI's native paint."},{"relationship":"inherited","owner":"button","reason":"The composed Input Group frame and Button keep their own migrated colour owner inside this composition; the editor keeps Base UI's native paint."}],"state.morph/one-shot":[{"relationship":"default","owner":"combobox","reason":"Each option keeps one retained tick host that morphs from the committed selected state without moving the row."}]}}
 complexity: L
 tier: T2
 since: 0.4.0
-deps: ["@base-ui/react", "lucide-react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider", "@cadence/input-group"]
+deps: ["@base-ui/react","lucide-react","motion"]
+registryDeps: ["@cadence/cadence-motion","@cadence/cadence-utils","@cadence/cadence-provider","@cadence/input-group","@cadence/button"]
+---
 ---
 
 ## Installation
@@ -27,7 +28,7 @@ Combobox examples that use external actions also require `@cadence/button`.
 
 [Manual installation files](https://cadence.dev/r/combobox.json)
 
-Copy all thirteen target files, including every shared `lib/` file and the
+Copy every target file in the install table, including every shared `lib/` file and the
 Button, Input, Textarea and Input Group sources. Keep the mirrored `cadence/`
 tree, relative imports and `"use client"` directives intact. Input Group imports
 all three controls even when this composition only renders its input and button.
@@ -36,9 +37,10 @@ in `CadenceProvider` is optional.
 
 Complete the base theme setup linked above, including Cadence's easing tokens,
 and ensure Tailwind scans the copied files. These payloads contain no additional
-Combobox-specific CSS or assets. Full mode scales and fades the popup and animates
-the selection tick. Reduced keeps opacity and removes scale; none disables those
-transitions from the first frame. Filtering and list placement update immediately
+Combobox-specific CSS or assets. Full mode owns the popup entrance and anchored
+ending, the insertion envelopes, the selection tick and scoped paint. Reduced keeps
+opacity and removes scale and travel; none resolves every clock to zero from the
+first frame. Filtering and list placement update immediately
 in every mode. Standalone components respect the system motion preference, as
 does a nested full provider.
 
@@ -1169,32 +1171,42 @@ an undo affordance should not also hand out half of one.
 
 ## Motion contract
 
-Authored intensity is **medium**: Combobox opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: The popup owns one anchored envelope and one scoped surface paint, each chip, standalone trigger and chips frame keeps its own insertion and paint, and the item tick morphs on a retained host without moving rows.
 
-| Phase | Properties | Token | Interruptible |
+| Phase | Animated properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | popup `opacity` 0→1, `scale` `--motion-scale-in`→1 | `popup.anchored/css-transition` | yes: a CSS transition, so reopening reverses it |
-| close | popup `opacity` 1→0, `scale` 1→`--motion-scale-in` | `exit.fade/css-transition` | yes |
-| select | tick `scale` `0.96`→1, `opacity` 0→1 | `state.morph/one-shot` | yes: a spring, retargeted from the current value |
-| filter | none — rows are replaced, not moved | – | – |
-| reduced | popup and tick fade without scaling; tick stays at full size | – | – |
-| none | every duration is zero | – | – |
+| open | popup `opacity` 0→1 with the anchored `scale.in` pose | `popup.anchored/one-shot` | yes: the current entrance retargets from the displayed opacity |
+| close | popup `opacity` 1→0 with the anchored ending pose | `popup.anchored/one-shot` | yes: Base UI completes its own native unmount after the ending |
+| insert | later chips frame, chip or standalone trigger `opacity` 0→1 | `data.transition/one-shot` | yes: a presenting parent keeps the control's native paint |
+| select | retained tick `opacity` 0→1 and `scale.in`→1 | `state.morph/one-shot` | yes: the spring retargets from the current value |
+| paint | scoped `background-color`, `color`, border colours, `box-shadow` and the separator rule | `state.color/css-transition` | yes: focus/focus-within, invalid state or an unknown palette settles at once |
 
-The scale grows out of `--transform-origin`, which Base UI writes from the positioner, so the panel opens
-from the field rather than from its own centre. The list itself never animates: a filter runs on every
+The popup entrance grows from `--transform-origin`, which Base UI writes from the positioner, so the panel
+opens from the field rather than from its own centre. Base UI still owns the open/close decision, the
+portal, positioning, dismissal and the native unmount; Cadence only writes the short entrance and the
+anchored ending on the surface it is given. The list itself never animates: a filter runs on every
 keystroke, and a row that is still travelling when the next character arrives is a list the reader has to
 chase.
 
-Each portal resolves token durations from its local provider, including `full` nested inside
-`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
-geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. Ordinary examples inherit the site header on the same component tree; the named Without motion example demonstrates explicit local overrides. Base UI `className(state)` and `style(state)` callbacks are evaluated
-before merging; caller utilities and styles win. Native `render`, events and ref cleanup
-remain owned by the primitive. Base UI 1.9's typeable focus manager hides background
-nodes from assistive technology while leaving their tab stops enabled. Cadence adds native
-temporary negative tab indices only to newly hidden focus stops, preserving outside pointer activation; Tab releases them before normal focus navigation and
-Base UI's blur dismissal. Existing hidden/inert nodes and parent dialogs keep their owners; cleanup preserves caller tabindex changes. `ComboboxInput` string classes style the field frame;
-state callback classes style the native input with its real Base UI input state.
+Every mode is explicit. Full runs the declared popup, insertion, colour and tick clocks. Reduced keeps the
+popup and insertion opacity, holds the tick at full size and never starts a spatial writer. None resolves
+every clock to zero and paints the semantic state first; Base UI's native close path still completes. A
+live downgrade cancels the running writer, and an entrance is never replayed for a revision that was
+already settled. Each portal resolves its own effective mode, including `full` nested inside `none` (the OS
+reduced-motion preference still wins). Ordinary examples inherit the site header on the same component
+tree; the named Without motion example demonstrates explicit local overrides.
+
+The composed Input Group frame and Button keep their own migrated owners inside this composition: the frame
+owns its border, background and shadow, the composed button owns its surface and foreground, and the native
+editor keeps Base UI's paint and editing. Combobox installs no second writer on those nodes. A caller
+palette that cannot be proven readable settles its whole colour family immediately. Base UI
+`className(state)` and `style(state)` callbacks are evaluated before merging; caller utilities and styles
+win. Native `render`, events and ref cleanup remain owned by the primitive. Base UI 1.9's typeable focus
+manager hides background nodes from assistive technology while leaving their tab stops enabled. Cadence adds
+native temporary negative tab indices only to newly hidden focus stops, preserving outside pointer
+activation; Tab releases them before normal focus navigation and Base UI's blur dismissal. Existing
+hidden/inert nodes and parent dialogs keep their owners; cleanup preserves caller tabindex changes.
+`ComboboxInput` string classes style the field frame and the native editor.
 
 ## Keyboard interactions
 
@@ -1233,13 +1245,15 @@ of scrolling horizontally, and the popup widens to the chips container.
 
 ## Performance
 
-- One CSS transition on `opacity` and `scale` per open and per close; no JS animation loop, and no layout
-  read.
-- Each mounted row keeps its indicator and uses the token spring for selection changes. Filtering replaces
+- One anchored WAAPI entrance and one anchored ending per popup; one local entrance per later-inserted chip,
+  trigger or chips frame. There is no animation loop and no layout read in the component.
+- Each mounted row keeps its retained indicator and uses the shared indicator spring. Filtering replaces
   rendered rows immediately instead of animating the list layout.
+- The popup width and height remain Base UI's anchor/available-space owners; Combobox writes no independent
+  box, so no measurement transaction competes with the positioner.
 - The filter is synchronous over whatever `items` holds; a remote list is a debounce in the caller, not a
-  behaviour of this component.
-- Budget: T2 (10 KB gzip).
+  behaviour of this component. Tier source budgets are advisory under ADR-023; performance governance is
+  deferred until functional migration completes.
 
 ## Notes for AI
 
