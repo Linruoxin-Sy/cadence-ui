@@ -2799,13 +2799,28 @@
           "path": "registry/cadence/slider/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/slider/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.3.0",
         "tier": "T1",
         "batch": "B3",
-        "motion": ["feedback.press"],
+        "motion": [
+          "data.transition",
+          {
+            "recipe": "feedback.press",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          }
+        ],
         "intensity": "subtle",
         "complexity": "M",
         "upstream": {
@@ -2817,16 +2832,30 @@
           "scope": "local",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Thumb feedback stays on the direct manipulation control; native value input is immediate."
+          "reason": "The native thumb stays on Base UI input geometry, a decorative face owns the press scale, and each track, range and thumb part owns one scoped palette; value input and a readout stay immediate."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "slider",
+                "reason": "Slider owns one opacity entrance on a later-inserted root with already-correct value geometry; a presenting parent, a hidden host or an unusable control keeps native paint."
+              }
+            ],
             "feedback.press/one-shot": [
               {
                 "relationship": "default",
                 "owner": "slider",
-                "reason": "Slider integrates press feedback at its own parts, using the reached installed executor."
+                "reason": "The decorative thumb face owns the press scale while the native positional layer keeps its coordinate box, hit target and focus ring unscaled."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "slider",
+                "reason": "The track, the range, the thumb ring and the thumb face each own one scoped paint set; real DOM focus or invalid state settles that owner's declared paint immediately in every mode."
               }
             ]
           }
