@@ -175,7 +175,7 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
         toggle: `it('dead call',()=>{if(false) expectMotionContract('full'); expect(true).toBe(true)});`,
         checkbox: `describe.skip('skipped contract',()=>{it.each(['full','reduced','none'])('mode %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)})});`,
         "radio-group": `describe.skip('skipped contract',()=>{it.each(['full','reduced','none'])('mode %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)})});`,
-        switch: `it.each(['full','reduced'])('missing none %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)});`,
+        switch: `describe.skip('skipped contract',()=>{it.each(['full','reduced','none'])('mode %s',(mode)=>{render(<CadenceProvider mode={mode}><Button>Test</Button></CadenceProvider>);expectMotionContract(mode)})});`,
         spinner: `it.each(['full','reduced','none'])('positive %s',(mode)=>{render(<CadenceProvider mode={mode}><Spinner/></CadenceProvider>);expectMotionContract(mode)});`,
         badge: `it('T0 needs no helper',()=>{expect(true).toBe(true)});`,
         label: `it('static v2 cannot bypass the migration gate',()=>{expect(true).toBe(true)});`,
@@ -322,7 +322,22 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
       const output = result.stdout + result.stderr;
       if (process.env.CADENCE_GATE_EVIDENCE) await writeFile(path.join(fixture, "executed-reporter.log"), output);
       expect(result.status, output).toBe(1);
-      for (const id of ["switch"]) expect(output).toContain(`${id}: execute expectMotionContract`);
+      // Switch is v2: a whole skipped contract must fail every exact action,
+      // boundary and mode through the strict v2 diagnostics rather than the
+      // retired legacy adoption message.
+      for (const [binding, slot] of [
+        ["switch.root.enter", "switch"],
+        ["switch.thumb.select", "switch-thumb"],
+        ["switch.root.colour", "switch"],
+        ["switch.thumb.colour", "switch-thumb"],
+        ["switch.root.resize", "switch"],
+      ] as const)
+        for (const mode of ["full", "reduced", "none"])
+          expect(output).toContain(
+            `switch: v2 execute ${binding} on switch#Switch/${slot} with exact source/property/preset policy in ${mode}`,
+          );
+      for (const capability of ["Text colour", "Changed text", "Changed numbers"])
+        expect(output).toContain(`switch: v2 verify ${capability}/@root`);
       // Checkbox is v2: a whole skipped contract must fail every exact action,
       // boundary and mode through the strict v2 diagnostics rather than the
       // retired legacy adoption message.
