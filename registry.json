@@ -1879,20 +1879,40 @@
       "title": "Field",
       "description": "Form controls that need a label, help text, and error.",
       "categories": ["form"],
-      "dependencies": ["class-variance-authority"],
-      "registryDependencies": ["@cadence/cadence-utils", "@cadence/label", "@cadence/separator"],
+      "dependencies": ["class-variance-authority", "motion"],
+      "registryDependencies": [
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-motion",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/separator"
+      ],
       "files": [
         {
           "path": "registry/cadence/field/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/field/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.2.0",
         "tier": "T0",
         "batch": "B2",
-        "motion": [],
+        "motion": [
+          "data.transition",
+          "exit.fade",
+          { "recipe": "geometry.resize", "form": "measured" },
+          { "recipe": "state.color", "form": "css-transition" },
+          { "recipe": "text.change", "form": "changed-runs" },
+          { "recipe": "number.roll", "form": "reels" }
+        ],
         "intensity": "subtle",
         "complexity": "M",
         "upstream": {
@@ -1901,14 +1921,77 @@
           "version": "2026-10"
         },
         "motionProfile": {
-          "scope": "static",
+          "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "Field declares no Cadence recipe; native content/layout and existing CSS state feedback remain unchanged."
+          "reason": "FieldContent owns one measured helper/error block while each message row, structure entry, display run and colour owner settles independently on its own host."
         },
         "motionCoverage": {
           "schema": 1,
-          "effects": {}
+          "effects": {
+            "data.transition/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "field",
+                "reason": "Field, FieldSet, FieldGroup and each message row own one insertion opacity; a presenting ancestor consumes the nested structure entrance."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "The FieldSeparator rule keeps Separator's own insertion and orientation replacement."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "field",
+                "reason": "A message row retained by its own presence scope fades out before the caller-owned completion removes it."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "A removed rule keeps Separator's own exit instead of a second Field opacity channel."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "field",
+                "reason": "FieldContent owns the single measured message block and yields it to a focused editor, a caller clock or an unreadable destination."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "The FieldSeparator rule keeps Separator's own explicit-length interpolation on its final orientation axis."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "field",
+                "reason": "FieldLabel owns its surface and foreground together, and title, legend, description and error own their foreground; a focused editor or an invalid state settles them immediately."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "separator",
+                "reason": "The rule background belongs to the actual Separator child, never to the caption that masks it."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "field",
+                "reason": "Plain label, title, legend, description, error and caption strings replace only their changed runs on one display host."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "field",
+                "reason": "A direct quantity in those same display parts reels its changed places; rich counters and identifiers stay text."
+              }
+            ]
+          }
         }
       }
     },
