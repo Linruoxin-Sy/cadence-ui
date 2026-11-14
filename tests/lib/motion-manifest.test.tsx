@@ -211,20 +211,21 @@ describe("installed size-linked geometry forms", () => {
 });
 
 describe("disclosure motion manifest", () => {
-  it("keeps the CSS content owner separate from its mounted natural-measurement body", () => {
-    expect(cssImplementationExports(source, "geometry.resize")).toContain("AccordionContent");
-    expect(cssImplementationExports(source, "geometry.resize")).not.toContain("AccordionBody");
+  it("keeps one measured block-size owner on the panel and a separate retained paint body", () => {
+    expect(cssImplementationExports(source, "geometry.resize")).toEqual([]);
+    expect(implementedForm(source, "geometry.resize", "css-transition")).toBeNull();
+    expect(implementedForm(source, "geometry.resize", "measured")).toBe("measured");
   });
-  it("requires an explicit CSS geometry form", () => {
-    expect(implementedForm(source, "geometry.resize", "css-transition")).toBe("css-transition");
-    expect(implementedForm(source, "geometry.resize")).toBeNull();
-  });
-  it.each(["ResizeObserver", "Math.max(0,", "data-[ending-style]:h-0", "duration-0", "--motion-duration-slow"])(
-    "rejects missing %s evidence",
+  it.each(["createMeasuredGeometry(", ".register(", ".commit(", "geometry.resize/measured"])(
+    "rejects missing %s measured evidence",
     (evidence) => {
-      expect(implementedForm(source.replaceAll(evidence, "missing"), "geometry.resize", "css-transition")).toBeNull();
+      expect(implementedForm(source.replaceAll(evidence, "missing"), "geometry.resize", "measured")).toBeNull();
     },
   );
+  it("inherits the native disclosure phase from the shared clock helper", () => {
+    expect(source).toContain("disclosurePanelClasses(cm)");
+    expect(source).not.toMatch(/transition-\[height\]|data-\[ending-style\]:h-0/);
+  });
 });
 
 describe("explicit CSS policy adoption", () => {
