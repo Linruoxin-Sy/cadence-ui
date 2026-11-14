@@ -176,6 +176,7 @@ describe("current registry inventory and real part references", () => {
       "input-group",
       "toggle",
       "toggle-group",
+      "input-otp",
       "select",
       "tabs",
     ]);

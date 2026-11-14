@@ -2,15 +2,15 @@
 title: Input OTP
 description: Login codes, email verification, and device pairing.
 category: form
-motion: [state.morph]
+motion: ["data.transition",{"recipe":"state.color","form":"css-transition"},{"recipe":"text.change","form":"changed-runs"}]
 intensity: subtle
-motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"The active caret blinks in its native character slot; OTP characters are not animated counters."}
-motionCoverage: {"schema":1,"effects":{"state.morph/one-shot":[{"relationship":"default","owner":"input-otp","reason":"Input OTP integrates local state/glyph feedback at its own parts, using the reached installed executor."}]}}
+motionProfile: {"scope":"local","travel":"none","coordination":"independent","reason":"One group entrance, per-slot state paint and changed-character replacements keep the single native input and its caret untouched."}
+motionCoverage: {"schema":1,"effects":{"data.transition/one-shot":[{"relationship":"default","owner":"input-otp","reason":"Input OTP owns one opacity entrance on a later-inserted slot group; hidden, inert and unusable groups keep native paint."}],"state.color/css-transition":[{"relationship":"default","owner":"input-otp","reason":"Each slot owns its own border, background and character foreground; invalid state, DOM focus-within and unverified palettes settle that paint immediately."}],"text.change/changed-runs":[{"relationship":"default","owner":"input-otp","reason":"Only the character whose code position changed is replaced inside its fixed box; the real input keeps caret, selection, composition and paste."}]}}
 complexity: M
 tier: T1
 since: 0.3.0
 deps: ["input-otp", "lucide-react", "motion"]
-registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"]
+registryDeps: ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-text", "@cadence/cadence-utils"]
 ---
 
 ## Installation
@@ -42,10 +42,12 @@ CSS fallback; do not replace the real input with one input per slot. Its
 `nonce` prop supports the injected runtime style tag when your CSP requires
 one; review `noScriptCSSFallback` separately for your application's CSP.
 
-Full mode plays `state.morph` when a character changes, with opacity and scale;
-reduced keeps opacity at neutral scale; none shows characters immediately.
-Deleting is instant, character nodes stay mounted, and mode changes cancel an
-entry. The fake caret is static. Standalone inputs follow the system motion
+Full mode fades a later-inserted slot group once, replaces only the character whose
+position changed, and transitions each slot's own border, background and character
+colour; reduced keeps opacity-only feedback, and none shows characters and colours
+immediately. Invalid state or real DOM focus inside a slot settles that slot's paint at
+its target. The mirrored active slot is not DOM focus, so its colour stays an eligible
+transition, and the caret never blinks. Standalone inputs follow the system motion
 preference. The optional `CadenceProvider` controls mode and timing; an explicit
 nested full scope still respects system reduced motion.
 
@@ -404,24 +406,22 @@ export function StaticCode() {
 
 ## Motion contract
 
-Authored intensity is **subtle**: The active caret blinks in its native character slot; OTP characters are not animated counters.
+Authored intensity is **subtle**: One group entrance, per-slot state paint and changed-character replacements keep the single native input and its caret untouched.
 
-Recipe: `state.morph/one-shot`. A character lands in its slot with a short fade and settles
-from 0.96 to full size. Deleting a character is instant — an exit animation would
-leave a ghost in a field the user is racing against.
+The real input stays the only editor node. Cadence never mirrors, copies or re-measures
+the code, so typing, selection, composition, autofill and completion are always the
+browser's own.
 
-| Phase   | Properties                        | Token         | Interruptible |
-| ------- | --------------------------------- | ------------- | ------------- |
-| type    | `opacity 0 → 1`, `scale 0.96 → 1` | `state.morph/one-shot` | yes           |
-| delete  | none (instant)                    | –             | –             |
-| reduced | `opacity` only                    | `state.morph/one-shot` | yes           |
-| none    | no transition                     | –             | –             |
+| Recipe / form | Owner and full behaviour | reduced | none |
+| ------------- | ------------------------ | ------- | ---- |
+| `data.transition/one-shot` | One opacity entrance on a slot group inserted into an already-presented page. A hidden, inert or unusable group keeps native paint, and a group that is already on screen is never faded in. | Short opacity. | Immediate. |
+| `text.change/changed-runs` | Only the slot whose character changed replaces that character inside its fixed box, opacity only, with no per-slot stagger. Unchanged slots and caret moves do not replay, clearing a position is immediate, and an unprovable glyph copy keeps the exact native character. | Opacity only where the lane is safe. | Final character immediately. |
+| `state.color/css-transition` | Each slot's owned border, background and character foreground, all on one scoped colour clock. Invalid state or real DOM focus-within settles every declared property at its target; a palette we cannot prove does the same. The active ring is shadow geometry and stays immediate. | Short eligible colour. | Zero duration and delay. |
 
-The character span stays mounted when its value changes; updates replay the recipe on that same node. Mode changes cancel the running entry, and `none` renders filled slots immediately, including on the first render.
-
-The caret is drawn but does not blink. A blink is a continuous loop that would
-have to be declared as `data.transition`; the active slot's ring already shows
-where the next character goes, so the loop buys nothing.
+The native input owns caret, selection, paste and completion throughout. Live reduction
+finishes an eligible colour or character replacement, and `none` or a zero clock cancels
+them without touching the accepted code. Unmounting a slot clears its writer, and parent
+removal never holds the field in a retained fade.
 
 ## Keyboard interactions
 
@@ -461,13 +461,16 @@ before shrinking the slots below 32px.
 
 ## Performance
 
-One Motion element per slot, animating `opacity` and `transform` only when a
-character changes. No per-keystroke layout read: the caret position comes from the
-input, not from measurement.
+One changed-run writer per visible slot, opacity only, plus one scoped colour owner on
+the slot itself; a group owns a single insertion opacity. No per-keystroke layout read:
+the caret position comes from the input, not from measurement, and an unchanged code
+creates no new revision. Numeric source budgets remain advisory under ADR-023 and are
+not a performance pass.
 
 ## Notes for AI
 
 - `maxLength` and the slot count must agree; a mismatch silently drops characters.
 - Use `onComplete` to submit, not an effect that watches `value.length`.
-- The caret does not blink on purpose. Do not re-add a `animate-caret-blink`
-  loop without declaring the recipe.
+- The caret does not blink on purpose. Do not add a blinking caret loop without
+  declaring a continuous recipe, and keep slot colour on the slot rather than on the
+  character span.

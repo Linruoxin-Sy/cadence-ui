@@ -1,6 +1,6 @@
 # Input OTP motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated. Numerical performance governance remains deferred under ADR-023.
 
 Only slots whose code characters actually change receive a local replacement cue. Typing, paste, selection and completion remain native and immediate. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
@@ -10,10 +10,18 @@ Only slots whose code characters actually change receive a local replacement cue
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
+  "regions": {
+    "root": ["input-otp-group"],
+    "slot": ["input-otp-slot"],
+    "text": ["input-otp-slot-text"],
+    "input": ["input-otp"],
+    "separator": ["input-otp-separator"]
+  },
   "parts": {
-    "root": ["input-otp#InputOTP", "input-otp#InputOTPGroup"],
+    "root": ["input-otp#InputOTPGroup"],
     "slot": ["input-otp#InputOTPSlot"],
+    "text": ["input-otp#InputOTPSlot"],
     "input": ["input-otp#InputOTP"],
     "separator": ["input-otp#InputOTPSeparator"]
   }
@@ -24,19 +32,19 @@ Only slots whose code characters actually change receive a local replacement cue
 
 | Capability      | Application and owner                                                                                                                                                                                                                                                                                                                         | References                                                |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Appearance      | Default: the input container/group owns one entrance; `input-otp-slot` and separators inherit it.                                                                                                                                                                                                                                             | default: `input-otp.root.enter`                           |
+| Appearance      | Default: the visible slot group owns one entrance for its own insertion; the container class is caller layout, `input-otp-slot` and separators inherit the group's presentation and never replay it.                                                                                                                                          | default: `input-otp.root.enter`                           |
 | Size            | Inherited: slots have fixed boxes and caller-owned grouping. Changing code length changes semantic structure immediately; no per-slot size spring.                                                                                                                                                                                            | inherited: `@root`, `@slot`                               |
-| Surface colour  | Default: each slot owns active, invalid and disabled border/background and fixed-geometry shadow-colour feedback; focus-ring geometry remains immediate.                                                                                                                                                                                      | default: `input-otp.slot.colour`                          |
+| Surface colour  | Default: each slot owns active, invalid and disabled border and background paint. The active ring is shadow geometry whose width and offset change with the slot, so the whole ring, including its colour, stays immediate rather than tweening a growing box.                                                                                | default: `input-otp.slot.colour`                          |
 | Text colour     | Default: each displayed character inherits its slot foreground; eligible active/disabled colours use scoped transitions, while a slot with invalid state or actual DOM focus-within uses immediate paint. The decorative separator inherits surrounding foreground through its existing currentColor glyph, with no slot-state interpolation. | default: `input-otp.slot.colour`; inherited: `@separator` |
-| Changed text    | Default: the presentation inside each changed `input-otp-slot` replaces that character only; unchanged slots and focus-only moves do not replay. The real input remains native.                                                                                                                                                               | default: `input-otp.slot.change`                          |
+| Changed text    | Default: the presentation inside each changed `input-otp-slot` replaces that character only; unchanged slots and focus-only moves do not replay. The lane keeps the exact native character whenever the surrounding font cannot be reproduced. The real input remains native.                                                                 | default: `input-otp.text.change`                          |
 | Changed numbers | Not applicable: OTP digits are an identifier, not an integer. No rolling, carry, inferred direction or count-up.                                                                                                                                                                                                                              | not-applicable: `@root`                                   |
 
 ## Choreography and modes
 
 | Trigger / owner                                 | Full                                                                                                                                                                                                        | Reduced                                                         | None                         | Binding → preset → recipe/form                                                                                     |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Independent insertion / container               | One opacity entrance with existing code already rendered.                                                                                                                                                   | Short opacity.                                                  | Final state immediately.     | `input-otp.root.enter` → `presence.inline` → `data.transition/opacity`                                             |
-| Accepted edit/paste / changed slot presentation | Changed character fades out/in in its fixed box; `stagger: none`, including multi-slot paste.                                                                                                               | Short opacity only where safe.                                  | Final character immediately. | `input-otp.slot.change` → `text.replace` → `text.change/changed-runs`                                              |
+| Independent insertion / slot group              | One opacity entrance with existing code already rendered.                                                                                                                                                   | Short opacity.                                                  | Final state immediately.     | `input-otp.root.enter` → `presence.inline` → `data.transition/opacity`                                             |
+| Accepted edit/paste / changed slot presentation | Changed character fades out/in in its fixed box; `stagger: none`, including multi-slot paste. An unprovable glyph copy keeps the exact native character instead.                                            | Short opacity only where safe.                                  | Final character immediately. | `input-otp.text.change` → `text.replace` → `text.change/changed-runs`                                              |
 | Active/invalid/disabled / slot                  | A slot with invalid state or actual DOM focus-within settles all declared paint immediately; other eligible active/disabled colours transition. Ring width/offset and the focus indicator remain immediate. | Same immediate owner priority; otherwise short colour feedback. | Final colours immediately.   | `input-otp.slot.colour` → `state.color` → `state.color/surface-foreground`                                         |
 | Caret/selection / native input and active slot  | Immediate caret and selection; no authored blinking loop.                                                                                                                                                   | Same immediate behavior.                                        | Same immediate behavior.     | `input-otp.input.edit` → `engine.native` → `native/input-otp` (input-otp's native input/selection (no new recipe)) |
 
@@ -62,12 +70,6 @@ Only slots whose code characters actually change receive a local replacement cue
 
 ## Acceptance scenarios
 
-- Pending: an equal-code controlled echo during replacement, a delayed accepted paste, and native
-  reset/restoration where supported. Compare a cancelled reset and rejected edit in all modes; slots
-  never replay uncommitted characters or produce a second input/completion event. Preserve the real
-  native selection and existing upstream callback behavior.
+Required acceptance: an equal-code controlled echo during replacement; a delayed accepted paste; type, replace one middle character, backspace and paste a full code with unchanged slots still; native selection, read-only, transformed paste and composition input without rolling numeric codes; initial value hydration, parent-owned entrance, all modes, zero clock and cleanup on unmount.
 
-- Pending: type, replace one middle character, backspace and paste a full code; unchanged slots remain still and completion timing is unchanged.
-- Pending: verify native selection, read-only, transformed paste and composition input without rolling numeric codes.
-- Pending: verify initial value hydration, parent-owned entrance, all modes, zero clock, close during paste feedback and cleanup.
-- Pending: change controlled code or maxLength during composition/paste, then downgrade motion while editing; no duplicated character, stale mirror or extra completion callback is introduced. Distinguish an active-slot change from actual DOM focus on the paint owner; marking a slot invalid cancels its whole colour transition, not only its ring.
+The executed suite covers the declared group entrance, the changed-character replacement and the slot colour owner in full/reduced/none with a zero clock, the shared colour policy on the real slots, and the native input/separator/size/identifier boundaries. The site's own typographic font features make the glyph copy unprovable there, so the browser run observes the exact immediate character on that host while a consumer page with normal font features keeps the eligible fade. Also pending browser verification: typing and pasting while a replacement is in flight, an accepted echo that repeats the same code, native reset/restore, and a downgrade to reduced/none during an active replacement; the real input must keep one accessible value, native selection and exactly one completion callback throughout.

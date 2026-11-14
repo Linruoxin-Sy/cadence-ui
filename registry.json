@@ -3016,19 +3016,33 @@
       "description": "Login codes, email verification, and device pairing.",
       "categories": ["form"],
       "dependencies": ["input-otp", "lucide-react", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-text",
+        "@cadence/cadence-utils"
+      ],
       "files": [
         {
           "path": "registry/cadence/input-otp/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/input-otp/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
         "since": "0.3.0",
         "tier": "T1",
         "batch": "B3",
-        "motion": ["state.morph"],
+        "motion": [
+          "data.transition",
+          { "recipe": "state.color", "form": "css-transition" },
+          { "recipe": "text.change", "form": "changed-runs" }
+        ],
         "intensity": "subtle",
         "complexity": "M",
         "upstream": {
@@ -3040,16 +3054,30 @@
           "scope": "local",
           "travel": "none",
           "coordination": "independent",
-          "reason": "The active caret blinks in its native character slot; OTP characters are not animated counters."
+          "reason": "One group entrance, per-slot state paint and changed-character replacements keep the single native input and its caret untouched."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "state.morph/one-shot": [
+            "data.transition/one-shot": [
               {
                 "relationship": "default",
                 "owner": "input-otp",
-                "reason": "Input OTP integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "Input OTP owns one opacity entrance on a later-inserted slot group; hidden, inert and unusable groups keep native paint."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "input-otp",
+                "reason": "Each slot owns its own border, background and character foreground; invalid state, DOM focus-within and unverified palettes settle that paint immediately."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "input-otp",
+                "reason": "Only the character whose code position changed is replaced inside its fixed box; the real input keeps caret, selection, composition and paste."
               }
             ]
           }
