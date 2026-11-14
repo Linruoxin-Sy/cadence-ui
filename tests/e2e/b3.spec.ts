@@ -120,7 +120,7 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
                 (window as unknown as { initial: { animations: number }[] }).initial.every((s) => s.animations === 0),
             ),
           ).toBe(true);
-          const expectedPart = id === "input-otp" ? "otp-character" : parts[id][1];
+          const expectedPart = id === "input-otp" ? "input-otp-slot-text" : parts[id][1];
           expect(
             await page.evaluate(
               (slot) => (window as unknown as { initial: { slot: string }[] }).initial.some((s) => s.slot === slot),
@@ -166,10 +166,17 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             contentType: "application/json",
           });
           expect(samples.length).toBeGreaterThan(4);
-          if (["checkbox", "radio-group", "input-otp"].includes(id)) {
+          if (["checkbox", "radio-group"].includes(id)) {
             if (actual === "full") expect(samples.some((s) => s.scale < 0.999)).toBe(true);
             else expect(samples.every((s) => s.scale === 1)).toBe(true);
             if (actual !== "none") expect(samples.some((s) => s.opacity > 0 && s.opacity < 1)).toBe(true);
+          }
+          if (id === "input-otp") {
+            // v2 changed text owns the slot's own character lane: opacity only, inside a
+            // fixed box, so the character never scales or travels. The exact character is
+            // already committed when the text engine cannot prove its glyph copy.
+            expect(samples.every((s) => s.scale === 1)).toBe(true);
+            await expect(p.locator('[data-slot="input-otp-slot"]')).toHaveText(["7", "", "", "", "", ""]);
           }
           if (id === "switch") {
             expect(samples.at(-1)?.x).toBeGreaterThan(5);
@@ -239,11 +246,15 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
           await record(page, selector);
           await act(page, id, true);
           const restored = await frames(page);
-          if (reducedMotion === "no-preference") {
+          if (reducedMotion === "no-preference" && id !== "input-otp") {
             const values = restored.map((s) =>
-              id === "switch" ? s.x : ["checkbox", "radio-group", "input-otp"].includes(id) ? s.opacity : s.scale,
+              id === "switch" ? s.x : ["checkbox", "radio-group"].includes(id) ? s.opacity : s.scale,
             );
             expect(new Set(values.map((v) => v.toFixed(4))).size).toBeGreaterThan(2);
+          }
+          if (id === "input-otp") {
+            // The restored control writes the accepted character; its lane never scales.
+            await expect(p.locator('[data-slot="input-otp-slot"]')).toHaveText(["7", "", "", "", "", ""]);
           }
           if (["slider", "toggle", "toggle-group"].includes(id)) await page.mouse.up();
           if (["toggle", "toggle-group", "input-otp", "progress"].includes(id)) {
@@ -265,14 +276,14 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
             const samples = await frames(page);
             if (id === "toggle" || id === "toggle-group") await page.mouse.up();
             expect(samples.length).toBeGreaterThan(4);
-            if (reducedMotion === "no-preference")
-              expect(
-                new Set(samples.map((s) => (id === "input-otp" ? s.opacity : s.scale).toFixed(4))).size,
-              ).toBeGreaterThan(2);
-            else if (id === "input-otp") {
+            if (id === "input-otp") {
+              // An explicit nested full scope keeps the same character lane: no scale,
+              // and the accepted character is committed on this very node.
               expect(samples.every((s) => s.scale === 1)).toBe(true);
-              expect(samples.some((s) => s.opacity > 0 && s.opacity < 1)).toBe(true);
-            } else expect(new Set(samples.map((s) => s.scale.toFixed(4))).size).toBeLessThanOrEqual(2);
+              await expect(scope.locator('[data-slot="input-otp-slot"]')).toHaveText(["7"]);
+            } else if (reducedMotion === "no-preference")
+              expect(new Set(samples.map((s) => s.scale.toFixed(4))).size).toBeGreaterThan(2);
+            else expect(new Set(samples.map((s) => s.scale.toFixed(4))).size).toBeLessThanOrEqual(2);
             expect(await part.evaluate((n, saved) => n === saved, saved)).toBe(true);
             expect(
               await staticScope.evaluate((n) => n.querySelector("[data-motion]")?.getAttribute("data-motion")),
