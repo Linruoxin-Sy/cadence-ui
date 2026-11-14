@@ -28568,6 +28568,10 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -28590,13 +28594,34 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | accordion | `@components/cadence/accordion/index.tsx` | [JSON files[].content](https://cadence.dev/r/accordion.json) |
+| accordion | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/accordion.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
 
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: accordion](https://cadence.dev/r/accordion.json)
 
@@ -28753,19 +28778,19 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, keeping `accordion/index.tsx` and the shared
+Copy all thirty-one target files, keeping `accordion/index.tsx` and the shared
 `lib/` directory in the same `cadence/` tree. Preserve relative imports and
 the sources' `"use client"` directives. Copy every file in the motion,
-utilities and provider payloads, including helpers not imported by Accordion
-directly. The provider files and `motion` package are required imports even
-without the optional `CadenceProvider` wrapper.
+utilities, provider, geometry, text and number payloads, including helpers not
+imported by Accordion directly. The provider files and `motion` package are
+required imports even without the optional `CadenceProvider` wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the
 copied files. Include the Cadence duration and easing tokens used by the
 disclosure classes. No additional item-specific CSS or external asset is
-required. Keep the inner measurement wrapper: full mode transitions the
-nonnegative measured panel height, while reduced and none update it
-immediately. Initially open server-rendered content retains its natural height.
+required. Base UI owns the panel's open/close endpoint phase; once the panel is
+open the shared measured owner follows a direct plain-string content revision.
+Initially open server-rendered content retains its natural height.
 Standalone components follow the system preference; use `CadenceProvider`
 to choose a product mode or override an inherited scope.
 
@@ -29051,7 +29076,7 @@ export function WithoutMotionExample() {
 ### `AccordionTrigger`
 
 All Base UI Trigger props pass through, including `render`, `ref`, and `nativeButton`. A heading wraps
-the trigger. Two decorative icons swap immediately with `aria-expanded`; no rotation is animated.
+the trigger. Two decorative icons crossfade in place as `aria-expanded` changes; no rotation is animated.
 
 ### `AccordionContent`
 
@@ -29061,18 +29086,25 @@ Root and Item classes merge last.
 
 ## Motion contract
 
-Authored intensity is **medium**: The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes.
+Authored intensity is **medium**: Each disclosure panel owns one measured block size, its retained content paint and an in-place glyph indicator; trigger and item paint stay local to their own region.
 
-| Phase | Properties | Token | Interruptible |
+| Phase | Animated properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| Open / close / content resize | Measured height clamped at zero | `geometry.resize/css-transition` CSS form: `duration.slow` / `ease.out` | Yes, native CSS reversal from current height |
-| Initially open | Natural height, no entrance | — | — |
-| Reduced | Instant height, no transform | Zero duration | Yes |
-| None | Instant height, no transform or transition | Zero duration | Yes |
+| Open / close / content resize | Measured block size clamped at zero; the primitive owns the open/close endpoint pair | `geometry.resize/measured` (`spring.morph`) | Yes, native reversal from the current size |
+| Open / close; retained inner content paint | Opacity on the inner body only | `data.transition/one-shot` / `exit.fade/one-shot` | Yes, re-entry reverses the current paint |
+| Expanded state | Two existing glyphs crossfade in place; no rotation, scale or path morph | `state.morph/one-shot` | Yes, the latest expanded state wins |
+| Trigger focus/hover/disabled paint | Scoped foreground and border colour; focus and an unprovable palette are immediate | `state.color/css-transition` | Yes, latest committed colour |
+| Item border paint | Scoped border colour on the item only | `state.color/css-transition` | Yes, latest committed colour |
+| Plain trigger/content text | Changed graphemes only, no stagger | `text.change/changed-runs` | Yes, the newest diff replaces the old target |
+| Direct numeric trigger/content quantity | Changed place values only | `number.roll/reels` | Yes, retargets the current reel |
+| Later item insertion | One opacity envelope on that item | `data.transition/one-shot` | Yes, a presenting parent suppresses it |
+| Initially open / reduced / none | Natural height and final paint, no entrance | `data.transition/one-shot` | Yes |
 
-The CSS form preserves position on interruption rather than spring velocity. Base UI owns panel
-mounting, hidden state, keyboard navigation, and find-in-page behavior. An inner ResizeObserver
-retargets changes in content without observing the animated panel itself. The closed size is zero.
+Base UI owns panel mounting, hidden state, the native disclosure endpoint pair, keyboard navigation, and
+find-in-page behavior. The panel keeps one block-size owner: its native phase runs while the primitive opens or
+closes, and the shared measured owner follows a direct plain-string content revision only while the panel is open
+and idle. Reduced and none resolve the primitive's clock to zero, so a closing body commits immediately instead of
+holding empty space. Rich caller children keep their native text identity.
 
 ## Accessibility
 
@@ -29097,8 +29129,9 @@ remeasured when wrapping changes; there is no fixed maximum height or breakpoint
 
 ## Performance
 
-T3 budget: 12 KB gzip. One observer per mounted content slot; closed panels unmount by default.
-Measurements run after commit and on content resize, never during render. No timers drive motion.
+T3 source ceiling: 12 KB gzip, an advisory reference under ADR-023 rather than a functional gate. One geometry
+owner and one presence owner per mounted panel; closed panels unmount by default. Measurements run after commit
+and on a direct plain-string content revision, never during render. No timers drive motion.
 Server-rendered initially open content keeps its natural size before hydration.
 
 ## Notes for AI
