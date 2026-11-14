@@ -358,7 +358,27 @@ it("combobox preserves typed callbacks, render, refs, events, controlled updates
   expect(node.tagName).toBe("SECTION");
   expect(node).toHaveClass("callback", "p-8", "shadow-none");
   expect(node.style.opacity).toBe("0.9");
-  expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0.32s");
+  // The popup entrance/ending is the shared JS executor; the local provider clock and
+  // caller opacity/style still decide its effective timing and resting paint.
+  const expectNativeClock = (mode: "full" | "reduced" | "none") => {
+    const policy = parameterCalls
+      .filter((call) => call.form === "popup.anchored/presence" && call.origin?.exports.includes("ComboboxContent"))
+      .at(-1);
+    expect(policy?.mode).toBe(mode);
+    const parameters = policy?.result as {
+      kind: string;
+      opacity: { duration: number };
+      spatial: { duration?: number };
+    };
+    expect(parameters.kind).toBe("visual");
+    expect(parameters.opacity.duration).toBeCloseTo(
+      mode === "none" ? 0 : duration.base * 2 * (mode === "reduced" ? reducedDurationScale : 1),
+    );
+    if (mode !== "full") expect(parameters.spatial.duration).toBe(0);
+    expect(node.style.getPropertyValue("--cadence-time-scale")).toBe("2");
+    expect(node.style.opacity).toBe("0.9");
+  };
+  expectNativeClock("full");
   expect(node.querySelector(".item-callback")).toBeInTheDocument();
   fireEvent.keyDown(node, { key: "a" });
   expect(key).toHaveBeenCalledWith("keydown");
@@ -366,12 +386,8 @@ it("combobox preserves typed callbacks, render, refs, events, controlled updates
     view.rerender(example(mode));
     expect(document.querySelector('[data-slot="combobox-content"]')).toBe(node);
     expect(node).toHaveAttribute("data-motion", mode);
-    if (mode === "none") {
-      expect(node.className).toContain("transition-none");
-      expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
-      expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
-    }
-    if (mode === "reduced") expect(node.className).toContain("transition-opacity");
+    expectNativeClock(mode);
+    if (mode === "none") expect(node.style.transitionDuration).toBe("0s");
   }
   view.rerender(example("none", false));
   view.unmount();

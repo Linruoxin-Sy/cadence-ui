@@ -310,10 +310,19 @@ export async function motionV2Plan(root, registry, contracts, adoption) {
               exported,
             ))
               if (region.includes(slot)) overrides.add(slot);
-        if (overrides.size)
-          hosts = hosts
-            .filter((host) => host.file === file)
-            .flatMap((host) => [...overrides].map((slot) => ({ ...host, authoredSlot: host.slot, slot })));
+        if (overrides.size) {
+          // A composition specializes the one element it renders for that export, not
+          // every internal host the dependency's own export declares. Map each selected
+          // dependency root (its first authored host) and leave sibling hosts untouched.
+          const roots = new Map();
+          for (const host of hosts.filter((candidate) => candidate.file === file)) {
+            const current = roots.get(host.selected);
+            if (!current || host.offset < current.offset) roots.set(host.selected, host);
+          }
+          hosts = [...roots.values()].flatMap((host) =>
+            [...overrides].map((slot) => ({ ...host, authoredSlot: host.slot, slot })),
+          );
+        }
       }
       if (region) hosts = hosts.filter((host) => region.includes(host.slot));
       if (["text.change/changed-runs", "number.roll/reels"].includes(binding.targetForm))

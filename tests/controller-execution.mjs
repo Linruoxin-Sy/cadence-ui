@@ -154,15 +154,17 @@ export function observeCopiedController(controller, kind, args, source) {
   const origin = currentExecution();
   controllerOrigins.set(controller, origin);
   controllerSources.set(controller, source);
-  if (kind === "createSelectPopup" || kind === "createCapturedHandoff") {
+  if (kind === "createSelectPopup" || kind === "createComboboxPopup" || kind === "createCapturedHandoff") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);
     controller.commit = (...input) => {
       const offset = parameterCalls.length;
       const result = withController(controller, () => commit(...input));
-      const popup = kind === "createSelectPopup",
+      const popup = kind !== "createCapturedHandoff",
         options = input[0];
-      const form = popup ? (options.open ? "popup.anchored/presence" : "exit.fade/opacity") : "handoff/value";
+      const anchored = kind === "createComboboxPopup";
+      const exitForm = anchored ? "popup.anchored/ending" : "exit.fade/opacity";
+      const form = popup ? (options.open ? "popup.anchored/presence" : exitForm) : "handoff/value";
       const policy = popup
         ? parameterCalls.slice(offset).find((call) => call.form === form)
         : parameterSamples.get(options.transition);
@@ -171,9 +173,9 @@ export function observeCopiedController(controller, kind, args, source) {
         node: popup ? args[0] : options.destination,
         origin: popup ? origin : (policy?.origin ?? currentExecution()),
         form,
-        supportedForms: popup ? ["popup.anchored/presence", "exit.fade/opacity"] : undefined,
+        supportedForms: popup ? ["popup.anchored/presence", exitForm] : undefined,
         mode: popup ? options.cm.mode : options.destination.dataset.motion,
-        properties: popup ? (options.open ? ["opacity", "transform"] : ["opacity"]) : ["transform"],
+        properties: popup ? (options.open || anchored ? ["opacity", "transform"] : ["opacity"]) : ["transform"],
         preset: policy?.preset,
         zeroClock: parameterClockIsZero(popup ? policy?.result : options.transition),
         target: popup ? options.open : options.revision.target,

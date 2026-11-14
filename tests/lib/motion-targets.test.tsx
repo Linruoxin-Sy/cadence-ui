@@ -182,6 +182,7 @@ describe("current registry inventory and real part references", () => {
       "toggle-group",
       "input-otp",
       "select",
+      "combobox",
       "tabs",
     ]);
     expect([...result.contracts.values()].every((contract) => ["legacy", "v2"].includes(contract.migration))).toBe(
