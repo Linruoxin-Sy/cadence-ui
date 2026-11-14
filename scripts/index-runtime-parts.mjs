@@ -52,7 +52,12 @@ const parts = {
     "switch-thumb | CSS colour policy | state.color",
     "switch root | measured geometry | geometry.resize",
   ],
-  slider: ["slider-thumb ControlDiv | Base dragging + Motion committed controls | feedback.press"],
+  slider: [
+    "slider root entrance | WAAPI opacity | data.transition",
+    "slider-thumb-face ControlSpan press target | Motion controls | feedback.press",
+    "slider-track / slider-range / slider-thumb ring / slider-thumb-face | CSS colour policy | state.color",
+    "slider thumb/range geometry | Base UI direct manipulation and measurement | primitive-owned",
+  ],
   toggle: ["toggle PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press"],
   "toggle-group": [
     "toggle-group-item PressButton | native pointer/Enter lifecycle + Motion committed controls | feedback.press",
