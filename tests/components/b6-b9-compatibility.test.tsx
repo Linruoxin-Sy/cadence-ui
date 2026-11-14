@@ -72,7 +72,7 @@ describe("B6/B7 inherited compatibility", () => {
       );
       const view = render(tree(true, oldRef));
       const panel = screen.getByRole("region");
-      const body = screen.getByText("Answer");
+      const body = view.container.querySelector('[data-slot="accordion-content-inner"]') as HTMLElement;
       expect(body).toHaveClass("pb-8", "body-open");
       expect(body).not.toHaveClass("pb-4");
       expect(panel).toHaveStyle({ color: "rgb(255, 0, 0)" });
@@ -88,7 +88,7 @@ describe("B6/B7 inherited compatibility", () => {
       expect(events).toEqual(["capture", "bubble"]);
       view.rerender(tree(false, newRef));
       expect(view.container.querySelector('[data-slot="accordion-content"]')).toBe(panel);
-      expect(screen.getByText("Answer")).toBe(body);
+      expect(view.container.querySelector('[data-slot="accordion-content-inner"]')).toBe(body);
       expect(body).toHaveClass("body-closed");
       expect(panel).toHaveStyle({ color: "rgb(0, 0, 255)" });
       expect(oldCleanup).toHaveBeenCalledOnce();

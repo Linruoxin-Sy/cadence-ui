@@ -4376,12 +4376,24 @@
       "description": "Reveal related sections while keeping their headings easy to scan.",
       "categories": ["layout"],
       "dependencies": ["@base-ui/react", "motion", "lucide-react"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-utils", "@cadence/cadence-provider"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number"
+      ],
       "files": [
         {
           "path": "registry/cadence/accordion/index.tsx",
           "type": "registry:ui",
           "target": "@components/cadence/accordion/index.tsx"
+        },
+        {
+          "path": "registry/cadence/lib/inline-entrance.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/inline-entrance.ts"
         }
       ],
       "meta": {
@@ -4390,8 +4402,32 @@
         "batch": "B6",
         "motion": [
           {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
             "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -4405,16 +4441,58 @@
           "scope": "surface",
           "travel": "extended",
           "coordination": "independent",
-          "reason": "The disclosure panel changes height for open and close; it does not yet animate arbitrary content resizes."
+          "reason": "Each disclosure panel owns one measured block size, its retained content paint and an in-place glyph indicator; trigger and item paint stay local to their own region."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "geometry.resize/css-transition": [
+            "data.transition/one-shot": [
               {
                 "relationship": "default",
                 "owner": "accordion",
-                "reason": "Accordion integrates owned size transitions at its own parts, using the reached installed executor."
+                "reason": "Accordion integrates one opacity entrance at its retained content paint and at each later-inserted item host."
+              }
+            ],
+            "exit.fade/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "Accordion retains the closing content body while Base UI still owns the panel and fades its own paint."
+              }
+            ],
+            "state.morph/one-shot": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "The trigger crossfades its two existing glyphs in place through the shared indicator control."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "The panel owns one measured block-size transaction over its natural inner body while open and idle."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "Trigger surface/foreground and item border paint transition under one focus-aware colour owner each."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "Directly owned plain trigger and content strings replace only their changed graphemes."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "accordion",
+                "reason": "A supported direct numeric trigger or content quantity rolls only its changed places."
               }
             ]
           }
