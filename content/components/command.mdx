@@ -2,10 +2,10 @@
 title: Command
 description: Search and run actions from a keyboard-driven command palette.
 category: navigation
-motion: [{"recipe":"popup.anchored","form":"css-transition"},{"recipe":"exit.fade","form":"css-transition"}]
+motion: [{"recipe":"enter.pop","form":"one-shot"},{"recipe":"exit.fade","form":"one-shot"}]
 intensity: medium
 motionProfile: {"scope":"surface","travel":"compact","coordination":"independent","reason":"Command opens and closes its existing popup surface; content and native focus retain their current owners."}
-motionCoverage: {"schema":1,"effects":{"popup.anchored/css-transition":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts dialog for popup opening; that installed component remains the integration owner."}],"exit.fade/css-transition":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts dialog for popup closing; that installed component remains the integration owner."}]}}
+motionCoverage: {"schema":1,"effects":{"enter.pop/one-shot":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts DialogContent for its palette entrance; the migrated Dialog panel and backdrop remain the actual presence owners."}],"exit.fade/one-shot":[{"relationship":"inherited","owner":"dialog","reason":"Command mounts DialogContent for its palette exit; the migrated Dialog keeps that opacity owner and the native completion."},{"relationship":"inherited","owner":"input-group","reason":"A retained composed InputGroupAddon keeps its own insertion/exit opacity inside CommandInput rather than receiving a second palette writer."}]}}
 complexity: M
 tier: T2
 since: 0.3.0
@@ -795,11 +795,11 @@ Authored intensity is **medium**: Command opens and closes its existing popup su
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored/css-transition` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
-| close | dialog and backdrop fade out, panel scales back in full mode | `exit.fade/css-transition` via Dialog | yes |
+| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `enter.pop/one-shot` via Dialog · `duration.base` / `duration.fast` | yes, from the current paint |
+| close | dialog and backdrop fade out only, no scale-out | `exit.fade/one-shot` via Dialog · `duration.fast` | yes (reopen mid-exit) |
 | filter / highlight | instant replacement and background feedback, no row motion | none | n/a |
-| reduced | opacity only; scale classes absent | mode durations | yes |
-| none | dialog and backdrop durations resolve to zero | zero duration | n/a |
+| reduced | opacity only; the scale envelope is absent | mode durations | yes |
+| none | dialog and backdrop targets settle immediately and the writer is cancelled | zero duration | n/a |
 
 The inline command has no animation. `CommandDialog` inherits Dialog's recipes and mode branches;
 it adds no transition of its own. Fixed centering translation is layout, not motion.

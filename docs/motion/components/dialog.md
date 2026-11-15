@@ -1,8 +1,11 @@
 # Dialog motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
-The modal surface arrives as one readable unit, then accommodates intentional content changes without moving focus or bouncing the reading plane. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
+The modal surface arrives as one readable unit, then accommodates intentional content changes without moving focus or
+bouncing the reading plane. This contract inherits the [common contract](../README.md) and
+[presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
 
 ## Contract references
 
@@ -10,83 +13,108 @@ The modal surface arrives as one readable unit, then accommodates intentional co
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "content": ["dialog#DialogContent"],
     "overlay": ["dialog#DialogOverlay"],
+    "surface": ["dialog#DialogContent"],
+    "foreground": ["dialog#DialogTitle", "dialog#DialogDescription"],
     "title": ["dialog#DialogTitle"],
+    "title-shell": ["dialog#DialogTitle"],
     "description": ["dialog#DialogDescription"],
-    "surface": ["dialog#DialogContent", "dialog#DialogOverlay", "dialog#DialogTitle", "dialog#DialogDescription"],
+    "description-shell": ["dialog#DialogDescription"],
     "quantity": ["dialog#DialogTitle", "dialog#DialogDescription"],
     "body": ["dialog#DialogContent"],
-    "built-in-close": ["dialog#DialogContent", "dialog#DialogFooter", "button#Button"]
-  }
+    "built-in-close": ["dialog#DialogContent", "dialog#DialogFooter"]
+  },
+  "regions": {
+    "content": ["dialog-content"],
+    "overlay": ["dialog-overlay"],
+    "surface": ["dialog-content"],
+    "foreground": ["dialog-title", "dialog-description"],
+    "title": ["dialog-title-text"],
+    "title-shell": ["dialog-title"],
+    "description": ["dialog-description-text"],
+    "description-shell": ["dialog-description"],
+    "quantity": ["dialog-title-number", "dialog-description-number"],
+    "body": ["dialog-content"],
+    "built-in-close": ["dialog-close"]
+  },
+  "axes": { "content": ["height"] }
 }
 ```
 
 ## Capability ownership
 
-| Capability      | Application and owner                                                                                                                                                                                                                                                                                              | References                                                                                                                                  |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Appearance      | Default: `dialog-content` owns panel presence and `dialog-overlay` owns backdrop opacity. Header, footer and initial children inherit that entrance.                                                                                                                                                               | default: `dialog.content.enter`, `dialog.content.exit`, `dialog.overlay.enter`, `dialog.overlay.exit`; inherited: `@built-in-close`         |
-| Size            | Default: content shell owns content-driven width/height within existing viewport/max-width constraints; its natural-content measurement is separate. Built-in close controls retain Button geometry.                                                                                                               | default: `dialog.content.resize`; inherited: `@built-in-close`                                                                              |
-| Surface colour  | Default: content/overlay own their supplied background/border tokens; child buttons retain their own state owners. Built-in close controls retain Button paint.                                                                                                                                                    | default: `dialog.surface.colour`; inherited: `@built-in-close`                                                                              |
-| Text colour     | Default: `dialog-title` and `dialog-description` own foreground changes; arbitrary body children inherit or retain component ownership. Built-in close controls retain Button foreground.                                                                                                                          | default: `dialog.surface.colour`; inherited: `@built-in-close`                                                                              |
-| Changed text    | Default for primitive title/description content: changed runs only. Rich body/title children use composed ownership. Built-in close captions/icons are fixed.                                                                                                                                                      | default: `dialog.title.change`, `dialog.description.change`; composed: `@title`, `@description`, `@body`; not-applicable: `@built-in-close` |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. Built-in close controls have no quantity. | default: `dialog.quantity.change`; composed: `@title`, `@description`, `@body`; not-applicable: `@built-in-close`                           |
+| Capability      | Application and owner                                                                                                                                                                                                                                                    | References                                                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `dialog-content` owns panel presence and `dialog-overlay` owns backdrop opacity, each as its own physical writer. Header, footer and initial children inherit that entrance.                                                                                    | default: `dialog.content.enter`, `dialog.content.exit`, `dialog.overlay.enter`, `dialog.overlay.exit`                                                   |
+| Size            | Default: the content shell owns a measured block-size revision over its natural content within the existing viewport and `max-width` constraints. Its inline size is caller/viewport-owned (`w-full`), so only the block axis is measured.                               | default: `dialog.content.resize`; not-applicable: `@built-in-close`                                                                                     |
+| Surface colour  | Default: content and overlay own their supplied background, border and scoped shadow paint. The built-in close controls are native buttons styled by Button's variant classes; they carry no separate Cadence owner here.                                                | default: `dialog.surface.colour`, `dialog.overlay.colour`; not-applicable: `@built-in-close`                                                            |
+| Text colour     | Default: `dialog-title` and `dialog-description` own foreground changes; arbitrary body children inherit or retain component ownership. The built-in close controls keep their static native paint.                                                                      | default: `dialog.foreground.colour`; not-applicable: `@built-in-close`                                                                                  |
+| Changed text    | Default for primitive title/description content: changed runs only, no stagger. Rich body/title children use composed ownership.                                                                                                                                         | default: `dialog.title.change`, `dialog.description.change`; composed: `@title-shell`, `@description-shell`, `@body`; not-applicable: `@built-in-close` |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. | default: `dialog.quantity.change`; composed: `@title-shell`, `@description-shell`, `@body`; not-applicable: `@built-in-close`                           |
 
 ## Choreography and modes
 
-| Trigger / owner                                                | Full                                                                                                                                                                           | Reduced                                                                        | None                                                    | Binding → preset → recipe/form                                                                                                                 |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Open / content                                                 | Opacity with `scale.in`; final centered placement is stable. Entry is subject to the actual-focus gate below.                                                                  | Short opacity only. Entry obeys the same focus gate.                           | Open target immediately.                                | `dialog.content.enter` → `presence.surface` → `enter.pop/surface`                                                                              |
-| Close / content                                                | Opacity exit only; no delayed child exits.                                                                                                                                     | Short opacity only.                                                            | Closed target immediately.                              | `dialog.content.exit` → `presence.exit` → `exit.fade/opacity`                                                                                  |
-| Open/close / overlay                                           | Opacity follows the same open transaction, with its own property owner.                                                                                                        | Short opacity.                                                                 | Target opacity immediately.                             | `dialog.overlay.enter` → `presence.surface` → `enter.pop/opacity`; `dialog.overlay.exit` → `presence.exit` → `exit.fade/opacity`               |
-| Intentional body/size change / content shell                   | Measure the final target and animate clamped width/height without bounce.                                                                                                      | Final geometry immediately.                                                    | Final geometry immediately.                             | `dialog.content.resize` → `geometry.panel` → `geometry.resize/measured`                                                                        |
-| Plain title/description update / respective text owner         | Stable-grapheme replacement, `stagger: none`; initial text inherits panel entrance.                                                                                            | Changed-run opacity only.                                                      | Final text immediately.                                 | `dialog.title.change` → `text.replace` → `text.change/changed-runs`; `dialog.description.change` → `text.replace` → `text.change/changed-runs` |
-| Supplied colour token change / relevant parts                  | Scoped surface/border/foreground transition. Colour eligibility and immediate-owner priority follow the rule below.                                                            | Short colour feedback. Colour obeys the same owner priority.                   | Final colours immediately.                              | `dialog.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                     |
-| Direct numeric Title/Description revision / owned display slot | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                                                                              | Final number immediately.                                                      | Final number immediately.                               | `dialog.quantity.change` → `number.compact` → `number.roll/reels`                                                                              |
-| Press/release / inherited Button feedback layer                | Inherit Button press on its safe visual layer; omit scale when that layer is unavailable. Native activation and existing close semantics remain immediate; no second executor. | No scale; colour follows the same Button owner and its focus/invalid priority. | Native activation/close immediately, without animation. | `dialog.built-in-close.press` → `feedback.press` → `feedback.press/scale` (inherited Button owner)                                             |
+| Trigger / owner                                                | Full                                                                                                                                                                                | Reduced                                                                                      | None                                                                         | Binding → preset → recipe/form                                                                                                                                                                          |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open / panel and backdrop                                      | Panel opacity with a bounded `scale.in` envelope; backdrop opacity follows the same open transaction with its own property owner. Entry is subject to the actual-focus gate below.  | Panel and backdrop opacity only; the panel drops the scale. Entry obeys the same focus gate. | Open target immediately, with no authored animation.                         | `dialog.content.enter` → `presence.surface` → `enter.pop/surface`; `dialog.overlay.enter` → `presence.surface` → `enter.pop/opacity`                                                                    |
+| Close / panel and backdrop                                     | Opacity exit only on each owned region; no delayed child exits and no scale-out.                                                                                                    | Short opacity exit.                                                                          | Closed target immediately; a retained native close hides on the first frame. | `dialog.content.exit` → `presence.exit` → `exit.fade/opacity`; `dialog.overlay.exit` → `presence.exit` → `exit.fade/opacity`                                                                            |
+| Intentional body/size change / content shell                   | Measure the final natural block size after the shell releases its own writer, then animate a clamped height without bounce; the width stays laid out at its destination.            | Final block geometry immediately.                                                            | Final geometry immediately.                                                  | `dialog.content.resize` → `geometry.panel` → `geometry.resize/measured`                                                                                                                                 |
+| Plain title/description update / respective text owner         | Stable-grapheme replacement, `stagger: none`; initial text inherits the panel entrance.                                                                                             | Changed-run opacity only.                                                                    | Final text immediately.                                                      | `dialog.title.change` → `text.replace` → `text.change/changed-runs`; `dialog.description.change` → `text.replace` → `text.change/changed-runs`                                                          |
+| Supplied colour token change / relevant parts                  | Scoped surface paint on the content and overlay, and foreground paint on the title/description. Focus-within or that region's invalid state settles its declared paint immediately. | Short colour feedback under the same owner priority.                                         | Final colours immediately.                                                   | `dialog.surface.colour` → `state.color` → `state.color/surface`; `dialog.overlay.colour` → `state.color` → `state.color/surface`; `dialog.foreground.colour` → `state.color` → `state.color/foreground` |
+| Direct numeric Title/Description revision / owned display slot | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                                                                                   | Final number immediately.                                                                    | Final number immediately.                                                    | `dialog.quantity.change` → `number.compact` → `number.roll/reels`                                                                                                                                       |
 
-`surface.colour` addresses separate content, overlay and title/description regions. Actual DOM focus/focus-within or a region's own invalid state cancels its colour clock and settles all its declared paint immediately; independent backdrop/text regions retain their own clocks. Other colour interpolation requires a verified readable palette. This does not cancel disjoint presence, text or geometry owners.
-
-`built-in-close` covers only the actual [Button](button.md) rendered by DialogContent's close affordance and DialogFooter's optional close action. Those controls inherit Button paint, fixed geometry and safe press feedback once; local surface/title/description controllers exclude them. Initial controls share panel presence; a later `showCloseButton` membership change uses the surviving Button presence owner, without delaying native close. Their fixed Close caption/accessibility text and glyph do not gain text replacement or numeric reels. Same-cause panel/control layout supplies one committed destination or delegates geometry, with no duplicate size writer. The exported bare DialogClose remains a pass-through composition: it acquires Button behavior only when its actual caller render uses Button.
+The content and overlay controllers are separate instances, so opacity and the optional scale envelope never share a
+writer and no two engines claim the same property. The built-in close controls in `DialogContent` and
+`DialogFooter` are native buttons that reuse Button's variant classes; native activation, focus and the closing
+transition stay theirs, so the dialog installs no second Button presence, press, paint or display owner on them. The
+exported bare `DialogClose` remains a pass-through composition and acquires Button behavior only when its actual
+caller render uses Button.
 
 ## Interruption and lifecycle
 
-Preserve Base UI's actual initial-focus timing and target. Its ordinary default focuses a tabbable child or the popup itself; if that target would still be faded or displaced by the content entrance, settle that content envelope before presenting focus. Consequently a default open can legitimately skip panel entry while the separately owned backdrop still fades. Never delay/disable autofocus to guarantee a scale animation. A caller's existing focus policy may leave the surface eligible for entry until a real focus/pointer activation reaches it.
+Preserve Base UI's actual initial-focus timing and target. Its ordinary default focuses a tabbable child or the popup
+itself; when that focus lands inside an entering panel, the panel settles its opacity and scale envelope immediately
+while the separately owned backdrop may finish its own fade. Never delay or disable autofocus to guarantee a scale
+animation. A caller's existing focus policy may leave the surface eligible for entry until a real focus, pointer or
+key activation reaches it.
 
-- Base UI owns open state, modal behavior, focus trapping, dismissal and return focus. Semantic state and input never wait for panel, title or geometry completion.
-- Rapid close/reopen reverses the same presence boundary from its current visual state. A content update during close commits semantic content but does not start a second entrance or resize.
-- Closing cancels local text/numeric/geometry work; the exit owner alone retains visual presence until Base UI permits removal. No duplicate interactive or accessible subtree.
-- Live reduced cancels scale/layout; none and zero clock complete the semantic target and cancel presentation delays/exit holds through Base UI's native exit protocol. Unmount removes measurements and all writers.
-- Async content arriving while closed updates the next semantic view without starting geometry/presence. A new open revision invalidates all older completion callbacks; a zero-duration close still completes through Base UI's actual protocol before modality/return-focus ownership is released. Native controls inside the dialog remain operable in reduced/none.
-
-Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich Title/Description children and formatting callbacks retain their composed owners; the separately anchored body boundary delegates to its actual child display components rather than running the title controller over body content. Screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
+Base UI owns open state, modal behavior, focus trapping, dismissal, portal retention and return focus. Semantic state
+and input never wait for panel, title or geometry completion. Rapid close/reopen reverses the same presence boundary
+from its current visual state; a content update during close commits semantic content but does not start a second
+entrance or resize. Closing settles the panel's measured block-size owner while the exit owner keeps its zero-opacity
+envelope until Base UI permits removal, including `preventUnmountOnClose`. A live reduced downgrade cancels the scale
+envelope before paint; none and a zero recipe clock settle the semantic target immediately and cancel the running
+animation, so Base UI's own completion protocol still releases modality and focus. Title, description, quantity and
+colour controllers are retired with the panel's unmount. Unmount removes measurements and all writers.
 
 ## Geometry and performance
 
-- One natural-content observer and one shell writer own both measured axes. Centering/placement and panel decoration must use separated properties/layers so transforms do not compete.
-- Lay text at the final destination width once, measure its natural height, then animate the shell around that layout. Do not continuously rewrap text through intermediate widths; passive font/viewport changes are immediate.
-- Preserve Content's existing width/viewport constraints and any caller-provided overflow region; the default Content does not create a scrolling viewport. If readable geometry cannot fit the available bounds without adding a scroll policy or extra clipping, use immediate native layout. Do not clip focus rings, close controls or portalled descendants.
-- At most one panel, one overlay and the bounded changed text set animate per dialog. Avoid per-child entrances and resize feedback from the animated shell.
-
-- Observe a natural-content region distinct from the sizing host and clamp each rendered dimension to valid non-negative intrinsic/closed/available bounds. Nested content and the panel choose one owner for the same size cause; the panel never observes a child's interpolated box as a fresh target.
-- A destination-layout size animation must not newly crop required text, an active descendant or a focused control. Use existing legal scroll/overflow to keep them immediately reachable; otherwise settle that axis before paint. Do not add temporary truncation or hide required content to make the shell animate.
-
-A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
+One measured block-size owner registers on the content shell itself; it reads its natural height only after releasing
+its own size overlay, so a child's interpolated box is never reused as a fresh target. The destination is clamped to
+a non-negative minimum and to at least the natural extent, so required text, the close control and focus rings are
+never newly cropped and no scroll policy is invented. The inline size is not interpolated: the panel lays out at its
+destination width once, and only the block axis is measured. Passive font, viewport or caller class changes settle
+immediately instead of manufacturing a revision. At most one panel, one overlay and the bounded changed-text set
+animate per dialog; no per-child entrances or resize feedback are added.
 
 ## Acceptance scenarios
 
-- Pending: keep the same Content host while changing only its callback ref during entry/exit; external registration transfers without interrupting eligible presence. Separately replace the actual render host and reject writes from its retired owner. Exercise native retained mounting and prevent-unmount control: visual completion, hidden connected content and actual unmount retain their distinct native callback/focus semantics.
-- Pending: preserve a caller-owned continuous CSS animation across mode/clock changes and a close/reopen that retains the same host. Actual native unmount may end that handle; reopening a new host gets a new handle. The caller loop neither becomes a Cadence exit hold nor gets blanket-cancelled to force completion.
+Executed in `tests/components/dialog.test.tsx`: the panel and backdrop entrance/exit, the measured content revision,
+changed title and description strings, changed direct quantities, the content and overlay surface colour owners and
+the title/description foreground owner. Each runs in full, reduced and none with a zero clock, and the native
+built-in close regions are verified as non-animated boundaries.
 
-- Pending: open from keyboard, change body height and close mid-resize; focus, Escape, modal variants and return focus retain Base UI behavior.
-- Pending: rapidly reopen during exit, including changed title and lazy body content, with no duplicated panel/name or stale geometry.
-- Pending: SSR-visible open state, small viewport/zoom, parent child entrance suppression, all modes, live downgrade and zero clock.
-- Pending: grow a focused form/message inside a constrained dialog, including a nested disclosure and async content arriving after close; required text stays visible, no parent/child size chase occurs, and only the current close revision completes modality/focus restoration.
+Also pending browser verification: 3 modes × 2 OS preferences, live same-target mode/clock cancellation in a real
+browser, nested dialogs and portals, SSR/no-JS/hydration probes, keyboard focus and return focus, `preventUnmountOnClose`
+retention, a focused native editor during a content resize, and light/dark × narrow/wide screenshot review. jsdom has
+no layout engine, so the real block-size interpolation and Base UI's focus settlement are proven here by their
+committed revision, source and property policy rather than by rendered geometry.
 
-- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
-- Pending: Exercise the existing initial-focus default and a supported caller focus override during entry; default autofocus may settle only the panel while backdrop opacity continues, and neither path delays focus.
-- Pending: Press the built-in Content/Footer close Buttons and a caller-rendered DialogClose. Verify the real Button safe-layer owner or the actual caller owner executes once; switch to reduced/none or zero clock while held, then close. Preserve the correct held/released target, native activation/return focus and immediate native close without a stale press writer or added exit hold.
-- Pending: grow long content beyond available height with default Content and with an explicitly composed scroll region. Preserve each existing layout/overflow policy; an infeasible readable size interval uses immediate native layout rather than adding a scrollbar, clipping text or changing the caller's scroll owner for animation.
+Delegation gaps are recorded rather than hidden: Base UI owns mounting, modality, focus and the native unmount
+protocol; the measured owner animates only the block axis and only a known content revision while the panel is open;
+the built-in close controls are native buttons with Button's variant classes instead of composed Button instances, so
+they add no inherited Cadence press/paint/display owner inside this component; and no performance, CLS,
+interaction-cost or real-device FPS measurement was taken (ADR-023 defers performance governance).
