@@ -1,8 +1,12 @@
 # Alert Dialog motion contract
 
-Status: target design; implementation and verification pending.
+Status: functionally migrated to v2. Browser matrix, a production build and performance governance remain
+deferred under ADR-023.
 
-The consequential message becomes readable quickly and remains visually steady. Motion reinforces the surface and changing explanation without delaying a decision or inventing a warning shake. This contract inherits the [common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or public APIs.
+The consequential message becomes readable quickly and remains visually steady. Motion reinforces the surface and
+changing explanation without delaying a decision or inventing a warning shake. This contract inherits the
+[common contract](../README.md) and [presets](../presets.md); bindings are design references, not recipe IDs or
+public APIs.
 
 ## Contract references
 
@@ -10,84 +14,144 @@ The consequential message becomes readable quickly and remains visually steady. 
 {
   "schema": 1,
   "target": "motion-v2",
-  "migration": "legacy",
+  "migration": "v2",
   "parts": {
     "content": ["alert-dialog#AlertDialogContent"],
     "overlay": ["alert-dialog#AlertDialogOverlay"],
+    "surface": ["alert-dialog#AlertDialogContent", "alert-dialog#AlertDialogMedia"],
+    "foreground": ["alert-dialog#AlertDialogTitle", "alert-dialog#AlertDialogDescription"],
     "title": ["alert-dialog#AlertDialogTitle"],
     "description": ["alert-dialog#AlertDialogDescription"],
-    "surface": [
-      "alert-dialog#AlertDialogContent",
-      "alert-dialog#AlertDialogMedia",
-      "alert-dialog#AlertDialogTitle",
-      "alert-dialog#AlertDialogDescription"
-    ],
     "quantity": ["alert-dialog#AlertDialogTitle", "alert-dialog#AlertDialogDescription"],
     "body": ["alert-dialog#AlertDialogContent"],
-    "actions": ["alert-dialog#AlertDialogAction", "alert-dialog#AlertDialogCancel", "button#Button"]
-  }
+    "actions": ["button#Button"],
+    "actions-label": ["button#Button"],
+    "actions-number": ["button#Button"],
+    "actions-feedback": ["button#Button"]
+  },
+  "regions": {
+    "content": ["alert-dialog-content"],
+    "overlay": ["alert-dialog-overlay"],
+    "surface": ["alert-dialog-content", "alert-dialog-media"],
+    "foreground": ["alert-dialog-title", "alert-dialog-description"],
+    "title": ["alert-dialog-title-text"],
+    "description": ["alert-dialog-description-text"],
+    "quantity": ["alert-dialog-title-number", "alert-dialog-description-number"],
+    "body": ["alert-dialog-content"],
+    "actions": ["alert-dialog-action"],
+    "actions-label": ["button-text"],
+    "actions-number": ["button-number"],
+    "actions-feedback": ["button-feedback"]
+  },
+  "axes": { "content": ["height"], "actions": ["width", "height"] }
 }
 ```
 
 ## Capability ownership
 
-| Capability      | Application and owner                                                                                                                                                                                                                                                                                                                    | References                                                                                                                                                                 |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Appearance      | Default: `alert-dialog-content` and overlay own coordinated opacity presence; media, title, description and actions inherit it.                                                                                                                                                                                                          | default: `alert-dialog.content.enter`, `alert-dialog.overlay.enter`, `alert-dialog.content.exit`, `alert-dialog.overlay.exit`; inherited: `@actions`; composed: `@actions` |
-| Size            | Default: content shell owns natural message changes and explicit `size` changes within existing constraints. Button-backed actions retain their inherited geometry owner.                                                                                                                                                                | default: `alert-dialog.content.resize`; inherited: `@actions`; composed: `@actions`                                                                                        |
-| Surface colour  | Default: content/media own supplied surface tokens; action/cancel Buttons keep their button state contracts.                                                                                                                                                                                                                             | default: `alert-dialog.surface.colour`; inherited: `@actions`; composed: `@actions`                                                                                        |
-| Text colour     | Default: title/description own foreground token transitions. Urgency is supplied by the caller, not inferred from message text. Button-backed action foreground follows its inherited owner.                                                                                                                                             | default: `alert-dialog.surface.colour`; inherited: `@actions`; composed: `@actions`                                                                                        |
-| Changed text    | Default for primitive title/description: preserve unchanged graphemes and replace changed runs. Rich content uses explicit composed owners. Action labels follow their actual Button/caller owner.                                                                                                                                       | default: `alert-dialog.title.change`, `alert-dialog.description.change`; inherited: `@actions`; composed: `@title`, `@description`, `@body`, `@actions`                    |
-| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children/render functions. Action quantities follow Button's existing applicability rules. | default: `alert-dialog.quantity.change`; inherited: `@actions`; composed: `@title`, `@description`, `@body`, `@actions`                                                    |
+| Capability      | Application and owner                                                                                                                                                                                                                                                                            | References                                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Appearance      | Default: `alert-dialog-content` owns the panel presence and `alert-dialog-overlay` owns the backdrop opacity, each as its own physical writer. Media, title and description inherit that entrance. A composed action keeps Button's own retained exit.                                           | default: `alert-dialog.content.enter`, `alert-dialog.content.exit`, `alert-dialog.overlay.enter`, `alert-dialog.overlay.exit`; inherited: `alert-dialog.actions.exit` |
+| Size            | Default: the content shell owns a clamped measured block-size revision over its natural message within the existing `size`/viewport constraints. A composed action keeps Button's own measured box and explicit size variants.                                                                   | default: `alert-dialog.content.resize`; inherited: `alert-dialog.actions.resize`                                                                                      |
+| Surface colour  | Default: content and media own their supplied background, border and scoped shadow tokens. Action and cancel are ordinary Buttons and keep their button state contracts instead of receiving a second writer.                                                                                    | default: `alert-dialog.surface.colour`; inherited: `alert-dialog.actions.colour`                                                                                      |
+| Text colour     | Default: title and description own foreground token transitions. Urgency is supplied by the caller, not inferred from message text. A Button-backed action follows its inherited Button foreground owner.                                                                                        | default: `alert-dialog.foreground.colour`; inherited: `alert-dialog.actions.colour`                                                                                   |
+| Changed text    | Default for a primitive title/description: preserve unchanged graphemes and replace changed runs. Rich children use the composed body boundary; an action label keeps Button's own changed-run owner.                                                                                            | default: `alert-dialog.title.change`, `alert-dialog.description.change`; composed: `@body`; inherited: `alert-dialog.actions-label.replace`                           |
+| Changed numbers | Default for a directly supplied supported numeric quantity in Title/Description: the owned display slot uses compact reels. Strings remain text; codes, dates and numeric identities are not parsed. Composed for body quantities inside rich children, inherited inside a numeric action label. | default: `alert-dialog.quantity.change`; composed: `@body`; inherited: `alert-dialog.actions-number.roll`                                                             |
+
+`surface.colour` addresses the content shell and the optional media region separately; `foreground.colour`
+addresses title and description. Actual DOM focus/focus-within or a region's own invalid state cancels its colour
+clock and settles that region's declared paint immediately, while an independent region keeps its own clock. Any
+colour interpolation additionally requires a verified readable palette. Action and cancel keep the same
+immediate-paint rule through their inherited Button owner.
+
+The `actions*` bindings name the actual `AlertDialogAction`/`AlertDialogCancel` composition with [Button](button.md):
+the action renders Button directly and the cancel renders Base UI's Close through Button. Alert Dialog executes none
+of those actions itself — `actions.exit` is the composed button's own retained removal, `actions.resize` its measured
+box, `actions.colour` its single surface/foreground family, `actions-label`/`actions-number` its label and quantity
+owners, and `actions-feedback` its press layer. Focus/invalid paint and every mode follow that owner; no extra action
+executor, entrance or closing policy is introduced, and the alert never writes those regions.
 
 ## Choreography and modes
 
-| Trigger / owner                                                | Full                                                                                                                                                                           | Reduced                                                                        | None                                                    | Binding → preset → recipe/form                                                                                                                             |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Open / content and overlay                                     | Coordinated opacity entrance; no travel, bounce or decorative action stagger. Entry is subject to the actual-focus gate below.                                                 | Short opacity. Entry obeys the same focus gate.                                | Open target immediately.                                | `alert-dialog.content.enter` → `presence.surface` → `enter.pop/opacity`; `alert-dialog.overlay.enter` → `presence.surface` → `enter.pop/opacity`           |
-| Close / content and overlay                                    | Opacity exit together; message remains stationary.                                                                                                                             | Short opacity.                                                                 | Closed target immediately.                              | `alert-dialog.content.exit` → `presence.exit` → `exit.fade/opacity`; `alert-dialog.overlay.exit` → `presence.exit` → `exit.fade/opacity`                   |
-| Message/explicit size change / content shell                   | Clamped measured width/height, with final typography and no bounce.                                                                                                            | Final geometry immediately.                                                    | Final geometry immediately.                             | `alert-dialog.content.resize` → `geometry.panel` → `geometry.resize/measured`                                                                              |
-| Plain explanation/name update / text owner                     | Changed-run replacement, `stagger: none`; semantic text is already final.                                                                                                      | Short changed-run opacity.                                                     | Final text immediately.                                 | `alert-dialog.title.change` → `text.replace` → `text.change/changed-runs`; `alert-dialog.description.change` → `text.replace` → `text.change/changed-runs` |
-| Supplied visual state / surface/text owners                    | Scoped colour transition. Colour eligibility and immediate-owner priority follow the rule below.                                                                               | Short colour feedback. Colour obeys the same owner priority.                   | Target colours immediately.                             | `alert-dialog.surface.colour` → `state.color` → `state.color/surface-foreground`                                                                           |
-| Direct numeric Title/Description revision / owned display slot | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                                                                              | Final number immediately.                                                      | Final number immediately.                               | `alert-dialog.quantity.change` → `number.compact` → `number.roll/reels`                                                                                    |
-| Press/release / inherited Button feedback layer                | Inherit Button press on its safe visual layer; omit scale when that layer is unavailable. Native activation and existing close semantics remain immediate; no second executor. | No scale; colour follows the same Button owner and its focus/invalid priority. | Native activation/close immediately, without animation. | `alert-dialog.actions.press` → `feedback.press` → `feedback.press/scale` (inherited Button owner)                                                          |
+| Trigger / owner                                                | Full                                                                                                                                                                           | Reduced                                                                        | None                                                    | Binding → preset → recipe/form                                                                                                                                  |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Open / content and overlay                                     | Coordinated opacity entrance; no travel, bounce or decorative action stagger. Entry is subject to the actual-focus gate below.                                                 | Short opacity. Entry obeys the same focus gate.                                | Open target immediately.                                | `alert-dialog.content.enter` → `presence.surface` → `enter.pop/surface`; `alert-dialog.overlay.enter` → `presence.surface` → `enter.pop/opacity`                |
+| Close / content and overlay                                    | Opacity exit together; the message remains stationary and no child runs its own exit.                                                                                          | Short opacity.                                                                 | Closed target immediately.                              | `alert-dialog.content.exit` → `presence.exit` → `exit.fade/opacity`; `alert-dialog.overlay.exit` → `presence.exit` → `exit.fade/opacity`                        |
+| Message/explicit size change / content shell                   | Clamped measured block height, with final typography and no bounce; the width stays laid out at its destination.                                                               | Final geometry immediately.                                                    | Final geometry immediately.                             | `alert-dialog.content.resize` → `geometry.panel` → `geometry.resize/measured`                                                                                   |
+| Plain explanation/name update / text owner                     | Changed-run replacement, `stagger: none`; semantic text is already final.                                                                                                      | Short changed-run opacity.                                                     | Final text immediately.                                 | `alert-dialog.title.change` → `text.replace` → `text.change/changed-runs`; `alert-dialog.description.change` → `text.replace` → `text.change/changed-runs`      |
+| Supplied visual state / surface and foreground owners          | Scoped colour transition per owned region. Colour eligibility and immediate-owner priority follow the rule above.                                                              | Short colour feedback. Colour obeys the same owner priority.                   | Target colours immediately.                             | `alert-dialog.surface.colour` → `state.color` → `state.color/surface`; `alert-dialog.foreground.colour` → `state.color` → `state.color/foreground`              |
+| Direct numeric Title/Description revision / owned display slot | Roll changed places only; the same slot never also runs text replacement on its formatted digits.                                                                              | Final number immediately.                                                      | Final number immediately.                               | `alert-dialog.quantity.change` → `number.compact` → `number.roll/reels`                                                                                         |
+| Composed action removal / inherited Button                     | Button keeps its own retained exit on its own host; the alert adds no second removal fade and never delays the decision.                                                       | Short opacity only.                                                            | Removed with the native frame.                          | `alert-dialog.actions.exit` → `presence.exit` → `exit.fade/opacity`                                                                                             |
+| Composed action box / inherited Button                         | Button interpolates its own owned width and height from one intrinsic measurement; the focused editor rule stays Button's.                                                     | Final box immediately.                                                         | Final box immediately.                                  | `alert-dialog.actions.resize` → `geometry.compact` → `geometry.resize/measured`                                                                                 |
+| Composed action paint / inherited Button                       | Button's single surface and foreground family, with immediate focus/invalid priority and its light/dark variant boundary.                                                      | Same immediate priority, otherwise short colour.                               | Target colours immediately.                             | `alert-dialog.actions.colour` → `state.color` → `state.color/surface-foreground`                                                                                |
+| Composed action labels and quantities / inherited Button       | Button replaces its own changed label runs and reels its own numeric label once, retargeting its box concurrently.                                                             | Short changed-text opacity; quantity and box immediate.                        | Final text and number immediately.                      | `alert-dialog.actions-label.replace` → `text.replace` → `text.change/changed-runs`; `alert-dialog.actions-number.roll` → `number.compact` → `number.roll/reels` |
+| Composed action press/release / inherited Button               | Inherit Button press on its safe visual layer; omit scale when that layer is unavailable. Native activation and existing close semantics remain immediate; no second executor. | No scale; colour follows the same Button owner and its focus/invalid priority. | Native activation/close immediately, without animation. | `alert-dialog.actions-feedback.press` → `feedback.press` → `feedback.press/scale`                                                                               |
 
-`surface.colour` addresses separate content, media and title/description regions. Actual DOM focus/focus-within or a region's own invalid state cancels its colour clock and settles all its declared paint immediately; independent regions retain their clocks. Other colour interpolation requires a verified readable palette. Action/Cancel keep the same immediate-paint rule through their inherited Button owner.
-
-`actions` identifies the actual AlertDialogAction/AlertDialogCancel composition with [Button](button.md). Button owns its action paint, eligible geometry, press and direct label/quantity updates once; `surface.colour` and title/description controllers do not write those regions. Initial actions inherit panel presence; a later independent action insertion/removal uses Button's surviving presence owner without delaying an action or alert closure. Same-cause panel/action geometry delegates to one host or consumes a shared committed destination, never a child's interpolated size. Cancel's caller `render` may replace Button; that branch is composed at `@actions` and uses the actual caller owner. Action's Button `render` retains Button's safe-layer fallback. Focus/invalid paint and all modes follow the inherited owner; no extra action executor or closing policy is introduced.
+The content and overlay controllers are separate instances, so the opacity envelope and the optional panel scale
+never share a writer and no two engines claim the same property. The panel's measured block-size owner, its scoped
+surface paint and the title/description display owners are separate again, so a size revision never rewrites paint
+and a text revision never rewrites geometry. The panel never consumes a child button's interpolated box, and the
+composed buttons never receive a second paint, label, quantity, box or press writer from the alert.
 
 ## Interruption and lifecycle
 
-Preserve the native initial-focus decision for the alert and its actions. If it lands in the entering panel, settle the panel's opacity before presenting that focus; the independent backdrop may continue its fade. This is a normal safe outcome of default opening, not permission to defer autofocus or a destructive/cancel action until animation completes.
+Preserve Base UI's actual initial-focus decision for the alert and its actions. If that focus lands inside the
+entering panel, the panel settles its opacity and scale envelope before presenting it while the independently owned
+backdrop may finish its own fade. This is an ordinary outcome of default opening: never defer or disable autofocus,
+a destructive action or a cancel to guarantee an entrance animation.
 
-- Preserve Alert Dialog's dismissal and focus rules. Action/cancel callbacks, disabled state and initial focus never wait for animation; no minimum reading timer or auto-action is introduced.
-- New messages replace the pending text transaction. Closing cancels resize/replacement; reopening during exit reverses the same panel without replaying action buttons.
-- A removed action or changed message is semantically current immediately. Decorative outgoing text cannot remain an accessible alert or focus target.
-- Live reduced commits geometry; none and zero clock cancel authored clocks and finish the current presence boundary through Base UI's actual completion protocol, without releasing modality/focus early. Unmount releases observers and decorative text resources. Native action/cancel operation remains immediate in every mode.
-- Async message/action changes received while closed establish the next view without starting an entrance. A reopened revision invalidates old exit callbacks; no obsolete callback can close the new alert or restore focus to its prior trigger.
+- Preserve Alert Dialog's dismissal and focus rules. Action/cancel callbacks, disabled state and initial focus never wait for animation; no minimum reading timer and no auto-action are introduced.
+- New messages replace the pending text transaction. Closing cancels resize and replacement; reopening during exit reverses the same panel without replaying action buttons.
+- A removed action or changed message is semantically current immediately. Decorative outgoing text can never remain an accessible alert name or a focus target.
+- Live reduced commits geometry; none and a zero clock cancel the authored clocks and finish the current presence boundary through Base UI's own completion protocol, without releasing modality or focus early. Unmount releases the measurement, the presence controllers and the decorative text hosts.
+- Async message/action changes received while closed establish the next view without starting an entrance. A reopened revision invalidates old exit callbacks, so no obsolete callback can close the new alert or restore focus to its prior trigger.
+- The composed action and cancel keep Button's own cancellation rules: pointer cancellation, lost capture, blur and a disabled change release the press owner, and a caller `render` without a safe inner layer uses Button's colour-only fallback. Neither activation nor closure is delayed, and the action still does not close unless its caller's own behaviour does.
 
-Dispatch a direct Title/Description string to the text owner and a supported direct numeric quantity to the numeric owner; changing renderer type establishes an immediate baseline. Rich Title/Description children and formatting callbacks retain their composed owners; the separately anchored body boundary delegates to its actual child display components rather than running the title controller over body content. Screen-reader-only content updates immediately. Use one slot transaction under the popup's existing size owner and aggregate text/reel limits; no new counter prop, parser, countdown or inferred application state is added.
+A direct Title/Description string goes to the text owner and a supported direct numeric quantity to the numeric
+owner; changing the renderer type establishes an immediate baseline. Rich Title/Description children keep their
+composed owners, and the separately anchored body boundary delegates to its actual child display components instead
+of running the title controller over body content. Screen-reader-only content updates immediately. One slot
+transaction runs under the panel's existing size owner; no new counter prop, parser, countdown or inferred
+application state is added.
 
 ## Geometry and performance
 
-- One content measurement and shell writer; `size` variants keep their existing constraints. Reading-plane geometry uses clamped, non-bouncing transitions.
-- Reflow text at the final destination width before measuring the target height, then animate only the shell. Passive font/viewport changes settle immediately; no intermediate-width rewrapping.
-- Preserve Content's existing overflow policy and any explicitly composed scroll region; default Content does not create one. If readable content/actions cannot fit the available bounds under that policy, use immediate native layout rather than introducing scrolling or extra clipping for animation. Media dimensions belong to the media/layout owner, not an independent panel spring.
-- One panel, one backdrop and bounded title/description transactions per alert. No looping urgency effect or per-action entrance.
+One measured block-size owner registers on the content shell itself; it reads its natural height only after
+releasing its own size overlay, so a child's interpolated box is never reused as a fresh target. The committed
+content signature follows the nested title, description and body text that carries the message, so a longer
+explanation is a real revision and an unrelated re-render is not. The destination is clamped to a non-negative
+minimum and to at least the natural extent, so required text, the action row and focus rings are never newly
+cropped and no scroll policy is invented. The inline size is not interpolated: the panel lays out at its
+destination width once, and only the block axis is measured. Passive font, viewport or caller class changes settle
+immediately instead of manufacturing a revision. `size` variants keep their existing `max-width` constraints, and
+media dimensions stay the media/layout owner's rather than an independent panel spring.
 
-- Observe a natural-content region distinct from the sizing host and clamp each rendered dimension to valid non-negative intrinsic/closed/available bounds. Nested content and the panel choose one owner for the same size cause; the panel never observes a child's interpolated box as a fresh target.
-- A destination-layout size animation must not newly crop required text, an active descendant or a focused control. Use existing legal scroll/overflow to keep them immediately reachable; otherwise settle that axis before paint. Do not add temporary truncation or hide required content to make the shell animate.
-
-A focused native editor also takes priority when geometry would move its caret/content box or change its scroll position, even if no text would be clipped. Settle the affected decorative size axis; unrelated paint may continue. A child size change that leaves the editor's geometry and scroll stable can retain its existing single owner.
+At most one panel, one backdrop, one measured height owner and the bounded changed-text/quantity set animate per
+alert; no per-child entrance, looping urgency effect or per-action entrance is added. A destination-layout size
+animation must not newly crop required text, an active descendant or a focused control: existing legal
+overflow/scroll keeps them reachable, and an axis that would clip settles before paint. If readable content and the
+action row cannot fit the available bounds at all, the native layout result is used immediately rather than adding
+a scroll container, truncating the explanation or changing the caller's focus policy. A focused native editor also
+takes priority over a decorative size axis that would move its caret or scroll position.
 
 ## Acceptance scenarios
 
-- Pending: change a destructive explanation and action availability during open/close without delaying focus, action or cancel behavior.
-- Pending: test both size variants, long localized messages, zoom and small viewport while preserving readable actions.
-- Pending: rapidly reverse presence, then exercise all modes, live downgrade, zero clock and removal during text/size changes.
-- Pending: grow a required explanation or focus an action during a constrained resize, and deliver async content after close; readability, one size owner and native completion/focus rules remain intact.
+Executed in `tests/components/alert-dialog.test.tsx`: the panel and backdrop entrance and exit, the measured
+content revision, changed title and description strings, changed direct quantities on both display slots, the
+content/media surface colour owner, the title/description foreground owner and the inherited Button press layer.
+Each runs in full, reduced and none with a zero clock, and the composed action and cancel parts are verified as
+inherited boundaries rather than local writers. The live full→reduced→none downgrade is exercised on an open panel.
 
-- Pending: update a direct numeric Title/Description value, a numeric-looking string and rich quantity content separately; switch string/number types while open and close mid-roll. Verify one display owner, exact accessible/copyable output and no inferred numeric origin.
-- Pending: Open with native initial focus on an action while content is fading; settle the content gate without delaying the action or cancelling the independent backdrop.
-- Pending: Press default Button-backed Action/Cancel and supported caller render replacements, including a render without a safe feedback layer. Switch to reduced/none or zero clock mid-press, then cancel/close. Only the actual owner runs, held/released targets follow Button modes, and neither activation nor closure is delayed; Action still does not close unless its existing caller behavior does so.
-- Pending: expand a long explanation/action group beyond available height, with and without a caller-owned scroll region. An infeasible readable size interval takes the native layout fallback without adding a scroll container, truncating the explanation or changing the caller's overflow/focus policy.
+Also pending browser verification: 3 modes × 2 OS preferences, live same-target mode/clock cancellation in a real
+browser, nested alerts and portals, SSR/no-JS/hydration probes, keyboard focus and return focus, retention through
+Base UI's unmount protocol, a focused native editor during a message resize, rapid reversal and reopen, async
+content delivered after close, and light/dark × narrow/wide screenshot review. jsdom has no layout engine, so the
+real block-size interpolation, the palette readability gate and Base UI's focus settlement are proven here by
+their committed revision, source and property policy rather than by rendered geometry.
+
+Delegation gaps are recorded rather than hidden: Base UI owns mounting, modality, focus, dismissal and the native
+unmount protocol; the measured owner animates only the block axis and only a known content revision while the panel
+is open; the composed action and cancel inherit Button's press, paint, label, quantity and box owners instead of
+installing a second executor, so the press binding is proven on the action button's own feedback layer; and no
+performance, CLS, interaction-cost or real-device FPS measurement was taken (ADR-023 defers performance
+governance).
