@@ -3356,7 +3356,11 @@
         "@cadence/button",
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
-        "@cadence/cadence-provider"
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-modal-presence"
       ],
       "files": [
         {
@@ -3371,12 +3375,32 @@
         "batch": "B4",
         "motion": [
           {
-            "recipe": "popup.anchored",
-            "form": "css-transition"
+            "recipe": "enter.pop",
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
+          },
+          {
+            "recipe": "feedback.press",
+            "form": "one-shot"
           }
         ],
         "intensity": "medium",
@@ -3390,23 +3414,83 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Alert Dialog opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Alert Dialog owns its panel presence, measured message height, scoped paint and the title/description display; the composed action and cancel buttons keep Button's own press, paint, label and box owners, and Base UI keeps mounting, modality, focus and dismissal."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "enter.pop/one-shot": [
               {
                 "relationship": "default",
                 "owner": "alert-dialog",
-                "reason": "Alert Dialog integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "The panel owns one opacity and scale entrance envelope and the independent backdrop owns one stationary opacity entrance on its own rendered host."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "default",
                 "owner": "alert-dialog",
-                "reason": "Alert Dialog integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "A closing panel and backdrop each fade on their own opacity channel while Base UI retains the native unmount, modality and focus protocol."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed action or cancel is an ordinary Button: its own retained exit is Button's, so the alert adds no second removal fade or pending decision."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "alert-dialog",
+                "reason": "The panel shell owns one clamped measured block-size transaction over its natural message while the alert is open and not closing."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed action keeps Button's own measured label/icon box and explicit size variants; the panel's block-size owner never rewrites a child button's box."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "alert-dialog",
+                "reason": "Content, media, title and description each own their declared scoped paint on their own physical region, with focus and unverified palettes immediate."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed action keeps Button's single surface and foreground owner, including its immediate focus/invalid priority and its light/dark variant boundary."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "alert-dialog",
+                "reason": "A directly supplied plain Title or Description string replaces only its changed graphemes; rich children keep their native identity."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed action's label is Button's own changed-run owner; the alert installs no second text writer on the action label."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "alert-dialog",
+                "reason": "A directly supplied supported numeric quantity in Title or Description rolls only its changed places; strings and codes remain text."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "A composed action's numeric label is Button's own quantity owner; the alert does not parse or reel action labels itself."
+              }
+            ],
+            "feedback.press/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "The composed action and cancel buttons keep Button's own press layer, held/released state and immediate native activation; the alert adds no second executor or closing policy."
               }
             ]
           }
