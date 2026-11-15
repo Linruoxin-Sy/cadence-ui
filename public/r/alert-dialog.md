@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/alert-dialog`
 - Type: registry:ui
 - Since: 0.3.0
-- Motion recipes: popup.anchored, exit.fade
+- Motion recipes: enter.pop, exit.fade, geometry.resize, state.color, text.change, number.roll, feedback.press
 
 ## Installation
 
@@ -34,11 +34,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -74,6 +75,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | alert-dialog | `@components/cadence/alert-dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/alert-dialog.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -91,6 +93,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: alert-dialog](https://cadence.dev/r/alert-dialog.json)
 
@@ -247,23 +251,27 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten target files, keeping `alert-dialog/index.tsx`, `button/index.tsx`
-and the shared `lib/` directory in the same `cadence/` tree. Preserve the
-relative imports and the sources' `"use client"` directives. Button reaches
-`press-button.tsx`, which imports `control-animation.tsx` and in turn
-`native-div.tsx`; copy every file in the provider, motion and utilities
-payloads. The provider files and `motion` package remain required imports
-even when you omit the optional provider wrapper.
+Copy every file in the target list, keeping `alert-dialog/index.tsx`,
+`button/index.tsx` and the shared `lib/` directory in the same `cadence/` tree.
+Preserve the relative imports and the sources' `"use client"` directives. Button
+reaches `press-button.tsx`, which imports `control-animation.tsx` and in turn
+`native-div.tsx`; the panel reaches `modal-presence.ts`, `measured-geometry.ts`,
+`text-presentation.ts` and `number-presentation.ts`. Copy every file in the
+provider, motion, geometry, text, number and utilities payloads. The provider
+files and `motion` package remain required imports even when you omit the
+optional provider wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the
-copied files. Include the Cadence easing and motion-scale tokens used by the
-popup classes. There is no additional item-specific CSS or external asset.
-The overlay fades and the panel fades and scales in full; reduced keeps
-opacity only, and none removes the transitions and hidden entry styles.
-Each portalled surface resolves its own provider clock. Standalone components
-follow the system motion preference; an optional `CadenceProvider` controls
-a subtree, and nested full still respects system reduced motion. The included
-Button retains its own press-feedback contract.
+copied files. Include the Cadence easing, motion-scale and spring tokens the
+popup and measured-size owners read. There is no additional item-specific CSS
+or external asset. The panel and its backdrop are written by the shared modal
+presence controller: full fades and scales the panel in, reduced keeps opacity
+only, and none settles both on the first frame. The panel measures its own
+message height, so a longer explanation is a real revision. Each portalled
+surface resolves its own provider clock. Standalone components follow the
+system motion preference; an optional `CadenceProvider` controls a subtree,
+and nested full still respects system reduced motion. The included Button
+retains its own press-feedback contract.
 
 Usage, Confirmation sizes and With an icon import `Trash2Icon`; the top
 specimen uses it too. To copy those snippets unchanged, also install:
@@ -755,10 +763,10 @@ export function AlertMotionScopes() {
 | --- | --- | --- |
 | `AlertDialog` | `open`, `defaultOpen`, `onOpenChange`, `onOpenChangeComplete` | Base UI root. Always modal; pointer dismissal is fixed off. |
 | `AlertDialogTrigger` | native button props, `render` | Opens the dialog. |
-| `AlertDialogContent` | `size` (`"default" \| "sm"`), `render`, `className` | Renders portal, overlay, and popup. |
-| `AlertDialogOverlay` | `className` | Only needed when replacing `AlertDialogContent`. |
+| `AlertDialogContent` | `size` (`"default" \| "sm"`), `render`, `className`, `style` | Renders portal, overlay, and popup. Carries the measured message height. |
+| `AlertDialogOverlay` | `className`, `style` | Only needed when replacing `AlertDialogContent`. |
 | `AlertDialogHeader` / `AlertDialogFooter` | `className` | Layout only. |
-| `AlertDialogMedia` | `className` | Icon slot; changes the header layout. |
+| `AlertDialogMedia` | `className`, `style` | Icon slot; changes the header layout. Owns its own scoped surface paint. |
 | `AlertDialogTitle` | `className` | Required accessible name. |
 | `AlertDialogDescription` | `className` | Supporting text; wire it to the decision, not the product. |
 | `AlertDialogAction` | `variant`, `size`, `onClick`, `render` | Confirming Button. The caller owns closing via the root’s controlled `open` value. |
@@ -770,21 +778,27 @@ Button: clicking it invokes the caller’s handler and leaves the popup open. Us
 
 ## Motion contract
 
-Authored intensity is **medium**: Alert Dialog opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Alert Dialog owns its panel presence, measured message height, scoped paint and the title/description display; the composed action and cancel buttons keep Button's own press, paint, label and box owners, and Base UI keeps mounting, modality, focus and dismissal.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live reduced drops the panel's scale envelope and keeps a short opacity; none settles every target on the first frame and cancels the running writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored/css-transition` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
+| enter | backdrop opacity; panel opacity with a bounded `scale.in` envelope | `enter.pop/one-shot` · `duration.base` / `duration.fast` | yes, a reversal continues from the current paint |
+| exit | panel and backdrop opacity only; the message stays stationary | `exit.fade/one-shot` · `duration.fast` | yes (reopen mid-exit) |
+| message revision | clamped measured panel height while open | `geometry.resize/measured` · `spring.sizePanel` | yes, retargets from the current size |
+| title / description text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title / description quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| content / media / title / description paint | scoped surface or foreground colour; focus or an unprovable palette is immediate | `state.color/css-transition` | yes, latest committed colour |
+| action / cancel press | Button's own press layer on its inner visual span | `feedback.press/one-shot` | yes, release or loss of capture settles it |
 
-The entrance is the dialog's, because this is the same popup: a fade under a 0.96-scale settle. The
-motion is CSS-only — Base UI toggles `data-starting-style` / `data-ending-style` and the class list
-reads the duration tokens — so there is no JavaScript animation loop and nothing to interrupt by hand.
-Reopening during the exit reverses the fade rather than restarting it.
+The panel stays mounted while Base UI completes its own native close protocol, so reopening mid-exit reverses the
+current paint. Focus, activation or selection inside an entering panel settles that panel immediately while the
+independently owned backdrop may continue; Base UI retains focus, portal, modality and completion ownership.
+`AlertDialogAction` renders Button and `AlertDialogCancel` renders Base UI's Close through Button, so both inherit
+Button's press, colour, label, quantity and measured-box owners and add no second Cadence writer. Their
+activation and Cancel's automatic close never wait for animation, and the action still leaves the alert open
+unless the caller closes it.
 
 ## Keyboard interactions
 
@@ -823,11 +837,13 @@ buttons split the width instead of stacking, so the two answers stay side by sid
 
 ## Performance
 
-- One popup tree is mounted only while open; the overlay and panel unmount after the exit transition.
-- Animates `opacity` and `scale` only: no layout reads, no `width`/`height` transition, and no
-  JavaScript animation running while the dialog sits open.
-- `AlertDialogAction` and `AlertDialogCancel` are ordinary `Button`s, so the press feedback is the
-  button's (a 0.97 scale that the same motion mode can drop).
+- One panel tree is mounted only while open, and Base UI keeps the modality, focus and unmount protocol.
+- The panel animates one clamped block height next to its opacity and scale envelope: no width interpolation,
+  no intermediate-width rewrapping and no JavaScript animation running while the alert sits open.
+- Changed title, description and quantity output touches only the changed runs and places; rich children keep
+  their native identity, and a passive font or viewport change settles instead of animating.
+- `AlertDialogAction` and `AlertDialogCancel` are ordinary `Button`s, so their press feedback, colour, label and
+  measured box belong to the same Button owners a standalone button uses.
 
 ## Notes for AI
 
