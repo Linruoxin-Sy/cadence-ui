@@ -104,6 +104,24 @@
     "item": "/r/cadence-modal-presence.json"
   },
   {
+    "name": "cadence-anchored-presence",
+    "type": "registry:lib",
+    "title": "Anchored popup presence",
+    "description": "Opacity and short anchor-side approach for one anchored popup surface, with Base UI's native positioning, focus and unmount completion.",
+    "categories": [
+      "foundation"
+    ],
+    "dependencies": [
+      "motion"
+    ],
+    "registryDependencies": [
+      "@cadence/cadence-motion",
+      "@cadence/cadence-provider"
+    ],
+    "docs": "/r/cadence-anchored-presence.md",
+    "item": "/r/cadence-anchored-presence.json"
+  },
+  {
     "name": "cadence-surface-presence",
     "type": "registry:lib",
     "title": "Surface presence controller",
@@ -331,7 +349,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -439,7 +457,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -540,7 +558,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -622,7 +640,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -719,7 +737,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -794,7 +812,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -868,7 +886,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -975,7 +993,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -1058,7 +1076,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -1165,7 +1183,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -1220,7 +1238,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -1336,7 +1354,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -1453,7 +1471,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -1562,7 +1580,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1690,7 +1708,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1827,7 +1845,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -2016,7 +2034,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -2056,7 +2074,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -2096,7 +2114,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -2151,7 +2169,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -2267,7 +2285,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -2342,7 +2360,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -2416,7 +2434,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -2502,7 +2520,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -2576,7 +2594,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -2680,7 +2698,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -2823,7 +2841,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -2899,7 +2917,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -2950,7 +2968,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -3101,7 +3119,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -3120,7 +3138,11 @@
     "registryDependencies": [
       "@cadence/cadence-motion",
       "@cadence/cadence-utils",
-      "@cadence/cadence-provider"
+      "@cadence/cadence-provider",
+      "@cadence/cadence-geometry",
+      "@cadence/cadence-text",
+      "@cadence/cadence-number",
+      "@cadence/cadence-anchored-presence"
     ],
     "since": "0.3.0",
     "tier": "T2",
@@ -3128,11 +3150,27 @@
     "motion": [
       {
         "recipe": "popup.anchored",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       {
         "recipe": "exit.fade",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "state.color",
         "form": "css-transition"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      },
+      {
+        "recipe": "number.roll",
+        "form": "reels"
       }
     ],
     "intensity": "medium",
@@ -3146,28 +3184,56 @@
       "scope": "surface",
       "travel": "compact",
       "coordination": "independent",
-      "reason": "Popover opens and closes its existing popup surface; content and native focus retain their current owners."
+      "reason": "Popover owns one anchored panel presence with a short anchor-side approach, clamped measured width and height, scoped surface paint and the title/description text, quantity and foreground owners; Base UI keeps positioning, focus, dismissal and unmount, and composed controls keep their own motion."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "popup.anchored/css-transition": [
+        "popup.anchored/one-shot": [
           {
             "relationship": "default",
             "owner": "popover",
-            "reason": "Popover integrates popup opening at its own parts, using the reached installed executor."
+            "reason": "The anchored panel owns one opacity and anchor-side approach envelope on its own visual layer; the positioner keeps its native coordinates and initial children inherit the entrance."
           }
         ],
-        "exit.fade/css-transition": [
+        "exit.fade/one-shot": [
           {
             "relationship": "default",
             "owner": "popover",
-            "reason": "Popover integrates popup closing at its own parts, using the reached installed executor."
+            "reason": "The closing panel fades on its own opacity channel without moving the anchor, while Base UI retains its native completion protocol and unmount."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "popover",
+            "reason": "The panel shell owns one clamped measured width and height transaction over its natural content inside the positioned available space."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "popover",
+            "reason": "The panel owns its scoped surface paint and the title and description own their foreground paint; focus, invalid state or an unprovable caller palette settles that region immediately."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "popover",
+            "reason": "A directly supplied plain Title or Description string replaces only its changed graphemes; rich children keep their native identity and are composed, not recursively split."
+          }
+        ],
+        "number.roll/reels": [
+          {
+            "relationship": "default",
+            "owner": "popover",
+            "reason": "A directly supplied supported numeric quantity in Title or Description rolls only its changed places; strings, codes and dates remain text."
           }
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -3233,7 +3299,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -3299,7 +3365,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -3367,7 +3433,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -3433,7 +3499,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -3569,7 +3635,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -3680,7 +3746,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -3755,7 +3821,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -3830,7 +3896,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -3905,7 +3971,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -3990,7 +4056,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -4077,7 +4143,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -4143,7 +4209,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -4268,7 +4334,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -4381,7 +4447,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -4508,7 +4574,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -4545,7 +4611,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -4603,7 +4669,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -4642,7 +4708,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -4694,7 +4760,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -4753,7 +4819,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -4832,7 +4898,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -4872,7 +4938,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -5000,7 +5066,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -5092,7 +5158,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -5122,11 +5188,11 @@
       "feedback.press",
       {
         "recipe": "popup.anchored",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       {
         "recipe": "exit.fade",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       "data.transition"
     ],
@@ -5155,20 +5221,6 @@
             "reason": "Date Picker mounts button for press feedback; that installed component remains the integration owner."
           }
         ],
-        "popup.anchored/css-transition": [
-          {
-            "relationship": "inherited",
-            "owner": "popover",
-            "reason": "Date Picker mounts popover for popup opening; that installed component remains the integration owner."
-          }
-        ],
-        "exit.fade/css-transition": [
-          {
-            "relationship": "inherited",
-            "owner": "popover",
-            "reason": "Date Picker mounts popover for popup closing; that installed component remains the integration owner."
-          }
-        ],
         "data.transition/one-shot": [
           {
             "relationship": "inherited",
@@ -5180,10 +5232,29 @@
             "owner": "button",
             "reason": "The selected live composition reaches button's installed data.transition/one-shot owner; this is inherited execution, not a second local writer."
           }
+        ],
+        "popup.anchored/one-shot": [
+          {
+            "relationship": "inherited",
+            "owner": "popover",
+            "reason": "Date Picker mounts popover for popup opening; that installed component remains the integration owner."
+          }
+        ],
+        "exit.fade/one-shot": [
+          {
+            "relationship": "inherited",
+            "owner": "popover",
+            "reason": "Date Picker mounts popover for popup closing; that installed component remains the integration owner."
+          },
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "The selected live composition also reaches button's installed exit.fade/one-shot owner; that remains Button's own removal fade rather than a second writer."
+          }
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -5249,7 +5320,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -5302,7 +5373,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -5362,7 +5433,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -5414,7 +5485,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -5466,7 +5537,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -5520,7 +5591,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -5572,7 +5643,7 @@
         ]
       }
     },
-    "sourceSha": "516bdb82",
+    "sourceSha": "01257d4e",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }
