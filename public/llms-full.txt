@@ -17129,6 +17129,11 @@ npm install clsx tailwind-merge motion @base-ui/react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -17151,6 +17156,19 @@ npm install clsx tailwind-merge motion @base-ui/react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-number | `@components/cadence/lib/number-plan.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -17158,6 +17176,16 @@ npm install clsx tailwind-merge motion @base-ui/react
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: popover](https://cadence.dev/r/popover.json)
 
@@ -17314,21 +17342,24 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, keeping `popover/index.tsx` and the shared `lib/`
+Copy all thirty-one target files, keeping `popover/index.tsx` and the shared `lib/`
 directory in the same `cadence/` tree. Preserve relative imports and the
-sources' `"use client"` directives. Copy every file in the motion, utilities
-and provider payloads, including helpers not imported by Popover directly.
+sources' `"use client"` directives. Copy every file in the motion, utilities,
+provider, geometry, text, number and anchored-presence payloads, including
+helpers not imported by Popover directly.
 The provider files and `motion` package are required imports even when you
 omit the optional provider wrapper.
 
 Complete the base theme setup linked above and ensure Tailwind scans the
-copied files. Include the Cadence easing and motion-scale tokens used by the
-popup classes. No additional item-specific CSS or external asset is required.
-Full fades and scales the panel from its anchor; reduced keeps opacity only;
-none removes the transitions and hidden entry/exit styles. The portalled popup
-resolves its own mode and token clock. Standalone components follow the system
-motion preference; an optional `CadenceProvider` controls a subtree, and nested
-full still respects system reduced motion.
+copied files. Include the Cadence easing, motion-scale and motion-distance
+tokens used by the panel. No additional item-specific CSS or external asset is required.
+Full fades the panel in with a short approach from its resolved side and
+transitions its measured size, colour and title/description display; reduced
+keeps opacity only; none removes the writers and settles every target on the
+first frame. The portalled popup resolves its own mode and token clock.
+Standalone components follow the system motion preference; an optional
+`CadenceProvider` controls a subtree, and nested full still respects system
+reduced motion.
 
 The examples need additional registry items. Copy each item's complete Manual
 setup, including its npm dependencies and shared files:
@@ -17851,31 +17882,35 @@ export function PopoverMotionScopes() {
 | --- | --- | --- |
 | `Popover` | `open`, `defaultOpen`, `onOpenChange`, `triggerId`, `modal` | Base UI root; `modal=false` by default, also accepts `true` and `"trap-focus"`. |
 | `PopoverTrigger` | native button props, `render` | The anchor and the toggle. |
-| `PopoverContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className` | Portal and positioner; side=`bottom`, align=`center`, sideOffset=`4`, alignOffset=`0`. Sides include physical and logical values. |
+| `PopoverContent` | `side`, `align`, `sideOffset`, `alignOffset`, `render`, `className`, `style` | Portal, positioner and panel; side=`bottom`, align=`center`, sideOffset=`4`, alignOffset=`0`. Sides include physical and logical values. `className`/`style` accept Base UI state callbacks and merge last, including a caller transition or transform family, which then keeps its own paint. |
 | `PopoverHeader` | `className` | Stacked title and description. |
-| `PopoverTitle` | `className` | Base UI heading; the panel's accessible name. |
-| `PopoverDescription` | `className` | Muted supporting text; becomes `aria-describedby`. |
+| `PopoverTitle` | `render`, `className`, `style` | Base UI heading; the panel's accessible name. A plain string replaces only its changed runs; a direct number uses the compact numeric display slot. |
+| `PopoverDescription` | `render`, `className`, `style` | Muted supporting text; becomes `aria-describedby`. Same changed-text and direct-quantity owners as the title. |
 
 `PopoverContent` positions itself; there is no `PopoverAnchor` export, because Base UI anchors to the
 trigger and upstream's Base UI surface has no anchor part.
 
 ## Motion contract
 
-Authored intensity is **medium**: Popover opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Popover owns one anchored panel presence with a short anchor-side approach, clamped measured width and height, scoped surface paint and the title/description text, quantity and foreground owners; Base UI keeps positioning, focus, dismissal and unmount, and composed controls keep their own motion.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live reduced drops the approach and keeps a short opacity; none settles every target on the first frame and cancels the running writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `scale 0.96 → 1` from the anchor origin | `popup.anchored/css-transition` · `duration.fast` | yes |
-| exit | panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (96ms) | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so the panel appears on the first frame | – | – |
+| enter | panel `opacity 0 → 1` with a `4px` approach along the resolved side | `popup.anchored/one-shot` · `duration.base` | yes, a reversal continues from the current paint |
+| exit | panel `opacity → 0`; the anchor does not move | `exit.fade/one-shot` · `duration.fast` | yes (reopen mid-exit) |
+| size revision | clamped measured panel width and height while open | `geometry.resize/measured` · `spring.sizeCompact` | yes, retargets from the current size |
+| title / description text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title / description quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| panel surface and title/description paint | scoped surface or foreground colour; focus or an unprovable palette is immediate | `state.color/css-transition` | yes, latest committed colour |
 
-The panel grows out of its anchor rather than sliding towards it. A slide would need a distance token
-and four per-side classes, and it moves the edge the positioner just lined up away from the trigger;
-`--transform-origin` says the same thing with one transform. The scale reads `--motion-scale-in`, so
-the class list carries a token and not a number.
+The panel approaches from the side Base UI resolved instead of sliding across the positioner's coordinates:
+`sideOffset` and `alignOffset` stay geometry, the positioner keeps its own transform and `--transform-origin`, and a
+collision flip settles the panel on its new side rather than animating through the old one. The approach reads the
+`distance.xs` token, so no distance literal is written here. Base UI keeps portal, focus, dismissal and completion
+ownership; focus, activation or selection inside an entering panel settles that panel immediately, and closing it
+leaves independent updates on its external trigger intact.
 
 ## Keyboard interactions
 
@@ -17906,15 +17941,20 @@ Pressing outside closes it, which is the difference between a popover and an ale
 ## Responsive behavior
 
 The panel is `w-72` wide and flips sides when the trigger has no room above or below; Base UI also
-shifts it along the cross axis to stay inside the viewport. On a narrow screen it can fill most of the
-width — pass `className="w-[calc(100vw-2rem)]"` or a max width when the content is wider than the
-default.
+shifts it along the cross axis to stay inside the viewport. Its measured width and height are clamped
+to the space Base UI reports as available, so a content change never grows the panel past the viewport.
+On a narrow screen it can fill most of the width — pass `className="w-[calc(100vw-2rem)]"` or a max
+width when the content is wider than the default.
 
 ## Performance
 
-- One popup tree is mounted only while open; the portal unmounts after the exit transition.
-- Animates `opacity` and `scale` only — no layout read, no `top`/`left` transition, no JavaScript
-  animation loop. Reopening during the exit reverses the fade.
+- One popup tree is mounted only while open; the portal unmounts after the exit animation finishes, because the
+  close waits for the panel's own running animation rather than a timer.
+- Animates `opacity` and one short `transform`, plus measured `width`/`height` when the panel's owned content
+  changes — no `top`/`left` transition, no `sideOffset` interpolation and no JavaScript animation loop. Reopening
+  during the exit reverses the fade.
+- One natural-content observer per open panel clamps both measured axes to Base UI's available width and height;
+  passive font or viewport reflow settles immediately instead of animating.
 
 ## Notes for AI
 
@@ -17926,8 +17966,10 @@ default.
 
 Popover resolves its local token clock inside the portal, including timeScale and
 reducedDurationScale. Callback classes/styles are evaluated with Base UI state and
-merged last. Live reduced removes scale transitions; none cancels transitions and
-renders without hidden starting/ending opacity, including nested provider overrides.
+merged last. Live reduced drops the anchor-side approach and the measured axes; none
+cancels every writer and settles the panel, its colours and its display slots on the
+first frame, including nested provider overrides. Composed controls inside the panel
+(buttons, checkboxes, inputs, fields) keep their own motion owners.
 
 # Tooltip
 
@@ -38793,6 +38835,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — transitive registry dependency.
 - [@cadence/calendar](https://cadence.dev/r/calendar.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
 - [@cadence/popover](https://cadence.dev/r/popover.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -38831,6 +38874,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 | date-picker | `@components/cadence/date-picker/index.tsx` | [JSON files[].content](https://cadence.dev/r/date-picker.json) |
 
@@ -38853,6 +38897,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 [Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
 
 [Source files: calendar](https://cadence.dev/r/calendar.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: popover](https://cadence.dev/r/popover.json)
 
@@ -39560,13 +39606,13 @@ selection-keyed remount, new recipe or runtime is added.
 | Recipe / cause | full | reduced | none |
 | --- | --- | --- | --- |
 | `feedback.press/one-shot` / trigger press | token spring scale | no scale | immediate |
-| `popup.anchored/css-transition` / open | opacity and token scale | opacity only | visible first frame |
-| `exit.fade/css-transition` / close | opacity and scale | opacity only | immediate |
+| `popup.anchored/one-shot` / open | opacity with the short anchor-side approach | opacity only | visible first frame |
+| `exit.fade/one-shot` / close | opacity only | opacity only | immediate |
 | `data.transition/one-shot` / calendar month | token horizontal translation and opacity | opacity only | immediate |
 
 Popover resolves its own `duration.fast` clock with timeScale and reducedDurationScale
 inside the portal. Nested full can recover under outer none; OS reduce still wins.
-Live reduced drops scale and live none cancels transitions immediately. Calendar
+Live reduced drops the approach and live none cancels its writers immediately. Calendar
 cancels its WAAPI effect on mode changes without replacing the grid or focused day.
 
 ## Keyboard and accessibility

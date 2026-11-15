@@ -46,6 +46,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/cadence-content](https://cadence.dev/r/cadence-content.json) — transitive registry dependency.
 - [@cadence/calendar](https://cadence.dev/r/calendar.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
 - [@cadence/popover](https://cadence.dev/r/popover.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
@@ -84,6 +85,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | cadence-content | `@components/cadence/lib/content-transition.ts` | [JSON files[].content](https://cadence.dev/r/cadence-content.json) |
 | calendar | `@components/cadence/calendar/index.tsx` | [JSON files[].content](https://cadence.dev/r/calendar.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | popover | `@components/cadence/popover/index.tsx` | [JSON files[].content](https://cadence.dev/r/popover.json) |
 | date-picker | `@components/cadence/date-picker/index.tsx` | [JSON files[].content](https://cadence.dev/r/date-picker.json) |
 
@@ -106,6 +108,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority r
 [Source files: cadence-content](https://cadence.dev/r/cadence-content.json)
 
 [Source files: calendar](https://cadence.dev/r/calendar.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: popover](https://cadence.dev/r/popover.json)
 
@@ -813,13 +817,13 @@ selection-keyed remount, new recipe or runtime is added.
 | Recipe / cause | full | reduced | none |
 | --- | --- | --- | --- |
 | `feedback.press/one-shot` / trigger press | token spring scale | no scale | immediate |
-| `popup.anchored/css-transition` / open | opacity and token scale | opacity only | visible first frame |
-| `exit.fade/css-transition` / close | opacity and scale | opacity only | immediate |
+| `popup.anchored/one-shot` / open | opacity with the short anchor-side approach | opacity only | visible first frame |
+| `exit.fade/one-shot` / close | opacity only | opacity only | immediate |
 | `data.transition/one-shot` / calendar month | token horizontal translation and opacity | opacity only | immediate |
 
 Popover resolves its own `duration.fast` clock with timeScale and reducedDurationScale
 inside the portal. Nested full can recover under outer none; OS reduce still wins.
-Live reduced drops scale and live none cancels transitions immediately. Calendar
+Live reduced drops the approach and live none cancels its writers immediately. Calendar
 cancels its WAAPI effect on mode changes without replacing the grid or focused day.
 
 ## Keyboard and accessibility

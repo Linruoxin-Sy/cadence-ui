@@ -462,7 +462,16 @@ import {expectMotionContract} from '@/tests/motion-contract';\n`;
             `tabs: v2 execute ${action} on tabs#${part}/${slot} with exact source/property/preset policy in ${mode}`,
           );
       expect(output).not.toContain("tabs: execute layout.shared/selection controller policy");
-      expect(output).toContain("popover: execute popup.anchored/css-transition CSS owner in full, reduced, none");
+      // Popover has since migrated: its dead helper call must fail the strict v2
+      // action and boundary matrix instead of the legacy adoption diagnostic.
+      for (const mode of ["full", "reduced", "none"])
+        expect(output).toContain(
+          `popover: v2 execute popover.content.enter on popover#PopoverContent/popover-content with exact source/property/preset policy in ${mode}`,
+        );
+      expect(output).toContain(
+        "popover: v2 verify Native popover.position.place/@position native boundary on popover#PopoverContent",
+      );
+      expect(output).not.toContain("popover: execute popup.anchored/css-transition CSS owner");
       for (const id of ["animated-text", "animated-number", "reveal", "reveal-group", "tooltip"])
         expect(output).toContain(`${id}: mount the actual registry component in full, reduced, none`);
     } finally {

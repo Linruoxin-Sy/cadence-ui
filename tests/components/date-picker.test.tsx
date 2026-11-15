@@ -82,8 +82,10 @@ describe("Date Picker composition", () => {
     const popup = screen.getByRole("dialog");
     expectMotionContract(mode, { parts: [popup] });
     expect(screen.getByRole("grid")).toHaveAttribute("data-motion", mode);
-    expect(popup.className.includes("scale-(--motion-scale-in)")).toBe(mode === "full");
-    if (mode === "none") expect(popup).toHaveClass("transition-none", "duration-0");
+    // Installed Popover owns one anchored presence writer rather than a CSS
+    // transition family, so the composed panel carries no scale or clock class.
+    expect(popup.className).not.toContain("scale-(--motion-scale-in)");
+    expect(popup.className).not.toMatch(/transition-(?:opacity|\[)/);
   });
   it("keeps civil date fields for an explicitly zoned date", async () => {
     const zoned = new TZDate(2026, 10, 12, "Pacific/Kiritimati");

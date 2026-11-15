@@ -271,11 +271,16 @@ it("popover preserves callbacks, render, refs, native events, controlled updates
     view.rerender(example({ mode }));
     expect(document.querySelector('[data-slot="popover-content"]')).toBe(node);
     expect(node).toHaveAttribute("data-motion", mode);
-    if (mode !== "full") expect(node.className).toContain(mode === "none" ? "transition-none" : "transition-opacity");
+    // The anchored presence writer replaces a CSS transition family; the local
+    // colour clock still carries the effective mode duration.
+    expect(node.className).not.toMatch(/transition-(?:opacity|\[)/);
     if (mode === "none") {
       expect(node.style.getPropertyValue("--motion-duration-fast")).toBe("0s");
       expect(node.className).not.toMatch(/data-(?:\[starting-style\]|starting-style):[^ ]*opacity-0/);
     }
+    expect(node.style.getPropertyValue("--motion-duration-fast")).toBe(
+      mode === "none" ? "0s" : mode === "reduced" ? "0.192s" : "0.32s",
+    );
   }
   view.rerender(example({ open: false, mode: "none" }));
   expect(screen.queryByText("Content")).not.toBeInTheDocument();

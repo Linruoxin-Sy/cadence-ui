@@ -154,6 +154,40 @@ export function observeCopiedController(controller, kind, args, source) {
   const origin = currentExecution();
   controllerOrigins.set(controller, origin);
   controllerSources.set(controller, source);
+  if (kind === "createAnchoredPresence") {
+    const commit = controller.commit.bind(controller),
+      settle = controller.settle.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    controller.commit = (...input) => {
+      const offset = parameterCalls.length;
+      const result = withController(controller, () => commit(...input));
+      const options = input[0];
+      const form = options.open ? "popup.anchored/presence" : "exit.fade/opacity";
+      const policy = parameterCalls.slice(offset).find((call) => call.form === form);
+      presentationSamples.set(controller, {
+        controller,
+        node: args[0],
+        origin,
+        form,
+        supportedForms: ["popup.anchored/presence", "exit.fade/opacity"],
+        mode: options.cm.mode,
+        properties: options.open ? ["opacity", "transform"] : ["opacity"],
+        preset: policy?.preset,
+        zeroClock: parameterClockIsZero(policy?.result),
+        clock: policy?.result,
+        target: options.open,
+        commits: (presentationSamples.get(controller)?.commits ?? 0) + 1,
+      });
+      return result;
+    };
+    // A settled entry keeps its resting semantic state for a later exit action.
+    controller.settle = () => settle();
+    controller.dispose = () => {
+      presentationSamples.delete(controller);
+      dispose();
+    };
+    return controller;
+  }
   if (kind === "createModalPresence") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);
