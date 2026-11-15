@@ -107,8 +107,12 @@ describe("Command", () => {
     const popup = await screen.findByRole("dialog", { name: "Command Palette" });
     expect(popup).toHaveAccessibleDescription("Search for a command to run...");
     expectMotionContract(mode, { parts: [popup] });
-    expect(popup.className.includes("scale-(--motion-scale-in)")).toBe(mode === "full");
-    expect(popup.className).toContain("duration-(--motion-duration-base)");
+    expect(popup).toHaveAttribute("data-motion", mode);
+    expect(popup.className).not.toMatch(/transition-(?:opacity|\[)/);
+    expect(popup.className).not.toContain("scale-(--motion-scale-in)");
+    expect(popup.style.getPropertyValue("--motion-duration-base")).toBe(
+      mode === "none" ? "0s" : mode === "reduced" ? "0.132s" : "0.22s",
+    );
     expect(document.querySelector('[data-slot="dialog-overlay"]')).toHaveAttribute("data-motion", mode);
     expect(document.querySelector('[data-slot="command"]')).toHaveAttribute("data-motion", mode);
     expect(screen.queryByRole("button", { name: "Close" })).not.toBeInTheDocument();

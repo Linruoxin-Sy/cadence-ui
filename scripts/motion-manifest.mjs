@@ -319,6 +319,24 @@ function comboboxPresentationForms(source) {
   return [];
 }
 
+/** Fixed-property factories used by the modal adapter. The panel and backdrop each
+ * own one instance, so the surface form is selected by the adapter, not by a caller. */
+function modalPresentationForms(source) {
+  const selected = motionSource(source);
+  if (!selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")))
+    return [];
+  if (
+    selected.source.includes("function createModalPresence(") &&
+    selected.source.includes("node.animate(") &&
+    selected.source.includes("owner.begin(") &&
+    selected.source.includes('"enter.pop/surface"') &&
+    selected.source.includes('"enter.pop/opacity"') &&
+    selected.source.includes('"exit.fade/opacity"')
+  )
+    return ["enter.pop/surface", "enter.pop/opacity", "exit.fade/opacity"];
+  return [];
+}
+
 /** Parameter-backed shared controls retain their exact property form. The
  * binding must reach a rendered shared controller's real transition prop. */
 export function parameterWriterForms(source) {
@@ -332,6 +350,7 @@ export function parameterWriterForms(source) {
       ...comboboxPresentationForms(source),
       ...kbdPresentationForms(source),
       ...groupPositionForms(source),
+      ...modalPresentationForms(source),
     ]),
   ];
 }
