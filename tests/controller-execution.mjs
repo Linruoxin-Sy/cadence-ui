@@ -154,6 +154,39 @@ export function observeCopiedController(controller, kind, args, source) {
   const origin = currentExecution();
   controllerOrigins.set(controller, origin);
   controllerSources.set(controller, source);
+  if (kind === "createModalPresence") {
+    const commit = controller.commit.bind(controller),
+      dispose = controller.dispose.bind(controller);
+    controller.commit = (...input) => {
+      const offset = parameterCalls.length;
+      const result = withController(controller, () => commit(...input));
+      const options = input[0];
+      const spatial = args[1]?.spatial === true;
+      const enterForm = spatial ? "enter.pop/surface" : "enter.pop/opacity";
+      const form = options.open ? enterForm : "exit.fade/opacity";
+      const policy = parameterCalls.slice(offset).find((call) => call.form === form);
+      presentationSamples.set(controller, {
+        controller,
+        node: args[0],
+        origin,
+        form,
+        supportedForms: [enterForm, "exit.fade/opacity"],
+        mode: options.cm.mode,
+        properties: options.open && spatial ? ["opacity", "transform"] : ["opacity"],
+        preset: policy?.preset,
+        zeroClock: parameterClockIsZero(policy?.result),
+        clock: policy?.result,
+        target: options.open,
+        commits: (presentationSamples.get(controller)?.commits ?? 0) + 1,
+      });
+      return result;
+    };
+    controller.dispose = () => {
+      presentationSamples.delete(controller);
+      dispose();
+    };
+    return controller;
+  }
   if (kind === "createSelectPopup" || kind === "createComboboxPopup" || kind === "createCapturedHandoff") {
     const commit = controller.commit.bind(controller),
       dispose = controller.dispose.bind(controller);

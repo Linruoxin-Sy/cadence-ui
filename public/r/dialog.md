@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/dialog`
 - Type: registry:ui
 - Since: 0.2.0
-- Motion recipes: popup.anchored, exit.fade
+- Motion recipes: enter.pop, exit.fade, geometry.resize, state.color, text.change, number.roll
 
 ## Installation
 
@@ -16,7 +16,7 @@
 npx shadcn@latest add @cadence/dialog
 ```
 
-This also installs `button`, which the dialog uses for its close control.
+This also installs `button`, whose variant classes style the built-in close controls.
 The editing example additionally uses `@cadence/field` and `@cadence/input`.
 
 **Manual**
@@ -35,11 +35,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -75,6 +76,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | dialog | `@components/cadence/dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/dialog.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -92,6 +94,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: dialog](https://cadence.dev/r/dialog.json)
 
@@ -248,22 +252,25 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten files in the target list. Keep `dialog/index.tsx` and
-`button/index.tsx` beside the shared `lib/` directory, with their relative
-imports and `"use client"` directives intact. Button is required by Dialog's
-built-in close controls, even if your own trigger uses a native button. Copy all
-files from the motion, utilities and provider payloads. The popup uses CSS
-transitions, but its provider imports and the installed Button still require
-`motion`; wrapping the application in `CadenceProvider` is optional.
+Copy every file in the target list. Keep `dialog/index.tsx` beside the shared
+`lib/` directory, with its relative imports and `"use client"` directive intact.
+The payload also installs `button/index.tsx` for the close controls' variant
+classes, and the shared geometry, text, number, modal-presence, motion,
+utilities and provider files. Dialog's provider imports and the shared
+controllers require `motion`; wrapping the application in `CadenceProvider` is
+optional.
 
 Complete the base theme setup linked above, including Cadence's easing and scale
 tokens, and ensure Tailwind scans the copied files. There is no additional
 Dialog-specific CSS. Each portalled overlay and panel resolves its own token
 clock, including provider `timeScale`: full fades the overlay and fades/scales
-the panel, reduced keeps opacity only, and none removes transitions and hidden
-entry/exit opacity from the first frame. Without a wrapper, Dialog follows the
-system motion preference. Use the included provider for explicit scopes; a
-nested full scope still respects the system reduced-motion preference.
+the panel, reduced drops the panel's scale and keeps a short opacity, and none
+settles every target on the first frame and cancels the running writer. The
+panel reads its natural height once after a known content revision and animates
+only that block size while it is open; a passive font or viewport change applies
+immediately. Without a wrapper, Dialog follows the system motion preference. Use
+the included provider for explicit scopes; a nested full scope still respects the
+system reduced-motion preference.
 
 Usage, Editing a project and the top specimen also use [Field](/components/field)
 and [Input](/components/input). Install them when copying the editing form:
@@ -741,32 +748,34 @@ export function DialogMotionScopes() {
 | --- | --- | --- |
 | `Dialog` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI root; `modal` defaults to `true`, also accepts `false` or `"trap-focus"`. |
 | `DialogTrigger` | native button props, `render` | Opens the dialog. |
-| `DialogContent` | `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
+| `DialogContent` | `showCloseButton`, `overlayClassName`, `overlayStyle`, `render`, `className` | Renders portal, overlay, and popup. `overlayClassName` / `overlayStyle` target only the built-in backdrop. |
 | `DialogOverlay` | `className` | Only needed when replacing `DialogContent`. |
 | `DialogClose` | native button props, `render` | Closes the dialog. |
 | `DialogHeader` / `DialogFooter` | `className`; footer `showCloseButton=false` | Layout; footer can add a Close action. |
-| `DialogTitle` | `className` | Required accessible name. |
-| `DialogDescription` | `className` | Optional supporting text. |
+| `DialogTitle` | `className` | Required accessible name; a plain string or number keeps its own changed-text/number display. |
+| `DialogDescription` | `className` | Optional supporting text; a plain string or number keeps its own changed-text/number display. |
 
 ## Motion contract
 
-Authored intensity is **medium**: Dialog opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Dialog owns its panel and backdrop presence, the panel's measured block size, scoped paint and owned title/description display; Base UI keeps mounting, modality and focus.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live reduced drops the panel's scale envelope and keeps a short opacity; none settles every target on the first frame and cancels the running writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | overlay `opacity 0 → 1`; panel `opacity 0 → 1` + `scale 0.96 → 1` | `popup.anchored/css-transition` · `duration.fast` / `duration.base` | yes |
-| exit | overlay `opacity → 0`; panel `opacity → 0` + `scale → 0.96` | `exit.fade/css-transition` · `duration.fast` / `duration.base` | yes (reopen mid-exit) |
-| reduced | opacity only, no scale; the duration tokens run at 0.6× (overlay 96ms, panel 132ms) | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so no transition runs | – | – |
+| enter | backdrop opacity; panel opacity with a bounded `scale.in` envelope | `enter.pop/one-shot` · `duration.base` / `duration.fast` | yes, a reversal continues from the current paint |
+| exit | panel and backdrop opacity only | `exit.fade/one-shot` · `duration.fast` | yes (reopen mid-exit) |
+| content revision | clamped measured panel height while open | `geometry.resize/measured` · `spring.sizePanel` | yes, retargets from the current size |
+| title / description text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title / description quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| content / overlay / title / description paint | scoped surface or foreground colour; focus or an unprovable palette is immediate | `state.color/css-transition` | yes, latest committed colour |
 
-The panel stays mounted while its exit transition runs; Base UI delays unmount until the
-transition ends, so reopening mid-exit reverses cleanly.
-Focus, activation or find/selection inside an entering panel settles that panel to its current
-resting paint immediately; an independent backdrop may continue. Base UI retains focus,
-portal and completion ownership, including `preventUnmountOnClose` and actions-based unmount.
-Closing the panel retires its child work; a visible external trigger keeps independent updates.
+The panel stays mounted while Base UI completes its own native close protocol, so reopening mid-exit
+reverses the current paint. Focus, activation or selection inside an entering panel settles that panel
+immediately while an independently owned backdrop may continue; Base UI retains focus, portal, modality
+and completion ownership, including `preventUnmountOnClose`. The built-in close controls are native
+buttons that reuse Button's variant classes; they keep native activation and static paint and add no
+second Cadence writer. A caller-rendered `DialogClose` with Button acquires that Button's own owners.
 
 ## Keyboard interactions
 
@@ -782,7 +791,8 @@ Closing the panel retires its child work; a visible external trigger keeps indep
   focus trapping, focus return, scroll lock, and Escape handling.
 - The close button is a real button with a screen-reader-only label.
 - `DialogTitle` is required; a dialog without an accessible name is invalid.
-- Content is unmounted after the exit transition, so focus is never lost mid-flight.
+- Base UI completes its own close protocol before unmounting, so focus is never
+  lost mid-flight.
 
 ## Responsive behavior
 
@@ -792,8 +802,10 @@ so the popup scrolls independently. Hydrated open/close interactions require Jav
 
 ## Performance
 
-- One popup tree is mounted only while open.
-- Animates opacity and scale only; no layout reads and no JavaScript animation loop.
+- One popup tree is mounted only while open, plus the exit retention Base UI needs.
+- The panel reads its natural height once per known content revision; there is no
+  animation loop and no per-frame layout read. Only the block axis is measured;
+  the inline size stays laid out at its destination.
 
 ## Notes for AI
 
