@@ -133,6 +133,22 @@
       ]
     },
     {
+      "name": "cadence-modal-presence",
+      "type": "registry:lib",
+      "title": "Modal presence controller",
+      "description": "Opacity and optional scale presence for one modal surface, with Base UI's native mounting and focus owners.",
+      "categories": ["foundation"],
+      "dependencies": ["motion"],
+      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider"],
+      "files": [
+        {
+          "path": "registry/cadence/lib/modal-presence.ts",
+          "type": "registry:lib",
+          "target": "@components/cadence/lib/modal-presence.ts"
+        }
+      ]
+    },
+    {
       "name": "cadence-surface-presence",
       "type": "registry:lib",
       "title": "Surface presence controller",
@@ -2509,7 +2525,11 @@
         "@cadence/button",
         "@cadence/cadence-motion",
         "@cadence/cadence-utils",
-        "@cadence/cadence-provider"
+        "@cadence/cadence-provider",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-number",
+        "@cadence/cadence-modal-presence"
       ],
       "files": [
         {
@@ -2524,12 +2544,28 @@
         "batch": "B4",
         "motion": [
           {
-            "recipe": "popup.anchored",
-            "form": "css-transition"
+            "recipe": "enter.pop",
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          },
+          {
+            "recipe": "number.roll",
+            "form": "reels"
           }
         ],
         "intensity": "medium",
@@ -2543,23 +2579,51 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Dialog opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Dialog owns its panel and backdrop presence, the panel's measured block size, scoped paint and owned title/description display; Base UI keeps mounting, modality and focus."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "enter.pop/one-shot": [
               {
                 "relationship": "default",
                 "owner": "dialog",
-                "reason": "Dialog integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "The panel owns one opacity and scale entrance envelope and the backdrop owns one stationary opacity entrance on its own rendered host."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "default",
                 "owner": "dialog",
-                "reason": "Dialog integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "A closing panel and backdrop each fade out only on their own opacity channel while Base UI retains the native unmount protocol."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "dialog",
+                "reason": "The panel shell owns one clamped measured block-size transaction over its natural content while it is open and not yet closing."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "dialog",
+                "reason": "Content, backdrop, title and description each own their declared scoped paint on their own physical region, with focus and unverified palettes immediate."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "dialog",
+                "reason": "A directly supplied plain Title or Description string replaces only its changed graphemes; arbitrary rich children keep their native identity."
+              }
+            ],
+            "number.roll/reels": [
+              {
+                "relationship": "default",
+                "owner": "dialog",
+                "reason": "A directly supplied supported numeric quantity in Title or Description rolls only its changed places; strings and identifiers remain text."
               }
             ]
           }
@@ -3846,10 +3910,22 @@
         "tier": "T2",
         "batch": "B5",
         "motion": [
-          { "recipe": "data.transition", "form": "one-shot" },
-          { "recipe": "popup.anchored", "form": "one-shot" },
-          { "recipe": "state.color", "form": "css-transition" },
-          { "recipe": "state.morph", "form": "one-shot" }
+          {
+            "recipe": "data.transition",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "popup.anchored",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "state.color",
+            "form": "css-transition"
+          },
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
@@ -4264,12 +4340,12 @@
         "batch": "B5",
         "motion": [
           {
-            "recipe": "popup.anchored",
-            "form": "css-transition"
+            "recipe": "enter.pop",
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
-            "form": "css-transition"
+            "form": "one-shot"
           }
         ],
         "intensity": "medium",
@@ -4288,18 +4364,23 @@
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "enter.pop/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dialog",
-                "reason": "Command mounts dialog for popup opening; that installed component remains the integration owner."
+                "reason": "Command mounts DialogContent for its palette entrance; the migrated Dialog panel and backdrop remain the actual presence owners."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dialog",
-                "reason": "Command mounts dialog for popup closing; that installed component remains the integration owner."
+                "reason": "Command mounts DialogContent for its palette exit; the migrated Dialog keeps that opacity owner and the native completion."
+              },
+              {
+                "relationship": "inherited",
+                "owner": "input-group",
+                "reason": "A retained composed InputGroupAddon keeps its own insertion/exit opacity inside CommandInput rather than receiving a second palette writer."
               }
             ]
           }
