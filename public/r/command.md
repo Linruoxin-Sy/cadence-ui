@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/command`
 - Type: registry:ui
 - Since: 0.3.0
-- Motion recipes: popup.anchored, exit.fade
+- Motion recipes: enter.pop, exit.fade
 
 ## Installation
 
@@ -40,6 +40,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
 - [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — transitive registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — transitive registry dependency.
 - [@cadence/dialog](https://cadence.dev/r/dialog.json) — direct registry dependency.
 - [@cadence/input](https://cadence.dev/r/input.json) — transitive registry dependency.
 - [@cadence/textarea](https://cadence.dev/r/textarea.json) — transitive registry dependency.
@@ -79,6 +80,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | dialog | `@components/cadence/dialog/index.tsx` | [JSON files[].content](https://cadence.dev/r/dialog.json) |
 | input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | input | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/input.json) |
@@ -103,6 +105,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: dialog](https://cadence.dev/r/dialog.json)
 
@@ -1034,11 +1038,11 @@ Authored intensity is **medium**: Command opens and closes its existing popup su
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `popup.anchored/css-transition` via Dialog, `duration.base` / `duration.fast` | yes, CSS transitions |
-| close | dialog and backdrop fade out, panel scales back in full mode | `exit.fade/css-transition` via Dialog | yes |
+| open | dialog opacity 0 to 1 and scale from `--motion-scale-in`; backdrop opacity 0 to 1 | `enter.pop/one-shot` via Dialog · `duration.base` / `duration.fast` | yes, from the current paint |
+| close | dialog and backdrop fade out only, no scale-out | `exit.fade/one-shot` via Dialog · `duration.fast` | yes (reopen mid-exit) |
 | filter / highlight | instant replacement and background feedback, no row motion | none | n/a |
-| reduced | opacity only; scale classes absent | mode durations | yes |
-| none | dialog and backdrop durations resolve to zero | zero duration | n/a |
+| reduced | opacity only; the scale envelope is absent | mode durations | yes |
+| none | dialog and backdrop targets settle immediately and the writer is cancelled | zero duration | n/a |
 
 The inline command has no animation. `CommandDialog` inherits Dialog's recipes and mode branches;
 it adds no transition of its own. Fixed centering translation is layout, not motion.
