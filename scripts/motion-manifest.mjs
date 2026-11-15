@@ -319,6 +319,23 @@ function comboboxPresentationForms(source) {
   return [];
 }
 
+/** Fixed-property factories used by the anchored-popup adapter. The opacity layer
+ * and the anchor-side approach are the only writers, on the panel's own host. */
+function anchoredPresenceForms(source) {
+  const selected = motionSource(source);
+  if (!selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")))
+    return [];
+  if (
+    selected.source.includes("function createAnchoredPresence(") &&
+    selected.source.includes("node.animate(") &&
+    selected.source.includes("owner.begin(") &&
+    selected.source.includes('"popup.anchored/presence"') &&
+    selected.source.includes('"exit.fade/opacity"')
+  )
+    return ["popup.anchored/presence", "exit.fade/opacity"];
+  return [];
+}
+
 /** Fixed-property factories used by the modal adapter. The panel and backdrop each
  * own one instance, so the surface form is selected by the adapter, not by a caller. */
 function modalPresentationForms(source) {
@@ -351,6 +368,7 @@ export function parameterWriterForms(source) {
       ...kbdPresentationForms(source),
       ...groupPositionForms(source),
       ...modalPresentationForms(source),
+      ...anchoredPresenceForms(source),
     ]),
   ];
 }

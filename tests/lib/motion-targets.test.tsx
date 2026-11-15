@@ -183,6 +183,7 @@ describe("current registry inventory and real part references", () => {
       "toggle-group",
       "input-otp",
       "alert-dialog",
+      "popover",
       "select",
       "combobox",
       "accordion",
