@@ -23,7 +23,7 @@ function Example() {
 }
 
 function panel() {
-  return document.querySelector('[data-slot="hover-card-content"]');
+  return document.querySelector<HTMLElement>('[data-slot="hover-card-content"]');
 }
 
 function renderInMode(mode: NonNullable<CadenceProviderProps["mode"]>) {
