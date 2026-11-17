@@ -6,7 +6,7 @@
 - Install: `npx shadcn@latest add @cadence/dropdown-menu`
 - Type: registry:ui
 - Since: 0.4.0
-- Motion recipes: popup.anchored, exit.fade, state.morph
+- Motion recipes: popup.anchored, exit.fade, geometry.resize, state.color, state.morph, text.change
 
 ## Installation
 
@@ -34,6 +34,10 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
+- [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -56,6 +60,17 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 | cadence-provider | `@components/cadence/lib/motion-ref.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/group-member.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
 | cadence-provider | `@components/cadence/lib/inline-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-provider.json) |
+| cadence-geometry | `@components/cadence/lib/measured-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/size-linked-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-geometry.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-geometry | `@components/cadence/lib/sidebar-labels.ts` | [JSON files[].content](https://cadence.dev/r/cadence-geometry.json) |
+| cadence-handoff | `@components/cadence/lib/captured-handoff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-handoff.json) |
+| cadence-text | `@components/cadence/lib/text-diff.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-layout.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-text | `@components/cadence/lib/use-text-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-text.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | dropdown-menu | `@components/cadence/dropdown-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/dropdown-menu.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -63,6 +78,14 @@ npm install clsx tailwind-merge motion @base-ui/react lucide-react
 [Source files: cadence-utils](https://cadence.dev/r/cadence-utils.json)
 
 [Source files: cadence-provider](https://cadence.dev/r/cadence-provider.json)
+
+[Source files: cadence-geometry](https://cadence.dev/r/cadence-geometry.json)
+
+[Source files: cadence-handoff](https://cadence.dev/r/cadence-handoff.json)
+
+[Source files: cadence-text](https://cadence.dev/r/cadence-text.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: dropdown-menu](https://cadence.dev/r/dropdown-menu.json)
 
@@ -219,12 +242,12 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all nine target files, including every shared `lib/` file. Keep the mirrored
-`cadence/` tree, relative imports and `"use client"` directives intact. The provider
-files and `motion` are required imports; wrapping your application in
-`CadenceProvider` is optional. Complete the base theme setup linked above,
-including Cadence's easing tokens, and ensure Tailwind scans the copied files.
-These payloads contain no additional menu-specific CSS or assets.
+Copy all twenty-nine target files, including every shared `lib/` file. Keep the mirrored
+`cadence/` tree, relative imports and `"use client"` directives intact. The provider,
+measured-geometry, changed-text and anchored-presence files and `motion` are required
+imports; wrapping your application in `CadenceProvider` is optional. Complete the base
+theme setup linked above, including Cadence's easing tokens, and ensure Tailwind scans
+the copied files. These payloads contain no additional menu-specific CSS or assets.
 
 Usage, the top specimen and every body example also compose Button. Follow
 [Button's manual installation](https://cadence.dev/components/button#installation)
@@ -274,13 +297,12 @@ does not register a key binding. Group labels name a DropdownMenuGroup;
 ungrouped labels are captions. This menu supplies no form-state or validation
 package, and the examples only update local status text.
 
-Full mode scales and fades the popup and animates the checkbox/radio mark.
-Reduced keeps opacity and removes scale; none disables those transitions from
-the first mounted frame. A nested provider can restore full inside none,
-subject to the system reduced-motion preference. Keep native menu focus and
-dismissal behavior when supplying custom render elements or handlers; use
-ordinary links or Navigation Menu for a navigation list and Popover for a task
-form.
+Full mode fades and briefly approaches the popup, measures a content revision, animates scoped paint and
+animates the checkbox/radio mark. Reduced keeps the short opacity and colour feedback, removes the
+approach and mark scale, and settles measured geometry; none settles every property on the first
+mounted frame. A nested provider can restore full inside none, subject to the system reduced-motion
+preference. Keep native menu focus and dismissal behavior when supplying custom render elements or
+handlers; use ordinary links or Navigation Menu for a navigation list and Popover for a task form.
 
 ## Usage
 
@@ -929,32 +951,38 @@ the element the user presses.
 
 ## Motion contract
 
-Authored intensity is **medium**: Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Dropdown Menu owns one anchored popup presence per open branch, its measured shell, scoped row and popup paint, indicator marks and plain row/label text while Base UI keeps placement, roving focus, typeahead and unmount.
 
-| Phase         | Properties                                        | Token             | Interruptible                |
-| ------------- | ------------------------------------------------- | ----------------- | ---------------------------- |
-| open          | panel `opacity 0 → 1`, `scale 0.96 → 1` from the trigger origin | `popup.anchored/css-transition` · `duration.fast` | yes (reopen mid-exit) |
-| close         | panel `opacity → 0`, `scale → 0.96`               | `exit.fade/css-transition` · `duration.fast` | yes                |
-| check / radio | mark `opacity` + `scale`                          | `state.morph/one-shot`     | yes                          |
-| reduced       | panel fades, no scale; the mark cross-fades at full size | `exit.fade/css-transition` | yes                         |
-| none          | every `--motion-duration-*` resolves to `0ms`; the mark jumps | –      | –                            |
+| Phase                       | Properties                                                                                                                  | Token                                                   | Interruptible                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| open                        | popup `opacity 0 → 1` with a short approach along the side Base UI resolved                                                   | `popup.anchored/one-shot` · `duration.fast`              | yes, a reversal continues from the current paint      |
+| close                       | popup `opacity → 0`; the anchor does not move                                                                                | `exit.fade/one-shot` · `duration.fast`                   | yes (reopen mid-exit)                                 |
+| content revision            | clamped measured popup width and height while the branch is open                                                             | `geometry.resize/measured` · `spring.sizeCompact`        | yes, retargets from the current size                  |
+| item and shell paint        | scoped row surface/foreground and the popup, label, shortcut and separator paint; focus or an unprovable palette is immediate | `state.color/css-transition` · `duration.fast`           | yes, latest committed colour                          |
+| checkbox / radio change     | mark `opacity` plus the preset's `scale.in` pose                                                                              | `state.morph/one-shot` · `spring.snappy`                 | yes, the slot retargets in place                      |
+| plain row / label text      | changed graphemes only, no stagger                                                                                            | `text.change/changed-runs` · `duration.instant` exit / `duration.fast` enter | yes, the newest diff replaces the old target          |
 
-Opening and closing are one CSS transition on `opacity` and `scale`, driven by Base UI's
-`data-starting-style` / `data-ending-style`, so an interrupted close reverses rather than
-restarts. The panel grows out of `--transform-origin`, which Base UI points at the trigger;
-a submenu grows out of its item the same way, because both levels render the same panel.
+The popup approach uses the shared anchored-presence executor: the positioner keeps its own transform and
+`--transform-origin`, `sideOffset` and `alignOffset` are never interpolated, and a collision flip settles the panel on
+its new side instead of travelling through the old one. The approach reads the `distance.xs` token, so no distance
+literal is written here. Each mounted branch — the root menu and every submenu — is its own controller instance with
+its own slot, so a submenu never reuses the parent's measured box or presence envelope.
 
-The highlighted row is a colour change, not motion: `data-highlighted` switches the item's
-background. A travelling highlight would be a shared element across items — `layout.move`,
-which belongs to `tabs` and `toggle-group`, not to a menu that can be entered at any row.
+The highlighted row is a colour change, not motion: `data-highlighted` switches the item's surface, and one scoped
+`state.color` owner per row writes it. A travelling highlight would be a shared element across items — `layout.move`,
+which belongs to `tabs` and `toggle-group`, not to a menu that can be entered at any row. Checkbox and radio marks
+keep their independent state; there is no shared selection pill.
 
-Each portal resolves token durations from its local provider, including `full` nested inside
-`none` (the OS reduced-motion preference still wins). Full → reduced cancels running panel
-geometry and keeps the opacity transition; `none` cancels opacity too and is visible on the
-first mounted frame. The site header changes the inherited mode on the same component tree; the named
-Explicit motion scopes example demonstrates fixed local overrides. Base UI `className(state)` and `style(state)` callbacks are evaluated
-before merging; caller utilities and styles win. Native `render`, events and ref cleanup
-remain owned by the primitive.
+Each portal resolves token durations from its local provider, including `full` nested inside `none` (the OS
+reduced-motion preference still wins). Full → reduced cancels the approach, the mark scale and measured geometry while
+keeping the short opacity and colour feedback; `none` settles every property on the first frame and cancels the running
+writers. The site header changes the inherited mode on the same component tree; the named Explicit motion scopes
+example demonstrates fixed local overrides. Base UI `className(state)` and `style(state)` callbacks are evaluated
+before merging; caller utilities and styles win. Native `render`, events, refs and focus remain owned by the primitive.
+
+A plain item, group-label or shortcut string is diffed into changed runs; a rich item or label child (links, mixed
+JSX, render callbacks) keeps its own content and is never split by the menu. An explicit `AnimatedNumber` child may
+roll its own count; the menu never infers a quantity from a numeric-looking command name or shortcut.
 
 ## Keyboard interactions
 
@@ -996,11 +1024,12 @@ is as wide as its widest item.
 
 ## Performance
 
-- One portal per open menu; closing unmounts it after the exit transition.
-- The panel animates `opacity` and `scale` only, on one element. Nothing measures layout, and
-  no JavaScript runs per frame.
-- Items carry no per-item motion: the only animated state is the check mark, and it animates
-  two properties on a 14px span.
+- One portal per open menu; closing unmounts it after the owned exit and Base UI's own completion.
+- The popup animates `opacity` and one short `transform` on one element, plus a clamped measured
+  `width`/`height` only for a known content revision. No per-frame JavaScript runs for those writes.
+- Items carry no entrance of their own: a row owns only its scoped colour family, and a plain row or
+  label string replaces changed graphemes in place. The check/radio mark animates two properties on a
+  14px span.
 - Budget: T2 (10 KB gzip). A page with a dozen closed menus pays for one component's source,
   no mounted popups, and no timers.
 
@@ -1014,11 +1043,11 @@ is as wide as its widest item.
 - Do not put a form with validation inside a menu. A menu is a list of commands; `popover`
   is the surface for controls.
 
-The popup owns its `duration.fast` clock, including provider timeScale and the
-reduced duration multiplier. An explicit full provider restores the clock inside
-an outer none scope. In none mode the popup removes starting/ending opacity and
-uses zero duration on the first frame. Function-valued popup `className` and
-`style` receive Base UI state and merge after the component defaults.
+The popup owns its `duration.fast` presence clock, including provider timeScale and the
+reduced duration multiplier. An explicit full provider restores the clock inside an outer none
+scope. In none mode every authored property reaches its target with zero duration and no delay,
+and Base UI still completes its own exit protocol. Function-valued popup `className` and `style`
+receive Base UI state and merge after the component defaults.
 
 ---
 
