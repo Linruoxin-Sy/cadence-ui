@@ -157,6 +157,33 @@ describe("Sidebar", () => {
     expect(hint).toHaveTextContent("Projects");
     expectMotionContract(mode, { behavior: () => expect(hint).toBeInTheDocument() });
   });
+  // The mobile composition is a real dependency: Sidebar renders the migrated
+  // Sheet, whose panel shell owns its own measured block size in every mode.
+  it.each(["full", "reduced", "none"] as const)("opens the composed mobile sheet in %s", async (mode) => {
+    const width = window.innerWidth;
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: 500 });
+    try {
+      render(
+        <CadenceProvider mode={mode}>
+          <SidebarProvider>
+            <Sidebar>
+              <SidebarMenuButton>
+                <span>Projects</span>
+              </SidebarMenuButton>
+            </Sidebar>
+            <SidebarTrigger />
+          </SidebarProvider>
+        </CadenceProvider>,
+      );
+      await userEvent.click(screen.getByRole("button", { name: "Toggle Sidebar" }));
+      const panel = await screen.findByRole("dialog");
+      expect(panel).toHaveAttribute("data-slot", "sheet-content");
+      expect(panel).toHaveAttribute("data-motion", mode);
+      expectMotionContract(mode, { behavior: () => expect(panel).toHaveAttribute("data-side", "left") });
+    } finally {
+      Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
+    }
+  });
   it("forwards native events/styles/render refs and ref cleanup", () => {
     const ref = createRef<HTMLDivElement>();
     const cleanup = vi.fn();

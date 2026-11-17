@@ -40,6 +40,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — transitive registry dependency.
 - [@cadence/sheet](https://cadence.dev/r/sheet.json) — direct registry dependency.
 - [@cadence/skeleton](https://cadence.dev/r/skeleton.json) — direct registry dependency.
 - [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
@@ -84,6 +85,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | input | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
 | skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
 | cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
@@ -112,6 +114,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: input](https://cadence.dev/r/input.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: sheet](https://cadence.dev/r/sheet.json)
 

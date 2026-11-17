@@ -186,7 +186,14 @@ export function useSidebarGeometry(
         const old = doc.createElement("span").style;
         old.cssText = record.oldValue ?? "";
         const next = (record.target as HTMLElement).style;
-        return [...new Set([...old, ...next])].some(
+        // A CSSStyleDeclaration is array-like, not iterable: collect the declared
+        // property names explicitly instead of spreading the live objects.
+        const declared = (style: CSSStyleDeclaration) => {
+          const names: string[] = [];
+          for (let index = 0; index < style.length; index += 1) names.push(style.item(index));
+          return names;
+        };
+        return [...new Set([...declared(old), ...declared(next)])].some(
           (key) =>
             !key.startsWith("--motion-") &&
             !key.startsWith("--cadence-") &&

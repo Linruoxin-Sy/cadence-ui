@@ -19297,11 +19297,12 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-utils](https://cadence.dev/r/cadence-utils.json) — direct registry dependency.
 - [@cadence/cadence-theme](https://cadence.dev/r/cadence-theme.json) — transitive registry dependency.
 - [@cadence/cadence-provider](https://cadence.dev/r/cadence-provider.json) — direct registry dependency.
-- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — transitive registry dependency.
+- [@cadence/cadence-geometry](https://cadence.dev/r/cadence-geometry.json) — direct registry dependency.
 - [@cadence/cadence-handoff](https://cadence.dev/r/cadence-handoff.json) — transitive registry dependency.
-- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — transitive registry dependency.
-- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
+- [@cadence/cadence-text](https://cadence.dev/r/cadence-text.json) — direct registry dependency.
+- [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — direct registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — direct registry dependency.
 
 3. Place every file at its target below. `@components` means your components directory, for example `src/components`; keep the remaining `cadence/` tree and relative imports intact. Each source block on the website copies the entire file, including folded lines.
 
@@ -19337,6 +19338,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | cadence-number | `@components/cadence/lib/number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | cadence-number | `@components/cadence/lib/use-number-presentation.ts` | [JSON files[].content](https://cadence.dev/r/cadence-number.json) |
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
 
 [Source files: cadence-motion](https://cadence.dev/r/cadence-motion.json)
@@ -19354,6 +19356,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: cadence-number](https://cadence.dev/r/cadence-number.json)
 
 [Source files: button](https://cadence.dev/r/button.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: sheet](https://cadence.dev/r/sheet.json)
 
@@ -19510,21 +19514,22 @@ export function MotionRoot({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Copy all ten files in the target list, including `button/index.tsx` and every
+Copy every file in the target list, including `button/index.tsx` and every
 shared `lib/` file. Keep the mirrored `cadence/` tree, relative imports and
 `"use client"` directives intact. Button is required by Sheet's built-in close
-control even when your trigger is a native button. The panel and backdrop use
-CSS transitions, but Button and the provider imports still require `motion`;
-wrapping your application in `CadenceProvider` is optional.
+control even when your trigger is a native button. The panel and backdrop are
+driven by the shared presence controller, but Button and the provider imports
+still require `motion`; wrapping your application in `CadenceProvider` is
+optional.
 
 Complete the base theme setup linked above, including Cadence's easing tokens,
 and ensure Tailwind scans the copied files. There is no additional Sheet-specific
 CSS or asset. Each portalled panel and backdrop resolves its own motion clock,
-including provider `timeScale`: full fades the backdrop and slides/fades the
-panel, reduced keeps opacity only, and none removes transitions and hidden
-entry/exit opacity from the first frame. Without a wrapper, Sheet follows the
-system motion preference. An explicit nested full scope still respects the
-system reduced-motion preference.
+including provider `timeScale`: full slides the panel from its own edge and fades
+it while the backdrop fades on its own clock, reduced keeps opacity only, and none
+places the panel immediately. Without a wrapper, Sheet follows the system motion
+preference. An explicit nested full scope still respects the system
+reduced-motion preference.
 
 Usage and the top filter specimen additionally need [Checkbox](/components/checkbox)
 and [Field](/components/field). Controlled form needs Field and
@@ -19671,7 +19676,7 @@ export function SheetEdges() {
 
 ## Without the built-in close button
 
-showCloseButton=false removes only the corner control. Keep a clear footer close action, Escape and outside dismissal. This example provides an explicit Done action.
+showCloseButton=false removes only the corner control. Keep a clear footer close action, Escape and outside dismissal. This example provides an explicit Done action. `SheetFooter showCloseButton` renders the same Button-backed close for you, with `closeLabel` for a localized wording.
 
 <ComponentExample name="footer-close" />
 
@@ -19937,31 +19942,43 @@ export function SheetMotionScopes() {
 | --- | --- | --- |
 | `Sheet` | `open`, `defaultOpen`, `onOpenChange`, `modal` | Base UI dialog root. |
 | `SheetTrigger` | native button props, `render` | Opens the sheet. |
-| `SheetContent` | `side` (`"right" \| "left" \| "top" \| "bottom"`), `showCloseButton`, `render`, `className` | Renders portal, overlay, and popup. |
-| `SheetOverlay` | `className` | Only needed when replacing `SheetContent`. |
+| `SheetContent` | `side` (`"right" \| "left" \| "top" \| "bottom"`), `showCloseButton`, `overlayClassName`, `overlayStyle`, `render`, `className`, `style` | Renders portal, overlay, and popup. The overlay hooks paint only the backdrop. |
+| `SheetOverlay` | `className`, `style` | Only needed when replacing `SheetContent`. |
 | `SheetPortal` | `container` | Available for a custom portal target. |
-| `SheetClose` | native button props, `render` | Closes the sheet. |
-| `SheetHeader` / `SheetFooter` | `className` | Padding and stacking only. |
+| `SheetClose` | native button props, `render` | Closes the sheet. Pass `render={<Button />}` to close with a Button. |
+| `SheetHeader` | `className` | Padding and stacking only. |
+| `SheetFooter` | `className`, `showCloseButton`, `closeLabel`, `closeClassName`, `closeStyle` | Stacking only by default; `showCloseButton` adds one Button-backed close action, exactly like `DialogFooter`. |
 | `SheetTitle` | `className` | Required accessible name. |
 | `SheetDescription` | `className` | Supporting text. |
 
 ## Motion contract
 
-Authored intensity is **medium**: Sheet opens and closes its existing popup surface; content and native focus retain their current owners.
+Authored intensity is **medium**: Sheet owns its panel edge flight, the independently owned backdrop opacity, the panel's measured block size, scoped paint and owned title/description display while Base UI keeps mounting, modality and focus.
 
-Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Live reduced cancels scale or slide and keeps opacity; none cancels transitions and shows the first frame immediately. Base parts accept `className(state)` and `style(state)`; caller values merge last.
+Each portal surface resolves its own mode and token clock. A nested full scope restores timing inside none (subject to the system preference). Base parts accept `className(state)` and `style(state)`; caller values merge last. Live reduced drops the edge flight and keeps a short opacity; none settles every target on the first frame and cancels the running writer.
 
 | Phase | Properties | Token | Interruptible |
 | --- | --- | --- | --- |
-| enter | panel `opacity 0 → 1` + `translate` from its own size; backdrop `opacity 0 → 1` | `popup.anchored/css-transition` · `duration.base` / `duration.fast` | yes |
-| exit | panel `opacity → 0` + `translate` back off its edge; backdrop `opacity → 0` | `exit.fade/css-transition` · panel `duration.base` / backdrop `duration.fast` | yes |
-| reduced | opacity only, no translate; at `timeScale={1}`, default duration tokens run at 0.6×: panel 132ms / backdrop 96ms | `exit.fade/css-transition` | yes |
-| none | every `--motion-duration-*` resolves to `0ms`, so the panel is in place on the first frame | – | – |
+| enter | panel `opacity 0 → 1` plus a `transform` translation from its own edge extent | `popup.anchored/one-shot` · `duration.slow` | yes, a reversal continues from the current paint |
+| backdrop enter | backdrop `opacity 0 → 1` on its own host, independent of the panel flight | `enter.pop/one-shot` · `duration.base` | yes |
+| exit | panel `opacity → 0` and `transform` back off its edge; backdrop `opacity → 0` | `exit.fade/one-shot` · panel `duration.base` / backdrop `duration.fast` | yes (reopen mid-exit) |
+| content revision | clamped measured panel block size while open | `geometry.resize/measured` · `spring.sizePanel` | yes, retargets from the current size |
+| title / description text | changed graphemes only, no stagger | `text.change/changed-runs` | yes, the newest diff replaces the old target |
+| direct numeric title / description quantity | changed place values only | `number.roll/reels` | yes, retargets the current reel |
+| panel / backdrop / title / description paint | scoped surface or foreground colour; focus or an unprovable palette is immediate | `state.color/css-transition` | yes, latest committed colour |
+| press on the Button-backed close | `scale.press` on Button's own safe layer, omitted when that layer is unavailable | `feedback.press/one-shot` | native activation and close stay immediate |
 
-The slide is `translate-*-full`, the panel's own width or height, not a fixed distance: a side panel
-should enter from off its edge at every size, and a distance token would need one value per side. The
-transition list names `translate` rather than `transform` because Tailwind v4's `translate-*` utilities
-write the property individually — the same reason the dialogs transition `scale`.
+The travel distance is the panel's own rendered width or height, expressed as a percentage of that box, so
+each edge and size enters from exactly off its edge without a distance token per side. A caller transform
+keeps its own family, and the panel then runs the opacity half only. A live `side` change settles the
+obsolete envelope and places the new edge immediately instead of flying across the viewport. Only the block
+axis is measured: a side panel keeps its full height and caller/viewport-owned width, so a content revision
+there settles natively rather than rewrapping text on every frame.
+
+Focus, pointer or key activation inside an entering panel settles that panel immediately while the
+independently owned backdrop may continue. Base UI retains focus, portal, modality and completion ownership,
+including `preventUnmountOnClose`. The built-in close control is a `Button`, so its paint, box, label,
+quantity and press behavior are that component's own owners, never a second sheet writer.
 
 ## Keyboard interactions
 
@@ -19972,8 +19989,9 @@ write the property individually — the same reason the dialogs transition `scal
 | Enter / Space | Activates the focused control. |
 
 The panel and backdrop resolve local token clocks from the effective mode and time scale, including
-full inside a parent none scope. None also removes starting/ending opacity classes, so no hidden
-starting frame remains. Caller state callback classes/styles still merge last.
+full inside a parent none scope. None places the panel at its open geometry on the first frame and
+cancels the running writer, so no hidden starting pose remains. Caller state callback classes/styles
+still merge last.
 
 ## Accessibility
 
@@ -19995,8 +20013,11 @@ reachable and the page behind does not move.
 ## Performance
 
 - One popup tree is mounted only while open; the overlay and panel unmount after the exit.
-- Animates `opacity` and `translate` only: the panel is `fixed` at its edge, so nothing reflows and the
-  page behind never reads layout.
+- Animates `opacity` and `transform` only: the panel is `fixed` at its edge, so nothing reflows and the
+  page behind never reads layout. The travel is a percentage of the panel's own box, never a measured
+  viewport distance.
+- One measured block-size owner serves the panel's natural height; a side panel's inline size is never
+  interpolated, so text does not rewrap per frame.
 - The close control is a `Button`, so its press feedback obeys the same motion mode as the sheet.
 
 ## Notes for AI
@@ -35986,6 +36007,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
 - [@cadence/separator](https://cadence.dev/r/separator.json) — direct registry dependency.
+- [@cadence/cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json) — transitive registry dependency.
 - [@cadence/sheet](https://cadence.dev/r/sheet.json) — direct registry dependency.
 - [@cadence/skeleton](https://cadence.dev/r/skeleton.json) — direct registry dependency.
 - [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
@@ -36030,6 +36052,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | input | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | separator | `@components/cadence/separator/index.tsx` | [JSON files[].content](https://cadence.dev/r/separator.json) |
 | separator | `@components/cadence/lib/separator-layout.ts` | [JSON files[].content](https://cadence.dev/r/separator.json) |
+| cadence-modal-presence | `@components/cadence/lib/modal-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-modal-presence.json) |
 | sheet | `@components/cadence/sheet/index.tsx` | [JSON files[].content](https://cadence.dev/r/sheet.json) |
 | skeleton | `@components/cadence/skeleton/index.tsx` | [JSON files[].content](https://cadence.dev/r/skeleton.json) |
 | cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
@@ -36058,6 +36081,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: input](https://cadence.dev/r/input.json)
 
 [Source files: separator](https://cadence.dev/r/separator.json)
+
+[Source files: cadence-modal-presence](https://cadence.dev/r/cadence-modal-presence.json)
 
 [Source files: sheet](https://cadence.dev/r/sheet.json)
 

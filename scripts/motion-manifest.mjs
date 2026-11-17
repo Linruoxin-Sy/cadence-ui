@@ -354,7 +354,9 @@ function tooltipPresenceForms(source) {
 }
 
 /** Fixed-property factories used by the modal adapter. The panel and backdrop each
- * own one instance, so the surface form is selected by the adapter, not by a caller. */
+ * own one instance, so the surface form is selected by the adapter, not by a caller.
+ * The same adapter resolves an edge flight for a panel that leaves from its own
+ * extent; that form is only recognised when the installed source really carries it. */
 function modalPresentationForms(source) {
   const selected = motionSource(source);
   if (!selected.imports.some((entry) => entry.name === "bindMotionParameters" && entry.path.endsWith("/motion")))
@@ -367,7 +369,16 @@ function modalPresentationForms(source) {
     selected.source.includes('"enter.pop/opacity"') &&
     selected.source.includes('"exit.fade/opacity"')
   )
-    return ["enter.pop/surface", "enter.pop/opacity", "exit.fade/opacity"];
+    return [
+      "enter.pop/surface",
+      "enter.pop/opacity",
+      "exit.fade/opacity",
+      ...(selected.source.includes('"popup.anchored/edge"') &&
+      selected.source.includes('"popup.anchored/edge-exit"') &&
+      selected.source.includes("edgeOffset(")
+        ? ["popup.anchored/edge", "popup.anchored/edge-exit"]
+        : []),
+    ];
   return [];
 }
 
