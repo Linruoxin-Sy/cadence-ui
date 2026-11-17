@@ -16,6 +16,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/registry/cadence/sidebar";
+import { TooltipProvider } from "@/registry/cadence/tooltip";
 import { expectMotionContract } from "../motion-contract";
 import { imperativeSamples } from "../motion-observer";
 
@@ -133,6 +134,28 @@ describe("Sidebar", () => {
     expect(panel).toHaveAttribute("data-motion", "none");
     expect(panel.style.transform).toBe("");
     expect(container.querySelector("input")).toBe(input);
+  });
+  // The composed hint is a real dependency: a collapsed icon sidebar enables it,
+  // and the migrated Tooltip owns its own measured hint shell in every mode.
+  it.each(["full", "reduced", "none"] as const)("opens the composed hint tooltip in %s", async (mode) => {
+    render(
+      <CadenceProvider mode={mode}>
+        <TooltipProvider delay={0}>
+          <SidebarProvider open={false}>
+            <Sidebar collapsible="icon">
+              <SidebarMenuButton tooltip="Projects">
+                <span>Projects</span>
+              </SidebarMenuButton>
+            </Sidebar>
+          </SidebarProvider>
+        </TooltipProvider>
+      </CadenceProvider>,
+    );
+    await userEvent.hover(screen.getByRole("button", { name: "Projects" }));
+    const hint = await screen.findByRole("tooltip");
+    expect(hint).toHaveAttribute("data-slot", "tooltip-content");
+    expect(hint).toHaveTextContent("Projects");
+    expectMotionContract(mode, { behavior: () => expect(hint).toBeInTheDocument() });
   });
   it("forwards native events/styles/render refs and ref cleanup", () => {
     const ref = createRef<HTMLDivElement>();
