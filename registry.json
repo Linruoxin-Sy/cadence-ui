@@ -4410,7 +4410,14 @@
       "description": "Row actions, filters, and view settings behind one button.",
       "categories": ["overlay"],
       "dependencies": ["@base-ui/react", "lucide-react", "motion"],
-      "registryDependencies": ["@cadence/cadence-motion", "@cadence/cadence-provider", "@cadence/cadence-utils"],
+      "registryDependencies": [
+        "@cadence/cadence-motion",
+        "@cadence/cadence-provider",
+        "@cadence/cadence-utils",
+        "@cadence/cadence-geometry",
+        "@cadence/cadence-text",
+        "@cadence/cadence-anchored-presence"
+      ],
       "files": [
         {
           "path": "registry/cadence/dropdown-menu/index.tsx",
@@ -4425,13 +4432,28 @@
         "motion": [
           {
             "recipe": "popup.anchored",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "geometry.resize",
+            "form": "measured"
+          },
+          {
+            "recipe": "state.color",
             "form": "css-transition"
           },
-          "state.morph"
+          {
+            "recipe": "state.morph",
+            "form": "one-shot"
+          },
+          {
+            "recipe": "text.change",
+            "form": "changed-runs"
+          }
         ],
         "intensity": "medium",
         "complexity": "L",
@@ -4444,30 +4466,51 @@
           "scope": "surface",
           "travel": "compact",
           "coordination": "independent",
-          "reason": "Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners."
+          "reason": "Dropdown Menu owns one anchored popup presence per open branch, its measured shell, scoped row and popup paint, indicator marks and plain row/label text while Base UI keeps placement, roving focus, typeahead and unmount."
         },
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "default",
                 "owner": "dropdown-menu",
-                "reason": "Dropdown Menu integrates popup opening at its own parts, using the reached installed executor."
+                "reason": "Each mounted popup shell, including every submenu branch, owns one opacity and anchor-side approach envelope on its own visual layer; Base UI keeps mounting, placement and focus."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "default",
                 "owner": "dropdown-menu",
-                "reason": "Dropdown Menu integrates popup closing at its own parts, using the reached installed executor."
+                "reason": "A closing branch fades on its own opacity channel without moving the anchor while Base UI retains its actual exit-completion and unmount protocol."
+              }
+            ],
+            "geometry.resize/measured": [
+              {
+                "relationship": "default",
+                "owner": "dropdown-menu",
+                "reason": "The open popup shell owns one clamped measured width and height revision over its natural menu content inside the positioned available space."
+              }
+            ],
+            "state.color/css-transition": [
+              {
+                "relationship": "default",
+                "owner": "dropdown-menu",
+                "reason": "Item rows own their merged pointer/checked/disabled/destructive surface and foreground paint, the popup shell owns its own surface, and Label, Shortcut and Separator own theirs; focus or an unprovable caller palette settles that region immediately."
               }
             ],
             "state.morph/one-shot": [
               {
                 "relationship": "default",
                 "owner": "dropdown-menu",
-                "reason": "Dropdown Menu integrates local state/glyph feedback at its own parts, using the reached installed executor."
+                "reason": "A checkbox or radio mark owns its local opacity and scale indicator revision on its own kept-mounted host, with state and focus already final."
+              }
+            ],
+            "text.change/changed-runs": [
+              {
+                "relationship": "default",
+                "owner": "dropdown-menu",
+                "reason": "A plain supplied item, group-label or shortcut string replaces only its changed graphemes; rich item and label content keeps its native identity and is composed."
               }
             ]
           }
@@ -4572,11 +4615,11 @@
         "motion": [
           {
             "recipe": "popup.anchored",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           "state.morph"
         ],
@@ -4596,14 +4639,14 @@
         "motionCoverage": {
           "schema": 1,
           "effects": {
-            "popup.anchored/css-transition": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
                 "reason": "Menubar mounts dropdown-menu for popup opening; that installed component remains the integration owner."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
@@ -5762,11 +5805,11 @@
           "state.morph",
           {
             "recipe": "popup.anchored",
-            "form": "css-transition"
+            "form": "one-shot"
           },
           {
             "recipe": "exit.fade",
-            "form": "css-transition"
+            "form": "one-shot"
           }
         ],
         "intensity": "medium",
@@ -5806,14 +5849,19 @@
                 "reason": "Data Table mounts dropdown-menu for this installed state.morph form; distinct component parts retain their own writers."
               }
             ],
-            "popup.anchored/css-transition": [
+            "popup.anchored/one-shot": [
               {
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
                 "reason": "Data Table mounts dropdown-menu for popup opening; that installed component remains the integration owner."
               }
             ],
-            "exit.fade/css-transition": [
+            "exit.fade/one-shot": [
+              {
+                "relationship": "inherited",
+                "owner": "button",
+                "reason": "Data Table mounts button for its retained exit; that installed component remains an independent integration owner."
+              },
               {
                 "relationship": "inherited",
                 "owner": "dropdown-menu",
