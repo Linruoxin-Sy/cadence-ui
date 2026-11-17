@@ -44,6 +44,7 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 - [@cadence/cadence-number](https://cadence.dev/r/cadence-number.json) — transitive registry dependency.
 - [@cadence/button](https://cadence.dev/r/button.json) — direct registry dependency.
 - [@cadence/checkbox](https://cadence.dev/r/checkbox.json) — direct registry dependency.
+- [@cadence/cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json) — transitive registry dependency.
 - [@cadence/dropdown-menu](https://cadence.dev/r/dropdown-menu.json) — direct registry dependency.
 - [@cadence/input](https://cadence.dev/r/input.json) — direct registry dependency.
 - [@cadence/table](https://cadence.dev/r/table.json) — direct registry dependency.
@@ -84,6 +85,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 | button | `@components/cadence/button/index.tsx` | [JSON files[].content](https://cadence.dev/r/button.json) |
 | checkbox | `@components/cadence/checkbox/index.tsx` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
 | checkbox | `@components/cadence/lib/inline-entrance.ts` | [JSON files[].content](https://cadence.dev/r/checkbox.json) |
+| cadence-anchored-presence | `@components/cadence/lib/anchored-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
+| cadence-anchored-presence | `@components/cadence/lib/tooltip-presence.ts` | [JSON files[].content](https://cadence.dev/r/cadence-anchored-presence.json) |
 | dropdown-menu | `@components/cadence/dropdown-menu/index.tsx` | [JSON files[].content](https://cadence.dev/r/dropdown-menu.json) |
 | input | `@components/cadence/input/index.tsx` | [JSON files[].content](https://cadence.dev/r/input.json) |
 | table | `@components/cadence/table/index.tsx` | [JSON files[].content](https://cadence.dev/r/table.json) |
@@ -106,6 +109,8 @@ npm install clsx tailwind-merge motion @base-ui/react class-variance-authority l
 [Source files: button](https://cadence.dev/r/button.json)
 
 [Source files: checkbox](https://cadence.dev/r/checkbox.json)
+
+[Source files: cadence-anchored-presence](https://cadence.dev/r/cadence-anchored-presence.json)
 
 [Source files: dropdown-menu](https://cadence.dev/r/dropdown-menu.json)
 
@@ -708,8 +713,8 @@ T2 describes the composed controls; there is no separate table animation runtime
 | --- | --- | --- | --- |
 | `feedback.press/one-shot` / Button press | token spring scale | no scale | immediate |
 | `state.morph/one-shot` / checkbox or menu check | opacity and scale | opacity only | zero duration |
-| `popup.anchored/css-transition` / Columns or Actions opens | opacity and scale | opacity only | visible on first frame |
-| `exit.fade/css-transition` / menu closes | opacity and scale exit | opacity only | immediate |
+| `popup.anchored/one-shot` / Columns or Actions opens | opacity and a short anchor-side approach | opacity only | visible on first frame |
+| `exit.fade/one-shot` / menu closes | opacity exit, no anchor movement | opacity only | immediate |
 
 Recipes and timing tokens belong to the installed controls. Dropdown Menu uses
 its local `duration.fast` clock, including timeScale and reducedDurationScale,

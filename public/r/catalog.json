@@ -349,7 +349,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/button.md",
     "item": "/r/button.json"
   },
@@ -457,7 +457,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/badge.md",
     "item": "/r/badge.json"
   },
@@ -558,7 +558,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/kbd.md",
     "item": "/r/kbd.json"
   },
@@ -640,7 +640,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/separator.md",
     "item": "/r/separator.json"
   },
@@ -737,7 +737,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/label.md",
     "item": "/r/label.json"
   },
@@ -812,7 +812,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/input.md",
     "item": "/r/input.json"
   },
@@ -886,7 +886,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/textarea.md",
     "item": "/r/textarea.json"
   },
@@ -993,7 +993,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/card.md",
     "item": "/r/card.json"
   },
@@ -1076,7 +1076,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/aspect-ratio.md",
     "item": "/r/aspect-ratio.json"
   },
@@ -1183,7 +1183,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/avatar.md",
     "item": "/r/avatar.json"
   },
@@ -1238,7 +1238,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/skeleton.md",
     "item": "/r/skeleton.json"
   },
@@ -1354,7 +1354,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/alert.md",
     "item": "/r/alert.json"
   },
@@ -1471,7 +1471,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/empty.md",
     "item": "/r/empty.json"
   },
@@ -1580,7 +1580,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/item.md",
     "item": "/r/item.json"
   },
@@ -1708,7 +1708,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/field.md",
     "item": "/r/field.json"
   },
@@ -1845,7 +1845,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/button-group.md",
     "item": "/r/button-group.json"
   },
@@ -2034,7 +2034,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/input-group.md",
     "item": "/r/input-group.json"
   },
@@ -2074,7 +2074,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/breadcrumb.md",
     "item": "/r/breadcrumb.json"
   },
@@ -2114,7 +2114,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/pagination.md",
     "item": "/r/pagination.json"
   },
@@ -2169,7 +2169,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/spinner.md",
     "item": "/r/spinner.json"
   },
@@ -2285,7 +2285,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/dialog.md",
     "item": "/r/dialog.json"
   },
@@ -2360,7 +2360,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/checkbox.md",
     "item": "/r/checkbox.json"
   },
@@ -2434,7 +2434,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/radio-group.md",
     "item": "/r/radio-group.json"
   },
@@ -2520,7 +2520,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/switch.md",
     "item": "/r/switch.json"
   },
@@ -2594,7 +2594,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/slider.md",
     "item": "/r/slider.json"
   },
@@ -2698,7 +2698,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/toggle.md",
     "item": "/r/toggle.json"
   },
@@ -2841,7 +2841,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/toggle-group.md",
     "item": "/r/toggle-group.json"
   },
@@ -2917,7 +2917,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/input-otp.md",
     "item": "/r/input-otp.json"
   },
@@ -2968,7 +2968,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/progress.md",
     "item": "/r/progress.json"
   },
@@ -3119,7 +3119,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/alert-dialog.md",
     "item": "/r/alert-dialog.json"
   },
@@ -3233,7 +3233,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/popover.md",
     "item": "/r/popover.json"
   },
@@ -3336,7 +3336,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/tooltip.md",
     "item": "/r/tooltip.json"
   },
@@ -3450,7 +3450,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/hover-card.md",
     "item": "/r/hover-card.json"
   },
@@ -3613,7 +3613,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/sheet.md",
     "item": "/r/sheet.json"
   },
@@ -3738,7 +3738,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/drawer.md",
     "item": "/r/drawer.json"
   },
@@ -3874,7 +3874,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/select.md",
     "item": "/r/select.json"
   },
@@ -3985,7 +3985,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/combobox.md",
     "item": "/r/combobox.json"
   },
@@ -4005,7 +4005,10 @@
     "registryDependencies": [
       "@cadence/cadence-motion",
       "@cadence/cadence-provider",
-      "@cadence/cadence-utils"
+      "@cadence/cadence-utils",
+      "@cadence/cadence-geometry",
+      "@cadence/cadence-text",
+      "@cadence/cadence-anchored-presence"
     ],
     "since": "0.4.0",
     "tier": "T2",
@@ -4013,13 +4016,28 @@
     "motion": [
       {
         "recipe": "popup.anchored",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       {
         "recipe": "exit.fade",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "geometry.resize",
+        "form": "measured"
+      },
+      {
+        "recipe": "state.color",
         "form": "css-transition"
       },
-      "state.morph"
+      {
+        "recipe": "state.morph",
+        "form": "one-shot"
+      },
+      {
+        "recipe": "text.change",
+        "form": "changed-runs"
+      }
     ],
     "intensity": "medium",
     "complexity": "L",
@@ -4032,35 +4050,56 @@
       "scope": "surface",
       "travel": "compact",
       "coordination": "independent",
-      "reason": "Dropdown Menu opens and closes its existing popup surface; content and native focus retain their current owners."
+      "reason": "Dropdown Menu owns one anchored popup presence per open branch, its measured shell, scoped row and popup paint, indicator marks and plain row/label text while Base UI keeps placement, roving focus, typeahead and unmount."
     },
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "popup.anchored/css-transition": [
+        "popup.anchored/one-shot": [
           {
             "relationship": "default",
             "owner": "dropdown-menu",
-            "reason": "Dropdown Menu integrates popup opening at its own parts, using the reached installed executor."
+            "reason": "Each mounted popup shell, including every submenu branch, owns one opacity and anchor-side approach envelope on its own visual layer; Base UI keeps mounting, placement and focus."
           }
         ],
-        "exit.fade/css-transition": [
+        "exit.fade/one-shot": [
           {
             "relationship": "default",
             "owner": "dropdown-menu",
-            "reason": "Dropdown Menu integrates popup closing at its own parts, using the reached installed executor."
+            "reason": "A closing branch fades on its own opacity channel without moving the anchor while Base UI retains its actual exit-completion and unmount protocol."
+          }
+        ],
+        "geometry.resize/measured": [
+          {
+            "relationship": "default",
+            "owner": "dropdown-menu",
+            "reason": "The open popup shell owns one clamped measured width and height revision over its natural menu content inside the positioned available space."
+          }
+        ],
+        "state.color/css-transition": [
+          {
+            "relationship": "default",
+            "owner": "dropdown-menu",
+            "reason": "Item rows own their merged pointer/checked/disabled/destructive surface and foreground paint, the popup shell owns its own surface, and Label, Shortcut and Separator own theirs; focus or an unprovable caller palette settles that region immediately."
           }
         ],
         "state.morph/one-shot": [
           {
             "relationship": "default",
             "owner": "dropdown-menu",
-            "reason": "Dropdown Menu integrates local state/glyph feedback at its own parts, using the reached installed executor."
+            "reason": "A checkbox or radio mark owns its local opacity and scale indicator revision on its own kept-mounted host, with state and focus already final."
+          }
+        ],
+        "text.change/changed-runs": [
+          {
+            "relationship": "default",
+            "owner": "dropdown-menu",
+            "reason": "A plain supplied item, group-label or shortcut string replaces only its changed graphemes; rich item and label content keeps its native identity and is composed."
           }
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/dropdown-menu.md",
     "item": "/r/dropdown-menu.json"
   },
@@ -4135,7 +4174,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/context-menu.md",
     "item": "/r/context-menu.json"
   },
@@ -4163,11 +4202,11 @@
     "motion": [
       {
         "recipe": "popup.anchored",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       {
         "recipe": "exit.fade",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       "state.morph"
     ],
@@ -4187,14 +4226,14 @@
     "motionCoverage": {
       "schema": 1,
       "effects": {
-        "popup.anchored/css-transition": [
+        "popup.anchored/one-shot": [
           {
             "relationship": "inherited",
             "owner": "dropdown-menu",
             "reason": "Menubar mounts dropdown-menu for popup opening; that installed component remains the integration owner."
           }
         ],
-        "exit.fade/css-transition": [
+        "exit.fade/one-shot": [
           {
             "relationship": "inherited",
             "owner": "dropdown-menu",
@@ -4210,7 +4249,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/menubar.md",
     "item": "/r/menubar.json"
   },
@@ -4295,7 +4334,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/code-block.md",
     "item": "/r/code-block.json"
   },
@@ -4382,7 +4421,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/command.md",
     "item": "/r/command.json"
   },
@@ -4448,7 +4487,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/toast.md",
     "item": "/r/toast.json"
   },
@@ -4573,7 +4612,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/accordion.md",
     "item": "/r/accordion.json"
   },
@@ -4686,7 +4725,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/collapsible.md",
     "item": "/r/collapsible.json"
   },
@@ -4813,7 +4852,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/tabs.md",
     "item": "/r/tabs.json"
   },
@@ -4850,7 +4889,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/table.md",
     "item": "/r/table.json"
   },
@@ -4908,7 +4947,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/carousel.md",
     "item": "/r/carousel.json"
   },
@@ -4947,7 +4986,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/scroll-area.md",
     "item": "/r/scroll-area.json"
   },
@@ -4999,7 +5038,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/chart.md",
     "item": "/r/chart.json"
   },
@@ -5058,7 +5097,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/calendar.md",
     "item": "/r/calendar.json"
   },
@@ -5137,7 +5176,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/navigation-menu.md",
     "item": "/r/navigation-menu.json"
   },
@@ -5177,7 +5216,7 @@
       "schema": 1,
       "effects": {}
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/resizable.md",
     "item": "/r/resizable.json"
   },
@@ -5315,7 +5354,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/sidebar.md",
     "item": "/r/sidebar.json"
   },
@@ -5347,11 +5386,11 @@
       "state.morph",
       {
         "recipe": "popup.anchored",
-        "form": "css-transition"
+        "form": "one-shot"
       },
       {
         "recipe": "exit.fade",
-        "form": "css-transition"
+        "form": "one-shot"
       }
     ],
     "intensity": "medium",
@@ -5391,14 +5430,19 @@
             "reason": "Data Table mounts dropdown-menu for this installed state.morph form; distinct component parts retain their own writers."
           }
         ],
-        "popup.anchored/css-transition": [
+        "popup.anchored/one-shot": [
           {
             "relationship": "inherited",
             "owner": "dropdown-menu",
             "reason": "Data Table mounts dropdown-menu for popup opening; that installed component remains the integration owner."
           }
         ],
-        "exit.fade/css-transition": [
+        "exit.fade/one-shot": [
+          {
+            "relationship": "inherited",
+            "owner": "button",
+            "reason": "Data Table mounts button for its retained exit; that installed component remains an independent integration owner."
+          },
           {
             "relationship": "inherited",
             "owner": "dropdown-menu",
@@ -5407,7 +5451,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/data-table.md",
     "item": "/r/data-table.json"
   },
@@ -5503,7 +5547,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/date-picker.md",
     "item": "/r/date-picker.json"
   },
@@ -5569,7 +5613,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/attachment.md",
     "item": "/r/attachment.json"
   },
@@ -5622,7 +5666,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/bubble.md",
     "item": "/r/bubble.json"
   },
@@ -5682,7 +5726,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/toc.md",
     "item": "/r/toc.json"
   },
@@ -5734,7 +5778,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/animated-text.md",
     "item": "/r/animated-text.json"
   },
@@ -5786,7 +5830,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/animated-number.md",
     "item": "/r/animated-number.json"
   },
@@ -5840,7 +5884,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/reveal.md",
     "item": "/r/reveal.json"
   },
@@ -5892,7 +5936,7 @@
         ]
       }
     },
-    "sourceSha": "2746c300",
+    "sourceSha": "c042a9e3",
     "docs": "/r/reveal-group.md",
     "item": "/r/reveal-group.json"
   }
